@@ -29,7 +29,7 @@ namespace ShaderCompiler {
 	/**************************************************************
 	 * ShaderListener
 	 **************************************************************/
-	ShaderListener::ShaderListener(Shader::StreamRequest* sh, const String& _name) : shader(sh), name(_name) {
+	ShaderListener::ShaderListener(ShaderAsset::StreamRequest* sh, const String& _name) : shader(sh), name(_name) {
 	}
 
 	void ShaderListener::EnterBlock(ScriptParser::BlockContext& ctx) {

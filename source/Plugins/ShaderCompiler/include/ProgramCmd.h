@@ -26,8 +26,8 @@ namespace ShaderCompiler {
 			public ScriptParser::StatementListener {
 		static CommandNamePair commands[];
 		static const size_t commandCount;
-		Shader::StreamRequest* shader;
-		inline ProgramListener(Shader::StreamRequest* s) : shader(s) {}
+		ShaderAsset::StreamRequest* shader;
+		inline ProgramListener(ShaderAsset::StreamRequest* s) : shader(s) {}
 		virtual void EnterBlock(ScriptParser::BlockContext& block);
 		virtual void EnterStatement(ScriptParser::StatementContext& statement);
 	};

@@ -14,17 +14,17 @@ using namespace nextar;
 namespace MeshLoader {
 
 	struct MeshLoaderIntf {
-		virtual void Load(InputSerializer&, Mesh::Loader& loader) = 0;
+		virtual void Load(InputSerializer&, MeshAsset::Loader& loader) = 0;
 	};
 
-	class MeshLoaderImpl: public Mesh::LoaderImpl, public AllocGeneral {
+	class MeshLoaderImpl: public MeshAsset::LoaderImpl, public AllocGeneral {
 		NEX_LOG_HELPER(MeshLoaderImpl);
 
 	public:
 		MeshLoaderImpl();
 		virtual ~MeshLoaderImpl();
 
-		virtual void Load(InputStreamPtr&, Mesh::Loader& loader);
+		virtual void Load(InputStreamPtr&, MeshAsset::Loader& loader);
 	};
 }
 #endif	/* MESHLOADERIMPLV1_0_H */

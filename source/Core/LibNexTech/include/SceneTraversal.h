@@ -19,7 +19,7 @@ namespace nextar {
 		virtual ~SceneTraversal();
 
 
-		Movable* currentMoveable;
+		Moveable* currentMoveable;
 
 		Camera* camera;
 		VisibilitySet* visibilitySet;

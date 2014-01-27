@@ -25,7 +25,7 @@ namespace nextar {
 		renderMeshes.clear();
 	}
 
-	void MeshNode::SetMesh(MeshPtr& _mesh) {
+	void MeshNode::SetMesh(MeshAssetPtr& _mesh) {
 		mesh = _mesh;
 
 		const PrimitiveGroupList& list = mesh->GetPrimitiveGroups();
@@ -34,11 +34,11 @@ namespace nextar {
 
 		MeshVertexData* sharedVertexData = mesh->GetSharedVertexData();
 		MeshIndexData* sharedIndexData = mesh->GetSharedIndexData();
-		Material* sharedMaterial = mesh->GetSharedMaterial().GetPtr();
+		MaterialAsset* sharedMaterial = mesh->GetSharedMaterial().GetPtr();
 		for(auto &p : list) {
 			uint32 sortKey = 0;
-			Material* material = p.defaultMaterial ? p.defaultMaterial : sharedMaterial;
-			ShaderPtr& shader = material->GetShader();
+			MaterialAsset* material = p.defaultMaterial ? p.defaultMaterial : sharedMaterial;
+			ShaderAssetPtr& shader = material->GetShader();
 			Renderable& r = (*it);
 			r.material = material;
 			r.numWorldMatrices = 1;

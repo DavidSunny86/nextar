@@ -9,10 +9,11 @@
 
 namespace nextar {
 
-	Camera::Camera(bool allocMatBuff) :
+	Camera::Camera(ComponentManager* creator, const String& name, bool allocMatBuff) :
+			Moveable(creator, name),
 			cameraMatrix(0), visibilityMask(VisibilitySet::VM_ALL) {
 		if (allocMatBuff)
-			SetCameraMatrix(NEX_NEW CameraMatrix);
+			SetCameraMatrixDataPtr(NEX_NEW CameraMatrix);
 		cullFrustum = &viewFrustum;
 	}
 
@@ -22,10 +23,11 @@ namespace nextar {
 			NEX_DELETE cameraMatrix;
 	}
 
-	void Camera::SetCameraMatrix(CameraMatrix* projectionView) {
+	void Camera::SetCameraMatrixDataPtr(CameraMatrix* projectionView) {
 		this->cameraMatrix = projectionView;
 		/* The frustum planes are allocated by cam buffer */
 		viewFrustum.SetPlanes(cameraMatrix->camPlanes, 6);
+		SetMatrixDataPtr(&cameraMatrix->matrixData);
 	}
 
 	void Camera::SetPerspective(float fov, float ratio, float znear, float zfar) {
@@ -129,5 +131,9 @@ namespace nextar {
 				cameraMatrix->projection);
 		viewFrustum.ConstructFrom(cameraMatrix->viewProjection);
 		SetFrustumOutOfDate(false);
+	}
+
+	int Camera::GetComponentType() const {
+		return TYPE;
 	}
 }

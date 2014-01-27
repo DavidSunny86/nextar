@@ -13,11 +13,11 @@
 
 namespace nextar {
 
-	class MaterialManager : public nextar::AssetManager
+	class MaterialAssetManager : public nextar::AssetManager
 	{
 	public:
-		MaterialManager(const String&);
-		virtual ~MaterialManager(void);
+		MaterialAssetManager(const String&);
+		virtual ~MaterialAssetManager(void);
 
 	protected:
 
@@ -27,7 +27,7 @@ namespace nextar {
 	/* Non automatic parameters for shaders and shader options
 	 * and the compiled shader technique reference stored here.
 	 */
-	class _NexExport Material: public nextar::Asset {
+	class _NexExport MaterialAsset: public nextar::Asset {
 	public:
 
 		enum Type {
@@ -76,14 +76,14 @@ namespace nextar {
 			void AddParameter(const String& name, ShaderVariant&& swapValue);
 
 		protected:
-			friend class Material;
+			friend class MaterialAsset;
 			ShaderParamMap params;
 		};
 
-		Material(MaterialManager* manager, const String& name);
-		virtual ~Material();
+		MaterialAsset(MaterialAssetManager* manager, const String& name);
+		virtual ~MaterialAsset();
 
-		inline const ShaderPtr& GetShader() const {
+		inline const ShaderAssetPtr& GetShader() const {
 			return shader;
 		}
 
@@ -95,7 +95,7 @@ namespace nextar {
 			return renderLayer;
 		}
 
-		static Material* Instance(AssetManager* manager, const String& name, const URL& location);
+		static MaterialAsset* Instance(AssetManager* manager, const String& name, const URL& location);
 
 		virtual int GetType() const;
 
@@ -112,7 +112,7 @@ namespace nextar {
 		virtual void DestroyStreamRequestImpl(nextar::StreamRequest*&, bool load=true);
 
 		void _PrepareParamData(const ShaderParamMap&);
-		void _PrepareMaterial(Material::StreamRequest*);
+		void _PrepareMaterial(MaterialAsset::StreamRequest*);
 		void _PreparePropertyBuffer();
 		void _RelievePropertyBuffer();
 
@@ -120,7 +120,7 @@ namespace nextar {
 		uint8 layerMask;
 		uint8 renderLayer;
 
-		ShaderPtr shader;
+		ShaderAssetPtr shader;
 		String options;
 
 		PropertyBuffer propertyBuffer;

@@ -59,8 +59,8 @@ namespace nextar {
 		/** This function might alter the actual layer indexes which are referred to
 		 * by materials. So, this should be called at the start of engine initialization and
 		 * not modified later. */
-		virtual void AddRenderLayer(const String& name, uint16 priority, uint16 flags);
-		virtual const RenderLayerList& GetRenderLayerInfo() const;
+		virtual void AddRenderQueue(const String& name, uint16 priority, uint16 flags);
+		virtual const RenderQueueDescList& GetRenderQueueInfo() const;
 
 		virtual RenderSystemList& GetRenderSystems();
 		/* Implement */
@@ -96,7 +96,7 @@ namespace nextar {
 		/* Registered render systems */
 		RenderSystemList renderSystems;
 		/* Render layers */
-		RenderLayerList renderLayers;
+		RenderQueueDescList renderQueues;
 		/* List of objects needs readying */
 		GpuObjectTraitsList objectsToReady;
 		bool usingMultiGpuSetup;

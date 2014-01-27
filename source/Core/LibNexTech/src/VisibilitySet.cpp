@@ -6,31 +6,38 @@
  */
 #include "NexHeaders.h"
 #include "VisibilitySet.h"
-#include "RadixSort.h"
+#include "RenderManager.h"
 
 namespace nextar {
 	/******************************
 	 * RenderQueue
 	 */
+	RenderQueue::RenderQueue() : descriptor(0), flags(DEFAULT_FLAGS) {
+	}
+
 	void RenderQueue::Sort() {
-		if (visibles.size() > 32)
-			RadixSort(visibles.data(), visibles.size(), 0xff000000, 24);
-		else
-			std::sort(visibles.begin(), visibles.end());
 	}
 
 	/******************************
 	 * VisibilitySet
 	 */
 	VisibilitySet::VisibilitySet() : visibleCount(0) {
+		/* Create basic queues */
+		const RenderQueueDescList& rqdl = RenderManager::Instance().GetRenderQueueInfo();
+		queues.resize(rqdl.size());
+		RenderQueueList::iterator it = queues.begin();
+		RenderQueueList::iterator end = queues.end();
+
+		RenderQueueDescList::const_iterator descIt = rqdl.begin();
+		RenderQueueDescList::const_iterator descEnd = rqdl.end();
+		for (; it != end; ++it, ++descIt) {
+			(*it).SetDesc((*descIt));
+		}
 	}
 
 	VisibilitySet::~VisibilitySet() {
 	}
 
 	void VisibilitySet::SortSet() {
-		for (auto &q : queues) {
-			q.Sort();
-		}
 	}
 } /* namespace nextar */

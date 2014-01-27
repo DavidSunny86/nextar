@@ -25,18 +25,18 @@ namespace nextar {
 
 	public:
 
-		SubMesh(const String&, Mesh* origMesh);
+		SubMesh(const String&, MeshAsset* origMesh);
 		~SubMesh();
 
 		PrimitiveType GetPrimitiveType() const {
 			return primitiveType;
 		}
 
-		inline const Material* GetMaterial() const {
+		inline const MaterialAsset* GetMaterial() const {
 			return material;
 		}
 
-		inline Material* GetMaterial() {
+		inline MaterialAsset* GetMaterial() {
 			return material;
 		}
 
@@ -76,11 +76,11 @@ namespace nextar {
 
 		BoundsInfo boundsInfo;
 		/**/
-		Mesh* mesh;
+		MeshAsset* mesh;
 		/* Type, may vary depending upon pass */
 		PrimitiveType primitiveType;
 		/* Material, may be shared */
-		Material* material;
+		MaterialAsset* material;
 		/* Vertex data, buffers may be shared */
 		MeshVertexData* vertexData;
 		/* Index data, buffers may be shared */

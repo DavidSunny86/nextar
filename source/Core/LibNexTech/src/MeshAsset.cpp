@@ -1,5 +1,6 @@
+
 #include "NexHeaders.h"
-#include "Mesh.h"
+#include "MeshAsset.h"
 
 namespace nextar {
 
@@ -17,24 +18,24 @@ namespace nextar {
 	/*********************************
 	 * Mesh
 	 *********************************/
-	Mesh::Mesh(MeshManager* man, const String& name)
+	MeshAsset::MeshAsset(MeshAssetManager* man, const String& name)
 			: Asset(man, name), vertexDeformationsEnabled(false), sharedVertexData(
 					0), sharedIndexData(0) {
 	}
 
-	Mesh::~Mesh() {
+	MeshAsset::~MeshAsset() {
 	}
 
-	int Mesh::GetType() const {
+	int MeshAsset::GetType() const {
 		return TYPE;
 	}
 
-	void Mesh::LoadImpl(nextar::StreamRequest* req, bool isAsync) {
+	void MeshAsset::LoadImpl(nextar::StreamRequest* req, bool isAsync) {
 		Loader loader(req);
 		loader.Serialize();
 	}
 
-	void Mesh::UnloadImpl(nextar::StreamRequest* req, bool isAsync) {
+	void MeshAsset::UnloadImpl(nextar::StreamRequest* req, bool isAsync) {
 		if (sharedVertexData) {
 			NEX_DELETE sharedVertexData;
 			sharedVertexData = 0;
@@ -45,7 +46,7 @@ namespace nextar {
 		}
 	}
 
-	void Mesh::_FillVertexData(MeshVertexData* data, MeshBufferData::BufferList::iterator& vertexBufferIt) {
+	void MeshAsset::_FillVertexData(MeshVertexData* data, MeshBufferData::BufferList::iterator& vertexBufferIt) {
 		/* create vertex binding */
 		data->binding = BufferManager::Instance().CreateVertexBufferBinding();
 		data->binding->SetBufferCount(data->numVertexBuffers);
@@ -65,7 +66,7 @@ namespace nextar {
 		}
 	}
 
-	void Mesh::_FillIndexData(MeshIndexData* data, MeshBufferData::BufferList::iterator& indexBufferIt) {
+	void MeshAsset::_FillIndexData(MeshIndexData* data, MeshBufferData::BufferList::iterator& indexBufferIt) {
 		ByteStream& byteData = (*indexBufferIt);
 		data->ibdata = BufferManager::Instance().CreateIndexBuffer(byteData.size(),
 				Buffer::GPU_READ, data->twoBytePerElement ?
@@ -73,8 +74,8 @@ namespace nextar {
 		indexBufferIt++;
 	}
 
-	void Mesh::NotifyAssetLoaded() {
-		Mesh::StreamRequest* request = static_cast<Mesh::StreamRequest*>(GetStreamRequest());
+	void MeshAsset::NotifyAssetLoaded() {
+		MeshAsset::StreamRequest* request = static_cast<MeshAsset::StreamRequest*>(GetStreamRequest());
 		defaultSharedMaterial = request->sharedMaterial;
 		sharedIndexData = request->sharedIndexData;
 		sharedVertexData = request->sharedVertexData;
@@ -104,17 +105,17 @@ namespace nextar {
 	/*********************************
 	 * Mesh::StreamRequest
 	 *********************************/
-	Mesh::StreamRequest::StreamRequest(Mesh* mesh) :
+	MeshAsset::StreamRequest::StreamRequest(MeshAsset* mesh) :
 			AssetStreamRequest(mesh), sharedVertexData(0),
 			sharedIndexData(0) {
 	}
 
-	ByteStream& Mesh::StreamRequest::AddIndexBuffer() {
+	ByteStream& MeshAsset::StreamRequest::AddIndexBuffer() {
 		bufferData.indexBuffers.resize(bufferData.indexBuffers.size()+1);
 		return bufferData.indexBuffers.back();
 	}
 
-	ByteStream& Mesh::StreamRequest::AddVertexBuffer() {
+	ByteStream& MeshAsset::StreamRequest::AddVertexBuffer() {
 		bufferData.vertexBuffers.resize(bufferData.vertexBuffers.size()+1);
 		return bufferData.vertexBuffers.back();
 	}
@@ -122,14 +123,14 @@ namespace nextar {
 	/*********************************
 	 * Mesh::Loader
 	 *********************************/
-	Mesh::Loader::Loader(nextar::StreamRequest* req) : meshRequest(req) {
+	MeshAsset::Loader::Loader(nextar::StreamRequest* req) : meshRequest(req) {
 	}
 
-	Mesh::Loader::~Loader() {
+	MeshAsset::Loader::~Loader() {
 	}
 
 	void
-	Mesh::Loader::EndianFlip(void* data, const VertexElement* veBegin,
+	MeshAsset::Loader::EndianFlip(void* data, const VertexElement* veBegin,
 			const VertexElement* veEnd, size_t count) {
 
 		uint16 stride = veBegin->desc.stride;
@@ -159,12 +160,12 @@ namespace nextar {
 
 	}
 
-	void Mesh::Loader::Serialize() {
-		Mesh* meshPtr = static_cast<Mesh*>(meshRequest->GetStreamedObject());
+	void MeshAsset::Loader::Serialize() {
+		MeshAsset* meshPtr = static_cast<MeshAsset*>(meshRequest->GetStreamedObject());
 		const URL& location = meshPtr->GetAssetLocator();
 		String ext = location.GetExtension();
 		StringUtils::ToUpper(ext);
-		Mesh::LoaderImpl* impl = GetImpl(ext);
+		MeshAsset::LoaderImpl* impl = GetImpl(ext);
 		if (!impl) {
 			Error("No mesh loader for type.");
 			NEX_THROW_GracefulError(EXCEPT_MISSING_PLUGIN);
@@ -185,22 +186,22 @@ namespace nextar {
 	/*********************************
 	 * MeshManager
 	 *********************************/
-	MeshManager::MeshManager(const String& name) : AssetManager(name) {
+	MeshAssetManager::MeshAssetManager(const String& name) : AssetManager(name) {
 	}
 
-	MeshManager::~MeshManager() {
+	MeshAssetManager::~MeshAssetManager() {
 	}
 
-	Component* MeshManager::AsyncCreateImpl(int type, const String& name) {
-		if (type == Mesh::TYPE) {
-			return NEX_NEW Mesh(this, name);
+	Component* MeshAssetManager::AsyncCreateImpl(int type, const String& name) {
+		if (type == MeshAsset::TYPE) {
+			return NEX_NEW MeshAsset(this, name);
 		}
 		return nullptr;
 	}
 
-	MeshPtr MeshManager::AsyncCreateInstance(const String& name, const String& group,
+	MeshAssetPtr MeshAssetManager::AsyncCreateInstance(const String& name, const String& group,
 		const URL& location) {
-		MeshPtr mesh = Bind(AsyncCreate(Mesh::TYPE, name));
+		MeshAssetPtr mesh = Bind(AsyncCreate(MeshAsset::TYPE, name));
 		if (mesh) {
 			mesh->SetAssetGroup(group);
 			mesh->SetAssetLocator(location);

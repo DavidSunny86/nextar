@@ -6,7 +6,7 @@
  */
 #include "NexHeaders.h"
 #include "Pass.h"
-#include "Shader.h"
+#include "ShaderAsset.h"
 
 namespace nextar {
 
@@ -14,25 +14,25 @@ namespace nextar {
 	/*****************************************************/
 	/* Shader											 */
 	/*****************************************************/
-	Shader::Shader(AssetManager* manager, const String& name) : Asset(manager, name),
+	ShaderAsset::ShaderAsset(AssetManager* manager, const String& name) : Asset(manager, name),
 			translucency(0), shaderParamBufferSize(0) {
 	}
 
-	Shader::~Shader() {
+	ShaderAsset::~ShaderAsset() {
 	}
 
-	Shader* Shader::Instance(AssetManager* manager, const String& name, const URL& loc) {
-		Shader* shader = static_cast<Shader*>(manager->AsyncCreate(Shader::TYPE, name));
+	ShaderAsset* ShaderAsset::Instance(AssetManager* manager, const String& name, const URL& loc) {
+		ShaderAsset* shader = static_cast<ShaderAsset*>(manager->AsyncCreate(ShaderAsset::TYPE, name));
 		if(shader)
 			shader->SetAssetLocator(loc);
 		return shader;
 	}
 
-	int Shader::GetType() const {
+	int ShaderAsset::GetType() const {
 		return TYPE;
 	}
 
-	void Shader::NotifyAssetLoaded() {
+	void ShaderAsset::NotifyAssetLoaded() {
 		StreamRequest* creationParams = static_cast<StreamRequest*>(streamRequest);
 		ContextObject::NotifyCreated();
 		/* update programs */
@@ -76,7 +76,7 @@ namespace nextar {
 		SetReady(true);
 	}
 
-	Pass* Shader::CreatePass(Shader::StreamPass& p, const String& co) {
+	Pass* ShaderAsset::CreatePass(ShaderAsset::StreamPass& p, const String& co) {
 		Pass* r = CreatePassImpl(p.name);
 		r->blendState = p.blendState;
 		r->depthStencilState = p.depthStencilState;
@@ -98,7 +98,7 @@ namespace nextar {
 		return r;
 	}
 
-	void Shader::NotifyAssetUnloaded() {
+	void ShaderAsset::NotifyAssetUnloaded() {
 		ContextObject::NotifyDestroyed();
 
 		for(auto &p : passes) {
@@ -112,32 +112,32 @@ namespace nextar {
 		Asset::NotifyAssetUnloaded();
 	}
 
-	void Shader::LoadImpl(StreamRequest* request, bool) {
+	void ShaderAsset::LoadImpl(StreamRequest* request, bool) {
 		Loader loader(request);
 		loader.Serialize();
 	}
 
-	void Shader::UnloadImpl(StreamRequest*, bool) {
+	void ShaderAsset::UnloadImpl(StreamRequest*, bool) {
 		passes.clear();
 	}
 
-	void Shader::NotifyAssetUpdated() {
+	void ShaderAsset::NotifyAssetUpdated() {
 		ContextObject::NotifyUpdated(nullptr);
 		_UpdatePasses();
 		Asset::NotifyAssetUpdated();
 	}
 
-	void Shader::_UpdatePasses() {
+	void ShaderAsset::_UpdatePasses() {
 		for(auto &p : passes) {
 			p->FinalizeUpdate();
 		}
 	}
 
-	void Shader::Create(nextar::RenderContext*) {
+	void ShaderAsset::Create(nextar::RenderContext*) {
 		// @todo
 	}
 
-	void Shader::Update(RenderContext* rc, ContextObject::UpdateParamPtr streamRequest) {
+	void ShaderAsset::Update(RenderContext* rc, ContextObject::UpdateParamPtr streamRequest) {
 		StreamRequest* creationParams = static_cast<StreamRequest*>(streamRequest);
 
 		bool useFallback = false;
@@ -151,19 +151,19 @@ namespace nextar {
 			Compile(rc);
 	}
 
-	void Shader::Destroy(nextar::RenderContext* rc) {
+	void ShaderAsset::Destroy(nextar::RenderContext* rc) {
 		Decompile(rc);
 		for(auto& p : passes) {
 			p->NotifyDestroyed(rc);
 		}
 	}
 
-	nextar::StreamRequest* Shader::CreateStreamRequestImpl(bool load) {
-		return NEX_NEW Shader::StreamRequest(this);
+	nextar::StreamRequest* ShaderAsset::CreateStreamRequestImpl(bool load) {
+		return NEX_NEW ShaderAsset::StreamRequest(this);
 	}
 
-	void Shader::DestroyStreamRequestImpl(nextar::StreamRequest*& request, bool load) {
-		Shader::StreamRequest* req = static_cast<Shader::StreamRequest*>(request);
+	void ShaderAsset::DestroyStreamRequestImpl(nextar::StreamRequest*& request, bool load) {
+		ShaderAsset::StreamRequest* req = static_cast<ShaderAsset::StreamRequest*>(request);
 		NEX_DELETE req;
 		request = nullptr;
 	}
@@ -171,22 +171,22 @@ namespace nextar {
 	/*****************************************************/
 	/* Shader::StreamRequest							 */
 	/*****************************************************/
-	Shader::StreamRequest::StreamRequest(Shader* shader) : AssetStreamRequest(shader), currentPass(-1) {
+	ShaderAsset::StreamRequest::StreamRequest(ShaderAsset* shader) : AssetStreamRequest(shader), currentPass(-1) {
 	}
 
-	Shader::StreamRequest::~StreamRequest() {
+	ShaderAsset::StreamRequest::~StreamRequest() {
 	}
 
-	void Shader::StreamRequest::SetProgramSource(GpuProgram::Type type, const String& src) {
+	void ShaderAsset::StreamRequest::SetProgramSource(GpuProgram::Type type, const String& src) {
 		passes[currentPass].programSources[type] = src;
 	}
 
-	void Shader::StreamRequest::AddParam(const String& name,
+	void ShaderAsset::StreamRequest::AddParam(const String& name,
 			const String& param, const String& description, const String& defaultValue,
 			ParamDataType type) {
 	}
 
-	void Shader::StreamRequest::AddMacro(const String& name,
+	void ShaderAsset::StreamRequest::AddMacro(const String& name,
 			const String& param, const String& description, bool defaultValue) {
 
 		if (macroTable.size() >= 255) {
@@ -196,8 +196,8 @@ namespace nextar {
 		macroTable.push_back({defaultValue, param});
 	}
 
-	void Shader::StreamRequest::BindDefaultTexture(const String& unitName, TextureBase* texture) {
-		Shader* shader = static_cast<Shader*>(streamedObject);
+	void ShaderAsset::StreamRequest::BindDefaultTexture(const String& unitName, TextureBase* texture) {
+		ShaderAsset* shader = static_cast<ShaderAsset*>(streamedObject);
 		DefaultTextureUnitMap& defaultTextureUnits = passes[currentPass].defaultTextureUnits;
 		DefaultTextureUnitMap::iterator it = defaultTextureUnits.find(unitName);
 		if (it == defaultTextureUnits.end()) {
@@ -207,27 +207,27 @@ namespace nextar {
 
 		(*it).second.defaultTexture = texture;
 		if (texture->IsTextureAsset())
-			metaInfo.AddDependency(static_cast<Texture*>(texture));
+			metaInfo.AddDependency(static_cast<TextureAsset*>(texture));
 	}
 
-	void Shader::StreamRequest::AddTextureUnit(const String& unitName, TextureUnitParams& tu) {
+	void ShaderAsset::StreamRequest::AddTextureUnit(const String& unitName, TextureUnitParams& tu) {
 		DefaultTextureUnitMap& defaultTextureUnits = passes[currentPass].defaultTextureUnits;
 		defaultTextureUnits[unitName].params = tu;
 	}
 
-	void Shader::StreamRequest::SetBlendState(BlendState& state) {
+	void ShaderAsset::StreamRequest::SetBlendState(BlendState& state) {
 		passes[currentPass].blendState = state;
 	}
 
-	void Shader::StreamRequest::SetRasterState(RasterState& state) {
+	void ShaderAsset::StreamRequest::SetRasterState(RasterState& state) {
 		passes[currentPass].rasterState = state;
 	}
 
-	void Shader::StreamRequest::SetDepthStencilState(DepthStencilState& state) {
+	void ShaderAsset::StreamRequest::SetDepthStencilState(DepthStencilState& state) {
 		passes[currentPass].depthStencilState = state;
 	}
 
-	void Shader::StreamRequest::AddPass(const String& name) {
+	void ShaderAsset::StreamRequest::AddPass(const String& name) {
 		currentPass = passes.size();
 		passes.resize(currentPass+1);
 		passes[currentPass].name = name;
@@ -235,19 +235,19 @@ namespace nextar {
 	/*****************************************************/
 	/* Shader::Loader       							 */
 	/*****************************************************/
-	NEX_IMPLEMENT_FACTORY(Shader::Loader);
-	Shader::Loader::Loader(nextar::StreamRequest* shader) : shaderRequest(shader) {
+	NEX_IMPLEMENT_FACTORY(ShaderAsset::Loader);
+	ShaderAsset::Loader::Loader(nextar::StreamRequest* shader) : shaderRequest(shader) {
 	}
 
-	Shader::Loader::~Loader() {
+	ShaderAsset::Loader::~Loader() {
 	}
 
-	void Shader::Loader::Serialize() {
-		Shader* shaderPtr = static_cast<Shader*>(shaderRequest->GetStreamedObject());
+	void ShaderAsset::Loader::Serialize() {
+		ShaderAsset* shaderPtr = static_cast<ShaderAsset*>(shaderRequest->GetStreamedObject());
 		const URL& location = shaderPtr->GetAssetLocator();
 		String ext = location.GetExtension();
 		StringUtils::ToUpper(ext);
-		Shader::LoaderImpl* impl = GetImpl(ext);
+		ShaderAsset::LoaderImpl* impl = GetImpl(ext);
 		if (!impl) {
 			Error("No shader compiler registered.");
 			NEX_THROW_GracefulError(EXCEPT_MISSING_PLUGIN);

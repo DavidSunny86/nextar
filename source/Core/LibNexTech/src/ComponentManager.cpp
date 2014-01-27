@@ -46,7 +46,7 @@ namespace nextar {
 	}
 
 	void ComponentManagerImpl::AsyncDestroy(Component* c) {
-		{
+		if (c) {
 			NEX_THREAD_LOCK_GUARD_MUTEX(containerLock);
 			ComponentMap::iterator it = componentMap.find(c->GetName());
 			if (it != componentMap.end()) {
@@ -59,22 +59,16 @@ namespace nextar {
 	Component* ComponentManagerImpl::AsyncFind(const String& name) {
 		/* No sub component by default */
 		if (name.length()) {
-			size_t pos = name.find_first_of(':');
-			const String* namePtr = &name;
-			String tmp;
-			if (pos != String::npos) {
-				tmp = name.substr(0, pos);
-				namePtr = &tmp;
-			}
+			StringPair namePair = StringUtils::Split(name);
 			{
 				NEX_THREAD_LOCK_GUARD_MUTEX(containerLock);
-				ComponentMap::iterator it = componentMap.find(*namePtr);
+				ComponentMap::iterator it = componentMap.find(
+						nameTable.AsyncStringID(namePair.first) );
 				if (it != componentMap.end()) {
-					if (pos == String::npos)
+					if (!namePair.second.length())
 						return (*it).second;
 					else
-						return (*it).second->AsyncFindChild(
-								name.substr(pos + 1));
+						return (*it).second->AsyncFindChild(namePair.second);
 				}
 			}
 		}

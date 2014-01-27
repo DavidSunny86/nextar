@@ -11,10 +11,11 @@
 #include "Asset.h"
 #include "ContextObject.h"
 #include "Image.h"
+#include "TextureBase.h"
 
 namespace nextar {
 
-	class _NexExport Texture: public nextar::Asset,
+	class _NexExport TextureAsset: public nextar::Asset,
 	public TextureBase {
 	public:
 
@@ -33,8 +34,8 @@ namespace nextar {
 		struct LodStrategy;
 
 		struct LodStrategy {
-			virtual uint32 GetNumLevelsToLoad(Texture*) = 0;
-			virtual uint32 GetNumLevelsToUnload(Texture*) = 0;
+			virtual uint32 GetNumLevelsToLoad(TextureAsset*) = 0;
+			virtual uint32 GetNumLevelsToUnload(TextureAsset*) = 0;
 		};
 
 		class TextureStreamRequest : public AllocGeneral,
@@ -52,15 +53,15 @@ namespace nextar {
 			Image image;
 			uint32 maxLodLevels;
 
-			TextureStreamRequest(Texture* texture) : AssetStreamRequest(texture), maxLodLevels(-1) {
+			TextureStreamRequest(TextureAsset* texture) : AssetStreamRequest(texture), maxLodLevels(-1) {
 			}
 		};
 
-		Texture(AssetManager*, const String&);
-		virtual ~Texture();
+		TextureAsset(AssetManager*, const String&);
+		virtual ~TextureAsset();
 
-		static Texture* Instance(AssetManager*, const String&);
-		static Texture* Instance(AssetManager*, const String&, const URL& locator);
+		static TextureAsset* Instance(AssetManager*, const String&);
+		static TextureAsset* Instance(AssetManager*, const String&, const URL& locator);
 
 		inline bool IsTextureInited() const {
 			return (flags & TEXTURE_INITED) != 0;

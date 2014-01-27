@@ -10,21 +10,19 @@
 
 #include "NexSys.h"
 #include "Component.h"
-#include "scene/RegionNode.h"
-#include "scene/MeshNode.h"
 
 namespace nextar {
 
-	class SceneManager: public nextar::ComponentManager {
+	class SceneManager: public nextar::ComponentManagerImpl {
 	public:
 		SceneManager();
 		virtual ~SceneManager();
 
-		virtual RegionNode* AddRegion(const String& name);
-		virtual MeshNode* AddMesh(const String& name, MeshPtr& mesh);
+		virtual ScenePtr AsyncCreateEmptyScene(const String& name);
 		
 	protected:
 		
+		virtual Component* AsyncCreateImpl(int type, const String& name);
 	};
 
 } /* namespace nextar */

@@ -24,14 +24,14 @@ namespace nextar {
 		Size			targetDimension;
 
 		Pass*				pass;
-		Shader*				shader;
+		ShaderAsset*				shader;
 		DebugDisplay*		debugDisplay;
 		VisibilitySet*		visibiles;
 		LightSystem*		lightSystem;
 		RenderTarget*		renderTarget;
 		Viewport* 			viewport;
 		VisiblePrimitive*	primitive;
-		Material*			material;
+		MaterialAsset*			material;
 	};
 
 } /* namespace nextar */

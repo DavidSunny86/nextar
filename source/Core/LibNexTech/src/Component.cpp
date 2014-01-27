@@ -13,9 +13,9 @@
 namespace nextar {
 		
 
-	Component::Component(ComponentManager* componentCreator, const String& compName) :
+	Component::Component(ComponentManager* componentCreator, const String& compName, Entity* entityObject) :
 		creator(componentCreator), 
-		bounds(0), flags(ENABLED) {
+		bounds(0), flags(ENABLED), entity(entityObject) {
 		SetName(compName);
 		NEX_ASSERT(creator);
 	}
@@ -30,7 +30,7 @@ namespace nextar {
 			flags &= ~ENABLED;
 	}
 
-	Component* Component::AsyncFindChild(const String& name) {
+	Component* Component::AsyncFindChild(const StringID name) {
 		return 0;
 	}
 

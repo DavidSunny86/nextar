@@ -5,6 +5,7 @@
 namespace nextar {
 	namespace StringUtils {
 		const String Null;
+		const String Default("Default");
 		const UniString UniNull;
 		const String Unknown("<?>");
 		const StringID NullID(Null);

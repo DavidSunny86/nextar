@@ -22,7 +22,7 @@ namespace nextar {
 			return &streamData;
 		}
 
-		Material* GetMaterial() {
+		MaterialAsset* GetMaterial() {
 			return material;
 		}
 
@@ -44,7 +44,7 @@ namespace nextar {
 		/* The current world matrices */
 		Matrix4x4* worldMatrices;
 		/* Material */
-		Material* material;
+		MaterialAsset* material;
 		/** stream data to render */
 		StreamData streamData;
 	};

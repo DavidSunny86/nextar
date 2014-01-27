@@ -1,10 +1,10 @@
 
 #include "NexHeaders.h"
-#include "Movable.h"
+#include "Moveable.h"
 
 namespace nextar {
 
-	Movable::Movable(ComponentManager *creator, const String& nodeName, bool allocMBuff)
+	Moveable::Moveable(ComponentManager *creator, const String& nodeName, bool allocMBuff)
 			: Component(creator, nodeName), matrixNumber(0), lastFrustumPlane(0), matrixData(0) {
 		flags = DEFAULT_FLAGS;
 		if (allocMBuff) {
@@ -14,12 +14,12 @@ namespace nextar {
 		}
 	}
 
-	Movable::~Movable() {
+	Moveable::~Moveable() {
 		if (matrixData)
 			NEX_DELETE matrixData;
 	}
 
-	void Movable::SetIdentityTransforms() {
+	void Moveable::SetIdentityTransforms() {
 		NEX_ASSERT(matrixData);
 		matrixData->ipos = matrixData->wpos = Vec3ASet(0, 0, 0);
 		matrixData->iscale = matrixData->wscale = 1.0f;
@@ -27,7 +27,7 @@ namespace nextar {
 		SetMatrixDirty(true);
 	}
 
-	void Movable::SetInitialTransforms() {
+	void Moveable::SetInitialTransforms() {
 		NEX_ASSERT(matrixData);
 		matrixData->wpos = matrixData->ipos;
 		matrixData->wscale = matrixData->iscale;
@@ -35,26 +35,26 @@ namespace nextar {
 		SetMatrixDirty(true);
 	}
 	
-	void Movable::UpdateBounds() {
+	void Moveable::UpdateBounds() {
 		matrixData->bounds.UpdateBounds(GetFullTransform());
 	}
 
-	void Movable::NotifyNodeAdded(Movable*) {
+	void Moveable::NotifyNodeAdded(Moveable*) {
 	}
 
-	void Movable::NotifyNodeRemoved(Movable*) {
+	void Moveable::NotifyNodeRemoved(Moveable*) {
 	}
 
-	void Movable::NotifyUpdated() {
+	void Moveable::NotifyUpdated() {
 		SetMatrixDirty(true);
 	}
 
 	/** @brief Get node type */
-	int Movable::GetType() const {
+	int Moveable::GetComponentType() const {
 		return TYPE;
 	}
 
-	const Matrix4x4& Movable::GetFullTransform() {
+	const Matrix4x4& Moveable::GetFullTransform() {
 		if (IsMatrixDirty()) {
 			matrixData->cached = Mat4x4FromScaleRotPos(matrixData->wscale,
 					matrixData->wrot, matrixData->wpos);

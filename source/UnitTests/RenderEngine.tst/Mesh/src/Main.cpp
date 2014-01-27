@@ -9,10 +9,18 @@ using namespace nextar;
 class UTApplicationMesh : public UTApplication {
 public:
 	virtual void _SetupScene() {
-		MeshPtr mesh = defaultMeshManager.AsyncCreateInstance("Mesh", "UTScene", URL("${EngineData}/mesh/box.mesh"));
+		MeshAssetManager* meshManager =
+				static_cast<MeshAssetManager*>(
+						ComponentManagerArchive::Instance().AsyncFindManager(MeshAsset::TYPE));
+		MeshAssetPtr mesh = meshManager->AsyncCreateInstance("Mesh", "UTScene", URL("${EngineData}/mesh/box.mesh"));
 		if (mesh) {
 			mesh->Load(false);
 		}
+		EntityManager* entityManager =
+				static_cast<EntityManager*>(
+				ComponentManagerArchive::Instance().AsyncFindManager(Entity::TYPE));
+
+		entityManager->AsyncCreateMeshEntity()
 	}
 };
 

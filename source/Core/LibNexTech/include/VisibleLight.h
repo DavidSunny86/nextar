@@ -21,7 +21,7 @@ namespace nextar {
 		VisibleLight(Type);
 		virtual ~VisibleLight();
 
-		Shader* GetShader() const {
+		ShaderAsset* GetShader() const {
 			return appliedShader;
 		}
 
@@ -153,7 +153,7 @@ namespace nextar {
 
 		Type lightType;
 		StreamData* lightVolume;
-		Shader* appliedShader;
+		ShaderAsset* appliedShader;
 	};
 
 }

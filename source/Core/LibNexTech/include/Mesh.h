@@ -12,8 +12,12 @@
 
 namespace nextar {
 
-	class RenderableMesh: public nextar::Renderable {
+	class Mesh: public nextar::Renderable {
 	public:
+
+		enum {
+			TYPE = COMPONENT_MESH,
+		};
 
 		struct Primitive {
 			uint8 layer;
@@ -22,14 +26,16 @@ namespace nextar {
 			VisiblePrimitive primitive;
 		};
 
-		RenderableMesh();
-		virtual ~RenderableMesh();
+		Mesh();
+		virtual ~Mesh();
 
 
 		/** @brief Get node type */
 		virtual int GetType() const;
 
 		virtual void RegisterVisibles(SceneTraversal& traversal);
+
+	protected:
 	};
 
 } /* namespace nextar */

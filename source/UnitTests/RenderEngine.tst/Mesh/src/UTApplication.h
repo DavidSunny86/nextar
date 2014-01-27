@@ -18,7 +18,4 @@ protected:
 	virtual void _SetupScene() {}
 	virtual void _SetupRenderDriver();
 
-
-	MeshManager defaultMeshManager;
-
 };

@@ -31,7 +31,7 @@ namespace ShaderCompiler {
 			ScriptParser::StatementContext& ctx) {
 		if (parentType == CommandDelegate::SHADER_BLOCK) {
 			BlendStateListener blend;
-			Shader::StreamRequest* shader = static_cast<Shader::StreamRequest*>(parentParam);
+			ShaderAsset::StreamRequest* shader = static_cast<ShaderAsset::StreamRequest*>(parentParam);
 			ctx.ParseBlock(&blend);
 			if (!ctx.IsErrorBitSet()) {
 				shader->SetBlendState(blend.state);

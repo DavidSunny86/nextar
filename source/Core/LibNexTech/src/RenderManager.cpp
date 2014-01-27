@@ -92,17 +92,17 @@ namespace nextar {
 		}
 	}
 
-	void RenderManager::AddRenderLayer(const String& name, uint16 priority, uint16 flags) {
-		if (renderLayers.size() >= 255) {
-			Error("Render layer index must be less than 255");
+	void RenderManager::AddRenderQueue(const String& name, uint16 priority, uint16 flags) {
+		if (renderQueues.size() >= 255) {
+			Error("Render queue index must be less than 255");
 			return;
 		}
-		renderLayers.emplace_back(flags, priority, name);
-		std::sort(renderLayers.begin(), renderLayers.end());
+		renderQueues.emplace_back(flags, priority, name);
+		std::sort(renderQueues.begin(), renderQueues.end());
 	}
 
-	const RenderLayerList& RenderManager::GetRenderLayerInfo() const {
-		return renderLayers;
+	const RenderQueueDescList& RenderManager::GetRenderQueueInfo() const {
+		return renderQueues;
 	}
 
 	void RenderManager::RenderFrame(uint32 frameNumber) {

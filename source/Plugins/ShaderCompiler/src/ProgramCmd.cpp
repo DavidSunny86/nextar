@@ -34,7 +34,7 @@ namespace ShaderCompiler {
 	void ProgramCmd::Execute(int parentType, void* parentParam,
 			ScriptParser::StatementContext& ctx) {
 		if (parentType == CommandDelegate::SHADER_BLOCK) {
-			Shader::StreamRequest* shader = static_cast<Shader::StreamRequest*>(parentParam);
+			ShaderAsset::StreamRequest* shader = static_cast<ShaderAsset::StreamRequest*>(parentParam);
 			ProgramListener programListener(shader);
 			ctx.ParseBlock(&programListener);
 		} else {
@@ -57,7 +57,7 @@ namespace ShaderCompiler {
 	void ParamCmd::Execute(int parentType, void* state,
 			ScriptParser::StatementContext& ctx) {
 		NEX_ASSERT (parentType == CommandDelegate::SHADER_BLOCK);
-		Shader::StreamRequest* shader = (static_cast<Shader::StreamRequest*>(state));
+		ShaderAsset::StreamRequest* shader = (static_cast<ShaderAsset::StreamRequest*>(state));
 		StringUtils::TokenIterator it = 0;
 		String value;
 		String name, param, defaultVal, desc;
@@ -67,7 +67,7 @@ namespace ShaderCompiler {
 		if (it != String::npos) {
 			StringUtils::StringPair p = StringUtils::Split(value);
 			if (p.second.length()) {
-				type = Shader::MapParamType(value);
+				type = ShaderAsset::MapParamType(value);
 				param = p.second;
 			} else
 				param = p.first;
@@ -101,7 +101,7 @@ namespace ShaderCompiler {
 	void ShaderCmd::Execute(int parentType, void* parentParam,
 			ScriptParser::StatementContext& statement) {
 		NEX_ASSERT (parentType == CommandDelegate::SHADER_BLOCK);
-		Shader::StreamRequest* shader = (static_cast<Shader::StreamRequest*>(parentParam));
+		ShaderAsset::StreamRequest* shader = (static_cast<ShaderAsset::StreamRequest*>(parentParam));
 		String value;
 		StringUtils::TokenIterator it = 0;
 		it = StringUtils::NextWord(statement.paramContext, value, it);

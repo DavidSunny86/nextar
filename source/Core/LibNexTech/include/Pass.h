@@ -71,7 +71,7 @@ namespace nextar {
 		virtual void NotifyDestroyed(nextar::RenderContext*);
 
 		
-		const TexturePtr& GetDefaultTexture(const String& name) const;
+		const TextureAssetPtr& GetDefaultTexture(const String& name) const;
 		const TextureUnitParams* GetTextureUnit(const String& name) const;
 
 		void FinalizeUpdate();
@@ -110,7 +110,7 @@ namespace nextar {
 		BlendState blendState;
 		DepthStencilState depthStencilState;
 
-		friend class Shader;
+		friend class ShaderAsset;
 	};
 
 } /* namespace nextar */

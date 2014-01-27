@@ -34,7 +34,7 @@ namespace ShaderCompiler {
 			ScriptParser::StatementContext& ctx) {
 		if (parentType == CommandDelegate::SHADER_BLOCK) {
 			DepthStencilStateListener depthStencil;
-			Shader::StreamRequest* shader = static_cast<Shader::StreamRequest*>(parentParam);
+			ShaderAsset::StreamRequest* shader = static_cast<ShaderAsset::StreamRequest*>(parentParam);
 			ctx.ParseBlock(&depthStencil);
 			if (!ctx.IsErrorBitSet()) {
 				shader->SetDepthStencilState(depthStencil.state);

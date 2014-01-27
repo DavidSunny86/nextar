@@ -20,7 +20,7 @@ namespace nextar {
 	typedef list<Component*>::type ComponentList;
 	typedef vector<Component*>::type ComponentArray;
 	typedef set<Component*>::type ComponentSet;
-	typedef unordered_map<String, Component*>::type ComponentMap;
+	typedef unordered_map<StringID, Component*>::type ComponentMap;
 
 	/**
 	 * @remarks Component is the base of all game components. Game components include:
@@ -28,7 +28,7 @@ namespace nextar {
 	 * Components may depend on multiple components and will issue load/save calls using
 	 * dependency order.
 	 */
-	class Component: public NamedObject, 
+	class _NexExport Component: public NamedObject,
 		public AllocComponent {
 		NEX_LOG_HELPER(Component);
 	public:
@@ -36,33 +36,30 @@ namespace nextar {
 		/* known types */
 		enum {
 			COMPONENT_UNKNOWN = -1,
-			COMPONENT_ASSET_MESH = 10010,
+			COMPONENT_ASSET_MESH = 100,
 			COMPONENT_ASSET_SHADER,
 			COMPONENT_ASSET_TEXTURE,
 			COMPONENT_ASSET_MATERIAL,
 
-			COMPONENT_RENDERABLE_MESH = 10110,
-			COMPONENT_RENDERABLE_LIGHT,
+			COMPONENT_ENTITY,
+			COMPONENT_MESH,
+			COMPONENT_LIGHT,
 			COMPONENT_MOVABLE,
+			COMPONENT_CAMERA,
 		};
 
 		enum Flags {
 			ENABLED = 1 << 0,
-			IS_NODE = 1 << 1,
 			LAST_FLAG = 1 << 2,
 		};
 
 	public:
 
-		Component(ComponentManager *creator = 0, const String & name = StringUtils::Null);
+		Component(ComponentManager *creator = nullptr, const String & name = StringUtils::Null, Entity* entity = nullptr);
 		virtual ~Component();
 
 		inline ComponentManager *GetCreator() const {
 			return creator;
-		}
-
-		inline bool IsNode() const {
-			return (flags & IS_NODE) != 0;
 		}
 
 		inline BoundingVolume *GetBounds() const {
@@ -105,16 +102,27 @@ namespace nextar {
 			return (flags & f) != 0;
 		}
 
-		virtual int GetType() const = 0;
+		inline Component* GetParent() const {
+			return parent;
+		}
+
+		virtual int GetComponentType() const = 0;
 		virtual void SetEnabled(bool enabled);
 
-		virtual Component* AsyncFindChild(const String& name);
+		inline Component* AsyncFindChild(const String& name) {
+			return AsyncFindChild(nameTable.AsyncStringID(name));
+		}
+
+		virtual Component* AsyncFindChild(const StringID name);
+
 	protected:
 
 		uint32 flags;
 
 		BoundingVolume *bounds;
 		ComponentManager *creator;
+		// parent component this component is attached to
+		Component* parent;
 	};
 
 } /* namespace nextar */

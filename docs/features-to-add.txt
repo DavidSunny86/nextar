@@ -1,2 +1,5 @@
 Text Rendering:
 http://crimild.wordpress.com/2013/09/01/improving-text-rendering-with-signed-distance-fields/
+Motion Capture data:
+http://gfx-motion-capture.blogspot.in/search?updated-max=2011-08-17T08:35:00-07:00&max-results=4
+

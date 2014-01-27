@@ -15,7 +15,7 @@
 
 namespace nextar {
 
-	class Mesh;
+	class MeshAsset;
 	class Deformer;
 
 	class _NexExport MeshNode: public Movable {
@@ -56,7 +56,7 @@ namespace nextar {
 		virtual void FindVisibles(SceneTraversal& traversal);
 
 		/** @remarks Construct the mesh renderables from a given mesh **/
-		virtual void SetMesh(MeshPtr& m);
+		virtual void SetMesh(MeshAssetPtr& m);
 		/** @remarks Deconstruct the mesh **/
 		virtual void ResetMesh();
 
@@ -68,7 +68,7 @@ namespace nextar {
 		uint32 visibilityMask;
 
 		Deformer* deformer;
-		MeshPtr mesh;
+		MeshAssetPtr mesh;
 
 		RenderMeshList renderMeshes;
 	};

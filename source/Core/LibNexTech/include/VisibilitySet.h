@@ -9,6 +9,7 @@
 #define VISIBILITYSET_H_
 
 #include "VisiblePrimitive.h"
+#include "RadixSort.h"
 
 namespace nextar {
 
@@ -129,19 +130,37 @@ namespace nextar {
 		}
 	};
 
-	class RenderQueue : public AllocScene {
-	public:
+	struct RenderQueueDesc {
 		uint16 flags;
 		uint16 priority;
 		String name;
-		VisibilityList visibles;
 
-		friend inline bool operator < (const RenderQueue& rl1, const RenderQueue& rl2) {
+		friend inline bool operator < (const RenderQueueDesc& rl1, const RenderQueueDesc& rl2) {
 			return rl1.priority < rl2.priority;
 		}
 
-		friend inline bool operator == (const RenderQueue& rl1, const RenderQueue& rl2) {
-			return rl1.priority == rl2.priority;
+		friend inline bool operator == (const RenderQueueDesc& rl1, const RenderQueueDesc& rl2) {
+			return rl1.name == rl2.name;
+		}
+	};
+
+	typedef vector<RenderQueueDesc>::type RenderQueueDescList;
+	class RenderQueue : public AllocScene {
+	public:
+		enum {
+			SORT_ENABLED = 1 << 0,
+			DEFAULT_FLAGS = SORT_ENABLED
+		};
+
+		uint16 flags;
+		const RenderQueueDesc* descriptor;
+		VisibilityList visibles;
+
+		RenderQueue();
+
+		inline void SetDesc(const RenderQueueDesc& desc) {
+			flags = desc.flags;
+			descriptor = &desc;
 		}
 
 		inline VisibilityList& GetVisibilityList() {
@@ -152,11 +171,24 @@ namespace nextar {
 			return visibles;
 		}
 
+		inline bool IsSorted() const {
+			return (flags & SORT_ENABLED) != 0;
+		}
+
 		inline void AddPrimitive(VisiblePrimitive* primitive, uint32 sortKey) {
 			visibles.push_back(KeyVisiblePrimitivePair(sortKey, primitive));
 		}
 
-		void Sort();
+		inline void Sort() {
+			if (visibles.size() > 32)
+				RadixSort(visibles.data(), visibles.size(), 0xff000000, 24);
+			else
+				std::sort(visibles.begin(), visibles.end());
+		}
+
+		inline void Prepare() {
+			visibles.clear();
+		}
 	};
 
 	typedef vector<RenderQueue>::type RenderQueueList;
@@ -178,11 +210,23 @@ namespace nextar {
 		VisibilitySet();
 		virtual ~VisibilitySet();
 
-		void Prepare();
+		inline void Prepare() {
+			for (auto &q : queues) {
+				if (q.IsSorted())
+					q.Prepare();
+			}
+		}
+
 		inline void AddVisiblePrimitve(uint16 qu, VisiblePrimitive* primitive, uint32 sortKey) {
 			queues[qu].AddPrimitive(primitive, sortKey);
 		}
-		void SortSet();
+
+		inline void SortSet() {
+			for (auto &q : queues) {
+				if (q.IsSorted())
+					q.Sort();
+			}
+		}
 
 		RenderQueueList& GetRenderQueues() {
 			return queues;

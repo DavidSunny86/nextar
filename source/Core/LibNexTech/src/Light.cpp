@@ -6,16 +6,16 @@
  */
 
 #include "NexHeaders.h"
-#include "RenderableLight.h"
+#include "Light.h"
 
 namespace nextar {
 
-	RenderableLight::RenderableLight() {
+	Light::Light() {
 		// TODO Auto-generated constructor stub
 
 	}
 
-	RenderableLight::~RenderableLight() {
+	Light::~Light() {
 		// TODO Auto-generated destructor stub
 	}
 

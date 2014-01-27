@@ -44,8 +44,8 @@ namespace nextar {
 		virtual int 	GetType() const;
 		void 			SetDirection(Vec3AF dir);
 		Vector3A		GetDerivedDirection();
-		void			SetLightMaterial(Shader* customShader);
-		MaterialPtr&	GetLightMaterial() const;
+		void			SetLightMaterial(ShaderAsset* customShader);
+		MaterialAssetPtr&	GetLightMaterial() const;
 		virtual void 	FindVisibles(SceneTraversal& trav);
 
 	private:
@@ -55,7 +55,7 @@ namespace nextar {
 		};
 
 		uint16 importance;
-		MaterialPtr lightMaterial;
+		MaterialAssetPtr lightMaterial;
 	};
 
 	typedef vector<LightNode*>::type LightList;

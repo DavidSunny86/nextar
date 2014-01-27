@@ -31,20 +31,20 @@ namespace MeshLoader {
 		MCID_END
 	};
 
-	Material* MeshLoaderImplv1_0::ReadMaterialData(Mesh::StreamRequest* mesh, InputSerializer& ser) {
+	MaterialAsset* MeshLoaderImplv1_0::ReadMaterialData(MeshAsset::StreamRequest* mesh, InputSerializer& ser) {
 		String manager, name, path;
 		ser >> manager >> name >> path;
-		Material* mtl = 0;
+		MaterialAsset* mtl = 0;
 		URL location(path);
-		AssetManager* managerPtr = ComponentManagerArchive::Instance().AsyncFindManager(Material::TYPE, manager);
+		AssetManager* managerPtr = ComponentManagerArchive::Instance().AsyncFindManager(MaterialAsset::TYPE, manager);
 		if (managerPtr) {
 			// create a new request for material load??
-			mtl = Material::Instance(managerPtr, name, location);
+			mtl = MaterialAsset::Instance(managerPtr, name, location);
 		}
 		return mtl;
 	}
 
-	void MeshLoaderImplv1_0::FindStreamVertexElements(Mesh::StreamRequest* mesh,
+	void MeshLoaderImplv1_0::FindStreamVertexElements(MeshAsset::StreamRequest* mesh,
 			const VertexElement*& start, const VertexElement*& end,
 			uint16 streamIndex, const VertexElement* elem, uint16 numVertexElements) {
 		start = 0;
@@ -72,7 +72,7 @@ namespace MeshLoader {
 		end++;
 	}
 
-	void MeshLoaderImplv1_0::ReadVertexElementData(Mesh::StreamRequest* request,
+	void MeshLoaderImplv1_0::ReadVertexElementData(MeshAsset::StreamRequest* request,
 			InputSerializer& ser, VertexElement*& vertexElements,
 			uint16& vertexElementCount) {
 
@@ -110,7 +110,7 @@ namespace MeshLoader {
 		std::sort(vertexElements, vertexElements + vertexElementCount);
 	}
 
-	void MeshLoaderImplv1_0::ReadVertexBufferData(Mesh::StreamRequest* request,
+	void MeshLoaderImplv1_0::ReadVertexBufferData(MeshAsset::StreamRequest* request,
 			InputSerializer& ser, MeshVertexData*& vertexData) {
 
 		Asset* mesh = static_cast<Asset*>(request->GetStreamedObject());
@@ -136,12 +136,12 @@ namespace MeshLoader {
 			const VertexElement* start, *end;
 			FindStreamVertexElements(request, start, end, streamIndex,
 					vertexData->vertexElements, vertexData->numVertexElements);
-			Mesh::Loader::EndianFlip(vertexBuffer, start, end, vertexCount);
+			MeshAsset::Loader::EndianFlip(vertexBuffer, start, end, vertexCount);
 		}
 	}
 
 	MeshVertexData* MeshLoaderImplv1_0::ReadVertexData(
-			Mesh::StreamRequest* request,
+			MeshAsset::StreamRequest* request,
 			InputSerializer& ser,
 			VertexElement* vertexElements, uint16 vertexElementCount) {
 
@@ -188,7 +188,7 @@ namespace MeshLoader {
 		return vertexData;
 	}
 
-	MeshIndexData* MeshLoaderImplv1_0::ReadIndexData(Mesh::StreamRequest* request, InputSerializer& ser) {
+	MeshIndexData* MeshLoaderImplv1_0::ReadIndexData(MeshAsset::StreamRequest* request, InputSerializer& ser) {
 		Asset* mesh = static_cast<Asset*>(request->GetStreamedObject());
 		MeshIndexData* indexData = NEX_NEW MeshIndexData;
 
@@ -206,7 +206,7 @@ namespace MeshLoader {
 		return indexData;
 	}
 
-	BoundsInfo MeshLoaderImplv1_0::ReadBoundsInfo(Mesh::StreamRequest* mesh, InputSerializer& ser) {
+	BoundsInfo MeshLoaderImplv1_0::ReadBoundsInfo(MeshAsset::StreamRequest* mesh, InputSerializer& ser) {
 		BoundsInfo bv;
 		float radius;
 		float extendsAndCenter[6];
@@ -218,13 +218,13 @@ namespace MeshLoader {
 		return bv;
 	}
 
-	void MeshLoaderImplv1_0::ReadSubMesh(Mesh::StreamRequest* request, InputSerializer& ser) {
+	void MeshLoaderImplv1_0::ReadSubMesh(MeshAsset::StreamRequest* request, InputSerializer& ser) {
 		Asset* mesh = static_cast<Asset*>(request->GetStreamedObject());
 		uint32 subMesh = request->AddPrimitiveGroup();
 		// right now all buffers are shared by subMesh
 		InputSerializer::Chunk chunk(MARKER_INVALID_CHUNK, 0);
 
-		MaterialPtr mtl;
+		MaterialAssetPtr mtl;
 		MeshVertexData* vertexData = 0;
 		MeshIndexData* indexData = 0;
 		VertexElement* ve = 0;
@@ -277,19 +277,19 @@ namespace MeshLoader {
 		} while (!ser.IsEndOfStream());
 	}
 
-	void MeshLoaderImplv1_0::ReadMeshHeader(Mesh::StreamRequest* mesh, InputSerializer& ser) {
+	void MeshLoaderImplv1_0::ReadMeshHeader(MeshAsset::StreamRequest* mesh, InputSerializer& ser) {
 		uint32 numSubMesh;
 		ser >> numSubMesh;
 		mesh->SetPrimitiveGroupCount(numSubMesh);
 	}
 
-	void MeshLoaderImplv1_0::ReadMeshChunk(Mesh::StreamRequest* request, InputSerializer& ser) {
+	void MeshLoaderImplv1_0::ReadMeshChunk(MeshAsset::StreamRequest* request, InputSerializer& ser) {
 		/* check if data is shared */
 		Asset* mesh = static_cast<Asset*>(request->GetStreamedObject());
 		InputSerializer::Chunk chunk;
 		bool headersRead = false;
 		bool subMeshesRead = false;
-		MaterialPtr mtl;
+		MaterialAssetPtr mtl;
 
 		do {
 			ser >> chunk;
@@ -350,8 +350,8 @@ namespace MeshLoader {
 	MeshLoaderImplv1_0::~MeshLoaderImplv1_0() {
 	}
 
-	void MeshLoaderImplv1_0::Load(InputSerializer& streamPtr, Mesh::Loader& loader) {
-		Mesh::StreamRequest* request = static_cast<Mesh::StreamRequest*>(loader.GetRequestPtr());
+	void MeshLoaderImplv1_0::Load(InputSerializer& streamPtr, MeshAsset::Loader& loader) {
+		MeshAsset::StreamRequest* request = static_cast<MeshAsset::StreamRequest*>(loader.GetRequestPtr());
 		ReadMeshChunk(request, streamPtr);
 	}
 }

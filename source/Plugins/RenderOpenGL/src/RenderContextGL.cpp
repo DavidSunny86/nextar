@@ -295,7 +295,7 @@ namespace RenderOpenGL {
 	        uform.matrixStride = matStride[i];
 	        uform.arrayStride = arrayStride[i];
 	        uform.arrayCount = uint16(arraynum[i]);
-	        Shader::ParamDef& paramDef = Shader::MapParamName(uform.name);
+	        ShaderAsset::ParamDef& paramDef = ShaderAsset::MapParamName(uform.name);
 	        uform.autoName = paramDef.autoName;
 	        if (uform.autoName == (uint16)AutoParamName::AUTO_CUSTOM)
 	        	uform.name = uniName;
@@ -360,7 +360,7 @@ namespace RenderOpenGL {
 				    Error(String("Overflowing/Unspecified texture unit index for ") + name);
 				    continue;
 				}
-                Shader::ParamDef& paramDef = Shader::MapParamName(unitName);
+                ShaderAsset::ParamDef& paramDef = ShaderAsset::MapParamName(unitName);
                 ss.location = loc;
                 /**
                  * The index of the texture unit within the shader may not be stored

@@ -8,15 +8,15 @@
 #ifndef LIGHT_H_
 #define LIGHT_H_
 
-#include <Renderable.h>
+#include "Renderable.h"
 
 namespace nextar {
 
-	class RenderableLight: public nextar::Renderable {
+	class Light: public nextar::Renderable {
 	public:
 
 		enum {
-			TYPE = COMPONENT_RENDERABLE_LIGHT
+			TYPE = COMPONENT_LIGHT
 		};
 
 		enum class Type : uint16 {
@@ -28,8 +28,8 @@ namespace nextar {
 			TYPE_COUNT,
 		};
 
-		RenderableLight();
-		virtual ~RenderableLight();
+		Light();
+		virtual ~Light();
 
 		/** @brief Get node type */
 		virtual int GetType() const;
@@ -54,7 +54,7 @@ namespace nextar {
 			float attenuation[4];
 		};
 
-		MaterialPtr lightMaterial;
+		MaterialAssetPtr lightMaterial;
 	};
 
 } /* namespace nextar */

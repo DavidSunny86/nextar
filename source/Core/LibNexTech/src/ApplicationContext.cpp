@@ -10,6 +10,7 @@
 #include "PropertyInterface.h"
 #include "ComponentManagerArchive.h"
 #include "Mesh.h"
+#include "Entity.h"
 
 namespace nextar {
 
@@ -167,12 +168,18 @@ namespace nextar {
 	void ApplicationContext::CreateComponentManagers() {
 		/*@todo Optimize by sending a list*/
 		/* default mesh manager */
-		MeshManager* mshM = NEX_NEW MeshManager("Mesh");
-		ComponentManagerArchive::Instance().AsyncAddManager(Mesh::TYPE, mshM);
+		MeshAssetManager* mshM = NEX_NEW MeshAssetManager(StringUtils::Default);
+		ComponentManagerArchive::Instance().AsyncAddManager(MeshAsset::TYPE, mshM);
 		/* default shader manager */
 		/* default material manager */
-		MaterialManager* mtlM = NEX_NEW MaterialManager("Material");
-		ComponentManagerArchive::Instance().AsyncAddManager(Material::TYPE, mtlM);
+		MaterialAssetManager* mtlM = NEX_NEW MaterialAssetManager(StringUtils::Default);
+		ComponentManagerArchive::Instance().AsyncAddManager(MaterialAsset::TYPE, mtlM);
+		/* default entity manager */
+		EntityManager* entM = NEX_NEW EntityManager(StringUtils::Default);
+		ComponentManagerArchive::Instance().AsyncAddManager(Entity::TYPE, entM);
+		ComponentManagerArchive::Instance().AsyncAddManager(Moveable::TYPE, entM);
+		ComponentManagerArchive::Instance().AsyncAddManager(Light::TYPE, entM);
+		ComponentManagerArchive::Instance().AsyncAddManager(Mesh::TYPE, entM);
 	}
 
 	void ApplicationContext::ConfigureComponentManagers() {

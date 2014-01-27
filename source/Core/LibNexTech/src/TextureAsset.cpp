@@ -5,24 +5,25 @@
  *      Author: obhi
  */
 
-#include "Texture.h"
+#include "NexHeaders.h"
+#include "TextureAsset.h"
 
 namespace nextar {
 
-	class DefaultTextureLodStrategy : public Texture::LodStrategy {
+	class DefaultTextureLodStrategy : public TextureAsset::LodStrategy {
 	public:
 		static DefaultTextureLodStrategy strategy;
 
-		virtual uint32 GetNumLevelsToLoad(Texture* texture) {
+		virtual uint32 GetNumLevelsToLoad(TextureAsset* texture) {
 			return 2;
 		}
 
-		virtual uint32 GetNumLevelsToUnload(Texture* texture) {
+		virtual uint32 GetNumLevelsToUnload(TextureAsset* texture) {
 			return 2;
 		}
 	};
 
-	Texture::Texture(AssetManager* assetManager, const String& name) :
+	TextureAsset::TextureAsset(AssetManager* assetManager, const String& name) :
 		TextureBase(TextureBase::TEXTURE_ASSET),
 		Asset(assetManager, name),
 		lodStrategy(&DefaultTextureLodStrategy::strategy) {
@@ -30,25 +31,25 @@ namespace nextar {
 		flags |= (AUTOGEN_MIP_MAPS_ENABLED|AUTOSTREAM_ENABLED);
 	}
 
-	Texture::~Texture() {
+	TextureAsset::~TextureAsset() {
 	}
 
-	int Texture::GetType() const {
-		return Texture::TYPE;
+	int TextureAsset::GetType() const {
+		return TextureAsset::TYPE;
 	}
 
-	Texture* Texture::Instance(AssetManager* am, const String& name) {
-		return am->AsyncCreate(Texture::TYPE, name);
+	TextureAsset* TextureAsset::Instance(AssetManager* am, const String& name) {
+		return am->AsyncCreate(TextureAsset::TYPE, name);
 	}
 
-	Texture* Texture::Instance(AssetManager* am, const String& name, const URL& locator) {
-		Texture* texture = Instance(am, name);
+	TextureAsset* TextureAsset::Instance(AssetManager* am, const String& name, const URL& locator) {
+		TextureAsset* texture = Instance(am, name);
 		if (texture)
 			texture->SetAssetLocator(locator);
 		return texture;
 	}
 
-	void Texture::LoadImpl(StreamRequest* request, bool isStreamed) {
+	void TextureAsset::LoadImpl(StreamRequest* request, bool isStreamed) {
 		/* load a certain mip level if streaming is on, else
 		 * load the whole texture */
 		TextureStreamRequest* textureParams = static_cast<TextureStreamRequest*>(request);
@@ -80,7 +81,7 @@ namespace nextar {
 		}
 	}
 
-	void Texture::NotifyAssetLoaded() {
+	void TextureAsset::NotifyAssetLoaded() {
 		TextureStreamRequest* textureParams = static_cast<TextureStreamRequest*>(
 				GetStreamRequest());
 
@@ -127,12 +128,12 @@ namespace nextar {
 		}
 	}
 
-	void Texture::Create(nextar::RenderContext* rc) {
+	void TextureAsset::Create(nextar::RenderContext* rc) {
 		/* unload */
 		NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
 	}
 
-	void Texture::Update(nextar::RenderContext* rc, ContextObject::UpdateParamPtr params) {
+	void TextureAsset::Update(nextar::RenderContext* rc, ContextObject::UpdateParamPtr params) {
 		TextureStreamRequest* textureParams = static_cast<TextureStreamRequest*>(params);
 		Image& img = textureParams->image;
 		uint32 numMips = img.GetNumMipMaps();
@@ -146,17 +147,17 @@ namespace nextar {
 		currentMaxMipLevel += numMips;
 	}
 
-	void Texture::Destroy(nextar::RenderContext* rc) {
+	void TextureAsset::Destroy(nextar::RenderContext* rc) {
 		/* unload */
 		NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
 	}
 
-	void Texture::NotifyAssetUnloaded() {
+	void TextureAsset::NotifyAssetUnloaded() {
 		NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
 		Asset::NotifyAssetUnloaded();
 	}
 
-	void Texture::NotifyAssetUpdated() {
+	void TextureAsset::NotifyAssetUpdated() {
 		TextureStreamRequest* textureParams = static_cast<TextureStreamRequest*>(
 						GetStreamRequest());
 		// @TODO update parameters?
@@ -164,15 +165,15 @@ namespace nextar {
 		Asset::NotifyAssetUpdated();
 	}
 
-	void Texture::UnloadImpl(StreamRequest* req, bool isStreamed) {
+	void TextureAsset::UnloadImpl(StreamRequest* req, bool isStreamed) {
 		NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
 	}
 
-	StreamRequest* Texture::CreateStreamRequestImpl(bool load) {
+	StreamRequest* TextureAsset::CreateStreamRequestImpl(bool load) {
 		return NEX_NEW TextureStreamRequest(this);
 	}
 
-	void Texture::DestroyStreamRequestImpl(StreamRequest*& request, bool load) {
+	void TextureAsset::DestroyStreamRequestImpl(StreamRequest*& request, bool load) {
 		TextureStreamRequest* req = static_cast<TextureStreamRequest*>(request);
 		NEX_DELETE req;
 		request = nullptr;

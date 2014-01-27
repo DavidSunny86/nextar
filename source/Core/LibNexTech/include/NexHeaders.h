@@ -29,6 +29,11 @@
 
 #include "Asset.h"
 #include "AssetStreamer.h"
+#include "MeshAsset.h"
+
+#include "Entity.h"
+#include "Light.h"
 #include "Mesh.h"
+#include "Moveable.h"
 
 #endif //NEXTAR_NEXBASE_STDHEADERS_H__

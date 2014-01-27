@@ -29,7 +29,7 @@ namespace ShaderCompiler {
 			ScriptParser::StatementContext& ctx) {
 		if (parentType == CommandDelegate::SHADER_BLOCK) {
 			RasterStateListener raster;
-			Shader::StreamRequest* shader = static_cast<Shader::StreamRequest*>(parentParam);
+			ShaderAsset::StreamRequest* shader = static_cast<ShaderAsset::StreamRequest*>(parentParam);
 			ctx.ParseBlock(&raster);
 			if (!ctx.IsErrorBitSet()) {
 				shader->SetRasterState(raster.state);

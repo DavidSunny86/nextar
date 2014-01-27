@@ -18,13 +18,13 @@ namespace nextar {
 
 	/**
 	 **/
-	class _NexExport Movable: public Component {
+	class _NexExport Moveable: public Component {
 	public:
 		enum {
 			TYPE = COMPONENT_MOVABLE
 		};
 
-		enum Flags {
+		enum {
 			/** true enables bound updates */
 			UPDATE_BOUNDS_ENABLED = Component::LAST_FLAG << 1,
 			/** true when matrix needs recalculation */
@@ -48,17 +48,20 @@ namespace nextar {
 			Matrix4x4 cached;
 			/* Bound information */
 			BoundingVolume bounds;
+			/* variable placement takes into account the alignment */
 			float iscale;
 			float wscale;
+			/* 4 byte padding */
+			uint32 flags;
 		};
 
-		NEX_LOG_HELPER(Movable);
+		NEX_LOG_HELPER(Moveable);
 
-		Movable(ComponentManager *creator,
+		Moveable(ComponentManager *creator,
 				const String& name = StringUtils::Null, bool allocMatrixBuff =
 						true);
 
-		virtual ~Movable();
+		virtual ~Moveable();
 
 		/** @remarks Returns the local rotation for parent */
 		inline QuatR GetRotation() const {
@@ -112,7 +115,7 @@ namespace nextar {
 			return (flags & UPDATE_BOUNDS_ENABLED) != 0;
 		}
 
-		inline void SetMatrixBuffer(MatrixBuffer* matrixData) {
+		inline void SetMatrixDataPtr(MatrixBuffer* matrixData) {
 			this->matrixData = matrixData;
 			if (matrixData) {
 				SetIdentityTransforms();
@@ -121,7 +124,7 @@ namespace nextar {
 				SetBounds(0);
 		}
 
-		inline MatrixBuffer* GetMatrixData() const {
+		inline MatrixBuffer* GetMatrixDataPtr() const {
 			return matrixData;
 		}
 
@@ -142,13 +145,13 @@ namespace nextar {
 		/** @remarks Returns the derived matrix  */
 		virtual const Matrix4x4& GetFullTransform();
 		/* child notifications, received by regions or parent regions */
-		virtual void NotifyNodeAdded(Movable*);
+		virtual void NotifyNodeAdded(Moveable*);
 		/* child notifications, received by regions or parent regions */
-		virtual void NotifyNodeRemoved(Movable*);
+		virtual void NotifyNodeRemoved(Moveable*);
 		/** @brief Specify that states were updated */
 		virtual void NotifyUpdated();
 		/** @brief Get node type */
-		virtual int GetType() const;
+		virtual int GetComponentType() const;
 
 	protected:
 		/** State number indicating the matrix change state. Every time
@@ -156,12 +159,12 @@ namespace nextar {
 		uint16 matrixNumber;
 		/* View based info, last frustum plane from the main camera
 		 * which rejected this node. 0 is the default. */
-		uint32 lastFrustumPlane;
+		uint16 lastFrustumPlane;
 		/** Matrices and bounds information */
 		MatrixBuffer* matrixData;
 	};
 
-	typedef list<Movable*>::type MovableComponentList;
+	typedef list<Moveable*>::type MoveableComponentList;
 }
 
 #endif	/* NEXTAR_NEXNODE_H */

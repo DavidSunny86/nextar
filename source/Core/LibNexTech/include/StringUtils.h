@@ -19,11 +19,13 @@
 
 namespace nextar {
 	typedef vector<String, AllocatorString>::type StringVector;
+	typedef std::pair<String, String> StringPair;
 
 	namespace StringUtils {
 // const char* operator
 //! Exported constants
 		NEX_EXTERN_SYM _NexExport const String Null;
+		NEX_EXTERN_SYM _NexExport const String Default;
 		NEX_EXTERN_SYM _NexExport const String Unknown;
 		NEX_EXTERN_SYM _NexExport const UniString UniNull;
 		NEX_EXTERN_SYM _NexExport const StringID NullID;
@@ -47,7 +49,7 @@ namespace nextar {
 		 * be initialized to 0.
 		 */
 		typedef size_t TokenIterator;
-		typedef std::pair<String, String> StringPair;
+		typedef nextar::StringPair StringPair;
 		typedef String WordList;
 
 		struct NotAsciiTest: public std::unary_function<int, bool > {
@@ -572,13 +574,13 @@ namespace nextar {
 		_NexExport String FormatName(const String& str);
 
 		/** Seperates a string pair of the format Abc:efg into 'Abc' and 'efg' */
-		_NexInline std::pair<String, String> Split(const String& name) {
-			size_t seperator = name.find_first_of(':');
+		_NexInline StringPair Split(const String& name, char by = ':') {
+			size_t seperator = name.find_first_of(by);
 			if (seperator != String::npos)
-				return std::pair<String, String>(name.substr(0, seperator),
+				return StringPair(name.substr(0, seperator),
 					name.substr(seperator + 1));
 			else
-				return std::pair<String, String>(name, Null);
+				return StringPair(name, Null);
 		}
 
 		/** @remarks Trim leading white space **/

@@ -26,11 +26,17 @@ namespace nextar {
 			AsyncRemoveManager(Component::COMPONENT_UNKNOWN, name);
 		}
 
+		inline ComponentManager* AsyncFindManager(int componentType) {
+			return AsyncFindManager(componentType, StringUtils::Default);
+		}
+
 		void Configure(const Config&);
 
 		void AsyncAddManager(int componentType, ComponentManager*);
 		void AsyncRemoveManager(int componentType, const String&, bool deleteManager = true);
 		void AsyncDeleteAll();
+
+
 		ComponentManager *AsyncFindManager(int componentType, const String& name);
 
 	protected:

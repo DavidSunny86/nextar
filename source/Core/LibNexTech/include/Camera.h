@@ -14,15 +14,22 @@
 #include "Intersect.h"
 #include "VisibilitySet.h"
 #include "SceneTraversal.h"
+#include "Moveable.h"
 
 namespace nextar {
 
 	class Camera;
 
-	class _NexExport Camera {
+	class _NexExport Camera : public Moveable {
 	public:
 
+		enum {
+			TYPE = Component::COMPONENT_CAMERA
+		};
+
 		struct CameraMatrix: public AllocMathCore {
+			MatrixBuffer matrixData;
+
 			Matrix4x4 view;
 			Matrix4x4 projection;
 			Matrix4x4 viewProjection;
@@ -36,7 +43,7 @@ namespace nextar {
 			BoundingVolume boundsInfo;
 		};
 
-		Camera(bool allocMatrixBuffer = true);
+		Camera(ComponentManager* creator, const String& name, bool allocMatrixBuffer = true);
 		virtual ~Camera();
 
 		_NexInline const Matrix4x4* GetViewMatrix() const {
@@ -55,7 +62,7 @@ namespace nextar {
 			return &cameraMatrix->boundsInfo;
 		}
 
-		void SetCameraMatrix(CameraMatrix* projectionView);
+		void SetCameraMatrixDataPtr(CameraMatrix* projectionView);
 
 		CameraMatrix* GetCameraMatrix() const {
 			return cameraMatrix;
@@ -270,6 +277,9 @@ namespace nextar {
 			MakeFrustumUptoDate();
 		}
 
+		/** @brief Get node type */
+		virtual int GetComponentType() const;
+
 	protected:
 
 		void _CalculateBoundCorners();
@@ -316,6 +326,8 @@ namespace nextar {
 		 * portal traversal.
 		 */
 		Frustum* cullFrustum;
+		/* Culling system of the area where the camera is located. */
+		CullingSystem* culler;
 		CameraMatrix* cameraMatrix;
 	};
 }

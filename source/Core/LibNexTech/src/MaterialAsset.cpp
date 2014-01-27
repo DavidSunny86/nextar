@@ -5,9 +5,9 @@
  *      Author: obhi
  */
 #include "NexHeaders.h"
-#include "Material.h"
-#include "Texture.h"
-#include "Shader.h"
+#include "MaterialAsset.h"
+#include "TextureAsset.h"
+#include "ShaderAsset.h"
 
 namespace nextar {
 
@@ -30,65 +30,65 @@ namespace nextar {
 
 		void ConstructFromType();
 		void DestructFromType();
-		void SetValue(Material*, const ShaderVariant&);
+		void SetValue(MaterialAsset*, const ShaderVariant&);
 
-		friend class Material;
+		friend class MaterialAsset;
 	};
 	
 	/****************************************
 	 * MaterialManater
 	 ****************************************/
-	MaterialManager::MaterialManager(const String& name) : AssetManager(name) {
+	MaterialAssetManager::MaterialAssetManager(const String& name) : AssetManager(name) {
 	}
 
-	MaterialManager::~MaterialManager() {
+	MaterialAssetManager::~MaterialAssetManager() {
 	}
 
-	Component* MaterialManager::AsyncCreateImpl(int type, const String& name) {
+	Component* MaterialAssetManager::AsyncCreateImpl(int type, const String& name) {
 		if (type == Asset::COMPONENT_ASSET_MATERIAL)
-			return NEX_NEW Material(this, name);
+			return NEX_NEW MaterialAsset(this, name);
 		return 0;
 	}
 
 	/****************************************
 	 * Material
 	 ****************************************/
-	Material::Material(MaterialManager* manager, const String& name) : Asset(manager, name) {
+	MaterialAsset::MaterialAsset(MaterialAssetManager* manager, const String& name) : Asset(manager, name) {
 	}
 
-	Material::~Material() {
+	MaterialAsset::~MaterialAsset() {
 		_RelievePropertyBuffer();
 	}
 
-	Material* Material::Instance(AssetManager* manager, const String& name, const URL& location) {
-		Material* material = static_cast<Material*>(manager->AsyncFindOrCreate(Material::TYPE, name));
+	MaterialAsset* MaterialAsset::Instance(AssetManager* manager, const String& name, const URL& location) {
+		MaterialAsset* material = static_cast<MaterialAsset*>(manager->AsyncFindOrCreate(MaterialAsset::TYPE, name));
 		if(material)
 			material->SetAssetLocator(location);
 		return material;
 	}
 
-	int Material::GetType() const {
+	int MaterialAsset::GetType() const {
 		return TYPE;
 	}
 
-	void Material::NotifyAssetLoaded() {
+	void MaterialAsset::NotifyAssetLoaded() {
 		/* loaded only when dependencies are resolved */
-		Material::StreamRequest* req = static_cast<Material::StreamRequest*>(GetStreamRequest());
+		MaterialAsset::StreamRequest* req = static_cast<MaterialAsset::StreamRequest*>(GetStreamRequest());
 		_PrepareMaterial(req);
 		Asset::NotifyAssetLoaded();
 	}
 
-	void Material::NotifyAssetUnloaded() {
+	void MaterialAsset::NotifyAssetUnloaded() {
 		// @todo
 		Asset::NotifyAssetUnloaded();
 	}
 
-	void Material::NotifyAssetUpdated() {
+	void MaterialAsset::NotifyAssetUpdated() {
 		// @todo
 		Asset::NotifyAssetUpdated();
 	}
 
-	void Material::_RelievePropertyBuffer() {
+	void MaterialAsset::_RelievePropertyBuffer() {
 		uint8* begin = &propertyBuffer[0];
 		uint8* end = begin + propertyBuffer.size();
 		while (begin < end) {
@@ -98,15 +98,15 @@ namespace nextar {
 		}
 	}
 
-	void Material::_PrepareMaterial(Material::StreamRequest* req) {
+	void MaterialAsset::_PrepareMaterial(MaterialAsset::StreamRequest* req) {
 		_PreparePropertyBuffer();
 		_PrepareParamData(req->params);
 	}
 
-	void Material::_PrepareParamData(const ShaderParamMap& paramMap) {
+	void MaterialAsset::_PrepareParamData(const ShaderParamMap& paramMap) {
 		uint8* buffer = &propertyBuffer[0];
 
-		const Shader::ShaderParamInfoList& l = shader->GetShaderParams();
+		const ShaderAsset::ShaderParamInfoList& l = shader->GetShaderParams();
 		for(auto p : l) {
 			Property& prop = *(reinterpret_cast<Property*>(buffer));
 			prop.ConstructFromType();
@@ -118,9 +118,9 @@ namespace nextar {
 		}
 	}
 
-	void Material::_PreparePropertyBuffer() {
+	void MaterialAsset::_PreparePropertyBuffer() {
 
-		const Shader::ShaderParamInfoList& l = shader->GetShaderParams();
+		const ShaderAsset::ShaderParamInfoList& l = shader->GetShaderParams();
 		size_t shaderParamBufferSize = shader->GetShaderParamBufferSize() + (l.size()*2*sizeof(uint16));
 		/* clear existing buffer of pointer references */
 		_RelievePropertyBuffer();
@@ -133,26 +133,26 @@ namespace nextar {
 		for(auto p : l) {
 			Property& prop = *(reinterpret_cast<Property*>(buffer));
 			prop.type = p.type;
-			prop.offset = Shader::ParamSizeFromType((ParamDataType)p.type)*p.count+2*sizeof(uint16);
+			prop.offset = ShaderAsset::ParamSizeFromType((ParamDataType)p.type)*p.count+2*sizeof(uint16);
 			buffer += prop.offset;
 		}
 	}
 
-	void Material::LoadImpl(nextar::StreamRequest* request, bool) {
+	void MaterialAsset::LoadImpl(nextar::StreamRequest* request, bool) {
 		Loader loader(request);
 		loader.Serialize();
 	}
 
-	void Material::UnloadImpl(nextar::StreamRequest* req, bool isStreamed) {
+	void MaterialAsset::UnloadImpl(nextar::StreamRequest* req, bool isStreamed) {
 		// @todo
 	}
 
-	nextar::StreamRequest* Material::CreateStreamRequestImpl(bool load) {
-		return NEX_NEW Material::StreamRequest(this);
+	nextar::StreamRequest* MaterialAsset::CreateStreamRequestImpl(bool load) {
+		return NEX_NEW MaterialAsset::StreamRequest(this);
 	}
 
-	void Material::DestroyStreamRequestImpl(nextar::StreamRequest*& request, bool load) {
-		Material::StreamRequest* req = static_cast<Material::StreamRequest*>(request);
+	void MaterialAsset::DestroyStreamRequestImpl(nextar::StreamRequest*& request, bool load) {
+		MaterialAsset::StreamRequest* req = static_cast<MaterialAsset::StreamRequest*>(request);
 		NEX_DELETE req;
 		request = nullptr;
 	}
@@ -160,13 +160,13 @@ namespace nextar {
 	/*****************************************************/
 	/* Material::StreamRequest							 */
 	/*****************************************************/
-	Material::StreamRequest::StreamRequest(Asset *asset) : AssetStreamRequest(asset) {
+	MaterialAsset::StreamRequest::StreamRequest(Asset *asset) : AssetStreamRequest(asset) {
 	}
 
-	Material::StreamRequest::~StreamRequest() {
+	MaterialAsset::StreamRequest::~StreamRequest() {
 	}
 
-	void Material::StreamRequest::SetShader(const String& name, const String& options, const URL& location) {
+	void MaterialAsset::StreamRequest::SetShader(const String& name, const String& options, const URL& location) {
 		// construct the name
 		std::pair<String, String> strPair = StringUtils::Split(name);
 		if(!strPair.second.length()) {
@@ -187,11 +187,11 @@ namespace nextar {
 		}
 
 		ComponentManager* manager =
-				ComponentManagerArchive::Instance().AsyncFindManager(Shader::TYPE, strPair.first);
+				ComponentManagerArchive::Instance().AsyncFindManager(ShaderAsset::TYPE, strPair.first);
 		if (manager) {
 			shader = Bind(manager->AsyncFind(strPair.second));
 			if (!shader) {
-				shader = Bind(Shader::Instance(
+				shader = Bind(ShaderAsset::Instance(
 						static_cast<AssetManager*>(manager), strPair.second, location));
 			}
 
@@ -205,14 +205,14 @@ namespace nextar {
 		GetMetaInfo().AddDependency(shader);
 	}
 
-	void Material::StreamRequest::AddParameter(const String& name, ShaderVariant&& swapValue) {
+	void MaterialAsset::StreamRequest::AddParameter(const String& name, ShaderVariant&& swapValue) {
 		ShaderVariant& sv = params[name];
 		sv = swapValue;
 		if (sv.type == (uint16)ParamDataType::PDT_TEXTURE) {
 			for(uint16 i = 0; i < sv.count; ++i) {
 				TextureBase* tb = sv.GetTextureUnit(i).texture;
 				if (tb && tb->IsTextureAsset()) {
-					GetMetaInfo().AddDependency(static_cast<Texture*>(tb));
+					GetMetaInfo().AddDependency(static_cast<TextureAsset*>(tb));
 				}
 			}
 		}
@@ -221,19 +221,19 @@ namespace nextar {
 	/*****************************************************/
 	/* Material::Loader       							 */
 	/*****************************************************/
-	NEX_IMPLEMENT_FACTORY(Material::Loader);
-	Material::Loader::Loader(nextar::StreamRequest* material) : requestPtr(material) {
+	NEX_IMPLEMENT_FACTORY(MaterialAsset::Loader);
+	MaterialAsset::Loader::Loader(nextar::StreamRequest* material) : requestPtr(material) {
 	}
 
-	Material::Loader::~Loader() {
+	MaterialAsset::Loader::~Loader() {
 	}
 
-	void Material::Loader::Serialize() {
-		Material* materialPtr = static_cast<Material*>(requestPtr->GetStreamedObject());
+	void MaterialAsset::Loader::Serialize() {
+		MaterialAsset* materialPtr = static_cast<MaterialAsset*>(requestPtr->GetStreamedObject());
 		const URL& location = materialPtr->GetAssetLocator();
 		String ext = location.GetExtension();
 		StringUtils::ToUpper(ext);
-		Material::LoaderImpl* impl = GetImpl(ext);
+		MaterialAsset::LoaderImpl* impl = GetImpl(ext);
 		if (!impl) {
 			Error("No material compiler registered.");
 			NEX_THROW_GracefulError(EXCEPT_MISSING_PLUGIN);

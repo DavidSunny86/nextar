@@ -23,10 +23,10 @@ namespace ShaderCompiler {
 	ShaderLoaderImplv1_0::~ShaderLoaderImplv1_0() {
 	}
 
-	void ShaderLoaderImplv1_0::Load(InputStreamPtr& input, Shader::Loader& shader) {
+	void ShaderLoaderImplv1_0::Load(InputStreamPtr& input, ShaderAsset::Loader& shader) {
 		ScriptParser scriptParser;
 		ShaderLoaderImplv1_0::Script s(shader.GetRequestPtr());
-		Shader* shaderPtr = static_cast<Shader*>(shader.GetRequestPtr()->streamedObject);
+		ShaderAsset* shaderPtr = static_cast<ShaderAsset*>(shader.GetRequestPtr()->streamedObject);
 		scriptParser.ParseScript(&s, shaderPtr->GetName(), input);
 	}
 

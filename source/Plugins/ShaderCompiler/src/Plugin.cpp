@@ -30,11 +30,11 @@ namespace ShaderCompiler {
 	}
 
 	void Plugin::LicenseRenewed() {
-		Shader::Loader::RegisterFactory("NFX", &shaderLoaderImpl);
+		ShaderAsset::Loader::RegisterFactory("NFX", &shaderLoaderImpl);
 	}
 
 	bool Plugin::LicenseExpired() {
-		Shader::Loader::UnregisterFactory("NFX");
+		ShaderAsset::Loader::UnregisterFactory("NFX");
 		return true;
 	}
 

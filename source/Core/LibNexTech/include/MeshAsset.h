@@ -71,7 +71,7 @@ namespace nextar {
 		/* Index data, buffers may be shared */
 		MeshIndexData* indexData;
 		/* Material data */
-		MaterialPtr defaultMaterial;
+		MaterialAssetPtr defaultMaterial;
 		/* start vertex */
 		uint32 startVertex;
 		/* vertex count */
@@ -84,14 +84,14 @@ namespace nextar {
 	typedef vector<PrimitiveGroup>::type PrimitiveGroupList;
 
 
-	class _NexExport MeshManager: public AssetManager {
+	class _NexExport MeshAssetManager: public AssetManager {
 	protected:
 
 	public:
-		MeshManager(const String& name);
-		~MeshManager();
+		MeshAssetManager(const String& name);
+		~MeshAssetManager();
 
-		virtual MeshPtr AsyncCreateInstance(const String& name, 
+		virtual MeshAssetPtr AsyncCreateInstance(const String& name, 
 			const String& assetGroup, const URL& location);
 
 		/* Implementation */
@@ -105,8 +105,8 @@ namespace nextar {
 	 * @remarks  Base mesh class for all types of meshes
 	 *
 	 **/
-	class _NexExport Mesh: public nextar::Asset {
-		NEX_LOG_HELPER(Mesh);
+	class _NexExport MeshAsset: public nextar::Asset {
+		NEX_LOG_HELPER(MeshAsset);
 
 	public:
 		enum Type {
@@ -118,7 +118,7 @@ namespace nextar {
 
 		class LoaderImpl {
 		public:
-			virtual void Load(InputStreamPtr&, Mesh::Loader&) = 0;
+			virtual void Load(InputStreamPtr&, MeshAsset::Loader&) = 0;
 		};
 
 		class Loader : public AllocGeneral {
@@ -145,7 +145,7 @@ namespace nextar {
 		class StreamRequest : public AllocGeneral,
 		public AssetStreamRequest {
 		public:
-			StreamRequest(Mesh* a);
+			StreamRequest(MeshAsset* a);
 
 			inline uint32 AddPrimitiveGroup() {
 				uint32 size = (uint32)primitives.size();
@@ -173,7 +173,7 @@ namespace nextar {
 				sharedIndexData = id;
 			}
 
-			inline void SetSharedMaterial(MaterialPtr& m) {
+			inline void SetSharedMaterial(MaterialAssetPtr& m) {
 				sharedMaterial = m;
 				if(sharedMaterial)
 					metaInfo.AddDependency(sharedMaterial.GetPtr());
@@ -195,7 +195,7 @@ namespace nextar {
 				pg.indexCount = indexCount;
 			}
 
-			inline void SetPrimitiveMaterial(uint32 i, MaterialPtr& m) {
+			inline void SetPrimitiveMaterial(uint32 i, MaterialAssetPtr& m) {
 				PrimitiveGroup& pg = primitives[i];
 				pg.defaultMaterial = m;
 				if(pg.defaultMaterial)
@@ -213,11 +213,11 @@ namespace nextar {
 
 		protected:
 
-			friend class Mesh;
+			friend class MeshAsset;
 
 			MeshVertexData* sharedVertexData;
 			MeshIndexData* sharedIndexData;
-			MaterialPtr sharedMaterial;
+			MaterialAssetPtr sharedMaterial;
 
 			BoundsInfo boundsInfo;
 			PrimitiveGroupList primitives;
@@ -225,8 +225,8 @@ namespace nextar {
 		};
 
 
-		Mesh(MeshManager*, const String&);
-		~Mesh();
+		MeshAsset(MeshAssetManager*, const String&);
+		~MeshAsset();
 		
 		const BoundsInfo& GetBoundsInfo() const {
 			return boundsInfo;
@@ -248,7 +248,7 @@ namespace nextar {
 			return sharedVertexData;
 		}
 
-		MaterialPtr& GetSharedMaterial() {
+		MaterialAssetPtr& GetSharedMaterial() {
 			return defaultSharedMaterial;
 		}
 
@@ -287,7 +287,7 @@ namespace nextar {
 		bool vertexDeformationsEnabled;
 		PrimitiveGroupList primitives;
 		/* Default material shared by submeshes or NULL */
-		MaterialPtr defaultSharedMaterial;
+		MaterialAssetPtr defaultSharedMaterial;
 		/* Shared vertex data, may be NULL */
 		MeshVertexData* sharedVertexData;
 		/* Shared index data, may be NULL */

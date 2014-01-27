@@ -99,14 +99,14 @@ namespace nextar {
 				: bindPoint(_bindPoint), texture(_texture), uvTile(tile), uvOffset(
 						offset) {
 			if (texture && texture->IsTextureAsset())
-				static_cast<Texture*>(texture)->AddRef();
+				static_cast<TextureAsset*>(texture)->AddRef();
 		}
 
 		inline TextureUnit(int16 _bindPoint, TextureBase* _texture)
 				: bindPoint(_bindPoint), texture(_texture), uvTile(1, 1), uvOffset(
 						0, 0) {
 			if (texture && texture->IsTextureAsset())
-				static_cast<Texture*>(texture)->AddRef();
+				static_cast<TextureAsset*>(texture)->AddRef();
 		}
 
 		inline TextureUnit(const TextureUnit& tu) : bindPoint(tu.bindPoint), texture(tu.texture), 
@@ -115,15 +115,15 @@ namespace nextar {
 
 		inline ~TextureUnit() {
 			if (texture && texture->IsTextureAsset())
-				static_cast<Texture*>(texture)->Release();
+				static_cast<TextureAsset*>(texture)->Release();
 		}
 
 		inline void SetTexture(TextureBase* _texture) {
 			if (texture && texture->IsTextureAsset())
-				static_cast<Texture*>(texture)->Release();
+				static_cast<TextureAsset*>(texture)->Release();
 			texture = _texture;
 			if (texture && texture->IsTextureAsset())
-				static_cast<Texture*>(texture)->AddRef();
+				static_cast<TextureAsset*>(texture)->AddRef();
 		}
 
 		inline TextureUnit& operator = (TextureBase* _texture) {

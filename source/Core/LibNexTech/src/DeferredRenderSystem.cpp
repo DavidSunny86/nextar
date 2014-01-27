@@ -37,13 +37,13 @@ namespace nextar {
 		renderCtx->BeginRender(&gbufferRI);
 		VisibilityLayerList& layerList = visibles.GetLayerList();
 
-		Material* currentMtl = nullptr;
-		Shader* currentShader = nullptr;
+		MaterialAsset* currentMtl = nullptr;
+		ShaderAsset* currentShader = nullptr;
 		for(auto &layer : layerList) {
 			if (layer.flags & LayerFlags::DEFERRED) {
 				for(auto &prim : layer.visibles) {
-					Material* material = prim.second->GetMaterial();
-					Shader* shader = material->GetShader();
+					MaterialAsset* material = prim.second->GetMaterial();
+					ShaderAsset* shader = material->GetShader();
 					uint16 updateParamFlag = UpdateFrequency::PER_OBJECT_INSTANCE;
 					context.primitive = &prim;
 					if (currentMtl != material) {

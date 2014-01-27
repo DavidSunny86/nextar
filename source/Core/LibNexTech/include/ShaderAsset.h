@@ -23,9 +23,9 @@ namespace nextar {
 	 * 	ShaderPtr compiledShader;
 	 * }
 	 */
-	class _NexExport Shader: public nextar::Asset,
+	class _NexExport ShaderAsset: public nextar::Asset,
 	public ContextObject {
-		NEX_LOG_HELPER(Shader);
+		NEX_LOG_HELPER(ShaderAsset);
 	public:
 
 		enum Type {
@@ -61,11 +61,11 @@ namespace nextar {
 		struct LoaderImpl;
 
 		struct LoaderImpl {
-			virtual void Load(InputStreamPtr& input, Shader::Loader& shader) = 0;
+			virtual void Load(InputStreamPtr& input, ShaderAsset::Loader& shader) = 0;
 		};
 
 		class Loader {
-			NEX_LOG_HELPER(Shader::Loader);
+			NEX_LOG_HELPER(ShaderAsset::Loader);
 			NEX_DECLARE_FACTORY(LoaderImpl);
 
 		public:
@@ -95,9 +95,9 @@ namespace nextar {
 
 		class StreamRequest : public AllocGeneral,
 			public AssetStreamRequest {
-			NEX_LOG_HELPER(Shader::StreamRequest);
+			NEX_LOG_HELPER(ShaderAsset::StreamRequest);
 		public:
-			StreamRequest(Shader*);
+			StreamRequest(ShaderAsset*);
 			~StreamRequest();
 
 			/* all parameters which are not auto type will have update frequency of material, which means they will
@@ -119,7 +119,7 @@ namespace nextar {
 
 		protected:
 
-			friend class Shader;
+			friend class ShaderAsset;
 			uint32 currentPass;
 			StreamPassList passes;
 
@@ -127,10 +127,10 @@ namespace nextar {
 			String shaderOptionSuffix;
 		};
 
-		Shader(AssetManager*, const String&);
-		virtual ~Shader();
+		ShaderAsset(AssetManager*, const String&);
+		virtual ~ShaderAsset();
 
-		static Shader* Instance(AssetManager* manager, const String& name, const URL& location);
+		static ShaderAsset* Instance(AssetManager* manager, const String& name, const URL& location);
 				
 		inline uint16 GetTranslucency() const {
 			return translucency;

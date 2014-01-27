@@ -37,7 +37,7 @@ namespace nextar {
 	class Viewport;
 	class BufferManager;
 	class GpuProgram;
-	class Shader;
+	class ShaderAsset;
 	class TextureBase;
 	class RenderTarget;
 	class RenderTexture;
@@ -54,19 +54,19 @@ namespace nextar {
 	class VisibilitySet;
 	class VisiblePrimitive;
 
+	class Entity;
+	class Light;
+	class Renderable;
+	class Moveable;
 	class Camera;
 
-	class Node;
-	class ContainerNode;
-	class MeshNode;
-	class LightNode;
-	class RegionNode;
+	class Scene;
 
 	class Asset;
-	class Texture;
-	class Shader;
-	class Material;
-	class Mesh;
+	class TextureAsset;
+	class ShaderAsset;
+	class MaterialAsset;
+	class MeshAsset;
 
 	class AssetStreamRequest;
 	class AssetCallback;
@@ -87,10 +87,13 @@ namespace nextar {
 	typedef RefPtr<MultiRenderTarget> MultiRenderTargetPtr;
 
 	typedef RefPtr<Asset> AssetPtr;
-	typedef RefPtr<Texture> TexturePtr;
-	typedef RefPtr<Shader> ShaderPtr;
-	typedef RefPtr<Material> MaterialPtr;
-	typedef RefPtr<Mesh> MeshPtr;
+	typedef RefPtr<TextureAsset> TextureAssetPtr;
+	typedef RefPtr<ShaderAsset> ShaderAssetPtr;
+	typedef RefPtr<MaterialAsset> MaterialAssetPtr;
+	typedef RefPtr<MeshAsset> MeshAssetPtr;
+
+	typedef RefPtr<Entity> EntityPtr;
+	typedef RefPtr<Scene> ScenePtr;
 }
 
 #endif //NEXTAR_NEXSYS_H__

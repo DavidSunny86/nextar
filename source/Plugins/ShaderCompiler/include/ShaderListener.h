@@ -21,8 +21,8 @@ namespace ShaderCompiler {
 		static const size_t commandCount;
 
 		String name;
-		Shader::StreamRequest* shader;
-		ShaderListener(Shader::StreamRequest*, const String& name);
+		ShaderAsset::StreamRequest* shader;
+		ShaderListener(ShaderAsset::StreamRequest*, const String& name);
 
 		virtual void EnterBlock(ScriptParser::BlockContext& block);
 		virtual void EnterStatement(ScriptParser::StatementContext& statement);

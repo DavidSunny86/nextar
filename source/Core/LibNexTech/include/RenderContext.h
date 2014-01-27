@@ -45,7 +45,7 @@ namespace nextar {
 		virtual void BeginRender(const RenderInfo*) = 0;
 		virtual void EndRender() = 0;
 
-		virtual void SwitchShader(uint16 pass, Shader*) = 0;
+		virtual void SwitchShader(uint16 pass, ShaderAsset*) = 0;
 		virtual void Draw(StreamData*) = 0;
 
 		virtual void RegisterObject(ContextObject*) = 0;

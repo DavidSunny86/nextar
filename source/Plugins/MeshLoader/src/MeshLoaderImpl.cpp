@@ -25,11 +25,11 @@ namespace MeshLoader {
 	MeshLoaderImpl::~MeshLoaderImpl() {
 	}
 
-	void MeshLoaderImpl::Load(InputStreamPtr& input, Mesh::Loader& loader) {
+	void MeshLoaderImpl::Load(InputStreamPtr& input, MeshAsset::Loader& loader) {
 
 		static MeshLoaderImplv1_0 loaderImplv1_0;
 		StreamRequest* request = loader.GetRequestPtr();
-		Mesh* mesh = static_cast<StreamRequest*>(request->GetStreamedObject());
+		MeshAsset* mesh = static_cast<StreamRequest*>(request->GetStreamedObject());
 
 		if (input) {
 

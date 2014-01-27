@@ -4,18 +4,15 @@
  *  Created on: 25-Jan-2014
  *      Author: obhi
  */
-
-#include "RenderableMesh.h"
+#include "NexHeaders.h"
+#include "Mesh.h"
 
 namespace nextar {
 
-	RenderableMesh::RenderableMesh() {
-		// TODO Auto-generated constructor stub
-
+	Mesh::Mesh() {
 	}
 
-	RenderableMesh::~RenderableMesh() {
-		// TODO Auto-generated destructor stub
+	Mesh::~Mesh() {
 	}
 
 } /* namespace nextar */

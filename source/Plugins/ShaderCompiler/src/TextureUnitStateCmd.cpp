@@ -21,7 +21,7 @@ namespace ShaderCompiler {
 	void TextureUnitStateCmd::Execute(int parentType, void* parentParam,
 			ScriptParser::StatementContext& ctx) {
 		if (parentType == CommandDelegate::SHADER_BLOCK) {
-			Shader::StreamRequest* shader = static_cast<Shader::StreamRequest*>(parentParam);
+			ShaderAsset::StreamRequest* shader = static_cast<ShaderAsset::StreamRequest*>(parentParam);
 			TextureUnitStateListener textureUnitState(shader);
 			ctx.ParseBlock(&textureUnitState);
 		} else {
@@ -45,7 +45,7 @@ namespace ShaderCompiler {
 			ScriptParser::StatementContext& ctx) {
 		NEX_ASSERT (parentType == CommandDelegate::DEPTH_STENCIL_BLOCK);
 		TextureUnitParams texUnitParams;
-		Shader::StreamRequest* shader = (static_cast<Shader::StreamRequest*>(state));
+		ShaderAsset::StreamRequest* shader = (static_cast<ShaderAsset::StreamRequest*>(state));
 		StringUtils::TokenIterator it = 0;
 		String value;
 		String name;
