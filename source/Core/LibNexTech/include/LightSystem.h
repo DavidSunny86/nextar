@@ -1,0 +1,55 @@
+/*
+ * LightSystem.h
+ *
+ *  Created on: 25-Nov-2013
+ *      Author: obhi
+ */
+
+#ifndef LIGHTSYSTEM_H_
+#define LIGHTSYSTEM_H_
+
+#include "NexSys.h"
+#include "VisiblePrimitive.h"
+#include "VisibleLight.h"
+#include "RenderConstants.h"
+
+namespace nextar {
+
+	typedef std::pair<uint32, VisibleLight*> KeyVisibleLightPair;
+	typedef vector<KeyVisibleLightPair>::type LightList;
+	typedef vector< std::reference_wrapper< const KeyVisibleLightPair > >::type SortedLightList;
+	
+	/*
+	class LightKeyHelper {
+	public:
+		inline friend bool operator < (const KeyVisibleLightPair& kvp1, const KeyVisibleLightPair& kvp2) {
+			return kvp1.first < kvp2.first;
+		}
+	};*/
+	/**
+	 * @remarks Scene traversal will involve lights being pushed into
+	 * light system, which will later be used by the render system to
+	 * determine scene lighting for the current frame.
+	 */
+	class LightSystem : public Referenced<LightSystem, AllocScene> {
+	public:
+		enum {
+			/* The first 255 sorted lights are taken into account for forward lights */
+			FORWARD_MAX_LIGHT_COUNT = RenderConstants::FORWARD_MAX_LIGHT_COUNT,
+			FORWARD_MAX_LIGHT_PER_PRIMITIVE = RenderConstants::FORWARD_MAX_LIGHT_PER_PRIMITIVE,
+		};
+
+		typedef array<uint8, FORWARD_MAX_LIGHT_PER_PRIMITIVE>::type LightSet;
+
+		LightSystem();
+		virtual ~LightSystem();
+
+		virtual void Prepare() = 0;
+		virtual void PushLight(uint32 sortKey, VisibleLight*) = 0;
+		virtual void Sort() = 0;
+		virtual void NearbyLights(LightSet& ls, BoundingVolume*) = 0;
+		virtual LightList& GetLights() = 0;
+	};
+
+} /* namespace nextar */
+#endif /* LIGHTSYSTEM_H_ */

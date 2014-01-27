@@ -1,0 +1,37 @@
+@effect 
+
+shader Deferred {
+	
+	flags Deferred;
+
+	pass GBuffer {
+		
+		depth_stencil_state {
+			depth_state true true lessEq;
+			stencil_test false;
+		}
+		
+		blend_state {
+			blend false;
+		}
+		
+		raster_state {
+			raster solid back true;
+			scissor false;
+			anti_aliasing false false;
+		}
+		
+		program {
+		
+			vertex_program VSGBuffer;
+			fragment_program PSGBuffer;
+		}
+	}
+	
+}
+
+
+@VSGbuffer
+
+
+@PSGbuffer

@@ -1,0 +1,79 @@
+@effect
+// DeferredLocalLights.nfx
+
+// Created on: 21-Nov-2013
+//     Author: obhi
+
+shader DeferredLocalLights {
+	
+	flags Deferred;
+
+	program {
+		vertex_program VSOmni
+		pixel_program PSOmni
+	}
+
+}
+
+@VSOmni:GLSL
+#version 330
+in vec4 vertPos;
+in vec4 vertNorm;
+
+uniform transform_block {
+	mat4 mvpMatrix;
+	mat4 mvMatrix;
+	mat3 normalMatrix;
+};
+
+uniform omni_light {
+	vec3 lightPosition;
+};
+
+smooth out vec3 varyingLightDir;
+smooth out vec3 varyingNormal;
+
+void main(void)
+{
+	varyingNormal = normalMatrix * vertNorm;
+	// Get vertex position in eye coordinates
+	vec4 vPosition = mvMatrix * vertPos;
+		
+	// Get vector to light source
+	varyingLightDir = normalize(lightPosition - vPosition.xyz);
+	
+	// Don’t forget to transform the geometry!
+	gl_Position = mvpMatrix * vertPos;
+}
+
+@PSOmni:GLSL
+
+#version 330
+out vec4 vFragColor;
+
+uniform vec4 ambientColor;
+uniform vec4 diffuseColor;
+uniform vec4 specularColor;
+
+in vec3 varyingLightDir;
+in vec3 varyingNormal;
+
+void main(void)
+{
+	// Dot product gives us diffuse intensity
+	float diff = max(0.0, dot(normalize(vVaryingNormal),
+	normalize(vVaryingLightDir)));
+	// Multiply intensity by diffuse color, force alpha to 1.0
+	vFragColor = diff * diffuseColor;
+	// Add in ambient light
+	vFragColor += ambientColor;
+	// Specular Light
+	vec3 vReflection = normalize(reflect(-normalize(vVaryingLightDir),
+	normalize(vVaryingNormal)));
+	float spec = max(0.0, dot(normalize(vVaryingNormal), vReflection));
+	// If the diffuse light is zero, don’t even bother with the pow function
+	if(diff != 0) {
+	float fSpec = pow(spec, 128.0);
+	vFragColor.rgb += vec3(fSpec, fSpec, fSpec);
+}
+

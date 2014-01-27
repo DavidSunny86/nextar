@@ -1,0 +1,14 @@
+shader Deferred {
+	
+	flags Deferred;
+
+	pass GBuffer {
+		
+		program {
+			vertex_program ${Data}/shaders/Deferred.vert;
+			fragment_program ${Data}/shaders/Deferred.frag;
+		}
+	}
+
+}
+

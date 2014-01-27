@@ -1,0 +1,2 @@
+Text Rendering:
+http://crimild.wordpress.com/2013/09/01/improving-text-rendering-with-signed-distance-fields/
