@@ -156,4 +156,8 @@ namespace nextar {
 			a->Load(false);
 		}
 	}
-}
+
+	int Asset::GetComponentCatagory() const {
+		return CATAGORY;
+	}
+ }

@@ -5,10 +5,12 @@
  *      Author: obhi
  */
 
+#include "NexHeaders.h"
 #include "Entity.h"
 #include "Mesh.h"
 #include "Light.h"
 #include "Moveable.h"
+#include "Camera.h"
 
 namespace nextar {
 
@@ -17,6 +19,13 @@ namespace nextar {
 	 *************************************/
 	EntityManager::EntityManager(const String& name) :
 			ComponentManagerImpl(name) {
+	}
+
+	EntityPtr EntityManager::AsyncCreateCameraEntity(const String& name) {
+		EntityPtr ent = Assign(AsyncCreate(Entity::TYPE, name));
+		Camera* camera = static_cast<Camera*>(AsyncCreate(Camera::TYPE, name));
+		ent->AttachComponent(camera);
+		return ent;
 	}
 
 	Component* EntityManager::AsyncCreateImpl(int type, const String& name) {
@@ -54,20 +63,82 @@ namespace nextar {
 	}
 
 	void Entity::FindVisibles(SceneTraversal& traversal) {
-		Moveable* lastMoveable = traversal.currentMoveable;
+		Moveable* lastMoveable = traversal.moveable;
 
 		if (moveable)
-			traversal.currentMoveable = moveable;
+			traversal.moveable = moveable;
 		if (renderable)
 			renderable->RegisterVisibles(traversal);
 		if (light)
 			light->RegisterVisibles(traversal);
 
-		traversal.currentMoveable = lastMoveable;
+		traversal.moveable = lastMoveable;
 	}
 
-	int Entity::GetType() const {
+	void Entity::AttachComponent(Component* comp) {
+		switch(comp->GetComponentCatagory()) {
+		case Entity::CATAGORY:
+			Error("Sub-entities not supported yet!");
+		case Light::CATAGORY:
+			light = static_cast<Light*>(comp);
+			break;
+		case Renderable::CATAGORY:
+			renderable = static_cast<Renderable*>(comp);
+			if (moveable)
+				renderable->NotifyMoveable(moveable);
+			break;
+		case Camera::CATAGORY:
+			SetFlag(IS_CAMERA);
+			/* no break */
+		case Moveable::CATAGORY:
+			moveable = static_cast<Moveable*>(comp);
+			if (renderable)
+				renderable->NotifyMoveable(moveable);
+			break;
+		}
+		comp->SetParent(this);
+		/* @todo Fire event */
+	}
+
+	void Entity::DetachComponent(int type) {
+		switch(type) {
+		case Entity::CATAGORY:
+			Error("Sub-entities not supported yet!");
+		case Light::CATAGORY:
+			if (light) {
+				moveable->SetParent(nullptr);
+				NEX_DELETE light;
+			}
+			light = nullptr;
+			break;
+		case Mesh::CATAGORY:
+			if (renderable) {
+				moveable->SetParent(nullptr);
+				NEX_DELETE renderable;
+			}
+			renderable = nullptr;
+			break;
+		case Camera::CATAGORY:
+			UnsetFlag(IS_CAMERA);
+			/* no break */
+		case Moveable::CATAGORY:
+			if (moveable) {
+				moveable->SetParent(nullptr);
+				NEX_DELETE moveable;
+				if (renderable)
+					renderable->NotifyMoveable(moveable);
+			}
+			moveable = nullptr;
+			break;
+		}
+	}
+
+	int Entity::GetComponentType() const {
 		return Entity::TYPE;
+	}
+
+	int Entity::GetComponentCatagory() const {
+		return Entity::CATAGORY;
 	}
 
 } /* namespace nextar */

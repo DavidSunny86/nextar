@@ -10,10 +10,11 @@
 
 #include "NexSys.h"
 #include "Component.h"
+#include "Asset.h"
 
 namespace nextar {
 
-	class SceneManager: public nextar::ComponentManagerImpl {
+	class SceneManager: public nextar::AssetManager {
 	public:
 		SceneManager();
 		virtual ~SceneManager();

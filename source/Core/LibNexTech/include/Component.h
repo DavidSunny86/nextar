@@ -33,45 +33,50 @@ namespace nextar {
 		NEX_LOG_HELPER(Component);
 	public:
 
-		/* known types */
-		enum {
-			COMPONENT_UNKNOWN = -1,
-			COMPONENT_ASSET_MESH = 100,
-			COMPONENT_ASSET_SHADER,
-			COMPONENT_ASSET_TEXTURE,
-			COMPONENT_ASSET_MATERIAL,
+		/* catagory the component belongs to aka Generalization */
+		enum Catagory {
+			CAT_ASSET,
+			CAT_ENTITY,
+			CAT_RENDERABLE,
+			CAT_MOVEABLE,
+			CAT_CAMERA,
+			CAT_LIGHT,
+			CAT_SCENE
+		};
 
-			COMPONENT_ENTITY,
-			COMPONENT_MESH,
-			COMPONENT_LIGHT,
-			COMPONENT_MOVABLE,
-			COMPONENT_CAMERA,
+		/* specific component type  aka Specialization */
+		enum Type {
+			TYPE_UNKNOWN = -1,
+			TYPE_ASSET_MESH = 100,
+			TYPE_ASSET_SHADER,
+			TYPE_ASSET_TEXTURE,
+			TYPE_ASSET_MATERIAL,
+
+			TYPE_ENTITY,
+			TYPE_MESH,
+			TYPE_LIGHT,
+			TYPE_MOVABLE,
+			TYPE_CAMERA,
+
+			TYPE_SCENE,
 		};
 
 		enum Flags {
 			ENABLED = 1 << 0,
-			LAST_FLAG = 1 << 2,
+			LAST_FLAG = 1 << 1,
 		};
 
 	public:
 
-		Component(ComponentManager *creator = nullptr, const String & name = StringUtils::Null, Entity* entity = nullptr);
+		Component(ComponentManager *creator = nullptr, const String & name = StringUtils::Null, Component* parent = nullptr);
 		virtual ~Component();
 
 		inline ComponentManager *GetCreator() const {
 			return creator;
 		}
 
-		inline BoundingVolume *GetBounds() const {
-			return bounds;
-		}
-
 		inline void SetCreator(ComponentManager *creator) {
 			this->creator = creator;
-		}
-
-		inline void SetBounds(BoundingVolume *bounds) {
-			this->bounds = bounds;
 		}
 
 		inline bool IsEnabled() const {
@@ -106,7 +111,11 @@ namespace nextar {
 			return parent;
 		}
 
+
+		virtual int GetComponentCatagory() const = 0;
 		virtual int GetComponentType() const = 0;
+
+		virtual void SetParent(Component*);
 		virtual void SetEnabled(bool enabled);
 
 		inline Component* AsyncFindChild(const String& name) {
@@ -119,7 +128,6 @@ namespace nextar {
 
 		uint32 flags;
 
-		BoundingVolume *bounds;
 		ComponentManager *creator;
 		// parent component this component is attached to
 		Component* parent;

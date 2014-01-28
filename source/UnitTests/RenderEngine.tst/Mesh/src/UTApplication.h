@@ -15,7 +15,7 @@ public:
 
 protected:
 	
-	virtual void _SetupScene() {}
+	virtual void _SetupScene(ScenePtr&);
 	virtual void _SetupRenderDriver();
-
+	virtual ScenePtr _CreateDefaultScene();
 };

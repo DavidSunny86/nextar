@@ -14,11 +14,17 @@ namespace nextar {
 
 	class Renderable: public nextar::Component {
 	public:
+		enum {
+			CATAGORY = Component::CAT_RENDERABLE
+		};
+
 		Renderable();
 		virtual ~Renderable();
 
+		/** called by entity to update the renderable with the current moveable */
+		virtual void NotifyMoveable(Moveable*) {}
 		/** @brief Get node type */
-		virtual int GetType() const;
+		virtual int GetComponentCatagory() const;
 
 		virtual void RegisterVisibles(SceneTraversal& traversal) = 0;
 

@@ -8,17 +8,24 @@
 #ifndef SCENE_H_
 #define SCENE_H_
 
-#include <Component.h>
+#include <Asset.h>
 #include <Entity.h>
 #include <SceneParametrs.h>
 
 namespace nextar {
 
+	struct SceneEventListener {
+	};
+
 	/**
 	 * Represents a game world.
 	 * */
-	class _NexExport Scene: public Referenced<Scene, nextar::Component> {
+	class _NexExport Scene: public Asset {
 	public:
+		enum {
+			TYPE = Component::COMPONENT_SCENE,
+		};
+
 		typedef list<EntityPtr>::type EntityList;
 
 		Scene();

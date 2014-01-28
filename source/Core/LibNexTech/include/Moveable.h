@@ -21,7 +21,8 @@ namespace nextar {
 	class _NexExport Moveable: public Component {
 	public:
 		enum {
-			TYPE = COMPONENT_MOVABLE
+			TYPE = TYPE_MOVABLE,
+			CATAGORY = CAT_MOVEABLE,
 		};
 
 		enum {
@@ -119,9 +120,7 @@ namespace nextar {
 			this->matrixData = matrixData;
 			if (matrixData) {
 				SetIdentityTransforms();
-				SetBounds(&matrixData->bounds);
-			} else
-				SetBounds(0);
+			}
 		}
 
 		inline MatrixBuffer* GetMatrixDataPtr() const {
@@ -134,6 +133,10 @@ namespace nextar {
 
 		inline uint16 GetMatrixNumber() const {
 			return matrixNumber;
+		}
+
+		inline const BoundingVolume& GetBoundsInfo() const {
+			return matrixData->bounds;
 		}
 
 		/** @brief Resets position, rotation and scaling to inital state */
@@ -152,6 +155,7 @@ namespace nextar {
 		virtual void NotifyUpdated();
 		/** @brief Get node type */
 		virtual int GetComponentType() const;
+		virtual int GetComponentCatagory() const;
 
 	protected:
 		/** State number indicating the matrix change state. Every time

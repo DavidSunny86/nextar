@@ -18,8 +18,7 @@ namespace nextar {
 	protected:
 	};
 
-	class AssetCallback {
-	public:
+	struct AssetCallback {
 		virtual void AssetUnloaded(Asset*) = 0;
 		virtual void AssetLoaded(Asset*) = 0;
 		virtual void AssetUpdated(Asset*) = 0;
@@ -42,6 +41,10 @@ namespace nextar {
 		NEX_LOG_HELPER(Asset);
 
 	public:
+
+		enum {
+			CATAGORY = CAT_ASSET,
+		};
 
 		typedef list<AssetCallback*>::type AssetCallbackList;
 
@@ -187,6 +190,8 @@ namespace nextar {
 			Unload(nullptr, useAsyncUnload);
 		}
 
+		virtual int GetComponentCatagory() const;
+
 		virtual void Load(StreamRequest* request, bool useAsyncLoad);
 		virtual void Unload(StreamRequest* request, bool useAsyncUnload);
 		/* Called from main thread when the asset is loaded */
@@ -242,7 +247,7 @@ namespace nextar {
 	public:
 
 		inline AssetStreamRequest(Asset* asset, uint16 exFlags = AUTO_DELETE_REQUEST) :
-		StreamRequest(asset, exFlags|ASSET_STREAM_REQUEST) {
+			StreamRequest(asset, exFlags|ASSET_STREAM_REQUEST) {
 		}
 
 		inline Asset::MetaInfo& GetMetaInfo() {

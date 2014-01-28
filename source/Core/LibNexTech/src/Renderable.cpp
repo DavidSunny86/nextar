@@ -18,4 +18,7 @@ namespace nextar {
 		// TODO Auto-generated destructor stub
 	}
 
+	int Renderable::GetComponentCatagory() const {
+		return Renderable::CATAGORY;
+	}
 } /* namespace nextar */

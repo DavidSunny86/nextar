@@ -16,7 +16,7 @@ namespace nextar {
 	public:
 
 		enum {
-			TYPE = COMPONENT_MESH,
+			TYPE = TYPE_MESH,
 		};
 
 		struct Primitive {
@@ -26,12 +26,12 @@ namespace nextar {
 			VisiblePrimitive primitive;
 		};
 
-		Mesh();
+		Mesh(ComponentManager* creator, const String& name);
 		virtual ~Mesh();
 
-
 		/** @brief Get node type */
-		virtual int GetType() const;
+		virtual int GetComponentType() const;
+		virtual int GetComponentCatagory() const;
 
 		virtual void RegisterVisibles(SceneTraversal& traversal);
 

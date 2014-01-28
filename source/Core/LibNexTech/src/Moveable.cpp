@@ -63,5 +63,4 @@ namespace nextar {
 		}
 		return matrixData->cached;
 	}
-
 }

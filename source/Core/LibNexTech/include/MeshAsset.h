@@ -110,7 +110,7 @@ namespace nextar {
 
 	public:
 		enum Type {
-			TYPE = Asset::COMPONENT_ASSET_MESH,
+			TYPE = Component::TYPE_ASSET_MESH,
 		};
 
 		class Loader;

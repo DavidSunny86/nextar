@@ -12,11 +12,12 @@
 
 namespace nextar {
 
-	class Light: public nextar::Renderable {
+	class Light: public nextar::Component {
 	public:
 
 		enum {
-			TYPE = COMPONENT_LIGHT
+			TYPE = TYPE_LIGHT,
+			CATAGORY = CAT_LIGHT,
 		};
 
 		enum class Type : uint16 {
@@ -28,11 +29,12 @@ namespace nextar {
 			TYPE_COUNT,
 		};
 
-		Light();
+		Light(ComponentManager* creator, const String& name);
 		virtual ~Light();
 
 		/** @brief Get node type */
-		virtual int GetType() const;
+		virtual int GetComponentType() const;
+		virtual int GetComponentCatagory() const;
 
 		virtual void RegisterVisibles(SceneTraversal& traversal);
 

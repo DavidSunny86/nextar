@@ -6,10 +6,26 @@
 UTApplication::UTApplication() : ApplicationContext("UTApplication") {
 }
 
+ScenePtr UTApplication::_CreateDefaultScene() {
+	SceneManager* sceneManager =
+			static_cast<SceneManager*>(ComponentManagerArchive::Instance().AsyncFindManager(
+			Scene::TYPE));
+	return sceneManager->AsyncCreateEmptyScene("UTScene");
+}
+
+void UTApplication::_SetupScene(ScenePtr& scene) {
+	EntityManager* entityManager =
+			static_cast<EntityManager*>(
+			ComponentManagerArchive::Instance().AsyncFindManager(Entity::TYPE));
+
+	EntityPtr camera = entityManager->AsyncCreateCameraEntity("Main");
+	camera->AddToScene(scene);
+}
+
 void UTApplication::ConfigureExtendedInterfacesImpl() {
 	_SetupRenderDriver();
-	_SetupScene();
-
+	ScenePtr scene = _CreateDefaultScene();
+	_SetupScene(scene);
 	AsyncRegisterListener(Listener(this, 0));
 }
 

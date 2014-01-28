@@ -24,10 +24,37 @@ namespace nextar {
 	public:
 
 		enum {
-			TYPE = Component::COMPONENT_CAMERA
+			CATAGORY = Component::CAT_CAMERA,
+			TYPE = Component::TYPE_CAMERA
 		};
 
-		struct CameraMatrix: public AllocMathCore {
+		enum {
+			ASSYMETRIC_CAMERA = Moveable::LAST_FLAG << 0,
+		};
+
+		enum {
+			PROJECTION_PERSPECTIVE,
+			PROJECTION_ASYMMETRIC,
+			PROJECTION_ORTHOGRAPHIC,
+		};
+
+		// Symmetric camera
+		struct PerspectiveParams {
+			float fieldOfView;
+			float aspectRatio;
+		};
+
+		struct AsymmetricParams {
+			float nearLeft, nearTop;
+			float nearRight, nearBottom;
+		};
+
+		struct OrthographicParams {
+			float viewWidth;
+			float viewHeight;
+		};
+
+		struct Matrix: public AllocMathCore {
 			MatrixBuffer matrixData;
 
 			Matrix4x4 view;
@@ -39,256 +66,76 @@ namespace nextar {
 			Vector3A corners[8];
 			/* typical camera planes, used in frustum */
 			Plane camPlanes[6];
-			/* Bounds info for a single scene traversal */
-			BoundingVolume boundsInfo;
 		};
 
 		Camera(ComponentManager* creator, const String& name, bool allocMatrixBuffer = true);
 		virtual ~Camera();
 
-		_NexInline const Matrix4x4* GetViewMatrix() const {
-			return &cameraMatrix->view;
-		}
+		/** This is basically the inverse of the world transform */
+		const Matrix4x4& GetViewMatrix();
+		/* Projection matrix as determined by the current projection parameters */
+		const Matrix4x4& GetProjectionMatrix();
+		/* Pre-multiplied view projection matrix */
+		const Matrix4x4& GetViewProjectionMatrix();
+		/* Projection type */
+		uint8 GetProjectionType() const;
+		/* */
+		const PerspectiveParams& GetPerspectiveParams() const;
+		/* */
+		const OrthographicParams& GetOrthographicParams() const;
+		/* */
+		const AsymmetricParams& GetAsymmetricParams() const;
+		/* */
+		const Frustum& GetFrustum() const;
+		void SetPerspectiveParams(const PerspectiveParams& params);
+		void SetOrthographicParams(const OrthographicParams& params);
+		void SetAsymmetricParams(const AsymmetricParams& params);
+		void SetNearDistance(float d);
+		void SetFarDistance(float d);
 
-		_NexInline const Matrix4x4* GetProjectionMatrix() const {
-			return &cameraMatrix->projection;
-		}
+		void SetCullMask(uint32 cullMask);
+		uint32 GetCullMask() const;
+		void SetVisibilityMask(uint32 visibilityMask);
+		uint32 GetVisibilityMask() const;
 
-		_NexInline const Matrix4x4* GetViewProjectionMatrix() const {
-			return &cameraMatrix->viewProjection;
-		}
-
-		_NexInline BoundingVolume* GetBoundsInfo() {
-			return &cameraMatrix->boundsInfo;
-		}
-
-		void SetCameraMatrixDataPtr(CameraMatrix* projectionView);
-
-		CameraMatrix* GetCameraMatrix() const {
-			return cameraMatrix;
-		}
-
-		void MakeFrustumUptoDate() {
-			if (frustumOutOfDate)
-				UpdateFrustum();
-		}
-
-		_NexInline const Frustum& GetFrustum() const {
-			return *cullFrustum;
-		}
-
-		_NexInline bool IsMainCamera() const {
-			return mainCamera;
-		}
-
+		/** Visibility tests */
 		bool IsVisible(const BoundingVolume& vol, uint32& newMask,
-				uint32& lastPlane) const {
-			uint32 lfp = 0;
-			return Intersect::BoundingVolumeFrustumCoherent(vol, GetFrustum(),
-					cullMask, &newMask, IsMainCamera() ? &lastPlane : &lfp)
-					!= Intersect::IR_OUTSIDE;
-		}
+				uint32& lastPlane) const;
+		bool IsVisible(const BoundingVolume& vol) const;
+		bool IsVisible(Vec3AF center, float radius) const;
 
-		bool IsVisible(const BoundingVolume& vol) const {
-			return Intersect::BoundingVolumeFrustum(vol, GetFrustum())
-					!= Intersect::IR_OUTSIDE;
-		}
-
-		bool IsVisible(Vec3AF center, float radius) const {
-			return Intersect::BoundingSphereFrustum(center, radius,
-					GetFrustum()) != Intersect::IR_OUTSIDE;
-		}
-
-		float GetSqDistance(Vec3AF from) const {
-			return Vec3ASqDistance(from, GetEyePosition());
-		}
-
-		/* Set projection transform */
-		virtual void SetPerspective(float fov, float aspectRatio, float znear,
-				float zfar);
-
-		/* Changes camera type and sets orthographic projection */
-		virtual void SetOrthographic(float width, float height, float znear,
-				float zfar);
-
-		/** @remarks Called to update the render queue with renderable data. */
-		virtual void FindVisiblePrimitives(SceneTraversal & traversal) = 0;
-
-		/* invalidate view */
-		void InvalidateView() {
-			frustumOutOfDate = true;
-			boundsOutOfDate = true;
-			viewMatrixNumber++;
-		}
-
-		const Vector3A* GetCorners();
 		void UpdateFrustum();
 
-		void SetCullFrustum(Frustum* cullFrustum) {
-			this->cullFrustum = cullFrustum;
-		}
+		Vector3A GetRightDirection();
+		Vector3A GetUpDirection();
+		Vector3A GetViewDirection();
+		Vector3A GetEyePosition();
 
-		Frustum* GetCullFrustum() const {
-			return cullFrustum;
-		}
-
-		void SetCullMask(uint32 cullMask) {
-			this->cullMask = cullMask;
-		}
-
-		uint32 GetCullMask() const {
-			return cullMask;
-		}
-
-		void SetAspectRatio(float aspectRatio) {
-			this->aspectRatio = aspectRatio;
-		}
-
-		float GetAspectRatio() const {
-			return aspectRatio;
-		}
-
-		void SetFieldOfView(float fieldOfView) {
-			this->fieldOfView = fieldOfView;
-		}
-
-		float GetFieldOfView() const {
-			return fieldOfView;
-		}
-
-		void SetViewHeight(float viewHeight) {
-			this->viewHeight = viewHeight;
-		}
-
-		float GetViewHeight() const {
-			return viewHeight;
-		}
-
-		void SetViewWidth(float viewWidth) {
-			this->viewWidth = viewWidth;
-		}
-
-		float GetViewWidth() const {
-			return viewWidth;
-		}
-
-		void SetZFar(float zFar) {
-			this->farDist = zFar;
-		}
-
-		float GetZFar() const {
-			return farDist;
-		}
-
-		void SetZNear(float zNear) {
-			this->nearDist = zNear;
-		}
-
-		float GetZNear() const {
-			return nearDist;
-		}
-
-		void SetBoundsOutOfDate(bool boundsOutOfDate) {
-			this->boundsOutOfDate = boundsOutOfDate;
-		}
-
-		bool IsBoundsOutOfDate() const {
-			return boundsOutOfDate;
-		}
-
-		Vector3A GetRightDirection() const {
-			NEX_ASSERT(invView);
-			return Mat4x4Row(*invView, 0);
-		}
-
-		Vector3A GetUpDirection() const {
-			NEX_ASSERT(invView);
-			return Mat4x4Row(*invView, 1);
-		}
-
-		Vector3A GetViewDirection() const {
-			NEX_ASSERT(invView);
-			return Mat4x4Row(*invView, 2);
-		}
-
-		Vector3A GetEyePosition() const {
-			NEX_ASSERT(invView);
-			return Mat4x4Row(*invView, 3);
-		}
-
-		void SetInvView(Matrix4x4* invView) {
-			this->invView = invView;
-		}
-
-		const Matrix4x4* GetInvView() const {
-			return invView;
-		}
-
-		void SetViewMatrixNumber(uint16 viewMatrixNumber) {
-			this->viewMatrixNumber = viewMatrixNumber;
-		}
-
-		uint16 GetViewMatrixNumber() const {
-			return viewMatrixNumber;
-		}
-
-		void SetFrustumOutOfDate(bool frustumOutOfDate) {
-			this->frustumOutOfDate = frustumOutOfDate;
-		}
-
-		bool IsFrustumOutOfDate() const {
-			return frustumOutOfDate;
-		}
-
-		void SetOrthographic(bool orthographic) {
-			this->orthographic = orthographic;
-		}
-
-		bool IsOrthographic() const {
-			return orthographic;
-		}
-
-		void SetCornersOutOfDate(bool cornersOutOfDate) {
-			this->cornersOutOfDate = cornersOutOfDate;
-		}
-
-		bool IsCornersOutOfDate() const {
-			return cornersOutOfDate;
-		}
-
-		void SetViewDimOutOfDate(bool viewDimOutOfDate) {
-			this->viewDimOutOfDate = viewDimOutOfDate;
-		}
-
-		bool IsViewDimOutOfDate() const {
-			return viewDimOutOfDate;
-		}
-
-		void SetVisibilityMask(uint32 visibilityMask) {
-			this->visibilityMask = visibilityMask;
-		}
-
-		uint32 GetVisibilityMask() const {
-			return visibilityMask;
-		}
-
-		void PrepareRendering() {
-			cullMask = 0xffffffff;
-			MakeFrustumUptoDate();
-		}
+		const Vector3A* GetCorners();
+				/** @remarks Called to update the render queue with renderable data. */
+		virtual void FindVisiblePrimitives(SceneTraversal & traversal);
 
 		/** @brief Get node type */
 		virtual int GetComponentType() const;
+		virtual int GetComponentCatagory() const;
 
 	protected:
 
+		void _SetCameraMatrixDataPtr(Matrix* projectionView);
 		void _CalculateBoundCorners();
 		void _CalculateViewDimensions();
 
 		/* true if this is the main camera */
-		bool mainCamera;
-		/* true if camera is using orthographic projection */
-		bool orthographic;
+		uint8 projectionType;
+		union {
+			PerspectiveParams perspective;
+			OrthographicParams orthographic;
+			AsymmetricParams asymmetric;
+		};
+
+		float nearDistance;
+		float farDistance;
+
 		/* recalculate frustum */
 		bool frustumOutOfDate;
 		/* recalculate bounds */
@@ -297,14 +144,6 @@ namespace nextar {
 		bool cornersOutOfDate;
 		/* view dimensions are out of date */
 		bool viewDimOutOfDate;
-
-		/* Indicates if view matrix has changed */
-		uint16 viewMatrixNumber;
-
-		float nearDist, farDist;
-		float viewWidth, viewHeight;
-		float fieldOfView;
-		float aspectRatio;
 
 		/* Projection params */
 		float widthNear, widthFar;
@@ -316,20 +155,206 @@ namespace nextar {
 		uint32 visibilityMask;
 		uint32 cullMask;
 
-		/* This matrix is received from the implementation.
-		 * This could be considered as the world matrix of the camera object.
-		 */
-		const Matrix4x4* invView;
-
 		Frustum viewFrustum;
-		/* Culling done via 'viewFrustum' or via a new frustrum created during
-		 * portal traversal.
-		 */
-		Frustum* cullFrustum;
 		/* Culling system of the area where the camera is located. */
 		CullingSystem* culler;
-		CameraMatrix* cameraMatrix;
+		Matrix* cameraMatrix;
 	};
+
+	inline const Matrix4x4& Camera::GetViewMatrix() {
+		return cameraMatrix->view;
+	}
+
+	inline const Matrix4x4& Camera::GetProjectionMatrix() {
+		return &cameraMatrix->projection;
+	}
+
+	inline const Matrix4x4& Camera::GetViewProjectionMatrix() {
+		return &cameraMatrix->viewProjection;
+	}
+
+	inline Camera::Matrix* Camera::GetCameraMatrix() const {
+		return cameraMatrix;
+	}
+
+	inline void Camera::MakeFrustumUptoDate() {
+		if (frustumOutOfDate)
+			UpdateFrustum();
+	}
+
+	inline const Frustum& Camera::GetFrustum() const {
+		return viewFrustum;
+	}
+
+	inline bool Camera::IsMainCamera() const {
+		return mainCamera;
+	}
+
+	inline bool Camera::IsVisible(Vec3AF center, float radius) const {
+		return Intersect::BoundingSphereFrustum(center, radius, GetFrustum())
+				!= Intersect::IR_OUTSIDE;
+	}
+
+	inline bool Camera::IsVisible(const BoundingVolume& vol) const {
+		return Intersect::BoundingVolumeFrustum(vol, GetFrustum())
+				!= Intersect::IR_OUTSIDE;
+	}
+
+	inline bool Camera::IsVisible(const BoundingVolume& vol, uint32& newMask,
+			uint32& lastPlane) const {
+		uint32 lfp = 0;
+		return Intersect::BoundingVolumeFrustumCoherent(vol, GetFrustum(),
+				cullMask, &newMask, IsMainCamera() ? &lastPlane : &lfp)
+				!= Intersect::IR_OUTSIDE;
+	}
+
+	inline float Camera::GetSqDistance(Vec3AF from) const {
+		return Vec3ASqDistance(from, GetEyePosition());
+	}
+
+	inline void Camera::InvalidateView() {
+		frustumOutOfDate = true;
+		boundsOutOfDate = true;
+		viewMatrixNumber++;
+	}
+
+	inline void Camera::SetCullMask(uint32 cullMask) {
+		this->cullMask = cullMask;
+	}
+
+	inline uint32 Camera::GetCullMask() const {
+		return cullMask;
+	}
+
+	inline void Camera::SetAspectRatio(float aspectRatio) {
+		this->aspectRatio = aspectRatio;
+	}
+
+	inline float Camera::GetAspectRatio() const {
+		return aspectRatio;
+	}
+
+	inline void Camera::SetFieldOfView(float fieldOfView) {
+		this->fieldOfView = fieldOfView;
+	}
+
+	inline float Camera::GetFieldOfView() const {
+		return fieldOfView;
+	}
+
+	inline void Camera::SetViewHeight(float viewHeight) {
+		this->viewHeight = viewHeight;
+	}
+
+	inline float Camera::GetViewHeight() const {
+		return viewHeight;
+	}
+
+	inline void Camera::SetViewWidth(float viewWidth) {
+		this->viewWidth = viewWidth;
+	}
+
+	inline float Camera::GetViewWidth() const {
+		return viewWidth;
+	}
+
+	inline void Camera::SetZFar(float zFar) {
+		this->farDist = zFar;
+	}
+
+	inline float Camera::GetZFar() const {
+		return farDist;
+	}
+
+	inline void Camera::SetZNear(float zNear) {
+		this->nearDist = zNear;
+	}
+
+	inline float Camera::GetZNear() const {
+		return nearDist;
+	}
+
+	inline void Camera::SetBoundsOutOfDate(bool boundsOutOfDate) {
+		this->boundsOutOfDate = boundsOutOfDate;
+	}
+
+	inline bool Camera::IsBoundsOutOfDate() const {
+		return boundsOutOfDate;
+	}
+
+	inline Vector3A Camera::GetRightDirection() {
+		return Mat4x4Row(GetInvViewMatrix(), 0);
+	}
+
+	inline Vector3A Camera::GetUpDirection() {
+		return Mat4x4Row(GetInvViewMatrix(), 1);
+	}
+
+	inline Vector3A Camera::GetViewDirection() {
+		return Mat4x4Row(GetInvViewMatrix(), 2);
+	}
+
+	inline Vector3A Camera::GetEyePosition() {
+		return Mat4x4Row(GetInvViewMatrix(), 3);
+	}
+
+	inline const Matrix4x4& Camera::GetInvViewMatrix() {
+		return GetFullTransform();
+	}
+
+	inline void Camera::SetViewMatrixNumber(uint16 viewMatrixNumber) {
+		this->viewMatrixNumber = viewMatrixNumber;
+	}
+
+	inline uint16 Camera::GetViewMatrixNumber() const {
+		return viewMatrixNumber;
+	}
+
+	inline void Camera::SetFrustumOutOfDate(bool frustumOutOfDate) {
+		this->frustumOutOfDate = frustumOutOfDate;
+	}
+
+	inline bool Camera::IsFrustumOutOfDate() const {
+		return frustumOutOfDate;
+	}
+
+	inline bool Camera::IsOrthographic() const {
+		return orthographic;
+	}
+
+	inline void Camera::SetCornersOutOfDate(bool cornersOutOfDate) {
+		this->cornersOutOfDate = cornersOutOfDate;
+	}
+
+	inline bool Camera::IsCornersOutOfDate() const {
+		return cornersOutOfDate;
+	}
+
+	inline void Camera::SetViewDimOutOfDate(bool viewDimOutOfDate) {
+		this->viewDimOutOfDate = viewDimOutOfDate;
+	}
+
+	inline bool Camera::IsViewDimOutOfDate() const {
+		return viewDimOutOfDate;
+	}
+
+	inline void Camera::SetVisibilityMask(uint32 visibilityMask) {
+		this->visibilityMask = visibilityMask;
+	}
+
+	inline uint32 Camera::GetVisibilityMask() const {
+		return visibilityMask;
+	}
+
+	inline void Camera::PrepareRendering() {
+		cullMask = 0xffffffff;
+		MakeFrustumUptoDate();
+	}
+
+	inline void Camera::SetOrthographic(bool orthographic) {
+		this->orthographic = orthographic;
+	}
+
 }
 #endif	/* CAMERA_H */
 

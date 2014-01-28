@@ -19,12 +19,13 @@ namespace nextar {
 		virtual ~SceneTraversal();
 
 
-		Moveable* currentMoveable;
-
+		Moveable* moveable;
 		Camera* camera;
+		Frustum* frustum;
 		VisibilitySet* visibilitySet;
 		BoundingVolume* visibleBoundsInfo;
 		LightSystem* lightSystem;
+		Scene* scene;
 		/* Layer mask */
 		uint32 visibilityMask;
 		uint32 frameNumber;

@@ -13,8 +13,7 @@ namespace nextar {
 			Moveable(creator, name),
 			cameraMatrix(0), visibilityMask(VisibilitySet::VM_ALL) {
 		if (allocMatBuff)
-			SetCameraMatrixDataPtr(NEX_NEW CameraMatrix);
-		cullFrustum = &viewFrustum;
+			SetCameraMatrixDataPtr(NEX_NEW Matrix);
 	}
 
 	Camera::~Camera() {
@@ -23,7 +22,7 @@ namespace nextar {
 			NEX_DELETE cameraMatrix;
 	}
 
-	void Camera::SetCameraMatrixDataPtr(CameraMatrix* projectionView) {
+	void Camera::SetCameraMatrixDataPtr(Camera::Matrix* projectionView) {
 		this->cameraMatrix = projectionView;
 		/* The frustum planes are allocated by cam buffer */
 		viewFrustum.SetPlanes(cameraMatrix->camPlanes, 6);

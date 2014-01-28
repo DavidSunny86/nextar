@@ -35,5 +35,7 @@
 #include "Light.h"
 #include "Mesh.h"
 #include "Moveable.h"
+#include "Scene.h"
+#include "SceneManager.h"
 
 #endif //NEXTAR_NEXBASE_STDHEADERS_H__
