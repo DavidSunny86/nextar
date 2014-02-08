@@ -19,7 +19,7 @@ namespace nextar {
 		RenderSystem();
 		virtual ~RenderSystem();
 
-		virtual void Commit(CommitContext& context, RenderContextPtr& renderCtx) = 0;
+		virtual void Commit(CommitContext& context, RenderContext& renderCtx) = 0;
 	};
 
 	typedef vector<RenderSystem*>::type RenderSystemList;

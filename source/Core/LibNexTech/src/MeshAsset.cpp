@@ -26,8 +26,8 @@ namespace nextar {
 	MeshAsset::~MeshAsset() {
 	}
 
-	int MeshAsset::GetType() const {
-		return TYPE;
+	uint32 MeshAsset::GetClassID() const {
+		return CLASS_ID;
 	}
 
 	void MeshAsset::LoadImpl(nextar::StreamRequest* req, bool isAsync) {
@@ -192,8 +192,8 @@ namespace nextar {
 	MeshAssetManager::~MeshAssetManager() {
 	}
 
-	Component* MeshAssetManager::AsyncCreateImpl(int type, const String& name) {
-		if (type == MeshAsset::TYPE) {
+	Component* MeshAssetManager::AsyncCreateImpl(uint32 classId, const String& name) {
+		if (classId == MeshAsset::CLASS_ID) {
 			return NEX_NEW MeshAsset(this, name);
 		}
 		return nullptr;
@@ -201,11 +201,12 @@ namespace nextar {
 
 	MeshAssetPtr MeshAssetManager::AsyncCreateInstance(const String& name, const String& group,
 		const URL& location) {
-		MeshAssetPtr mesh = Bind(AsyncCreate(MeshAsset::TYPE, name));
+		MeshAssetPtr mesh = Bind(AsyncCreate(MeshAsset::CLASS_ID, name));
 		if (mesh) {
 			mesh->SetAssetGroup(group);
 			mesh->SetAssetLocator(location);
 		}
+		return mesh;
 	}
 
 	/*********************************

@@ -9,16 +9,22 @@
 #define CULLINGSYSTEM_H_
 
 #include "NexSys.h"
+#include "Spatial.h"
 
 namespace nextar {
 
-	class CullingSystem {
+	/** 
+	 * Culling systems derive from spatial to support hybrid culler hierarchies.
+	 */
+	class CullingSystem : public Spatial {
 	public:
-		CullingSystem();
+		CullingSystem(ComponentManager *creator = nullptr, const String& name = StringUtils::Null, Component* parent = nullptr);
 		virtual ~CullingSystem();
+				
+		virtual void AddBody(Spatial*) = 0;
+		virtual void RemoveBody(Spatial*) = 0;
 
-		virtual void NotifyNodeAdded(Movable*) {}
-		virtual void NotifyNodeRemoved(Movable*) {}
+		virtual void Visit(SceneTraversal& trav) = 0;
 	};
 
 } /* namespace nextar */

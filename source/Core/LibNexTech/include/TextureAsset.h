@@ -20,7 +20,8 @@ namespace nextar {
 	public:
 
 		enum Type {
-			TYPE = Asset::COMPONENT_ASSET_TEXTURE,
+			CLASS_ID = Component::CLASS_ASSET_TEXTURE,
+			CATAGORY = COMPONENT_CAT(CLASS_ID),
 		};
 
 		enum Flags {
@@ -83,7 +84,7 @@ namespace nextar {
 		virtual void Update(nextar::RenderContext*, ContextObject::UpdateParamPtr update);
 		virtual void Destroy(nextar::RenderContext*);
 
-		virtual int GetType() const;
+		virtual uint32 GetClassID() const;
 
 	protected:
 

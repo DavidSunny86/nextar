@@ -5,16 +5,16 @@
  *      Author: obhi
  */
 
-#include "SceneParametrs.h"
+#include "SceneParameters.h"
 
 namespace nextar {
 
-	SceneParametrs::SceneParametrs() {
+	SceneParameters::SceneParameters() {
 		// TODO Auto-generated constructor stub
 
 	}
 
-	SceneParametrs::~SceneParametrs() {
+	SceneParameters::~SceneParameters() {
 		// TODO Auto-generated destructor stub
 	}
 

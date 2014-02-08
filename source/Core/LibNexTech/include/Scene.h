@@ -10,7 +10,8 @@
 
 #include <Asset.h>
 #include <Entity.h>
-#include <SceneParametrs.h>
+#include "SceneParameters.h"
+#include "CullingSystem.h"
 
 namespace nextar {
 
@@ -23,22 +24,29 @@ namespace nextar {
 	class _NexExport Scene: public Asset {
 	public:
 		enum {
-			TYPE = Component::COMPONENT_SCENE,
+			CLASS_ID = Component::CLASS_SCENE,
+			CATAGORY = COMPONENT_CAT(CLASS_ID),
 		};
 
 		typedef list<EntityPtr>::type EntityList;
 
-		Scene();
+		class SceneStreamRequest : public AssetStreamRequest {
+		};
+
+		Scene(ComponentManager* creator, const String& name);
 		virtual ~Scene();
-
-
+		
 		/* internal API */
 		virtual void _AddEntity(Entity* entity);
 		virtual void _RemoveEntity(Entity* entity);
 
 	protected:
 
+		virtual void LoadImpl(StreamRequest* req, bool isAsync);
+		virtual void UnloadImpl(StreamRequest* req, bool isAsync);
+
 		SceneParameters parameters;
+		CullingSystem* cullingSystem;
 		EntityList sceneEntities;
 	};
 

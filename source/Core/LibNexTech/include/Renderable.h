@@ -8,25 +8,21 @@
 #ifndef RENDERABLE_H_
 #define RENDERABLE_H_
 
-#include <Component.h>
+#include <Spatial.h>
 
 namespace nextar {
 
-	class Renderable: public nextar::Component {
+	class Renderable: public nextar::Spatial {
 	public:
 		enum {
 			CATAGORY = Component::CAT_RENDERABLE
 		};
-
-		Renderable();
+		
+		Renderable(ComponentManager* creator, const String& name, Component* parent);
 		virtual ~Renderable();
 
-		/** called by entity to update the renderable with the current moveable */
-		virtual void NotifyMoveable(Moveable*) {}
-		/** @brief Get node type */
-		virtual int GetComponentCatagory() const;
-
-		virtual void RegisterVisibles(SceneTraversal& traversal) = 0;
+		virtual uint32 GetClassID() const override = 0;
+		virtual void Visit(SceneTraversal& traversal) override = 0;
 
 	protected:
 	};

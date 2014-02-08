@@ -23,7 +23,7 @@ namespace nextar {
 		virtual ~ComponentManagerArchive();
 
 		inline void AsyncRemoveManager(const String& name) {
-			AsyncRemoveManager(Component::COMPONENT_UNKNOWN, name);
+			AsyncRemoveManager(Component::CLASS_UNKNOWN, name);
 		}
 
 		inline ComponentManager* AsyncFindManager(int componentType) {
@@ -35,8 +35,7 @@ namespace nextar {
 		void AsyncAddManager(int componentType, ComponentManager*);
 		void AsyncRemoveManager(int componentType, const String&, bool deleteManager = true);
 		void AsyncDeleteAll();
-
-
+		
 		ComponentManager *AsyncFindManager(int componentType, const String& name);
 
 	protected:

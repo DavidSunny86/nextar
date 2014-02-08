@@ -21,17 +21,17 @@ namespace nextar {
         };
         typedef uint8 TypeTag;
 
-        IndexBuffer(Type type) :  index_type(static_cast<TypeTag>(type)) {
+        inline IndexBuffer(size_t size, uint32 flags, Type type) :  ManagedBuffer(size, flags), indexType(static_cast<TypeTag>(type)) {
         }
         virtual ~IndexBuffer();
 
         Type GetIndexType() const {
-            return static_cast<Type>(index_type);
+            return static_cast<Type>(indexType);
         }
        
     private:
 
-        TypeTag index_type;
+        TypeTag indexType;
     };
 }
 

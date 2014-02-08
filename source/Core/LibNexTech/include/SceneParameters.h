@@ -5,17 +5,17 @@
  *      Author: obhi
  */
 
-#ifndef SCENEPARAMETRS_H_
-#define SCENEPARAMETRS_H_
+#ifndef SCENEPARAMETERS_H_
+#define SCENEPARAMETERS_H_
 
 #include "NexMath.h"
 
 namespace nextar {
 
-	class SceneParametrs {
+	class SceneParameters : public AllocGeneral {
 	public:
-		SceneParametrs();
-		~SceneParametrs();
+		SceneParameters();
+		~SceneParameters();
 
 	protected:
 		Vector3 maxPoint;
@@ -23,4 +23,4 @@ namespace nextar {
 	};
 
 } /* namespace nextar */
-#endif /* SCENEPARAMETRS_H_ */
+#endif /* SCENEPARAMETERS_H_ */

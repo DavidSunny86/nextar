@@ -1,12 +1,13 @@
-#ifndef NEXSYS_MESH_H
-#define NEXSYS_MESH_H
+
+#ifndef MESHASSET_H_
+#define MESHASSET_H_
 
 #include "NexSys.h"
 #include "Asset.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "StreamData.h"
-#include "Material.h"
+#include "MaterialAsset.h"
 
 namespace nextar {
 
@@ -43,7 +44,7 @@ namespace nextar {
 
 		inline MeshVertexData()
 				: numVertexBuffers(0), vertexCount(0), numVertexElements(0),
-				  vertexElements(0), binding(0) {
+				  vertexElements(nullptr), binding(nullptr), layout(nullptr) {
 		}
 
 		~MeshVertexData();
@@ -95,7 +96,7 @@ namespace nextar {
 			const String& assetGroup, const URL& location);
 
 		/* Implementation */
-		virtual Component* AsyncCreateImpl(int type, const String& name);
+		virtual Component* AsyncCreateImpl(uint32 type, const String& name);
 		virtual void AsyncDestroyImpl(Component*);
 	};
 
@@ -110,9 +111,9 @@ namespace nextar {
 
 	public:
 		enum Type {
-			TYPE = Component::TYPE_ASSET_MESH,
+			CLASS_ID = Component::CLASS_ASSET_MESH,
+			CATAGORY = COMPONENT_CAT(CLASS_ID),
 		};
-
 		class Loader;
 		class LoaderImpl;
 
@@ -265,7 +266,7 @@ namespace nextar {
 		}
 
 		/* Implementation */
-		virtual int GetType() const;
+		virtual uint32 GetClassID() const override;
 
 
 	protected:
@@ -296,4 +297,4 @@ namespace nextar {
 
 }
 
-#endif //NEXSYS_MESH_H
+#endif //MESHASSET_H_

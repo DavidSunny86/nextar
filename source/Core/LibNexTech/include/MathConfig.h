@@ -17,6 +17,8 @@
 // @remarks Set this to 1 to do debug checks
 #define NEX_CORE_DEBUG_CHECKS		1
 
+// Num matrix per block in matrix pool
+#define NEX_MATRIX_POOL_NUM_PER_BLOCK 32
 #ifdef NEX_USE_ASM_WHEN_REQUIRED 
 #	define NEX_CORE_USE_ASM
 #endif

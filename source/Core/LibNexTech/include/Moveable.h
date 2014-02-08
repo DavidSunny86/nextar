@@ -5,62 +5,39 @@
  * Created on January 24, 2011, 7:53 AM
  */
 
-#ifndef NEXTAR_NEXNODE_H
-#define	NEXTAR_NEXNODE_H
+#ifndef NEXTAR_MOVEABLE_H_
+#define	NEXTAR_MOVEABLE_H_
 
 #include "NexSys.h"
 #include "BoundingVolume.h"
 #include "Frustum.h"
-#include "Camera.h"
 #include "Component.h"
+#include "TransformData.h"
 
 namespace nextar {
-
+		
 	/**
 	 **/
 	class _NexExport Moveable: public Component {
+		NEX_LOG_HELPER(Moveable);
 	public:
 		enum {
-			TYPE = TYPE_MOVABLE,
-			CATAGORY = CAT_MOVEABLE,
+			CLASS_ID = Component::CLASS_MOVABLE,
+			CATAGORY = COMPONENT_CAT(CLASS_ID),
 		};
 
 		enum {
-			/** true enables bound updates */
-			UPDATE_BOUNDS_ENABLED = Component::LAST_FLAG << 1,
 			/** true when matrix needs recalculation */
-			MATRIX_DIRTY = Component::LAST_FLAG << 5,
+			MATRIX_DIRTY = Component::LAST_FLAG << 1,
 			/** flags set by default */
-			DEFAULT_FLAGS = (UPDATE_BOUNDS_ENABLED
-					| MATRIX_DIRTY  ),
-			LAST_FLAG = Component::LAST_FLAG << 11,
+			DEFAULT_FLAGS = (MATRIX_DIRTY),
+			LAST_FLAG = Component::LAST_FLAG << 2,
 		};
 
-		struct MatrixBuffer: public AllocMathCore {
-			/* World rotation */
-			Quaternion wrot;
-			/* World postion */
-			Vector3A wpos;
-			/* Initial rotation */
-			Quaternion irot;
-			/* Initial position */
-			Vector3A ipos;
-			/* Cached matrix */
-			Matrix4x4 cached;
-			/* Bound information */
-			BoundingVolume bounds;
-			/* variable placement takes into account the alignment */
-			float iscale;
-			float wscale;
-			/* 4 byte padding */
-			uint32 flags;
-		};
-
-		NEX_LOG_HELPER(Moveable);
-
+		typedef TransformData Matrix;
+				
 		Moveable(ComponentManager *creator,
-				const String& name = StringUtils::Null, bool allocMatrixBuff =
-						true);
+				const String& name = StringUtils::Null);
 
 		virtual ~Moveable();
 
@@ -107,26 +84,7 @@ namespace nextar {
 		inline bool IsMatrixDirty() const {
 			return (flags & MATRIX_DIRTY) != 0;
 		}
-
-		inline void SetUpdateBoundsEnabled(bool updateBoundsEnabled) {
-			SetFlag(UPDATE_BOUNDS_ENABLED, updateBoundsEnabled);
-		}
-
-		inline bool IsUpdateBoundsEnabled() const {
-			return (flags & UPDATE_BOUNDS_ENABLED) != 0;
-		}
-
-		inline void SetMatrixDataPtr(MatrixBuffer* matrixData) {
-			this->matrixData = matrixData;
-			if (matrixData) {
-				SetIdentityTransforms();
-			}
-		}
-
-		inline MatrixBuffer* GetMatrixDataPtr() const {
-			return matrixData;
-		}
-
+		
 		inline void SetMatrixNumber(uint16 matrixNumber) {
 			this->matrixNumber = matrixNumber;
 		}
@@ -134,17 +92,16 @@ namespace nextar {
 		inline uint16 GetMatrixNumber() const {
 			return matrixNumber;
 		}
-
-		inline const BoundingVolume& GetBoundsInfo() const {
-			return matrixData->bounds;
+		
+		/** @brief Used internally to store a reference of the existing transform ptr */
+		inline Matrix4x4* GetTransformPtr() {
+			return &matrixData->cached;
 		}
 
 		/** @brief Resets position, rotation and scaling to inital state */
 		void SetInitialTransforms();
 		/** @brief Initialize position, rotation and scaling values to identity */
 		void SetIdentityTransforms();
-		/** @remarks Update world volume */
-		virtual void UpdateBounds();
 		/** @remarks Returns the derived matrix  */
 		virtual const Matrix4x4& GetFullTransform();
 		/* child notifications, received by regions or parent regions */
@@ -154,10 +111,10 @@ namespace nextar {
 		/** @brief Specify that states were updated */
 		virtual void NotifyUpdated();
 		/** @brief Get node type */
-		virtual int GetComponentType() const;
-		virtual int GetComponentCatagory() const;
-
+		virtual uint32 GetClassID() const;
+		
 	protected:
+		
 		/** State number indicating the matrix change state. Every time
 		 * the matrix is recalculated this is changed */
 		uint16 matrixNumber;
@@ -165,11 +122,11 @@ namespace nextar {
 		 * which rejected this node. 0 is the default. */
 		uint16 lastFrustumPlane;
 		/** Matrices and bounds information */
-		MatrixBuffer* matrixData;
+		Matrix* matrixData;
 	};
 
 	typedef list<Moveable*>::type MoveableComponentList;
 }
 
-#endif	/* NEXTAR_NEXNODE_H */
+#endif	/* NEXTAR_MOVEABLE_H_ */
 

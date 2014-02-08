@@ -7,6 +7,13 @@
 
 namespace nextar {
 
+	struct FrameStats {
+		uint32 frameID;
+		uint32 polygonCount;
+		uint32 shaderSwitches;
+		uint32 renderTargetsUsed;
+		uint32 textureFetches;
+	};
 
 	struct RenderInfo {
 		RenderTarget* rt;
@@ -22,6 +29,8 @@ namespace nextar {
 		CLEAR_STENCIL = 1 << 2,
 		CLEAR_ALL = CLEAR_COLOR|CLEAR_DEPTH|CLEAR_STENCIL
 	};
+
+	typedef list<RenderTargetPtr>::type RenderTargetList;
 
 	class RenderContext : public Referenced<RenderContext, AllocGraphics> {
 	public:
@@ -40,10 +49,13 @@ namespace nextar {
 
 		/* Called by the window to indicate it was destroyed */
 		virtual void DestroyedRenderWindow(RenderWindowPtr&) = 0;
-
+		/* Get the i'th window created. */
+		virtual RenderWindowPtr GetRenderTarget(uint32 i) = 0;
+		virtual RenderTargetList& GetRenderTargetList() = 0;
 		virtual void SetVideoMode(uint32 videoModeIndex) = 0;
-		virtual void BeginRender(const RenderInfo*) = 0;
-		virtual void EndRender() = 0;
+		virtual void BeginFrame(uint32 frame) = 0;
+		virtual void EndFrame() = 0;
+		virtual FrameStats GetFrameStats() = 0;
 
 		virtual void SwitchShader(uint16 pass, ShaderAsset*) = 0;
 		virtual void Draw(StreamData*) = 0;

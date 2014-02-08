@@ -24,7 +24,7 @@ namespace nextar {
 		 */
 		_NexExport IntersectionResult BoundingVolumeFrustumCoherent(
 				const BoundingVolume& vol, const Frustum& frustum, uint32 inMask,
-				uint32* newMask, uint32* lastPlane);
+				uint32& newMask, uint32& lastPlane);
 
 		/** @remarks Test bounding volume frustum intersection */
 		_NexExport IntersectionResult BoundingVolumeFrustum(

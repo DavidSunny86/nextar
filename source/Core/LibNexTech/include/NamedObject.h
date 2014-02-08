@@ -20,6 +20,10 @@ namespace nextar {
 			return nameTable.AsyncString(name);
 		}
 
+		inline StringID GetID() const {
+			return name;
+		}
+
 	protected:
 		
 		static StringInternTable nameTable;

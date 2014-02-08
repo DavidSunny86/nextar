@@ -16,7 +16,7 @@ namespace nextar {
 
 	class ContextObject {
 	public:
-		typedef void* UpdateParamPtr;
+		typedef std::ptrdiff_t UpdateParamPtr;
 
 		ContextObject();
 		virtual ~ContextObject();

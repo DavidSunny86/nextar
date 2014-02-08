@@ -6,6 +6,7 @@
 #include "NexTypes.h"
 #include "NexThread.h"
 
+
 namespace nextar {
 		
 	typedef std::reference_wrapper<const String> StringID;
@@ -39,6 +40,15 @@ namespace nextar {
 #endif
 		/* In release mode, might just offload this list to a disk as it wont be required in most cases */
 		StringSet	listOfStrings;
+	};
+}
+
+namespace std {
+	template <>
+	struct hash<nextar::StringID> {
+		size_t operator () (const nextar::StringID& x) const {
+			return reinterpret_cast<size_t>(&x.get());
+		}
 	};
 }
 

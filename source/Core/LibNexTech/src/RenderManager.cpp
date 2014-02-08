@@ -8,12 +8,12 @@
 #include "VertexElement.h"
 #include "RenderManager.h"
 #include "RenderContext.h"
+#include "Viewport.h"
 
 namespace nextar {
 
 	NEX_DEFINE_SINGLETON_PTR(RenderManager);
-	RenderManager::RenderManager() : usingMultiGpuSetup(false),
-			maxRenderLayer(0) {
+	RenderManager::RenderManager() : usingMultiGpuSetup(false) {
 		VertexSemantic::BuildSemanticMap();
 	}
 
@@ -109,5 +109,51 @@ namespace nextar {
 		/**
 		 * Handle culling step followed by rendering step.
 		 */
+		if (primaryContext) {
+			RenderAllTargets(primaryContext, frameNumber, !renderSettings.syncPresent);
+		} else {
+			RenderContextList::iterator it = activeContexts.begin();
+			RenderContextList::iterator en = activeContexts.end();
+			for(; it != en; ++it) {
+				RenderAllTargets((*it), frameNumber, !renderSettings.syncPresent);
+			}
+		}
+
+		if (renderSettings.syncPresent) {
+			if (primaryContext) {
+				PresentSwapChains(primaryContext);
+			} else {
+
+				RenderContextList::iterator it = activeContexts.begin();
+				RenderContextList::iterator en = activeContexts.end();
+				for(; it != en; ++it) {
+					PresentSwapChains((*it));
+				}
+			}
+		}
 	}
+
+	void RenderManager::RenderAllTargets(RenderContext* rc, uint32 frame, bool callPresent) {
+		rc->BeginFrame(frame);
+		RenderTargetList& rtList = rc->GetRenderTargetList();
+		for (auto &rt : rtList) {
+
+			Viewport::Iterator it = rt->GetViewports();
+			for(; it; ++it) {
+				(*it)->Render(rc, frame);
+			}
+
+			if (callPresent) 
+				rt->Present(rc);
+		}
+		rc->EndFrame();
+	}
+
+	void RenderManager::PresentSwapChains(RenderContext* rc) {
+		RenderTargetList& rtList = rc->GetRenderTargetList();
+		for (auto &rt : rtList) {
+			rt->Present(rc);
+		}
+	}
+
 } /* namespace nextar */

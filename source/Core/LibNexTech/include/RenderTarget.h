@@ -25,7 +25,7 @@ namespace nextar {
 		MULTI_RENDER_TARGET,
 	};
 
-	class RenderTarget : public AllocGraphics {
+	class RenderTarget : public Referenced<RenderTarget, AllocGraphics> {
 	public:
 
 		RenderTarget(uint16 type);
@@ -54,6 +54,7 @@ namespace nextar {
 		/* Capture render target */
 		virtual void Capture(RenderContext* rc, PixelBox& image, FrameBuffer) = 0;
 		virtual void Reset(RenderContext* rc, Size size, PixelFormat format) = 0;
+		virtual void Present(RenderContext* rc) = 0;
 
 	protected:
 

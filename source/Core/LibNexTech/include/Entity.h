@@ -10,6 +10,8 @@
 
 #include "NexSys.h"
 #include "Component.h"
+#include "Moveable.h"
+#include "Camera.h"
 
 namespace nextar {
 
@@ -40,8 +42,8 @@ namespace nextar {
 		NEX_LOG_HELPER(Entity);
 	public:
 		enum {
-			TYPE = Component::TYPE_ENTITY,
-			CATAGORY = Component::CAT_ENTITY,
+			CLASS_ID = Component::CLASS_ENTITY,
+			CATAGORY = COMPONENT_CAT(CLASS_ID),
 		};
 
 		enum {
@@ -52,13 +54,16 @@ namespace nextar {
 		Entity(ComponentManager* creator, const String& name);
 		virtual ~Entity();
 
+		inline Camera* GetCamera() const {
+			return camera;
+		}
+
 		/** Attach */
 		virtual void AttachComponent(Component* component);
-		virtual void DetachComponent(int catagory);
+		virtual void DetachComponent(uint32 type);
 		/** @brief Get node type */
-		virtual int GetComponentType() const;
-		virtual int GetComponentCatagory() const;
-
+		virtual uint32 GetClassID() const;
+		
 		/** @brief Visit renderables attached to this node **/
 		virtual void FindVisibles(SceneTraversal& traversal);
 
@@ -73,8 +78,8 @@ namespace nextar {
 	protected:
 
 		Moveable* moveable;
+		Camera* camera;
 		Renderable* renderable;
-		Light* light;
 	};
 
 } /* namespace nextar */

@@ -14,7 +14,7 @@ namespace nextar {
 
 	/** @reference DrDoob Radix Sort implementation
 	 * Sort based on 32/64 bit integers * */
-	template<typename _It, const uint32 Threshold = 32, typename Integer=uint32 >
+	template<typename _It, const uint32 Threshold, typename Integer>
 	inline void RadixSort( _It* a, uint32 size, Integer bitMask, uint32 shiftRightAmount )	{
 		const uint32 numberOfBins = 256;
 		// initially stores the count
@@ -33,7 +33,7 @@ namespace nextar {
 	            startOfBin[ i ] = startOfBin[ i - 1 ] + endOfBin[ i - 1 ];
 	   std::memcpy(endOfBin, startOfBin, sizeof(endOfBin));
 
-	   for ( long _current = 0; _current <= size; ) {
+	   for ( uint32 _current = 0; _current <= size; ) {
 	           unsigned long digit;
 	           _It tmp = a[ _current ];
 	           // take tmp and put it in its place, iteratively
@@ -71,6 +71,11 @@ namespace nextar {
 	          }
 	      }
 	   }
+	}
+
+	template<typename _It>
+	inline void RadixSortInt32( _It* a, uint32 size)	{
+		RadixSort<_It, 32, uint32>(a, size, 0xff000000, 24);
 	}
 }
 

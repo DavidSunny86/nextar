@@ -3,6 +3,7 @@
 #include "VideoMode.h"
 #include "BaseRenderContext.h"
 #include "RenderWindow.h"
+#include "NexThread.h"
 
 namespace nextar {
 
@@ -22,6 +23,7 @@ namespace nextar {
 					contextCreationParams.fullScreen,
 					&contextCreationParams.extraParams);
 		}
+		threadId = NEX_THREAD_ID();
 	}
 
 	RenderWindowPtr BaseRenderContext::CreateRenderWindow(uint32 width, uint32 height,
@@ -44,6 +46,14 @@ namespace nextar {
 		}
 	}
 
+	RenderWindowPtr BaseRenderContext::GetRenderTarget(uint32 i) {
+		return graphicsWindowList[i];
+	}
+
+	RenderTargetList& BaseRenderContext::GetRenderTargetList() {
+		return graphicsWindowList;
+	}
+
 	uint32 BaseRenderContext::GetVideoModeIndex(const VideoMode& current) const {
 		for (size_t i = 0; i < videoModes.size(); ++i) {
 			if (current == videoModes[i]) {
@@ -58,5 +68,12 @@ namespace nextar {
 			SetVideoModeImpl(videoModes[vidMod]);
 			currentVideoMode = vidMod;
 		}
+	}
+
+	void BaseRenderContext::BeginFrame(uint32 frame) {
+		frameStats.frameID = frame;
+	}
+
+	void BaseRenderContext::EndFrame() {
 	}
 }

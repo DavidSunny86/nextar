@@ -29,7 +29,7 @@ namespace nextar {
 
 	public:
 
-		Frustum(size_t numPlanes = 0);
+		Frustum(Plane* planes = nullptr, size_t numPlanes = 0);
 		~Frustum();
 
 		void SetupPlanes(size_t numPlanes);

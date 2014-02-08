@@ -40,7 +40,7 @@ namespace nextar {
 		};
 
 		struct RenderSettings {
-
+			bool syncPresent;
 		};
 
 		RenderManager();
@@ -71,11 +71,14 @@ namespace nextar {
 		virtual RenderTarget* CreateRenderTarget(bool textureTarget = true);
 		virtual MultiRenderTarget* CreateMultiRenderTarget();
 
-		/* Render a single frame */
+		/* Render a single frame for a specific window, should be called
+		   from the thread this window was created in */
 		virtual void RenderFrame(uint32 frameNumber);
-
-
+		
 	protected:
+
+		virtual void RenderAllTargets(RenderContext* rc, uint32 frame, bool callPresent);
+		virtual void PresentSwapChains(RenderContext* rc);
 
 		typedef vector<RenderDriverPtr>::type RenderDriverList;
 		typedef vector<RenderContextPtr>::type RenderContextList;

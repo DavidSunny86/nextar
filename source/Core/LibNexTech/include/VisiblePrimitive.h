@@ -34,17 +34,30 @@ namespace nextar {
 			return worldMatrices;
 		}
 
+		void SetWorldMatrices(const Matrix4x4* matrices, int16 numMatrices) {
+			worldMatrices = matrices;
+			numWorldMatrices = numMatrices;
+		}
+
+		void SetBoundsInfo(const BoundingVolume* bounds) {
+			this->bounds = bounds;
+		}
+
+		void SetMaterial(MaterialAssetPtr& m) {
+			material = m;
+		}
+
 	protected:
 		/* Shader rendering flags */
 		uint16 renderFlags;
 		/* Number of world matrices */
 		int16 numWorldMatrices;
 		/* bounding volume */
-		BoundingVolume* bounds;
+		const BoundingVolume* bounds;
 		/* The current world matrices */
-		Matrix4x4* worldMatrices;
+		const Matrix4x4* worldMatrices;
 		/* Material */
-		MaterialAsset* material;
+		MaterialAssetPtr material;
 		/** stream data to render */
 		StreamData streamData;
 	};

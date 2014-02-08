@@ -20,6 +20,7 @@ void UTApplication::_SetupScene(ScenePtr& scene) {
 
 	EntityPtr camera = entityManager->AsyncCreateCameraEntity("Main");
 	camera->AddToScene(scene);
+	window->CreateViewport(camera->GetCamera());
 }
 
 void UTApplication::ConfigureExtendedInterfacesImpl() {
@@ -27,6 +28,13 @@ void UTApplication::ConfigureExtendedInterfacesImpl() {
 	ScenePtr scene = _CreateDefaultScene();
 	_SetupScene(scene);
 	AsyncRegisterListener(Listener(this, 0));
+}
+
+void UTApplication::BeginFrame(uint32 frameNumber) {
+	RenderManager::Instance().RenderFrame(frameNumber);
+}
+
+void UTApplication::EndFrame(uint32 elapsedTime) {
 }
 
 void UTApplication::_SetupRenderDriver() {
@@ -49,4 +57,7 @@ void UTApplication::_SetupRenderDriver() {
 	dcp.defaultContextParams.extraParams["WindowLeft"] = "0";
 	dcp.defaultContextParams.extraParams["WindowTop"] = "0";
 	dcp.defaultContextParams.extraParams["WindowTitle"] = "UTApplication";
+
+	RenderDriverPtr driver = RenderManager::Instance().AsyncCreateDriver(dcp);
+	window = driver->AsyncGetContext(0)->GetRenderWindow(0);
 }

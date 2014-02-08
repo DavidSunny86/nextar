@@ -58,7 +58,7 @@ namespace nextar {
 		 * buffers.
 		 **/
 		void SetBufferCount(size_t num) {
-			bufferCount = num;
+			bufferCount = (uint16)num;
 		}
 
 		/** @remarks Binds the buffer to the specified index */

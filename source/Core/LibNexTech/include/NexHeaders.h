@@ -31,6 +31,9 @@
 #include "AssetStreamer.h"
 #include "MeshAsset.h"
 
+#include "Component.h"
+#include "ComponentManagerArchive.h"
+
 #include "Entity.h"
 #include "Light.h"
 #include "Mesh.h"

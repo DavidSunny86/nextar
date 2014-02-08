@@ -11,7 +11,7 @@
 #include "NexSys.h"
 #include "StringUtils.h"
 #include "Color.h"
-#include "Texture.h"
+#include "TextureAsset.h"
 
 namespace nextar {
 

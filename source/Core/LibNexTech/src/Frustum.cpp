@@ -9,9 +9,9 @@
 
 namespace nextar {
 
-	Frustum::Frustum(size_t num) :
-			planes(0) {
-		if (num > 0)
+	Frustum::Frustum(Plane* _planes, size_t num) :
+			planes(_planes), numPlanes(num) {
+		if (!planes && num > 0)
 			SetupPlanes(num);
 	}
 

@@ -124,10 +124,6 @@ namespace nextar {
 		static inline uint16 Depth(float normalizedDepth) {
 			return static_cast<uint16>(normalizedDepth * MAX_DEPTH);
 		}
-
-		friend inline bool operator < (const KeyVisiblePrimitivePair& kvp1, const KeyVisiblePrimitivePair& kvp2) {
-			return kvp1.first < kvp2.first;
-		}
 	};
 
 	struct RenderQueueDesc {
@@ -181,7 +177,7 @@ namespace nextar {
 
 		inline void Sort() {
 			if (visibles.size() > 32)
-				RadixSort(visibles.data(), visibles.size(), 0xff000000, 24);
+				RadixSortInt32(visibles.data(), (uint32)visibles.size());
 			else
 				std::sort(visibles.begin(), visibles.end());
 		}

@@ -12,19 +12,19 @@
 
 namespace nextar {
 
-	class Light: public nextar::Component {
+	class Light: public Renderable {
 	public:
 
 		enum {
-			TYPE = TYPE_LIGHT,
-			CATAGORY = CAT_LIGHT,
+			CLASS_ID = Component::CLASS_LIGHT,
+			CATAGORY = COMPONENT_CAT(CLASS_ID),
 		};
 
 		enum class Type : uint16 {
 			DIRECTIONAL,
 			OMNI,
 			SPOT,
-			SUN,
+			SKY,
 			AREA,
 			TYPE_COUNT,
 		};
@@ -33,10 +33,9 @@ namespace nextar {
 		virtual ~Light();
 
 		/** @brief Get node type */
-		virtual int GetComponentType() const;
-		virtual int GetComponentCatagory() const;
-
-		virtual void RegisterVisibles(SceneTraversal& traversal);
+		virtual uint32 GetClassID() const;
+		
+		virtual void Visit(SceneTraversal& traversal);
 
 	protected:
 		Color diffuseColor;

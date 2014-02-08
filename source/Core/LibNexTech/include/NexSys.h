@@ -27,7 +27,7 @@ namespace nextar {
 	class WindowManager;
 	class LogManager;
 	
-	class RenAssetderManager;
+	class RenderManager;
 	class RenderDriver;
 	class RenderContext;
 	class RenderWindow;
@@ -54,11 +54,15 @@ namespace nextar {
 	class VisibilitySet;
 	class VisiblePrimitive;
 
+	class Frustum;
+
 	class Entity;
 	class Light;
 	class Renderable;
 	class Moveable;
 	class Camera;
+	class Spatial;
+	class CullingSystem;
 
 	class Scene;
 
@@ -69,7 +73,7 @@ namespace nextar {
 	class MeshAsset;
 
 	class AssetStreamRequest;
-	class AssetCallback;
+	struct AssetCallback;
 	class AssetManager;
 
 	typedef RefPtr<LightSystem> LightSystemPtr;
@@ -84,6 +88,7 @@ namespace nextar {
 	typedef RefPtr<RenderDriver> RenderDriverPtr;
 	typedef RefPtr<Buffer> BufferPtr;
 	typedef RefPtr<RenderTexture> RenderTexturePtr;
+	typedef RefPtr<RenderTarget> RenderTargetPtr;
 	typedef RefPtr<MultiRenderTarget> MultiRenderTargetPtr;
 
 	typedef RefPtr<Asset> AssetPtr;

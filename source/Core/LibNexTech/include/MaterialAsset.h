@@ -29,11 +29,11 @@ namespace nextar {
 	 */
 	class _NexExport MaterialAsset: public nextar::Asset {
 	public:
-
+		
 		enum Type {
-			TYPE = Asset::COMPONENT_ASSET_MATERIAL
+			CLASS_ID = Component::CLASS_ASSET_MATERIAL,
+			CATAGORY = COMPONENT_CAT(CLASS_ID),
 		};
-
 		typedef ByteStream PropertyBuffer;
 		typedef unordered_map<String, ShaderVariant>::type ShaderParamMap;
 
@@ -97,7 +97,7 @@ namespace nextar {
 
 		static MaterialAsset* Instance(AssetManager* manager, const String& name, const URL& location);
 
-		virtual int GetType() const;
+		virtual uint32 GetClassID() const;
 
 	protected:
 		/* notify loaded/unloaded */

@@ -1,22 +1,20 @@
 
 #include "NexHeaders.h"
 #include "Moveable.h"
+#include "CommonPools.h"
 
 namespace nextar {
 
-	Moveable::Moveable(ComponentManager *creator, const String& nodeName, bool allocMBuff)
+	Moveable::Moveable(ComponentManager *creator, const String& nodeName)
 			: Component(creator, nodeName), matrixNumber(0), lastFrustumPlane(0), matrixData(0) {
 		flags = DEFAULT_FLAGS;
-		if (allocMBuff) {
-			matrixData = NEX_NEW MatrixBuffer();
-			SetIdentityTransforms();
-			matrixData->bounds.SetNull();
-		}
+		matrixData = TransformDataPool::Alloc();
+		SetIdentityTransforms();
 	}
 
 	Moveable::~Moveable() {
-		if (matrixData)
-			NEX_DELETE matrixData;
+		TransformDataPool::Free(matrixData);
+		matrixData = nullptr;
 	}
 
 	void Moveable::SetIdentityTransforms() {
@@ -35,10 +33,6 @@ namespace nextar {
 		SetMatrixDirty(true);
 	}
 	
-	void Moveable::UpdateBounds() {
-		matrixData->bounds.UpdateBounds(GetFullTransform());
-	}
-
 	void Moveable::NotifyNodeAdded(Moveable*) {
 	}
 
@@ -50,8 +44,8 @@ namespace nextar {
 	}
 
 	/** @brief Get node type */
-	int Moveable::GetComponentType() const {
-		return TYPE;
+	uint32 Moveable::GetClassID() const {
+		return CLASS_ID;
 	}
 
 	const Matrix4x4& Moveable::GetFullTransform() {

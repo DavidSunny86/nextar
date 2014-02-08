@@ -40,14 +40,14 @@ namespace nextar {
 
 		virtual void Configure(const Config& config);
 
-		virtual Component* AsyncCreate(int type, const String& name) = 0;
+		virtual Component* AsyncCreate(uint32 classId, const String& name) = 0;
 		virtual void AsyncDestroy(Component*) = 0;
 		virtual Component* AsyncFind(const String& name) = 0;
-		virtual Component* AsyncFindOrCreate(int type, const String& name) = 0;
+		virtual Component* AsyncFindOrCreate(uint32 classId, const String& name) = 0;
 		virtual void AsyncCleanup() = 0;
 		
-		static Component* AsyncFindComponent(int type, const String& comp);
-		static Component* AsyncFindOrCreateComponent(int type, const String& comp);
+		static Component* AsyncFindComponent(uint32 classId, const String& comp);
+		static Component* AsyncFindOrCreateComponent(uint32 classId, const String& comp);
 		
 	protected:
 
@@ -61,15 +61,15 @@ namespace nextar {
 		ComponentManagerImpl(const String& name);
 		virtual ~ComponentManagerImpl();
 
-		virtual Component* AsyncCreate(int type, const String& name);
+		virtual Component* AsyncCreate(uint32 classId, const String& name);
 		virtual void AsyncDestroy(Component*);
 		virtual Component* AsyncFind(const String& name);
-		virtual Component* AsyncFindOrCreate(int type, const String& name);
+		virtual Component* AsyncFindOrCreate(uint32 classId, const String& name);
 		virtual void AsyncCleanup();
 
 	protected:
 
-		virtual Component* AsyncCreateImpl(int type, const String& name) = 0;
+		virtual Component* AsyncCreateImpl(uint32 classId, const String& name) = 0;
 		virtual void AsyncDestroyImpl(Component* component);
 		
 		NEX_THREAD_MUTEX(containerLock);

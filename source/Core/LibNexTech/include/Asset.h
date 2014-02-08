@@ -41,11 +41,7 @@ namespace nextar {
 		NEX_LOG_HELPER(Asset);
 
 	public:
-
-		enum {
-			CATAGORY = CAT_ASSET,
-		};
-
+		
 		typedef list<AssetCallback*>::type AssetCallbackList;
 
 		enum Flags {
@@ -189,9 +185,7 @@ namespace nextar {
 		inline void Unload(bool useAsyncUnload) {
 			Unload(nullptr, useAsyncUnload);
 		}
-
-		virtual int GetComponentCatagory() const;
-
+		
 		virtual void Load(StreamRequest* request, bool useAsyncLoad);
 		virtual void Unload(StreamRequest* request, bool useAsyncUnload);
 		/* Called from main thread when the asset is loaded */

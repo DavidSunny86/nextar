@@ -52,13 +52,23 @@ namespace nextar {
 
 		traversal.camera = camera;
 		traversal.frameNumber = frameNumber;
-		traversal.visibleBoundsInfo = camera->GetBoundsInfo();
-		traversal.visibilityMask = camera->GetVisibilityMask();
+		//traversal.visibleBoundsInfo = &(camera->GetBoundsInfo());
+		//traversal.visibilityMask = camera->GetVisibilityMask();
 		traversal.visibilitySet = &visibleSet;
 		camera->FindVisiblePrimitives(traversal);
+		// if we registered any offscreen viewports, lets call push on those
+		for(auto &s : offscreen) {
+			s->PushPrimitives(frameNumber);
+		}
 	}
 
-	void Viewport::CommitPrimitives(RenderContextPtr& renderCtx, uint32 frameNumber) {
+	void Viewport::CommitPrimitives(RenderContext* renderCtx, uint32 frameNumber) {
+
+		// if we had offscreen vp lets commit them first
+		for(auto &s : offscreen) {
+			s->CommitPrimitives(renderCtx, frameNumber);
+		}
+
 		visibleSet.SortSet();
 
 		commitContext.viewport = this;
@@ -66,21 +76,16 @@ namespace nextar {
 		commitContext.visibiles = &visibleSet;
 
 		for(auto &r : renderSystems) {
-			r->Commit(commitContext, renderCtx);
+			r->Commit(commitContext, *renderCtx);
 		}
 	}
 
-	void Viewport::Render(RenderContextPtr& renderCtx, uint32 frameNumber) {
+	void Viewport::Render(RenderContext* renderCtx, uint32 frameNumber) {
 		RenderManager& rm = RenderManager::Instance();
-		visibleSet.Prepare(rm.GetRenderLayerInfo());
-		for(auto &s : offscreen) {
-			s->Render(renderCtx, frameNumber);
-		}
+		visibleSet.Prepare();
 		PushPrimitives(frameNumber);
 		FirePreupdate();
 		CommitPrimitives(renderCtx, frameNumber);
 		FirePostupdate();
 	}
 }
-
-

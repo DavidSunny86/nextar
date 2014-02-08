@@ -9,16 +9,11 @@
 
 namespace nextar {
 
-	Renderable::Renderable() {
-		// TODO Auto-generated constructor stub
-
+	Renderable::Renderable(ComponentManager* creator, const String& name, Component* parent) :
+		Spatial(creator, name, parent) {
 	}
 
 	Renderable::~Renderable() {
-		// TODO Auto-generated destructor stub
 	}
 
-	int Renderable::GetComponentCatagory() const {
-		return Renderable::CATAGORY;
-	}
 } /* namespace nextar */

@@ -2,6 +2,8 @@
 ######################
 /build
 /bin
+/dependencies
+/lib
 
 # Compiled source #
 ###################
@@ -40,5 +42,4 @@
 .Trashes
 ehthumbs.db
 Thumbs.db
-
 

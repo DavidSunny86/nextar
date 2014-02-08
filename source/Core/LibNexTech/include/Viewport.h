@@ -155,7 +155,7 @@ namespace nextar {
 
 
 		/* Update viewport */
-		virtual void Render(RenderContextPtr& renderCtx, uint32 frameNumber);
+		virtual void Render(RenderContext* renderCtx, uint32 frameNumber);
 
 		/* @remarks Add new callback */
 		virtual void AddCallback(ViewportCallback*);
@@ -168,7 +168,7 @@ namespace nextar {
 
 		/* */
 		virtual void PushPrimitives(uint32 frameNumber);
-		virtual void CommitPrimitives(RenderContextPtr& renderCtx, uint32 frameNumber);
+		virtual void CommitPrimitives(RenderContext* renderCtx, uint32 frameNumber);
 
 	protected:
 

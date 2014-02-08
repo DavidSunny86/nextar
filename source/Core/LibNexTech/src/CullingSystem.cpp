@@ -5,7 +5,8 @@
  *      Author: obhi
  */
 
-#include "scene/CullingSystem.h"
+#include "NexHeaders.h"
+#include "CullingSystem.h"
 
 namespace nextar {
 

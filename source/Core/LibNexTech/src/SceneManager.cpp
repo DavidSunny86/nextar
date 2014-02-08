@@ -5,7 +5,7 @@
  *      Author: obhi
  */
 #include "NexHeaders.h"
-#include "scene/SceneManager.h"
+#include "SceneManager.h"
 
 namespace nextar {
 

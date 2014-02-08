@@ -28,7 +28,7 @@ namespace nextar {
 		return ent;
 	}
 
-	Component* EntityManager::AsyncCreateImpl(int type, const String& name) {
+	Component* EntityManager::AsyncCreateImpl(uint32 type, const String& name) {
 		switch(type) {
 		case Entity::TYPE:
 			return NEX_NEW Entity(this, name);
@@ -58,87 +58,71 @@ namespace nextar {
 			NEX_DELETE moveable;
 		if (renderable)
 			NEX_DELETE renderable;
-		if (light)
-			NEX_DELETE light;
 	}
 
 	void Entity::FindVisibles(SceneTraversal& traversal) {
 		Moveable* lastMoveable = traversal.moveable;
-
 		if (moveable)
 			traversal.moveable = moveable;
 		if (renderable)
-			renderable->RegisterVisibles(traversal);
-		if (light)
-			light->RegisterVisibles(traversal);
-
+			renderable->Visit(traversal);
 		traversal.moveable = lastMoveable;
 	}
 
 	void Entity::AttachComponent(Component* comp) {
-		switch(comp->GetComponentCatagory()) {
-		case Entity::CATAGORY:
+		uint32 type = comp->GetClassID();
+		uint16 catagory = Component::GetComponentCatagory(type);
+		if(catagory & Entity::CATAGORY) {
 			Error("Sub-entities not supported yet!");
-		case Light::CATAGORY:
-			light = static_cast<Light*>(comp);
-			break;
-		case Renderable::CATAGORY:
+		}
+
+		if(catagory & Renderable::CATAGORY) {
 			renderable = static_cast<Renderable*>(comp);
-			if (moveable)
-				renderable->NotifyMoveable(moveable);
-			break;
-		case Camera::CATAGORY:
-			SetFlag(IS_CAMERA);
-			/* no break */
-		case Moveable::CATAGORY:
+			renderable->NotifyMoveableChanged(moveable);
+		}
+
+		if(catagory & Moveable::CATAGORY) {
+			if(catagory & Camera::CATAGORY)
+				SetFlag(IS_CAMERA);
 			moveable = static_cast<Moveable*>(comp);
 			if (renderable)
-				renderable->NotifyMoveable(moveable);
-			break;
+				renderable->NotifyMoveableChanged(moveable);
 		}
+
 		comp->SetParent(this);
 		/* @todo Fire event */
 	}
 
-	void Entity::DetachComponent(int type) {
-		switch(type) {
-		case Entity::CATAGORY:
+	void Entity::DetachComponent(uint32 type) {
+		Component* toDetach = nullptr;
+		uint16 catagory = Component::GetComponentCatagory(type);
+		if(catagory & Entity::CATAGORY) {
 			Error("Sub-entities not supported yet!");
-		case Light::CATAGORY:
-			if (light) {
-				moveable->SetParent(nullptr);
-				NEX_DELETE light;
-			}
-			light = nullptr;
-			break;
-		case Mesh::CATAGORY:
-			if (renderable) {
-				moveable->SetParent(nullptr);
-				NEX_DELETE renderable;
-			}
-			renderable = nullptr;
-			break;
-		case Camera::CATAGORY:
-			UnsetFlag(IS_CAMERA);
-			/* no break */
-		case Moveable::CATAGORY:
-			if (moveable) {
-				moveable->SetParent(nullptr);
-				NEX_DELETE moveable;
-				if (renderable)
-					renderable->NotifyMoveable(moveable);
-			}
-			moveable = nullptr;
-			break;
 		}
+
+		if(catagory & Renderable::CATAGORY) {
+			NEX_ASSERT(!toDetach || toDetach == static_cast<Component*>(renderable));
+			toDetach = renderable;
+			renderable = nullptr;
+		}
+
+		if(catagory & Moveable::CATAGORY) {
+			NEX_ASSERT(!toDetach || toDetach == static_cast<Component*>(moveable));
+			toDetach = moveable;
+			moveable = nullptr;
+			if(catagory & Camera::CATAGORY)
+				UnsetFlag(IS_CAMERA);
+			if (renderable)
+				renderable->NotifyMoveableChanged(nullptr);
+		}
+
+		if (toDetach) {
+			toDetach->SetParent(nullptr);
+			NEX_DELETE toDetach;
+		} // else report error ??
 	}
 
-	int Entity::GetComponentType() const {
-		return Entity::TYPE;
+	uint32 Entity::GetClassID() const {
+		return Entity::CLASS_ID;
 	}
-
-	int Entity::GetComponentCatagory() const {
-		return Entity::CATAGORY;
-	}
-
 } /* namespace nextar */

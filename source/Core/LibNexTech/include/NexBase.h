@@ -193,6 +193,11 @@ typedef unsigned short wchar_t;
 #	endif
 #endif
 
+#if (_MSC_VER <= 1700) || defined(__MINGW32__)
+#	define noexcept
+#	define override
+#endif
+
 #if defined( NEX_MSVC ) && !defined(NEX_DONOT_USE_NOVTABLE)
 #	define _NexNoVtable __declspec(novtable)
 #else

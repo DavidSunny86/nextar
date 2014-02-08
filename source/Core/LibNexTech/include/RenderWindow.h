@@ -8,8 +8,7 @@
 namespace nextar {
 
 	class _NexExport RenderWindow :
-		public RenderTarget,
-		public Referenced<RenderWindow, AllocGraphics> {
+		public RenderTarget {
 
 		NEX_LOG_HELPER(RenderWindow);
 
@@ -107,7 +106,7 @@ namespace nextar {
 			WINDOW_LAST_FLAG = 1 << 6,
 			WINDOW_EXIT_ON_CLOSE = 1 << 7,
 		};
-
+				
 		String windowTitle;
 		uint32 flags;
 		WinEventListnerList listeners;

@@ -18,4 +18,6 @@ protected:
 	virtual void _SetupScene(ScenePtr&);
 	virtual void _SetupRenderDriver();
 	virtual ScenePtr _CreateDefaultScene();
+
+	RenderWindowPtr window;
 };
