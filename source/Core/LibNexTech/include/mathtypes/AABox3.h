@@ -14,17 +14,17 @@ public:
 	min(minV),max(maxV) {}
 
 	inline void MakeLargest() {
-		max.x = max.y = max.z = N3DInfinity;
-		min.x = min.y = min.z =-N3DInfinity;
+		max.x = max.y = max.z = Math::INFINITY;
+		min.x = min.y = min.z =-Math::INFINITY;
 	}
 
 	inline void Invalidate() {
-		min.x = N3DInfinity;
-		min.y = N3DInfinity;
-		min.z = N3DInfinity;
-		max.x =-N3DInfinity;
-		max.y =-N3DInfinity;
-		max.z =-N3DInfinity;
+		min.x = Math::INFINITY;
+		min.y = Math::INFINITY;
+		min.z = Math::INFINITY;
+		max.x =-Math::INFINITY;
+		max.y =-Math::INFINITY;
+		max.z =-Math::INFINITY;
 	}
 
 	inline bool IsValid() const {

@@ -12,33 +12,11 @@
 #include "MemUtils.h"
 #include "Randomizer.h"
 
-//@ include proper files
-#if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE
-#include "xmmintrin.h"
-#include "emmintrin.h"
-#include "smmintrin.h"
-#elif NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_3DNOW
-#include "mm3dnow.h"
-#error Not implemented
-#elif NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_VMX128
-#error Not implemented
-#endif
-
 //@ Macros
 
 namespace nextar {
 	namespace Math {
 
-		inline void Clamp(float& clampwhat, float lowvalue, float hivalue) {
-#if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE
-			_mm_store_ss(&clampwhat,
-					_mm_max_ss(_mm_load_ss(&lowvalue),
-							_mm_min_ss(_mm_load_ss(&clampwhat),
-									_mm_load_ss(&hivalue))));
-#else
-			clampwhat = std::max(lowvalue,std::min(clampwhat,hivalue));
-#endif
-		}
 	}
 }
 

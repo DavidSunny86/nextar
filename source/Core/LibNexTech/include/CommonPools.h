@@ -2,88 +2,73 @@
 #ifndef MATRIXPOOL_H_
 #define MATRIXPOOL_H_
 
-#include "NexMath.h"
 #include "NexAlloc.h"
 #include "MemPool.h"
 #include "NexThread.h"
-#include "TransformData.h"
-#include "BoundingVolume.h"
 
 namespace nextar {
 
-	template <typename T, size_t NumPerBlock, typename Allocator>
-	class _NexExport SingletonPool : public AllocGeneral {
+	template <typename T, const size_t NumPerBlock, enum MemoryCatagory Catagory>
+	class PooledAllocator {
 
-		typedef MemPool<T, NumPerBlock, mt::Mutex, Allocator> MPool;
-		typedef SingletonPool<T, NumPerBlock, Allocator> Type;
+		typedef T ObjectType;
+		typedef AllocatorBase<Catagory> BaseAllocator;
+		typedef MemPool<NumPerBlock, mt::Mutex, Allocator> MPool;
+		
 		MPool pool;
-
 	public:
+		typedef PooledAllocator<T, NumPerBlock, Catagory> Type;
 
-		inline SingletonPool() {}
-				
-		static inline T* Alloc() {
-			return Instance()._Alloc();
+		PooledAllocator() : pool(sizeof(ObjectType)) {}
+		~PooledAllocator() { }
+
+		/* generic */
+		inline static void* Alloc(size_t amount) {
+			if (amount == ObjectSize)
+				return AllocSingle(amount);
+			return AllocMultiple(amount);
 		}
 
-		static inline T* Alloc(size_t n) {
-			return Instance()._Alloc(n);
+		inline static void Free(void* ptr) {
+			FreeSingle(ptr);
 		}
 
-		static inline void Free(T* m) {
-			Instance()._Free(m);
+		inline static void Free(void* ptr, size_t totalSize) {
+			FreeMultiple(ptr);
 		}
 
-		static inline void Free(T* m, size_t n) {
-			Instance()._Free(m, n);
+		/* optimized */
+		inline static void* AllocSingle(size_t amount) {
+			NEX_ASSERT(amount == Instance().pool.GetChunkSize());
+			return Instance().pool.Alloc();
+		}
+
+		inline static void  FreeSingle(void* ptr) {
+			return Instance().pool.Free(ptr);
+		}
+
+		/* use base allocator */
+		inline static void* AllocMultiple(size_t amount) {
+			return BaseAllocator::Alloc(amount);
+		}
+
+		inline static void  FreeMultiple(void* ptr) {
+			BaseAllocator::Free(ptr);
+		}
+
+		inline static void FreePool() {
+			Instance().pool.FreePool();
 		}
 
 	protected:
 
-		friend class PoolManager;
-		
-		inline T* _Alloc() {
-			return pool.Alloc();
-		}
-
-		inline T* _Alloc(size_t n) {
-			return pool.Alloc(n);
-		}
-
-		inline void _Free(T* m) {
-			pool.Free(m);
-		}
-
-		inline void _Free(T* m, size_t n) {
-			pool.Free(m, n);
-		}
-		
-		inline void _FreePool() {
-			pool.FreePool();
-		}
-
-		static inline void FreePool() {
-			Instance()._FreePool();
-		}
-
-		static inline void AllocPool() {
-		}
-
 		static Type& Instance() {
-			static Type pool;
-			return pool;
+			static Type _singletonPool;
+			return _singletonPool;
 		}
-
 	};
 
-	typedef SingletonPool<Matrix4x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, AllocatorMathCore> Matrix4x4Pool;
-	//extern template class SingletonPool<Matrix4x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, AllocatorMathCore>;
-	typedef SingletonPool<TransformData, NEX_MATRIX_POOL_NUM_PER_BLOCK, AllocatorMathCore> TransformDataPool;
-	//extern template class SingletonPool<TransformData, NEX_MATRIX_POOL_NUM_PER_BLOCK, AllocatorMathCore>;
-	//extern template class SingletonPool<Matrix4x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, AllocatorMathCore>;
-	typedef SingletonPool<BoundingBox, NEX_MATRIX_POOL_NUM_PER_BLOCK, AllocatorMathCore> BoundingBoxPool;
-
-	class PoolManager {
+	class PoolAllocatorManager {
 	public:
 		static void CreateCommonPools();
 		static void DestroyCommonPools();

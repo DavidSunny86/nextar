@@ -8,12 +8,12 @@ namespace nextar {
 	Moveable::Moveable(ComponentManager *creator, const String& nodeName)
 			: Component(creator, nodeName), matrixNumber(0), lastFrustumPlane(0), matrixData(0) {
 		flags = DEFAULT_FLAGS;
-		matrixData = TransformDataPool::Alloc();
+		matrixData = NEX_NEW TransformData;
 		SetIdentityTransforms();
 	}
 
 	Moveable::~Moveable() {
-		TransformDataPool::Free(matrixData);
+		NEX_DELETE (matrixData);
 		matrixData = nullptr;
 	}
 

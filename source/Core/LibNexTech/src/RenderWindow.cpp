@@ -84,10 +84,3 @@ namespace nextar {
 		flags = val ? flags | WINDOW_VISIBLE : flags & ~WINDOW_VISIBLE;
 	}
 }
-
-
-#if defined(NEX_WINDOWS)
-#	include "platform/win32/RenderWindowWin.cpp"
-#elif defined(NEX_LINUX)
-#	include "platform/win32/RenderWindowX.cpp"
-#endif

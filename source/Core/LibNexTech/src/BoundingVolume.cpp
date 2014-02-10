@@ -75,12 +75,12 @@ namespace nextar {
 	 * BoundingVolume
 	 *********************************/
 	BoundingVolume::BoundingVolume() {
-		box = BoundingBoxPool::Alloc();
+		box = NEX_NEW BoundingBox;
 		radius = 0;
 	}
 
 	BoundingVolume::~BoundingVolume() {
-		BoundingBoxPool::Free(box);
+		NEX_DELETE (box);
 	}
 		
 	void BoundingVolume::MergeBounds(const BoundingVolume& vol) {

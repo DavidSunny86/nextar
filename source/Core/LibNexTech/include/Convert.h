@@ -1,8 +1,10 @@
 #ifndef NEXTAR_NEXCONV_H
 #define NEXTAR_NEXCONV_H
 
+
 #include "NexSys.h"
 #include "NexMath.h"
+#include "MathTypes.h"
 #include "Color.h"
 
 namespace nextar {

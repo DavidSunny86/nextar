@@ -20,8 +20,8 @@ set(NEX_ROOT ${PROJECT_SOURCE_DIR})
 set(NEX_BIN_BASE  ${NEX_ROOT}/../bin)
 set(NEX_BUILD ${NEX_ROOT}/../build)
 set(NEX_LIB ${NEX_ROOT}/../lib)
+set(NEX_DEPENDENCIES ${NEX_ROOT}/../dependencies)
 set(NEX_DATA ${NEX_ROOT}/Data)
-set(NEX_DEPENDENCIES ${NEX_ROOT}/Dependencis)
 set(NEX_PLUGINS ${NEX_ROOT}/Plugins)
 set(NEX_UNIT_TESTS ${PROJECT_SOURCE_DIR}/UnitTests)
 
@@ -131,6 +131,15 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 # using Visual Studio C++
 endif()
 
+## Platform detection
+#============================================================
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	set(NEX_OS "Windows")
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	set(NEX_OS "Linux")
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	set(NEX_OS "MacOSX")
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 ## Create plugin configuration file
 #============================================================

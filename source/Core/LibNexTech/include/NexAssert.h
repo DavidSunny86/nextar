@@ -21,7 +21,7 @@ namespace nextar {
 	};
 }
 
-#define NEX_COMPILE_ASSERT(x)                                   \
+#define NEX_STATIC_ASSERT(x)                                   \
     typedef nextar::AssertTest<                                 \
         sizeof(nextar::AssertFaliure< (bool)( x ) >)>           \
             NEX_TOKEN_PASTE(_static_assert_typedef, __LINE__)

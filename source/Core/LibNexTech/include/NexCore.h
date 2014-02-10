@@ -3,13 +3,36 @@
 
 #include <cmath>
 #include "NexSys.h"
+#include "CommonPools.h"
 #include "MathConfig.h"
+
+//@ include proper files
+#if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE
+#include "xmmintrin.h"
+#include "emmintrin.h"
+#include "smmintrin.h"
+#elif NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_3DNOW
+#include "mm3dnow.h"
+#error Not implemented
+#elif NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_VMX128
+#error Not implemented
+#endif
 
 #define NEXCORE_VERSION NEX_MAKE_VERSION(1,0,1)
 
 // check if vectorizing
 #if NEX_VECTOR_MATH_TYPE != NEX_VECTOR_MATH_TYPE_FALLBACK
 #define NEX_VECTOR_HARDWARE_USED
+#endif
+
+#ifdef NEX_MSVC
+#	ifdef NEX_VECTOR_HARDWARE_USED
+#		define NEXCORE_FASTCALL __fastcall
+#	endif
+#endif
+
+#ifndef NEXCORE_FASTCALL
+#	define NEXCORE_FASTCALL
 #endif
 
 //! feature bits
@@ -56,13 +79,13 @@
 //! roll degree [0,360]
 #define NEX_ROLL_360(a)				if(NEX_IS_FLOAT_NEGETIVE(a)) a=360; else if (a>360) a = 0;
 //! roll radians [0,2pi]
-#define NEX_ROLL_2PI(a)				if(NEX_IS_FLOAT_NEGETIVE(a)) a=N3D2Pi; else if (a>N3D2Pi) a = 0;
+#define NEX_ROLL_2PI(a)				if(NEX_IS_FLOAT_NEGETIVE(a)) a=Math::TWO_PI; else if (a>Math::TWO_PI) a = 0;
 //! roll degree [-180,180]
 #define NEX_ROLL_180(a)				if(a<-180.0f) a=180.0f; else if (a > 180.0f) a = -180.0f;
 //! roll pi
-#define NEX_ROLL_PI(a)				if(a < -(N3DPi) ) a = (N3DPi); else if (a > (N3DPi)) a = -(N3DPi);
+#define NEX_ROLL_PI(a)				if(a < -(Math::PI) ) a = (Math::PI); else if (a > (Math::PI)) a = -(Math::PI);
 //! blocks the range of angle to straight up/down
-#define NEX_ROLL_PIBY2(a)			if(a<-N3DPiBy2-N3DEpsilon)a=-N3DPiBy2-N3DEpsilon;else if(a>N3DPiBy2-N3DEpsilon) a = N3DPiBy2-N3DEpsilon;  
+#define NEX_ROLL_PIBY2(a)			if(a<-N3DPiBy2-Math::EPSILON)a=-N3DPiBy2-Math::EPSILON;else if(a>N3DPiBy2-Math::EPSILON) a = N3DPiBy2-Math::EPSILON;  
 //! grades to radians
 #define NEX_DEG2RAD(a)			(a*0.0174532925f)               
 //! radians to grades
@@ -129,38 +152,5 @@
 #endif
 
 /* constants */
-#define N3DRoundOff					_R(0.000001)
-#define N3DPi						_R(3.14159265358900)
-#define N3D2Pi						_R(6.28318530717900)
-#define N3DPiBy2					_R(1.57079632679400)
-#define N3DPiBy4					_R(0.78539816339700)
-#define N3DPiBy6					_R(0.52359877559800)
-#define N3DGrad						_R(0.0174532925199)
-#define N3D1ByPi					_R(0.31830988618379067153776752674503)
-#define N3D1By2Pi					_R(0.15915494309189533576888376337254)
-#define N3DInfinity					_R(3.402823466e+38)
-#define N3DInfinityMed					_R(999999999.0)
-#define N3DEpsilonBig					_R(0.0625)
-#define N3DEpsilonMed					_R(0.0009765625)
-#define N3DEpsilon					_R(1.192092896e-06)
-#define N3DInv3						_R(0.33333333333333333333)
-#define N3DInv6						_R(0.16666666666666666666)
-#define N3DInv7						_R(0.14285714285714285714)
-#define N3DInv9						_R(0.11111111111111111111)
-#define N3DInv255					_R(0.00392156862745098039)
-#define N3DSqrt2					_R(1.41421356237)
-#define N3DInvSqrt2					_R(0.707106781188)
-#define N3DSqrt3 					_R(1.73205080757)
-#define N3DInvSqrt3					_R(0.577350269189)
-
-namespace nextar {
-/*	enum ClipSpecification {
- CLIP_INSIDE = 0,
- CLIP_OUTSIDE = 1,
- CLIP_INTERSECTS = 2
- };
- */ // internal
-// NEX_EFFICIENT_TYPEDEF(16,uint32 _albitmask[4]);
-}
 
 #endif //NEXTAR_NEXCORE_H

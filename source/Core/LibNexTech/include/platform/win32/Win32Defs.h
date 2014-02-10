@@ -61,6 +61,7 @@ DllMain (HINSTANCE , DWORD , LPVOID )                                           
 #define FOPEN_W(file, path, mode) file = _wfopen((const wchar_t*)(path), (mode));
 #endif
 
-NEX_COMPILE_ASSERT(sizeof(wchar_t)==sizeof(char16_t));
+static_assert(sizeof(wchar_t)==sizeof(char16_t), "wchar_t does not match char16_t size!, need to change code");
+
 #endif
 #endif //NEXTAR_WIN32_OSDEFS_H

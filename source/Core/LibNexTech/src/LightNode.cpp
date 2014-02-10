@@ -38,7 +38,7 @@ namespace nextar {
 			// take up a new axis
 			Vector3A yAxis = Vec3ASet(0, 1, 0);
 			axis = Vec3ACross(lookAt, yAxis);
-			if (Math::Abs(Vec3ADot(axis, axis)) < N3DEpsilon
+			if (Math::Abs(Vec3ADot(axis, axis)) < Math::EPSILON
 			)
 				axis = Vec3ACross(lookAt, Vec3ASet(0, 0, 1));
 		} else if (dotProd > 0.9998f) {

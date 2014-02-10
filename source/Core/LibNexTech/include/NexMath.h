@@ -1,9 +1,9 @@
-//@ Obi De
-//@ Nov 25 2007
-//@ Dec 27 07
-//@---------------------------
-#ifndef NEXTAR_MATH
-#define NEXTAR_MATH
+// Obi De
+// Nov 25 2007
+// Dec 27 07
+//---------------------------
+#ifndef NEXTAR_MATH_H_
+#define NEXTAR_MATH_H_
 
 #include "NexCore.h"
 
@@ -13,15 +13,43 @@
 namespace nextar {
 
 	/**
-	 * @note Matrix Layout
-	 * @par OpenGl uses Coloumn Major while DirectX uses Row major,
-	 * but, while considering memory, OpenGL nad DirectX both use the
-	 * same memory locations to store their matrices. 
-	 * @par Nextar uses the same thing. More specifically, it uses:
-	 * Row Major, Row Ordered matrices. So the 4 vectors are in 4 rows.
-	 **/
-
+	* @note Matrix Layout
+	* @par OpenGl uses Coloumn Major while DirectX uses Row major,
+	* but, while considering memory, OpenGL nad DirectX both use the
+	* same memory locations to store their matrices. 
+	* @par Nextar uses the same thing. More specifically, it uses:
+	* Row Major, Row Ordered matrices. So the 4 vectors are in 4 rows.
+	**/
 	namespace Math {
+
+		static constexpr float ROUND_OFF = 0.000001f;
+		static constexpr float PI = 3.14159265358900f;
+		static constexpr float TWO_PI = 6.28318530717900f;
+		static constexpr float PI_BY_2 = 1.57079632679400f;
+		static constexpr float PI_BY_4 = 0.78539816339700f;
+		static constexpr float PI_BY_6 = 0.52359877559800f;
+		static constexpr float INV_PI = 0.31830988618379067153776752674503f;
+		static constexpr float INV_2_PI = 0.15915494309189533576888376337254f;
+		static constexpr float DEG_TO_RAD_MULTIPLIER = 0.0174532925199f;
+
+		static constexpr float INFINITY = 3.402823466e+38f;
+		static constexpr float INFINITY_MED = 999999999.0f;
+
+		static constexpr float EPSILON = 1.192092896e-06f;
+		static constexpr float EPSILON_MED = 0.0009765625f;
+		static constexpr float EPSILON_BIG = 0.0625f;
+
+		static constexpr float INV_3 = 0.33333333333333333333f;
+		static constexpr float INV_6 = 0.16666666666666666666f;
+		static constexpr float INV_7 = 0.14285714285714285714f;
+		static constexpr float INV_9 = 0.11111111111111111111f;
+		static constexpr float INV_255 = 0.00392156862745098039f;
+		static constexpr float SQRT_2 = 1.41421356237f;
+		static constexpr float INV_SQRT_2 = 0.707106781188f;
+		static constexpr float SQRT_3 = 1.73205080757f;
+		static constexpr float INV_SQRT_3 = 0.577350269189f;
+
+
 		using namespace ::nextar;
 
 		/** Math function overrides */
@@ -75,12 +103,12 @@ namespace nextar {
 #if (NEX_ARCH==NEX_ARCH_X86) && defined(NEX_USE_ASM) && defined(NEX_GCC)
 			register float sinvalue, cosvalue;
 			asm ("fld %[angle]\t\n"
-					"fsincos\t\n"
-					"fstp %[cosval]\t\n"
-					"fstp %[sinval]\t\n"
-					: [sinval] "=g" (sinvalue),
-					[cosval] "=g" (cosvalue)
-					: [angle] "g" (__arg));
+				"fsincos\t\n"
+				"fstp %[cosval]\t\n"
+				"fstp %[sinval]\t\n"
+				: [sinval] "=g" (sinvalue),
+				[cosval] "=g" (cosvalue)
+				: [angle] "g" (__arg));
 			_sinvalue = sinvalue;
 			_cosvalue = cosvalue;
 #elif (NEX_ARCH==NEX_ARCH_X86) && defined(NEX_USE_ASM) && defined(NEX_MSVC)
@@ -88,13 +116,13 @@ namespace nextar {
 			__asm
 			{
 				fld __arg
-				fsincos
-				fstp cosvalue
-				fstp sinvalue
-				;mov eax, cosvalue
-				;fstp dword ptr[eax]
+					fsincos
+					fstp cosvalue
+					fstp sinvalue
+					;mov eax, cosvalue
+					;fstp dword ptr[eax]
 				;mov eax, sinvalue
-				;fstp dword ptr[eax]
+					;fstp dword ptr[eax]
 			}
 			_sinvalue = sinvalue;
 			_cosvalue = cosvalue;
@@ -103,56 +131,55 @@ namespace nextar {
 			_cosvalue = Math::Cos(__arg);
 #endif
 		}
-//-------------------------------------------------------
-//@ Other utilities
+		//-------------------------------------------------------
+		// Other utilities
 		_NexExport int32 GetNearestPow2(int32);
 		_NexExport bool IsPow2(uint32);
-//-------------------------------------------------------
-// inlined functions
-//@ wrap angle between -pi & +pi
+		//-------------------------------------------------------
+		// inlined functions
+		// wrap angle between -pi & +pi
 
 		inline float WrapPi(float theta) {
-			theta += N3DPi;
-			theta -= std::floor(theta * N3D1By2Pi) * N3D2Pi;
-			theta -= N3DPi;
+			theta += Math::PI;
+			theta -= std::floor(theta * Math::INV_2_PI) * Math::TWO_PI;
+			theta -= Math::PI;
 			return theta;
 		}
-//@ float to fixed point conversion, float must be
-//@ between 0-1
-
+		// float to fixed point conversion, float must be
+		// between 0-1
 		inline uint32 FloatToFixed(float f, uint32 n) {
-			//@ value * maxvalue
+			// value * maxvalue
 			return uint32(f * ((1 << (n)) - 1));
 		}
-//@ fixed to float, float returned is between
-//@ zero and one
+		// fixed to float, float returned is between
+		// zero and one
 
 		inline float FixedToFloat(uint32 f, uint32 n) {
-			//@ value / maxvalue
+			// value / maxvalue
 			return (float) (f) / (float) ((1 << n) - 1);
 		}
-//@ fixed to fixed, fixed returned is between
-//@ zero and one
+		// fixed to fixed, fixed returned is between
+		// zero and one
 
 		inline uint32 FixedToFixed(uint32 f, uint32 fb, uint32 reqb) {
 
-			//@ ((max(reqb)/max(fb)) * f)
-			//@ the trick is if reqb < fb we can straightforwardly
-			//@ divide by pow(2,reqb-fb), so
+			// ((max(reqb)/max(fb)) * f)
+			// the trick is if reqb < fb we can straightforwardly
+			// divide by pow(2,reqb-fb), so
 			if (reqb < fb)
 				return (f >> (reqb - fb));
 			return f * ((1 << reqb) - 1 / ((1 << fb) - 1));
 		}
 
-//@-- half-float conversions.
-//@-- to speed up we can use tables
-//@ (really small tables with mantissa, exponent, offset)
-//@-- this might be required elsewhere, for now just do it
-//@ algorithmetically
+		//-- half-float conversions.
+		//-- to speed up we can use tables
+		// (really small tables with mantissa, exponent, offset)
+		//-- this might be required elsewhere, for now just do it
+		// algorithmetically
 
 		inline uint16 FloatToHalfI(uint32 i) {
-			//@ can use SSE here, but lets
-			//@ do it naive way.
+			// can use SSE here, but lets
+			// do it naive way.
 			register int s = (i >> 16) & 0x00008000;
 			register int e = ((i >> 23) & 0x000000ff) - (127 - 15);
 			register int m = i & 0x007fffff;
@@ -182,15 +209,15 @@ namespace nextar {
 		}
 
 		inline uint32 HalfToFloatI(uint16 y) {
-			//@ can use SSE here, but lets
-			//@ do it naive way.
+			// can use SSE here, but lets
+			// do it naive way.
 			register int s = (y >> 15) & 0x00000001;
 			register int e = (y >> 10) & 0x0000001f;
 			register int m = y & 0x000003ff;
 
 			if (e == 0) {
 				if (m == 0) // Plus or minus zero
-						{
+				{
 					return s << 31;
 				} else // Denormalized number -- renormalize it
 				{
@@ -204,7 +231,7 @@ namespace nextar {
 				}
 			} else if (e == 31) {
 				if (m == 0) // Inf
-						{
+				{
 					return (s << 31) | 0x7f800000;
 				} else // NaN
 				{
@@ -249,60 +276,72 @@ namespace nextar {
 
 		/* Sin of angle in the range of [0, pi/2]*/
 		inline float SinZeroHalfPi(
-				float a) {
-			float s, t;
-			s = a * a;
-			t = -2.39e-08f;
-			t *= s;
-			t += 2.7526e-06f;
-			t *= s;
-			t += -1.98409e-04f;
-			t *= s;
-			t += 8.3333315e-03f;
-			t *= s;
-			t += -1.666666664e-01f;
-			t *= s;
-			t += 1.0f;
-			t *= a;
-			return t;
+			float a) {
+				float s, t;
+				s = a * a;
+				t = -2.39e-08f;
+				t *= s;
+				t += 2.7526e-06f;
+				t *= s;
+				t += -1.98409e-04f;
+				t *= s;
+				t += 8.3333315e-03f;
+				t *= s;
+				t += -1.666666664e-01f;
+				t *= s;
+				t += 1.0f;
+				t *= a;
+				return t;
 		}
 
 		/* Arc tan when x and y are positives */
 		inline float ArcTanPositive(
-				float y, float x) {
-			float a, d, s, t;
-			if (y > x) {
-				a = -x / y;
-				d = N3DPi / 2;
-			} else {
-				a = y / x;
-				d = 0.0f;
-			}
-			s = a * a;
-			t = 0.0028662257f;
-			t *= s;
-			t += -0.0161657367f;
-			t *= s;
-			t += 0.0429096138f;
-			t *= s;
-			t += -0.0752896400f;
-			t *= s;
-			t += 0.1065626393f;
-			t *= s;
-			t += -0.1420889944f;
-			t *= s;
-			t += 0.1999355085f;
-			t *= s;
-			t += -0.3333314528f;
-			t *= s;
-			t += 1.0f;
-			t *= a;
-			t += d;
-			return t;
+			float y, float x) {
+				float a, d, s, t;
+				if (y > x) {
+					a = -x / y;
+					d = Math::PI / 2;
+				} else {
+					a = y / x;
+					d = 0.0f;
+				}
+				s = a * a;
+				t = 0.0028662257f;
+				t *= s;
+				t += -0.0161657367f;
+				t *= s;
+				t += 0.0429096138f;
+				t *= s;
+				t += -0.0752896400f;
+				t *= s;
+				t += 0.1065626393f;
+				t *= s;
+				t += -0.1420889944f;
+				t *= s;
+				t += 0.1999355085f;
+				t *= s;
+				t += -0.3333314528f;
+				t *= s;
+				t += 1.0f;
+				t *= a;
+				t += d;
+				return t;
+		}
+
+
+		inline void Clamp(float& clampwhat, float lowvalue, float hivalue) {
+#if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE
+			_mm_store_ss(&clampwhat,
+				_mm_max_ss(_mm_load_ss(&lowvalue),
+				_mm_min_ss(_mm_load_ss(&clampwhat),
+				_mm_load_ss(&hivalue))));
+#else
+			clampwhat = std::max(lowvalue,std::min(clampwhat,hivalue));
+#endif
 		}
 	}
+
+		
 }
 
-#include "NexMathTypes.h"
-
-#endif //NEXTAR_MATH
+#endif //NEXTAR_MATH_H_

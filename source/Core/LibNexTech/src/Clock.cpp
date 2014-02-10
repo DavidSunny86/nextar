@@ -1,12 +1,5 @@
 
 #include "NexHeaders.h"
-#if defined(NEX_LINUX)
-#include "platform/linux/LinuxClock.cpp"
-#elif defined(NEX_WINDOWS)
-#include "platform/win32/Win32Clock.cpp"
-#else
-#error Clock not yet implemented
-#endif
 #include "Clock.h"
 
 using namespace nextar;

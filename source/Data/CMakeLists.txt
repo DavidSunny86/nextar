@@ -8,10 +8,14 @@
 # Source list
 #===========================================================
 set(NEX_DATA_SHADERS ${NEX_DATA}/Shaders)
+set(NEX_DATA_CONFIG ${NEX_DATA}/Config)
 
-file(GLOB NEX_SHADERS_LIST ${NEX_DATA_SHADERS}/*)
+file(GLOB NEX_DATA_SHADERS_LIST ${NEX_DATA_SHADERS}/*)
+file(GLOB NEX_DATA_CONFIG_LIST ${NEX_DATA_CONFIG}/*)
+
 set(DATA_SRC_LIST 
-	${NEX_SHADERS_LIST}
+	${NEX_DATA_SHADERS_LIST}
+	${NEX_DATA_CONFIG_LIST}
 )
 # Add definition
 

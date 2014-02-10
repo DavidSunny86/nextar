@@ -8,7 +8,7 @@
 // Return type     : const Vector3& 
 // Argument        : const Vector3 & v
 
-_NexInline Vector3& Vector3::operator =(const PolarSys & pol) {
+inline Vector3& Vector3::operator =(const PolarSys & pol) {
 
 	float sv = Math::Sin(pol.vert);
 	float cv = Math::Cos(pol.vert);

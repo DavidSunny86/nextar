@@ -7,7 +7,7 @@
 
 namespace nextar {
 
-	class TransformData : public AllocMathCore {
+	class TransformData : public AllocMathPool<TransformData, NEX_MATRIX_POOL_NUM_PER_BLOCK> {
 	public:
 		/* World rotation */
 		Quaternion wrot;
@@ -23,7 +23,7 @@ namespace nextar {
 		float wscale;
 		float iscale;
 		
-		/* we have 2 floats to spare here */		
+		/* we have 2 floats to spare here, mass and volume? */		
 		float pad[2];
 	};
 }

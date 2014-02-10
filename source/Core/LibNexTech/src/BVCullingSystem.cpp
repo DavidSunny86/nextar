@@ -33,10 +33,10 @@ namespace nextar {
 		for(auto &b : bodies) {
 			if (coherentCam == trav.camera) {
 				if (trav.camera->IsVisible(
-					b->GetBoundInfo(), b->_CullingData()))
+					b->GetBoundsInfo(), b->_CullingData()))
 					b->Visit(trav);
 			} else {
-				if (trav.camera->IsVisible(b->GetBoundInfo()))
+				if (trav.camera->IsVisible(b->GetBoundsInfo()))
 					b->Visit(trav);
 			}
 		}

@@ -1,10 +1,12 @@
+
 #include "NexHeaders.h"
 #include "NexMath.h"
+#include "MathTypes.h"
 #include "mathtypes/Matrix3x3.cpp"
 #include "mathtypes/EularAngles.cpp"
 
 #ifdef NEX_MATH_RANDOMIZER_DEFINED
-NEX_MATH_RANDOM_SEED;
+	NEX_MATH_RANDOM_SEED;
 #endif
 
 namespace nextar {

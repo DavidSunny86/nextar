@@ -38,6 +38,10 @@ namespace nextar {
 		virtual Component* AsyncCreateImpl(int type, const String& name);
 	};
 
+	/** 
+	 * We expect a lot of entities, so we will override new and delete operators
+	 * so that they allocate from a singleton pool.
+	 */
 	class _NexExport Entity: public Referenced<Entity, nextar::Component> {
 		NEX_LOG_HELPER(Entity);
 	public:

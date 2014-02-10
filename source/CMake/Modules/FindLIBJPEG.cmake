@@ -49,6 +49,7 @@ else (LIBJPEG_LIBRARIES AND LIBJPEG_INCLUDE_DIRS)
       /usr/local/include/libjpeg-turbo
       /usr/local/include/libjpeg
       /usr/include
+	  ${LIBJPEG_ROOT}/include
     PATH_SUFFIXES
 	  libjpeg-turbo
 	  libjpeg
@@ -72,8 +73,9 @@ else (LIBJPEG_LIBRARIES AND LIBJPEG_INCLUDE_DIRS)
   )
   find_path(LIBJPEG_STATIC_DIR
     NAMES
-	libjpeg.a
-	libjpeg62.a
+	  libjpeg.a
+	  libjpeg62.a
+	  jpeg.lib
     PATHS
 	  /opt/libjpeg-turbo/lib
       /usr/local/lib64
@@ -83,6 +85,7 @@ else (LIBJPEG_LIBRARIES AND LIBJPEG_INCLUDE_DIRS)
       /usr/local/lib
       /opt/local/lib
       /sw/lib
+	  ${LIBJPEG_ROOT}/lib
     NO_DEFAULT_PATH
   )
   set(LIBJPEG_INCLUDE_DIRS
@@ -90,10 +93,10 @@ else (LIBJPEG_LIBRARIES AND LIBJPEG_INCLUDE_DIRS)
   )
   set(LIBJPEG_LIBRARIES
     ${LIBJPEG_LIBRARY}
-)
+  )
   set(LIBJPEG_STATIC
     ${LIBJPEG_STATIC_DIR}/libjpeg.a
-)
+  )
   if (LIBJPEG_INCLUDE_DIRS AND LIBJPEG_LIBRARIES)
      set(LIBJPEG_FOUND TRUE)
   endif (LIBJPEG_INCLUDE_DIRS AND LIBJPEG_LIBRARIES)

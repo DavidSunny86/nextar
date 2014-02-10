@@ -19,6 +19,7 @@
 
 // Num matrix per block in matrix pool
 #define NEX_MATRIX_POOL_NUM_PER_BLOCK 32
+#define NEX_BV_POOL_NUM_PER_BLOCK 32
 #ifdef NEX_USE_ASM_WHEN_REQUIRED 
 #	define NEX_CORE_USE_ASM
 #endif

@@ -1,5 +1,8 @@
 
 #include "NexHeaders.h"
+#include "NexMath.h"
+#include "TransformData.h"
+#include "BoundingVolume.h"
 #include "CommonPools.h"
 
 namespace nextar {

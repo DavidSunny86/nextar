@@ -10,12 +10,12 @@ namespace nextar {
 		// the canonical range of -pi/2 ... pi/2
 		if (pitch < -N3DPiBy2) {
 			pitch = -N3DPiBy2 - pitch;
-			yaw += N3DPi;
-			roll += N3DPi;
+			yaw += Math::PI;
+			roll += Math::PI;
 		} else if (pitch > N3DPiBy2) {
-			pitch = N3DPi - pitch;
-			yaw += N3DPi;
-			roll += N3DPi;
+			pitch = Math::PI - pitch;
+			yaw += Math::PI;
+			roll += Math::PI;
 		}
 		// Now check for the gimbel Lock case (within a slight tolerance)
 		if (Math::Abs(pitch) > N3DPiBy2 - 1e-4) {

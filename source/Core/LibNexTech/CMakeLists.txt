@@ -9,7 +9,18 @@
 #===========================================================
 set(NEXTECH_SRC ${NEXTECH_ROOT}/src)
 
-file(GLOB NEX_SRC_LIST ${NEXTECH_SRC}/*.cpp)
+if(NEX_OS MATCHES "Windows")
+ set(NEXTECH_PLATFORM_SRC ${NEXTECH_ROOT}/src/win32)
+elseif(NEX_OS MATCHES "Linux")
+ set(NEXTECH_PLATFORM_SRC ${NEXTECH_ROOT}/src/linux)
+elseif(NEX_OS MATCHES "MacOSX")
+ set(NEXTECH_PLATFORM_SRC ${NEXTECH_ROOT}/src/macosx)
+endif(NEX_OS MATCHES "Windows")
+
+file(GLOB NEX_SRC_LIST 
+	${NEXTECH_SRC}/*.cpp
+	${NEXTECH_PLATFORM_SRC}/*.cpp
+	)
 
 # Add definition
 add_definitions( -DNEXTAR_BASE_EXPORTS )
@@ -30,10 +41,17 @@ add_library(${LIBNEXTECH} SHARED ${NEX_SRC_LIST})
 target_link_libraries(${LIBNEXTECH} ${CMAKE_DL_LIBS})
 
 # zlib
+if(NEX_OS MATCHES "Windows")
+ if((NOT ZLIB_ROOT) AND (NOT ENV{ZLIB_ROOT}))
+  message("Defaulting to dependencies/zlib")
+  set(ZLIB_ROOT ${NEX_DEPENDENCIES}/zlib)
+ endif((NOT ZLIB_ROOT) AND (NOT ENV{ZLIB_ROOT}))
+endif(NEX_OS MATCHES "Windows")
+
 find_package(ZLIB REQUIRED)
-if (ZLIB_FOUND)
+if(ZLIB_FOUND)
  include_directories( ${ZLIB_INCLUDE_DIRS} )
- target_link_libraries(${LIBNEXTECH} ${ZLIB_LIBRARIES})
+ target_link_libraries(${LIBNEXTECH} ${ZLIB_LIBRARIES}) 
 endif (ZLIB_FOUND)
 
 ## Platform specific dependencies

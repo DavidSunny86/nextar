@@ -109,6 +109,8 @@ namespace nextar {
 #define NEX_ALLOCATOR_FREE(ptr,alloctor)		(alloctor::Free(ptr))
 //! basic free
 #define NEX_FREE(ptr,catagory)				(AllocatorBase<catagory>::Free(ptr))
+#define NEX_FREE_ARRAY(ptr, size, catagory)	(AllocatorBase<catagory>::Free(ptr, size))
+#define NEX_ALLOC_ARRAY NEX_ALLOC
 //! basic allocator for objects not using AllocObjectBase
 #define NEX_ALLOC_T(T,catagory)				(ConstructObject<T>((T*)NEX_ALLOC(sizeof(T),catagory)))
 //! basic allocator for objects not using AllocObjectBase
@@ -116,9 +118,9 @@ namespace nextar {
 //! basic deallocator for objects not using AllocObjectBase
 #define NEX_FREE_T(T,catagory,ptr)			DestroyObject<T>(ptr); NEX_FREE(ptr,catagory)
 //! basic allocator for objects not using AllocObjectBase
-#define NEX_ALLOC_ARRAY_T(T,catagory,num)     (ConstructObjects<T>((T*)NEX_ALLOC(sizeof(T)*num,catagory), num))
+#define NEX_ALLOC_ARRAY_T(T,catagory,num)     (ConstructObjects<T>((T*)NEX_ALLOC_ARRAY(sizeof(T)*num,catagory), num))
 //! basic deallocator for objects not using AllocObjectBase
-#define NEX_FREE_ARRAY_T(T,catagory,num,ptr)  DestroyObjects<T>(ptr,num); NEX_FREE(ptr,catagory)
+#define NEX_FREE_ARRAY_T(T,catagory,num,ptr)  DestroyObjects<T>(ptr,num); NEX_FREE_ARRAY(ptr, sizeof(T)*num, catagory)
 //! delete operator override
 #define NEX_DELETE	delete
 	//! AllocObjectBase classes

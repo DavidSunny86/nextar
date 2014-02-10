@@ -3,13 +3,13 @@
 # : File system unit tests.
 # Abhishek Dey
 ##---------------------------------------------------
-set(NEX_UT_RE_MESHTEST ${NEX_UNIT_TESTS_RENDERENGINE}/Mesh)
+set(NEX_UT_RE_MESHTEST ${NEX_UT_RENDERENGINE}/Mesh)
 set(NEX_UT_RE_MESHTEST_INCLUDE ${NEX_UT_RE_MESHTEST}/include)
 set(NEX_UT_RE_MESHTEST_SRC ${NEX_UT_RE_MESHTEST}/src)
 
-file(GLOB NEX_UT_RE_MESHTEST_SRC_LIST ${NEX_UT_RE_MESHTEST_SRC}/*.cpp)
+file(GLOB NEX_UT_RE_MESHTEST_SRC_LIST ${NEX_UT_RENDERENGINE_COMMONS_SRC};${NEX_UT_RE_MESHTEST_SRC}/*.cpp)
 
-include_directories(${NEX_UT_RE_MESHTEST_INCLUDE})
+include_directories(${NEX_UT_RENDERENGINE_COMMONS_INCLUDE};${NEX_UT_RE_MESHTEST_INCLUDE})
 # console applicaiton
 add_definitions( -DNEX_CONSOLE_APP_ENTRY )
 # target

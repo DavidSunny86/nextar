@@ -26,6 +26,20 @@ target_link_libraries(ImageLoader ${LIBNEXTECH})
 
 ## Find dependencies
 #===========================================================
+message("@Todo Make all libraries optional."
+  "Use a config.h for selective inclusion")
+if(NEX_OS MATCHES "Windows")
+ # JPEG
+ if(NOT LIBJPEG_ROOT)
+  set(LIBJPEG_ROOT ${NEX_DEPENDENCIES}/libjpeg)
+ endif(NOT LIBJPEG_ROOT)
+ # PNG
+  if(NOT PNG_ROOT)
+  set(PNG_NAMES libpng16)
+  set(PNG_ROOT ${NEX_DEPENDENCIES}/libpng)
+ endif(NOT PNG_ROOT)
+endif(NEX_OS MATCHES "Windows")
+
 find_package(LIBJPEG REQUIRED)
 if (LIBJPEG_FOUND)
  include_directories( ${LIBJPEG_INCLUDE_DIRS} )

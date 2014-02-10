@@ -67,7 +67,7 @@ namespace nextar {
 		m1._21 = (m2._23 * m2._31 - m2._21 * m2._33);
 		m1._31 = (m2._21 * m2._32 - m2._31 * m2._22);
 		d = (m2._11 * m1._11 + m2._12 * m1._21 + m2._13 * m1._31);
-		if (Math::Abs(d) > N3DEpsilon) {
+		if (Math::Abs(d) > Math::EPSILON) {
 			d = 1 / d;
 			m1._11 *= d;
 			m1._12 = d * (m2._13 * m2._32 - m2._12 * m2._33);

@@ -8,7 +8,7 @@
 #ifndef BOUNDING_VOLUME_H
 #define	BOUNDING_VOLUME_H
 
-#include "NexMath.h"
+#include "MathTypes.h"
 #include "Frustum.h"
 
 namespace nextar {
@@ -18,13 +18,22 @@ namespace nextar {
 		Vector3 extends;
 		float radius;
 	};
-	class _NexExport BoundingBox: public AllocMathCore {
+	class _NexExport BoundingBox: public AllocMathPool<BoundingBox, NEX_BV_POOL_NUM_PER_BLOCK> {
 	public:
+
 		static BoundingBox Null;
 				
 
 		BoundingBox();
 		
+		const Vector3A& GetCenter() const {
+			return center;
+		}
+
+		const Vector3A& GetExtends() const {
+			return extends;
+		}
+
 		void SetNull();
 		void SetVolume(Vec3AF center, Vec3AF extends);
 		void UpdateBounds(Mat4x4F m);
@@ -59,6 +68,14 @@ namespace nextar {
 
 		inline float GetRadius() const {
 			return radius;
+		}
+
+		const Vector3A& GetCenter() const {
+			return GetBox().GetCenter();
+		}
+
+		const Vector3A& GetExtends() const {
+			return GetBox().GetExtends();
 		}
 
 		inline void UpdateBounds(Mat4x4F m) {

@@ -185,8 +185,8 @@ public:
 	//# friend operators
 
 	friend inline bool operator ==(const Vector2& v1, const Vector2 & v2) {
-		return (NEX_FLOAT_TOLERANCE_EQUAL(v1.x, v2.x, N3DRoundOff) &&
-				NEX_FLOAT_TOLERANCE_EQUAL(v1.y, v2.y, N3DRoundOff)) != 0;
+		return (NEX_FLOAT_TOLERANCE_EQUAL(v1.x, v2.x, Math::ROUND_OFF) &&
+				NEX_FLOAT_TOLERANCE_EQUAL(v1.y, v2.y, Math::ROUND_OFF)) != 0;
 	}
 
 	friend inline bool operator !=(const Vector2& v1, const Vector2 & v2) {

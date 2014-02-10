@@ -156,26 +156,6 @@ typedef unsigned short wchar_t;
 #	endif
 #endif
 
-//@ alignment macro
-#if defined(_MSC_VER) && _MSC_VER > 1200
-#	define NEX_ALIGN_MEMBER( _member_, _align_ )	__declspec(align(_align_))	_member_
-#	define NEX_EFFICIENT_ALIGN(_member_)			__declspec(align(16))		_member_
-#	define NEX_EFFICIENT_TYPEDEF( _align_num_, _def_ )	typedef __declspec(align(_align_num_)) _def_
-#	define NEX_ALIGNED_STRUCT_BEGIN( _align_num_, __name__ ) struct __declspec(align(_align_num_)) __name__ 
-#	define NEX_ALIGNED_STRUCT_END( _align_num_ )             
-#elif  __GNUC__
-#	define NEX_ALIGN_MEMBER( _member_, _align_ )	_member_ __attribute((aligned(_align_)))
-#	define NEX_EFFICIENT_ALIGN(_member_)			_member_ __attribute((aligned(16)))
-#	define NEX_EFFICIENT_TYPEDEF( _align_num_, _def_ )	typedef _def_ __attribute((aligned(_align_num_)))
-#	define NEX_ALIGNED_STRUCT_BEGIN( _align_num_, __name__ ) struct __name__ 
-#	define NEX_ALIGNED_STRUCT_END( _align_num_ ) __attribute((aligned(_align_num_)))
-#else
-#	define NEX_ALIGN_MEMBER( _member_, _align_ )	_member_
-#	define NEX_EFFICIENT_ALIGN(_member_)			_member_
-#	define NEX_EFFICIENT_TYPEDEF( _align_num_, _def_ )	typedef _def_
-#	pragma message("Alignment: Alignments unsupported. Please see note.")
-#endif
-
 #ifdef NEX_MSVC
 #if	_MSC_VER >= 1400
 #	include <intrin.h>
@@ -196,6 +176,9 @@ typedef unsigned short wchar_t;
 #if (_MSC_VER <= 1700) || defined(__MINGW32__)
 #	define noexcept
 #	define override
+#	define constexpr const
+	// no need to explicitly align as first member is aligned anyway
+#	define alignas(x)	
 #endif
 
 #if defined( NEX_MSVC ) && !defined(NEX_DONOT_USE_NOVTABLE)
@@ -232,6 +215,21 @@ typedef unsigned short wchar_t;
 #	define NEX_CLEAN_TYPE_NAME(ptr, status)	typeid(ptr).name(); status
 #endif
 
+
+#if defined(_MSC_VER) && _MSC_VER > 1200
+#	define NEX_ALIGN_MEMBER( _member_, _align_ )	__declspec(align(_align_))	_member_
+#	define NEX_EFFICIENT_ALIGN(_member_)			__declspec(align(16))		_member_
+#	define NEX_EFFICIENT_TYPEDEF( _align_num_, _def_ )	typedef __declspec(align(_align_num_)) _def_
+#elif  __GNUC__
+#	define NEX_ALIGN_MEMBER( _member_, _align_ )	_member_ __attribute((aligned(_align_)))
+#	define NEX_EFFICIENT_ALIGN(_member_)			_member_ __attribute((aligned(16)))
+#	define NEX_EFFICIENT_TYPEDEF( _align_num_, _def_ )	typedef _def_ __attribute((aligned(_align_num_)))
+#else
+#	define NEX_ALIGN_MEMBER( _member_, _align_ )	_member_
+#	define NEX_EFFICIENT_ALIGN(_member_)			_member_
+#	define NEX_EFFICIENT_TYPEDEF( _align_num_, _def_ )	typedef _def_
+#	pragma message("Alignment: Alignments unsupported. Please see note.")
+#endif
 
 #if !defined( NEX_ENDIAN_LITTLE ) || !defined( NEX_ENDIAN_BIG )
 # error Required constants missing.
@@ -286,4 +284,3 @@ typedef unsigned short wchar_t;
 //#include "nexcallstack.h"
 #endif //NEXTAR_BASE_DEF_H
 //@
-

@@ -8,13 +8,13 @@ namespace nextar {
 
 	Spatial::Spatial(ComponentManager *creator, const String& name, Component* parent) :
 		Component(creator, name, parent), cullingData(0), moveable(nullptr), culler(nullptr) {
-		worldMatrix = Matrix4x4Pool::Alloc();
+		worldMatrix = NEX_NEW Matrix4x4;
 		*worldMatrix = Matrix4x4::IdentityMatrix;
 	}
 
 	Spatial::~Spatial() {
 		if (!moveable) {
-			Matrix4x4Pool::Free(worldMatrix);
+			NEX_DELETE (worldMatrix);
 			worldMatrix = nullptr;
 		}
 	}
@@ -26,10 +26,10 @@ namespace nextar {
 
 		if (moveable) {
 			if (worldMatrix)
-				Matrix4x4Pool::Free(worldMatrix);
+				NEX_DELETE  (worldMatrix);
 			worldMatrix = moveable->GetTransformPtr();
 		} else {
-			worldMatrix = Matrix4x4Pool::Alloc();
+			worldMatrix = NEX_NEW Matrix4x4;
 			*worldMatrix = Matrix4x4::IdentityMatrix;
 		}
 

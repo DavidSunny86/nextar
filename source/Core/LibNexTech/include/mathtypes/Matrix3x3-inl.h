@@ -1,20 +1,20 @@
 // default constructor
 //=========================================
 
-_NexInline Matrix3x3::Matrix3x3() {
+inline Matrix3x3::Matrix3x3() {
 }
 
 // constructor
 //=========================================
 
-_NexInline Matrix3x3::Matrix3x3(const float* _m) {
+inline Matrix3x3::Matrix3x3(const float* _m) {
 	MemUtils::CopyDwords(m, _m, 9);
 }
 
 // constructor
 //=========================================
 
-_NexInline Matrix3x3::Matrix3x3(const float __11, const float __12, const float __13,
+inline Matrix3x3::Matrix3x3(const float __11, const float __12, const float __13,
 		const float __21, const float __22, const float __23, const float __31,
 		const float __32, const float __33) {
 	_11 = __11;
@@ -33,41 +33,41 @@ _NexInline Matrix3x3::Matrix3x3(const float __11, const float __12, const float 
 // constructor
 //=========================================
 
-_NexInline Matrix3x3::Matrix3x3(const Matrix3x3& _m) {
+inline Matrix3x3::Matrix3x3(const Matrix3x3& _m) {
 	MemUtils::CopyDwords(m, _m.m, 9);
 }
 
 // constructor
 //=========================================
 
-_NexInline Matrix3x3::Matrix3x3(const EularAngles& orientation) {
+inline Matrix3x3::Matrix3x3(const EularAngles& orientation) {
 	*this = orientation;
 }
 
 // constructor
 //=========================================
 
-_NexInline Matrix3x3::Matrix3x3(const AxisAngle& aa) {
+inline Matrix3x3::Matrix3x3(const AxisAngle& aa) {
 	*this = aa;
 }
 
 // constructor
 //=========================================
 
-_NexInline Matrix3x3::Matrix3x3(const QuatF q) {
+inline Matrix3x3::Matrix3x3(const QuatF q) {
 	*this = q;
 }
 
 //// operators
 //// conversion operators
 ////=========================================
-//_NexInline Matrix3x3::operator const float*() const
+//inline Matrix3x3::operator const float*() const
 //{
 //	return m;
 //}
 //
 ////=========================================
-//_NexInline Matrix3x3::operator float*()
+//inline Matrix3x3::operator float*()
 //{
 //	return m;
 //}
@@ -75,31 +75,31 @@ _NexInline Matrix3x3::Matrix3x3(const QuatF q) {
 // access grant
 //=========================================
 
-_NexInline const Vector3& Matrix3x3::operator ()(int32 i) const {
+inline const Vector3& Matrix3x3::operator ()(int32 i) const {
 	NEX_ASSERT(i > 0 && i < 3);
 	return *(const Vector3*) (&_11 + i * 3);
 }
 
 //=========================================
 
-_NexInline Vector3& Matrix3x3::operator ()(int32 i) {
+inline Vector3& Matrix3x3::operator ()(int32 i) {
 	NEX_ASSERT(i > 0 && i < 3);
 	return *(Vector3*) (&_11 + i * 3);
 }
 
 //=========================================
 
-_NexInline const float Matrix3x3::operator ()(int32 i, int32 j) const {
+inline const float Matrix3x3::operator ()(int32 i, int32 j) const {
 	return m[i * 3 + j];
 }
 
-_NexInline float& Matrix3x3::operator ()(int32 i, int32 j) {
+inline float& Matrix3x3::operator ()(int32 i, int32 j) {
 	return m[i * 3 + j];
 }
 
 //// asignment
 ////=========================================
-//_NexInline Matrix3x3& Matrix3x3::operator = (const float* _m)
+//inline Matrix3x3& Matrix3x3::operator = (const float* _m)
 //{
 //	MemUtils::CopyDwords(m,_m,9);
 //	return *this;
@@ -107,14 +107,14 @@ _NexInline float& Matrix3x3::operator ()(int32 i, int32 j) {
 
 //=========================================
 
-_NexInline Matrix3x3& Matrix3x3::operator =(const Matrix3x3& _m) {
+inline Matrix3x3& Matrix3x3::operator =(const Matrix3x3& _m) {
 	MemUtils::CopyDwords(m, _m.m, 9);
 	return *this;
 }
 
 //=========================================
 
-_NexInline Matrix3x3& Matrix3x3::operator =(const EularAngles& ea) {
+inline Matrix3x3& Matrix3x3::operator =(const EularAngles& ea) {
 	float sh, ch, sp, cp, sb, cb;
 	Math::SinCos(ea.yaw, sh, ch);
 	Math::SinCos(ea.pitch, sp, cp);
@@ -134,7 +134,7 @@ _NexInline Matrix3x3& Matrix3x3::operator =(const EularAngles& ea) {
 
 //=========================================
 
-_NexInline Matrix3x3& Matrix3x3::operator =(const AxisAngle& aa) {
+inline Matrix3x3& Matrix3x3::operator =(const AxisAngle& aa) {
 	Quaternion q = QuatFromAxisAng(aa.axis, aa.angle);
 	*this = q;
 	return *this;
@@ -143,7 +143,7 @@ _NexInline Matrix3x3& Matrix3x3::operator =(const AxisAngle& aa) {
 // operations
 //=========================================
 
-_NexInline Matrix3x3& Matrix3x3::operator +=(const Matrix3x3& _m) {
+inline Matrix3x3& Matrix3x3::operator +=(const Matrix3x3& _m) {
 	for (int i = 0; i < 9; ++i)
 		m[i] += _m.m[i];
 	return *this;
@@ -151,7 +151,7 @@ _NexInline Matrix3x3& Matrix3x3::operator +=(const Matrix3x3& _m) {
 
 //=========================================
 
-_NexInline Matrix3x3& Matrix3x3::operator -=(const Matrix3x3& _m) {
+inline Matrix3x3& Matrix3x3::operator -=(const Matrix3x3& _m) {
 	for (int i = 0; i < 9; ++i)
 		m[i] -= _m.m[i];
 	return *this;
@@ -159,7 +159,7 @@ _NexInline Matrix3x3& Matrix3x3::operator -=(const Matrix3x3& _m) {
 
 //=========================================
 
-_NexInline Matrix3x3& Matrix3x3::operator *=(const Matrix3x3& m2) {
+inline Matrix3x3& Matrix3x3::operator *=(const Matrix3x3& m2) {
 	Matrix3x3 m1 = *this;
 	*this = m1 * m2;
 	return *this;
@@ -167,7 +167,7 @@ _NexInline Matrix3x3& Matrix3x3::operator *=(const Matrix3x3& m2) {
 
 //=========================================
 
-_NexInline Matrix3x3& Matrix3x3::operator *=(const float val) // post multiply
+inline Matrix3x3& Matrix3x3::operator *=(const float val) // post multiply
 		{
 	for (int i = 0; i < 9; ++i)
 		m[i] *= val;
@@ -176,7 +176,7 @@ _NexInline Matrix3x3& Matrix3x3::operator *=(const float val) // post multiply
 
 //=========================================
 
-_NexInline Matrix3x3& Matrix3x3::operator /=(const float val) // post multiply
+inline Matrix3x3& Matrix3x3::operator /=(const float val) // post multiply
 		{
 	*this *= (1 / val);
 	return *this;
@@ -185,14 +185,14 @@ _NexInline Matrix3x3& Matrix3x3::operator /=(const float val) // post multiply
 //=========================================
 // invert
 
-_NexInline Matrix3x3 Matrix3x3::operator -() const {
+inline Matrix3x3 Matrix3x3::operator -() const {
 	return Matrix3x3(-_11, -_12, -_13, -_21, -_22, -_23, -_31, -_32, -_32);
 }
 
 // functions
 //=========================================
 
-_NexInline void Matrix3x3::Identity() {
+inline void Matrix3x3::Identity() {
 	_11 = 1;
 	_12 = 0;
 	_13 = 0;
@@ -206,7 +206,7 @@ _NexInline void Matrix3x3::Identity() {
 
 //=========================================
 
-_NexInline void Matrix3x3::Transpose() {
+inline void Matrix3x3::Transpose() {
 	float tmp;
 #define TPOSE_SWAP(a,b) tmp = _##a##b; _##a##b = _##b##a; _##b##a = tmp;
 	TPOSE_SWAP(1, 2);
@@ -216,19 +216,19 @@ _NexInline void Matrix3x3::Transpose() {
 }
 
 //=========================================
-_NexInline void Matrix3x3::Invert() {
+inline void Matrix3x3::Invert() {
 	*this = Inverse(*this);
 }
 
 //=========================================
-_NexInline float Matrix3x3::Determinant() const {
+inline float Matrix3x3::Determinant() const {
 	return (_11 * (_22 * _33 - _23 * _32)) + (_12 * (_23 * _31 - _21 * _33))
 			+ (_13 * (_21 * _32 - _31 * _22));
 }
 
 //=========================================
 
-_NexInline void Matrix3x3::FromInvEular(const EularAngles& v) {
+inline void Matrix3x3::FromInvEular(const EularAngles& v) {
 	EularAngles invm2;
 	invm2.yaw = -v.yaw;
 	invm2.pitch = -v.pitch;
@@ -237,13 +237,13 @@ _NexInline void Matrix3x3::FromInvEular(const EularAngles& v) {
 }
 
 //=========================================
-_NexInline void Matrix3x3::FromInvAxisAng(const AxisAngle& aa) {
+inline void Matrix3x3::FromInvAxisAng(const AxisAngle& aa) {
 	Quaternion q = QuatFromAxisAng(aa.axis, aa.angle);
 	FromInvQuat(q);
 }
 
 //=========================================
-_NexInline Vector3 Matrix3x3::Transform(const Vector3& v) const {
+inline Vector3 Matrix3x3::Transform(const Vector3& v) const {
 	Vector3 rv;
 	rv.x = v.x * _11 + v.y * _21 + v.z * _31;
 	rv.y = v.x * _12 + v.y * _22 + v.z * _32;
@@ -252,7 +252,7 @@ _NexInline Vector3 Matrix3x3::Transform(const Vector3& v) const {
 }
 
 //=========================================
-_NexInline Vector3 Matrix3x3::InvTransform(const Vector3& v) const {
+inline Vector3 Matrix3x3::InvTransform(const Vector3& v) const {
 	Vector3 rv;
 	rv.x = Dot(v, *(const Vector3*) &(_11));
 	rv.y = Dot(v, *(const Vector3*) &(_21));
@@ -264,19 +264,19 @@ _NexInline Vector3 Matrix3x3::InvTransform(const Vector3& v) const {
 // operators
 //=========================================
 
-_NexInline Vector3 operator *(const Vector3& v, const Matrix3x3& m) {
+inline Vector3 operator *(const Vector3& v, const Matrix3x3& m) {
 	return m.Transform(v);
 }
 
 //=========================================
 
-_NexInline Vector3 operator *(const Matrix3x3& m, const Vector3& v) {
+inline Vector3 operator *(const Matrix3x3& m, const Vector3& v) {
 	return m.InvTransform(v);
 }
 
 //=========================================
 
-_NexInline Matrix3x3 operator *(const Matrix3x3& m1, const Matrix3x3& m2) {
+inline Matrix3x3 operator *(const Matrix3x3& m1, const Matrix3x3& m2) {
 	Matrix3x3 m;
 	for (int32 i = 0; i < 3; ++i)
 		for (int32 j = 0; j < 3; ++j)
@@ -288,7 +288,7 @@ _NexInline Matrix3x3 operator *(const Matrix3x3& m1, const Matrix3x3& m2) {
 
 //=========================================
 
-_NexInline Matrix3x3 operator +(const Matrix3x3& m1, const Matrix3x3& m2) {
+inline Matrix3x3 operator +(const Matrix3x3& m1, const Matrix3x3& m2) {
 	Matrix3x3 m;
 	for (int32 i = 0; i < 9; ++i) {
 		m.m[i] = m1.m[i] + m2.m[i];
@@ -298,7 +298,7 @@ _NexInline Matrix3x3 operator +(const Matrix3x3& m1, const Matrix3x3& m2) {
 
 //=========================================
 
-_NexInline Matrix3x3 operator -(const Matrix3x3& m1, const Matrix3x3& m2) {
+inline Matrix3x3 operator -(const Matrix3x3& m1, const Matrix3x3& m2) {
 	Matrix3x3 m;
 	for (int32 i = 0; i < 9; ++i) {
 		m.m[i] = m1.m[i] - m2.m[i];
@@ -308,7 +308,7 @@ _NexInline Matrix3x3 operator -(const Matrix3x3& m1, const Matrix3x3& m2) {
 
 //=========================================
 
-_NexInline Matrix3x3 operator *(const Matrix3x3& m1, const float val) {
+inline Matrix3x3 operator *(const Matrix3x3& m1, const float val) {
 	Matrix3x3 m;
 	for (int32 i = 0; i < 9; ++i) {
 		m.m[i] = m1.m[i] * val;
@@ -319,18 +319,18 @@ _NexInline Matrix3x3 operator *(const Matrix3x3& m1, const float val) {
 
 //=========================================
 
-_NexInline Matrix3x3 operator *(const float v1, const Matrix3x3& m) {
+inline Matrix3x3 operator *(const float v1, const Matrix3x3& m) {
 	return m * v1;
 }
 
 //=========================================
 
-_NexInline Matrix3x3 operator /(const Matrix3x3& m, const float v1) {
+inline Matrix3x3 operator /(const Matrix3x3& m, const float v1) {
 	return m * (1 / v1);
 }
 
 //=========================================
-_NexInline Matrix3x3 Transpose(const Matrix3x3& m) {
+inline Matrix3x3 Transpose(const Matrix3x3& m) {
 	Matrix3x3 ret(m._11, m._21, m._31, m._12, m._22, m._32, m._13, m._23,
 			m._33);
 

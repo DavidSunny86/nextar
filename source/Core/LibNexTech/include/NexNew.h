@@ -120,8 +120,7 @@ public:
 		Allocator_Class::Free(ptr);
 	}
 #endif
-
-
+	
 	void* operator new(size_t, void* ptr) {
 		return ptr;
 	}
@@ -146,6 +145,60 @@ public:
 		Allocator_Class::Free(ptr);
 	}
 
+
+	void operator delete(void*, void*) {
+	}
+};
+
+template<typename Allocator_Class>
+class AllocPooledObjectBase {
+public:
+#ifdef NEX_DEBUG
+
+	void* operator new(size_t s,
+			const char* func,
+			const char* file,
+			long line) throw () {
+		return Allocator_Class::AllocSingle(s);
+	}
+
+	void* operator new[](size_t s,
+			const char* func,
+			const char* file,
+			long line) throw () {
+		return Allocator_Class::AllocMultiple(s);
+	}
+
+	void operator delete(void* ptr, const char*, const char*, long) throw () {
+		Allocator_Class::FreeSingle(ptr);
+	}
+
+	void operator delete[](void* ptr, const char*, const char*, long) throw () {
+		Allocator_Class::FreeMultiple(ptr);
+	}
+#endif
+	
+	void* operator new(size_t, void* ptr) {
+		return ptr;
+	}
+
+
+	void* operator new(size_t s) {
+		return Allocator_Class::AllocSingle(s);
+	}
+
+
+	void* operator new[](size_t s) {
+		return Allocator_Class::AllocMultiple(s);
+	}
+	
+	void operator delete(void* ptr) throw () {
+		Allocator_Class::FreeSingle(ptr);
+	}
+	
+	void operator delete[](void* ptr) throw () {
+		Allocator_Class::FreeMultiple(ptr);
+	}
 
 	void operator delete(void*, void*) {
 	}
