@@ -175,7 +175,6 @@ typedef unsigned short wchar_t;
 
 #if (_MSC_VER <= 1700) || defined(__MINGW32__)
 #	define noexcept
-#	define override
 #	define constexpr const
 	// no need to explicitly align as first member is aligned anyway
 #	define alignas(x)	
@@ -196,7 +195,7 @@ typedef unsigned short wchar_t;
 
 #ifdef NEX_MSVC
 //#	pragma	warning(disable : 4250 4275 4355 4251)
-#	pragma	warning(disable : 4275 4355 4251 4661)
+#	pragma	warning(disable : 4275 4355 4251 4661 4800)
 #endif
 
 #ifdef NEX_DEBUG

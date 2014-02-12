@@ -36,11 +36,11 @@ namespace nextar {
 		componentMap.clear();
 	}
 
-	Component* ComponentManagerImpl::AsyncCreate(int type, const String& name) {
+	Component* ComponentManagerImpl::AsyncCreate(uint32 type, const String& name) {
 		Component* c = AsyncCreateImpl(type, name);
 		if (c) {
 			NEX_THREAD_LOCK_GUARD_MUTEX(containerLock);
-			componentMap.insert(ComponentMap::value_type(name, c));
+			componentMap.insert(ComponentMap::value_type(c->GetID(), c));
 		}
 		return c;
 	}
@@ -75,7 +75,7 @@ namespace nextar {
 		return 0;
 	}
 
-	Component* ComponentManagerImpl::AsyncFindOrCreate(int type, const String& name) {
+	Component* ComponentManagerImpl::AsyncFindOrCreate(uint32 type, const String& name) {
 		Component* c = AsyncFind(name);
 		if (!c) {
 			c = AsyncCreate(type, name);
@@ -90,13 +90,13 @@ namespace nextar {
 	/********************************************************************
 	 * ComponentManager
 	 ********************************************************************/
-	ComponentManager::ComponentManager(const String& _name) : name(_name) {
+	ComponentManager::ComponentManager(const String& _name) : NamedObject(_name) {
 	}
 
 	ComponentManager::~ComponentManager() {
 	}
 
-	Component* ComponentManager::AsyncFindComponent(int type, const String& comp) {
+	Component* ComponentManager::AsyncFindComponent(uint32 type, const String& comp) {
 		StringUtils::StringPair name = StringUtils::Split(comp);
 		ComponentManager* found = ComponentManagerArchive::Instance().AsyncFindManager(type, name.second);
 		if (found) {
@@ -106,7 +106,7 @@ namespace nextar {
 		return 0;
 	}
 
-	Component* ComponentManager::AsyncFindOrCreateComponent(int type, const String& comp) {
+	Component* ComponentManager::AsyncFindOrCreateComponent(uint32 type, const String& comp) {
 		StringUtils::StringPair name = StringUtils::Split(comp);
 		ComponentManager* found = ComponentManagerArchive::Instance().AsyncFindManager(type, name.second);
 		if (found) {

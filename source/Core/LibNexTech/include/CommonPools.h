@@ -68,11 +68,12 @@ namespace nextar {
 		}
 	};
 
+	/*
 	class PoolAllocatorManager {
 	public:
 		static void CreateCommonPools();
 		static void DestroyCommonPools();
-	};
+	};*/
 }
 
 #endif MATRIXPOOL_H_

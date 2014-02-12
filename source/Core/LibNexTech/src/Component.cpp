@@ -14,9 +14,9 @@ namespace nextar {
 		
 
 	Component::Component(ComponentManager* componentCreator, const String& compName, Component* parentObject) :
+		NamedObject(compName),
 		creator(componentCreator), 
 		flags(ENABLED), parent(parentObject) {
-		SetName(compName);
 		NEX_ASSERT(creator);
 	}
 

@@ -16,10 +16,6 @@ namespace nextar {
 			visibilityMask = camera->GetVisibilityMask();
 	}
 
-	SceneTraversal::SceneTraversal(VisibilitySet* visList, BoundingVolume* vol) :
-		SceneTraversal(0, visList, vol)	 {
-	}
-
 	SceneTraversal::~SceneTraversal() {
 		// TODO Auto-generated destructor stub
 	}

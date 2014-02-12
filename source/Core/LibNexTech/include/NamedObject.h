@@ -9,6 +9,7 @@ namespace nextar {
 	class NamedObject {
 	public:
 
+		NamedObject(const String& name);
 		inline NamedObject() : name(StringUtils::NullID) {
 		}
 		

@@ -1,6 +1,6 @@
 
 #include "NexHeaders.h"
-#include "NexMath.h"
+#include "MathBase.h"
 #include "TransformData.h"
 #include "BoundingVolume.h"
 #include "CommonPools.h"

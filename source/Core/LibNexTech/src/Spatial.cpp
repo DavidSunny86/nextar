@@ -27,7 +27,7 @@ namespace nextar {
 		if (moveable) {
 			if (worldMatrix)
 				NEX_DELETE  (worldMatrix);
-			worldMatrix = moveable->GetTransformPtr();
+			worldMatrix = &moveable->GetWorldMatrix();
 		} else {
 			worldMatrix = NEX_NEW Matrix4x4;
 			*worldMatrix = Matrix4x4::IdentityMatrix;

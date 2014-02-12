@@ -24,7 +24,7 @@ namespace nextar {
 		virtual void AddBody(Spatial*) = 0;
 		virtual void RemoveBody(Spatial*) = 0;
 
-		virtual void Visit(SceneTraversal& trav) = 0;
+		virtual void Visit(SceneTraversal& trav) override = 0;
 	};
 
 } /* namespace nextar */

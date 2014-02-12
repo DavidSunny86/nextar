@@ -21,6 +21,10 @@ namespace nextar {
 	public:
 
 		enum {
+			CATAGORY = Component::CAT_SPATIAL
+		};
+
+		enum {
 			BOUNDS_DIRTY = Component::LAST_FLAG << 1,
 			LAST_FLAG = Component::LAST_FLAG << 2
 		};

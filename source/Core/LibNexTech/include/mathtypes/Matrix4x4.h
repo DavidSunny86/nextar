@@ -8,7 +8,7 @@
 #ifndef MATRIX4X4_H_
 #define MATRIX4X4_H_
 
-#include "NexMath.h"
+#include "MathBase.h"
 #include "MathTypes.h"
 
 namespace nextar {

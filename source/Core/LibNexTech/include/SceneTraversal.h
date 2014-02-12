@@ -14,8 +14,7 @@ namespace nextar {
 
 	class SceneTraversal {
 	public:
-		SceneTraversal(Camera* cam, VisibilitySet* visList, BoundingVolume* vol);
-		SceneTraversal(VisibilitySet* visList = 0, BoundingVolume* vol = 0);
+		SceneTraversal(Camera* camera = nullptr, VisibilitySet* visList = nullptr, BoundingVolume* vol = nullptr);
 		virtual ~SceneTraversal();
 
 

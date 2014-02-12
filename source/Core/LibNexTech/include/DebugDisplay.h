@@ -9,7 +9,7 @@
 #define DEBUGINFO_H_
 
 #include "StreamData.h"
-#include "NexMath.h"
+#include "MathBase.h"
 #include "Color.h"
 #include "Frustum.h"
 

@@ -27,14 +27,10 @@ namespace nextar {
 		};
 
 		enum {
-			/** true when matrix needs recalculation */
-			MATRIX_DIRTY = Component::LAST_FLAG << 1,
 			/** flags set by default */
-			DEFAULT_FLAGS = (MATRIX_DIRTY),
-			LAST_FLAG = Component::LAST_FLAG << 2,
+			DEFAULT_FLAGS = 0,
+			LAST_FLAG = Component::LAST_FLAG << 0,
 		};
-
-		typedef TransformData Matrix;
 				
 		Moveable(ComponentManager *creator,
 				const String& name = StringUtils::Null);
@@ -42,68 +38,56 @@ namespace nextar {
 		virtual ~Moveable();
 
 		/** @remarks Returns the local rotation for parent */
-		inline QuatR GetRotation() const {
-			return matrixData->wrot;
+		inline const TransformData& GetTransform() const {
+			return *transform;
 		}
 
 		/** @remarks Returns the local position for parent */
-		inline Vec3AR GetPosition() const {
-			return matrixData->wpos;
+		inline Vec3AF GetTranslation() const {
+			return transform->GetTranslation();
 		}
 
+		/** @remarks Returns the local position for parent */
+		inline Vec3AF GetRotation() const {
+			return transform->GetRotation();
+		}
+		
 		/** @remarks Returns the local position for parent */
 		inline float GetScaling() const {
-			return matrixData->wscale;
+			return transform->GetScaling();
 		}
 
 		/** @remarks Sets the rotation of object in world space
 		 * NotifyUpdated must be called after this call.
 		 */
 		inline void SetRotation(QuatF q) {
-			matrixData->wrot = q;
+			transform->SetRotation(q);
 		}
 
 		/** @remarks Sets the position of object in world space
 		 * NotifyUpdated must be called after this call.
 		 */
-		inline void SetPosition(Vec3AF v) {
-			matrixData->wpos = v;
+		inline void SetTranslation(Vec3AF v) {
+			transform->SetTranslation(v);
 		}
 
 		/** @remarks Sets the scaling for object
 		 * NotifyUpdated must be called after this call.
 		 */
 		inline void SetScaling(float s) {
-			matrixData->wscale = s;
-		}
-		
-		inline void SetMatrixDirty(bool matrixDirty) {
-			SetFlag(MATRIX_DIRTY, matrixDirty);
+			transform->SetScaling(s);
 		}
 
-		inline bool IsMatrixDirty() const {
-			return (flags & MATRIX_DIRTY) != 0;
+		/** @remarks Returns the derived matrix  */
+		inline Matrix4x4& GetWorldMatrix() {
+			if (transform->IsMatrixDirty()) {
+				transform->UpdateMatrix();
+			}
+			return transform->GetMatrix();
 		}
-		
-		inline void SetMatrixNumber(uint16 matrixNumber) {
-			this->matrixNumber = matrixNumber;
-		}
-
-		inline uint16 GetMatrixNumber() const {
-			return matrixNumber;
-		}
-		
-		/** @brief Used internally to store a reference of the existing transform ptr */
-		inline Matrix4x4* GetTransformPtr() {
-			return &matrixData->cached;
-		}
-
-		/** @brief Resets position, rotation and scaling to inital state */
-		void SetInitialTransforms();
+	
 		/** @brief Initialize position, rotation and scaling values to identity */
 		void SetIdentityTransforms();
-		/** @remarks Returns the derived matrix  */
-		virtual const Matrix4x4& GetFullTransform();
 		/* child notifications, received by regions or parent regions */
 		virtual void NotifyNodeAdded(Moveable*);
 		/* child notifications, received by regions or parent regions */
@@ -114,15 +98,8 @@ namespace nextar {
 		virtual uint32 GetClassID() const;
 		
 	protected:
-		
-		/** State number indicating the matrix change state. Every time
-		 * the matrix is recalculated this is changed */
-		uint16 matrixNumber;
-		/* View based info, last frustum plane from the main camera
-		 * which rejected this node. 0 is the default. */
-		uint16 lastFrustumPlane;
 		/** Matrices and bounds information */
-		Matrix* matrixData;
+		TransformData* transform;
 	};
 
 	typedef list<Moveable*>::type MoveableComponentList;

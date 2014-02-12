@@ -9,7 +9,7 @@
 #define QUATERNION_H_
 
 
-#include "NexMath.h"
+#include "MathBase.h"
 #include "MathTypes.h"
 
 namespace nextar {

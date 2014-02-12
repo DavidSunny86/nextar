@@ -8,7 +8,7 @@
 #ifndef SSE_VECTORTYPES_H_
 #define SSE_VECTORTYPES_H_
 
-#include "NexMath.h"
+#include "MathBase.h"
 
 namespace nextar {
 	typedef __m128 Quad;

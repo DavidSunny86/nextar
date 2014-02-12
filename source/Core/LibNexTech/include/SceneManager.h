@@ -16,14 +16,15 @@ namespace nextar {
 
 	class SceneManager: public nextar::AssetManager {
 	public:
-		SceneManager();
+		SceneManager(const String& name);
 		virtual ~SceneManager();
-
+		
+		/* Create a scene with a default culling system */
 		virtual ScenePtr AsyncCreateEmptyScene(const String& name);
 		
 	protected:
 		
-		virtual Component* AsyncCreateImpl(int type, const String& name);
+		virtual Component* AsyncCreateImpl(uint32 type, const String& name) override;
 	};
 
 } /* namespace nextar */

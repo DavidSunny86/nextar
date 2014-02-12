@@ -9,13 +9,16 @@
 
 namespace nextar {
 
-	SceneManager::SceneManager() {
-		// TODO Auto-generated constructor stub
-
+	SceneManager::SceneManager(const String& name) : AssetManager(name) {
 	}
 
 	SceneManager::~SceneManager() {
-		// TODO Auto-generated destructor stub
 	}
 
+	ScenePtr SceneManager::AsyncCreateEmptyScene(
+		const String& name) {
+		Scene* scene = static_cast<Scene*>(AsyncCreate(Scene::CLASS_ID, name));
+		/* create a BV culling system */
+
+	}
 } /* namespace nextar */

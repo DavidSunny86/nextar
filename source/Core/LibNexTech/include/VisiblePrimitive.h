@@ -11,7 +11,7 @@
 #include "NexSys.h"
 #include "StreamData.h"
 #include "Color.h"
-#include "NexMath.h"
+#include "MathBase.h"
 
 namespace nextar {
 

@@ -20,6 +20,7 @@ namespace nextar {
 	 * Any extended component could register its own factory.
 	 * */
 	class _NexExport EntityManager : public ComponentManagerImpl {
+		NEX_LOG_HELPER(EntityManager);
 	public:
 		EntityManager(const String& name);
 
@@ -31,18 +32,22 @@ namespace nextar {
 		virtual EntityPtr AsyncCreateLightEntity(const String& name);
 
 		/* implementation */
-		virtual Component* AsyncCreate(int type, const String& name);
+		virtual Component* AsyncCreate(uint32 type, const String& name);
 		virtual void AsyncDestroy(Component*);
 
 	protected:
-		virtual Component* AsyncCreateImpl(int type, const String& name);
+
+		virtual EntityPtr AsyncCreateAndAttach(const String& name, uint32 subType, const String& subTypeName, Component** subComponent = nullptr);
+		virtual Component* AsyncCreateImpl(uint32 type, const String& name) override;
 	};
 
 	/** 
 	 * We expect a lot of entities, so we will override new and delete operators
 	 * so that they allocate from a singleton pool.
 	 */
-	class _NexExport Entity: public Referenced<Entity, nextar::Component> {
+	class _NexExport Entity: 
+		//public AllocPooledObjectBase< PooledAllocator<Entity, 32, MEMCAT_GENERAL> >,
+		public Referenced<Entity, nextar::Component> {
 		NEX_LOG_HELPER(Entity);
 	public:
 		enum {
@@ -51,25 +56,25 @@ namespace nextar {
 		};
 
 		enum {
-			IS_CAMERA = Component::LAST_FLAG << 1,
-			LAST_FLAG = Component::LAST_FLAG << 2,
+			LAST_FLAG = Component::LAST_FLAG << 0,
 		};
 
 		Entity(ComponentManager* creator, const String& name);
 		virtual ~Entity();
 
-		inline Camera* GetCamera() const {
-			return camera;
+		inline Spatial* GetSpatial() const {
+			return spatial;
 		}
 
+		inline Scene* GetScene() {
+			return scene;
+		}
+		
 		/** Attach */
 		virtual void AttachComponent(Component* component);
 		virtual void DetachComponent(uint32 type);
 		/** @brief Get node type */
-		virtual uint32 GetClassID() const;
-		
-		/** @brief Visit renderables attached to this node **/
-		virtual void FindVisibles(SceneTraversal& traversal);
+		virtual uint32 GetClassID() const override;
 
 		/* @brief Add entity to scene */
 		virtual void AddToScene(Scene*);
@@ -81,9 +86,12 @@ namespace nextar {
 
 	protected:
 
+		Scene* scene;
 		Moveable* moveable;
-		Camera* camera;
-		Renderable* renderable;
+		/* Only a single spatial object can be attached to an entity
+		 * at a given time. So camera and renderable cannot be attached to the
+		 * same entity as both derive from Spatial. */
+		Spatial* spatial;
 	};
 
 } /* namespace nextar */

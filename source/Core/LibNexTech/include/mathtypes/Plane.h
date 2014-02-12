@@ -9,7 +9,7 @@
 #define PLANE_H_
 
 
-#include "NexMath.h"
+#include "MathBase.h"
 #include "MathTypes.h"
 
 namespace nextar {

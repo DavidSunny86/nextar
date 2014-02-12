@@ -4,7 +4,7 @@
 #ifndef _MATHTYPES_H_
 #define _MATHTYPES_H_
 
-#include "NexMath.h"
+#include "MathBase.h"
 #include "NexAlloc.h"
 #include "MemUtils.h"
 #include "Randomizer.h"

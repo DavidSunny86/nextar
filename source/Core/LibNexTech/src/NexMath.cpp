@@ -1,6 +1,6 @@
 
 #include "NexHeaders.h"
-#include "NexMath.h"
+#include "MathBase.h"
 #include "MathTypes.h"
 #include "mathtypes/Matrix3x3.cpp"
 #include "mathtypes/EularAngles.cpp"

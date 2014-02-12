@@ -23,10 +23,9 @@ namespace nextar {
 		BVCullingSystem(ComponentManager *creator = nullptr, const String& name = StringUtils::Null, Component* parent = nullptr);
 		virtual ~BVCullingSystem();
 				
-		virtual void AddBody(Spatial*);
-		virtual void RemoveBody(Spatial*);
-
-		virtual void Visit(SceneTraversal& trav);
+		virtual void AddBody(Spatial*) override;
+		virtual void RemoveBody(Spatial*) override;
+		virtual void Visit(SceneTraversal& trav) override;
 
 	protected:
 		Camera* coherentCam;

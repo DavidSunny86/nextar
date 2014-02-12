@@ -147,7 +147,7 @@ namespace nextar {
 	
 		UnsetFlag(VIEW_DIM_OUTDATED);
 	}
-
+	
 	void Camera::UpdateProjection() {
 		distanceInView = farDistance - nearDistance;
 		recipDistanceInView = 1 / distanceInView;
@@ -168,7 +168,7 @@ namespace nextar {
 		UnsetFlag(PROJECTION_DIRTY);
 	}
 
-	void Camera::FindVisiblePrimitives(SceneTraversal & traversal) {
+	void Camera::Visit(SceneTraversal & traversal) {
 		traversal.camera = this;
 		traversal.visibilityMask = visibilityMask;
 		traversal.frustum = &viewFrustum;

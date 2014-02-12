@@ -1,5 +1,5 @@
 #include "NexHeaders.h"
-#include "NexMath.h"
+#include "MathBase.h"
 
 namespace nextar {
 

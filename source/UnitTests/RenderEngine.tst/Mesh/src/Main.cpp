@@ -12,18 +12,17 @@ public:
 		UTApplication::_SetupScene(scene);
 		MeshAssetManager* meshManager =
 				static_cast<MeshAssetManager*>(
-						ComponentManagerArchive::Instance().AsyncFindManager(MeshAsset::TYPE));
+				ComponentManagerArchive::Instance().AsyncFindManager(MeshAsset::CLASS_ID));
 		MeshAssetPtr mesh = meshManager->AsyncCreateInstance("Mesh", "UTScene", URL("${EngineData}/mesh/box.mesh"));
 		if (mesh) {
 			mesh->Load(false);
 		}
 		EntityManager* entityManager =
 				static_cast<EntityManager*>(
-				ComponentManagerArchive::Instance().AsyncFindManager(Entity::TYPE));
+				ComponentManagerArchive::Instance().AsyncFindManager(Entity::CLASS_ID));
 
 		EntityPtr meshEnt = entityManager->AsyncCreateMeshEntity("Mesh", mesh);
 		meshEnt->AddToScene(scene);
-
 	}
 };
 

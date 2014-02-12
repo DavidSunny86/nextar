@@ -61,11 +61,11 @@ namespace nextar {
 		ComponentManagerImpl(const String& name);
 		virtual ~ComponentManagerImpl();
 
-		virtual Component* AsyncCreate(uint32 classId, const String& name);
-		virtual void AsyncDestroy(Component*);
-		virtual Component* AsyncFind(const String& name);
-		virtual Component* AsyncFindOrCreate(uint32 classId, const String& name);
-		virtual void AsyncCleanup();
+		virtual Component* AsyncCreate(uint32 classId, const String& name) override;
+		virtual void AsyncDestroy(Component*) override;
+		virtual Component* AsyncFind(const String& name) override;
+		virtual Component* AsyncFindOrCreate(uint32 classId, const String& name) override;
+		virtual void AsyncCleanup() override;
 
 	protected:
 

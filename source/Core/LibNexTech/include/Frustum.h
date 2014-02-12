@@ -1,7 +1,7 @@
 #ifndef NEXTAR_FRUSTUM_H
 #define NEXTAR_FRUSTUM_H
 
-#include "NexMath.h"
+#include "MathBase.h"
 
 namespace nextar {
 

@@ -30,7 +30,7 @@ namespace nextar {
 			~Primitive();
 		};
 
-		Mesh(ComponentManager* creator, const String& name, Component* parent);
+		Mesh(ComponentManager* creator, const String& name, Component* parent = nullptr);
 		virtual ~Mesh();
 
 		/* recreate the object with new mesh asset */

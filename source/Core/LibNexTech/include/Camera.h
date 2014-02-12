@@ -123,10 +123,10 @@ namespace nextar {
 
 		const Vector3A* GetCorners();
 				/** @remarks Called to update the render queue with renderable data. */
-		virtual void FindVisiblePrimitives(SceneTraversal & traversal);
+		virtual void Visit(SceneTraversal & traversal) override;
 
 		/** @brief Get node type */
-		virtual uint32 GetClassID() const;
+		virtual uint32 GetClassID() const override;
 		
 	protected:
 

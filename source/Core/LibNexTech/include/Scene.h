@@ -10,10 +10,18 @@
 
 #include <Asset.h>
 #include <Entity.h>
-#include "SceneParameters.h"
 #include "CullingSystem.h"
 
 namespace nextar {
+	
+	struct SceneParameters : public AllocGeneral {
+	
+		SceneParameters();
+		~SceneParameters();
+
+		Vector3 maxPoint;
+		Vector3 minPoint;
+	};
 
 	struct SceneEventListener {
 	};
@@ -33,7 +41,7 @@ namespace nextar {
 		class SceneStreamRequest : public AssetStreamRequest {
 		};
 
-		Scene(ComponentManager* creator, const String& name);
+		Scene(AssetManager* creator, const String& name);
 		virtual ~Scene();
 		
 		/* internal API */

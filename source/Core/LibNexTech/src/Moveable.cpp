@@ -6,33 +6,21 @@
 namespace nextar {
 
 	Moveable::Moveable(ComponentManager *creator, const String& nodeName)
-			: Component(creator, nodeName), matrixNumber(0), lastFrustumPlane(0), matrixData(0) {
+			: Component(creator, nodeName), transform(NEX_NEW TransformData) {
 		flags = DEFAULT_FLAGS;
-		matrixData = NEX_NEW TransformData;
 		SetIdentityTransforms();
 	}
 
 	Moveable::~Moveable() {
-		NEX_DELETE (matrixData);
-		matrixData = nullptr;
+		NEX_DELETE (transform);
+		transform = nullptr;
 	}
 
 	void Moveable::SetIdentityTransforms() {
-		NEX_ASSERT(matrixData);
-		matrixData->ipos = matrixData->wpos = Vec3ASet(0, 0, 0);
-		matrixData->iscale = matrixData->wscale = 1.0f;
-		matrixData->irot = matrixData->wrot = QuatIdentity();
-		SetMatrixDirty(true);
+		NEX_ASSERT(transform);
+		transform->SetIdentity();
 	}
 
-	void Moveable::SetInitialTransforms() {
-		NEX_ASSERT(matrixData);
-		matrixData->wpos = matrixData->ipos;
-		matrixData->wscale = matrixData->iscale;
-		matrixData->wrot = matrixData->irot;
-		SetMatrixDirty(true);
-	}
-	
 	void Moveable::NotifyNodeAdded(Moveable*) {
 	}
 
@@ -40,7 +28,7 @@ namespace nextar {
 	}
 
 	void Moveable::NotifyUpdated() {
-		SetMatrixDirty(true);
+		transform->SetMatrixDirty(true);
 	}
 
 	/** @brief Get node type */
@@ -48,13 +36,4 @@ namespace nextar {
 		return CLASS_ID;
 	}
 
-	const Matrix4x4& Moveable::GetFullTransform() {
-		if (IsMatrixDirty()) {
-			matrixData->cached = Mat4x4FromScaleRotPos(matrixData->wscale,
-					matrixData->wrot, matrixData->wpos);
-			SetMatrixDirty(false);
-			matrixNumber++;
-		}
-		return matrixData->cached;
-	}
 }
