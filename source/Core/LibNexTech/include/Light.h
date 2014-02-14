@@ -21,15 +21,15 @@ namespace nextar {
 		};
 
 		enum class Type : uint16 {
+			SKY,
 			DIRECTIONAL,
 			OMNI,
 			SPOT,
-			SKY,
 			AREA,
 			TYPE_COUNT,
 		};
 
-		Light(ComponentManager* creator, const String& name);
+		Light(const String& name);
 		virtual ~Light();
 
 		/** @brief Get node type */
@@ -38,6 +38,7 @@ namespace nextar {
 		virtual void Visit(SceneTraversal& traversal);
 
 	protected:
+		uint32 sortKey;
 		Color diffuseColor;
 		Color specularColor;
 		Color ambientColor;

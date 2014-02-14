@@ -72,7 +72,7 @@ namespace nextar {
 			Plane camPlanes[6];
 		};
 
-		Camera(ComponentManager* creator, const String& name, Component* parent, bool allocMatrixBuffer = true);
+		Camera(const String& name, Component* parent = nullptr);
 		virtual ~Camera();
 
 		/** This is basically the inverse of the world transform */

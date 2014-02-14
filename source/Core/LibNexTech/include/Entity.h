@@ -19,10 +19,10 @@ namespace nextar {
 	 * This is a default manager for most/all default scene components.
 	 * Any extended component could register its own factory.
 	 * */
-	class _NexExport EntityManager : public ComponentManagerImpl {
-		NEX_LOG_HELPER(EntityManager);
+	class _NexExport EntityFactory : public Component::Factory {
+		NEX_LOG_HELPER(EntityFactory);
 	public:
-		EntityManager(const String& name);
+		EntityFactory(const String& name);
 
 		/**
 		 * Creates a simple perspective camera pointing in the negetive z direction
@@ -32,13 +32,11 @@ namespace nextar {
 		virtual EntityPtr AsyncCreateLightEntity(const String& name);
 
 		/* implementation */
-		virtual Component* AsyncCreate(uint32 type, const String& name);
-		virtual void AsyncDestroy(Component*);
+		virtual Component* AsyncCreate(uint32 classId, const String& name);
 
 	protected:
 
 		virtual EntityPtr AsyncCreateAndAttach(const String& name, uint32 subType, const String& subTypeName, Component** subComponent = nullptr);
-		virtual Component* AsyncCreateImpl(uint32 type, const String& name) override;
 	};
 
 	/** 
@@ -47,7 +45,7 @@ namespace nextar {
 	 */
 	class _NexExport Entity: 
 		//public AllocPooledObjectBase< PooledAllocator<Entity, 32, MEMCAT_GENERAL> >,
-		public Referenced<Entity, nextar::Component> {
+		public nextar::SharedComponent {
 		NEX_LOG_HELPER(Entity);
 	public:
 		enum {
@@ -59,7 +57,7 @@ namespace nextar {
 			LAST_FLAG = Component::LAST_FLAG << 0,
 		};
 
-		Entity(ComponentManager* creator, const String& name);
+		Entity(const String& name);
 		virtual ~Entity();
 
 		inline Spatial* GetSpatial() const {
@@ -79,10 +77,10 @@ namespace nextar {
 		/* @brief Add entity to scene */
 		virtual void AddToScene(Scene*);
 		/** @brief Detach the entity from current scene and also optionally
-		 * remove it from entity manager, the entity will still exist to the
+		 * remove it from group it is added to, the entity will still exist to the
 		 * caller, which can dereference it for proper destruction.
 		 * The actual deletion of the entity from memory is not determined. */
-		virtual void RemoveFromScene(bool removeFromCreator = true);
+		virtual void RemoveFromScene(bool removeFromGroup = true);
 
 	protected:
 

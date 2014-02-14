@@ -5,17 +5,9 @@
 namespace nextar {
 
 	Asset::AssetLocatorAccessor Asset::AssetLocatorAccessor::assetLocatorAccessor;
-	Asset::AssetGroupAccessor Asset::AssetGroupAccessor::assetGroupAccessor;
-
-	AssetManager::AssetManager(const String& name) : ComponentManagerImpl(name) {
-	}
-
-	void AssetManager::Configure(const Config& config) {
-	}
-
-	Asset::Asset(AssetManager* assetMan, const String& id)
-		: memoryCost(sizeof(Asset)), assetGroup(StringUtils::NullID) {
-		SetCreator(assetMan);
+		
+	Asset::Asset(const String& id)
+		: memoryCost(sizeof(Asset)), SharedComponent(id) {
 		SetName(id);
 		if (OverrideDictionary("Asset")) {
 			Populate(GetDictionary());
@@ -29,8 +21,6 @@ namespace nextar {
 		NEX_ASSERT(dict->GetName() == "Asset");
 		dict->AddParam("location", &AssetLocatorAccessor::assetLocatorAccessor, PROP_TYPE_STRING,
 				"Locates an asset via file identifier.");
-		dict->AddParam("group", &AssetGroupAccessor::assetGroupAccessor, PROP_TYPE_STRING,
-						"Specifies the group this asset belongs to.");
 	}
 
 	void Asset::AssetLocatorAccessor::SetStringValue(PropertyInterface* pi, const String& value) {
@@ -41,16 +31,6 @@ namespace nextar {
 	const String Asset::AssetLocatorAccessor::GetStringValue(const PropertyInterface* pi) const {
 		const Asset* asset = static_cast<const Asset*>(pi);
 		return asset->GetAssetLocator().ToString();
-	}
-
-	void Asset::AssetGroupAccessor::SetStringValue(PropertyInterface* pi, const String& value) {
-		Asset* asset = static_cast<Asset*>(pi);
-		asset->SetAssetGroup(value);
-	}
-
-	const String Asset::AssetGroupAccessor::GetStringValue(const PropertyInterface* pi) const {
-		const Asset* asset = static_cast<const Asset*>(pi);
-		return asset->GetAssetGroup();
 	}
 
 	void Asset::Load(StreamRequest* req, bool async) {

@@ -29,7 +29,7 @@ namespace nextar {
 	public:
 
 		enum Type {
-			TYPE = Asset::COMPONENT_ASSET_SHADER,
+			CLASS_ID = Asset::CLASS_ASSET_SHADER,
 		};
 
 		enum {
@@ -127,10 +127,10 @@ namespace nextar {
 			String shaderOptionSuffix;
 		};
 
-		ShaderAsset(AssetManager*, const String&);
+		ShaderAsset(const String&);
 		virtual ~ShaderAsset();
 
-		static ShaderAsset* Instance(AssetManager* manager, const String& name, const URL& location);
+		static ShaderAsset* Instance(ShaderAsset::Factory* factory, const String& name, const URL& location);
 				
 		inline uint16 GetTranslucency() const {
 			return translucency;
@@ -149,7 +149,7 @@ namespace nextar {
 		virtual void Update(nextar::RenderContext*, ContextObject::UpdateParamPtr);
 		virtual void Destroy(nextar::RenderContext*);
 
-		virtual int GetType() const;
+		virtual uint32 GetClassID() const;
 
 		//@ todo
 		static ParamDef& MapParamName(const String& name);

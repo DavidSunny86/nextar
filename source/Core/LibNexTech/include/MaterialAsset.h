@@ -13,16 +13,6 @@
 
 namespace nextar {
 
-	class MaterialAssetManager : public nextar::AssetManager
-	{
-	public:
-		MaterialAssetManager(const String&);
-		virtual ~MaterialAssetManager(void);
-
-	protected:
-
-		virtual Component* AsyncCreateImpl(int type, const String& name);
-	};
 
 	/* Non automatic parameters for shaders and shader options
 	 * and the compiled shader technique reference stored here.
@@ -40,6 +30,18 @@ namespace nextar {
 		class Loader;
 		struct LoaderImpl;
 		class StreamRequest;
+
+		
+		class Factory: public Asset::Factory {
+		protected:
+
+		public:
+			Factory(const String& name);
+			
+			/* Implementation */
+			virtual Component* AsyncCreate(uint32 type, const String& name);
+		};
+
 
 		struct LoaderImpl {
 			virtual void Load(InputStreamPtr& input, Loader& shader) = 0;
@@ -80,10 +82,14 @@ namespace nextar {
 			ShaderParamMap params;
 		};
 
-		MaterialAsset(MaterialAssetManager* manager, const String& name);
+		MaterialAsset(const String& name);
 		virtual ~MaterialAsset();
 
 		inline const ShaderAssetPtr& GetShader() const {
+			return shader;
+		}
+
+		inline ShaderAssetPtr& GetShader() {
 			return shader;
 		}
 
@@ -95,7 +101,7 @@ namespace nextar {
 			return renderLayer;
 		}
 
-		static MaterialAsset* Instance(AssetManager* manager, const String& name, const URL& location);
+		static MaterialAsset* Instance(MaterialAsset::Factory* factory, const String& name, const URL& location);
 
 		virtual uint32 GetClassID() const;
 

@@ -30,7 +30,7 @@ namespace nextar {
 			~Primitive();
 		};
 
-		Mesh(ComponentManager* creator, const String& name, Component* parent = nullptr);
+		Mesh(const String& name, Component* parent = nullptr);
 		virtual ~Mesh();
 
 		/* recreate the object with new mesh asset */
@@ -39,7 +39,7 @@ namespace nextar {
 		virtual uint32 GetClassID() const override;
 		virtual void Visit(SceneTraversal& traversal) override;
 
-		void SetMaterial(uint32 primitive, MaterialAssetPtr& material);
+		virtual void SetMaterial(uint32 primitive, MaterialAssetPtr& material);
 	protected:
 		typedef vector<Primitive>::type PrimitiveList;
 

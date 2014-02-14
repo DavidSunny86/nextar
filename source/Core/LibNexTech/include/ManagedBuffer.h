@@ -14,7 +14,7 @@
 
 namespace nextar {
 
-	class ManagedBuffer:
+	class _NexExport ManagedBuffer:
 			public nextar::ContextObject,
 			public nextar::Buffer {
 	public:
@@ -31,9 +31,9 @@ namespace nextar {
 		virtual void Write(const void *src, size_t offset = 0, size_t size = 0);
 		
 		/** Implementation */
-		virtual void Read(RenderContext* rc, void *dest, size_t offset = 0, size_t size = 0) =0;
-		virtual void Write(RenderContext* rc, const void *src, size_t offset = 0, size_t size = 0) =0;
-		virtual void CopyFrom(RenderContext* rc, BufferPtr&) =0;
+		virtual void Read(RenderContext* rc, void *dest, size_t offset = 0, size_t size = 0) override =0;
+		virtual void Write(RenderContext* rc, const void *src, size_t offset = 0, size_t size = 0) override =0;
+		virtual void CopyFrom(RenderContext* rc, BufferPtr&) override =0;
 
 	protected:
 

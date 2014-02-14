@@ -18,7 +18,7 @@ namespace nextar {
 			CATAGORY = Component::CAT_RENDERABLE
 		};
 		
-		Renderable(ComponentManager* creator, const String& name, Component* parent);
+		Renderable(const String& name, Component* parent = nullptr);
 		virtual ~Renderable();
 
 		virtual uint32 GetClassID() const override = 0;

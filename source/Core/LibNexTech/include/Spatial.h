@@ -29,7 +29,7 @@ namespace nextar {
 			LAST_FLAG = Component::LAST_FLAG << 2
 		};
 
-		Spatial(ComponentManager *creator = nullptr, const String& name = StringUtils::Null, Component* parent = nullptr);
+		Spatial(const String& name = StringUtils::Null, Component* parent = nullptr);
 		virtual ~Spatial();
 		
 		inline const BoundingVolume& GetBoundsInfo() const {
@@ -61,8 +61,12 @@ namespace nextar {
 			SetFlag(BOUNDS_DIRTY, v);
 		}
 
-		inline Matrix4x4* GetWorldMatrix() {
-			return worldMatrix;
+		inline Matrix4x4& GetWorldMatrix() {
+			return *worldMatrix;
+		}
+
+		inline const Matrix4x4& GetWorldMatrix() const {
+			return *worldMatrix;
 		}
 
 		inline Vector3A GetPosition() const {

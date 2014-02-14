@@ -3,21 +3,12 @@
 
 #include "NexSys.h"
 #include "PropertyInterface.h"
-#include "ComponentManager.h"
+#include "Component.h"
 #include "BackgroundStreamer.h"
 #include "URL.h"
 
 namespace nextar {
-
-	class AssetManager : public ComponentManagerImpl {
-	public:
-		AssetManager(const String& name);
-
-		virtual void Configure(const Config& config);
-
-	protected:
-	};
-
+	
 	struct AssetCallback {
 		virtual void AssetUnloaded(Asset*) = 0;
 		virtual void AssetLoaded(Asset*) = 0;
@@ -37,11 +28,12 @@ namespace nextar {
 	class _NexExport Asset:
 	public PropertyInterface,
 	public Streamable,
-	public Referenced<Asset, Component> {
+	public SharedComponent {
 		NEX_LOG_HELPER(Asset);
 
 	public:
-		
+
+		typedef SharedComponent::Factory Factory;
 		typedef list<AssetCallback*>::type AssetCallbackList;
 
 		enum Flags {
@@ -54,13 +46,6 @@ namespace nextar {
 
 		struct AssetLocatorAccessor: public PropertyAccessor {
 			static AssetLocatorAccessor assetLocatorAccessor;
-
-			virtual void SetStringValue(PropertyInterface*, const String&);
-			virtual const String GetStringValue(const PropertyInterface*) const;
-		};
-
-		struct AssetGroupAccessor: public PropertyAccessor {
-			static AssetGroupAccessor assetGroupAccessor;
 
 			virtual void SetStringValue(PropertyInterface*, const String&);
 			virtual const String GetStringValue(const PropertyInterface*) const;
@@ -110,7 +95,7 @@ namespace nextar {
 			AssetSet unresolvedDependencies;
 		};
 
-		Asset(AssetManager*, const String&);
+		Asset(const String&);
 		virtual ~Asset();
 
 		/* Populate dictionary */
@@ -150,14 +135,6 @@ namespace nextar {
 
 		inline void SetMemoryCost(size_t c) {
 			memoryCost = c;
-		}
-
-		inline void SetAssetGroup(const String& name) {
-			assetGroup = nameTable.AsyncStringID(name);
-		}
-
-		inline const String& GetAssetGroup() const {
-			return nameTable.AsyncString(assetGroup);
 		}
 
 		/** @remarks Returns the asset locator definition **/
@@ -223,9 +200,6 @@ namespace nextar {
 		NEX_THREAD_MUTEX(assetLock);
 		/* The asset locator */
 		URL assetLocator;
-		/* Asset group id */
-		/** @todo Must be a string ID */
-		StringID assetGroup;
 		/* List of asset callbacks */
 		AssetCallbackList callbacks;
 		/* The asset memory used count in bytes */

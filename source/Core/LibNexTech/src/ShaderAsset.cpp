@@ -14,22 +14,22 @@ namespace nextar {
 	/*****************************************************/
 	/* Shader											 */
 	/*****************************************************/
-	ShaderAsset::ShaderAsset(AssetManager* manager, const String& name) : Asset(manager, name),
-			translucency(0), shaderParamBufferSize(0) {
+	ShaderAsset::ShaderAsset(const String& name) : Asset(name),
+			translucency(0) {
 	}
 
 	ShaderAsset::~ShaderAsset() {
 	}
 
-	ShaderAsset* ShaderAsset::Instance(AssetManager* manager, const String& name, const URL& loc) {
-		ShaderAsset* shader = static_cast<ShaderAsset*>(manager->AsyncCreate(ShaderAsset::TYPE, name));
+	ShaderAsset* ShaderAsset::Instance(ShaderAsset::Factory* factory, const String& name, const URL& loc) {
+		ShaderAsset* shader = static_cast<ShaderAsset*>(factory->AsyncCreate(ShaderAsset::CLASS_ID, name));
 		if(shader)
 			shader->SetAssetLocator(loc);
 		return shader;
 	}
 
-	int ShaderAsset::GetType() const {
-		return TYPE;
+	uint32 ShaderAsset::GetClassID() const {
+		return CLASS_ID;
 	}
 
 	void ShaderAsset::NotifyAssetLoaded() {
@@ -66,7 +66,7 @@ namespace nextar {
 		}
 
 		/* update */
-		ContextObject::NotifyUpdated(creationParams);
+		ContextObject::NotifyUpdated(reinterpret_cast<UpdateParamPtr>(creationParams));
 		/* parameter buffer */
 		_UpdatePasses();
 		/* mark request as complete */
@@ -122,7 +122,7 @@ namespace nextar {
 	}
 
 	void ShaderAsset::NotifyAssetUpdated() {
-		ContextObject::NotifyUpdated(nullptr);
+		ContextObject::NotifyUpdated(0);
 		_UpdatePasses();
 		Asset::NotifyAssetUpdated();
 	}
@@ -138,7 +138,7 @@ namespace nextar {
 	}
 
 	void ShaderAsset::Update(RenderContext* rc, ContextObject::UpdateParamPtr streamRequest) {
-		StreamRequest* creationParams = static_cast<StreamRequest*>(streamRequest);
+		StreamRequest* creationParams = reinterpret_cast<StreamRequest*>(streamRequest);
 
 		bool useFallback = false;
 		for(auto &p : passes) {
@@ -193,7 +193,7 @@ namespace nextar {
 			Error("Too many macros in one shader!.");
 			return;
 		}
-		macroTable.push_back({defaultValue, param});
+		macroTable.emplace_back(defaultValue, param);
 	}
 
 	void ShaderAsset::StreamRequest::BindDefaultTexture(const String& unitName, TextureBase* texture) {

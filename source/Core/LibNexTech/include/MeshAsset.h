@@ -83,23 +83,7 @@ namespace nextar {
 		uint32 indexCount;
 	};
 	typedef vector<PrimitiveGroup>::type PrimitiveGroupList;
-
-
-	class _NexExport MeshAssetManager: public AssetManager {
-	protected:
-
-	public:
-		MeshAssetManager(const String& name);
-		~MeshAssetManager();
-
-		virtual MeshAssetPtr AsyncCreateInstance(const String& name, 
-			const String& assetGroup, const URL& location);
-
-		/* Implementation */
-		virtual Component* AsyncCreateImpl(uint32 type, const String& name);
-		virtual void AsyncDestroyImpl(Component*);
-	};
-
+	
 	/**
 	 * @class    Mesh
 	 *
@@ -121,6 +105,20 @@ namespace nextar {
 		public:
 			virtual void Load(InputStreamPtr&, MeshAsset::Loader&) = 0;
 		};
+				
+		class Factory: public Asset::Factory {
+		protected:
+
+		public:
+			Factory(const String& name);
+			
+			virtual MeshAssetPtr AsyncCreateInstance(const String& name, 
+				const URL& location);
+
+			/* Implementation */
+			virtual Component* AsyncCreate(uint32 type, const String& name);
+		};
+
 
 		class Loader : public AllocGeneral {
 			NEX_LOG_HELPER(MeshLoader);
@@ -226,9 +224,12 @@ namespace nextar {
 		};
 
 
-		MeshAsset(MeshAssetManager*, const String&);
+		MeshAsset(const String&);
 		~MeshAsset();
-		
+
+		static MeshAsset* Instance(MeshAsset::Factory* factory, const String&);
+		static MeshAsset* Instance(MeshAsset::Factory* factory, const String&, const URL& locator);
+
 		const BoundsInfo& GetBoundsInfo() const {
 			return boundsInfo;
 		}

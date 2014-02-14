@@ -8,7 +8,7 @@
 #include "RenderManager.h"
 #include "WindowManager.h"
 #include "PropertyInterface.h"
-#include "ComponentManagerArchive.h"
+#include "ComponentFactoryArchive.h"
 #include "Mesh.h"
 #include "Entity.h"
 
@@ -92,7 +92,7 @@ namespace nextar {
 		NEX_NEW FileSystem();
 		NEX_NEW PluginRegistry();
 		//NEX_NEW WindowManager();
-		NEX_NEW ComponentManagerArchive();
+		NEX_NEW ComponentFactoryArchive();
 
 		CreateExtendedInterfacesImpl();
 	}
@@ -103,7 +103,7 @@ namespace nextar {
 
 		NEX_ASSERT (!RenderManager::InstancePtr());
 
-		NEX_DELETE ComponentManagerArchive::InstancePtr();
+		NEX_DELETE ComponentFactoryArchive::InstancePtr();
 		//NEX_DELETE WindowManager::InstancePtr();
 		NEX_DELETE PluginRegistry::InstancePtr();
 		NEX_DELETE FileSystem::InstancePtr();
@@ -169,24 +169,24 @@ namespace nextar {
 		/*@todo Optimize by sending a list*/
 		/* default mesh manager */
 		MeshAssetManager* mshM = NEX_NEW MeshAssetManager(StringUtils::Default);
-		ComponentManagerArchive::Instance().AsyncAddManager(MeshAsset::TYPE, mshM);
+		ComponentFactoryArchive::Instance().AsyncAddManager(MeshAsset::TYPE, mshM);
 		/* default shader manager */
 		/* default material manager */
 		MaterialAssetManager* mtlM = NEX_NEW MaterialAssetManager(StringUtils::Default);
-		ComponentManagerArchive::Instance().AsyncAddManager(MaterialAsset::TYPE, mtlM);
+		ComponentFactoryArchive::Instance().AsyncAddManager(MaterialAsset::TYPE, mtlM);
 		/* default entity manager */
 		EntityManager* entM = NEX_NEW EntityManager(StringUtils::Default);
-		ComponentManagerArchive::Instance().AsyncAddManager(Entity::TYPE, entM);
-		ComponentManagerArchive::Instance().AsyncAddManager(Moveable::TYPE, entM);
-		ComponentManagerArchive::Instance().AsyncAddManager(Light::TYPE, entM);
-		ComponentManagerArchive::Instance().AsyncAddManager(Mesh::TYPE, entM);
+		ComponentFactoryArchive::Instance().AsyncAddManager(Entity::TYPE, entM);
+		ComponentFactoryArchive::Instance().AsyncAddManager(Moveable::TYPE, entM);
+		ComponentFactoryArchive::Instance().AsyncAddManager(Light::TYPE, entM);
+		ComponentFactoryArchive::Instance().AsyncAddManager(Mesh::TYPE, entM);
 	}
 
 	void ApplicationContext::ConfigureComponentManagers() {
-		ComponentManagerArchive::Instance().Configure(config);
+		ComponentFactoryArchive::Instance().Configure(config);
 	}
 
 	void ApplicationContext::CloseComponentManagers() {
-		ComponentManagerArchive::Instance().AsyncDeleteAll();
+		ComponentFactoryArchive::Instance().AsyncDeleteAll();
 	}
 }

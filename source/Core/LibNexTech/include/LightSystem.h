@@ -10,22 +10,27 @@
 
 #include "NexSys.h"
 #include "VisiblePrimitive.h"
-#include "VisibleLight.h"
+#include "Light.h"
 #include "RenderConstants.h"
 
 namespace nextar {
 
-	typedef std::pair<uint32, VisibleLight*> KeyVisibleLightPair;
+	typedef std::pair<uint32, Light*> KeyVisibleLightPair;
 	typedef vector<KeyVisibleLightPair>::type LightList;
 	typedef vector< std::reference_wrapper< const KeyVisibleLightPair > >::type SortedLightList;
-	
-	/*
+		
+	/* 
+	* [     3     |		13	   |	16		]
+	*  light type   importance	   depth
+	*  @todo Will work on it when implementing the light system.
+	*/
 	class LightKeyHelper {
 	public:
+
 		inline friend bool operator < (const KeyVisibleLightPair& kvp1, const KeyVisibleLightPair& kvp2) {
 			return kvp1.first < kvp2.first;
 		}
-	};*/
+	};
 	/**
 	 * @remarks Scene traversal will involve lights being pushed into
 	 * light system, which will later be used by the render system to
@@ -45,7 +50,7 @@ namespace nextar {
 		virtual ~LightSystem();
 
 		virtual void Prepare() = 0;
-		virtual void PushLight(uint32 sortKey, VisibleLight*) = 0;
+		virtual void PushLight(uint32 sortKey, Light*) = 0;
 		virtual void Sort() = 0;
 		virtual void NearbyLights(LightSet& ls, BoundingVolume*) = 0;
 		virtual LightList& GetLights() = 0;

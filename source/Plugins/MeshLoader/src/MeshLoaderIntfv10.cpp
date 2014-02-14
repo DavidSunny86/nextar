@@ -36,7 +36,7 @@ namespace MeshLoader {
 		ser >> manager >> name >> path;
 		MaterialAsset* mtl = 0;
 		URL location(path);
-		AssetManager* managerPtr = ComponentManagerArchive::Instance().AsyncFindManager(MaterialAsset::TYPE, manager);
+		AssetManager* managerPtr = ComponentFactoryArchive::Instance().AsyncFindManager(MaterialAsset::TYPE, manager);
 		if (managerPtr) {
 			// create a new request for material load??
 			mtl = MaterialAsset::Instance(managerPtr, name, location);

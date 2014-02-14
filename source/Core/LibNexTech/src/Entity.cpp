@@ -15,17 +15,17 @@
 namespace nextar {
 
 	/*************************************
-	 * EntityManager
+	 * EntityFactory
 	 *************************************/
-	EntityManager::EntityManager(const String& name) :
-			ComponentManagerImpl(name) {
+	EntityFactory::EntityFactory(const String& name) :
+			Component::Factory(name) {
 	}
 
-	EntityPtr EntityManager::AsyncCreateCameraEntity(const String& name) {
+	EntityPtr EntityFactory::AsyncCreateCameraEntity(const String& name) {
 		return AsyncCreateAndAttach(name, Camera::CLASS_ID, name+"#Cam");
 	}
 
-	EntityPtr EntityManager::AsyncCreateMeshEntity(const String& name, MeshAssetPtr mesh) {
+	EntityPtr EntityFactory::AsyncCreateMeshEntity(const String& name, MeshAssetPtr mesh) {
 		Component* _subComponent = nullptr;
 		EntityPtr ret = AsyncCreateAndAttach(name, Mesh::CLASS_ID, name+"#Mesh", &_subComponent);
 		if (_subComponent) {
@@ -34,13 +34,13 @@ namespace nextar {
 		}
 	}
 
-	EntityPtr EntityManager::AsyncCreateLightEntity(const String& name) {
-		return AsyncCreateAndAttach(Light::CLASS_ID, name);
+	EntityPtr EntityFactory::AsyncCreateLightEntity(const String& name) {
+		return AsyncCreateAndAttach(name, Light::CLASS_ID, name+"#Light");
 	}
 
-	EntityPtr EntityManager::AsyncCreateAndAttach(const String& name, uint32 subType, const String& subName, Component** _subComponent) {
-		EntityPtr ent = Assign(AsyncFindOrCreate(Entity::CLASS_ID, name));
-		Component* subComponent = AsyncFindOrCreate(subType, subName);
+	EntityPtr EntityFactory::AsyncCreateAndAttach(const String& name, uint32 subType, const String& subName, Component** _subComponent) {
+		EntityPtr ent = Assign(AsyncCreate(Entity::CLASS_ID, name));
+		Component* subComponent = AsyncCreate(subType, subName);
 		if (subComponent) {
 			ent->AttachComponent(subComponent);
 			if (_subComponent) 
@@ -51,18 +51,18 @@ namespace nextar {
 		return ent;
 	}
 
-	Component* EntityManager::AsyncCreateImpl(uint32 type, const String& name) {
+	Component* EntityFactory::AsyncCreate(uint32 type, const String& name) {
 		switch(type) {
 		case Entity::CLASS_ID:
-			return NEX_NEW Entity(this, name);
+			return NEX_NEW Entity(name);
 		case Light::CLASS_ID:
-			return NEX_NEW Light(this, name);
+			return NEX_NEW Light(name);
 		case Mesh::CLASS_ID:
-			return NEX_NEW Mesh(this, name);
+			return NEX_NEW Mesh(name);
 		case Moveable::CLASS_ID:
-			return NEX_NEW Moveable(this, name);
+			return NEX_NEW Moveable(name);
 		case Camera::CLASS_ID:
-			return NEX_NEW Camera(this, name);
+			return NEX_NEW Camera(name);
 		}
 		return 0;
 	}
@@ -70,10 +70,9 @@ namespace nextar {
 	/*************************************
 	 * Entity
 	 *************************************/
-	Entity::Entity(ComponentManager* creator, const String& name) : 
+	Entity::Entity(const String& name) : 
+		SharedComponent(name),
 		moveable(nullptr),	spatial(nullptr) {
-		SetCreator(creator);
-		SetName(name);
 	}
 
 	Entity::~Entity() {
@@ -146,12 +145,12 @@ namespace nextar {
 		scene->_AddEntity(this);
 	}
 
-	void Entity::RemoveFromScene(bool removeFromCreator) {
+	void Entity::RemoveFromScene(bool removeFromGroup) {
 		if(scene) {
 			scene->_RemoveEntity(this);
 			scene = nullptr;
 		}
-		if (removeFromCreator)
-			creator->AsyncDestroy(this);
+		if (removeFromGroup) 
+			RemoveFromGroup();
 	}
 } /* namespace nextar */

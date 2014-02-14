@@ -58,11 +58,11 @@ namespace nextar {
 			}
 		};
 
-		TextureAsset(AssetManager*, const String&);
+		TextureAsset(const String&);
 		virtual ~TextureAsset();
 
-		static TextureAsset* Instance(AssetManager*, const String&);
-		static TextureAsset* Instance(AssetManager*, const String&, const URL& locator);
+		static TextureAsset* Instance(TextureAsset::Factory* factory, const String&);
+		static TextureAsset* Instance(TextureAsset::Factory* factory, const String&, const URL& locator);
 
 		inline bool IsTextureInited() const {
 			return (flags & TEXTURE_INITED) != 0;

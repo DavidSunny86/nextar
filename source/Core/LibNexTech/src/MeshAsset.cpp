@@ -1,6 +1,7 @@
 
 #include "NexHeaders.h"
 #include "MeshAsset.h"
+#include "BufferManager.h"
 
 namespace nextar {
 
@@ -18,8 +19,8 @@ namespace nextar {
 	/*********************************
 	 * Mesh
 	 *********************************/
-	MeshAsset::MeshAsset(MeshAssetManager* man, const String& name)
-			: Asset(man, name), vertexDeformationsEnabled(false), sharedVertexData(
+	MeshAsset::MeshAsset(const String& name)
+			: Asset(name), vertexDeformationsEnabled(false), sharedVertexData(
 					0), sharedIndexData(0) {
 	}
 
@@ -150,7 +151,7 @@ namespace nextar {
 					}
 					break;
 				case COMP_BASE_TYPE_UNSIGNED_SHORT:	{
-						uint16& value = *static_cast<uint16*> (udata + element.desc.offset);
+						uint16& value = *reinterpret_cast<uint16*> (udata + element.desc.offset);
 						value = Endian::Swap16(value);
 					}
 					break;
@@ -184,26 +185,22 @@ namespace nextar {
 	}
 
 	/*********************************
-	 * MeshManager
+	 * MeshAsset::Factory
 	 *********************************/
-	MeshAssetManager::MeshAssetManager(const String& name) : AssetManager(name) {
+	MeshAsset::Factory::Factory(const String& name) : Asset::Factory(name) {
 	}
 
-	MeshAssetManager::~MeshAssetManager() {
-	}
-
-	Component* MeshAssetManager::AsyncCreateImpl(uint32 classId, const String& name) {
+	Component* MeshAsset::Factory::AsyncCreate(uint32 classId, const String& name) {
 		if (classId == MeshAsset::CLASS_ID) {
-			return NEX_NEW MeshAsset(this, name);
+			return NEX_NEW MeshAsset(name);
 		}
 		return nullptr;
 	}
 
-	MeshAssetPtr MeshAssetManager::AsyncCreateInstance(const String& name, const String& group,
+	MeshAssetPtr MeshAsset::Factory::AsyncCreateInstance(const String& name, 
 		const URL& location) {
 		MeshAssetPtr mesh = Bind(AsyncCreate(MeshAsset::CLASS_ID, name));
 		if (mesh) {
-			mesh->SetAssetGroup(group);
 			mesh->SetAssetLocator(location);
 		}
 		return mesh;

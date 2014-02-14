@@ -8,7 +8,7 @@ UTApplication::UTApplication() : ApplicationContext("UTApplication") {
 
 ScenePtr UTApplication::_CreateDefaultScene() {
 	SceneManager* sceneManager =
-			static_cast<SceneManager*>(ComponentManagerArchive::Instance().AsyncFindManager(
+			static_cast<SceneManager*>(ComponentFactoryArchive::Instance().AsyncFindManager(
 			Scene::CLASS_ID));
 	return sceneManager->AsyncCreateEmptyScene("UTScene");
 }
@@ -16,7 +16,7 @@ ScenePtr UTApplication::_CreateDefaultScene() {
 void UTApplication::_SetupScene(ScenePtr& scene) {
 	EntityManager* entityManager =
 			static_cast<EntityManager*>(
-			ComponentManagerArchive::Instance().AsyncFindManager(Entity::CLASS_ID));
+			ComponentFactoryArchive::Instance().AsyncFindManager(Entity::CLASS_ID));
 
 	EntityPtr camera = entityManager->AsyncCreateCameraEntity("Main");
 	camera->AddToScene(scene);

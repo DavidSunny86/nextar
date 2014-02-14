@@ -5,12 +5,15 @@
  *      Author: obhi
  */
 #include "NexHeaders.h"
+#include "MaterialAsset.h"
+#include "ShaderAsset.h"
+#include "MeshAsset.h"
 #include "Mesh.h"
 
 namespace nextar {
 
-	Mesh::Mesh(ComponentManager* creator, const String& name, Component* parent) :
-			Renderable(creator, name, parent), defaultRenderQueue(0) {
+	Mesh::Mesh(const String& name, Component* parent) :
+			Renderable(name, parent), defaultRenderQueue(0) {
 	}
 
 	Mesh::~Mesh() {
@@ -37,7 +40,7 @@ namespace nextar {
 				Primitive prim;
 				prim.flags = 0;
 				prim.renderQueue = defaultRenderQueue;
-				prim.primitive.SetWorldMatrices(GetWorldMatrix(), 1);
+				prim.primitive.SetWorldMatrices(&GetWorldMatrix(), 1);
 				prim.primitive.SetBoundsInfo(&GetBoundsInfo());
 				prim.layer = 0;
 				prim.sortKey = SortKeyHelper::KeyOpaque(prim.layer, 0, 0);
@@ -52,5 +55,9 @@ namespace nextar {
 		ShaderAssetPtr& s = m->GetShader();
 		p.primitive.SetMaterial(m);
 		p.sortKey = SortKeyHelper::KeyOpaque(p.layer, 0, s->GetShaderMask());
+	}
+
+	uint32 Mesh::GetClassID() const {
+		return CLASS_ID;
 	}
 } /* namespace nextar */

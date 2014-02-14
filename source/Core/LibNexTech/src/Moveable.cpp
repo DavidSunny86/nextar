@@ -5,8 +5,8 @@
 
 namespace nextar {
 
-	Moveable::Moveable(ComponentManager *creator, const String& nodeName)
-			: Component(creator, nodeName), transform(NEX_NEW TransformData) {
+	Moveable::Moveable(const String& nodeName, Component* parent)
+			: Component(nodeName, parent), transform(NEX_NEW TransformData) {
 		flags = DEFAULT_FLAGS;
 		SetIdentityTransforms();
 	}

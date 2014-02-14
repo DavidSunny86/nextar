@@ -187,7 +187,7 @@ namespace nextar {
 		}
 
 		ComponentManager* manager =
-				ComponentManagerArchive::Instance().AsyncFindManager(ShaderAsset::TYPE, strPair.first);
+				ComponentFactoryArchive::Instance().AsyncFindManager(ShaderAsset::TYPE, strPair.first);
 		if (manager) {
 			shader = Bind(manager->AsyncFind(strPair.second));
 			if (!shader) {

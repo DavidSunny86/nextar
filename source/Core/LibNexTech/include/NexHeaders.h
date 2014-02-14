@@ -32,13 +32,12 @@
 #include "MeshAsset.h"
 
 #include "Component.h"
-#include "ComponentManagerArchive.h"
+#include "ComponentFactoryArchive.h"
 
 #include "Entity.h"
 #include "Light.h"
 #include "Mesh.h"
 #include "Moveable.h"
 #include "Scene.h"
-#include "SceneManager.h"
 
 #endif //NEXTAR_NEXBASE_STDHEADERS_H__

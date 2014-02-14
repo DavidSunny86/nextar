@@ -9,11 +9,10 @@
 
 namespace nextar {
 
-	Camera::Camera(ComponentManager* creator, const String& name, bool allocMatBuff) :
-		Moveable(creator, name, false), projectMatrixNumber(0), 
+	Camera::Camera(const String& name, Component* parent) :
+		Spatial(name, parent), projectMatrixNumber(0), 
 			visibilityMask(VisibilitySet::VM_ALL) {
-		if (allocMatBuff)
-			_SetCameraMatrixDataPtr(NEX_NEW Camera::Matrix);
+		_SetCameraMatrixDataPtr(NEX_NEW Camera::Matrix);
 	}
 
 	Camera::~Camera() {
@@ -51,13 +50,13 @@ namespace nextar {
 		
 		Camera::Matrix* m = static_cast<Camera::Matrix*>(matrixData);
 		bool updateFrustum = false;
-		const Matrix4x4& worldData = GetFullTransform();
-		if (viewMatrixNumber != GetMatrixNumber()) {
+		const Matrix4x4& worldData = GetWorldMatrix();
+		//if (viewMatrixNumber != GetMatrixNumber()) {
 			
 			m->view = Mat4x4ViewFromWorld(worldData);
-			viewMatrixNumber = GetMatrixNumber();
+		//	viewMatrixNumber = GetMatrixNumber();
 			updateFrustum = true;
-		}
+		//}
 
 		if (IsProjectionDirty()) {
 			UpdateProjection();
@@ -76,9 +75,9 @@ namespace nextar {
 	const Vector3A* Camera::GetCorners() {
 		Camera::Matrix* m = static_cast<Camera::Matrix*>(matrixData);
 		Vector3A* transCorners = m->corners;
-		const Matrix4x4& worldData = GetFullTransform();
-		if (IsBoundsOutOfDate() ||
-			viewMatrixNumber != GetMatrixNumber()) {
+		const Matrix4x4& worldData = GetWorldMatrix();
+		if (IsBoundsOutOfDate()) { 
+			// || viewMatrixNumber != GetMatrixNumber()) {
 			
 			/* Recalculate */
 			if (IsViewDimOutOfDate())
@@ -169,11 +168,17 @@ namespace nextar {
 	}
 
 	void Camera::Visit(SceneTraversal & traversal) {
+		Camera* oldCamera = traversal.camera;
+		Frustum* oldFrustum = traversal.frustum;
+		uint32 oldMask = visibilityMask;
 		traversal.camera = this;
 		traversal.visibilityMask = visibilityMask;
 		traversal.frustum = &viewFrustum;
 		if (culler)
-			culler->Visit(traversal, cullingData);
+			culler->Visit(traversal);
+		traversal.camera = oldCamera;
+		traversal.visibilityMask = oldMask;
+		traversal.frustum = oldFrustum;
 	}
 	
 	uint32 Camera::GetClassID() const {

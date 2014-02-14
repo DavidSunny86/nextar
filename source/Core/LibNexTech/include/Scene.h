@@ -41,7 +41,7 @@ namespace nextar {
 		class SceneStreamRequest : public AssetStreamRequest {
 		};
 
-		Scene(AssetManager* creator, const String& name);
+		Scene(const String& name);
 		virtual ~Scene();
 		
 		/* internal API */

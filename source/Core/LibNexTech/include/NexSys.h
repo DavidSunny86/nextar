@@ -47,8 +47,8 @@ namespace nextar {
 	class Pass;
 
 	class Component;
-	class ComponentManager;
-	class ComponentManagerArchive;
+	class SharedComponent;
+	class ComponentFactoryArchive;
 	class LightSystem;
 	class BoundingVolume;
 	class VisibilitySet;
@@ -74,8 +74,7 @@ namespace nextar {
 
 	class AssetStreamRequest;
 	struct AssetCallback;
-	class AssetManager;
-
+	
 	typedef RefPtr<LightSystem> LightSystemPtr;
 
 	typedef RefPtr<VertexBuffer> VertexBufferPtr;
@@ -91,6 +90,7 @@ namespace nextar {
 	typedef RefPtr<RenderTarget> RenderTargetPtr;
 	typedef RefPtr<MultiRenderTarget> MultiRenderTargetPtr;
 
+	typedef RefPtr<SharedComponent> SharedComponentPtr;
 	typedef RefPtr<Asset> AssetPtr;
 	typedef RefPtr<TextureAsset> TextureAssetPtr;
 	typedef RefPtr<ShaderAsset> ShaderAssetPtr;

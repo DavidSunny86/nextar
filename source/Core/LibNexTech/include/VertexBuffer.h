@@ -12,10 +12,6 @@ namespace nextar {
 	};
 
 	class _NexExport VertexBuffer: public ManagedBuffer {
-	protected:
-		/* Vertex buffer relocation policy */
-		uint32 frameThreshold;
-		RelocationPolicy policy;
 
 	public:
 
@@ -37,11 +33,10 @@ namespace nextar {
 			return policy;
 		}
 
-		/** Implementation */
-		virtual void Read(RenderContext* rc, void *dest, size_t offset = 0, size_t size = 0) override = 0;
-		virtual void Write(RenderContext* rc, const void *src, size_t offset = 0, size_t size = 0) override = 0;
-		virtual void CopyFrom(RenderContext* rc, BufferPtr&) override = 0;
-
+	protected:
+		/* Vertex buffer relocation policy */
+		uint32 frameThreshold;
+		RelocationPolicy policy;
 	};
 
 }
