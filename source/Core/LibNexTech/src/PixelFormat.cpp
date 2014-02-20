@@ -153,7 +153,7 @@ namespace nextar {
 		size_t GetBufferSize(uint32 width, uint32 height, uint32 depth,
 				PixelFormat fmt) {
 			if (IsCompressed(fmt)) {
-				/* @todo for compressed formats */
+				/* todo for compressed formats */
 			}
 			return BytesPerPixel(fmt) * width * height * depth;
 		}
@@ -216,7 +216,7 @@ namespace nextar {
 									GetBufferSize(proxySrc.GetWidth(),
 											proxySrc.GetHeight(),
 											proxySrc.GetDepth(), dest.format), MEMCAT_GENERAL); // retrieve size
-					/* @todo this may be incorrectly set, the rowSkip and sliceSkip,
+					/* todo this may be incorrectly set, the rowSkip and sliceSkip,
 					 check this for compressed formats */
 					proxySrc.format = dest.format;
 					proxySrc.rowPixelPitch = proxySrc.GetWidth();

@@ -9,6 +9,7 @@
 #define GPUPROGRAM_H_
 
 #include "ContextObject.h"
+#include "StringUtils.h"
 
 namespace nextar {
 

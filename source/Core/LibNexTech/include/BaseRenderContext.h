@@ -24,7 +24,7 @@ namespace nextar {
 		virtual RenderTargetList& GetRenderTargetList();
 		virtual void SetVideoMode(uint32 videoModeIndex);
 
-		/** @todo Context objects */
+		/** todo Context objects */
 		virtual void RegisterObject(ContextObject*);
 		virtual void UnregisterObject(ContextObject*);
 		virtual void UpdateObject(ContextObject*, ContextObject::UpdateParamPtr);

@@ -14,6 +14,7 @@
 
 namespace RenderOpenGL {
 
+	class PassGL;
 	struct VertexAttribGL {
 		/* assumed true?? */
 		GLboolean normalize;
@@ -38,7 +39,7 @@ namespace RenderOpenGL {
 	typedef std::pair<uint32, GLuint> PassLayoutVertexArrayPair;
 	typedef std::vector<PassLayoutVertexArrayPair> PassLayoutVertexArrayPairList;
 
-	/** @todo We can have more efficient structures here, but if this works out,
+	/** todo We can have more efficient structures here, but if this works out,
 	 then no worry */
 	class VertexLayoutGL : public VertexLayout {
 	public:

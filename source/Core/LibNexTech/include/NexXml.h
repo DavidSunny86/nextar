@@ -165,7 +165,7 @@ namespace nextar {
             void AddChildLast(Node*);
             void AddChildFirst(Node*);
             void RemoveChild(Node*);
-            Iterator RemoveChild(Iterator); //@ @todo: check this intresting method.
+            Iterator RemoveChild(Iterator); //@ todo: check this intresting method.
             Node* FindChild(const char*);
             String ReadTextNode();
 

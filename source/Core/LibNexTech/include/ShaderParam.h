@@ -26,108 +26,68 @@ namespace nextar {
 		PDT_IVEC2,
 		PDT_IVEC3,
 		PDT_IVEC4,
+		PDT_MAT4x4,
+		PDT_MAT3x4,
 		PDT_COUNT,
 	};
 
 	enum class AutoParamName {
-		/* Time in seconds */
+		// Time in seconds
 		AUTO_TIME,
-		/* Elapsed time in seconds between two frames ( f(i) and f(i-1) ) */
+		// Elapsed time in seconds between two frames ( f(i) and f(i-1) )
 		AUTO_ELAPSED_TIME,
-		/* Frame Number */
+		// Frame Number
 		AUTO_FRAME_NUMBER,
-		/* Diffuse Color */
+		// Diffuse Color
 		AUTO_DIFFUSE_COLOR,
-		/* Specualar power */
+		// Specualar power
 		AUTO_SPECULAR_POWER,
-		/* World matrix.  */
+		// World matrix.
 		AUTO_WORLD,
-		/* Inverse world matrix, only 1 accepted */
+		// Inverse world matrix, only 1 accepted
 		AUTO_INV_WORLD,
-		/* View matrix.  */
+		// View matrix.
 		AUTO_VIEW,
-		/* Projection matrix.  */
+		// Projection matrix.
 		AUTO_PROJECTION,
-		/* World*View matrix.  */
+		// World*View matrix.
 		AUTO_WORLD_VIEW,
-		/* View*Projection matrix.  */
+		// View*Projection matrix.
 		AUTO_VIEW_PROJECTION,
-		/* World*View*Projection matrix.  */
+		// World*View*Projection matrix.
 		AUTO_WORLD_VIEW_PROJECTION,
-		/* Light position */
+		// Light position
 		AUTO_LIGHT_POSITION,
-		/* Light direction */
+		// Light direction
 		AUTO_LIGHT_DIRECTION,
-		/* Light position */
+		// Light position
 		AUTO_LIGHT_OBJ_SPACE_POSITION,
-		/* Light direction */
+		// Light direction
 		AUTO_LIGHT_OBJ_SPACE_DIRECTION,
-		/* Light color */
+		// Light color
 		AUTO_LIGHT_SPECUALR_COLOR,
-		/* Ambient color */
+		// Ambient color
 		AUTO_LIGHT_AMBIENT_COLOR,
-		/* Diffuse color */
+		// Diffuse color
 		AUTO_LIGHT_DIFFUSE_COLOR,
-		/* Atten range + coefficients color */
+		// Atten range + coefficients color
 		AUTO_LIGHT_ATTENUATION,
-		/* Light pov matrix used for shadow coordinates */
+		// Light pov matrix used for shadow coordinates
 		AUTO_LIGHT_POV_MATRIX,
-		/* Custom indicates a custom parameter */
+		// Custom indicates a custom parameter
 		AUTO_CUSTOM
 	};
 
 	enum class UpdateFrequency {
-		/* changes per frame: view matrix */
+		// changes per frame: view matrix
 		PER_FRAME = 1 << 0,
-		/* changes per material instance: diffuseColor */
+		// changes per material instance: diffuseColor
 		PER_MATERIAL = 1 << 1,
-		/* changes per object instance: worldMatrix */
+		// changes per object instance: worldMatrix
 		PER_OBJECT_INSTANCE = 1 << 2,
-		/* changes per shader pass */
+		// changes per shader pass
 		PER_PASS = 1 << 3,
 	};
 
-	struct ShaderParamInfo {
-		uint16	type;
-		uint8  index; /* for textures, this will be the bind point */
-		uint16  count;
-		String	name;
-	};
-
-	class _NexExport ShaderVariant : public AllocGeneral {
-	public:
-
-		ShaderVariant();
-		ShaderVariant(const ShaderVariant&);
-		ShaderVariant(ShaderVariant&&);
-		~ShaderVariant();
-
-		ShaderVariant& operator = (const ShaderVariant&);
-		ShaderVariant& operator = (ShaderVariant&&);
-
-		TextureUnit& GetTextureUnit(uint16 index);
-
-	
-
-		union {
-			float vFloat;
-			uint32 vInt;
-			int32 vUInt;
-			float vUVOffsetAndTile[4];
-			float vVec[4];
-
-			uint32* vUIntArray;
-			int32* vIntArray;
-			float* vFloatArray;
-			TextureUnit* vTexUnitArray;
-		};
-
-		/* Single texture unit */
-		TextureBase* vTexture;
-
-		uint16 type;
-		uint16 count;
-	};
-
-} /* namespace nextar */
-#endif /* SHADERPARAM_H_ */
+} // namespace nextar
+#endif // SHADERPARAM_H_

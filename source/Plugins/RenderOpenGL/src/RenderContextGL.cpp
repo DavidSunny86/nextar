@@ -8,7 +8,7 @@
 #include "RenderContextGL.h"
 #include "RenderDriverGL.h"
 #include "RenderWindow.h"
-#include "Shader.h"
+#include "ShaderAsset.h"
 
 namespace RenderOpenGL {
 
@@ -179,7 +179,7 @@ namespace RenderOpenGL {
 				inpComp[inpCount].semantic.semantic = semantic.semantic;
 	            inpCount++;
 	        } else {
-	            /** @todo Add support for output semantic */
+	            /** todo Add support for output semantic */
 	        }
 	    }
 
@@ -297,17 +297,18 @@ namespace RenderOpenGL {
 	        uform.arrayCount = uint16(arraynum[i]);
 	        ShaderAsset::ParamDef& paramDef = ShaderAsset::MapParamName(uform.name);
 	        uform.autoName = paramDef.autoName;
-	        if (uform.autoName == (uint16)AutoParamName::AUTO_CUSTOM)
-	        	uform.name = uniName;
 	        uform.type = GetShaderParamType(uform.typeGl);
+	        uform.sizeInBytes = GetShaderParamSize(uform.typeGl) * uform.arrayCount;
 	        uform.updateFrequency = paramDef.updateFrequency;
 	        uform.offset =  offset[i];
-	        if (uform.autoName == (uint16)AutoParamName::AUTO_CUSTOM)
+	        if (uform.autoName == (uint16)AutoParamName::AUTO_CUSTOM) {
+	        	uform.name = uniName;
 	        	numUnmappedParams++;
-	        else if(paramDef.type != uform.type ) {
+	        } else if(paramDef.type != uform.type ) {
 	        	Warn("Auto parameter differs by type, please set appropriate type: " + uform.name);
 	        	continue;
 	        }
+
 	        mask |= uform.updateFrequency;
 	        uniforms.push_back(uform);
 	    }
@@ -326,7 +327,7 @@ namespace RenderOpenGL {
 	}
 
 	void RenderContextGL::ReadSamplers(SamplerStateList& samplers, const PassGL* shader, GLuint program) {
-		/** @todo Massive work left for sampler arrays */
+		/** todo Massive work left for sampler arrays */
 	    GLint numUni = 0;
 	    char name[128];
         size_t extra = 0;
@@ -347,7 +348,7 @@ namespace RenderOpenGL {
 
             	SamplerState ss;
             	/**
-            	 * @todo Add sampler array support please
+            	 * todo Add sampler array support please
             	 * */
             	ss.samplerCount = 1;
                 //uint16 index = shader->GetTextureUnitIndex(unitName);
@@ -369,7 +370,7 @@ namespace RenderOpenGL {
                  * be recreated. Now, we choose not to store this index on to the shader
                  * texture table here, as we can search via name to obtain the same. To
                  * make it more efficient, we may eventually store the texture units as
-                 * in a map (marked as @todo) in the shader. This index will not be the
+                 * in a map (marked as todo) in the shader. This index will not be the
                  * location the texture will be bound to, or the sampler will be bound to.
                  * The sampler will be bound to the index in which it gets stored in the
                  * sampler table. This will be efficient and will result in no gaps in
@@ -531,18 +532,38 @@ namespace RenderOpenGL {
 		return -1;
 	}
 
+	uint16 RenderContextGL::GetShaderParamSize(GLuint type) {
+		switch(type) {
+			case GL_BOOL: return (uint16)1;
+			case GL_UNSIGNED_INT: return (uint16)sizeof(uint32);
+			case GL_INT: return (uint16)sizeof(int32);
+			case GL_FLOAT: return (uint16)sizeof(float);
+			case GL_FLOAT_VEC2: return (uint16)sizeof(float)*2;
+			case GL_FLOAT_VEC3: return (uint16)sizeof(float)*3;
+			case GL_FLOAT_VEC4: return (uint16)sizeof(float)*4;
+			case GL_INT_VEC2: return (uint16)sizeof(int32)*2;
+			case GL_INT_VEC3: return (uint16)sizeof(int32)*3;
+			case GL_INT_VEC4: return (uint16)sizeof(int32)*4;
+			case GL_FLOAT_MAT3x4: return (uint16)sizeof(float)*12;
+			case GL_FLOAT_MAT4: return (uint16)sizeof(float)*16;
+		}
+		return (uint16)0;
+	}
+
 	uint16 RenderContextGL::GetShaderParamType(GLuint type) {
 		switch(type) {
-		case GL_BOOL: return (uint16)ParamDataType::PDT_BOOL;
-		case GL_UNSIGNED_INT: return (uint16)ParamDataType::PDT_UINT;
-		case GL_INT: return (uint16)ParamDataType::PDT_INT;
-		case GL_FLOAT: return (uint16)ParamDataType::PDT_FLOAT;
-		case GL_FLOAT_VEC2: return (uint16)ParamDataType::PDT_VEC2;
-		case GL_FLOAT_VEC3: return (uint16)ParamDataType::PDT_VEC3;
-		case GL_FLOAT_VEC4: return (uint16)ParamDataType::PDT_VEC4;
-		case GL_INT_VEC2: return (uint16)ParamDataType::PDT_IVEC2;
-		case GL_INT_VEC3: return (uint16)ParamDataType::PDT_IVEC3;
-		case GL_INT_VEC4: return (uint16)ParamDataType::PDT_IVEC4;
+			case GL_BOOL: return (uint16)ParamDataType::PDT_BOOL;
+			case GL_UNSIGNED_INT: return (uint16)ParamDataType::PDT_UINT;
+			case GL_INT: return (uint16)ParamDataType::PDT_INT;
+			case GL_FLOAT: return (uint16)ParamDataType::PDT_FLOAT;
+			case GL_FLOAT_VEC2: return (uint16)ParamDataType::PDT_VEC2;
+			case GL_FLOAT_VEC3: return (uint16)ParamDataType::PDT_VEC3;
+			case GL_FLOAT_VEC4: return (uint16)ParamDataType::PDT_VEC4;
+			case GL_INT_VEC2: return (uint16)ParamDataType::PDT_IVEC2;
+			case GL_INT_VEC3: return (uint16)ParamDataType::PDT_IVEC3;
+			case GL_INT_VEC4: return (uint16)ParamDataType::PDT_IVEC4;
+			case GL_FLOAT_MAT3x4: return (uint16)ParamDataType::PDT_MAT3x4;
+			case GL_FLOAT_MAT4: return (uint16)ParamDataType::PDT_MAT4x4;
 		}
 		return (uint16)ParamDataType::PDT_UNKNOWN;
 	}

@@ -42,7 +42,7 @@ namespace nextar {
 		class TextureStreamRequest : public AllocGeneral,
 							  public AssetStreamRequest {
 		public:
-			/** @todo, global render options can be checked */
+			/** todo, global render options can be checked */
 			enum {
 				TEXTURE_PARAMS_INITED = AssetStreamRequest::LAST_FLAG << 0,
 				TEXTURE_STREAMING_ENABLED = AssetStreamRequest::LAST_FLAG << 1,

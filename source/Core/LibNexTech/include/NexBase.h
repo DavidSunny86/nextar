@@ -1,6 +1,6 @@
-//@ Abhishek
-//@ Nov 25 2007
-//@---------------------------
+// Abhishek
+// Nov 25 2007
+//---------------------------
 //## This is where I Start again, after 
 //## realizing the mistakes of the frame
 //## work.
@@ -83,10 +83,10 @@
 #	endif
 #endif
 
-//@ currently we implement 64 bit support
-//@ so we do not disable 64 bit warnings
+// currently we implement 64 bit support
+// so we do not disable 64 bit warnings
 
-//@ lets check for the arch
+// lets check for the arch
 
 #ifndef NEX_ARCH
 #	error No basic architecture support included.
@@ -173,7 +173,7 @@ typedef unsigned short wchar_t;
 #	endif
 #endif
 
-#if (_MSC_VER <= 1700) || defined(__MINGW32__)
+#if (defined(_MSC_VER) && (_MSC_VER <= 1700)) || defined(__MINGW32__)
 #	define noexcept
 #	define constexpr const
 	// no need to explicitly align as first member is aligned anyway
@@ -186,7 +186,7 @@ typedef unsigned short wchar_t;
 #	define _NexNoVtable 
 #endif 
 
-//@ macro to test if its debug mode
+// macro to test if its debug mode
 #ifdef NEX_DEBUG
 #	define NEX_IS_DEBUG_MODE() true
 #else
@@ -251,15 +251,15 @@ typedef unsigned short wchar_t;
 //#include "ErrorDefs.h"
 //#include "nexshared.h"
 
-//@ helper macros
+// helper macros
 //#define NEX_MULTIPLE_OF(_number_,n) (_number_ + (n-_number_%n))
 #define NEX_TOKEN_PASTE(X,Y)	NEX_TOKEN_PASTE1(X,Y)
 #define NEX_TOKEN_PASTE1(X,Y)	X##Y
 #define _NexInline inline
 
-//@*****************************************************************************
+//*****************************************************************************
 // Compiler specific options
-//@*****************************************************************************
+//*****************************************************************************
 #if defined( NEX_MSVC )
 #	define NEX_FUNCTION_NAME		__FUNCTION__
 #	define NEX_SOURCEFILE_NAME		__FILE__
@@ -274,12 +274,12 @@ typedef unsigned short wchar_t;
 #	define NEX_SOURCEFILE_LINE		0
 #endif
 
-//@*****************************************************************************
-//@ more macros
+//*****************************************************************************
+// more macros
 #define NEX_4LETTER_KEY(a,b,c,d) \
 	((long)a + ((long)b << 8) + ((long)c << 16) + ((long)d << 24))
 
-//@ May 08 2008 upgrade
+// May 08 2008 upgrade
 //#include "nexcallstack.h"
 #endif //NEXTAR_BASE_DEF_H
-//@
+//

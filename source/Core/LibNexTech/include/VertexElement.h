@@ -189,7 +189,7 @@ namespace nextar {
 	struct VertexElement: public AllocGraphics {
 
 		enum {
-			MAX_VERTEX_ELEMENT = RenderConstants::MAX_VERTEX_ELEMENT,
+			MAX_VERTEX_ELEMENT = (uint32)RenderConstants::MAX_VERTEX_ELEMENT,
 		};
 
 		/* Vertex description */

@@ -8,6 +8,7 @@
 #ifndef GPUCONTEXTOBJECT_H_
 #define GPUCONTEXTOBJECT_H_
 
+#include "NexSys.h"
 #include "NexTypes.h"
 #include "NexThread.h"
 

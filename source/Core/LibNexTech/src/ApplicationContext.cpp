@@ -166,7 +166,7 @@ namespace nextar {
 	}
 
 	void ApplicationContext::CreateComponentManagers() {
-		/*@todo Optimize by sending a list*/
+		/*todo Optimize by sending a list*/
 		/* default mesh manager */
 		MeshAssetManager* mshM = NEX_NEW MeshAssetManager(StringUtils::Default);
 		ComponentFactoryArchive::Instance().AsyncAddManager(MeshAsset::TYPE, mshM);

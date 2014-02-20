@@ -4,7 +4,7 @@
 #ifndef NEXTAR_ERR_DFS_1_01
 #define NEXTAR_ERR_DFS_1_01
 
-#ifndef NEXTAR_TYPES_BASE_H
+#ifndef NEXTYPES_H_
 #error Do not include this file directly, include "NexTypes.h" instead
 #endif
 

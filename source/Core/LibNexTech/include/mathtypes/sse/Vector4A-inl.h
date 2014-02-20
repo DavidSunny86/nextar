@@ -65,26 +65,26 @@ namespace nextar {
 
 	/** @reamarks Lerp */
 	inline Vector4A Vec4ALerp(Vec4AF src, Vec4AF dst, float t) {
-		/* @todo Make efficient */
+		/* todo Make efficient */
 		return Vec4AMulAdd(Vec4AReplicate(t), Vec4ASub(dst, src), src);
 	}
 
-	/** @todo */
+	/** todo */
 	inline float Vec4ASqLength(Vec4AF vec) {
 		return (Vec4ADot(vec, vec));
 	}
 
-	/** @todo*/
+	/** todo*/
 	inline float Vec4ALength(Vec4AF vec) {
 		return Math::Sqrt(Vec4ADot(vec, vec));
 	}
 
-	/** @todo*/
+	/** todo*/
 	inline float Vec4ADistance(Vec4AF vec1, Vec4AF vec2) {
 		return Vec4ALength(Vec4ASub(vec1, vec2));
 	}
 
-	/** @todo*/
+	/** todo*/
 	inline float Vec4ASqDistance(Vec4AF vec1, Vec4AF vec2) {
 		return Vec4ASqLength(Vec4ASub(vec1, vec2));
 	}

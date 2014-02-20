@@ -40,7 +40,7 @@ namespace nextar {
 		enum {
 			ACTIVE = 1 << 0, DIRTY = 1 << 1, LASTFLAG = 1 << 2
 		};
-		/** @todo We can use a single callback and multiplex if necessary */
+		/** todo We can use a single callback and multiplex if necessary */
 		typedef vector<ViewportCallback*>::type ViewportCallbackList;
 
 		class Iterator {

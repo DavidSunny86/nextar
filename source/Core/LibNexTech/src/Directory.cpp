@@ -1,3 +1,4 @@
+
 #include "NexHeaders.h"
 #include "Archive.h"
 #include "GenericStreams.h"
@@ -184,7 +185,7 @@ namespace nextar {
 		if (fileHandle != -1)
 		_findclose(fileHandle);
 #elif defined(NEX_GCC)
-		/** @todo Fix this */
+		/** todo Fix this */
 		DIR *dp;
 		struct dirent *dirp;
 		dp = opendir(fullPath.c_str());
@@ -216,12 +217,11 @@ namespace nextar {
 	class CollectFileNames: public Archive::ScanCallback {
 		StringVector& strArr;
 	public:
-
 		CollectFileNames(StringVector& arr) :
 				strArr(arr) {
 		}
 
-		void FoundFile(const FileAttribute& attr, Archive*) {
+		virtual void FoundFile(const FileAttribute& attr, Archive*) override {
 			strArr.push_back(attr.fileName.GetRelativePath());
 		}
 	};

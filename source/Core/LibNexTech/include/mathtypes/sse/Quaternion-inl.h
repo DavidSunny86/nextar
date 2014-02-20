@@ -16,7 +16,7 @@ namespace nextar {
 
 	inline Quaternion QuatFromAxisAng(Vec3AF axis, float ang) {
 	#if NEX_CORE_DEBUG_CHECKS == 1
-		float len = 1; //\@todo Find length of axis
+		float len = 1; //\todo Find length of axis
 		NEX_ASSERT(NEX_FLOAT_TOLERANCE_EQUAL(len, 1, Math::EPSILON_MED));
 	#endif
 		Quad N = _mm_and_ps(axis, N3D_FFFO.v);

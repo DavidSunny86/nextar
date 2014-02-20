@@ -10,7 +10,7 @@ namespace nextar {
 
 	MeshNode::MeshNode(ComponentManager *creator, const String& name)
 			: MovableComponent(creator, name), deformer(0), visibilityMask(0xffffffff),
-			  maxDrawDistanceSq(Math::INFINITY) {
+			  maxDrawDistanceSq(Math::SCALAR_MAX) {
 	}
 
 	MeshNode::~MeshNode() {

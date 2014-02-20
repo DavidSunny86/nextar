@@ -14,9 +14,6 @@ namespace nextar {
 
 	class FrameListener {
 	public:
-
-		virtual ~FrameListener() {}
-
 		/* Called to mark the start of a frame, return false to skip frame */
 		virtual void BeginFrame(uint32 frameNumber) {
 			(void) frameNumber;
@@ -27,8 +24,8 @@ namespace nextar {
 			(void) timeElapsed;
 		}
 
-	private:
-
+	protected:
+		~FrameListener() {}
 	};
 }
 #endif	/* FRAMELISTENER_H */

@@ -30,7 +30,7 @@ namespace nextar {
 			return renderCam;
 		}
 
-		/** @todo Make use of this?? */
+		/** todo Make use of this?? */
 		virtual void FindVisiblePrimitives(SceneTraversal & traversal) {}
 
 	private:

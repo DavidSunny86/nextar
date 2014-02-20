@@ -80,6 +80,7 @@ namespace RenderOpenGL {
 	protected:
 
 		static uint16 GetShaderParamType(GLuint type);
+		static uint16 GetShaderParamSize(GLuint type);
 		static uint16 GetSemanticType(GLenum);
 		static bool IsSamplerType(GLint type);
 		static GLint GetGlAddressMode(TextureAddressModeType t);

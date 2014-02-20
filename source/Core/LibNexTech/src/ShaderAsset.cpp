@@ -91,7 +91,7 @@ namespace nextar {
 						source.c_str(),
 						&co
 				};
-				r->programs[i]->NotifyUpdated(&update);
+				r->programs[i]->NotifyUpdated(reinterpret_cast<ContextObject::UpdateParamPtr>(&update));
 			}
 		}
 
@@ -134,7 +134,7 @@ namespace nextar {
 	}
 
 	void ShaderAsset::Create(nextar::RenderContext*) {
-		// @todo
+		// todo
 	}
 
 	void ShaderAsset::Update(RenderContext* rc, ContextObject::UpdateParamPtr streamRequest) {
@@ -146,7 +146,7 @@ namespace nextar {
 		}
 
 		if (useFallback)
-			Warn("@todo Shader compilation failed.");
+			Warn("Shader compilation failed.");
 		else
 			Compile(rc);
 	}

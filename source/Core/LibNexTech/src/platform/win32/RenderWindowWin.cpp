@@ -7,7 +7,7 @@
 namespace nextar {
 
     void RenderWindowWin::WindowConfigChanged() {
-        // @todo get the resized window
+        // todo get the resized window
         GraphicsWindow::WindowConfigChanged();
     }
 
@@ -24,7 +24,7 @@ namespace nextar {
 			}
 			break;
 		case WM_EXITSIZEMOVE:
-			// @todo should have size change started, size change ended
+			// todo should have size change started, size change ended
 			wind->WindowConfigChanged();
 			break;
 		case WM_SIZE:

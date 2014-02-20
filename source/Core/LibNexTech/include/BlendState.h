@@ -54,7 +54,7 @@ namespace nextar {
 		bool enabled;
 		bool alphaToCoverage;
 		uint16 numRenderTargets;
-		RenderTargetBlendOp blendOp[RenderConstants::MAX_RENDER_TARGETS];
+		RenderTargetBlendOp blendOp[(uint32)RenderConstants::MAX_RENDER_TARGETS];
 
 		BlendState() : enabled(false), alphaToCoverage(false), numRenderTargets(0) {
 		}

@@ -32,6 +32,7 @@ namespace nextar {
 			Mesh* meshPtr = static_cast<Mesh*>(_subComponent);
 			meshPtr->SetMeshAsset(mesh);
 		}
+		return ret;
 	}
 
 	EntityPtr EntityFactory::AsyncCreateLightEntity(const String& name) {
@@ -72,7 +73,7 @@ namespace nextar {
 	 *************************************/
 	Entity::Entity(const String& name) : 
 		SharedComponent(name),
-		moveable(nullptr),	spatial(nullptr) {
+		moveable(nullptr),	spatial(nullptr), scene(nullptr) {
 	}
 
 	Entity::~Entity() {
@@ -106,7 +107,7 @@ namespace nextar {
 		}
 		
 		comp->SetParent(this);
-		/* @todo Fire event */
+		/* todo Fire event */
 	}
 
 	void Entity::DetachComponent(uint32 type) {

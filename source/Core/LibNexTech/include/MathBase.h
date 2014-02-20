@@ -32,8 +32,8 @@ namespace nextar {
 		static constexpr float INV_2_PI = 0.15915494309189533576888376337254f;
 		static constexpr float DEG_TO_RAD_MULTIPLIER = 0.0174532925199f;
 
-		static constexpr float INFINITY = 3.402823466e+38f;
-		static constexpr float INFINITY_MED = 999999999.0f;
+		static constexpr float SCALAR_MAX = 3.402823466e+38f;
+		static constexpr float SCALAR_MED = 999999999.0f;
 
 		static constexpr float EPSILON = 1.192092896e-06f;
 		static constexpr float EPSILON_MED = 0.0009765625f;

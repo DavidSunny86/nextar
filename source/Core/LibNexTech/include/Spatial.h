@@ -26,7 +26,8 @@ namespace nextar {
 
 		enum {
 			BOUNDS_DIRTY = Component::LAST_FLAG << 1,
-			LAST_FLAG = Component::LAST_FLAG << 2
+			UPDATE_BOUNDS = Component::LAST_FLAG << 2,
+			LAST_FLAG = Component::LAST_FLAG << 3
 		};
 
 		Spatial(const String& name = StringUtils::Null, Component* parent = nullptr);
@@ -61,6 +62,14 @@ namespace nextar {
 			SetFlag(BOUNDS_DIRTY, v);
 		}
 
+		inline bool IsUpdateBoundsEnabled(bool b) const {
+			return IsFlagSet(UPDATE_BOUNDS);
+		}
+
+		inline void SetUpdateBoundsEnabled(bool v) {
+			SetFlag(UPDATE_BOUNDS, v);
+		}
+
 		inline Matrix4x4& GetWorldMatrix() {
 			return *worldMatrix;
 		}
@@ -74,7 +83,7 @@ namespace nextar {
 		}
 
 		/** @remarks Update world volume */
-		void UpdateBounds();
+		void Update();
 		virtual void SetMoveable(Moveable* ptr);
 		virtual void Visit(SceneTraversal& traversal) = 0;
 
@@ -84,7 +93,8 @@ namespace nextar {
 		/* culling system this object belongs to */
 		CullingSystem* culler;
 		std::ptrdiff_t cullingData;
-		/* This is either a part of the moveable or the spatail owns it */
+		/* This is either a part of the moveable or the spatial owns it */
+		uint32	matrixState;
 		Matrix4x4* worldMatrix;
 		/* This is a moveable attached to the entity */
 		Moveable* moveable;

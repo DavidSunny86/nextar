@@ -20,7 +20,7 @@ namespace nextar {
 
 	bool Pass::NotifyUpdated(RenderContext* rc) {
 		bool useFallback = false;
-		/** @todo Change to bool inliners */
+		/** todo Change to bool inliners */
 		if( (flags & DIRTY_RASTER_STATE) )
 			useFallback &= UpdateRasterStates(rc);
 		if( (flags & DIRTY_BLEND_STATE) && !useFallback)

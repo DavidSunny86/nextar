@@ -3,7 +3,7 @@
 
 #if defined(NEX_LINUX)
 #include <X11/X.h>
-#include "platform/linux/GraphicsWindowX.h"
+#include "platform/linux/RenderWindowX.h"
 #elif defined(NEX_WINDOWS)
 #include <windows.h>
 #include "platform/win32/RenderWindowWin.h"
@@ -72,7 +72,7 @@ namespace nextar {
 		WindowList::iterator it = registeredWindows.begin();
 		WindowList::iterator end = registeredWindows.end();
 		while (it != end) {
-			RenderWindowX* wind = static_cast<RenderWindowX*>((*it));
+			RenderWindowX* wind = static_cast<RenderWindowX*>((*it).GetPtr());
 			Display* disp = wind->GetDisplay();
 			Window w = wind->GetWindow();
 			while (XCheckWindowEvent(

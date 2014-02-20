@@ -67,6 +67,7 @@ namespace nextar {
 	class Scene;
 
 	class Asset;
+	class AssetStreamRequest;
 	class TextureAsset;
 	class ShaderAsset;
 	class MaterialAsset;

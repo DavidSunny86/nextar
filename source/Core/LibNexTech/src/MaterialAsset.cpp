@@ -36,39 +36,36 @@ namespace nextar {
 	};
 	
 	/****************************************
-	 * MaterialManater
+	 * Material::Factory
 	 ****************************************/
-	MaterialAssetManager::MaterialAssetManager(const String& name) : AssetManager(name) {
+	Material::Factory::Factory(const String& name) : Asset::Factory(name) {
 	}
 
-	MaterialAssetManager::~MaterialAssetManager() {
-	}
-
-	Component* MaterialAssetManager::AsyncCreateImpl(int type, const String& name) {
-		if (type == Asset::COMPONENT_ASSET_MATERIAL)
-			return NEX_NEW MaterialAsset(this, name);
+	Component* Material::Factory::AsyncCreate(uint32 type, const String& name) {
+		if (type == Material::CLASS_ID)
+			return NEX_NEW MaterialAsset(name);
 		return 0;
 	}
 
 	/****************************************
 	 * Material
 	 ****************************************/
-	MaterialAsset::MaterialAsset(MaterialAssetManager* manager, const String& name) : Asset(manager, name) {
+	MaterialAsset::MaterialAsset(const String& name) : Asset(name) {
 	}
 
 	MaterialAsset::~MaterialAsset() {
 		_RelievePropertyBuffer();
 	}
 
-	MaterialAsset* MaterialAsset::Instance(AssetManager* manager, const String& name, const URL& location) {
-		MaterialAsset* material = static_cast<MaterialAsset*>(manager->AsyncFindOrCreate(MaterialAsset::TYPE, name));
+	MaterialAsset* MaterialAsset::Instance(MaterialAsset::Factory* factory, const String& name, const URL& location) {
+		MaterialAsset* material = factory->AsyncCreate(Material::CLASS_ID, name);
 		if(material)
 			material->SetAssetLocator(location);
 		return material;
 	}
 
-	int MaterialAsset::GetType() const {
-		return TYPE;
+	uint32 MaterialAsset::GetClassID() const {
+		return CLASS_ID;
 	}
 
 	void MaterialAsset::NotifyAssetLoaded() {
@@ -79,12 +76,12 @@ namespace nextar {
 	}
 
 	void MaterialAsset::NotifyAssetUnloaded() {
-		// @todo
+		// todo
 		Asset::NotifyAssetUnloaded();
 	}
 
 	void MaterialAsset::NotifyAssetUpdated() {
-		// @todo
+		// todo
 		Asset::NotifyAssetUpdated();
 	}
 
@@ -105,7 +102,7 @@ namespace nextar {
 
 	void MaterialAsset::_PrepareParamData(const ShaderParamMap& paramMap) {
 		uint8* buffer = &propertyBuffer[0];
-
+		/*** todo for Sun Feb 16: adjust for passes ***/
 		const ShaderAsset::ShaderParamInfoList& l = shader->GetShaderParams();
 		for(auto p : l) {
 			Property& prop = *(reinterpret_cast<Property*>(buffer));
@@ -144,7 +141,7 @@ namespace nextar {
 	}
 
 	void MaterialAsset::UnloadImpl(nextar::StreamRequest* req, bool isStreamed) {
-		// @todo
+		// todo
 	}
 
 	nextar::StreamRequest* MaterialAsset::CreateStreamRequestImpl(bool load) {
@@ -167,9 +164,10 @@ namespace nextar {
 	}
 
 	void MaterialAsset::StreamRequest::SetShader(const String& name, const String& options, const URL& location) {
-		// construct the name
+		// construct the name, it will be of the form
+		// Factory:Group.Name
 		std::pair<String, String> strPair = StringUtils::Split(name);
-		if(!strPair.second.length()) {
+		if(!strPair.first.length()) {
 			strPair.first.swap(strPair.second);
 			strPair.first = "Default";
 		}
@@ -186,17 +184,20 @@ namespace nextar {
 				break;
 		}
 
-		ComponentManager* manager =
-				ComponentFactoryArchive::Instance().AsyncFindManager(ShaderAsset::TYPE, strPair.first);
-		if (manager) {
-			shader = Bind(manager->AsyncFind(strPair.second));
+		Asset* material = static_cast<Asset*>(GetStreamedObject());
+		Asset* shader = nullptr;
+		Component::Factory* factory =
+				ComponentFactoryArchive::Instance().AsyncFindFactory(
+						ShaderAsset::CLASS_ID, strPair.first);
+		RenderManager::Instance().AsyncGetShaderGroups();
+		if (factory) {
+			shader = Bind(factory->AsyncCreate(strPair.second));
 			if (!shader) {
 				shader = Bind(ShaderAsset::Instance(
 						static_cast<AssetManager*>(manager), strPair.second, location));
 			}
-
 		}
-		Asset* shader = static_cast<Asset*>(GetStreamedObject());
+
 		if(!shader) {
 			Warn("Failed to load shader for material: " + shader->GetName());
 			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
@@ -205,7 +206,7 @@ namespace nextar {
 		GetMetaInfo().AddDependency(shader);
 	}
 
-	void MaterialAsset::StreamRequest::AddParameter(const String& name, ShaderVariant&& swapValue) {
+	void MaterialAsset::StreamRequest::AddParameter(const String& name, TextureBase*& swapValue) {
 		ShaderVariant& sv = params[name];
 		sv = swapValue;
 		if (sv.type == (uint16)ParamDataType::PDT_TEXTURE) {

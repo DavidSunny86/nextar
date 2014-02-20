@@ -67,7 +67,7 @@ namespace nextar {
 			name = templ;
 		else
 #else
-#error @todo
+#error todo
 #endif
 		{
 			name = "nexx.";
@@ -82,7 +82,7 @@ namespace nextar {
 #elif defined(NEX_LINUX)
 		remove(name.c_str());
 #else
-#error @todo
+#error todo
 #endif
 
 	}
@@ -900,7 +900,7 @@ namespace nextar {
 
 					if ((file->Read(buff, size) < size))
 						goto tempFailed;
-					// @todo Handle failure while writing
+					// todo Handle failure while writing
 					temp->Write(buff, size);
 					bytesToCopy -= size;
 				}

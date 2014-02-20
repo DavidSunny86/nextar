@@ -22,6 +22,7 @@ namespace RenderOpenGL {
 	    uint16 matrixStride; // matrix/array
 	    uint16 arrayStride;
 	    uint16 arrayCount;
+	    uint16 sizeInBytes;
 		String name;
 	};
 

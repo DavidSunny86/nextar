@@ -104,7 +104,7 @@ namespace nextar {
 			case '\\':
 				if (scriptContext.lexer.Current() == '@') {
 					// skip the last char, so split up
-					// @todo check for buffer overruns inside AsText with signed/unsigned stuff
+					// todo check for buffer overruns inside AsText with signed/unsigned stuff
 					size_t s = scriptContext.lexer.Tell();
 					scriptContext.lexer.Forward();
 					str += scriptContext.lexer.AsText(c, s-c-1);
@@ -114,7 +114,7 @@ namespace nextar {
 			}
 			break;
 		}
-		// @todo check for buffer overruns inside AsText with signed/unsigned stuff
+		// todo check for buffer overruns inside AsText with signed/unsigned stuff
 		str += scriptContext.lexer.AsText(c, scriptContext.lexer.Tell()-c);
 	}
 

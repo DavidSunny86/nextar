@@ -76,11 +76,11 @@ inline Vector3A Vec3ACross(Vec3AF v1, Vec3AF v2) {
 
 /** @reamarks Lerp */
 inline Vector3A Vec3ALerp(Vec3AF src, Vec3AF dst, float t) {
-	/* @todo Make efficient */
+	/* todo Make efficient */
 	return Vec3AMulAdd(Vec4AReplicate(t), Vec3ASub(dst, src), src);
 }
 
-/** @todo */
+/** todo */
 inline float Vec3ASqLength(Vec3AF vec) {
 	return (Vec3ADot(vec, vec));
 }

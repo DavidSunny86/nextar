@@ -123,6 +123,8 @@ namespace nextar {
 			/** @brief Callback, called when scanning dir. **/
 			virtual void FoundFile(const FileAttribute& attribute,
 					Archive*) = 0;
+		protected:
+			~ScanCallback() {}
 		};
 
 		class Factory {

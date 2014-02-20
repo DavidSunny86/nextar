@@ -8,6 +8,7 @@
 #include "VertexElementGL.h"
 #include "RenderContextGL.h"
 #include "BufferManager.h"
+#include "PassGL.h"
 
 namespace RenderOpenGL {
 
@@ -149,7 +150,7 @@ namespace RenderOpenGL {
 		uint16 id = pass->GetInputLayoutID();
 
 		MappedVertexAttribList* selected = nullptr;
-		// @todo cache??
+		// todo cache??
 		if (!cached || cached->passId != id) {
 			uint16* current = indices.data();
 			uint16 i = 0;

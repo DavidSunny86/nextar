@@ -25,15 +25,15 @@ namespace RenderOpenGL {
 		iGlProgram = ctx->CreateProgram(programStages);
 		// read input/output semantics and lock before assignment
 		VertexSemanticGL inputSemantics[VertexElement::MAX_VERTEX_ELEMENT];
-		//@todo We might need sorting the semantics for more coherency
+		//todo We might need sorting the semantics for more coherency
 		uint32 numSemantics;
 		if(!(numSemantics = ctx->ReadProgramSemantics(iGlProgram, inputSemantics))) {
 			Error("Failed to read semantics!");
 			return false;
 		}
 		std::pair<uint16, VertexSemanticListGL*> layout = MapLayout(inputSemantics, numSemantics);
-		this->inputLoc.reserve(numSemantics);
-		this->inputLoc.assign(inputLoc, inputLoc + numSemantics);
+		// this->inputLoc.reserve(numSemantics);
+		// this->inputLoc.assign(inputLoc, inputLoc + numSemantics);
 		// read uniform data and register to uniform buffer manager
 		ctx->ReadUniforms(uniforms, iGlProgram);
 		// read samplers
@@ -43,7 +43,7 @@ namespace RenderOpenGL {
 			this->inputSemantics = layout.second;
 			this->inputLayoutUniqueID = layout.first;
 			// create the feedback uniform table for materials
-			for(uint32 i = 0; i < uniforms.size(); ++i) {
+			/*for(uint32 i = 0; i < uniforms.size(); ++i) {
 				UniformBufferGL& ubg = *uniforms[i];
 				if(ubg.numUnmappedParams) {
 					for (uint32 p = 0; p < ubg.uniforms.size(); ++p) {
@@ -60,17 +60,16 @@ namespace RenderOpenGL {
 			// create the  sampler information
 			for(uint32 s=0; s < samplers.size(); ++s) {
 				if(samplers[s].autoName == (uint16)AutoParamName::AUTO_CUSTOM) {
-					ShaderParamInfo spi;
+					//ShaderParamInfo spi;
 					spi.name = samplers[s].name;
 					spi.count = samplers[s].samplerCount;
 					spi.type = (uint16)ParamDataType::PDT_TEXTURE;
-					/** s is the index to which this sampler gets bound,
-					 * so textures bound to this index will be bound to this sampler
-					 * */
+					// s is the index to which this sampler gets bound,
+					// so textures bound to this index will be bound to this sampler
 					spi.index = s;
 					shaderParams.push_back(spi);
 				}
-			}
+			}*/
 
 			SetProgramDataInited(true);
 		}
@@ -83,7 +82,7 @@ namespace RenderOpenGL {
 					return false;
 				}
 				// Can also match up shader parameters
-				// @todo
+				// todo
 			}
 		}
 

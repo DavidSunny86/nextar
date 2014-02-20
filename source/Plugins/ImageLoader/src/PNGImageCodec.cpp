@@ -89,7 +89,7 @@ namespace ImageLoader {
 	    png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type,
 	            0, NULL, NULL);
 
-	    // @todo Unstrip
+	    // todo Unstrip
 	    png_set_strip_16(png_ptr);
 
 	    if (bit_depth != 8 && bit_depth != 16) {
@@ -183,7 +183,7 @@ namespace ImageLoader {
 	            png_set_gamma(png_ptr, screen_gamma, 0.45455);
 	    }
 
-	    /* @todo Unstrip this */
+	    /* todo Unstrip this */
 	    if (bit_depth > 8) {
 	        // tell libpng to strip 16 bit/color files down to 8 bits/color
 	        png_set_strip_16(png_ptr);

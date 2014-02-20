@@ -24,7 +24,7 @@ namespace nextar {
 
 		/* generic */
 		inline static void* Alloc(size_t amount) {
-			if (amount == ObjectSize)
+			if (amount == Instance().pool.GetChunkSize())
 				return AllocSingle(amount);
 			return AllocMultiple(amount);
 		}
@@ -76,4 +76,4 @@ namespace nextar {
 	};*/
 }
 
-#endif MATRIXPOOL_H_
+#endif// MATRIXPOOL_H_

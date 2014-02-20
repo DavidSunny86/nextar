@@ -49,7 +49,7 @@ namespace RenderOpenGL {
 		}
 
 		macroStr += "\n";
-		/* @todo append global options */
+		/* todo append global options */
 		const char* sourceStr = parentProgram->GetSource();
 
 		iGlShader = static_cast<RenderContextGL*>(ctx)->CreateShader(shaderType, macroStr.c_str(),

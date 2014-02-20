@@ -61,15 +61,11 @@ namespace RenderOpenGL {
 
 		/* Material Property Table:
 		 * [u1][u2]..[un][s1][s2]..[sm]
-		 * Uniforms are mapped to material properties
-		 * directly indexing, the material properties
-		 * first contain the uniforms then the samplers
-		 * in their taible. */
+		 * Uniforms are mapped to material properties directly indexing, the material properties
+		 * first contain the uniforms then the samplers in their table. */
 		UniformBufferList uniforms;
-		/* The samplers are bound following the uniforms,
-		 * the samplers might refer to default textures,
-		 * which may be retrieved from the material via
-		 * the name of the sampler in case the material
+		/* The samplers are bound following the uniforms, the samplers might refer to default textures,
+		 * which may be retrieved from the material via the name of the sampler in case the material
 		 * does not contain a valid value.
 		 * */
 		SamplerStateList samplers;

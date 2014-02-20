@@ -29,7 +29,7 @@ namespace nextar {
 		
 		static StringInternTable nameTable;
 
-		/** @todo Must be a string ID */
+		/** todo Must be a string ID */
 		StringID name;
 	};
 }

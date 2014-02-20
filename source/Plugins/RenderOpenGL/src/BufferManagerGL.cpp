@@ -40,7 +40,7 @@ namespace RenderOpenGL {
 
 			memoryInUse += bufferSize;
 			if (memoryBudget < memoryInUse)
-				Warn("Exceeding memory budget! @todo Free unused buffers");
+				Warn("Exceeding memory budget! todo Free unused buffers");
 
 			return Assign(vb);
 	}

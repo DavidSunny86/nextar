@@ -97,7 +97,7 @@ namespace MeshLoader {
 				>> (element.stepRate)
 				>> (element.desc.stride)
 				>> (element.streamIndex);
-			/** @todo check sanity */
+			/** todo check sanity */
 			vertexElements[i++] = element;
 		}
 

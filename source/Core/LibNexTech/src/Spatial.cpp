@@ -7,7 +7,8 @@
 namespace nextar {
 
 	Spatial::Spatial(const String& name, Component* parent) :
-		Component(name, parent), cullingData(0), moveable(nullptr), culler(nullptr) {
+		Component(name, parent), cullingData(0), moveable(nullptr), culler(nullptr),
+		matrixState(0) {
 		worldMatrix = NEX_NEW Matrix4x4;
 		*worldMatrix = Matrix4x4::IdentityMatrix;
 	}
@@ -36,7 +37,7 @@ namespace nextar {
 		this->moveable = moveable;
 	}
 
-	void Spatial::UpdateBounds() {
+	void Spatial::Update() {
 		bounds.UpdateBounds(*worldMatrix);
 		SetBoundsDirty(false);
 	}

@@ -67,7 +67,7 @@ namespace nextar {
 		virtual ShaderProgramLanguage GetProgramLanguage() = 0;
 		virtual String GetInfo() = 0;
 		/* Create objects */
-		virtual GpuProgram* CreateProgram(GpuProgram::Type type); //@todo
+		virtual GpuProgram* CreateProgram(GpuProgram::Type type); //todo
 		virtual RenderTarget* CreateRenderTarget(bool textureTarget = true);
 		virtual MultiRenderTarget* CreateMultiRenderTarget();
 

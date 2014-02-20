@@ -22,7 +22,7 @@ namespace nextar {
 	/* 
 	* [     3     |		13	   |	16		]
 	*  light type   importance	   depth
-	*  @todo Will work on it when implementing the light system.
+	*  todo Will work on it when implementing the light system.
 	*/
 	class LightKeyHelper {
 	public:

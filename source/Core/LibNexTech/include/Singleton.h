@@ -1,7 +1,7 @@
 #ifndef NEXTAR_SINGLETON_H
 #define NEXTAR_SINGLETON_H
 
-#ifndef NEXTAR_TYPES_BASE_H
+#ifndef NEXTYPES_H_
 #error include NexTypes.h rather
 #endif
 /*! \file Singleton.h

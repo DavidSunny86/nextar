@@ -66,7 +66,7 @@ namespace nextar {
 	}
 
 	void Asset::Unload(StreamRequest* req, bool async) {
-		// @todo
+		// todo
 	}
 
 	void Asset::NotifyAssetLoaded() {

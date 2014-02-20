@@ -49,7 +49,7 @@ namespace nextar {
 			return bufferCount;
 		}
 		/** @remarks Returns the buffer stored at a specified index */
-		VertexBufferPtr GetBuffer(size_t i) {
+		VertexBufferPtr& GetBuffer(size_t i) {
 			NEX_ASSERT(bufferCount > i);
 			return bufferList[i];
 		}

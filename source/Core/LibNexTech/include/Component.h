@@ -67,9 +67,10 @@ namespace nextar {
 			LAST_FLAG = 1 << 1,
 		};
 
-		struct Factory;
+		class Factory;
 		/* */
-		struct Factory : public NamedObject {
+		class Factory : public NamedObject {
+		public:
 			Factory(const String&);
 			virtual ~Factory();
 			virtual Component* AsyncCreate(uint32 classId, const String& name) = 0;
@@ -141,7 +142,9 @@ namespace nextar {
 	public:
 		static SharedComponentPtr Null;
 
-		struct Group : public NamedObject {
+		class Group : public NamedObject {
+		public:
+
 			Group(const String& name);
 			virtual ~Group();
 			virtual void AsyncAdd(SharedComponentPtr&) = 0;

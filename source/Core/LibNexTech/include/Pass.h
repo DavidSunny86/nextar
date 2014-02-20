@@ -21,7 +21,7 @@ namespace nextar {
 	class Pass : public AllocGraphics {
 	public:
 		enum {
-			NUM_STAGES = RenderConstants::MAX_PROGRAM_STAGES
+			NUM_STAGES = (uint32)RenderConstants::MAX_PROGRAM_STAGES
 		};
 
 		enum Flags {
@@ -40,7 +40,14 @@ namespace nextar {
 			TextureUnit defaultTexture;
 		};
 
-		typedef vector<ShaderParamInfo>::type ShaderParamInfoList;
+		// Will be used by the UI when displaying params
+		class ParamIterator {
+		public:
+			virtual const String& GetName() const = 0;
+			virtual ParamDataType GetType() const = 0;
+			virtual size_t GetSize() const = 0;
+			virtual ~ParamIterator() {}
+		};
 		/* shader programs */
 		typedef map<String, DefaultTextureUnit>::type DefaultTextureUnitMap;
 
@@ -59,10 +66,6 @@ namespace nextar {
 			return inputLayoutUniqueID;
 		}
 
-		inline const ShaderParamInfoList& GetParamInfoList() const {
-			return shaderParams;
-		}
-
 		inline size_t GetParamBufferSize() const {
 			return shaderParamBufferSize;
 		}
@@ -76,10 +79,9 @@ namespace nextar {
 
 		void FinalizeUpdate();
 
-		//@ todo
+		// todo
 		virtual void UpdateParams(RenderContext* renderCtx, CommitContext& context, uint32 flags);
-
-		//@ todo
+		// todo
 		static size_t ParamSizeFromType(ParamDataType);
 	protected:
 
@@ -102,7 +104,6 @@ namespace nextar {
 		DefaultTextureUnitMap defaultTextureUnits;
 
 		size_t shaderParamBufferSize;
-		ShaderParamInfoList shaderParams;
 				
 		GpuProgram* programs[NUM_STAGES];
 

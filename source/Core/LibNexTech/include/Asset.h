@@ -7,18 +7,21 @@
 #include "BackgroundStreamer.h"
 #include "URL.h"
 
+
 namespace nextar {
 	
-	struct AssetCallback {
+	class AssetCallback {
 		virtual void AssetUnloaded(Asset*) = 0;
 		virtual void AssetLoaded(Asset*) = 0;
 		virtual void AssetUpdated(Asset*) = 0;
+	protected:
+		~AssetCallback() {}
 	};
 
 	class Asset;
 	class AssetStreamRequest;
 
-	typedef unordered_set<AssetStreamRequest*>::type AssetStreamRequestSet;
+	typedef unordered_set<AssetStreamRequest*, std::hash<AssetStreamRequest*> >::type AssetStreamRequestSet;
 	typedef unordered_set<Asset*>::type AssetSet;
 
 	/**

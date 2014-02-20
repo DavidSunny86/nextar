@@ -4,7 +4,8 @@
  *  Created on: 22-Sep-2013
  *      Author: obhi
  */
-
+#include "NexHeaders.h"
+#include "RenderManager.h"
 #include "GpuProgram.h"
 
 namespace nextar {
@@ -17,11 +18,11 @@ namespace nextar {
 	}
 
 	void GpuProgram::Create(RenderContext* rc) {
-		// @todo
+		// todo
 	}
 
 	void GpuProgram::Update(RenderContext* rc, ContextObject::UpdateParamPtr ptr) {
-		UpdateParam* param = static_cast<UpdateParam*>(ptr);
+		UpdateParam* param = reinterpret_cast<UpdateParam*>(ptr);
 		if ((flags & PROG_COMPILED)) {
 			Decompile(rc);
 		}

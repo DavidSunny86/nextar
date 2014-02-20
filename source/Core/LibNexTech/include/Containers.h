@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef NEXTAR_TYPES_BASE_H
-#error Including this is unnecessary
+#ifndef NEXTYPES_H_
+#error Include NexTypes.h instead.
 #endif
 
 #include <utility>
@@ -28,7 +28,7 @@
 #endif
 
 namespace nextar {
-// stl types
+	// stl types
 	typedef STLAllocator<char, AllocatorString> STLAllocString;
 	typedef STLAllocator<char16_t, AllocatorString> STLAllocUniString;
 
@@ -41,6 +41,7 @@ namespace nextar {
 
 	typedef std::basic_istringstream<char, std::char_traits<char>,
 			STLAllocString> InStringStream;
+
 
 	template<typename T, std::size_t _Nm>
 	struct array {
@@ -57,6 +58,7 @@ namespace nextar {
 		typedef typename std::list<T, STLAllocator<T, Allocator> > type;
 	};
 
+
 	template<typename T, typename Allocator = AllocatorGeneral>
 	struct forward_list {
 		typedef typename std::forward_list<T, STLAllocator<T, Allocator> > type;
@@ -67,6 +69,7 @@ namespace nextar {
 	struct set {
 		typedef typename std::set<T, Pr, STLAllocator<T, Allocator> > type;
 	};
+
 
 	template<typename Kty, typename T, typename Pr = std::less<Kty>,
 			typename Allocator = AllocatorGeneral>
@@ -101,7 +104,7 @@ namespace nextar {
 	};
 
 #if defined( NEX_USE_TBB )
-#define NEX_HAS_CONCURRENT_CONTAINERS 1
+#define NEX_HAS_CONCURRENT_CONTAINERS
 	template<typename Kty, typename T, typename Hsh = tbb_hash<Kty>, typename Pr = std::equal_to<Kty>,
 			typename Allocator = AllocatorGeneral>
 	struct concurrent_unordered_map {
@@ -120,7 +123,7 @@ namespace nextar {
 				STLAllocator<Kty, Allocator> > type;
 	};
 #elif defined( NEX_MSVC )
-#define NEX_HAS_CONCURRENT_CONTAINERS 1
+#define NEX_HAS_CONCURRENT_CONTAINERS
 	template<typename Kty, typename T, typename Hsh = std::hash<Kty>, typename Pr = std::equal_to<Kty>,
 			typename Allocator = AllocatorGeneral>
 	struct concurrent_unordered_map {
@@ -139,24 +142,20 @@ namespace nextar {
 				STLAllocator<Kty, Allocator> > type;
 	};
 #else
-#define NEX_HAS_CONCURRENT_CONTAINERS 0
+// never define
 #endif
-	/**
-	 * @remarks std::vector erase by index for unsorted lists.
-	 **/
+	// @remarks std::vector erase by index for unsorted lists.
 	template <typename Vec, typename _It>
-	_NexInline void BestErase(Vec& _cont, _It _where) {
+	inline void BestErase(Vec& _cont, _It _where) {
 		if (_where != _cont.end()) {
 			*_where = *_cont.rbegin();
 			_cont.pop_back();
 		}
 	}
 
-	/**
-	 * @remarks sorted insertion by value.
-	 **/
+	// @remarks sorted insertion by value.
 	template <typename _Cont, typename _Val>
-	_NexInline void SortedInsert(_Cont& _cont, const _Val& _what) {
+	inline void SortedInsert(_Cont& _cont, const _Val& _what) {
 		typedef typename _Cont::iterator iteratorType;
 		for (iteratorType it = _cont.begin(); it != _cont.end(); ++it) {
 			if (_what < *it) {
@@ -187,3 +186,14 @@ namespace nextar {
 	typedef vector<uint8>::type ByteStream;
 }
 
+#ifdef NEX_GCC
+namespace std {
+
+	template <> struct hash<nextar::String> {
+	    size_t operator()(const nextar::String& x) const  {
+	    	// ugly hack
+	    	return std::_Hash_impl::hash(x.data(), x.length());
+	    }
+	  };
+}
+#endif

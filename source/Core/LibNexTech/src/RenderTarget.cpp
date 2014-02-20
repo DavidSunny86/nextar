@@ -26,7 +26,7 @@ namespace nextar {
 		Viewport* vp = NEX_NEW Viewport(cam, this, x, y, width, height,
 			priority, Viewport::ACTIVE, StringUtils::Null, viewport);
 		viewport = vp;
-		/** @todo Sort via priority (or do sorted insert) */
+		/** todo Sort via priority (or do sorted insert) */
 		return vp;
 	}
 

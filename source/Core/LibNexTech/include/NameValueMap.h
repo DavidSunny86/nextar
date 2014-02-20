@@ -5,7 +5,8 @@
 
 namespace nextar {
 	typedef std::pair<String, String> NameValuePair;
-	typedef unordered_map<String, String>::type NameValueMap;
+	// todo considerations to make it efficient
+	typedef map<String, String>::type NameValueMap;
 }
 
 #endif //NEXTAR_NAMEVALPAIR_H

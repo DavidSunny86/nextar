@@ -74,7 +74,7 @@ namespace ShaderCompiler {
 		}
 		it = StringUtils::NextWord(paramContext, value, it);
 		if (it != String::npos) {
-			/** @todo localization: should be a $variableName mapped to
+			/** todo localization: should be a $variableName mapped to
 			 * localization.zip/strings.table */
 			name = value;
 		}
@@ -84,7 +84,7 @@ namespace ShaderCompiler {
 		}
 		it = StringUtils::NextWord(paramContext, value, it);
 		if (it != String::npos) {
-			/** @todo localization: should be a $variableName mapped to
+			/** todo localization: should be a $variableName mapped to
 			 * localization.zip/strings.table */
 			desc = value;
 		}

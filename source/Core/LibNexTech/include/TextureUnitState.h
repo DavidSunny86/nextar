@@ -57,7 +57,7 @@ namespace nextar {
 
 	typedef uint8 TextureComparisonModeType;
 
-	/* @todo Incorporate unit type field specifying what kind of texture this
+	/* todo Incorporate unit type field specifying what kind of texture this
 	 * is going to use like:
 	 * a. Mesh Texture
 	 * b. Shadow Texture
@@ -85,7 +85,7 @@ namespace nextar {
 	 */
 	class TextureUnit {
 	public:
-		uint16 bindPoint; // @todo Might not be required
+		uint16 bindPoint; // todo Might not be required
 		Vector2 uvTile;
 		Vector2 uvOffset;
 		TextureBase* texture;

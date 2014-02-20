@@ -75,7 +75,7 @@ namespace nextar {
 
 			/** @options should be a string of comma separated indices */
 			void SetShader(const String& name, const String& options, const URL& location);
-			void AddParameter(const String& name, ShaderVariant&& swapValue);
+			void AddParameter(const String& name, TextureBase*& swapValue);
 
 		protected:
 			friend class MaterialAsset;

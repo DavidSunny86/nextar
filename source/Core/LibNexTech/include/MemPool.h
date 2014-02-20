@@ -9,7 +9,7 @@
 namespace nextar {
 
 	/*** 
-	* @todo Need more diagonistic infos regarding pool data, like average allocations for a specific type,
+	* todo Need more diagonistic infos regarding pool data, like average allocations for a specific type,
 	* total number of allocations per run of experience.
 	*/
 	template <const size_t NumChunkPerBlock, typename Allocator>
@@ -37,7 +37,7 @@ namespace nextar {
 
 		~Pool();
 
-		inline size_t GetChunkSize() constexpr {
+		inline size_t GetChunkSize() const {
 			return CHUNK_SIZE;
 		}
 
@@ -172,7 +172,7 @@ namespace nextar {
 		void  _UpdateFreeChunks(void *const block, void* const end) {
 			uint8* last = (static_cast<uint8*>(block) + (BLOCK_SIZE - CHUNK_SIZE));
 			_Next(last) = end;
-			/**@todo Pointer comparison, might cause portability issue! */
+			/**todo Pointer comparison, might cause portability issue! */
 			for (uint8* it = last - CHUNK_SIZE; it >= block; last = it, it -= CHUNK_SIZE) 
 				_Next(it) = last;
 		}
@@ -253,7 +253,7 @@ namespace nextar {
 
 		void Free(void* o, size_t numOfObject) {
 			NEX_THREAD_LOCK_GUARD_MUTEX_T(PoolType, pool);
-			pool.Free(o, n);
+			pool.Free(o, numOfObject);
 		}
 
 		void FreePool() {
@@ -261,7 +261,7 @@ namespace nextar {
 			pool.FreePool();
 		}
 
-		inline size_t GetChunkSize() constexpr {
+		inline size_t GetChunkSize() const {
 			return pool.GetChunkSize();
 		}
 

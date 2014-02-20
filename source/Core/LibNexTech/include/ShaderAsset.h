@@ -102,6 +102,9 @@ namespace nextar {
 
 			/* all parameters which are not auto type will have update frequency of material, which means they will
 			 * be updated per material (using the material property table). */
+			// Parameters are registered here for UI specific display (or when meta data has to be stored).
+			// The parameter name is of the form: Parameter Category:Parameter Name. The category, if ignored,
+			// will be set to General.
 			virtual void AddParam(const String& name,
 					const String& param, const String& description, const String& defaultValue, ParamDataType type);
 			virtual void AddMacro(const String& name,
@@ -137,7 +140,7 @@ namespace nextar {
 		}
 
 		inline uint16 GetShaderMask() const {
-			return ((uint32)(this)) & SortKeyHelper::SHADER_KEY_MASK;
+			return ((std::ptrdiff_t)(this)) & SortKeyHelper::SHADER_KEY_MASK;
 		}
 
 		//uint16 GetTextureUnitIndex(const String& name) const;
@@ -151,9 +154,9 @@ namespace nextar {
 
 		virtual uint32 GetClassID() const;
 
-		//@ todo
+		// todo
 		static ParamDef& MapParamName(const String& name);
-		//@ todo
+		// todo
 		static ParamDataType MapParamType(const String& typeName);
 		
 	protected:

@@ -26,7 +26,7 @@ namespace RenderOpenGL {
 
 		/* */
 		virtual void ConfigureImpl(const NameValueMap& params) {
-			/* @todo configure driver */
+			/* todo configure driver */
 		}
 
 	protected:

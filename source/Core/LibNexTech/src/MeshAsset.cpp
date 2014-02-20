@@ -130,8 +130,7 @@ namespace nextar {
 	MeshAsset::Loader::~Loader() {
 	}
 
-	void
-	MeshAsset::Loader::EndianFlip(void* data, const VertexElement* veBegin,
+	void MeshAsset::Loader::EndianFlip(void* data, const VertexElement* veBegin,
 			const VertexElement* veEnd, size_t count) {
 
 		uint16 stride = veBegin->desc.stride;

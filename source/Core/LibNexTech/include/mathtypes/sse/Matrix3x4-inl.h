@@ -4,7 +4,7 @@ namespace nextar {
 
 	inline Matrix3x4 Mat3x4FromVectorMapping(const Vector3& axis1,
 			const Vector3& axis2) {
-		/** \@todo sse **/
+		/** \todo sse **/
 		Matrix3x4 m;
 		float cs, xy1C, xz1C, yz1C;
 

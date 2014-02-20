@@ -71,7 +71,7 @@ namespace nextar {
 			img.baseMipLevel = currentMaxMipLevel;
 		InputStreamPtr& is = FileSystem::Instance().OpenRead(GetAssetLocator());
 		if (is) {
-			// @todo handle error here? try catch {}
+			// todo handle error here? try catch {}
 			textureParams->image.Load(is, img);
 		}
 

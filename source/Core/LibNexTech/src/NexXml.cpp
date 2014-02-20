@@ -316,7 +316,7 @@ namespace nextar {
             }
         }
 
-        Node::Iterator Node::RemoveChild(Node::Iterator it) //@ @todo: check this intresting method.
+        Node::Iterator Node::RemoveChild(Node::Iterator it) //@ todo: check this intresting method.
         {
             Node* prev = (Node*) (*it.Prev());
             Node* next = (Node*) (*it.Next());
