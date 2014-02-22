@@ -9,10 +9,11 @@ namespace nextar {
 	class NamedObject {
 	public:
 
-		NamedObject(const String& name);
+		NamedObject(const StringID _name) : name(_name) {}
 		inline NamedObject() : name(StringUtils::NullID) {
 		}
-		
+#ifdef NEX_USE_STRING_NAMES
+		NamedObject(const String& name);
 		inline void SetName(const String& name) {
 			this->name = nameTable.AsyncStringID(name);
 		}
@@ -20,15 +21,23 @@ namespace nextar {
 		inline const String& GetName() const {
 			return nameTable.AsyncString(name);
 		}
+#else
+		inline const String& GetName() const {
+			return StringUtils::Unknown;
+		}
+#endif
+		inline void SetID(StringID name) {
+			this->name = name;
+		}
 
 		inline StringID GetID() const {
 			return name;
 		}
 
 	protected:
-		
+#ifdef NEX_USE_STRING_NAMES
 		static StringInternTable nameTable;
-
+#endif
 		/** todo Must be a string ID */
 		StringID name;
 	};

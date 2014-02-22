@@ -6,9 +6,8 @@ namespace nextar {
 
 	Asset::AssetLocatorAccessor Asset::AssetLocatorAccessor::assetLocatorAccessor;
 		
-	Asset::Asset(const String& id)
+	Asset::Asset(const StringID id)
 		: memoryCost(sizeof(Asset)), SharedComponent(id) {
-		SetName(id);
 		if (OverrideDictionary("Asset")) {
 			Populate(GetDictionary());
 		}

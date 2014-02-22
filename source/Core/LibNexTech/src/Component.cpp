@@ -13,7 +13,7 @@ namespace nextar {
 	/*********************************
 	 * Component
 	 *********************************/
-	Component::Component(const String& compName, Component* parentObject) :
+	Component::Component(const StringID compName, Component* parentObject) :
 		NamedObject(compName),
 		flags(ENABLED), parent(parentObject) {
 	}
@@ -36,24 +36,14 @@ namespace nextar {
 		return 0;
 	}
 
-	Component* Component::FindComponent(const String& name) {
-		StringPair namePair = StringUtils::Split(name, '.');
-		Component* c = FindComponent(nameTable.AsyncStringID(namePair.first));
-		if (!namePair.second.length())
-			return c;
-		else
-			return c->FindComponent(namePair.second);
-		return nullptr;
-	}
-
 	/*********************************
 	 * SharedComponent
 	 *********************************/
 	SharedComponentPtr SharedComponent::Null;
-	SharedComponent::SharedComponent(const String& name,
+	SharedComponent::SharedComponent(const StringID name,
 			Component* parent, Group* addToGroup) :
 		group(nullptr) {
-		SetName(name);
+		SetID(name);
 		SetParent(parent);
 		if (addToGroup) {
 			AddToGroup(addToGroup);
@@ -84,7 +74,7 @@ namespace nextar {
 	/*********************************
 	 * Component::Factory
 	 *********************************/
-	Component::Factory::Factory(const String& name) : NamedObject(name) {
+	Component::Factory::Factory(const StringID name) : NamedObject(name) {
 	}
 
 	Component::Factory::~Factory() {
@@ -93,22 +83,11 @@ namespace nextar {
 	/*********************************
 	 * SharedComponent::Group
 	 *********************************/
-	SharedComponent::Group::Group(const String& name) : NamedObject(name) {
+	SharedComponent::Group::Group(const StringID name) : NamedObject(name) {
 	}
 
 	SharedComponent::Group::~Group() {
 	}
 
-	Component* SharedComponent::Group::Find(const String& name) {
-		if (name.length()) {
-			StringPair namePair = StringUtils::Split(name, '.');
-			SharedComponentPtr& ptr = AsyncFind(nameTable.AsyncStringID(namePair.first));
-			if (!namePair.second.length())
-				return ptr;
-			else
-				return ptr->FindComponent(namePair.second);
-		}
-		return nullptr;
-	}
 } /* namespace nextar */
 

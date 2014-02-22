@@ -5,6 +5,12 @@
 
 namespace RenderOpenGL {
 
+	PassGL::PassGL() : unmappedSamplers(0), inputSemantics(nullptr), iGlProgram(0) {
+	}
+
+	PassGL::~PassGL() {
+	}
+
 	void PassGL::Decompile(RenderContext* _ctx) {
 		RenderContextGL* ctx = static_cast<RenderContextGL*>(_ctx);
 		ctx->DestroyProgram(iGlProgram);
@@ -37,7 +43,8 @@ namespace RenderOpenGL {
 		// read uniform data and register to uniform buffer manager
 		ctx->ReadUniforms(uniforms, iGlProgram);
 		// read samplers
-		ctx->ReadSamplers(samplers, this, iGlProgram);
+		ctx->ReadSamplers(samplers, unmappedSamplers, this, iGlProgram);
+
 		/* Feedback data */
 		if (!IsProgramDataInited()) {
 			this->inputSemantics = layout.second;
@@ -104,4 +111,16 @@ namespace RenderOpenGL {
 		return std::pair<uint16, VertexSemanticListGL*>(index, &registeredSignatures.back());
 	}
 
+	void PassGL::UpdateParams(RenderContext* rc, CommitContext& ctx, uint32 flags) {
+		for(auto& u : uniforms) {
+			if (u->GetUpdateFrequency() & flags) {
+
+				for(auto& v : u->uniforms) {
+					if (v.updateFrequency & flags) {
+						Apply(v, ctx);
+					}
+				}
+			}
+		}
+	}
 }

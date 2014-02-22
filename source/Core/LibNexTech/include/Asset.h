@@ -98,7 +98,7 @@ namespace nextar {
 			AssetSet unresolvedDependencies;
 		};
 
-		Asset(const String&);
+		Asset(const StringID);
 		virtual ~Asset();
 
 		/* Populate dictionary */

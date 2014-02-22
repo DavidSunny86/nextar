@@ -25,6 +25,8 @@ namespace nextar {
 	typedef uint32 VersionID;
 	typedef uint8 ColorMaskType;
 
+	typedef std::reference_wrapper<const String> StringRef;
+
 	union Size {
 		uint32 combined;
 		struct {

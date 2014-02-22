@@ -43,6 +43,9 @@ namespace RenderOpenGL {
 		NEX_LOG_HELPER(PassGL);
 
 	public:
+
+		PassGL();
+		virtual ~PassGL();
 		/* Could be async accessed when using multi gpu setup, so have to make sure its thread safe */
 		static std::pair<uint16, VertexSemanticListGL*> MapLayout(const VertexSemanticGL* semantics, uint32 numSemantics);
 
@@ -50,6 +53,9 @@ namespace RenderOpenGL {
 			return *inputSemantics;
 		}
 
+		virtual void UpdateParams(RenderContext* renderCtx, CommitContext& context, uint32 flags);
+
+		void Apply()
 	protected:
 		virtual bool Compile(nextar::RenderContext*);
 		virtual void Decompile(nextar::RenderContext*);
@@ -68,7 +74,9 @@ namespace RenderOpenGL {
 		 * which may be retrieved from the material via the name of the sampler in case the material
 		 * does not contain a valid value.
 		 * */
+		uint32 unmappedSamplers;
 		SamplerStateList samplers;
+
 		GLuint iGlProgram;
 		VertexSemanticListGL* inputSemantics;
 		

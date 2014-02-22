@@ -28,7 +28,7 @@ namespace nextar {
 		NEX_LOG_HELPER(ShaderAsset);
 	public:
 
-		enum Type {
+		enum {
 			CLASS_ID = Asset::CLASS_ASSET_SHADER,
 		};
 
@@ -44,17 +44,26 @@ namespace nextar {
 					(uint8)UpdateFrequency::PER_MATERIAL);
 		};
 
+		struct CustomParamDef {
+			uint8 type;
+			size_t size;
+			size_t tableOffset;
+		};
+
+		typedef vector<CustomParamDef>::type CustomParamDefList;
+		class CustomParamTable {
+
+		protected:
+
+			friend class ShaderAsset;
+			uint32 numCustomTextureUnits;
+			CustomParamDefList customParams;
+		};
+
 		typedef map<String, ParamDef>::type ParamDefMap;
 		typedef std::unique_ptr<Pass> PassPtr;
 		typedef vector<PassPtr>::type PassList;
 		typedef Pass::DefaultTextureUnitMap DefaultTextureUnitMap;
-
-		struct Macro {
-			bool value;
-			String macro;
-		};
-
-		typedef vector<Macro>::type MacroTable;
 
 		class StreamRequest;
 		class Loader;
@@ -113,6 +122,7 @@ namespace nextar {
 			virtual void AddPass(const String& name);
 
 			/* Pass related */
+			void SetOptions(const String& options);
 			void SetProgramSource(GpuProgram::Type, const String& src);
 			void SetRasterState(RasterState& state);
 			void SetBlendState(BlendState& state);
@@ -126,33 +136,27 @@ namespace nextar {
 			uint32 currentPass;
 			StreamPassList passes;
 
-			MacroTable macroTable;
-			String shaderOptionSuffix;
+			String compilationOpt;
 		};
 
-		ShaderAsset(const String&);
+		ShaderAsset(const StringID);
 		virtual ~ShaderAsset();
 
-		static ShaderAsset* Instance(ShaderAsset::Factory* factory, const String& name, const URL& location);
-				
-		inline uint16 GetTranslucency() const {
-			return translucency;
-		}
+		static ShaderAsset* Instance(ShaderAsset::Factory* factory, const StringID name, const URL& location);
 
 		inline uint16 GetShaderMask() const {
 			return ((std::ptrdiff_t)(this)) & SortKeyHelper::SHADER_KEY_MASK;
 		}
 
-		//uint16 GetTextureUnitIndex(const String& name) const;
-
-		//const TexturePtr& GetDefaultTexture(const uint16 index) const;
-		//const TextureUnitParams& GetTextureUnit(const uint16 index) const;
+		inline uint16 GetTranslucency() const {
+			return translucency;
+		}
 
 		virtual void Create(nextar::RenderContext*);
 		virtual void Update(nextar::RenderContext*, ContextObject::UpdateParamPtr);
 		virtual void Destroy(nextar::RenderContext*);
 
-		virtual uint32 GetClassID() const;
+		virtual uint32 GetClassID() const override;
 
 		// todo
 		static ParamDef& MapParamName(const String& name);
@@ -180,7 +184,6 @@ namespace nextar {
 
 		// used as sort key
 		uint8 translucency;
-		
 		PassList passes;
 
 		friend class StreamRequest;

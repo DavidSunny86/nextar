@@ -71,14 +71,14 @@ namespace nextar {
 		/* */
 		class Factory : public NamedObject {
 		public:
-			Factory(const String&);
+			Factory(const StringID);
 			virtual ~Factory();
-			virtual Component* AsyncCreate(uint32 classId, const String& name) = 0;
+			virtual Component* AsyncCreate(uint32 classId, const StringID name) = 0;
 		};
 
 	public:
 
-		Component(const String& name = StringUtils::Null, Component* parent = nullptr);
+		Component(const StringID name = StringUtils::Null, Component* parent = nullptr);
 		virtual ~Component();
 				
 		inline bool IsEnabled() const {
@@ -122,7 +122,6 @@ namespace nextar {
 		virtual void SetParent(Component*);
 		virtual void SetEnabled(bool enabled);
 
-		Component* FindComponent(const String& name);
 		virtual Component* FindComponent(const StringID name);
 
 		static uint32 GetComponentCatagory(uint32 classID) {
@@ -145,22 +144,16 @@ namespace nextar {
 		class Group : public NamedObject {
 		public:
 
-			Group(const String& name);
+			Group(const StringID name);
 			virtual ~Group();
 			virtual void AsyncAdd(SharedComponentPtr&) = 0;
 			virtual SharedComponentPtr& AsyncFind(const StringID name) = 0;
 			virtual void AsyncRemove(StringID name) = 0;
 			virtual void AsyncRemoveAll(uint32 ofType = Component::CLASS_UNKNOWN) = 0;
 			virtual void AsyncCollect(Group* container, uint32 ofType) = 0;
-
-			/* Search and sub search within this group and sub components.
-			 * A name passed can be of the form:
-			 * Component.SubComponent1.SubComponent2, if Component exists
-			 * in this group, then SubComponent2 is returned. */
-			virtual Component* Find(const String& name);
 		};
 
-		SharedComponent(const String& name = StringUtils::Null,
+		SharedComponent(const StringID name = StringUtils::NullID,
 				Component* parent = nullptr, Group* addToGroup = nullptr);
 		virtual ~SharedComponent();
 

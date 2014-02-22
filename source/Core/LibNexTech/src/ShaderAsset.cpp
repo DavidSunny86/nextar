@@ -14,14 +14,14 @@ namespace nextar {
 	/*****************************************************/
 	/* Shader											 */
 	/*****************************************************/
-	ShaderAsset::ShaderAsset(const String& name) : Asset(name),
+	ShaderAsset::ShaderAsset(const StringID name) : Asset(name),
 			translucency(0) {
 	}
 
 	ShaderAsset::~ShaderAsset() {
 	}
 
-	ShaderAsset* ShaderAsset::Instance(ShaderAsset::Factory* factory, const String& name, const URL& loc) {
+	ShaderAsset* ShaderAsset::Instance(ShaderAsset::Factory* factory, const StringID name, const URL& loc) {
 		ShaderAsset* shader = static_cast<ShaderAsset*>(factory->AsyncCreate(ShaderAsset::CLASS_ID, name));
 		if(shader)
 			shader->SetAssetLocator(loc);
@@ -36,32 +36,12 @@ namespace nextar {
 		StreamRequest* creationParams = static_cast<StreamRequest*>(streamRequest);
 		ContextObject::NotifyCreated();
 		/* update programs */
-		/* build compilation options */
-		String compilationOpt;
-		const String& name = GetName();
-		size_t pos = name.find_last_of(':');
-
-		if (pos == String::npos) {
-			Warn("No compilation options set. Using defaults.");
-			MacroTable& mt = creationParams->macroTable;
-			for (auto m : mt) {
-				if(m.value)
-					StringUtils::PushBackWord(compilationOpt, m.macro);
-			}
-		} else {
-			MacroTable& mt = creationParams->macroTable;
-			for(size_t i = pos+1; i < name.size(); ++i) {
-				uint8 index = name[i]-1;
-				NEX_ASSERT(index < mt.size());
-				StringUtils::PushBackWord(compilationOpt, mt[index].macro);
-			}
-		}
-
+		/* build with compilation options */
 		StreamPassList &spl = creationParams->passes;
 		passes.clear();
 		passes.reserve(creationParams->passes.size());
 		for(auto i = spl.begin(); i != spl.end(); ++i) {
-			PassPtr p(CreatePass((*i), compilationOpt));
+			PassPtr p(CreatePass((*i), creationParams->compilationOpt));
 			passes.push_back(std::move(p));
 		}
 
@@ -177,6 +157,10 @@ namespace nextar {
 	ShaderAsset::StreamRequest::~StreamRequest() {
 	}
 
+	void ShaderAsset::StreamRequest::SetOptions(const String& options) {
+		compilationOpt = options;
+	}
+
 	void ShaderAsset::StreamRequest::SetProgramSource(GpuProgram::Type type, const String& src) {
 		passes[currentPass].programSources[type] = src;
 	}
@@ -188,12 +172,6 @@ namespace nextar {
 
 	void ShaderAsset::StreamRequest::AddMacro(const String& name,
 			const String& param, const String& description, bool defaultValue) {
-
-		if (macroTable.size() >= 255) {
-			Error("Too many macros in one shader!.");
-			return;
-		}
-		macroTable.emplace_back(defaultValue, param);
 	}
 
 	void ShaderAsset::StreamRequest::BindDefaultTexture(const String& unitName, TextureBase* texture) {

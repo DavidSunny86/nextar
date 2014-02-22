@@ -31,7 +31,7 @@ namespace nextar {
 		PDT_COUNT,
 	};
 
-	enum class AutoParamName {
+	enum class AutoParamName : uint16 {
 		// Time in seconds
 		AUTO_TIME,
 		// Elapsed time in seconds between two frames ( f(i) and f(i-1) )

@@ -213,10 +213,10 @@ namespace RenderOpenGL {
 			}
 			String uniName = name;
 			//bool shareUb = true;
-			UniformBufferGL* ubPtr = 0;
+			UniformBufferGL* ubPtr;
 			UniformBufferMap::iterator it = uniformBufferMap.find(uniName);
 			if (it != uniformBufferMap.end()) {
-				ubPtr = &(*it).second;
+				ubPtr = (*it).second;
 				if ( !(ubPtr && ubPtr->GetParamCount() == numParams &&
 						ubPtr->GetSize() == size) ) {
 					Warn(String("Uniform buffer cannot be registered"
@@ -229,28 +229,37 @@ namespace RenderOpenGL {
 
 			if (!ubPtr) {
 				// create a new uniform buffer
-				//if (shareUb) {
-					// insert into map
-				ubPtr = &uniformBufferMap[uniName];
-				CreateUniformBuffer(ubPtr, i, program, numParams, size);
-				//}
-			}
-			ubList.push_back(ubPtr);
-			GlUniformBlockBinding(program, i, i);
-		}
+				UniformBufferMap::iterator it = uniformBufferMap.emplace(uniName, std::move(CreateUniformBuffer(i, program, numParams, size))).first;
 
+				ubPtr = &(*it).second;
+				ubPtr->SetName((*it).first);
+				ubPtr->SetBinding((GLuint)uniformBufferMap.size());
+
+			}
+
+			ubList.push_back(ubPtr);
+			// sort ublist by name
+			std::sort(ubList.begin(), ubList.end(), [](const UniformBufferGL* first, const UniformBufferGL* second) {
+					if(first->GetUpdateFrequency() == second->GetUpdateFrequency())
+						return first->GetName() < second->GetName();
+					return (first->GetUpdateFrequency() < second->GetUpdateFrequency()) != 0;
+				});
+			GlBindBufferRange(GL_UNIFORM_BUFFER, ubPtr->GetBinding(), ubPtr->ubName, 0, ubPtr->size);
+			GlUniformBlockBinding(program, i, ubPtr->GetBinding());
+		}
 	}
 
-	void RenderContextGL::CreateUniformBuffer(UniformBufferGL* u,
-			GLint blockIndex, GLuint prog, GLuint numParams, size_t size) {
+	UniformBufferGL RenderContextGL::CreateUniformBuffer(GLint blockIndex, GLuint prog,
+			GLuint numParams, size_t size) {
 
 	    NEX_ASSERT(size > 0);
 	    uint16 numUnmappedParams = 0;
 
-	    u->ubName = GL_INVALID_VALUE;
-	    GlGenBuffers(1, &u->ubName);
+	    UniformBufferGL u;
+	    u.ubName = GL_INVALID_VALUE;
+	    GlGenBuffers(1, &u.ubName);
 	    GL_CHECK();
-	    if (u->ubName == GL_INVALID_VALUE) {
+	    if (u.ubName == GL_INVALID_VALUE) {
 	        Error("Failed to generate buffer name");
 	        NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 	    }
@@ -313,12 +322,15 @@ namespace RenderOpenGL {
 	        uniforms.push_back(uform);
 	    }
 
-	    u->numUnmappedParams = numUnmappedParams;
-	    u->uniforms.swap(uniforms);
-	    u->mask = mask;
-	    u->size = size;
+	    // sort the resulting uniforms such that auto params come first
+	    // followed by unmapped params. Unmapped params are sorted by name.
+	    std::sort(uniforms.begin(), uniforms.end());
+	    u.numUnmappedParams = numUnmappedParams;
+	    u.uniforms.swap(uniforms);
+	    u.updateFrequency = mask;
+	    u.size = size;
 	    NEX_FREE(tempBuffer, MEMCAT_GENERAL);
-	    GlBindBuffer( GL_UNIFORM_BUFFER, u->ubName );
+	    GlBindBuffer( GL_UNIFORM_BUFFER, u.ubName );
 	    GL_CHECK();
 	    GlBufferData( GL_UNIFORM_BUFFER, size, NULL, GL_DYNAMIC_DRAW );
 	    GL_CHECK();
@@ -326,13 +338,14 @@ namespace RenderOpenGL {
 	    GL_CHECK();
 	}
 
-	void RenderContextGL::ReadSamplers(SamplerStateList& samplers, const PassGL* shader, GLuint program) {
+	void RenderContextGL::ReadSamplers(SamplerStateList& samplers, uint32& numUnmapped, const PassGL* shader, GLuint program) {
 		/** todo Massive work left for sampler arrays */
 	    GLint numUni = 0;
 	    char name[128];
         size_t extra = 0;
 	    GlGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numUni);
 	    samplers.reserve(numUni);
+	    numUnmapped = 0;
 
         for (GLuint i = 0; i < (GLuint) numUni; ++i) {
 
@@ -379,8 +392,10 @@ namespace RenderOpenGL {
                  * */
                 // ss.index = (uint8)index;
                 ss.autoName = paramDef.autoName;
-                if (ss.autoName == (uint16)AutoParamName::AUTO_CUSTOM)
+                if (ss.autoName == (uint16)AutoParamName::AUTO_CUSTOM) {
+                	numUnmapped++;
                 	ss.name = unitName;
+                }
                 ss.updateFrequency = paramDef.updateFrequency;
 
                 GlGenSamplers(1, &ss.sampler);
@@ -418,6 +433,9 @@ namespace RenderOpenGL {
 				GL_CHECK();
 				samplers.push_back(ss);
             }
+            std::sort(samplers.begin(), samplers.end(), [](const SamplerState& s1, const SamplerState& s2) {
+            	return s1.autoName == s2.autoName ? s1.name < s2.name : ((s1.autoName < s2.autoName) != 0);
+            });
 	    }
 	}
 

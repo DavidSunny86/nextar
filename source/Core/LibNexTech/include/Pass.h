@@ -80,7 +80,7 @@ namespace nextar {
 		void FinalizeUpdate();
 
 		// todo
-		virtual void UpdateParams(RenderContext* renderCtx, CommitContext& context, uint32 flags);
+		virtual void UpdateParams(RenderContext* renderCtx, CommitContext& context, uint32 flags) = 0;
 		// todo
 		static size_t ParamSizeFromType(ParamDataType);
 	protected:

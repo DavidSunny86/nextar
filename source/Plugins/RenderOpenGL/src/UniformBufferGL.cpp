@@ -9,7 +9,7 @@
 
 namespace RenderOpenGL {
 
-	UniformBufferGL::UniformBufferGL() : mask(0),
+	UniformBufferGL::UniformBufferGL() : updateFrequency(0),
 			numUnmappedParams(0), frameStamp(0), ubName(0), size(0) {
 	}
 

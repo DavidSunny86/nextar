@@ -9,6 +9,7 @@ namespace nextar {
 		const UniString UniNull;
 		const String Unknown("<?>");
 		const StringID NullID(Null);
+		const StringRef NullRef(Null);
 
 		_NexExport char* NewStr(const char* str) {
 			size_t s;

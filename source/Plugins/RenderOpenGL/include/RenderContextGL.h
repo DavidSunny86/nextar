@@ -55,7 +55,7 @@ namespace RenderOpenGL {
 		/* Read uniform data */
 		void ReadUniforms(UniformBufferList&, GLuint program);
 		/* Read sampler information */
-		void ReadSamplers(SamplerStateList& samplers, const PassGL* shader, GLuint program);
+		void ReadSamplers(SamplerStateList& samplers, uint32& numUnmapped, const PassGL* shader, GLuint program);
 
 		GLuint CreateVAO(VertexBufferBinding& binding, VertexAttribListGL& attribs, const VertexSemanticListGL& semantics);
 		GLuint CreateVertexBuffer(size_t size, GLenum usage);
@@ -88,8 +88,7 @@ namespace RenderOpenGL {
 		static GLint GetGlMagFilter(TextureMinFilterType t);
 		static GLint GetGlMinFilter(TextureMinFilterType t);
 		
-		void CreateUniformBuffer(UniformBufferGL* u,
-					GLint blockIndex, GLuint prog, GLuint numParams, size_t size);
+		UniformBufferGL CreateUniformBuffer(GLint blockIndex, GLuint prog, GLuint numParams, size_t size);
 
 		enum {
 			CONTEXT_READY = 1 << 0,
@@ -111,7 +110,7 @@ namespace RenderOpenGL {
 		uint32 contextFlags;
 		//GpuObjectTable gpuObjects;
 		/* uniform buffer table */
-		typedef unordered_map<String, UniformBufferGL>::type UniformBufferMap;
+		typedef unordered_map<StringRef, UniformBufferGL>::type UniformBufferMap;
 
 		UniformBufferMap uniformBufferMap;
 		RenderDriver::ContextCreationParams contextCreationParams;

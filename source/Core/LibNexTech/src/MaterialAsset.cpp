@@ -163,14 +163,16 @@ namespace nextar {
 	MaterialAsset::StreamRequest::~StreamRequest() {
 	}
 
-	void MaterialAsset::StreamRequest::SetShader(const String& name, const String& options, const URL& location) {
+	void MaterialAsset::StreamRequest::SetShader(StringID name, StringID group,
+			const String& optionHash, const URL& location,
+			StringID factory = StringUtils::NullID) {
 		// construct the name, it will be of the form
 		// Factory:Group.Name
 		std::pair<String, String> strPair = StringUtils::Split(name);
 		if(!strPair.first.length()) {
-			strPair.first.swap(strPair.second);
 			strPair.first = "Default";
 		}
+		std::pair<String, String> strPair =
 		strPair.second += ':';
 
 		size_t pos = 0;

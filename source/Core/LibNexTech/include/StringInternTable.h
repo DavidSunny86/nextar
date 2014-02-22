@@ -6,11 +6,11 @@
 #include "NexTypes.h"
 #include "NexThread.h"
 
-
 namespace nextar {
 		
+#ifdef NEX_USE_STRING_NAMES
 	typedef std::reference_wrapper<const String> StringID;
-	
+
 	inline bool operator == (const StringID& first, const StringID& second) {
 		return (&first.get()) == (&second.get());
 	}
@@ -19,6 +19,9 @@ namespace nextar {
 		return (&first.get()) < (&second.get());
 	}
 
+#else
+	typedef uint32 StringID;
+#endif
 	class _NexExport StringInternTable {
 	public:
 

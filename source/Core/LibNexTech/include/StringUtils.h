@@ -29,6 +29,7 @@ namespace nextar {
 		NEX_EXTERN_SYM _NexExport const String Unknown;
 		NEX_EXTERN_SYM _NexExport const UniString UniNull;
 		NEX_EXTERN_SYM _NexExport const StringID NullID;
+		NEX_EXTERN_SYM _NexExport const StringRef NullRef;
 
 		struct Less { // functor for operator <
 

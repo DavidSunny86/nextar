@@ -24,6 +24,14 @@ namespace RenderOpenGL {
 	    uint16 arrayCount;
 	    uint16 sizeInBytes;
 		String name;
+
+		friend bool operator < (const UniformGL& first, const UniformGL& second) {
+			if (first.autoName == second.autoName) {
+				NEX_ASSERT(first.autoName == AutoParamName::AUTO_CUSTOM);
+				return first.name < second.name;
+			}
+			return (first.autoName < second.autoName) != 0;
+		}
 	};
 
 	typedef vector<UniformGL>::type UniformList;
@@ -41,18 +49,47 @@ namespace RenderOpenGL {
 			return size;
 		}
 
+		inline void SetName(const String& name) {
+			this->name = name;
+		}
+
+		inline const String& GetName() const {
+			return name;
+		}
+
+		inline void SetBinding(GLuint binding) {
+			ubBinding = binding;
+		}
+
+		inline GLuint GetBinding() const {
+			return ubBinding;
+		}
+
+		inline uint8 GetUpdateFrequency() const {
+			return updateFrequency;
+		}
+
+		friend bool operator < (UniformBufferGL*)
 	protected:
-		uint8 mask;
+
+		StringRef name;
+
+		uint8 updateFrequency;
 		uint16 numUnmappedParams;
+
 		uint32 frameStamp;
+
+		GLuint ubBinding;
 		GLuint ubName;
 
 		UniformList uniforms;
 		size_t size;
 		friend class PassGL;
 		friend class RenderContextGL;
+
 	};
 
+	typedef std::reference_wrapper<UniformBufferGL> UniformBufferGLRef;
 	typedef vector<UniformBufferGL*>::type UniformBufferList;
 
 } /* namespace RenderOpenGL */

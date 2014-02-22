@@ -25,7 +25,6 @@ namespace nextar {
 			CATAGORY = COMPONENT_CAT(CLASS_ID),
 		};
 		typedef ByteStream PropertyBuffer;
-		typedef unordered_map<String, ShaderVariant>::type ShaderParamMap;
 
 		class Loader;
 		struct LoaderImpl;
@@ -74,12 +73,14 @@ namespace nextar {
 			~StreamRequest();
 
 			/** @options should be a string of comma separated indices */
-			void SetShader(const String& name, const String& options, const URL& location);
+			void SetShader(StringID name, StringID group,
+					const URL& location, StringID factory = StringUtils::NullID);
+
 			void AddParameter(const String& name, TextureBase*& swapValue);
 
 		protected:
 			friend class MaterialAsset;
-			ShaderParamMap params;
+			String optionHash;
 		};
 
 		MaterialAsset(const String& name);
