@@ -55,7 +55,6 @@ namespace RenderOpenGL {
 
 		virtual void UpdateParams(RenderContext* renderCtx, CommitContext& context, uint32 flags);
 
-		void Apply()
 	protected:
 		virtual bool Compile(nextar::RenderContext*);
 		virtual void Decompile(nextar::RenderContext*);

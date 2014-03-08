@@ -32,11 +32,12 @@ namespace MeshLoader {
 	};
 
 	MaterialAsset* MeshLoaderImplv1_0::ReadMaterialData(MeshAsset::StreamRequest* mesh, InputSerializer& ser) {
-		String manager, name, path;
-		ser >> manager >> name >> path;
+		StringID factory, name, materialGroup;
+		String path;
+		ser >> factory >> name >> materialGroup >> path;
 		MaterialAsset* mtl = 0;
 		URL location(path);
-		AssetManager* managerPtr = ComponentFactoryArchive::Instance().AsyncFindManager(MaterialAsset::TYPE, manager);
+		Asset::Factory* managerPtr = ComponentFactoryArchive::Instance().AsyncFindFactory(MaterialAsset::CLASS_ID, name);
 		if (managerPtr) {
 			// create a new request for material load??
 			mtl = MaterialAsset::Instance(managerPtr, name, location);
@@ -271,7 +272,7 @@ namespace MeshLoader {
 					return;
 				}
 			} else {
-				Error(String("File is corrput: ") + mesh->GetName());
+				Error(String("File is corrupt: ") + mesh->GetName());
 				NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
 			}
 		} while (!ser.IsEndOfStream());

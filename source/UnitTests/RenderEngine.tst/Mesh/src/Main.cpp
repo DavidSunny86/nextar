@@ -10,18 +10,20 @@ class UTApplicationMesh : public UTApplication {
 public:
 	virtual void _SetupScene(ScenePtr& scene) {
 		UTApplication::_SetupScene(scene);
-		MeshAssetManager* meshManager =
-				static_cast<MeshAssetManager*>(
-				ComponentManagerArchive::Instance().AsyncFindManager(MeshAsset::CLASS_ID));
-		MeshAssetPtr mesh = meshManager->AsyncCreateInstance("Mesh", "UTScene", URL("${EngineData}/mesh/box.mesh"));
+
+		MeshAsset::Factory* factory = ComponentFactoryArchive::Instance().AsyncFindFactory(MeshAsset::CLASS_ID);
+		MeshAsset::Group* group = ComponentGroupArchive::Instance().AsyncFindOrCreate(StringUtils::DefaultID);
+		URL url("{EngineData}/mesh/box.mesh");
+		MeshAssetPtr mesh = MeshAsset::Instance(factory, NamedObject::AsyncStringID("Box"), url, group);
 		if (mesh) {
 			mesh->Load(false);
 		}
-		EntityManager* entityManager =
-				static_cast<EntityManager*>(
-				ComponentManagerArchive::Instance().AsyncFindManager(Entity::CLASS_ID));
 
-		EntityPtr meshEnt = entityManager->AsyncCreateMeshEntity("Mesh", mesh);
+		Entity::Factory* entityFactory =
+				static_cast<Entity::Factory*>(
+						ComponentFactoryArchive::Instance().AsyncFindFactory(Entity::CLASS_ID));
+
+		EntityPtr meshEnt = entityFactory->AsyncCreateMeshEntity(NamedObject::AsyncStringID("BoxEntity"), mesh);
 		meshEnt->AddToScene(scene);
 	}
 };

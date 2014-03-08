@@ -374,7 +374,7 @@ namespace RenderOpenGL {
 				    Error(String("Overflowing/Unspecified texture unit index for ") + name);
 				    continue;
 				}
-                ShaderAsset::ParamDef& paramDef = ShaderAsset::MapParamName(unitName);
+            	const AutoParam* paramDef = Pass::MapParam(unitName);
                 ss.location = loc;
                 /**
                  * The index of the texture unit within the shader may not be stored
@@ -391,12 +391,19 @@ namespace RenderOpenGL {
                  * from the shader might not get used eventually.
                  * */
                 // ss.index = (uint8)index;
-                ss.autoName = paramDef.autoName;
-                if (ss.autoName == (uint16)AutoParamName::AUTO_CUSTOM) {
+
+                if (paramDef) {
+                	ss.autoName = paramDef->autoName;
+                	ss.frequency = paramDef->frequency;
+                	ss.processor = paramDef->processor;
+                } else {
                 	numUnmapped++;
+                	ss.autoName = AutoParamName::AUTO_CUSTOM;
+                	ss.processor = Pass::GetCustomTextureProcessor();
+                	ss.frequency = UpdateFrequency::PER_MATERIAL;
                 	ss.name = unitName;
                 }
-                ss.updateFrequency = paramDef.updateFrequency;
+
 
                 GlGenSamplers(1, &ss.sampler);
                 GL_CHECK();

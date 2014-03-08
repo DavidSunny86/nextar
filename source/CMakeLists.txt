@@ -23,15 +23,12 @@ set(NEX_LIB ${NEX_ROOT}/../lib)
 set(NEX_DEPENDENCIES ${NEX_ROOT}/../dependencies)
 set(NEX_DATA ${NEX_ROOT}/Data)
 set(NEX_PLUGINS ${NEX_ROOT}/Plugins)
+set(NEX_CORE ${NEX_ROOT}/Core)
 set(NEX_UNIT_TESTS ${PROJECT_SOURCE_DIR}/UnitTests)
 
 ## Module path
 #============================================================
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${NEX_ROOT}/CMake/Modules/")
-
-## Basic Libraries
-#============================================================
-set(LIBNEXTECH NexTech)
 
 ## Compiler flags
 #============================================================
@@ -90,16 +87,10 @@ set(NEX_VER_REVISION 3)
 
 set(NEX_VERSION "${NEX_VER_MAJOR}.${NEX_VER_MINOR}.${NEX_VER_REVISION}")
 
-## Plugin dependecy on nextech
+## Plugin dependecy on Base
 #============================================================
-set(NEXTECH_ROOT ${PROJECT_SOURCE_DIR}/Core/LibNexTech)
-set(NEXTECH_INCLUDE ${NEXTECH_ROOT}/include)
-
-## Common include directories
-#============================================================
-include_directories(
-  "${NEXTECH_INCLUDE}"
-)
+set(NEX_BASE_ROOT ${PROJECT_SOURCE_DIR}/Core/Base)
+set(NEX_BASE_INCLUDE ${NEX_BASE_ROOT}/include)
 
 ## Common link directories
 #============================================================
@@ -110,13 +101,6 @@ link_directories(
 ## Common Pre definitions
 #============================================================
 add_definitions( -DNEXTAR_EXPORT_AS_DYNAMIC_LIB )
-
-## Configuration for libnextech
-#============================================================
-configure_file(
-   "${NEXTECH_INCLUDE}/config/Config.h.cmake"
-   "${NEXTECH_INCLUDE}/config/Config.h"
-)
 
 ## Setup compiler flags based on compiler
 #============================================================
@@ -163,9 +147,9 @@ file(APPEND ${NEX_PLUGIN_CONFIG_FILE}
 ## Build targets
 #============================================================
 add_subdirectory(Core)
-add_subdirectory(Plugins)
-add_subdirectory(UnitTests)
-add_subdirectory(Data)
+#add_subdirectory(Plugins)
+#add_subdirectory(UnitTests)
+#add_subdirectory(Data)
 ## End plugin configuration
 file(APPEND ${NEX_PLUGIN_CONFIG_FILE} "</plugins>\n")
 

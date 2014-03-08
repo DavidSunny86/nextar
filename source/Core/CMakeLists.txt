@@ -9,5 +9,7 @@
 
 ## Build targets
 #============================================================
-add_subdirectory(LibNexTech)
+add_subdirectory(Base)
+#add_subdirectory(Engine)
+#add_subdirectory(RenderSystem)
 

@@ -36,25 +36,13 @@ namespace RenderOpenGL {
 
 	typedef vector<UniformGL>::type UniformList;
 
-	class UniformBufferGL {
+	class UniformBufferGL : public ConstantBuffer {
 	public:
 		UniformBufferGL();
 		virtual ~UniformBufferGL();
 
 		inline uint16 GetParamCount() const {
 			return 0;
-		}
-
-		inline size_t GetSize() const {
-			return size;
-		}
-
-		inline void SetName(const String& name) {
-			this->name = name;
-		}
-
-		inline const String& GetName() const {
-			return name;
 		}
 
 		inline void SetBinding(GLuint binding) {
@@ -65,19 +53,7 @@ namespace RenderOpenGL {
 			return ubBinding;
 		}
 
-		inline uint8 GetUpdateFrequency() const {
-			return updateFrequency;
-		}
-
-		friend bool operator < (UniformBufferGL*)
 	protected:
-
-		StringRef name;
-
-		uint8 updateFrequency;
-		uint16 numUnmappedParams;
-
-		uint32 frameStamp;
 
 		GLuint ubBinding;
 		GLuint ubName;
