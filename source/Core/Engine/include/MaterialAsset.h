@@ -8,9 +8,9 @@
 #ifndef MATERIAL_H_
 #define MATERIAL_H_
 
-#include "Asset.h"
-#include "ShaderParam.h"
-#include "ShaderAsset.h"
+#include <Asset.h>
+#include <ShaderParam.h>
+#include <ShaderAsset.h>
 
 namespace nextar {
 

@@ -13,10 +13,6 @@
  *  \n 3. \a Warning which are not errors but are potential problems.
  */
 
-#ifndef NEXTYPES_H_
-#error Do not include this file directly, include "NexBase.h" instead
-#endif
-
 // todo C++0x changs this to noexcept
 #define NEX_NOTHROW() throw()
 #define NEX_THROW_ON(failure,except) if(failure) throw except

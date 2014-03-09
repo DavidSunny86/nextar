@@ -5,12 +5,12 @@
  *      Author: obhi
  */
 
-#include "NexEngine.h"
-#include "Entity.h"
-#include "Mesh.h"
-#include "Light.h"
-#include "Moveable.h"
-#include "Camera.h"
+#include <NexEngine.h>
+#include <Entity.h>
+#include <Mesh.h>
+#include <Light.h>
+#include <Moveable.h>
+#include <Camera.h>
 
 namespace nextar {
 

@@ -8,9 +8,9 @@
 #ifndef GRAPHICSWINDOWGLX_H_
 #define GRAPHICSWINDOWGLX_H_
 
-#include "RenderOpenGL.h"
-#include "GraphicsWindow.h"
-#include "glx/CanvasGLX.h"
+#include <RenderOpenGL.h>
+#include <GraphicsWindow.h>
+#include <glx/CanvasGLX.h>
 
 namespace RenderOpenGL {
 

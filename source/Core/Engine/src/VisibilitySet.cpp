@@ -4,9 +4,9 @@
  *  Created on: Oct 5, 2011
  *      Author: obhi
  */
-#include "NexEngine.h"
-#include "VisibilitySet.h"
-#include "RenderManager.h"
+#include <NexEngine.h>
+#include <VisibilitySet.h>
+#include <RenderManager.h>
 
 namespace nextar {
 	/******************************

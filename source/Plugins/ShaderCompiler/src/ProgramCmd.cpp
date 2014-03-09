@@ -5,9 +5,9 @@
  *      Author: obhi
  */
 
-#include "BaseHeaders.h"
-#include "ProgramCmd.h"
-#include "Shader.h"
+#include <BaseHeaders.h>
+#include <ProgramCmd.h>
+#include <Shader.h>
 
 namespace ShaderCompiler {
 

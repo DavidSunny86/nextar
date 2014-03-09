@@ -1,8 +1,8 @@
 #ifndef NEXTAR_NEXENDIN_ADJUSTMENTS
 #define NEXTAR_NEXENDIN_ADJUSTMENTS
 
-#include "NexBase.h"
-#include "NexSys.h"
+#include <NexBase.h>
+#include <NexBase.h>
 
 #if ( (NEX_STORE_IN_LITTLEENDIN) && (NEX_ENDIANNESS == NEX_ENDIAN_BIG) ) || ( !(NEX_STORE_IN_LITTLEENDIN) && (NEX_ENDIANNESS == NEX_ENDIAN_LITTLE) )
 /** @remarks Use this macro to determine weather to swap bits if the 

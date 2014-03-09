@@ -4,7 +4,7 @@
 #ifndef NEXTAR_MEMORY_H__
 #define NEXTAR_MEMORY_H__
 
-#include "NexSys.h"
+#include <NexBase.h>
 
 namespace nextar {
 

@@ -8,7 +8,7 @@
 #ifndef PNGIMAGELOADER_H
 #define	PNGIMAGELOADER_H
 
-#include "Image.h"
+#include <Image.h>
 
 using namespace nextar;
 

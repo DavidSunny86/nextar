@@ -8,7 +8,7 @@
 #ifndef RASTERCMD_H_
 #define RASTERCMD_H_
 
-#include "CommonTypes.h"
+#include <CommonTypes.h>
 
 namespace ShaderCompiler {
 	/** BlendState {} */

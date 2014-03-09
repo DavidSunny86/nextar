@@ -1,14 +1,14 @@
-#include "BaseHeaders.h"
-#include "DataStream.h"
+#include <BaseHeaders.h>
+#include <DataStream.h>
 #define _NexZipApi
 
-#include "time.h"
-#include "sys/types.h"
-#include "sys/stat.h"
+#include <time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
-#include "ZipArchive.h"
-#include "OsDefs.h"
-#include "Archive.h"
+#include <ZipArchive.h>
+#include <OsDefs.h>
+#include <Archive.h>
 
 #if defined(NEX_WINDOWS)
 #elif defined(NEX_LINUX)

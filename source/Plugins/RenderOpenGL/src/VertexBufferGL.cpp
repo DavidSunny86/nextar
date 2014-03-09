@@ -4,10 +4,10 @@
 * 
 * Created on February 21, 2011, 10:05 PM
 */
-#include "RenderOpenGL.h"
-#include "VertexBufferGL.h"
-#include "BufferManagerGL.h"
-#include "RenderContextGL.h"
+#include <RenderOpenGL.h>
+#include <VertexBufferGL.h>
+#include <BufferManagerGL.h>
+#include <RenderContextGL.h>
 
 #ifdef NEX_DEBUG
 static bool VertexBuffer_locked = false;

@@ -4,11 +4,7 @@
 #ifndef NEXTAR_ERR_DFS_1_01
 #define NEXTAR_ERR_DFS_1_01
 
-#ifndef NEXTYPES_H_
-#error Do not include this file directly, include "NexBase.h" instead
-#endif
-
-#include "NexAssert.h"
+#include <NexAssert.h>
 
 #ifdef NEX_DEBUG
 #	if (NEX_ARCH == NEX_ARCH_X86)
@@ -97,6 +93,6 @@ namespace nextar {
 
 }
 
-#include "NexException.h"
+#include <NexException.h>
 
 #endif //NEXTAR_ERR_DFS_1_01

@@ -8,7 +8,7 @@
 #ifndef COMMITCONTEXT_H_
 #define COMMITCONTEXT_H_
 
-#include "NexSys.h"
+#include <NexBase.h>
 
 namespace nextar {
 

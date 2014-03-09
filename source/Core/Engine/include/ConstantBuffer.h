@@ -8,7 +8,7 @@
 #ifndef CONSTANTBUFFER_H_
 #define CONSTANTBUFFER_H_
 
-#include "ShaderParam.h"
+#include <ShaderParam.h>
 
 namespace nextar {
 

@@ -1,9 +1,5 @@
 #pragma once
 
-#ifndef NEXTYPES_H_
-#error Include NexBase.h instead.
-#endif
-
 #include <utility>
 #include <functional>
 #include <string>
@@ -19,8 +15,8 @@
 #include <array>
 
 #if defined( NEX_USE_TBB )
-#include "tbb/concurrent_unordered_map.h"
-#include "tbb/concurrent_vector.h"
+#include <tbb/concurrent_unordered_map.h>
+#include <tbb/concurrent_vector.h>
 #elif defined(NEX_MSVC)
 #include <concurrent_unordered_map.h>
 #include <concurrent_unordered_set.h>

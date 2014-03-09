@@ -1,7 +1,7 @@
 
-#include "NexEngine.h"
-#include "Moveable.h"
-#include "CommonPools.h"
+#include <NexEngine.h>
+#include <Moveable.h>
+#include <CommonPools.h>
 
 namespace nextar {
 

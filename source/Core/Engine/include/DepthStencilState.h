@@ -1,7 +1,7 @@
 #ifndef NEXTAR_DEPTHSTENCILSTATE_H
 #define NEXTAR_DEPTHSTENCILSTATE_H
 
-#include "NexSys.h"
+#include <NexBase.h>
 
 namespace nextar {
 

@@ -8,12 +8,12 @@
 #ifndef SHADER_H_
 #define SHADER_H_
 
-#include "NexSys.h"
-#include "Asset.h"
-#include "Pass.h"
-#include "ShaderParam.h"
-#include "FactoryPlugin.h"
-#include "GpuProgram.h"
+#include <NexBase.h>
+#include <Asset.h>
+#include <Pass.h>
+#include <ShaderParam.h>
+#include <FactoryPlugin.h>
+#include <GpuProgram.h>
 
 namespace nextar {
 

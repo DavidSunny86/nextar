@@ -8,7 +8,7 @@
 #ifndef MESHLOADERIMPLV1_0_H
 #define	MESHLOADERIMPLV1_0_H
 
-#include "Mesh.h"
+#include <Mesh.h>
 
 using namespace nextar;
 namespace MeshLoader {

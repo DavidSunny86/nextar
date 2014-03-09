@@ -5,9 +5,9 @@
  *      Author: obhi
  */
 
-#include "RenderOpenGL.h"
-#include "glx/GraphicsWindowGLX.h"
-#include "glx/RenderContextGLX.h"
+#include <RenderOpenGL.h>
+#include <glx/GraphicsWindowGLX.h>
+#include <glx/RenderContextGLX.h>
 
 namespace RenderOpenGL {
 	GraphicsWindowGLX::GraphicsWindowGLX(RenderContextGLX* ctx) :

@@ -8,7 +8,7 @@
 #ifndef SPATIAL_H_
 #define SPATIAL_H_
 
-#include "Component.h"
+#include <Component.h>
 
 namespace nextar {
 

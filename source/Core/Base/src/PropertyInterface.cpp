@@ -4,8 +4,8 @@
  * 
  * Created on March 5, 2011, 7:26 PM
  */
-#include "BaseHeaders.h"
-#include "PropertyInterface.h"
+#include <BaseHeaders.h>
+#include <PropertyInterface.h>
 
 namespace nextar {
 

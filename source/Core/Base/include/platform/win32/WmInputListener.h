@@ -8,8 +8,8 @@
 #ifndef WMINPUTLISTENER_H
 #define	WMINPUTLISTENER_H
 
-#include "IncWnds.h"
-#include "NexSys.h"
+#include <IncWnds.h>
+#include <NexBase.h>
 
 namespace nextar {
 

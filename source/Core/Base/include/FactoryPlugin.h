@@ -1,7 +1,7 @@
 #ifndef NEXTAR_PLUGIN_H__
 #define NEXTAR_PLUGIN_H__
 
-#include "NexSys.h"
+#include <NexBase.h>
 
 namespace nextar {
 

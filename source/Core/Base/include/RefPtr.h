@@ -6,10 +6,10 @@
  *
  * @brief	Defines shared pointers used as smart pointers across nextar.
  *-----------------------------------------------------------------------------------------------**/
-#include "BaseTypes.h"
-#include "Disposer.h"
-#include "SharedObjectTracker.h"
-#include "NexThread.h"
+#include <BaseTypes.h>
+#include <Disposer.h>
+#include <SharedObjectTracker.h>
+#include <NexThread.h>
 
 namespace nextar {
 

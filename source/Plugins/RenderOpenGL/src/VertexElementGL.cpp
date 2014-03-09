@@ -4,11 +4,11 @@
  * 
  * Created on March 7, 2011, 3:28 AM
  */
-#include "RenderOpenGL.h"
-#include "VertexElementGL.h"
-#include "RenderContextGL.h"
-#include "BufferManager.h"
-#include "PassGL.h"
+#include <RenderOpenGL.h>
+#include <VertexElementGL.h>
+#include <RenderContextGL.h>
+#include <BufferManager.h>
+#include <PassGL.h>
 
 namespace RenderOpenGL {
 

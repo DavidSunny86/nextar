@@ -1,14 +1,14 @@
 #ifndef NEXTAR_DOTZIP_H
 #define NEXTAR_DOTZIP_H
 
-#include "NexSys.h"
-#include "Archive.h"
+#include <NexBase.h>
+#include <Archive.h>
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
-#include "zlib.h"
+#include <zlib.h>
 
 #if defined(__cplusplus)
 }

@@ -4,8 +4,8 @@
  *  Created on: 18-Nov-2013
  *      Author: obhi
  */
-#include "NexEngine.h"
-#include "SceneTraversal.h"
+#include <NexEngine.h>
+#include <SceneTraversal.h>
 
 namespace nextar {
 

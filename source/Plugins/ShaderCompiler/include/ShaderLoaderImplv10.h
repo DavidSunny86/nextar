@@ -8,8 +8,8 @@
 #ifndef SHADERLOADERIMPLV10_H_
 #define SHADERLOADERIMPLV10_H_
 
-#include "FactoryPlugin.h"
-#include "ScriptParser.h"
+#include <FactoryPlugin.h>
+#include <ScriptParser.h>
 
 using namespace nextar;
 namespace ShaderCompiler {

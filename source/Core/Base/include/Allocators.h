@@ -2,7 +2,7 @@
 #error Include NexAlloc.h instead
 #endif
 
-#include "StdHeaders.h"
+#include <StdHeaders.h>
 
 namespace nextar {
 //@ normal allocator

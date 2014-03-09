@@ -5,7 +5,7 @@
 #ifndef NEXTAR_MATH_H_
 #define NEXTAR_MATH_H_
 
-#include "NexCore.h"
+#include <NexCore.h>
 
 #undef max
 #undef min

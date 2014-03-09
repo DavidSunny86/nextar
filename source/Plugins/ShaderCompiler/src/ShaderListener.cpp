@@ -4,12 +4,12 @@
  *  Created on: 22-Sep-2013
  *      Author: obhi
  */
-#include "BaseHeaders.h"
-#include "ShaderListener.h"
-#include "DepthStencilStateCmd.h"
-#include "BlendStateCmd.h"
-#include "RasterStateCmd.h"
-#include "TextureUnitStateCmd.h"
+#include <BaseHeaders.h>
+#include <ShaderListener.h>
+#include <DepthStencilStateCmd.h>
+#include <BlendStateCmd.h>
+#include <RasterStateCmd.h>
+#include <TextureUnitStateCmd.h>
 
 namespace ShaderCompiler {
 

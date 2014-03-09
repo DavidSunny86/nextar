@@ -5,8 +5,8 @@
  *      Author: obhi
  */
 
-#include "NexEngine.h"
-#include "TextureAsset.h"
+#include <NexEngine.h>
+#include <TextureAsset.h>
 
 namespace nextar {
 

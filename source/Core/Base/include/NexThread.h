@@ -1,7 +1,7 @@
 #ifndef NEXTAR_NEXTHREAD_H
 #define NEXTAR_NEXTHREAD_H
 
-#include "BaseTypes.h"
+#include <BaseTypes.h>
 #include <thread>
 #include <mutex>
 #include <atomic>

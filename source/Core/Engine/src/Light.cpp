@@ -5,9 +5,9 @@
  *      Author: obhi
  */
 
-#include "NexEngine.h"
-#include "Light.h"
-#include "LightSystem.h"
+#include <NexEngine.h>
+#include <Light.h>
+#include <LightSystem.h>
 
 namespace nextar {
 

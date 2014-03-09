@@ -8,10 +8,10 @@
 #ifndef TEXTURE_H_
 #define TEXTURE_H_
 
-#include "Asset.h"
-#include "ContextObject.h"
-#include "Image.h"
-#include "TextureBase.h"
+#include <Asset.h>
+#include <ContextObject.h>
+#include <Image.h>
+#include <TextureBase.h>
 
 namespace nextar {
 

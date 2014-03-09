@@ -2,7 +2,7 @@
 #ifndef NEX_GRAPHICSWINDOW_H
 #define NEX_GRAPHICSWINDOW_H
 
-#include "IncWnds.h"
+#include <IncWnds.h>
 
 namespace nextar {
 

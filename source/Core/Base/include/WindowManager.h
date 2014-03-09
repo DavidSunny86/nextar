@@ -8,7 +8,7 @@
 #ifndef NEXTAR_WINMANAGER_H
 #define	NEXTAR_WINMANAGER_H
 
-#include "NexSys.h"
+#include <NexBase.h>
 
 namespace nextar {
 

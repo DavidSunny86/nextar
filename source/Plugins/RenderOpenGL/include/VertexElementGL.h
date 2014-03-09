@@ -8,9 +8,9 @@
 #ifndef GLVERTEXELEMENT_H
 #define	GLVERTEXELEMENT_H
 
-#include "RenderConstants.h"
-#include "RenderOpenGL.h"
-#include "Pass.h"
+#include <RenderConstants.h>
+#include <RenderOpenGL.h>
+#include <Pass.h>
 
 namespace RenderOpenGL {
 

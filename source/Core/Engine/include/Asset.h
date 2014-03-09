@@ -1,11 +1,11 @@
 #ifndef NEXTAR_ASSET_H
 #define NEXTAR_ASSET_H
 
-#include "NexEngine.h"
-#include "PropertyInterface.h"
-#include "Component.h"
-#include "BackgroundStreamer.h"
-#include "URL.h"
+#include <NexEngine.h>
+#include <PropertyInterface.h>
+#include <Component.h>
+#include <BackgroundStreamer.h>
+#include <URL.h>
 
 
 namespace nextar {

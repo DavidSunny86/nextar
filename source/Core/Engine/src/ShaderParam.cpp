@@ -5,7 +5,7 @@
  *      Author: obhi
  */
 
-#include "ShaderParam.h"
+#include <ShaderParam.h>
 
 namespace nextar {
 

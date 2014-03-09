@@ -9,10 +9,10 @@
 #define	GENIMAGELOADER_H
 
 
-#include "Image.h"
-#include "JPEGImageCodec.h"
-#include "PNGImageCodec.h"
-#include "DDSImageCodec.h"
+#include <Image.h>
+#include <JPEGImageCodec.h>
+#include <PNGImageCodec.h>
+#include <DDSImageCodec.h>
 
 using namespace nextar;
 

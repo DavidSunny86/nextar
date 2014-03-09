@@ -1,10 +1,10 @@
 #ifndef NEXTAR_SERIALIZER_H
 #define NEXTAR_SERIALIZER_H
 
-#include "NexBase.h"
-#include "DataStream.h"
-#include "Endian.h"
-#include "Logger.h"
+#include <NexBase.h>
+#include <DataStream.h>
+#include <Endian.h>
+#include <Logger.h>
 
 namespace nextar {
     class OutputSerializer;
@@ -207,7 +207,7 @@ namespace nextar {
     };
 }
 
-#include "Serializer.hpp"
+#include <Serializer.hpp>
 
 #endif //NEXTAR_SERIALIZER_H
 

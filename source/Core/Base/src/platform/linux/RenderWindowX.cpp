@@ -1,6 +1,6 @@
 
-#include "BaseHeaders.h"
-#include "RenderWindow.h"
+#include <BaseHeaders.h>
+#include <RenderWindow.h>
 
 #if defined(NEX_LINUX)
 

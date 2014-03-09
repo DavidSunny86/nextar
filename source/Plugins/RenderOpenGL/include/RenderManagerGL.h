@@ -8,8 +8,8 @@
 #ifndef RENDERMANAGERGL_H_
 #define RENDERMANAGERGL_H_
 
-#include "RenderOpenGL.h"
-#include "RenderManager.h"
+#include <RenderOpenGL.h>
+#include <RenderManager.h>
 
 namespace RenderOpenGL {
 

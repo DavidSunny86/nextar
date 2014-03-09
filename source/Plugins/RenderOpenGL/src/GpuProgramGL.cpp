@@ -4,8 +4,8 @@
  *  Created on: 02-Oct-2013
  *      Author: obhi
  */
-#include "RenderOpenGL.h"
-#include "GpuProgramGL.h"
+#include <RenderOpenGL.h>
+#include <GpuProgramGL.h>
 
 namespace RenderOpenGL {
 

@@ -1,7 +1,7 @@
 #ifndef NEXTAR_NAMEVALPAIR_H
 #define NEXTAR_NAMEVALPAIR_H
 
-#include "NexSys.h"
+#include <NexBase.h>
 
 namespace nextar {
 	typedef std::pair<String, String> NameValuePair;

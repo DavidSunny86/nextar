@@ -8,8 +8,8 @@
 #ifndef EXTENSIONSGL_H_
 #define EXTENSIONSGL_H_
 
-#include "NexBase.h"
-#include "RenderOpenGL.h"
+#include <NexBase.h>
+#include <RenderOpenGL.h>
 
 namespace RenderOpenGL {
 
@@ -33,7 +33,7 @@ namespace RenderOpenGL {
 #define DECL_EXTENSION(funcptr, fucnname) \
     	DECL_FUNC_TYPE(funcptr) DECL_FUNC_NAME(fucnname);
 
-#include "ExtListGL.h"
+#include <ExtListGL.h>
 
 #undef DECL_COND_START_VERSION
 #undef DECL_COND_END_VERSION

@@ -8,7 +8,7 @@
 #ifndef SHADERLISTENER_H_
 #define SHADERLISTENER_H_
 
-#include "CommonTypes.h"
+#include <CommonTypes.h>
 
 namespace ShaderCompiler {
 

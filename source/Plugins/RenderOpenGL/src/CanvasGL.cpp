@@ -5,8 +5,8 @@
  *      Author: obhi
  */
 
-#include "RenderOpenGL.h"
-#include "CanvasGL.h"
+#include <RenderOpenGL.h>
+#include <CanvasGL.h>
 
 namespace RenderOpenGL {
 

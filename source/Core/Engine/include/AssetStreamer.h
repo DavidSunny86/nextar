@@ -8,8 +8,8 @@
 #ifndef ASSETSTREAMER_H_
 #define ASSETSTREAMER_H_
 
-#include "Singleton.h"
-#include "BackgroundStreamer.h"
+#include <Singleton.h>
+#include <BackgroundStreamer.h>
 
 namespace nextar {
 

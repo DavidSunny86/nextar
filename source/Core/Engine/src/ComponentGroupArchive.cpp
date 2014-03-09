@@ -5,9 +5,9 @@
  *      Author: obhi
  */
 
-#include "NexEngine.h"
-#include "ComponentGroupArchive.h"
-#include "ComponentGroupSet.h"
+#include <NexEngine.h>
+#include <ComponentGroupArchive.h>
+#include <ComponentGroupSet.h>
 
 namespace nextar {
 

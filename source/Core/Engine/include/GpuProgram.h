@@ -8,8 +8,8 @@
 #ifndef GPUPROGRAM_H_
 #define GPUPROGRAM_H_
 
-#include "ContextObject.h"
-#include "StringUtils.h"
+#include <ContextObject.h>
+#include <StringUtils.h>
 
 namespace nextar {
 

@@ -1,8 +1,8 @@
 #ifndef NEXTAR_CLOCKIMPL_H
 #define NEXTAR_CLOCKIMPL_H
 
-#include "NexBase.h"
-#include "time.h"
+#include <NexBase.h>
+#include <time.h>
 
 namespace nextar {
 

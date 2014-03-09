@@ -1,6 +1,6 @@
 
-#include "BaseHeaders.h"
-#include "NamedObject.h"
+#include <BaseHeaders.h>
+#include <NamedObject.h>
 
 namespace nextar {
 

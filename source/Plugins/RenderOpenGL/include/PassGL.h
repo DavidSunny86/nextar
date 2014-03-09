@@ -2,8 +2,8 @@
 #ifndef PASSGL_H_
 #define PASSGL_H_
 
-#include "Pass.h"
-#include "UniformBufferGL.h"
+#include <Pass.h>
+#include <UniformBufferGL.h>
 
 namespace RenderOpenGL {
 

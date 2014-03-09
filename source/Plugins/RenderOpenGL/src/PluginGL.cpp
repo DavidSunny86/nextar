@@ -5,7 +5,7 @@
  *      Author: obhi
  */
 
-#include "PluginGL.h"
+#include <PluginGL.h>
 
 NEX_IMPLEMENT_PLUGIN(RenderOpenGL) {
 	return &(RenderOpenGL::PluginGL::pluginObject);

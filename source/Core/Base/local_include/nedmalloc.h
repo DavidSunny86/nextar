@@ -46,7 +46,7 @@
 
  */
 
-#include "stddef.h"   /* for size_t */
+#include <stddef.h>   /* for size_t */
 
 #ifndef EXTSPEC
 #define EXTSPEC extern

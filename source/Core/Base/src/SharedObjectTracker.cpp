@@ -4,14 +4,14 @@
 // Created   :: 7/5/2006 5:08:06 AM
 //-------------------------------------------------------------------------------------
 
-#include "BaseHeaders.h"
-#include "SharedObjectTracker.h"
+#include <BaseHeaders.h>
+#include <SharedObjectTracker.h>
 
 using namespace nextar;
 #ifdef NEX_TRACK_OBJECTS 
 using namespace nextar::debug;
 
-#include "stdio.h"
+#include <stdio.h>
 
 struct AllocBlockNode {
 	void* obj;

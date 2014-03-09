@@ -8,8 +8,8 @@
 #ifndef BVCULLINGSYSTEM_H_
 #define BVCULLINGSYSTEM_H_
 
-#include "NexSys.h"
-#include "CullingSystem.h"
+#include <NexBase.h>
+#include <CullingSystem.h>
 
 namespace nextar {
 

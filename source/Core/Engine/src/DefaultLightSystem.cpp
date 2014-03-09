@@ -5,7 +5,7 @@
  *      Author: obhi
  */
 
-#include "DefaultLightSystem.h"
+#include <DefaultLightSystem.h>
 
 namespace nextar {
 

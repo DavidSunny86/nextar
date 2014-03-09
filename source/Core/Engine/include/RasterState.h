@@ -1,7 +1,7 @@
 #ifndef NEXTAR_RASTERSTATE_H
 #define NEXTAR_RASTERSTATE_H
 
-#include "NexSys.h"
+#include <NexBase.h>
 
 namespace nextar {
 

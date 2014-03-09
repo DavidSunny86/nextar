@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include "RenderOpenGL.h"
-#include "RenderDriverGL.h"
+#include <RenderOpenGL.h>
+#include <RenderDriverGL.h>
 
 namespace RenderOpenGL {
 

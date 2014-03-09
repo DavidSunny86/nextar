@@ -8,7 +8,7 @@
 #ifndef GRAPHICSWINDOWX_H
 #define	GRAPHICSWINDOWX_H
 
-#include "LinuxDefs.h"
+#include <LinuxDefs.h>
 
 namespace nextar {
 

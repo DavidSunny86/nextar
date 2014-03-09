@@ -11,9 +11,9 @@
  *   The basic stream that nextar uses to dump errors is defined by the:
  *   \n \a Logger
  */
-#include "Singleton.h"
-#include "NexThread.h"
-#include "RefPtr.h"
+#include <Singleton.h>
+#include <NexThread.h>
+#include <RefPtr.h>
 
 namespace nextar {
 	class LoggerBase;

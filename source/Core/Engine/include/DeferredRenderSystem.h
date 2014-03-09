@@ -8,7 +8,7 @@
 #ifndef DEFERREDRENDERSYSTEM_H_
 #define DEFERREDRENDERSYSTEM_H_
 
-#include "RenderSystem.h"
+#include <RenderSystem.h>
 
 namespace nextar {
 

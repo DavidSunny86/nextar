@@ -1,7 +1,7 @@
 #ifndef CONTAINERNODE_H
 #define CONTAINERNODE_H
 
-#include "scene/Node.h"
+#include <scene/Node.h>
 
 namespace nextar {
 

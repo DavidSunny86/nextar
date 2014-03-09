@@ -8,14 +8,14 @@
 #ifndef CAMERA_H
 #define	CAMERA_H
 
-#include "NexSys.h"
-#include "Frustum.h"
-#include "BoundingVolume.h"
-#include "Intersect.h"
-#include "VisibilitySet.h"
-#include "SceneTraversal.h"
-#include "Moveable.h"
-#include "Spatial.h"
+#include <NexBase.h>
+#include <Frustum.h>
+#include <BoundingVolume.h>
+#include <Intersect.h>
+#include <VisibilitySet.h>
+#include <SceneTraversal.h>
+#include <Moveable.h>
+#include <Spatial.h>
 
 namespace nextar {
 

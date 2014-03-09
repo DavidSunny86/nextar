@@ -2,12 +2,12 @@
 #ifndef MESHASSET_H_
 #define MESHASSET_H_
 
-#include "NexSys.h"
-#include "Asset.h"
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
-#include "StreamData.h"
-#include "MaterialAsset.h"
+#include <NexBase.h>
+#include <Asset.h>
+#include <VertexBuffer.h>
+#include <IndexBuffer.h>
+#include <StreamData.h>
+#include <MaterialAsset.h>
 
 namespace nextar {
 

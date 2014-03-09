@@ -8,8 +8,8 @@
 #ifndef BOUNDING_VOLUME_H
 #define	BOUNDING_VOLUME_H
 
-#include "NexMath.h"
-#include "Frustum.h"
+#include <NexMath.h>
+#include <Frustum.h>
 
 namespace nextar {
 	

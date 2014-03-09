@@ -4,8 +4,8 @@
  * 
  * Created on May 8, 2011, 2:29 AM
  */
-#include "BaseHeaders.h"
-#include "JPEGImageCodec.h"
+#include <BaseHeaders.h>
+#include <JPEGImageCodec.h>
 
 extern "C" {
 #include <jconfig.h>

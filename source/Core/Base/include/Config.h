@@ -1,12 +1,12 @@
 #ifndef NEXTAR_NEXCONF_H
 #define NEXTAR_NEXCONF_H
 
-#include "NexSys.h"
-#include "RefPtr.h"
-#include "DataStream.h"
-#include "Convert.h"
-#include "StringUtils.h"
-#include "URL.h"
+#include <NexBase.h>
+#include <RefPtr.h>
+#include <DataStream.h>
+#include <Convert.h>
+#include <StringUtils.h>
+#include <URL.h>
 
 namespace nextar {
 

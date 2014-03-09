@@ -3,9 +3,10 @@
 #define	STRINGINTERNTABLE_H_
 
 
-#include "NexBase.h"
-#include "NexThread.h"
-#include "StringUtils.h"
+#include <NexBase.h>
+#include <Logger.h>
+#include <NexThread.h>
+#include <StringUtils.h>
 
 namespace nextar {
 	typedef uint32 StringID;

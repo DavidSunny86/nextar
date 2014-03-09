@@ -1,7 +1,7 @@
 #ifndef NEXTAR_RANDOMIZER_H
 #define NEXTAR_RANDOMIZER_H
 
-#include "NexSys.h"
+#include <NexBase.h>
 
 namespace nextar {
 

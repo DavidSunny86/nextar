@@ -8,10 +8,10 @@
 #ifndef VISIBLEPRIMITIVE_H_
 #define VISIBLEPRIMITIVE_H_
 
-#include "NexSys.h"
-#include "StreamData.h"
-#include "Color.h"
-#include "MathBase.h"
+#include <NexBase.h>
+#include <StreamData.h>
+#include <Color.h>
+#include <MathBase.h>
 
 namespace nextar {
 

@@ -1,8 +1,8 @@
 
-#include "RenderOpenGL.h"
-#include "RenderDriverGL.h"
-#include "glx/RenderDriverGLX.h"
-#include "glx/RenderContextGLX.h"
+#include <RenderOpenGL.h>
+#include <RenderDriverGL.h>
+#include <glx/RenderDriverGLX.h>
+#include <glx/RenderContextGLX.h>
 
 namespace RenderOpenGL {
 

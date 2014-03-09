@@ -8,8 +8,8 @@
 #ifndef PLUGIN_MANAGER_H
 #define	PLUGIN_MANAGER_H
 
-#include "FactoryPlugin.h"
-#include "OsDefs.h"
+#include <FactoryPlugin.h>
+#include <OsDefs.h>
 
 namespace nextar {
 

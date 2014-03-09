@@ -8,8 +8,8 @@
 #ifndef SCRIPTPARSER_H_
 #define SCRIPTPARSER_H_
 
-#include "NexBase.h"
-#include "StringUtils.h"
+#include <NexBase.h>
+#include <StringUtils.h>
 
 namespace nextar {
 

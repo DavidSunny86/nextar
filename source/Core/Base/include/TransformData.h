@@ -2,9 +2,9 @@
 #ifndef TRANSFORMDATA_H_
 #define TRANSFORMDATA_H_
 
-#include "NexMath.h"
-#include "MathTypes.h"
-#include "BoundingVolume.h"
+#include <NexMath.h>
+#include <MathTypes.h>
+#include <BoundingVolume.h>
 
 namespace nextar {
 

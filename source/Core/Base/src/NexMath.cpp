@@ -1,9 +1,9 @@
 
-#include "BaseHeaders.h"
-#include "MathBase.h"
-#include "MathTypes.h"
-#include "mathtypes/Matrix3x3.cpp"
-#include "mathtypes/EularAngles.cpp"
+#include <BaseHeaders.h>
+#include <MathBase.h>
+#include <MathTypes.h>
+#include <mathtypes/Matrix3x3.cpp>
+#include <mathtypes/EularAngles.cpp>
 
 #ifdef NEX_MATH_RANDOMIZER_DEFINED
 	NEX_MATH_RANDOM_SEED;

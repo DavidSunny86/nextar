@@ -5,10 +5,10 @@
  *      Author: obhi
  */
 
-#include "BaseHeaders.h"
-#include "TextureUnitState.h"
-#include "TextureUnitStateCmd.h"
-#include "Shader.h"
+#include <BaseHeaders.h>
+#include <TextureUnitState.h>
+#include <TextureUnitStateCmd.h>
+#include <Shader.h>
 
 namespace ShaderCompiler {
 

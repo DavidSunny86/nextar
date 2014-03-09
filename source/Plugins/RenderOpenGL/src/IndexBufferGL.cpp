@@ -4,10 +4,10 @@
 * 
 * Created on March 8, 2011, 8:19 PM
 */
-#include "RenderOpenGL.h"
-#include "BufferManagerGL.h"
-#include "IndexBufferGL.h"
-#include "RenderContextGL.h"
+#include <RenderOpenGL.h>
+#include <BufferManagerGL.h>
+#include <IndexBufferGL.h>
+#include <RenderContextGL.h>
 
 #ifdef NEX_DEBUG
 static bool IndexBuffer_locked = false;

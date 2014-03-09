@@ -1,6 +1,6 @@
 
-#include "NexEngine.h"
-#include "VertexElement.h"
+#include <NexEngine.h>
+#include <VertexElement.h>
 
 namespace nextar {
 

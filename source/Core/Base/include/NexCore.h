@@ -2,17 +2,17 @@
 #define NEXTAR_NEXCORE_H
 
 #include <cmath>
-#include "NexSys.h"
-#include "CommonPools.h"
-#include "MathConfig.h"
+#include <NexBase.h>
+#include <CommonPools.h>
+#include <MathConfig.h>
 
 //@ include proper files
 #if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE
-#include "xmmintrin.h"
-#include "emmintrin.h"
-#include "smmintrin.h"
+#include <xmmintrin.h>
+#include <emmintrin.h>
+#include <smmintrin.h>
 #elif NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_3DNOW
-#include "mm3dnow.h"
+#include <mm3dnow.h>
 #error Not implemented
 #elif NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_VMX128
 #error Not implemented

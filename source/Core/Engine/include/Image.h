@@ -8,8 +8,8 @@
 #ifndef IMAGE_H
 #define	IMAGE_H
 
-#include "NexSys.h"
-#include "PixelFormat.h"
+#include <NexBase.h>
+#include <PixelFormat.h>
 
 namespace nextar {
 

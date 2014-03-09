@@ -8,8 +8,8 @@
 #ifndef NEXENGINE_H_
 #define NEXENGINE_H_
 
-#include "EngineConfig.h"
-#include "BaseHeaders.h"
+#include <EngineConfig.h>
+#include <BaseHeaders.h>
 
 namespace nextar {
 

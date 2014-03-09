@@ -1,7 +1,7 @@
 #pragma once
 
-#include "NexBase.h"
-#include "Config.h"
+#include <NexBase.h>
+#include <Config.h>
 
 namespace nextar {
 

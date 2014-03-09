@@ -5,10 +5,10 @@
  *      Author: obhi
  */
 
-#include "BaseHeaders.h"
-#include "CommonTypes.h"
-#include "DepthStencilStateCmd.h"
-#include "Shader.h"
+#include <BaseHeaders.h>
+#include <CommonTypes.h>
+#include <DepthStencilStateCmd.h>
+#include <Shader.h>
 
 namespace ShaderCompiler {
 

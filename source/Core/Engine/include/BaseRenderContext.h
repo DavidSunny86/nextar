@@ -1,10 +1,10 @@
 
 #pragma once
 
-#include "NexSys.h"
-#include "RenderContext.h"
-#include "VideoMode.h"
-#include "ContextObject.h"
+#include <NexBase.h>
+#include <RenderContext.h>
+#include <VideoMode.h>
+#include <ContextObject.h>
 
 namespace nextar {
 

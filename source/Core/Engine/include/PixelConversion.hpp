@@ -1,7 +1,7 @@
 #ifndef PIXELCONVERSION_H
 #define PIXELCONVERSION_H
 
-#include "PixelFormat.h"
+#include <PixelFormat.h>
 
 namespace nextar {
 

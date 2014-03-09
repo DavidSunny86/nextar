@@ -8,7 +8,7 @@
 #ifndef INDEXBUFFER_H
 #define	INDEXBUFFER_H
 
-#include "ManagedBuffer.h"
+#include <ManagedBuffer.h>
 
 namespace nextar {
 

@@ -1,13 +1,13 @@
 #ifndef NEX_APPLICATIONCONTEXT_H_
 #define NEX_APPLICATIONCONTEXT_H_
 
-#include "BaseHeaders.h"
-#include "Singleton.h"
-#include "AppImpl.h"
-#include "Clock.h"
-#include "FrameTimer.h"
-#include "Config.h"
-#include "URL.h"
+#include <BaseHeaders.h>
+#include <Singleton.h>
+#include <AppImpl.h>
+#include <Clock.h>
+#include <FrameTimer.h>
+#include <Config.h>
+#include <URL.h>
 
 namespace nextar {
 

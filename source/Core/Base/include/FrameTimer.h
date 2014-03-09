@@ -8,8 +8,8 @@
 #ifndef FRAMETIMER_H
 #define	FRAMETIMER_H
 
-#include "NexSys.h"
-#include "FrameListener.h"
+#include <NexBase.h>
+#include <FrameListener.h>
 
 namespace nextar {
 

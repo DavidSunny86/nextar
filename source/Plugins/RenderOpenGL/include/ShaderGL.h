@@ -8,7 +8,7 @@
 #ifndef CTXGLPROGRAM_H_
 #define CTXGLPROGRAM_H_
 
-#include "Shader.h"
+#include <Shader.h>
 
 namespace RenderOpenGL {
 

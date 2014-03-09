@@ -2,7 +2,7 @@
 #ifndef NEXCORE_SSE_CONSTANTS_H
 #define NEXCORE_SSE_CONSTANTS_H
 
-#include "NexMath.h"
+#include <NexMath.h>
 
 namespace nextar {
 

@@ -8,7 +8,7 @@
 #ifndef PIXELFORMAT_H
 #define	PIXELFORMAT_H
 
-#include "NexSys.h"
+#include <NexBase.h>
 
 namespace nextar {
 

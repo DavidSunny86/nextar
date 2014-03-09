@@ -33,9 +33,9 @@
 
 /*#define FULLSANITYCHECKS*/
 
-#include "nedmalloc.h"
+#include <nedmalloc.h>
 #ifdef WIN32
-#include "malloc.h"
+#include <malloc.h>
 #endif
 #define MSPACES 1
 #define ONLY_MSPACES 1
@@ -59,7 +59,7 @@
 /*#define USE_SPIN_LOCKS 0*/
 
 /*#define FORCEINLINE*/
-#include "malloc.c.h"
+#include <malloc.c.h>
 #ifdef NDEBUG               /* Disable assert checking on release builds */
 #undef DEBUG
 #endif

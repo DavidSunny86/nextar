@@ -8,7 +8,7 @@
 #ifndef DEPTHSTENCIL_H_
 #define DEPTHSTENCIL_H_
 
-#include "CommonTypes.h"
+#include <CommonTypes.h>
 
 namespace ShaderCompiler {
 

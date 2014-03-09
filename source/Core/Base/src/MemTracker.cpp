@@ -1,14 +1,14 @@
-#include "BaseHeaders.h"
-#include "Logger.h"
-#include "Convert.h"
-#include "NexThread.h"
-#include "MemTracker.h"
+#include <BaseHeaders.h>
+#include <Logger.h>
+#include <Convert.h>
+#include <NexThread.h>
+#include <MemTracker.h>
 #include <map>
 
 #ifdef NEX_EXTENSIVE_MEM_TRACKER
 
 #if defined( NEX_USE_PTMALLOC ) || !defined(NEX_MSVC)
-#include "ned/nedmalloc.h"
+#include <ned/nedmalloc.h>
 #define _nalloc       nedalloc::nedmalloc
 #define _nfree        nedalloc::nedfree
 #else

@@ -4,12 +4,12 @@
  * 
  * Created on February 19, 2011, 9:06 AM
  */
-#include "NexEngine.h"
-#include "NexSys.h"
-#include "RenderContext.h"
-#include "Shader.h"
-#include "LightCamera.h"
-#include "scene/RegionNode.h"
+#include <NexEngine.h>
+#include <NexBase.h>
+#include <RenderContext.h>
+#include <Shader.h>
+#include <LightCamera.h>
+#include <scene/RegionNode.h>
 
 namespace nextar {
 

@@ -8,7 +8,7 @@
 #ifndef MANAGERROOT_H_
 #define MANAGERROOT_H_
 
-#include "Component.h"
+#include <Component.h>
 
 namespace nextar {
 

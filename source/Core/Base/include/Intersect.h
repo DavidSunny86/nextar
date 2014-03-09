@@ -8,7 +8,7 @@
 #ifndef NEXTAR_INTERSECTIONS_H
 #define	NEXTAR_INTERSECTIONS_H
 
-#include "BoundingVolume.h"
+#include <BoundingVolume.h>
 
 namespace nextar {
 

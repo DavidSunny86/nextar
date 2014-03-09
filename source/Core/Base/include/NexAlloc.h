@@ -9,7 +9,7 @@
  *
  */
 
-#include "Allocators.h"
+#include <Allocators.h>
 #include <new>
 
 namespace nextar {
@@ -86,7 +86,7 @@ namespace nextar {
 	typedef AllocatorBase<MEMCAT_BUFFER_DATA> AllocatorBufferData;
 
 	/**! \include Include inside namespace nextar. */
-#include "NexNew.h"
+#include <NexNew.h>
 
 	/**! Macros for allocation and deallocations */
 
@@ -137,6 +137,6 @@ namespace nextar {
 	typedef AllocObjectBase<AllocatorBufferData> AllocBufferData;
 }
 
-#include "STLAllocator.h"
+#include <STLAllocator.h>
 
 #endif //NEXTAR_NEXALLOC_H

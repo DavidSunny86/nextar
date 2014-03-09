@@ -2,9 +2,9 @@
 #ifndef MATRIXPOOL_H_
 #define MATRIXPOOL_H_
 
-#include "NexAlloc.h"
-#include "MemPool.h"
-#include "NexThread.h"
+#include <NexAlloc.h>
+#include <MemPool.h>
+#include <NexThread.h>
 
 namespace nextar {
 

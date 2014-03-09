@@ -8,10 +8,10 @@
 #ifndef TEXTUREUNITSTATE_H
 #define	TEXTUREUNITSTATE_H
 
-#include "NexSys.h"
-#include "StringUtils.h"
-#include "Color.h"
-#include "TextureAsset.h"
+#include <NexBase.h>
+#include <StringUtils.h>
+#include <Color.h>
+#include <TextureAsset.h>
 
 namespace nextar {
 

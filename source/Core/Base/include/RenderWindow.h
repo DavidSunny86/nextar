@@ -1,8 +1,8 @@
 #ifndef NEXTAR_GRAPHICS_WINDOW_H
 #define NEXTAR_GRAPHICS_WINDOW_H
 
-#include "NexSys.h"
-#include "NameValueMap.h"
+#include <NexBase.h>
+#include <NameValueMap.h>
 
 namespace nextar {
 

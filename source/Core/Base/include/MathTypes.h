@@ -4,10 +4,10 @@
 #ifndef _MATHTYPES_H_
 #define _MATHTYPES_H_
 
-#include "MathBase.h"
-#include "NexAlloc.h"
-#include "MemUtils.h"
-#include "Randomizer.h"
+#include <MathBase.h>
+#include <NexAlloc.h>
+#include <MemUtils.h>
+#include <Randomizer.h>
 
 // Specialize allocator
 namespace nextar {
@@ -49,25 +49,25 @@ namespace nextar {
 }
 
 /* depends on platform and implementation */
-#include "mathtypes/VectorTypes.h"
+#include <mathtypes/VectorTypes.h>
 /**
 	* Simple types, definitions separated to avoid inter-dependecy
 	*/
 namespace nextar {
-	#include "mathtypes/Vector3.h"
-	#include "mathtypes/Vector2.h"
-	#include "mathtypes/Vector4.h"
-	#include "mathtypes/Matrix3x3.h"
-	#include "mathtypes/Box2D.h"
-	#include "mathtypes/AABox3.h"
-	#include "mathtypes/AxisAngle.h"
-	#include "mathtypes/EularAngles.h"
-	#include "mathtypes/PolarSys.h"
-	#include "mathtypes/Vector3-inl.h"
-	#include "mathtypes/Matrix3x3-inl.h"
+	#include <mathtypes/Vector3.h>
+	#include <mathtypes/Vector2.h>
+	#include <mathtypes/Vector4.h>
+	#include <mathtypes/Matrix3x3.h>
+	#include <mathtypes/Box2D.h>
+	#include <mathtypes/AABox3.h>
+	#include <mathtypes/AxisAngle.h>
+	#include <mathtypes/EularAngles.h>
+	#include <mathtypes/PolarSys.h>
+	#include <mathtypes/Vector3-inl.h>
+	#include <mathtypes/Matrix3x3-inl.h>
 }
 
-#include "mathtypes/VectorTypes-inl.h"
+#include <mathtypes/VectorTypes-inl.h>
 
 namespace nextar {
 #ifdef NEX_MATH_RANDOMIZER_DEFINED

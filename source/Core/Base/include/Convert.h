@@ -2,10 +2,10 @@
 #define NEXTAR_NEXCONV_H
 
 
-#include "NexSys.h"
-#include "NexMath.h"
-#include "MathTypes.h"
-#include "Color.h"
+#include <NexBase.h>
+#include <NexMath.h>
+#include <MathTypes.h>
+#include <Color.h>
 
 namespace nextar {
 //! Generic conversion routines.

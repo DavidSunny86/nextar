@@ -5,11 +5,11 @@
 #ifndef NEXTAR_TIMER_H
 #define NEXTAR_TIMER_H
 
-#include "NexSys.h"
+#include <NexBase.h>
 #if defined(NEX_LINUX)
-#include "platform/linux/LinuxClock.h"
+#include <platform/linux/LinuxClock.h>
 #elif defined(NEX_WINDOWS)
-#include "platform/win32/Win32Clock.h"
+#include <platform/win32/Win32Clock.h>
 #else
 #error Clock not yet implemented
 #endif

@@ -4,8 +4,8 @@
  * 
  * Created on May 5, 2011, 4:25 PM
  */
-#include "NexEngine.h"
-#include "Image.h"
+#include <NexEngine.h>
+#include <Image.h>
 
 namespace nextar {
 

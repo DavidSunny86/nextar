@@ -8,8 +8,8 @@
 #ifndef TEXTUREBASE_H_
 #define TEXTUREBASE_H_
 
-#include "ContextObject.h"
-#include "PixelFormat.h"
+#include <ContextObject.h>
+#include <PixelFormat.h>
 
 namespace nextar {
 

@@ -5,11 +5,11 @@
 * Created on February 21, 2011, 10:21 PM
 */
 
-#include "RenderOpenGL.h"
-#include "BufferManagerGL.h"
-#include "VertexElementGL.h"
-#include "IndexBufferGL.h"
-#include "RenderContextGL.h"
+#include <RenderOpenGL.h>
+#include <BufferManagerGL.h>
+#include <VertexElementGL.h>
+#include <IndexBufferGL.h>
+#include <RenderContextGL.h>
 
 namespace RenderOpenGL {
 

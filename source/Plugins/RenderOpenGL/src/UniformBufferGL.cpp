@@ -4,8 +4,8 @@
  *  Created on: 06-Oct-2013
  *      Author: obhi
  */
-#include "RenderOpenGL.h"
-#include "UniformBufferGL.h"
+#include <RenderOpenGL.h>
+#include <UniformBufferGL.h>
 
 namespace RenderOpenGL {
 

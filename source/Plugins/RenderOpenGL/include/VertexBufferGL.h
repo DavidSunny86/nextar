@@ -8,7 +8,7 @@
 #ifndef GLVERTEXBUFFER_H
 #define	GLVERTEXBUFFER_H
 
-#include "VertexBuffer.h"
+#include <VertexBuffer.h>
 
 namespace RenderOpenGL {
 

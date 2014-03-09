@@ -8,7 +8,7 @@
 #ifndef NEXSYS_SUBMESH_H
 #define	NEXSYS_SUBMESH_H
 
-#include "NexSys.h"
+#include <NexBase.h>
 
 namespace nextar {
 

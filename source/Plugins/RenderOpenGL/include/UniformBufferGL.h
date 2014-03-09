@@ -8,7 +8,7 @@
 #ifndef UNIFORMBUFFERGL_H_
 #define UNIFORMBUFFERGL_H_
 
-#include "RenderOpenGL.h"
+#include <RenderOpenGL.h>
 
 namespace RenderOpenGL {
 

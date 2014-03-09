@@ -1,7 +1,7 @@
 #ifndef NEXTAR_IMPLEMENT_APPLICATION
 #define NEXTAR_IMPLEMENT_APPLICATION
 
-#include "OsDefs.h"
+#include <OsDefs.h>
 
 #ifdef NEX_MSVC
 #define NEX_ARG_C	__argc

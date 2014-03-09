@@ -8,9 +8,9 @@
 #ifndef COMPONENTMANAGER_H_
 #define COMPONENTMANAGER_H_
 
-#include "NexSys.h"
-#include "Component.h"
-#include "NexThread.h"
+#include <NexBase.h>
+#include <Component.h>
+#include <NexThread.h>
 
 namespace nextar {
 

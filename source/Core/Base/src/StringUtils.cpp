@@ -1,6 +1,6 @@
-#include "BaseHeaders.h"
-#include "NexSys.h"
-#include "StringUtils.h"
+#include <BaseHeaders.h>
+#include <NexBase.h>
+#include <StringUtils.h>
 
 namespace nextar {
 	namespace StringUtils {

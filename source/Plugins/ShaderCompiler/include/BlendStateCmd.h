@@ -8,8 +8,8 @@
 #ifndef BLENDCMD_H_
 #define BLENDCMD_H_
 
-#include "CommonTypes.h"
-#include "BlendStateCmd.h"
+#include <CommonTypes.h>
+#include <BlendStateCmd.h>
 
 namespace ShaderCompiler {
 	/** BlendState {} */

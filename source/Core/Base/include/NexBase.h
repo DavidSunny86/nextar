@@ -1,14 +1,10 @@
-#ifndef NEXTAR_NEXSYS_H__
-#define NEXTAR_NEXSYS_H__
+#ifndef NEXBASE_H__
+#define NEXBASE_H__
 
-#include "BaseTypes.h"
-#include "RefPtr.h"
-//#define NEX_MAX_STREAMS 8
-//#define NEX_MAS_VERTEX_ELEMENTS 32
+#include <BaseTypes.h>
+#include <RefPtr.h>
 
 namespace nextar {
-
-//typedef RefPtr<Material> MaterialPtr;
 
 	namespace debug {
 	}
@@ -34,5 +30,5 @@ namespace nextar {
 
 }
 
-#endif //NEXTAR_NEXSYS_H__
+#endif //NEXBASE_H__
 

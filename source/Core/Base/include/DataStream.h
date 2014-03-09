@@ -1,7 +1,7 @@
 #ifndef NEXTAR_DATASTREAM_H
 #define NEXTAR_DATASTREAM_H
 
-#include "NexSys.h"
+#include <NexBase.h>
 
 namespace nextar {
 

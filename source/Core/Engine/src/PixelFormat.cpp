@@ -4,9 +4,9 @@
  * 
  * Created on May 5, 2011, 5:02 PM
  */
-#include "NexEngine.h"
-#include "PixelFormat.h"
-#include "PixelConversion.hpp"
+#include <NexEngine.h>
+#include <PixelFormat.h>
+#include <PixelConversion.hpp>
 
 #define PixelConversionTypeId(from,to) (((uint32)from << 16) | (uint32)to)
 namespace nextar {

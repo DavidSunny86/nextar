@@ -4,10 +4,10 @@
  *  Created on: 03-Nov-2013
  *      Author: obhi
  */
-#include "BaseHeaders.h"
-#include "DDSImageCodec.h"
-#include "DXGIFormat.h"
-#include "Serializer.h"
+#include <BaseHeaders.h>
+#include <DDSImageCodec.h>
+#include <DXGIFormat.h>
+#include <Serializer.h>
 
 namespace ImageLoader {
 

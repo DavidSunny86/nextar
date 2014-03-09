@@ -8,13 +8,13 @@
 #ifndef PASS_H_
 #define PASS_H_
 
-#include "DepthStencilState.h"
-#include "BlendState.h"
-#include "RasterState.h"
-#include "TextureUnitState.h"
-#include "GpuProgram.h"
-#include "RenderConstants.h"
-#include "ShaderParam.h"
+#include <DepthStencilState.h>
+#include <BlendState.h>
+#include <RasterState.h>
+#include <TextureUnitState.h>
+#include <GpuProgram.h>
+#include <RenderConstants.h>
+#include <ShaderParam.h>
 
 namespace nextar {
 

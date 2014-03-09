@@ -8,9 +8,9 @@
 #ifndef LIGHTNODE_H
 #define	LIGHTNODE_H
 
-#include "Node.h"
-#include "VisiblePrimitive.h"
-#include "VisibleLight.h"
+#include <Node.h>
+#include <VisiblePrimitive.h>
+#include <VisibleLight.h>
 
 namespace nextar {
 

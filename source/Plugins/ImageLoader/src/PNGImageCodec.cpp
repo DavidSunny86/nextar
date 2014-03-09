@@ -4,9 +4,9 @@
  * 
  * Created on May 8, 2011, 4:57 AM
  */
-#include "BaseHeaders.h"
-#include "PNGImageCodec.h"
-#include "png.h"
+#include <BaseHeaders.h>
+#include <PNGImageCodec.h>
+#include <png.h>
 
 #define PNG_BYTES_TO_CHECK 4
 

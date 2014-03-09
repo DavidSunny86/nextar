@@ -8,8 +8,8 @@
 #ifndef CULLINGSYSTEM_H_
 #define CULLINGSYSTEM_H_
 
-#include "NexSys.h"
-#include "Spatial.h"
+#include <NexBase.h>
+#include <Spatial.h>
 
 namespace nextar {
 

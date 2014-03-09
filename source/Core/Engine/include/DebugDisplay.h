@@ -8,10 +8,10 @@
 #ifndef DEBUGINFO_H_
 #define DEBUGINFO_H_
 
-#include "StreamData.h"
-#include "MathBase.h"
-#include "Color.h"
-#include "Frustum.h"
+#include <StreamData.h>
+#include <MathBase.h>
+#include <Color.h>
+#include <Frustum.h>
 
 namespace nextar {
 

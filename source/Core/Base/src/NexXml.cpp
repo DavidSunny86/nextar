@@ -1,7 +1,7 @@
 
-#include "BaseHeaders.h"
-#include "GenericStreams.h"
-#include "NexXml.h"
+#include <BaseHeaders.h>
+#include <GenericStreams.h>
+#include <NexXml.h>
 
 namespace nextar {
     namespace xml {

@@ -5,9 +5,9 @@
  *      Author: obhi
  */
 
-#include "RenderOpenGL.h"
-#include "CanvasGL.h"
-#include "glx/CanvasGLX.h"
+#include <RenderOpenGL.h>
+#include <CanvasGL.h>
+#include <glx/CanvasGLX.h>
 
 namespace RenderOpenGL {
 

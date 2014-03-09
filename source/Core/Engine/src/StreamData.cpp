@@ -1,7 +1,7 @@
 
-#include "NexEngine.h"
-#include "StreamData.h"
-#include "RenderConstants.h"
+#include <NexEngine.h>
+#include <StreamData.h>
+#include <RenderConstants.h>
 
 namespace nextar {
 

@@ -1,12 +1,12 @@
 #ifndef NEXTAR_COMPRESSEDFILE_H__
 #define NEXTAR_COMPRESSEDFILE_H__
 
-#include "NexBase.h"
-#include "StringUtils.h"
-#include "DataStream.h"
-#include "GenericStreams.h"
-#include "Archive.h"
-#include "archive/ZipArchive.h"
+#include <NexBase.h>
+#include <StringUtils.h>
+#include <DataStream.h>
+#include <GenericStreams.h>
+#include <Archive.h>
+#include <archive/ZipArchive.h>
 
 namespace nextar {
 

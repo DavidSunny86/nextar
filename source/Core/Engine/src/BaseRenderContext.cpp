@@ -1,9 +1,9 @@
 
-#include "NexEngine.h"
-#include "VideoMode.h"
-#include "BaseRenderContext.h"
-#include "RenderWindow.h"
-#include "NexThread.h"
+#include <NexEngine.h>
+#include <VideoMode.h>
+#include <BaseRenderContext.h>
+#include <RenderWindow.h>
+#include <NexThread.h>
 
 namespace nextar {
 

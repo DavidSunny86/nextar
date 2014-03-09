@@ -1,8 +1,8 @@
 #ifndef NEXTAR_FILESYS_H
 #define NEXTAR_FILESYS_H
 
-#include "NexSys.h"
-#include "Archive.h"
+#include <NexBase.h>
+#include <Archive.h>
 
 namespace nextar {
 

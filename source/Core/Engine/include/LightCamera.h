@@ -8,8 +8,8 @@
 #ifndef LIGHTCAMERA_H
 #define	LIGHTCAMERA_H
 
-#include "Camera.h"
-#include "BoundingVolume.h"
+#include <Camera.h>
+#include <BoundingVolume.h>
 
 namespace nextar {
 

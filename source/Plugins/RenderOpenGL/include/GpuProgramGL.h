@@ -8,7 +8,7 @@
 #ifndef GLSHADER_H_
 #define GLSHADER_H_
 
-#include "GpuProgram.h"
+#include <GpuProgram.h>
 
 namespace RenderOpenGL {
 

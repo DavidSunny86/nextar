@@ -2,7 +2,7 @@
 #ifndef NAMEDOBJECT_H_
 #define NAMEDOBJECT_H_
 
-#include "StringUtils.h"
+#include <StringUtils.h>
 
 namespace nextar {
 

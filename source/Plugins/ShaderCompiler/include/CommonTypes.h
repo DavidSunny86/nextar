@@ -2,12 +2,12 @@
 #ifndef COMMONTYPES_H_
 #define COMMONTYPES_H_
 
-#include "ScriptParser.h"
-#include "DepthStencilState.h"
-#include "BlendState.h"
-#include "RasterState.h"
-#include "TextureUnitState.h"
-#include "GpuProgram.h"
+#include <ScriptParser.h>
+#include <DepthStencilState.h>
+#include <BlendState.h>
+#include <RasterState.h>
+#include <TextureUnitState.h>
+#include <GpuProgram.h>
 
 using namespace nextar;
 namespace ShaderCompiler {

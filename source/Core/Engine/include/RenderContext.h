@@ -1,9 +1,9 @@
 
 #pragma once
 
-#include "NexSys.h"
-#include "ContextObject.h"
-#include "StreamData.h"
+#include <NexBase.h>
+#include <ContextObject.h>
+#include <StreamData.h>
 
 namespace nextar {
 

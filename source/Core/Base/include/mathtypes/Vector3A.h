@@ -8,8 +8,8 @@
 #ifndef VECTOR3A_H_
 #define VECTOR3A_H_
 
-#include "MathBase.h"
-#include "MathTypes.h"
+#include <MathBase.h>
+#include <MathTypes.h>
 
 namespace nextar {
 

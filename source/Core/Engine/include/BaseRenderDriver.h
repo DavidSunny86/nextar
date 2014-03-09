@@ -1,7 +1,7 @@
 #pragma once
 
-#include "NexBase.h"
-#include "RenderDriver.h"
+#include <NexBase.h>
+#include <RenderDriver.h>
 
 namespace nextar {
 

@@ -8,10 +8,10 @@
 #ifndef COMPONENT_H_
 #define COMPONENT_H_
 
-#include "NexSys.h"
-#include "BoundingVolume.h"
-#include "StringUtils.h"
-#include "NamedObject.h"
+#include <NexBase.h>
+#include <BoundingVolume.h>
+#include <StringUtils.h>
+#include <NamedObject.h>
 
 namespace nextar {
 

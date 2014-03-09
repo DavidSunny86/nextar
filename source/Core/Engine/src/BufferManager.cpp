@@ -4,11 +4,11 @@
  * 
  * Created on February 6, 2011, 9:56 PM
  */
-#include "NexEngine.h"
-#include "BufferManager.h"
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
-#include "StreamData.h"
+#include <NexEngine.h>
+#include <BufferManager.h>
+#include <VertexBuffer.h>
+#include <IndexBuffer.h>
+#include <StreamData.h>
 
 namespace nextar {
 

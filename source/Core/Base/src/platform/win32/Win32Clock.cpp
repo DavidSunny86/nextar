@@ -1,12 +1,12 @@
 //@	Obi De
 //@ CREATED:	1/9/2007		AT:		2:07:58 PM
 //@ Jan 12 08
-#include "BaseHeaders.h"
+#include <BaseHeaders.h>
 
 using namespace nextar;
 
 #if defined(NEX_WINDOWS)
-#include "platform/win32/win32Clock.h"
+#include <platform/win32/win32Clock.h>
 
 ClockImpl::ClockImpl(bool reset) : timer_mask(0) {
     if (reset)

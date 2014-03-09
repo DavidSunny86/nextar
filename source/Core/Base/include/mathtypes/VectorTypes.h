@@ -14,7 +14,7 @@
 #	include "mathtypes/c/C_VectorTypes.h"
 #else
 #endif
-#include "NexBase.h"
+#include <NexBase.h>
 namespace nextar {
 
 	struct _Matrix3x4;
@@ -129,11 +129,11 @@ namespace nextar {
 
 }
 
-#include "mathtypes/Vector3A.h"
-#include "mathtypes/Vector4A.h"
-#include "mathtypes/Quaternion.h"
-#include "mathtypes/Plane.h"
-#include "mathtypes/Matrix3x4.h"
-#include "mathtypes/Matrix4x4.h"
+#include <mathtypes/Vector3A.h>
+#include <mathtypes/Vector4A.h>
+#include <mathtypes/Quaternion.h>
+#include <mathtypes/Plane.h>
+#include <mathtypes/Matrix3x4.h>
+#include <mathtypes/Matrix4x4.h>
 
 #endif /* VECTORTYPES_H_ */

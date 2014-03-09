@@ -8,7 +8,7 @@
 #ifndef LIGHT_H_
 #define LIGHT_H_
 
-#include "Renderable.h"
+#include <Renderable.h>
 
 namespace nextar {
 

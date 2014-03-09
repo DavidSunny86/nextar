@@ -1,6 +1,6 @@
 namespace nextar {
 
-#include "NexGenericTypes.h"
+#include <NexGenericTypes.h>
 
 	inline void Mat4x4TransVec3(Vector4* outstream, uint32 outstride,
 			const Vector3* inpstream, uint32 inpstride, uint32 count,

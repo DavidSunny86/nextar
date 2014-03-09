@@ -1,7 +1,7 @@
 #ifndef NEXTAR_GENERALSTREAMS_H
 #define NEXTAR_GENERALSTREAMS_H
 
-#include "DataStream.h"
+#include <DataStream.h>
 
 namespace nextar {
 

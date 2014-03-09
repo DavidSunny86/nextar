@@ -4,8 +4,8 @@
  * 
  * Created on May 15, 2011, 4:18 PM
  */
-#include "NexEngine.h"
-#include "scene/LightNode.h"
+#include <NexEngine.h>
+#include <scene/LightNode.h>
 
 namespace nextar {
 

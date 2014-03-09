@@ -8,7 +8,7 @@
 #ifndef DEFAULTLIGHTSYSTEM_H_
 #define DEFAULTLIGHTSYSTEM_H_
 
-#include "LightSystem.h"
+#include <LightSystem.h>
 
 namespace nextar {
 

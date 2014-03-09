@@ -8,10 +8,10 @@
 #ifndef BUFFERMANAGER_H
 #define	BUFFERMANAGER_H
 
-#include "NexSys.h"
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
-#include "VertexElement.h"
+#include <NexBase.h>
+#include <VertexBuffer.h>
+#include <IndexBuffer.h>
+#include <VertexElement.h>
 
 namespace nextar {
 

@@ -4,8 +4,8 @@
  *  Created on: 24-Nov-2013
  *      Author: obhi
  */
-#include "NexEngine.h"
-#include "MultiRenderTarget.h"
+#include <NexEngine.h>
+#include <MultiRenderTarget.h>
 
 namespace nextar {
 

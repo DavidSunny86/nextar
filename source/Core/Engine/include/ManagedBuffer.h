@@ -8,8 +8,8 @@
 #ifndef MANAGEDBUFFER_H_
 #define MANAGEDBUFFER_H_
 
-#include "ContextObject.h"
-#include "Buffer.h"
+#include <ContextObject.h>
+#include <Buffer.h>
 
 
 namespace nextar {

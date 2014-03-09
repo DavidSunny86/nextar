@@ -4,9 +4,9 @@
  *  Created on: Oct 3, 2011
  *      Author: obhi
  */
-#include "NexEngine.h"
-#include "Component.h"
-#include "ComponentFactoryArchive.h"
+#include <NexEngine.h>
+#include <Component.h>
+#include <ComponentFactoryArchive.h>
 
 namespace nextar {
 

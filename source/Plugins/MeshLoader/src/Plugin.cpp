@@ -5,9 +5,9 @@
  * Created on May 8, 2011, 2:23 AM
  */
 
-#include "BaseHeaders.h"
-#include "Plugin.h"
-#include "Image.h"
+#include <BaseHeaders.h>
+#include <Plugin.h>
+#include <Image.h>
 
 NEX_IMPLEMENT_PLUGIN(ImageLoader) {
 	return &ImageLoader::Plugin::plugin;

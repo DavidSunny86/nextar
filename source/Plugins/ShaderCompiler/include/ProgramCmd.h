@@ -8,7 +8,7 @@
 #ifndef PROGRAMCMD_H_
 #define PROGRAMCMD_H_
 
-#include "CommonTypes.h"
+#include <CommonTypes.h>
 
 namespace ShaderCompiler {
 

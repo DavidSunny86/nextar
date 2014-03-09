@@ -1,7 +1,7 @@
 #ifndef NEXTAR_DISPOSER_H
 #define NEXTAR_DISPOSER_H
 
-#include "NexAlloc.h"
+#include <NexAlloc.h>
 
 namespace nextar {
 	/**

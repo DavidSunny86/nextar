@@ -8,7 +8,7 @@
 #ifndef MESHLOADERINTFV10_H_
 #define MESHLOADERINTFV10_H_
 
-#include "MeshLoaderImpl.h"
+#include <MeshLoaderImpl.h>
 
 using namespace nextar;
 namespace MeshLoader {

@@ -1,10 +1,10 @@
 #ifndef NEXTAR_VIEWPORT_H
 #define NEXTAR_VIEWPORT_H
 
-#include "NexSys.h"
-#include "Color.h"
-#include "CommitContext.h"
-#include "SceneTraversal.h"
+#include <NexBase.h>
+#include <Color.h>
+#include <CommitContext.h>
+#include <SceneTraversal.h>
 
 namespace nextar {
 	struct ViewportCallback;

@@ -110,10 +110,10 @@ namespace nextar {
 
 }
 
-#include "mathtypes/c/Vector4a-inl.h"
-#include "mathtypes/c/Vector3a-inl.h"
-#include "mathtypes/c/Plane-inl.h"
-#include "mathtypes/c/Quaternion-inl.h"
-#include "mathtypes/c/Matrix3x4-inl.h"
-#include "mathtypes/c/Matrix4x4-inl.h"
+#include <mathtypes/c/Vector4a-inl.h>
+#include <mathtypes/c/Vector3a-inl.h>
+#include <mathtypes/c/Plane-inl.h>
+#include <mathtypes/c/Quaternion-inl.h>
+#include <mathtypes/c/Matrix3x4-inl.h>
+#include <mathtypes/c/Matrix4x4-inl.h>
 

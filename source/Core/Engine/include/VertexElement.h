@@ -1,8 +1,8 @@
 #ifndef NEXTAR_VERTEX_ELEMENT_H
 #define NEXTAR_VERTEX_ELEMENT_H
 
-#include "NexSys.h"
-#include "RenderConstants.h"
+#include <NexBase.h>
+#include <RenderConstants.h>
 
 namespace nextar {
 

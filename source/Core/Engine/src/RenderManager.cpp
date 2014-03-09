@@ -4,11 +4,11 @@
  *  Created on: 15-Aug-2013
  *      Author: obhi
  */
-#include "NexEngine.h"
-#include "VertexElement.h"
-#include "RenderManager.h"
-#include "RenderContext.h"
-#include "Viewport.h"
+#include <NexEngine.h>
+#include <VertexElement.h>
+#include <RenderManager.h>
+#include <RenderContext.h>
+#include <Viewport.h>
 
 namespace nextar {
 

@@ -8,7 +8,7 @@
 #ifndef CANVASGLX_H_
 #define CANVASGLX_H_
 
-#include "CanvasGL.h"
+#include <CanvasGL.h>
 
 namespace RenderOpenGL {
 

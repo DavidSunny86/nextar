@@ -8,9 +8,9 @@
 #ifndef PROPERTY_H
 #define	PROPERTY_H
 
-#include "NexSys.h"
-#include "StringUtils.h"
-#include "NameValueMap.h"
+#include <NexBase.h>
+#include <StringUtils.h>
+#include <NameValueMap.h>
 
 namespace nextar {
 

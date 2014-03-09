@@ -4,9 +4,9 @@
  *  Created on: 22-Sep-2013
  *      Author: obhi
  */
-#include "NexEngine.h"
-#include "RenderManager.h"
-#include "GpuProgram.h"
+#include <NexEngine.h>
+#include <RenderManager.h>
+#include <GpuProgram.h>
 
 namespace nextar {
 

@@ -4,11 +4,11 @@
  *  Created on: 25-Jan-2014
  *      Author: obhi
  */
-#include "NexEngine.h"
-#include "MaterialAsset.h"
-#include "ShaderAsset.h"
-#include "MeshAsset.h"
-#include "Mesh.h"
+#include <NexEngine.h>
+#include <MaterialAsset.h>
+#include <ShaderAsset.h>
+#include <MeshAsset.h>
+#include <Mesh.h>
 
 namespace nextar {
 

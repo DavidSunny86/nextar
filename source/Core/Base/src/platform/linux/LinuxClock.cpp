@@ -1,11 +1,11 @@
 //@	Obi De
 //@ CREATED:	1/9/2007		AT:		2:07:58 PM
 //@ Jan 12 08
-#include "BaseHeaders.h"
+#include <BaseHeaders.h>
 
 #if defined(NEX_LINUX)
 #include <sys/time.h>
-#include "platform/linux/LinuxClock.h"
+#include <platform/linux/LinuxClock.h>
 
 namespace nextar {
 

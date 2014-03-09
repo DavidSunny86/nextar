@@ -8,11 +8,11 @@
 #ifndef NEXTAR_MOVEABLE_H_
 #define	NEXTAR_MOVEABLE_H_
 
-#include "NexSys.h"
-#include "BoundingVolume.h"
-#include "Frustum.h"
-#include "Component.h"
-#include "TransformData.h"
+#include <NexBase.h>
+#include <BoundingVolume.h>
+#include <Frustum.h>
+#include <Component.h>
+#include <TransformData.h>
 
 namespace nextar {
 		

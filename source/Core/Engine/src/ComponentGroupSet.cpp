@@ -4,10 +4,10 @@
  *  Created on: Oct 3, 2011
  *      Author: obhi
  */
-#include "NexEngine.h"
-#include "ComponentGroupSet.h"
-#include "ComponentFactoryArchive.h"
-#include "ApplicationContext.h"
+#include <NexEngine.h>
+#include <ComponentGroupSet.h>
+#include <ComponentFactoryArchive.h>
+#include <ApplicationContext.h>
 
 namespace nextar {
 

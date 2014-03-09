@@ -8,8 +8,8 @@
 #ifndef REGIONNODE_H
 #define	REGIONNODE_H
 
-#include "scene/ContainerNode.h"
-#include "scene/LightNode.h"
+#include <scene/ContainerNode.h>
+#include <scene/LightNode.h>
 
 namespace nextar {
 

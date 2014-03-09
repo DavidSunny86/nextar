@@ -1,7 +1,7 @@
 #ifndef NEXTAR_ARCHIVESUPPORT_H
 #define NEXTAR_ARCHIVESUPPORT_H
 
-#include "ZipHeaders.h"
+#include <ZipHeaders.h>
 
 #ifndef _NexZipApi
 #define _NexZipApi

@@ -8,7 +8,7 @@
 #ifndef DDSIMAGELOADER_H_
 #define DDSIMAGELOADER_H_
 
-#include "Image.h"
+#include <Image.h>
 
 using namespace nextar;
 

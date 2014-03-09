@@ -8,7 +8,7 @@
 #ifndef JPEGIMAGELOADER_H
 #define	JPEGIMAGELOADER_H
 
-#include "Image.h"
+#include <Image.h>
 
 using namespace nextar;
 

@@ -1,7 +1,7 @@
 #ifndef NEXTAR_VERTEXBUFFER_H
 #define NEXTAR_VERTEXBUFFER_H
 
-#include "ManagedBuffer.h"
+#include <ManagedBuffer.h>
 
 namespace nextar {
 

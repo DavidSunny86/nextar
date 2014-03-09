@@ -5,7 +5,7 @@
  *      Author: obhi
  */
 
-#include "Scene.h"
+#include <Scene.h>
 
 namespace nextar {
 

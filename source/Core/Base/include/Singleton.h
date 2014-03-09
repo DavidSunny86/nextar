@@ -1,9 +1,5 @@
 #ifndef NEXTAR_SINGLETON_H
 #define NEXTAR_SINGLETON_H
-
-#ifndef NEXTYPES_H_
-#error include NexBase.h rather
-#endif
 /*! \file Singleton.h
  *  
  *  @author Abhishek Dey 
@@ -12,6 +8,8 @@
  *  
  *  
  */
+
+#include <NexBase.h>
 
 namespace nextar {
 

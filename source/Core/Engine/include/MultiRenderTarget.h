@@ -8,8 +8,8 @@
 #ifndef MULTIRENDERTARGET_H_
 #define MULTIRENDERTARGET_H_
 
-#include "ContextObject.h"
-#include "RenderTarget.h"
+#include <ContextObject.h>
+#include <RenderTarget.h>
 
 namespace nextar {
 

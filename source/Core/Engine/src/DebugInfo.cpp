@@ -5,8 +5,8 @@
  *      Author: obhi
  */
 
-#include "NexEngine.h"
-#include "DebugDisplay.h"
+#include <NexEngine.h>
+#include <DebugDisplay.h>
 
 namespace nextar {
 

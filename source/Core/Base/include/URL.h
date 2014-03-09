@@ -1,9 +1,9 @@
 #ifndef NEXTAR_PATHUTILS_H
 #define NEXTAR_PATHUTILS_H
 
-#include "NexSys.h"
-#include "NexBase.h"
-#include "NameValueMap.h"
+#include <NexBase.h>
+#include <NexBase.h>
+#include <NameValueMap.h>
 
 namespace nextar {
 

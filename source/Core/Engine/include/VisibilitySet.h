@@ -8,8 +8,8 @@
 #ifndef VISIBILITYSET_H_
 #define VISIBILITYSET_H_
 
-#include "VisiblePrimitive.h"
-#include "RadixSort.h"
+#include <VisiblePrimitive.h>
+#include <RadixSort.h>
 
 namespace nextar {
 

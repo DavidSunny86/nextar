@@ -8,7 +8,7 @@
 #ifndef PLUGINGL_H_
 #define PLUGINGL_H_
 
-#include "RenderManagerGL.h"
+#include <RenderManagerGL.h>
 
 namespace RenderOpenGL {
 

@@ -8,10 +8,10 @@
 #ifndef LIGHTSYSTEM_H_
 #define LIGHTSYSTEM_H_
 
-#include "NexSys.h"
-#include "VisiblePrimitive.h"
-#include "Light.h"
-#include "RenderConstants.h"
+#include <NexBase.h>
+#include <VisiblePrimitive.h>
+#include <Light.h>
+#include <RenderConstants.h>
 
 namespace nextar {
 

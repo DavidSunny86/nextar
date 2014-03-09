@@ -1,7 +1,7 @@
 #ifndef NEXTAR_JOBQUEUE_H
 #define NEXTAR_JOBQUEUE_H
 
-#include "NexSys.h"
+#include <NexBase.h>
 
 namespace nextar {
 

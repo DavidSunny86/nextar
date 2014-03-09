@@ -8,10 +8,10 @@
 #ifndef ENTITY_H_
 #define ENTITY_H_
 
-#include "NexSys.h"
-#include "Component.h"
-#include "Moveable.h"
-#include "Camera.h"
+#include <NexBase.h>
+#include <Component.h>
+#include <Moveable.h>
+#include <Camera.h>
 
 namespace nextar {
 

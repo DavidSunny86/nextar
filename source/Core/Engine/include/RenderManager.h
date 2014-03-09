@@ -8,13 +8,13 @@
 #ifndef RENDERMANAGER_H_
 #define RENDERMANAGER_H_
 
-#include "NexSys.h"
-#include "NexBase.h"
-#include "RenderDriver.h"
-#include "NameValueMap.h"
-#include "GpuProgram.h"
-#include "RenderSystem.h"
-#include "RenderConstants.h"
+#include <NexBase.h>
+#include <NexBase.h>
+#include <RenderDriver.h>
+#include <NameValueMap.h>
+#include <GpuProgram.h>
+#include <RenderSystem.h>
+#include <RenderConstants.h>
 
 namespace nextar {
 

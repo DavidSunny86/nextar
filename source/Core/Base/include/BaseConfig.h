@@ -280,8 +280,8 @@ typedef unsigned short wchar_t;
 #	define NEX_STORE_IN_LITTLEENDIN 1
 #endif
 
-//#include "ErrorDefs.h"
-//#include "nexshared.h"
+//#include <ErrorDefs.h>
+//#include <nexshared.h>
 
 // helper macros
 //#define NEX_MULTIPLE_OF(_number_,n) (_number_ + (n-_number_%n))

@@ -1,7 +1,7 @@
-#include "BaseHeaders.h"
-#include "WindowManager.h"
+#include <BaseHeaders.h>
+#include <WindowManager.h>
 
-#include "RenderWindow.h"
+#include <RenderWindow.h>
 
 namespace nextar {
 

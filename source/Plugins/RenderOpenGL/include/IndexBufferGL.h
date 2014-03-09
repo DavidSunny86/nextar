@@ -8,7 +8,7 @@
 #ifndef GLINDEXBUFFER_H
 #define	GLINDEXBUFFER_H
 
-#include "IndexBuffer.h"
+#include <IndexBuffer.h>
 
 namespace RenderOpenGL {
 

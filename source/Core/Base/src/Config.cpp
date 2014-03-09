@@ -1,8 +1,8 @@
-#include "BaseHeaders.h"
-#include "Config.h"
-#include "ApplicationContext.h"
-#include "FileSystem.h"
-#include "StreamLexer.h"
+#include <BaseHeaders.h>
+#include <Config.h>
+#include <ApplicationContext.h>
+#include <FileSystem.h>
+#include <StreamLexer.h>
 
 namespace nextar {
 	Config::Config() {

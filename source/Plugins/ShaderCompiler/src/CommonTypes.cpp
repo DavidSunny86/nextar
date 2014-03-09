@@ -5,8 +5,8 @@
  *      Author: obhi
  */
 
-#include "BaseHeaders.h"
-#include "CommonTypes.h"
+#include <BaseHeaders.h>
+#include <CommonTypes.h>
 
 namespace ShaderCompiler {
 

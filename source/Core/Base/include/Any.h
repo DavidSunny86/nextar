@@ -1,7 +1,7 @@
 #ifndef NEXTAR_NEXANY_H
 #define NEXTAR_NEXANY_H
 
-#include "NexSys.h"
+#include <NexBase.h>
 
 /**
  * @remarks Concept from: Valued Conversions

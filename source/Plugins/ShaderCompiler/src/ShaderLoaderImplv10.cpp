@@ -4,13 +4,13 @@
  *  Created on: 21-Sep-2013
  *      Author: obhi
  */
-#include "BaseHeaders.h"
-#include "NexSys.h"
-#include "Shader.h"
-#include "CommonTypes.h"
-#include "ShaderListener.h"
-#include "ShaderLoaderImplv10.h"
-#include "ScriptParser.h"
+#include <BaseHeaders.h>
+#include <NexBase.h>
+#include <Shader.h>
+#include <CommonTypes.h>
+#include <ShaderListener.h>
+#include <ShaderLoaderImplv10.h>
+#include <ScriptParser.h>
 
 namespace ShaderCompiler {
 

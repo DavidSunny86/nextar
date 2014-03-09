@@ -1,7 +1,7 @@
 #ifndef NEXTAR_GRAPHICS_BUFFER_H
 #define NEXTAR_GRAPHICS_BUFFER_H
 
-#include "NexSys.h"
+#include <NexBase.h>
 
 namespace nextar {
 

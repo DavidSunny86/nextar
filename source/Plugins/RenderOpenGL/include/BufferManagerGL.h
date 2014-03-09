@@ -8,10 +8,10 @@
 #ifndef GLBUFFERMANAGER_H
 #define	GLBUFFERMANAGER_H
 
-#include "BufferManager.h"
-#include "VertexBufferGL.h"
-#include "IndexBufferGL.h"
-#include "VertexElementGL.h"
+#include <BufferManager.h>
+#include <VertexBufferGL.h>
+#include <IndexBufferGL.h>
+#include <VertexElementGL.h>
 
 namespace RenderOpenGL {
 

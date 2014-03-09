@@ -5,7 +5,7 @@
  *      Author: obhi
  */
 
-#include "TextureBase.h"
+#include <TextureBase.h>
 
 namespace nextar {
 

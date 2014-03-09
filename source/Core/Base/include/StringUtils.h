@@ -8,9 +8,9 @@
 #ifndef NEXTAR_NSTR_H
 #define NEXTAR_NSTR_H
 
-#include "NexSys.h"
-#include "MemUtils.h"
-#include "StringInternTable.h"
+#include <NexBase.h>
+#include <MemUtils.h>
+#include <StringInternTable.h>
 
 // some macros
 #define NEX_DEFAULT_UCHAR	0xFFFD

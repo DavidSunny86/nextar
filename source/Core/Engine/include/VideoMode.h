@@ -8,7 +8,7 @@
 #ifndef VIDEOMODE_H_
 #define VIDEOMODE_H_
 
-#include "NexBase.h"
+#include <NexBase.h>
 
 namespace nextar {
 

@@ -8,7 +8,7 @@
 //---------------------------------------
 #ifdef NEX_WINDOWS
 
-#include "IncWnds.h"
+#include <IncWnds.h>
 
 #define DYN_LIB_TYPE HMODULE
 #define NEX_DYN_LOAD(name)          LoadLibrary(name)

@@ -5,10 +5,10 @@
  *      Author: obhi
  */
 
-#include "NexSys.h"
-#include "CommonTypes.h"
-#include "BlendStateCmd.h"
-#include "Shader.h"
+#include <NexBase.h>
+#include <CommonTypes.h>
+#include <BlendStateCmd.h>
+#include <Shader.h>
 
 namespace ShaderCompiler {
 

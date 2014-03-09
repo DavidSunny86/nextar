@@ -8,7 +8,7 @@
 #ifndef COMPONENTGROUPARCHIVE_H_
 #define COMPONENTGROUPARCHIVE_H_
 
-#include "Component.h"
+#include <Component.h>
 
 namespace nextar {
 

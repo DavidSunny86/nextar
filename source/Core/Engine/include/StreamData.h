@@ -8,10 +8,10 @@
 #ifndef StreamData_H
 #define	StreamData_H
 
-#include "RenderConstants.h"
-#include "VertexBuffer.h"
-#include "VertexElement.h"
-#include "IndexBuffer.h"
+#include <RenderConstants.h>
+#include <VertexBuffer.h>
+#include <VertexElement.h>
+#include <IndexBuffer.h>
 
 namespace nextar {
 

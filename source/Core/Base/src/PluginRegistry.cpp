@@ -1,9 +1,9 @@
-#include "BaseHeaders.h"
-#include "PluginRegistry.h"
-#include "URL.h"
-#include "Config.h"
-#include "NexXml.h"
-#include "FileSystem.h"
+#include <BaseHeaders.h>
+#include <PluginRegistry.h>
+#include <URL.h>
+#include <Config.h>
+#include <NexXml.h>
+#include <FileSystem.h>
 
 namespace nextar {
 

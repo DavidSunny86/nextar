@@ -2,9 +2,9 @@
 #ifndef POOLALLOCATOR_H_
 #define POOLALLOCATOR_H_
 
-#include "NexBase.h"
-#include "NexAlloc.h"
-#include "NexThread.h"
+#include <NexBase.h>
+#include <NexAlloc.h>
+#include <NexThread.h>
 
 namespace nextar {
 

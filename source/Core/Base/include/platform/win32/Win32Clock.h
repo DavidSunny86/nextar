@@ -1,7 +1,7 @@
 #ifndef NEXTAR_CLOCKIMPL_H
 #define NEXTAR_CLOCKIMPL_H
 
-#include "IncWnds.h"
+#include <IncWnds.h>
 
 namespace nextar {
 

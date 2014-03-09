@@ -1,9 +1,9 @@
 #ifndef NEXTAR_MOUNTPOINT_H
 #define NEXTAR_MOUNTPOINT_H
 
-#include "NexSys.h"
-#include "DataStream.h"
-#include "URL.h"
+#include <NexBase.h>
+#include <DataStream.h>
+#include <URL.h>
 
 #define NEX_SET_FILE_TIME(ft,tm) NEX_SET_FILE_TIME_((ft),(tm))
 #if defined(NEX_MSVC)

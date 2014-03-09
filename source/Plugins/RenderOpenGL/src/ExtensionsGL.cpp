@@ -5,9 +5,9 @@
  *      Author: obhi
  */
 
-#include "RenderOpenGL.h"
-#include "ExtensionsGL.h"
-#include "RenderDriverGL.h"
+#include <RenderOpenGL.h>
+#include <ExtensionsGL.h>
+#include <RenderDriverGL.h>
 
 namespace RenderOpenGL {
 
@@ -32,7 +32,7 @@ namespace RenderOpenGL {
 #define DECL_EXTENSION(funcptr, fucnname) \
     	DECL_FUNC_NAME(fucnname) = 0;
 
-#include "ExtListGL.h"
+#include <ExtListGL.h>
 
 #undef DECL_COND_START_VERSION
 #undef DECL_COND_END_VERSION
@@ -106,7 +106,7 @@ namespace RenderOpenGL {
 			failed = true;                                    \
 		}
 
-#include "ExtListGL.h"
+#include <ExtListGL.h>
 
 #undef DECL_COND_START_VERSION
 #undef DECL_COND_END_VERSION

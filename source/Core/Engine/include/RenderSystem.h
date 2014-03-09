@@ -8,8 +8,8 @@
 #ifndef RENDERSYSTEM_H_
 #define RENDERSYSTEM_H_
 
-#include "RenderContext.h"
-#include "VisibilitySet.h"
+#include <RenderContext.h>
+#include <VisibilitySet.h>
 
 namespace nextar {
 

@@ -2,14 +2,14 @@
 #ifndef RENDERCONTEXTGL_H_
 #define RENDERCONTEXTGL_H_
 
-#include "RenderOpenGL.h"
-#include "ExtensionsGL.h"
-#include "GpuProgramGL.h"
-#include "UniformBufferGL.h"
-#include "VertexElementGL.h"
-#include "VertexBufferGL.h"
-#include "IndexBufferGL.h"
-#include "PassGL.h"
+#include <RenderOpenGL.h>
+#include <ExtensionsGL.h>
+#include <GpuProgramGL.h>
+#include <UniformBufferGL.h>
+#include <VertexElementGL.h>
+#include <VertexBufferGL.h>
+#include <IndexBufferGL.h>
+#include <PassGL.h>
 
 namespace RenderOpenGL {
 
