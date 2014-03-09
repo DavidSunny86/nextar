@@ -4,7 +4,7 @@
  * 
  * Created on May 8, 2011, 2:29 AM
  */
-#include "NexHeaders.h"
+#include "BaseHeaders.h"
 #include "JPEGImageCodec.h"
 
 extern "C" {

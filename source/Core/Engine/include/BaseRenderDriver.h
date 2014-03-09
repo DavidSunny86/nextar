@@ -1,11 +1,11 @@
 #pragma once
 
-#include "NexTypes.h"
+#include "NexBase.h"
 #include "RenderDriver.h"
 
 namespace nextar {
 
-	class _NexExport BaseRenderDriver: public RenderDriver {
+	class _NexEngineExport BaseRenderDriver: public RenderDriver {
 
 	public:
 		BaseRenderDriver();

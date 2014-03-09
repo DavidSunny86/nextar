@@ -4,7 +4,7 @@
  *  Created on: 30-Sep-2013
  *      Author: obhi
  */
-#include "NexHeaders.h"
+#include "BaseHeaders.h"
 #include "Plugin.h"
 
 NEX_IMPLEMENT_PLUGIN(ShaderCompiler) {

@@ -8,7 +8,7 @@
 #ifndef EXTENSIONSGL_H_
 #define EXTENSIONSGL_H_
 
-#include "NexTypes.h"
+#include "NexBase.h"
 #include "RenderOpenGL.h"
 
 namespace RenderOpenGL {

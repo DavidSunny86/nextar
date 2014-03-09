@@ -18,7 +18,7 @@ namespace nextar {
 		
 	/**
 	 **/
-	class _NexExport Moveable: public Component {
+	class _NexEngineExport Moveable: public Component {
 		NEX_LOG_HELPER(Moveable);
 	public:
 		enum {

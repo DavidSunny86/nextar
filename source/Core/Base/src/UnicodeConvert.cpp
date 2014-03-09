@@ -1,4 +1,5 @@
-#include "NexHeaders.h"
+
+#include "BaseHeaders.h"
 #include "StringUtils.h"
 
 namespace nextar {
@@ -8,7 +9,7 @@ namespace nextar {
 
 		}
 
-		_NexExport UniString ToUtf16(const String& utf8string) {
+		_NexBaseExport UniString ToUtf16(const String& utf8string) {
 
 			UniString outPut;
 			outPut.reserve(utf8string.length() + 1);
@@ -55,7 +56,7 @@ namespace nextar {
 			return outPut;
 		}
 
-		_NexExport String ToUtf8(const UniString& utf16string) {
+		_NexBaseExport String ToUtf8(const UniString& utf16string) {
 			String outPut;
 			outPut.reserve(utf16string.length() + 1);
 			const utf16* buffer = (const utf16*) utf16string.c_str();

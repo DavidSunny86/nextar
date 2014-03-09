@@ -16,7 +16,7 @@ namespace nextar {
 	 * \@detail  @par
 	 */
 
-	class _NexExport FileSystem: public Singleton<FileSystem>,
+	class _NexBaseExport FileSystem: public Singleton<FileSystem>,
 		public AllocGeneral {
 		NEX_LOG_HELPER(FileSystem);
 

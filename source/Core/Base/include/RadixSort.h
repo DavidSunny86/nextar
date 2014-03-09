@@ -8,7 +8,7 @@
 #ifndef RADIXSORT_H_
 #define RADIXSORT_H_
 
-#include "NexTypes.h"
+#include "NexBase.h"
 
 namespace nextar {
 

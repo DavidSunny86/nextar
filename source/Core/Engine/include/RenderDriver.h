@@ -1,6 +1,6 @@
 #pragma once
 
-#include "NexTypes.h"
+#include "NexBase.h"
 #include "Config.h"
 
 namespace nextar {
@@ -8,7 +8,7 @@ namespace nextar {
 	/**
 	 * One instance per gpu
 	 **/
-	class _NexExport RenderDriver: public Referenced<RenderDriver, AllocGraphics> {
+	class _NexEngineExport RenderDriver: public Referenced<RenderDriver, AllocGraphics> {
 	public:
 
 

@@ -1,9 +1,15 @@
+// Abhishek
+// Nov 25 2007
+//---------------------------
+//## This is where I Start again, after 
+//## realizing the mistakes of the frame
+//## work.
+#ifndef NEXTAR_BASE_DEF_H
+#define NEXTAR_BASE_DEF_H
 
-#ifndef NEXTYPES_H_
-#define NEXTYPES_H_
-
-#include "NexBase.h"
-#include "NexAlloc.h"
+#include <StdHeaders.h>
+#include <BaseConfig.h>
+#include <NexAlloc.h>
 
 namespace nextar {
 
@@ -95,7 +101,8 @@ namespace nextar {
 	}
 }
 
-#include "Containers.h"
-#include "ErrorDefs.h"
+#include <Containers.h>
+#include <ErrorDefs.h>
 
-#endif //NEXTYPES_H_
+#endif //NEXTAR_BASE_DEF_H
+//

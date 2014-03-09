@@ -8,13 +8,13 @@
 #ifndef SCRIPTPARSER_H_
 #define SCRIPTPARSER_H_
 
-#include "NexTypes.h"
+#include "NexBase.h"
 #include "StringUtils.h"
 
 namespace nextar {
 
 	class StreamLexer;
-	class _NexExport ScriptParser {
+	class _NexBaseExport ScriptParser {
 		NEX_LOG_HELPER(ScriptParser);
 	public:
 

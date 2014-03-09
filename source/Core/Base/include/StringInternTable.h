@@ -3,14 +3,14 @@
 #define	STRINGINTERNTABLE_H_
 
 
-#include "NexTypes.h"
+#include "NexBase.h"
 #include "NexThread.h"
 #include "StringUtils.h"
 
 namespace nextar {
 	typedef uint32 StringID;
 
-	class _NexExport StringInternTable : public AllocGeneral {
+	class _NexBaseExport StringInternTable : public AllocGeneral {
 		NEX_LOG_HELPER(StringInternTable);
 	public:
 

@@ -1,10 +1,10 @@
-#include "NexHeaders.h"
+#include "BaseHeaders.h"
 #include "Intersect.h"
 
 namespace nextar {
 	namespace Intersect {
 
-		_NexExport IntersectionResult BoundingVolumes(
+		_NexBaseExport IntersectionResult BoundingVolumes(
 				const BoundingVolume& vol1, const BoundingVolume& vol2) {
 			
 			Vector3A d = Vec3ASub(vol1.GetCenter(), vol2.GetCenter());
@@ -18,7 +18,7 @@ namespace nextar {
 						IR_OUTSIDE : IR_OUTSIDE;
 		}
 
-		_NexExport IntersectionResult BoundingVolumeFrustumCoherent(
+		_NexBaseExport IntersectionResult BoundingVolumeFrustumCoherent(
 				const BoundingVolume& vol, const Frustum& frustum, uint32 inMask,
 				uint32& outMask, uint32& lastPlane) {
 
@@ -60,7 +60,7 @@ namespace nextar {
 			return result;
 		}
 
-		_NexExport IntersectionResult BoundingVolumeFrustum(
+		_NexBaseExport IntersectionResult BoundingVolumeFrustum(
 				const BoundingVolume& vol, const Frustum& frustum) {
 			IntersectionResult result = IR_INSIDE;
 			size_t numPlanes = frustum.GetNumPlanes();
@@ -78,7 +78,7 @@ namespace nextar {
 			return result;
 		}
 
-		_NexExport IntersectionResult BoundingSphereFrustum(Vec3AF center,
+		_NexBaseExport IntersectionResult BoundingSphereFrustum(Vec3AF center,
 				float radius, const Frustum& frustum) {
 			size_t numPlanes = frustum.GetNumPlanes();
 			const Plane* planes = frustum.GetPlanes();

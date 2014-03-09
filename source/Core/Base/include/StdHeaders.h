@@ -25,6 +25,7 @@
 #include <iterator>
 #include <ostream>
 #include <cstdint>
+#include <cstdbool>
 
 #undef max
 #undef min

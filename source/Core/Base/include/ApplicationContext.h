@@ -1,7 +1,7 @@
 #ifndef NEX_APPLICATIONCONTEXT_H_
 #define NEX_APPLICATIONCONTEXT_H_
 
-#include "NexHeaders.h"
+#include "BaseHeaders.h"
 #include "Singleton.h"
 #include "AppImpl.h"
 #include "Clock.h"
@@ -11,7 +11,7 @@
 
 namespace nextar {
 
-	class _NexExport ApplicationContext: public Singleton<ApplicationContext> {
+	class _NexBaseExport ApplicationContext: public Singleton<ApplicationContext> {
 		NEX_LOG_HELPER(ApplicationContext)
 		;
 

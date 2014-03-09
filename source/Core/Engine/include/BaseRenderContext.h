@@ -8,7 +8,7 @@
 
 namespace nextar {
 
-	class _NexExport BaseRenderContext : public RenderContext {
+	class _NexEngineExport BaseRenderContext : public RenderContext {
 
 		NEX_LOG_HELPER(BaseRenderContext);
 

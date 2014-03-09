@@ -9,7 +9,7 @@
 #define GPUCONTEXTOBJECT_H_
 
 #include "NexSys.h"
-#include "NexTypes.h"
+#include "NexBase.h"
 #include "NexThread.h"
 
 namespace nextar {

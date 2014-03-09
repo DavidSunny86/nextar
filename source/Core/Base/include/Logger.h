@@ -60,7 +60,7 @@ namespace nextar {
 		virtual void LogMsg(LogSeverity logSeverity, const String& msg) = 0;
 	};
 
-	class _NexExport LoggerBase {
+	class _NexBaseExport LoggerBase {
 	protected:
 		String name;
 	public:
@@ -84,7 +84,7 @@ namespace nextar {
 	 *  This class can redirect output from a perticualar stream to itself.
 	 *  Mostly logging is done to std::ostream.
 	 */
-	class _NexExport Logger: public LoggerBase, public AllocLogger {
+	class _NexBaseExport Logger: public LoggerBase, public AllocLogger {
 	public:
 		typedef vector<LogListener*>::type LogListenerList;
 
@@ -133,7 +133,7 @@ namespace nextar {
 	 * @author Abhishek Dey
 	 * @date 10/29/2009
 	 **/
-	class _NexExport LogManager: public Singleton<LogManager>,
+	class _NexBaseExport LogManager: public Singleton<LogManager>,
 		public AllocLogger {
 		typedef vector<LoggerBase*>::type LoggerBaseList;
 		LoggerBaseList loggers;

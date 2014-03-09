@@ -19,7 +19,7 @@ namespace nextar {
 	 *
 	 * @remarks SubMesh class for meshes separated by material data
 	 **/
-	class _NexExport SubMesh: public AllocGeneral {
+	class _NexEngineExport SubMesh: public AllocGeneral {
 		friend class MeshLoader;
 		friend class MeshLoaderImplv1_0;
 

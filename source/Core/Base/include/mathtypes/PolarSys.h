@@ -3,7 +3,7 @@
 
 //# generic polar sys corrdinate, this class is not aligned.
 
-class _NexExport PolarSys : public nextar::AllocGeneral {
+class _NexBaseExport PolarSys : public nextar::AllocGeneral {
 public:
 
 	union {

@@ -8,7 +8,7 @@
 #ifndef SHADERPARAM_H_
 #define SHADERPARAM_H_
 
-#include "NexTypes.h"
+#include "NexBase.h"
 #include "TextureUnitState.h"
 
 namespace nextar {

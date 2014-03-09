@@ -18,7 +18,7 @@ namespace nextar {
 	/* Non automatic parameters for shaders and shader options
 	 * and the compiled shader technique reference stored here.
 	 */
-	class _NexExport MaterialAsset: public nextar::Asset {
+	class _NexEngineExport MaterialAsset: public nextar::Asset {
 	public:
 		
 		enum Type {

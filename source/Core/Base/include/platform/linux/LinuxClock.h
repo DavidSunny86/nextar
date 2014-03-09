@@ -1,7 +1,7 @@
 #ifndef NEXTAR_CLOCKIMPL_H
 #define NEXTAR_CLOCKIMPL_H
 
-#include "NexTypes.h"
+#include "NexBase.h"
 #include "time.h"
 
 namespace nextar {
@@ -15,7 +15,7 @@ namespace nextar {
      * \date	6/24/2010
      *
      **/
-    class _NexExport ClockImpl :
+    class _NexBaseExport ClockImpl :
     public NonCopyableObject {
         //! performance timer start timing.
         struct timeval start;

@@ -1,4 +1,4 @@
-#include "NexHeaders.h"
+#include <BaseHeaders.h>
 
 #if defined( NEX_EXTENSIVE_MEM_TRACKER  )
 #	include "MemTracker.h"
@@ -6,7 +6,7 @@
 
 #if defined( NEX_USE_PTMALLOC ) || !defined(NEX_MSVC)
 #	undef   assert
-#   include "ned/nedmalloc_c.h"
+#   include "nedmalloc_c.h"
 #	define _nalloc       nedalloc::nedmalloc
 #	define _nfree        nedalloc::nedfree
 #	define _nalalloc(size, al)     nedalloc::nedmemalign(al, size)
@@ -76,14 +76,14 @@ namespace nextar {
 	}
 
 #ifdef NEX_EXTENSIVE_MEM_TRACKER
-	_NexExport void Allocator_CheckLeaks(std::ostream& s) {
+	_NexBaseExport void Allocator_CheckLeaks(std::ostream& s) {
 		memtracker::CheckLeaks(s);
 	}
-	_NexExport void Allocator_DumpMemStats(std::ostream& s) {
+	_NexBaseExport void Allocator_DumpMemStats(std::ostream& s) {
 		memtracker::OnDumpMemStats();
 	}
 
-	_NexExport void Allocator_DoTracking(bool track) {
+	_NexBaseExport void Allocator_DoTracking(bool track) {
 		G_TrackLeaks = track;
 	}
 #endif

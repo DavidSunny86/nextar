@@ -1,7 +1,7 @@
 #ifndef NEXTAR_ASSET_H
 #define NEXTAR_ASSET_H
 
-#include "NexSys.h"
+#include "NexEngine.h"
 #include "PropertyInterface.h"
 #include "Component.h"
 #include "BackgroundStreamer.h"
@@ -28,7 +28,7 @@ namespace nextar {
 	 * @class    Asset
 	 * Type of @Component, assets are basic game data like mesh, texture, sound, shaders, etc.
 	 **/
-	class _NexExport Asset:
+	class _NexEngineExport Asset:
 	public PropertyInterface,
 	public Streamable,
 	public SharedComponent {

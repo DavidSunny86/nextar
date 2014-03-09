@@ -19,7 +19,7 @@ namespace nextar {
      * @remarks This is the typesafe version for Any. Under debug build it will do checking for typesafety.
      *			Not so-much under normal build.
      **/
-    class _NexExport Any : public AllocGeneral {
+    class _NexBaseExport Any : public AllocGeneral {
     private:
 
         class PlaceHolder {

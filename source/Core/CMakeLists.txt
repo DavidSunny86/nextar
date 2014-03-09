@@ -9,7 +9,7 @@
 
 ## Build targets
 #============================================================
-add_subdirectory(Base)
-#add_subdirectory(Engine)
+add_framework(Base)
+add_framework(Engine)
 #add_subdirectory(RenderSystem)
 

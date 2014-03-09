@@ -4,7 +4,7 @@
  * 
  * Created on May 15, 2011, 4:18 PM
  */
-#include "NexHeaders.h"
+#include "NexEngine.h"
 #include "scene/LightNode.h"
 
 namespace nextar {

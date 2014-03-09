@@ -11,7 +11,7 @@ namespace nextar {
 
 	class RandomizerSeed {
 	protected:
-		_NexExport
+		_NexBaseExport
 		static uint32 seed;
 	};
 

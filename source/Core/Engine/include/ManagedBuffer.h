@@ -14,7 +14,7 @@
 
 namespace nextar {
 
-	class _NexExport ManagedBuffer:
+	class _NexEngineExport ManagedBuffer:
 			public nextar::ContextObject,
 			public nextar::Buffer {
 	public:

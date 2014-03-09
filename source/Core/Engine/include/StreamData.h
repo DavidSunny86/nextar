@@ -35,7 +35,7 @@ namespace nextar {
 		virtual uint32 GetNumElements() const = 0;
 	};
 
-	class _NexExport VertexBufferBinding: public AllocGraphics {
+	class _NexEngineExport VertexBufferBinding: public AllocGraphics {
 	public:
 		VertexBufferBinding();
 		~VertexBufferBinding() {}
@@ -129,7 +129,7 @@ namespace nextar {
 	 * simply use an instance of this class rather than
 	 * the stream pass map (StreamData)
 	 */
-	struct _NexExport StreamData: public AllocGeneral {
+	struct _NexEngineExport StreamData: public AllocGeneral {
 			/* This is a hint to the renderer for optimization saying
 		 * it doesn't use any dynamic vertex buffer */
 		bool usesOnlyStaticVb;

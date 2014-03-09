@@ -18,7 +18,7 @@ namespace nextar {
 	class ComponentFactoryArchive;
 	class ComponentStreamer;
 
-	class _NexExport ComponentGroupSet: public SharedComponent::Group {
+	class _NexEngineExport ComponentGroupSet: public SharedComponent::Group {
 		NEX_LOG_HELPER(ComponentGroupSet);
 
 	public:

@@ -25,7 +25,7 @@ namespace nextar {
 	 * Components may depend on multiple components and will issue load/save calls using
 	 * dependency order.
 	 */
-	class _NexExport Component: public NamedObject,
+	class _NexEngineExport Component: public NamedObject,
 		public AllocComponent {
 		NEX_LOG_HELPER(Component);
 	public:
@@ -136,7 +136,7 @@ namespace nextar {
 		Component* parent;
 	};
 		
-	class _NexExport SharedComponent :
+	class _NexEngineExport SharedComponent :
 		public Referenced<SharedComponent, Component> {
 
 	public:

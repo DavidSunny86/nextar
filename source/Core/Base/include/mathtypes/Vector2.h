@@ -6,7 +6,7 @@
  * SSE or other optimization.
  * This class represents a 2d vector.
  */
-class _NexExport Vector2 : public nextar::AllocGeneral {
+class _NexBaseExport Vector2 : public nextar::AllocGeneral {
 public:
 	float x, y;
 	static const Vector2 Origin;

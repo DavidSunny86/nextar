@@ -23,7 +23,7 @@ namespace nextar {
 
 	namespace debug {
 
-		class _NexExport DebugUnkownTracker {
+		class _NexBaseExport DebugUnkownTracker {
 			//NEX_LOG_HELPER(DebugUnkownTracker);
 		public:
 			static void OnCtor(void* obj, const char* name);

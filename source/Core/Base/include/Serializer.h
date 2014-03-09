@@ -1,7 +1,7 @@
 #ifndef NEXTAR_SERIALIZER_H
 #define NEXTAR_SERIALIZER_H
 
-#include "NexTypes.h"
+#include "NexBase.h"
 #include "DataStream.h"
 #include "Endian.h"
 #include "Logger.h"
@@ -45,7 +45,7 @@ namespace nextar {
 
     /** @remarks Output serialization
      * data is always in little endian format (unless configured otherwise) **/
-    class _NexExport OutputSerializer : public AllocGeneral {
+    class _NexBaseExport OutputSerializer : public AllocGeneral {
 
     public:
 
@@ -107,7 +107,7 @@ namespace nextar {
     };
 
     /** @remarks input serialization **/
-    class _NexExport InputSerializer : public AllocGeneral {
+    class _NexBaseExport InputSerializer : public AllocGeneral {
 
         NEX_LOG_HELPER(InputSerializer);
 
@@ -183,7 +183,7 @@ namespace nextar {
     	InputStreamPtr inStream;
     };
 
-    class _NexExport ChunkInputStream : public InputSerializer {
+    class _NexBaseExport ChunkInputStream : public InputSerializer {
     	static const Chunk First;
 
     public:

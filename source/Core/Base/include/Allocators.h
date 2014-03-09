@@ -8,7 +8,7 @@ namespace nextar {
 //@ normal allocator
 //@ debug allocator
 
-	class _NexExport Allocator {
+	class _NexBaseExport Allocator {
 	public:
 
 #if NEX_MEMTRACKERLEVEL > 1
@@ -84,9 +84,9 @@ namespace nextar {
 	}
 
 #if NEX_MEMTRACKERLEVEL > 1
-_NexExport void Allocator_DoTracking(bool);
-_NexExport void Allocator_CheckLeaks(std::ostream& s);
-_NexExport void Allocator_DumpMemStats();
+_NexBaseExport void Allocator_DoTracking(bool);
+_NexBaseExport void Allocator_CheckLeaks(std::ostream& s);
+_NexBaseExport void Allocator_DumpMemStats();
 #define NEXTAR_START_LEAK_TRACKING()		nextar::Allocator_DoTracking(true)
 #define NEXTAR_STOP_LEAK_TRACKING()		nextar::Allocator_DoTracking(false)
 #define NEXTAR_LEAK_CHECKS(outstream)	nextar::Allocator_CheckLeaks(outstream)

@@ -19,7 +19,7 @@ namespace nextar {
 	 * We expect a lot of entities, so we will override new and delete operators
 	 * so that they allocate from a singleton pool.
 	 */
-	class _NexExport Entity: 
+	class _NexEngineExport Entity: 
 		//public AllocPooledObjectBase< PooledAllocator<Entity, 32, MEMCAT_GENERAL> >,
 		public nextar::SharedComponent {
 		NEX_LOG_HELPER(Entity);
@@ -37,7 +37,7 @@ namespace nextar {
 		 * This is a default manager for most/all default scene components.
 		 * Any extended component could register its own factory.
 		 * */
-		class _NexExport Factory : public Component::Factory {
+		class _NexEngineExport Factory : public Component::Factory {
 			NEX_LOG_HELPER(EntityFactory);
 		public:
 			Factory(const StringID name);

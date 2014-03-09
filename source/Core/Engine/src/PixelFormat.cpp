@@ -4,7 +4,7 @@
  * 
  * Created on May 5, 2011, 5:02 PM
  */
-#include "NexHeaders.h"
+#include "NexEngine.h"
 #include "PixelFormat.h"
 #include "PixelConversion.hpp"
 

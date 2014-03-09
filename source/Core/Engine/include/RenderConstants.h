@@ -8,7 +8,7 @@
 #ifndef RENDERCONSTANTS_H_
 #define RENDERCONSTANTS_H_
 
-#include "NexTypes.h"
+#include "NexBase.h"
 
 namespace nextar {
 

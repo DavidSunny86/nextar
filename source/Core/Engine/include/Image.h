@@ -45,7 +45,7 @@ namespace nextar {
 	 * (face1,mip0) imagedata(x,y,z)
 	 * (face1,mip1) imagedata(x,y,z)
 	 */
-	class _NexExport Image: public AllocGraphics {
+	class _NexEngineExport Image: public AllocGraphics {
 		NEX_LOG_HELPER(Image);
 	public:
 

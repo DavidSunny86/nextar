@@ -23,7 +23,7 @@ namespace nextar {
 	 * 	ShaderPtr compiledShader;
 	 * }
 	 */
-	class _NexExport ShaderAsset: public nextar::Asset,
+	class _NexEngineExport ShaderAsset: public nextar::Asset,
 	public ContextObject {
 		NEX_LOG_HELPER(ShaderAsset);
 	public:

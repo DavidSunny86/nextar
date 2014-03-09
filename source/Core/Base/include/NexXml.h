@@ -28,7 +28,7 @@ namespace nextar {
             virtual bool EvalCondition(const String&) = 0;
         };
 
-        class _NexExport Node : public AllocGeneral {
+        class _NexBaseExport Node : public AllocGeneral {
             NEX_LOG_HELPER(Node);
         public:
 
@@ -201,7 +201,7 @@ namespace nextar {
             Document *document;
         };
 
-        class _NexExport Element : public Node {
+        class _NexBaseExport Element : public Node {
             NEX_LOG_HELPER(Element);
             NameValueMap attributes;
         public:
@@ -247,7 +247,7 @@ namespace nextar {
 
         };
 
-        class _NexExport Document : public Node {
+        class _NexBaseExport Document : public Node {
             NEX_LOG_HELPER(Document);
             bool parsed;
         public:

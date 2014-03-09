@@ -2,7 +2,7 @@
 #define NEXTAR_PATHUTILS_H
 
 #include "NexSys.h"
-#include "NexTypes.h"
+#include "NexBase.h"
 #include "NameValueMap.h"
 
 namespace nextar {
@@ -15,7 +15,7 @@ namespace nextar {
 	 * Common archives:
 	 * {FileSystem::ArchiveEngineData}
 	 */
-	class _NexExport URL {
+	class _NexBaseExport URL {
 
 		NEX_LOG_HELPER(URL)
 		;

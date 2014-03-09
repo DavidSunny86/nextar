@@ -14,7 +14,7 @@ namespace nextar {
      * @date	6/24/2010
      *
      **/
-    class _NexExport ClockImpl :
+    class _NexBaseExport ClockImpl :
     public NonCopyableObject {
         //! performance timer start timing.
         LARGE_INTEGER start_time;

@@ -5,7 +5,7 @@
 #define NEXTAR_ERR_DFS_1_01
 
 #ifndef NEXTYPES_H_
-#error Do not include this file directly, include "NexTypes.h" instead
+#error Do not include this file directly, include "NexBase.h" instead
 #endif
 
 #include "NexAssert.h"

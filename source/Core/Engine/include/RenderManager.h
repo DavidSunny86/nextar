@@ -9,7 +9,7 @@
 #define RENDERMANAGER_H_
 
 #include "NexSys.h"
-#include "NexTypes.h"
+#include "NexBase.h"
 #include "RenderDriver.h"
 #include "NameValueMap.h"
 #include "GpuProgram.h"

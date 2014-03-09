@@ -1,10 +1,10 @@
-#include "NexHeaders.h"
+#include "BaseHeaders.h"
 #include "Convert.h"
 
 namespace nextar {
 	namespace Convert {
 
-		_NexExport String ToString(uint32 num, char fill,
+		_NexBaseExport String ToString(uint32 num, char fill,
 				std::ios::fmtflags flags) {
 			OutStringStream buff;
 			buff.fill(fill);
@@ -14,7 +14,7 @@ namespace nextar {
 			return buff.str();
 		}
 
-		_NexExport String ToString(int32 num, char fill,
+		_NexBaseExport String ToString(int32 num, char fill,
 				std::ios::fmtflags flags) {
 			OutStringStream buff;
 			buff.fill(fill);
@@ -24,7 +24,7 @@ namespace nextar {
 			return buff.str();
 		}
 
-		_NexExport String ToString(float num, uint16 prec, char fill,
+		_NexBaseExport String ToString(float num, uint16 prec, char fill,
 				std::ios::fmtflags flags) {
 			OutStringStream buff;
 			buff.precision(prec);
@@ -35,49 +35,49 @@ namespace nextar {
 			return buff.str();
 		}
 
-		_NexExport String ToString(bool val, bool yesno) {
+		_NexBaseExport String ToString(bool val, bool yesno) {
 			if (yesno)
 				return val ? "yes" : "no";
 			else
 				return val ? "true" : "false";
 		}
 
-		_NexExport String ToVersionString(VersionID v) {
+		_NexBaseExport String ToVersionString(VersionID v) {
 			OutStringStream buff;
 			buff << NEX_GET_VER_MAJOR(v) << '.' << NEX_GET_VER_MINOR(v) << '.'
 					<< NEX_GET_VER_MINREV(v);
 			return buff.str();
 		}
 
-		_NexExport int32 ToLong(const String& str) {
+		_NexBaseExport int32 ToLong(const String& str) {
 			InStringStream strm(str);
 			int32 ret = -1;
 			strm >> ret;
 			return ret;
 		}
 
-		_NexExport size_t ToULong(const String& str) {
+		_NexBaseExport size_t ToULong(const String& str) {
 			InStringStream strm(str);
 			size_t ret = -1;
 			strm >> ret;
 			return ret;
 		}
 
-		_NexExport float ToFloat(const String& str) {
+		_NexBaseExport float ToFloat(const String& str) {
 			InStringStream strm(str);
 			float ret = 0;
 			strm >> ret;
 			return ret;
 		}
 
-		_NexExport bool ToBool(const String& str) {
+		_NexBaseExport bool ToBool(const String& str) {
 			if (!StringUtils::NoCaseCompare(str.c_str(), "yes")
 					|| !StringUtils::NoCaseCompare(str.c_str(), "true"))
 				return true;
 			return false;
 		}
 
-		_NexExport VersionID ToVersion(const String& ver) {
+		_NexBaseExport VersionID ToVersion(const String& ver) {
 			InStringStream strm(ver);
 			char dot1, dot2;
 			uint32 maj, min, rev;
@@ -88,26 +88,26 @@ namespace nextar {
 				return CONST_INVALID_VERSION_ID;
 		}
 
-		_NexExport String ToString(nextar::Vec4AF v) {
+		_NexBaseExport String ToString(nextar::Vec4AF v) {
 			OutStringStream ret;
 			ret << Vec4AGetX(v) << ' ' << Vec4AGetY(v) << ' ' << Vec4AGetZ(v)
 					<< ' ' << Vec4AGetW(v);
 			return ret.str();
 		}
 
-		_NexExport String ToString(const nextar::Vector3& v) {
+		_NexBaseExport String ToString(const nextar::Vector3& v) {
 			OutStringStream ret;
 			ret << v.x << ' ' << v.y << ' ' << v.z;
 			return ret.str();
 		}
 
-		_NexExport String ToString(const nextar::Vector2& v) {
+		_NexBaseExport String ToString(const nextar::Vector2& v) {
 			OutStringStream ret;
 			ret << v.x << ' ' << v.y;
 			return ret.str();
 		}
 
-		_NexExport String ToString(nextar::Mat4x4F mat) {
+		_NexBaseExport String ToString(nextar::Mat4x4F mat) {
 			OutStringStream ret;
 			ret << ' ';
 			for (int32 i = 0; i < 4; ++i)
@@ -115,19 +115,19 @@ namespace nextar {
 			return ret.str();
 		}
 
-		_NexExport String ToString(const nextar::Color& mat) {
+		_NexBaseExport String ToString(const nextar::Color& mat) {
 			OutStringStream ret;
 			ret << mat.red << ' ' << mat.green << ' ' << mat.blue << ' ' << mat.alpha;
 			return ret.str();
 		}
 
-		_NexExport String ToString(const nextar::Color32& mat) {
+		_NexBaseExport String ToString(const nextar::Color32& mat) {
 			OutStringStream ret;
 			ret << (uint32)mat.red << ' ' << (uint32)mat.green << ' ' << (uint32)mat.blue << ' ' << (uint32)mat.alpha;
 			return ret.str();
 		}
 
-		_NexExport nextar::Vector4A ToVec4A(const String& inp) {
+		_NexBaseExport nextar::Vector4A ToVec4A(const String& inp) {
 			InStringStream ret(inp);
 
 			float x, y, z, w;
@@ -135,21 +135,21 @@ namespace nextar {
 			return Vec4ASet(x, y, z, w);
 		}
 
-		_NexExport nextar::Vector3 ToVector3(const String& inp) {
+		_NexBaseExport nextar::Vector3 ToVector3(const String& inp) {
 			InStringStream ret(inp);
 			Vector3 v;
 			ret >> v.x >> v.y >> v.z;
 			return v;
 		}
 
-		_NexExport nextar::Vector2 ToVector2(const String& inp) {
+		_NexBaseExport nextar::Vector2 ToVector2(const String& inp) {
 			InStringStream ret(inp);
 			Vector2 v;
 			ret >> v.x >> v.y;
 			return v;
 		}
 
-		_NexExport nextar::Matrix4x4 ToMat4x4(const String& inp) {
+		_NexBaseExport nextar::Matrix4x4 ToMat4x4(const String& inp) {
 			nextar::Matrix4x4 ret;
 			InStringStream stream(inp);
 			float x, y, z, w;
@@ -162,14 +162,14 @@ namespace nextar {
 			return ret;
 		}
 
-		_NexExport nextar::Color ToColor(const String& inp) {
+		_NexBaseExport nextar::Color ToColor(const String& inp) {
 			InStringStream ret(inp);
 			float x, y, z, w;
 			ret >> x >> y >> z >> w;
 			return Color(x, y, z, w);
 		}
 
-		_NexExport nextar::Color32 ToColor32(const String& inp) {
+		_NexBaseExport nextar::Color32 ToColor32(const String& inp) {
 			InStringStream ret(inp);
 			uint32 x, y, z, w;
 			ret >> x >> y >> z >> w;

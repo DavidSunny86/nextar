@@ -8,7 +8,7 @@
 #ifndef SCENETRAVERSAL_H_
 #define SCENETRAVERSAL_H_
 
-#include "NexTypes.h"
+#include "NexBase.h"
 
 namespace nextar {
 

@@ -21,7 +21,7 @@ namespace nextar {
 	 * 1. User calls Read/Write. <br/>
 	 * 2. The buffer is bound to the context for rendering. <br/>
 	 **/
-	class _NexExport BufferManager: public Singleton<BufferManager>,
+	class _NexEngineExport BufferManager: public Singleton<BufferManager>,
 		public AllocGraphics {
 
 	public:

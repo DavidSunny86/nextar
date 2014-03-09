@@ -3,8 +3,6 @@
 
 #include "StdHeaders.h"
 #include "NexBase.h"
-#include "NexTypes.h"
-#include "NexSys.h"
 #include "OsDefs.h"
 #include "AppImpl.h"
 #include "FactoryPlugin.h"

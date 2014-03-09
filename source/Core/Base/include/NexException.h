@@ -14,7 +14,7 @@
  */
 
 #ifndef NEXTYPES_H_
-#error Do not include this file directly, include "NexTypes.h" instead
+#error Do not include this file directly, include "NexBase.h" instead
 #endif
 
 // todo C++0x changs this to noexcept
@@ -41,7 +41,7 @@ namespace nextar {
  *   Any other exception class must not derive from here rather,
  *   should use other exception classes.
  */
-class _NexExport Exception : public std::exception {
+class _NexBaseExport Exception : public std::exception {
 	uint32 errorCode; /**< The error code, used to identify the error. */
 	ErrorSeverity severity;
 	const char* file;
@@ -96,7 +96,7 @@ public:
  *   @brief Base class for fatal exceptions.
  *
  */
-class _NexExport FatalErrorExcept : public Exception {
+class _NexBaseExport FatalErrorExcept : public Exception {
 public:
 
 	/** @brief Constructor.
@@ -122,7 +122,7 @@ public:
 	*   
 	*/
 
-class _NexExport GracefulErrorExcept : public Exception {
+class _NexBaseExport GracefulErrorExcept : public Exception {
 public:
 
 	/** @brief Constructor.
@@ -147,7 +147,7 @@ public:
 	*   
 	*/
 
-class _NexExport WarningExcept : public Exception {
+class _NexBaseExport WarningExcept : public Exception {
 public:
 
 	/** @brief Constructor.

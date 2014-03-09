@@ -22,20 +22,20 @@ namespace nextar {
 		 * @remarks Test bounding volume frustum intersection using coherency
 		 *          and masking.
 		 */
-		_NexExport IntersectionResult BoundingVolumeFrustumCoherent(
+		_NexBaseExport IntersectionResult BoundingVolumeFrustumCoherent(
 				const BoundingVolume& vol, const Frustum& frustum, uint32 inMask,
 				uint32& newMask, uint32& lastPlane);
 
 		/** @remarks Test bounding volume frustum intersection */
-		_NexExport IntersectionResult BoundingVolumeFrustum(
+		_NexBaseExport IntersectionResult BoundingVolumeFrustum(
 				const BoundingVolume& vol, const Frustum& frustum);
 
 		/** @remarks Test bounding volume bounding volume */
-		_NexExport IntersectionResult BoundingVolumes(
+		_NexBaseExport IntersectionResult BoundingVolumes(
 				const BoundingVolume& vol1, const BoundingVolume& vol2);
 
 		/** @remarks Intersect sphere with frustum */
-		_NexExport IntersectionResult BoundingSphereFrustum(Vec3AF center,
+		_NexBaseExport IntersectionResult BoundingSphereFrustum(Vec3AF center,
 				float radius, const Frustum& frustum);
 	}
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #ifndef NEXTYPES_H_
-#error Include NexTypes.h instead.
+#error Include NexBase.h instead.
 #endif
 
 #include <utility>

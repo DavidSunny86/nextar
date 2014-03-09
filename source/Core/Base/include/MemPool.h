@@ -2,7 +2,7 @@
 #ifndef POOLALLOCATOR_H_
 #define POOLALLOCATOR_H_
 
-#include "NexTypes.h"
+#include "NexBase.h"
 #include "NexAlloc.h"
 #include "NexThread.h"
 

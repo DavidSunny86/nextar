@@ -133,8 +133,8 @@ namespace nextar {
 		}
 		//-------------------------------------------------------
 		// Other utilities
-		_NexExport int32 GetNearestPow2(int32);
-		_NexExport bool IsPow2(uint32);
+		_NexBaseExport int32 GetNearestPow2(int32);
+		_NexBaseExport bool IsPow2(uint32);
 		//-------------------------------------------------------
 		// inlined functions
 		// wrap angle between -pi & +pi

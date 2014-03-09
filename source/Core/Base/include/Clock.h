@@ -27,7 +27,7 @@ namespace nextar {
 	 * @author	Abhishek Dey
 	 * @date	11/27/2009
 	 **/
-	class _NexExport Clock: public AllocGeneral, public ClockImpl {
+	class _NexBaseExport Clock: public AllocGeneral, public ClockImpl {
 		friend class Application;
 
 	public:

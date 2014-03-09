@@ -94,7 +94,7 @@ namespace nextar {
 	 * Classes supporitng property accessors should
 	 * inherit from this class.
 	 */
-	class _NexExport PropertyInterface {
+	class _NexBaseExport PropertyInterface {
 		PropertyDictionary* dictionary;
 
 	public:

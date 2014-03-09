@@ -11,7 +11,7 @@ cmake_minimum_required(VERSION 2.8)
 
 ## Project
 #============================================================
-project(nextar)
+project(NextarEngine)
 
 
 ## Root variables
@@ -129,6 +129,13 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 #============================================================
 set(NEX_PLUGIN_CONFIG_FILE ${NEX_BIN}/Plugins.xml)
 
+## Create nextar configuration file
+
+
+## Macros
+#============================================================
+# Add_Plugin
+#============================================================
 macro(add_plugin pluginName pluginPath type build optional)
 file(APPEND ${NEX_PLUGIN_CONFIG_FILE} 
 "${NEX_PLUGIN_CONFIG}"
@@ -139,10 +146,58 @@ file(APPEND ${NEX_PLUGIN_CONFIG_FILE}
  "  <build>${ARGV3}</build>\n"
  "  <optional>${ARGV4}</optional>\n"
  " </plugin>\n")
- endmacro(add_plugin)
+endmacro(add_plugin)
 
-## Create nextar configuration file
+#============================================================
+# Add_Framework
+#============================================================
+macro(add_framework frameWorkName)
+    add_subdirectory(${ARGV0})
+endmacro(add_framework)
 
+#============================================================
+# Configure_Module
+#============================================================
+macro(configure_module moduleName frameWorkName)
+	if(EXISTS "${NEX_ROOT}/${ARGV1}/${ARGV0}/local_include/Config.h.cmake")
+		configure_file(
+			"${NEX_ROOT}/${ARGV1}/${ARGV0}/local_include/Config.h.cmake"
+			"${NEX_ROOT}/${ARGV1}/${ARGV0}/include/${ARGV0}Config.h"
+		)
+	endif()
+endmacro(configure_module)
+#============================================================
+# Create_Module
+#============================================================
+macro(create_module moduleName frameWorkName sourceBlob)
+    message("Building..: ${ARGV1}.${ARGV0}")
+    include_directories(${NEX_ROOT}/${ARGV1}/${ARGV0}/include)
+    include_directories(${NEX_ROOT}/${ARGV1}/${ARGV0}/local_include)
+    set(NEXTAR_MODULE "NE_${ARGV1}.${ARGV0}")
+    set(NEXTAR_MODULE_DEFINE "NE_${ARGV1}_${ARGV0}")
+    add_library(${NEXTAR_MODULE} SHARED ${ARGV2})
+    configure_module(${ARGV0} ${ARGV1})
+endmacro(create_module)
+
+#============================================================
+# Add_Dependency
+#============================================================
+macro(add_dependency moduleName moduleFrameWork dependency frameWorkName)
+    message("Linking..: ${ARGV1}.${ARGV0} ->  ${ARGV3}.${ARGV2}")
+    include_directories(${NEX_ROOT}/${ARGV3}/${ARGV2}/include)
+    target_link_libraries("NE_${ARGV1}.${ARGV0}" "NE_${ARGV3}.${ARGV2}")
+endmacro(add_dependency)
+
+#============================================================
+# Add_Specific_Dependency
+#============================================================
+macro(add_specific_dependency moduleName moduleFrameWork includeFiles libraryName)
+    message("Linking..: ${ARGV1}.${ARGV0} -> ${ARGV3}")
+    if(NOT ${ARGV2} MATCHES "")
+	    include_directories(${ARGV2})
+    endif()
+    target_link_libraries("NE_${ARGV1}.${ARGV0}" ${ARGV3})
+endmacro(add_specific_dependency)
 
 ## Build targets
 #============================================================

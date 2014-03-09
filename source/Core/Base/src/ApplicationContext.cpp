@@ -1,13 +1,5 @@
-
-#include "NexHeaders.h"
+#include <BaseHeaders.h>
 #include "ApplicationContext.h"
-#include "SharedObjectTracker.h"
-#include "FrameListener.h"
-#include "PluginRegistry.h"
-#include "FileSystem.h"
-#include "WindowManager.h"
-#include "PropertyInterface.h"
-
 
 namespace nextar {
 

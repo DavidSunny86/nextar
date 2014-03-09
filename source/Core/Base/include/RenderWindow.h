@@ -6,7 +6,7 @@
 
 namespace nextar {
 
-	class _NexExport RenderWindow {
+	class _NexBaseExport RenderWindow {
 
 		NEX_LOG_HELPER(RenderWindow);
 

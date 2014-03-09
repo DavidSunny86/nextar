@@ -5,7 +5,7 @@
 //# 3d rotation.
 //# Mostly avoids SSE or other optimization.
 
-class _NexExport EularAngles : public nextar::AllocGeneral {
+class _NexBaseExport EularAngles : public nextar::AllocGeneral {
 public:
 	float yaw; // heading
 	float pitch;

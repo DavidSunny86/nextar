@@ -4,7 +4,7 @@
  *  Created on: 22-Sep-2013
  *      Author: obhi
  */
-#include "NexHeaders.h"
+#include "NexEngine.h"
 #include "RenderManager.h"
 #include "GpuProgram.h"
 

@@ -1,4 +1,4 @@
-#include "NexHeaders.h"
+#include "BaseHeaders.h"
 #include "Config.h"
 #include "ApplicationContext.h"
 #include "FileSystem.h"
@@ -76,7 +76,7 @@ namespace nextar {
 					input.SkipWhite();
 					section = input.ReadWord("] \n\t\r");
 					current = &sections[section];
-					if (nexDebugBit) {
+					if (NEX_IS_DEBUG_MODE()) {
 						input.SkipWhite();
 						if (input.Current() != ']') {
 							Warn( "expected ']', in line: "

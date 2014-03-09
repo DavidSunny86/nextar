@@ -8,11 +8,11 @@
 #ifndef VIDEOMODE_H_
 #define VIDEOMODE_H_
 
-#include "NexTypes.h"
+#include "NexBase.h"
 
 namespace nextar {
 
-	class _NexExport VideoMode {
+	class _NexEngineExport VideoMode {
 	public:
 
 		static inline String ToString(const VideoMode& vm) {

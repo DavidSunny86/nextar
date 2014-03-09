@@ -107,7 +107,7 @@ namespace nextar {
 	 * @author	Abhishek Dey
 	 * @date	11/28/2009
 	 **/
-	class _NexExport Archive: public Referenced<Archive, AllocGeneral> {
+	class _NexBaseExport Archive: public Referenced<Archive, AllocGeneral> {
 
 	public:
 

@@ -5,12 +5,12 @@
  *	    http://software.intel.com/en-us/articles/fast-random-number-generator-on-the-intel-pentiumr-4-processor/
  **/
 #define NEX_MATH_RANDOMIZER_DEFINED
-#define NEX_MATH_RANDOM_SEED _NexExport NEX_EFFICIENT_ALIGN(__m128i nextar::MathRandomizer::curSeed);
+#define NEX_MATH_RANDOM_SEED _NexBaseExport NEX_EFFICIENT_ALIGN(__m128i nextar::MathRandomizer::curSeed);
 
 namespace nextar {
 
 	class MathRandomizer {
-		_NexExport static __m128i curSeed;
+		_NexBaseExport static __m128i curSeed;
 	public:
 
 		static inline void Seed(unsigned int seed) {

@@ -8,7 +8,7 @@
 #ifndef BACKGROUNDSTREAMER_H_
 #define BACKGROUNDSTREAMER_H_
 
-#include "NexTypes.h"
+#include "NexBase.h"
 
 namespace nextar {
 

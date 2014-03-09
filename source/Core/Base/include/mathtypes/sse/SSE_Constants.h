@@ -27,8 +27,8 @@ namespace nextar {
 	using ConstF32 alignas(16) = _ConstF32;
 	using ConstI32 alignas(16) = _ConstI32;
 #endif
-	#define NEXCORE_DEFINE_MASK(maskname) NEX_EXTERN_SYM _NexExport const ConstI32  maskname
-	#define NEXCORE_DEFINE_F32C(_f32const_) NEX_EXTERN_SYM _NexExport const ConstF32  _f32const_
+	#define NEXCORE_DEFINE_MASK(maskname) NEX_EXTERN_SYM _NexBaseExport const ConstI32  maskname
+	#define NEXCORE_DEFINE_F32C(_f32const_) NEX_EXTERN_SYM _NexBaseExport const ConstF32  _f32const_
 
 	/**
 	 * @remarks Constants used for SIMD operations

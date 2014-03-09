@@ -4,7 +4,7 @@
 // Created   :: 7/5/2006 5:08:06 AM
 //-------------------------------------------------------------------------------------
 
-#include "NexHeaders.h"
+#include "BaseHeaders.h"
 #include "SharedObjectTracker.h"
 
 using namespace nextar;

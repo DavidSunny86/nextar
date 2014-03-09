@@ -6,7 +6,7 @@
 //# mostly avoid SSE or other optimization.
 //# A row vector rotation matrix in row major format.
 
-class _NexExport Matrix3x3 : public nextar::AllocGeneral {
+class _NexBaseExport Matrix3x3 : public nextar::AllocGeneral {
 public:
 	static const Matrix3x3 IdentityMatrix;
 
@@ -82,7 +82,7 @@ public:
 	friend inline Matrix3x3 operator +(const Matrix3x3& m1, const Matrix3x3 & m2);
 	friend inline Matrix3x3 operator -(const Matrix3x3& m1, const Matrix3x3 & m2);
 	// functions
-	friend _NexExport Matrix3x3 Inverse(const Matrix3x3&);
+	friend _NexBaseExport Matrix3x3 Inverse(const Matrix3x3&);
 	friend inline Matrix3x3 Transpose(const Matrix3x3&);
 
 };

@@ -5,7 +5,7 @@
 //# vector4 is not aligned and operations in vector4
 //# mostly avoid SSE or other optimization.
 
-class _NexExport Vector4 : public nextar::AllocGeneral {
+class _NexBaseExport Vector4 : public nextar::AllocGeneral {
 public:
 	float x, y, z, w;
 	//# construction and implicit conversions

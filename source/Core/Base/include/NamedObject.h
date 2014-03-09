@@ -6,7 +6,7 @@
 
 namespace nextar {
 
-	class NamedObject {
+	class _NexBaseExport NamedObject {
 	public:
 
 		NamedObject(const StringID _name) : name(_name) {}

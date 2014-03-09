@@ -1,9 +1,8 @@
-#include "NexHeaders.h"
+#include "BaseHeaders.h"
 #include "Archive.h"
 #include "CompressedArchive.h"
 #include "ApplicationContext.h"
 #include "FileSystem.h"
-#include "archive/ZipArchive.cpp"
 
 namespace nextar {
 
