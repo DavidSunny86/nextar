@@ -32,7 +32,7 @@ namespace nextar {
 		yaw = Math::WrapPi(yaw);
 	}
 
-	_NexBaseExport void EularAngles::FromQuat(QuatF src) {
+	_NexBaseAPI void EularAngles::FromQuat(QuatF src) {
 		float srcX = QuatGetX(src);
 		float srcY = QuatGetY(src);
 		float srcZ = QuatGetZ(src);
@@ -59,7 +59,7 @@ namespace nextar {
 		}
 	}
 
-	_NexBaseExport void EularAngles::FromInvQuat(QuatF src) {
+	_NexBaseAPI void EularAngles::FromInvQuat(QuatF src) {
 		float srcX = QuatGetX(src);
 		float srcY = QuatGetY(src);
 		float srcZ = QuatGetZ(src);
@@ -86,7 +86,7 @@ namespace nextar {
 		}
 	}
 
-	_NexBaseExport void EularAngles::FromMat3x3(const Matrix3x3& src) {
+	_NexBaseAPI void EularAngles::FromMat3x3(const Matrix3x3& src) {
 		// Extract sin(pitch) from m32.
 		float sp = -src._32;
 		// Check for Gimbel Lock

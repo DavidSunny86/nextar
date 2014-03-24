@@ -13,7 +13,7 @@
 
 namespace nextar {
 
-	class _NexEngineExport RegionNode: public ContainerNode {
+	class _NexEngineAPI RegionNode: public ContainerNode {
 	public:
 		enum {
 			TYPE = COMPONENT_REGION_NODE,

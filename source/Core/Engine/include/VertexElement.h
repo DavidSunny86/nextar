@@ -77,7 +77,7 @@ namespace nextar {
 		}
 	};
 
-	struct _NexEngineExport VertexSemantic: public AllocGraphics {
+	struct _NexEngineAPI VertexSemantic: public AllocGraphics {
 		/* Indicates if this is an instance/vertex data*/
 		bool instanceData;
 		/* Semantic index for elements with same semantic but diff indices

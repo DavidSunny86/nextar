@@ -37,7 +37,7 @@ namespace nextar {
  *   Any other exception class must not derive from here rather,
  *   should use other exception classes.
  */
-class _NexBaseExport Exception : public std::exception {
+class _NexBaseAPI Exception : public std::exception {
 	uint32 errorCode; /**< The error code, used to identify the error. */
 	ErrorSeverity severity;
 	const char* file;
@@ -92,7 +92,7 @@ public:
  *   @brief Base class for fatal exceptions.
  *
  */
-class _NexBaseExport FatalErrorExcept : public Exception {
+class _NexBaseAPI FatalErrorExcept : public Exception {
 public:
 
 	/** @brief Constructor.
@@ -118,7 +118,7 @@ public:
 	*   
 	*/
 
-class _NexBaseExport GracefulErrorExcept : public Exception {
+class _NexBaseAPI GracefulErrorExcept : public Exception {
 public:
 
 	/** @brief Constructor.
@@ -143,7 +143,7 @@ public:
 	*   
 	*/
 
-class _NexBaseExport WarningExcept : public Exception {
+class _NexBaseAPI WarningExcept : public Exception {
 public:
 
 	/** @brief Constructor.

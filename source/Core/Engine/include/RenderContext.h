@@ -44,13 +44,13 @@ namespace nextar {
 		 * WindowLeft:int, WindowTop:int, WindowTitle:string, IsMainWindow:bool,
 		 * VideoMode:class VideoMode, ExitOnClose:bool
 		 * */
-		virtual RenderWindowPtr CreateRenderWindow(uint32 width, uint32 height,
+		virtual RenderWindow* CreateRenderWindow(uint32 width, uint32 height,
 								  bool fullscreen, NameValueMap* params) = 0;
 
 		/* Called by the window to indicate it was destroyed */
-		virtual void DestroyedRenderWindow(RenderWindowPtr&) = 0;
+		virtual void DestroyedRenderWindow(RenderWindow*) = 0;
 		/* Get the i'th window created. */
-		virtual RenderWindowPtr GetRenderTarget(uint32 i) = 0;
+		virtual RenderTargetPtr GetRenderTarget(uint32 i) = 0;
 		virtual RenderTargetList& GetRenderTargetList() = 0;
 		virtual void SetVideoMode(uint32 videoModeIndex) = 0;
 		virtual void BeginFrame(uint32 frame) = 0;

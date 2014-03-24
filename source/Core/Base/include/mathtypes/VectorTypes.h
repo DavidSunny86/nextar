@@ -75,7 +75,7 @@ namespace nextar {
 	};
 	
 	struct _Matrix4x4 : public AllocMathPool<_Matrix4x4, NEX_MATRIX_POOL_NUM_PER_BLOCK> {
-		static _NexBaseExport const Matrix4x4 IdentityMatrix;
+		static _NexBaseAPI const Matrix4x4 IdentityMatrix;
 
 		union {
 			struct {

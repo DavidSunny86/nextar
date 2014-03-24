@@ -11,6 +11,7 @@
 #include <Asset.h>
 #include <ShaderParam.h>
 #include <ShaderAsset.h>
+#include <ParameterBuffer.h>
 
 namespace nextar {
 
@@ -18,7 +19,7 @@ namespace nextar {
 	/* Non automatic parameters for shaders and shader options
 	 * and the compiled shader technique reference stored here.
 	 */
-	class _NexEngineExport MaterialAsset: public nextar::Asset {
+	class _NexEngineAPI MaterialAsset: public nextar::Asset {
 	public:
 		
 		enum Type {
@@ -104,25 +105,6 @@ namespace nextar {
 			return renderLayer;
 		}
 
-		inline uint32 GetParameterOffset(uint32 paramIndex) const {
-			NEX_ASSERT(parameterDef);
-			return parameterDef->at(paramIndex).byteOffset;
-		}
-
-		inline uint32 GetParameterType(uint32 paramIndex) const {
-			NEX_ASSERT(parameterDef);
-			return parameterDef->at(paramIndex).type;
-		}
-
-		inline const TextureUnit* GetParameterAsTexture(uint32 paramIndex) const {
-			NEX_ASSERT(GetParameterType(paramIndex) == ParamDataType::PDT_TEXTURE);
-			return reinterpret_cast<const TextureUnit*>(parameters.data() + GetParameterOffset(paramIndex));
-		}
-
-		inline const void* GetParameterData(uint32 paramIndex) const {
-			return parameters.data() + GetParameterOffset(paramIndex);
-		}
-
 		inline void SetRenderLayer(uint8 l) {
 			renderLayer = l;
 		}
@@ -130,11 +112,6 @@ namespace nextar {
 		static MaterialAssetPtr Instance(MaterialAsset::Factory* factory, const StringID name, const URL& location);
 
 		virtual uint32 GetClassID() const;
-
-		void SetParamBufferSize(uint32 bufferSize);
-
-		void SetParamDataByOffset(uint32 offset, const void* data, size_t amount);
-		void SetParamTextureByOffset(uint32 offset, const TextureUnit* data, size_t count);
 
 	protected:
 		/* notify loaded/unloaded */
@@ -153,7 +130,6 @@ namespace nextar {
 		void _PreparePropertyBuffer();
 		void _RelievePropertyBuffer();
 
-		typedef ByteStream ParameterBuffer;
 		// used as sort key
 		uint8 layerMask;
 		uint8 renderLayer;
@@ -162,11 +138,8 @@ namespace nextar {
 		String options;
 
 		//ConstantBufferPtr materialParameters;
-
-		const ShaderAsset::ParameterList* parameterDef;
-		ParameterBuffer parameters;
+		ParameterBuffer materialParamData;
 	};
-
 
 } /* namespace nextar */
 #endif /* MATERIAL_H_ */

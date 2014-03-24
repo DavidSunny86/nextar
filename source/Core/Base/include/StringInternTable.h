@@ -2,7 +2,6 @@
 #ifndef STRINGINTERNTABLE_H_
 #define	STRINGINTERNTABLE_H_
 
-
 #include <NexBase.h>
 #include <Logger.h>
 #include <NexThread.h>
@@ -11,7 +10,7 @@
 namespace nextar {
 	typedef uint32 StringID;
 
-	class _NexBaseExport StringInternTable : public AllocGeneral {
+	class _NexBaseAPI StringInternTable : public AllocGeneral {
 		NEX_LOG_HELPER(StringInternTable);
 	public:
 

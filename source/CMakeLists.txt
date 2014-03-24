@@ -23,7 +23,6 @@ set(NEX_LIB ${NEX_ROOT}/../lib)
 set(NEX_DEPENDENCIES ${NEX_ROOT}/../dependencies)
 set(NEX_DATA ${NEX_ROOT}/Data)
 set(NEX_PLUGINS ${NEX_ROOT}/Plugins)
-set(NEX_CORE ${NEX_ROOT}/Core)
 set(NEX_UNIT_TESTS ${PROJECT_SOURCE_DIR}/UnitTests)
 
 ## Module path
@@ -152,8 +151,17 @@ endmacro(add_plugin)
 # Add_Framework
 #============================================================
 macro(add_framework frameWorkName)
+    set(NEXTAR_FRAMEWORK ${ARGV0})
     add_subdirectory(${ARGV0})
 endmacro(add_framework)
+
+#============================================================
+# Add_Module
+#============================================================
+macro(add_module moduleName)
+    set(NEXTAR_MODULE ${ARGV0})
+    add_subdirectory(${ARGV0})
+endmacro(add_module)
 
 #============================================================
 # Configure_Module
@@ -166,45 +174,90 @@ macro(configure_module moduleName frameWorkName)
 		)
 	endif()
 endmacro(configure_module)
+
 #============================================================
 # Create_Module
 #============================================================
 macro(create_module moduleName frameWorkName sourceBlob)
-    message("Building..: ${ARGV1}.${ARGV0}")
+    message("Create Module..: ${ARGV1}.${ARGV0}")
     include_directories(${NEX_ROOT}/${ARGV1}/${ARGV0}/include)
     include_directories(${NEX_ROOT}/${ARGV1}/${ARGV0}/local_include)
-    set(NEXTAR_MODULE "NE_${ARGV1}.${ARGV0}")
+    set(NEXTAR_MODULE_NAME "NE_${ARGV1}.${ARGV0}")
     set(NEXTAR_MODULE_DEFINE "NE_${ARGV1}_${ARGV0}")
-    add_library(${NEXTAR_MODULE} SHARED ${ARGV2})
+    add_library(${NEXTAR_MODULE_NAME} SHARED ${ARGV2})
     configure_module(${ARGV0} ${ARGV1})
 endmacro(create_module)
 
 #============================================================
+# Create_Module_Default
+#============================================================
+macro(create_module_default)
+	set(NEX_SRC_PATH ${NEX_ROOT}/${NEXTAR_FRAMEWORK}/${NEXTAR_MODULE}/src)
+	if(EXISTS "${NEX_SRC_PATH}/platform")
+		if(NEX_OS MATCHES "Windows")
+			set(NEX_PLATFORM_SRC ${NEXCORE_BASE_SRC}/platform/win32)
+		elseif(NEX_OS MATCHES "Linux")
+			set(NEX_PLATFORM_SRC ${NEXCORE_BASE_SRC}/platform/linux)
+		elseif(NEX_OS MATCHES "MacOSX")
+			set(NEX_PLATFORM_SRC ${NEXCORE_BASE_SRC}/platform/macosx)
+		endif(NEX_OS MATCHES "Windows")
+
+		file(GLOB NEX_SRC_LIST 
+			${NEX_SRC_PATH}/*.cpp
+			${NEX_PLATFORM_SRC}/*.cpp
+			)
+	else()
+
+		file(GLOB NEX_SRC_LIST 
+			${NEX_SRC_PATH}/*.cpp
+			)
+	endif()
+	create_module(${NEXTAR_MODULE} ${NEXTAR_FRAMEWORK} ${NEX_SRC_LIST})
+endmacro(create_module_default)
+
+#============================================================
 # Add_Dependency
 #============================================================
-macro(add_dependency moduleName moduleFrameWork dependency frameWorkName)
-    message("Linking..: ${ARGV1}.${ARGV0} ->  ${ARGV3}.${ARGV2}")
-    include_directories(${NEX_ROOT}/${ARGV3}/${ARGV2}/include)
-    target_link_libraries("NE_${ARGV1}.${ARGV0}" "NE_${ARGV3}.${ARGV2}")
+macro(add_dependency moduleFrameWork moduleName frameWorkName dependency)
+    message("Dependency..: ${ARGV0}.${ARGV1} ->  ${ARGV2}.${ARGV3}")
+    include_directories(${NEX_ROOT}/${ARGV2}/${ARGV3}/include)
+    target_link_libraries("NE_${ARGV0}.${ARGV1}" "NE_${ARGV2}.${ARGV3}")
 endmacro(add_dependency)
 
 #============================================================
-# Add_Specific_Dependency
+# Add_External_Dependency
 #============================================================
-macro(add_specific_dependency moduleName moduleFrameWork includeFiles libraryName)
-    message("Linking..: ${ARGV1}.${ARGV0} -> ${ARGV3}")
+macro(add_external_dependency moduleFrameWork moduleName includeFiles libraryName)
+    message("Dependency..: ${ARGV0}.${ARGV1} -> ${ARGV3}")
     if(NOT ${ARGV2} MATCHES "")
 	    include_directories(${ARGV2})
     endif()
-    target_link_libraries("NE_${ARGV1}.${ARGV0}" ${ARGV3})
-endmacro(add_specific_dependency)
+    if(NOT ${ARGV3} MATCHES "")
+	    target_link_libraries("NE_${ARGV0}.${ARGV1}" ${ARGV3})
+    endif()
+endmacro(add_external_dependency)
+
+#============================================================
+# Add_Dependency_Default
+#============================================================
+macro(add_dependency_default frameWorkName dependency)
+	add_dependency(${NEXTAR_FRAMEWORK} ${NEXTAR_MODULE} ${ARGV0} ${ARGV1})
+endmacro(add_dependency_default)
+
+#============================================================
+# Add_External_Dependency_Default
+#============================================================
+macro(add_external_dependency_default includeFiles libraryName)
+	add_external_dependency(${NEXTAR_FRAMEWORK} ${NEXTAR_MODULE} "${ARGV0}" "${ARGV1}")
+endmacro(add_external_dependency_default)
 
 ## Build targets
 #============================================================
-add_subdirectory(Core)
-#add_subdirectory(Plugins)
-#add_subdirectory(UnitTests)
-#add_subdirectory(Data)
+add_framework(Core)
+add_framework(Plugins)
+#add_framework(UnitTests)
+#add_framework(Data)
+
 ## End plugin configuration
 file(APPEND ${NEX_PLUGIN_CONFIG_FILE} "</plugins>\n")
 

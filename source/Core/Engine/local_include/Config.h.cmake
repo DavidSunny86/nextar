@@ -6,12 +6,12 @@
 
 #ifdef NEXTAR_EXPORT_AS_DYNAMIC_LIB
 #	ifdef @NEXTAR_MODULE_DEFINE@_EXPORTS
-#		define _NexEngineExport	_NexExportSym
+#		define _NexEngineAPI	_NexExportSym
 #	else
-#		define _NexEngineExport	_NexImportSym
+#		define _NexEngineAPI	_NexImportSym
 #	endif
 #else
-#	define _NexEngineExport
+#	define _NexEngineAPI
 #endif
 
 #endif //NEXTAR_ENGINE_CONFIG_1_01

@@ -15,12 +15,12 @@ namespace nextar {
 	const Vector3 Vector3::ZAxis(0, 0, 1);
 	const Vector3 Vector3::Origin(0, 0, 0);
 	const Vector2 Vector2::Origin(0, 0);
-	_NexBaseExport const Matrix4x4 Matrix4x4::IdentityMatrix(1, 0, 0, 0, 0, 1, 0, 0,
+	_NexBaseAPI const Matrix4x4 Matrix4x4::IdentityMatrix(1, 0, 0, 0, 0, 1, 0, 0,
 			0, 0, 1, 0, 0, 0, 0, 1);
 
 	namespace Math {
 
-		_NexBaseExport int32 GetNearestPow2(int32 from) {
+		_NexBaseAPI int32 GetNearestPow2(int32 from) {
 			int32 r = 1;
 			while (r < from)
 				r <<= 1;
@@ -29,7 +29,7 @@ namespace nextar {
 			return r;
 		}
 
-		_NexBaseExport bool IsPow2(uint32 from) {
+		_NexBaseAPI bool IsPow2(uint32 from) {
 			uint32 r = 1;
 			if (!from)
 				return 0;

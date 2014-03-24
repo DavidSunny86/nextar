@@ -14,7 +14,7 @@
 namespace nextar {
 
 	class StreamLexer;
-	class _NexBaseExport ScriptParser {
+	class _NexBaseAPI ScriptParser {
 		NEX_LOG_HELPER(ScriptParser);
 	public:
 

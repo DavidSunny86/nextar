@@ -21,7 +21,7 @@ namespace nextar {
 
 	class Camera;
 
-	class _NexEngineExport Camera : public Spatial {
+	class _NexEngineAPI Camera : public Spatial {
 	public:
 
 		enum {

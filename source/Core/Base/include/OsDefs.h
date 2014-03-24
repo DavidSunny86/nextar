@@ -32,7 +32,7 @@
 
 namespace nextar {
 
-	class _NexBaseExport Platform {
+	class _NexBaseAPI Platform {
 	public:
 		/* returns the location where the current exe resides */
 		static String GetModuleLocation();

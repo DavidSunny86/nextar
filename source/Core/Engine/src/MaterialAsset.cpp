@@ -27,7 +27,7 @@ namespace nextar {
 	 * Material
 	 ****************************************/
 	MaterialAsset::MaterialAsset(const StringID name) : Asset(name), layerMask(0),
-			parameterDef(nullptr), renderLayer(0) {
+			renderLayer(0) {
 	}
 
 	MaterialAsset::~MaterialAsset() {

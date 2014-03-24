@@ -8,7 +8,7 @@
 
 namespace nextar {
 
-	class _NexBaseExport TransformData : public AllocMathPool< TransformData, 
+	class _NexBaseAPI TransformData : public AllocMathPool< TransformData, 
 		NEX_MATRIX_POOL_NUM_PER_BLOCK > {
 		enum  {
 			IDENTITY_TRANSFORM = 1 << 0,

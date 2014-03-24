@@ -14,7 +14,7 @@ namespace nextar {
 	 * @class Config
 	 * @brief Simple ini based configuration, no unicode support. XML is for unicode configurations.
 	 **/
-	class _NexBaseExport Config: public NonCopyableObject, public Referenced<Config,
+	class _NexBaseAPI Config: public NonCopyableObject, public Referenced<Config,
 			AllocGeneral> {
 		NEX_LOG_HELPER(Config)
 		;

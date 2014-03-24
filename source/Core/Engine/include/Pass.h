@@ -15,25 +15,9 @@
 #include <GpuProgram.h>
 #include <RenderConstants.h>
 #include <ShaderParam.h>
+#include <ConstantBuffer.h>
 
 namespace nextar {
-
-	class AutoParamProcessor {
-	public:
-		virtual void Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) = 0;
-	protected:
-		~AutoParamProcessor() {}
-	};
-
-	struct AutoParam {
-		uint32 type;
-		uint32 autoName;
-		uint32 frequency;
-		AutoParamProcessor* processor;
-		// todo May not be useful except in UI
-		StringRef name;
-		String desc;
-	};
 
 	class Pass : public AllocGraphics {
 	public:
@@ -51,6 +35,19 @@ namespace nextar {
 			DIRTY_FLAG = (DIRTY_RASTER_STATE|DIRTY_BLEND_STATE|DIRTY_DEPTHSTENCIL_STATE|
 					DIRTY_TEXUNIT_STATE|COMPILE_NEEDED)
 		};
+		// todo 7 or 8 is a good cap for this array, and
+		// can make do with a static array in that case.
+		typedef vector<TextureBase*>::type TextureList;
+
+		struct SamplerDesc {
+			TextureUnitParams texUnitParams;
+			uint32 arrayCount;
+			TextureBase* defaultTexture0;
+			// rest of the default textures
+			TextureList defaultTextures;
+		};
+
+		typedef map<String, SamplerDesc>::type TextureDescMap;
 
 		Pass();
 		virtual ~Pass();
@@ -67,25 +64,19 @@ namespace nextar {
 			return inputLayoutUniqueID;
 		}
 
-		inline size_t GetParamBufferSize() const {
-			return shaderParamBufferSize;
+		inline ConstantBufferList& GetConstantBuffers() {
+			return constantBuffers;
 		}
 
 		inline ShaderParamIterator GetSamplerIterator() {
-			return ShaderParamIterator(samplers, samplerStride, samplerCount);
-		}
-
-		inline void SetParamIndex(uint32 index) {
-			paramIndex = index;
+			return ShaderParamIterator(&samplers->paramDesc, samplerStride, samplerCount);
 		}
 
 		virtual bool NotifyUpdated(nextar::RenderContext*);
 		virtual void NotifyDestroyed(nextar::RenderContext*);
-
 		
-		// const TextureAssetPtr& GetDefaultTexture(const String& name) const;
-		// const TextureUnitParams* GetTextureUnit(const String& name) const;
-		uint32 GetCustomParamCount() const;
+		TextureBase* GetDefaultTexture(const String& name, uint32 index) const;
+		const TextureUnitParams* GetTextureUnit(const String& name) const;
 
 		// todo
 		virtual void UpdateParams(RenderContext* renderCtx, CommitContext& context, uint32 flags);
@@ -94,14 +85,8 @@ namespace nextar {
 		// todo
 		static const AutoParam* MapParam(const String& name);
 
-		static AutoParamProcessor* GetCustomTextureProcessor() {
-			return customTextureProcessor;
-		}
 
-		static AutoParamProcessor* GetCustomConstantProcessor() {
-			return customConstantProcessor;
-		}
-
+		// Set texture states, called during pass creation
 
 		// Bind texture to a shader parameter. The number of units must match the desc->numUnits count.
 		virtual void SetTextureImpl(RenderContext* rc, const TextureSamplerParamDesc* desc, const TextureUnit* tu) = 0;
@@ -109,12 +94,13 @@ namespace nextar {
 	protected:
 
 		inline void _ProcessShaderParamIterator(RenderContext* rc, CommitContext& ctx, ShaderParamIterator& it, uint32 flags) {
-			while(it.Next()) {
-				const ShaderParamDesc& d = it.Get();
+			while(it) {
+				const ShaderParamDesc& d = (*it);
 				if (d.frequency & flags) {
 					NEX_ASSERT(d.processor);
 					d.processor->Apply(rc, &d, ctx);
 				}
+				++it;
 			}
 		}
 
@@ -130,18 +116,15 @@ namespace nextar {
 		uint16 inputLayoutUniqueID;
 
 		/* Base index to the parameter buffer */
-		uint16 baseParamIndex;
 		uint16 flags;
-
-		size_t shaderParamBufferSize;
 				
 		GpuProgram* programs[NUM_STAGES];
 
 		RasterState rasterState;
 		BlendState blendState;
 		DepthStencilState depthStencilState;
+		TextureDescMap textureDescMap;
 
-		typedef vector<ConstantBufferPtr>::type ConstantBufferList;
 		ConstantBufferList constantBuffers;
 		// updated per frame
 		//ConstantBufferPtr frameParameters;
@@ -153,17 +136,26 @@ namespace nextar {
 		TextureSamplerParamDesc* samplers;
 		uint32 samplerStride;
 		uint32 samplerCount;
-		uint32 customSamplerCount;
 
-		uint32 paramIndex;
+		uint32 passParamByteOffset;
+		uint32 materialParamByteOffset;
+		uint32 objectParamByteOffset;
 
 		uint32 lastFrameUpdate;
 		uint32 lastViewUpdate;
 		//static AutoParam autoParams[AutoParamName::AUTO_COUNT];
-		static AutoParamProcessor* customConstantProcessor;
-		static AutoParamProcessor* customTextureProcessor;
+		static AutoParamProcessor* customConstantProcessorMaterial;
+		static AutoParamProcessor* customTextureProcessorMaterial;
+		static AutoParamProcessor* customConstantProcessorPass;
+		static AutoParamProcessor* customTextureProcessorPass;
+		static AutoParamProcessor* customConstantProcessorObject;
+		static AutoParamProcessor* customTextureProcessorObject;
+
 		friend class ShaderAsset;
 	};
+
+	typedef std::unique_ptr<Pass> PassPtr;
+	typedef vector<PassPtr>::type PassList;
 
 } /* namespace nextar */
 #endif /* PASS_H_ */

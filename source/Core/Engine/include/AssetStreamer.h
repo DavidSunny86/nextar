@@ -13,7 +13,7 @@
 
 namespace nextar {
 
-	class _NexEngineExport AssetStreamer:
+	class _NexEngineAPI AssetStreamer:
 			public nextar::Singleton<AssetStreamer>,
 			public nextar::StreamHandler,
 			public AllocGeneral {

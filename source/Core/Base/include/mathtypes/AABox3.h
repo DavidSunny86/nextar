@@ -3,7 +3,7 @@
 
 //# utility class AABB2
 
-class _NexBaseExport AABox3 : public nextar::AllocGeneral {
+class _NexBaseAPI AABox3 : public nextar::AllocGeneral {
 public:
 	Vector3 min;
 	Vector3 max;

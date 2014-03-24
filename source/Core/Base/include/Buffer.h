@@ -16,7 +16,7 @@ namespace nextar {
 			GPU_ACCESS = GPU_READ | GPU_WRITE,
 			CPU_ACCESS = CPU_READ | CPU_WRITE,
 			DYNAMIC = CPU_WRITE | GPU_READ,
-			DEFAULT_FLAGS = GPU_ACCESS
+			DEFAULT_FLAGS = GPU_ACCESS,
 		};
 
 		Buffer(size_t bufferSize, uint32 flags) : creator(0),

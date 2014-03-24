@@ -14,9 +14,8 @@ namespace nextar {
 	/*****************************************************/
 	/* Shader											 */
 	/*****************************************************/
-	ShaderAsset::ShaderAsset(const StringID name) : nextar::Asset(name),
-			parameterBufferSize(0),
-			translucency(0) {
+	ShaderAsset::ShaderAsset(const StringID name) : nextar::Asset(name)
+			,translucency(0) {
 	}
 
 	ShaderAsset::~ShaderAsset() {
@@ -51,8 +50,7 @@ namespace nextar {
 
 		/* update */
 		ContextObject::NotifyUpdated(reinterpret_cast<UpdateParamPtr>(creationParams));
-		/* parameter buffer */
-		_UpdatePasses();
+		_BuildParameterTable();
 		/* mark request as complete */
 		creationParams->flags |= StreamRequest::COMPLETED;
 		/* notify dependents */
@@ -65,7 +63,8 @@ namespace nextar {
 		r->blendState = p.blendState;
 		r->depthStencilState = p.depthStencilState;
 		r->rasterState = p.rasterState;
-		r->defaultTextureUnits.swap(p.defaultTextureUnits);
+		r->textureDescMap.swap(p.textureStates);
+		//r->defaultTextureUnits.swap(p.defaultTextureUnits);
 		for(uint32 i = 0; i < Pass::NUM_STAGES; ++i) {
 			GpuProgram::Type t = (GpuProgram::Type)i;
 			const String& source = p.programSources[i];
@@ -107,33 +106,8 @@ namespace nextar {
 
 	void ShaderAsset::NotifyAssetUpdated() {
 		ContextObject::NotifyUpdated(0);
-		_UpdatePasses();
+		_BuildParameterTable();
 		Asset::NotifyAssetUpdated();
-	}
-
-	void ShaderAsset::_UpdatePasses() {
-		uint32 numParams = 0;
-		for(auto &p : passes) {
-			numParams += p->GetCustomParamCount();
-		}
-		properties.reserve(numParams);
-		// todo Can optimize here, because we have the count of individual
-		// custom parameters, we can start iterating from there and not go
-		// over all parameters.
-		/* calculate the property buffer descriptor */
-		uint32 byteOffset = 0;
-		for(auto &p : passes) {
-			p->SetParamIndex(properties.size());
-			for(auto &cb : p->constantBuffers) {
-				ShaderParamIterator it = cb->GetParamIterator();
-				_ProcessParamIterator(it, byteOffset);
-			}
-
-			ShaderParamIterator it = p->GetSamplerIterator();
-			_ProcessParamIterator(it, byteOffset);
-		}
-
-		parameterBufferSize = byteOffset;
 	}
 
 	void ShaderAsset::Create(nextar::RenderContext*) {
@@ -171,6 +145,91 @@ namespace nextar {
 		request = nullptr;
 	}
 
+	void ShaderAsset::_BeginPass(PassPtr& p, ParamTableBuilder& ptb) {
+		p->passParamByteOffset = ptb.passParamOffset;
+		p->materialParamByteOffset = ptb.materialParamOffset;
+		p->objectParamByteOffset = ptb.objectParamOffset;
+	}
+
+	void ShaderAsset::_Process(ShaderParamIterator& it, ParamTableBuilder& ptb) {
+		auto desc = (*it);
+		if (desc.autoName != AutoParamName::AUTO_CUSTOM_CONSTANT)
+			return;
+		uint32 offset;
+		switch(desc.frequency) {
+		case UpdateFrequency::PER_FRAME:
+			ptb.frameParamCount++;break;
+		case UpdateFrequency::PER_VIEW:
+			ptb.viewParamCount++;break;
+		case UpdateFrequency::PER_MATERIAL:
+			offset = ptb.materialParamOffset;
+			ptb.materialParamOffset += desc.size;
+			ptb.materialParamCount++;break;
+		case UpdateFrequency::PER_OBJECT_INSTANCE:
+			offset = ptb.objectParamOffset;
+			ptb.objectParamOffset += desc.size;
+			ptb.objectParamCount++;break;
+		case UpdateFrequency::PER_PASS:
+			offset = ptb.passParamOffset;
+			ptb.passParamOffset += desc.size;
+			ptb.passParamCount++;break;
+		}
+
+		ParamEntry pe;
+		pe.descriptor = &desc;
+		pe.offset = offset;
+		ptb.passTable.push_back(pe);
+	}
+
+	void ShaderAsset::_EndPass(PassPtr& p, ParamTableBuilder& ptb) {
+
+	}
+
+	void ShaderAsset::_Finalize(ParamTableBuilder& ptb) {
+		std::sort(ptb.passTable.begin(),ptb.passTable.end(), [] (const ParamEntry& first, const ParamEntry& second) -> bool {
+			return first.descriptor->frequency < second.descriptor->frequency;
+		});
+
+		paramLookup.reserve(ptb.passTable.size());
+		paramLookup.assign(ptb.passTable.begin(), ptb.passTable.end());
+
+		uint32 offset = ptb.frameParamCount + ptb.viewParamCount;
+		// todo Only automatic frame and view parameters are supported currently
+		NEX_ASSERT(offset);
+		passProperties.first = paramLookup.begin() + offset;
+		offset += ptb.passParamCount;
+		materialProperties.first = passProperties.second = paramLookup.begin() + offset;
+		offset += ptb.materialParamCount;
+		objectProperties.first = materialProperties.second = paramLookup.begin() + offset;
+		offset += ptb.objectParamCount;
+		objectProperties.second = paramLookup.begin() + offset;
+	}
+
+	void ShaderAsset::_BuildParameterTable() {
+		paramLookup.clear();
+
+		ParamTableBuilder paramTableBuilder;
+
+		for(auto &p : passes) {
+			_BeginPass(p, paramTableBuilder);
+			ConstantBufferList& cbl = p->GetConstantBuffers();
+			for(auto &c : cbl) {
+				ShaderParamIterator it = c->GetParamIterator();
+				while(it) {
+					_Process(it, paramTableBuilder);
+					++it;
+				}
+			}
+			_EndPass(p, paramTableBuilder);
+			ShaderParamIterator it = p->GetSamplerIterator();
+			while(it) {
+				_Process(it, paramTableBuilder);
+				++it;
+			}
+		}
+		_Finalize(paramTableBuilder);
+	}
+
 	/*****************************************************/
 	/* Shader::StreamRequest							 */
 	/*****************************************************/
@@ -197,23 +256,36 @@ namespace nextar {
 			const String& param, const String& description, bool defaultValue) {
 	}
 
-	void ShaderAsset::StreamRequest::BindDefaultTexture(const String& unitName, TextureBase* texture) {
+	void ShaderAsset::StreamRequest::BindDefaultTexture(const String& unitName, TextureBase* texture, uint32 index) {
 		ShaderAsset* shader = static_cast<ShaderAsset*>(streamedObject);
-		DefaultTextureUnitMap& defaultTextureUnits = passes[currentPass].defaultTextureUnits;
-		DefaultTextureUnitMap::iterator it = defaultTextureUnits.find(unitName);
+		Pass::TextureDescMap& defaultTextureUnits = passes[currentPass].textureStates;
+		Pass::TextureDescMap::iterator it = defaultTextureUnits.find(unitName);
 		if (it == defaultTextureUnits.end()) {
 			Error("Bind point out of bounds for default texture in shader: " + shader->GetName());
 			return;
 		}
-
-		(*it).second.defaultTexture = texture;
+		Pass::SamplerDesc& sd = (*it).second;
+		if (index == 0)
+			sd.defaultTexture0 = texture;
+		else if (index < sd.arrayCount) {
+			if (!sd.defaultTextures.size())
+				sd.defaultTextures.resize(sd.arrayCount-1);
+			sd.defaultTextures[index-1] = texture;
+		} else
+			return;
 		if (texture->IsTextureAsset())
 			metaInfo.AddDependency(static_cast<TextureAsset*>(texture));
 	}
 
-	void ShaderAsset::StreamRequest::AddTextureUnit(const String& unitName, TextureUnitParams& tu) {
-		DefaultTextureUnitMap& defaultTextureUnits = passes[currentPass].defaultTextureUnits;
-		defaultTextureUnits[unitName].params = tu;
+	void ShaderAsset::StreamRequest::AddTextureUnit(const String& unitName, uint32 count, TextureUnitParams& tu) {
+		Pass::TextureDescMap& defaultTextureUnits = passes[currentPass].textureStates;
+		Pass::SamplerDesc& sd = defaultTextureUnits[unitName];
+		sd.texUnitParams = tu;
+		sd.arrayCount = count;
+	}
+
+	ParameterIterator ShaderAsset::GetParameterIterator(uint32 type) {
+		return ParameterIterator(passes, type);
 	}
 
 	void ShaderAsset::StreamRequest::SetBlendState(BlendState& state) {

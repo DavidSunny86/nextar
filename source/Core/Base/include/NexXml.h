@@ -26,9 +26,11 @@ namespace nextar {
         class _NexNoVtable ConditionCallback {
         public:
             virtual bool EvalCondition(const String&) = 0;
+        protected:
+            ~ConditionCallback() {}
         };
 
-        class _NexBaseExport Node : public AllocGeneral {
+        class _NexBaseAPI Node : public AllocGeneral {
             NEX_LOG_HELPER(Node);
         public:
 
@@ -201,7 +203,7 @@ namespace nextar {
             Document *document;
         };
 
-        class _NexBaseExport Element : public Node {
+        class _NexBaseAPI Element : public Node {
             NEX_LOG_HELPER(Element);
             NameValueMap attributes;
         public:
@@ -247,7 +249,7 @@ namespace nextar {
 
         };
 
-        class _NexBaseExport Document : public Node {
+        class _NexBaseAPI Document : public Node {
             NEX_LOG_HELPER(Document);
             bool parsed;
         public:

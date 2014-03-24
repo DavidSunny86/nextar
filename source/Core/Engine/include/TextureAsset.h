@@ -15,7 +15,7 @@
 
 namespace nextar {
 
-	class _NexEngineExport TextureAsset: public nextar::Asset,
+	class _NexEngineAPI TextureAsset: public nextar::Asset,
 	public TextureBase {
 	public:
 

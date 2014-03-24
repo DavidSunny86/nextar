@@ -5,7 +5,7 @@
 //# vector3 is not aligned and operations in vector3
 //# mostly avoid SSE or other optimization.
 
-class _NexBaseExport Vector3 : public nextar::AllocGeneral {
+class _NexBaseAPI Vector3 : public nextar::AllocGeneral {
 public:
 	static const Vector3 XAxis;
 	static const Vector3 YAxis;

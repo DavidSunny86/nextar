@@ -27,7 +27,7 @@ namespace nextar {
 	 * @author	Abhishek Dey
 	 * @date	11/29/2009
 	 **/
-	class _NexBaseExport MemoryInputStream: public InputStream {
+	class _NexBaseAPI MemoryInputStream: public InputStream {
 		uint8* data;
 		size_t readLeft;bool freedata;
 	public:
@@ -83,7 +83,7 @@ namespace nextar {
 	 * @author	Abhishek Dey
 	 * @date	11/29/2009
 	 **/
-	class _NexBaseExport MemoryOutputStream: public OutputStream {
+	class _NexBaseAPI MemoryOutputStream: public OutputStream {
 
 		ByteStream buffer;
 		size_t pos;
@@ -109,7 +109,7 @@ namespace nextar {
 		virtual std::streamoff Tell();
 	};
 
-	class _NexBaseExport GenericInputStream: public InputStream {
+	class _NexBaseAPI GenericInputStream: public InputStream {
 		std::istream* streamptr;bool freedata;
 	public:
 
@@ -128,7 +128,7 @@ namespace nextar {
 		virtual bool IsEndOfStream() const;
 	};
 
-	class _NexBaseExport GenericOutputStream: public OutputStream {
+	class _NexBaseAPI GenericOutputStream: public OutputStream {
 		std::ostream* streamptr;bool freedata;
 	public:
 		GenericOutputStream(std::ostream* strm,
@@ -144,7 +144,7 @@ namespace nextar {
 		virtual std::streamoff Tell();
 	};
 
-	class _NexBaseExport FileInputStream: public InputStream {
+	class _NexBaseAPI FileInputStream: public InputStream {
 		std::FILE* streamptr;
 	public:
 
@@ -162,7 +162,7 @@ namespace nextar {
 		virtual bool IsEndOfStream() const;
 	};
 
-	class _NexBaseExport FileOutputStream: public OutputStream {
+	class _NexBaseAPI FileOutputStream: public OutputStream {
 		std::FILE* streamptr;
 	public:
 		FileOutputStream(std::FILE* streamptr,

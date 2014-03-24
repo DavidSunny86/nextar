@@ -90,7 +90,7 @@ namespace nextar {
 	 * @remarks  Base mesh class for all types of meshes
 	 *
 	 **/
-	class _NexEngineExport MeshAsset: public nextar::Asset {
+	class _NexEngineAPI MeshAsset: public nextar::Asset {
 		NEX_LOG_HELPER(MeshAsset);
 
 	public:

@@ -8,7 +8,7 @@ namespace nextar {
 //@ normal allocator
 //@ debug allocator
 
-	class _NexBaseExport Allocator {
+	class _NexBaseAPI Allocator {
 	public:
 
 #if NEX_MEMTRACKERLEVEL > 1
@@ -49,7 +49,6 @@ namespace nextar {
 			}
 
 			static inline void Free(void* ptr, size_t size) {
-				size;
 				Free(ptr);
 			}
 
@@ -77,16 +76,15 @@ namespace nextar {
 			}
 
 			static inline void Free(void* ptr, size_t size) {
-				size;
 				Free(ptr);
 			}
 		};
 	}
 
 #if NEX_MEMTRACKERLEVEL > 1
-_NexBaseExport void Allocator_DoTracking(bool);
-_NexBaseExport void Allocator_CheckLeaks(std::ostream& s);
-_NexBaseExport void Allocator_DumpMemStats();
+_NexBaseAPI void Allocator_DoTracking(bool);
+_NexBaseAPI void Allocator_CheckLeaks(std::ostream& s);
+_NexBaseAPI void Allocator_DumpMemStats();
 #define NEXTAR_START_LEAK_TRACKING()		nextar::Allocator_DoTracking(true)
 #define NEXTAR_STOP_LEAK_TRACKING()		nextar::Allocator_DoTracking(false)
 #define NEXTAR_LEAK_CHECKS(outstream)	nextar::Allocator_CheckLeaks(outstream)

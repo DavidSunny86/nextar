@@ -31,6 +31,8 @@ namespace nextar {
 	typedef uint32 VersionID;
 	typedef uint8 ColorMaskType;
 
+	typedef std::unique_ptr<uint8, GenericDeleter<uint8> > DataPtr;
+
 	union Size {
 		uint32 combined;
 		struct {

@@ -13,25 +13,11 @@
 namespace RenderOpenGL {
 
 	struct UniformGL {
+		ConstBufferParamDesc constBufferDesc;
 		bool	isRowMajMatrix;
-		uint8	updateFrequency;
-		uint16	type;
 		uint16	typeGl;
-		uint16 autoName;
-		uint16 offset;
 	    uint16 matrixStride; // matrix/array
 	    uint16 arrayStride;
-	    uint16 arrayCount;
-	    uint16 sizeInBytes;
-		String name;
-
-		friend bool operator < (const UniformGL& first, const UniformGL& second) {
-			if (first.autoName == second.autoName) {
-				NEX_ASSERT(first.autoName == AutoParamName::AUTO_CUSTOM);
-				return first.name < second.name;
-			}
-			return (first.autoName < second.autoName) != 0;
-		}
 	};
 
 	typedef vector<UniformGL>::type UniformList;

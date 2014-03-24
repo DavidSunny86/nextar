@@ -11,7 +11,7 @@
 
 namespace nextar {
 
-	class _NexBaseExport ApplicationContext: public Singleton<ApplicationContext> {
+	class _NexBaseAPI ApplicationContext: public Singleton<ApplicationContext> {
 		NEX_LOG_HELPER(ApplicationContext)
 		;
 

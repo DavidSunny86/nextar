@@ -4,7 +4,7 @@
  *  Created on: 26-Nov-2013
  *      Author: obhi
  */
-
+#include <RenderSystem.h>
 #include <DefaultLightSystem.h>
 
 namespace nextar {

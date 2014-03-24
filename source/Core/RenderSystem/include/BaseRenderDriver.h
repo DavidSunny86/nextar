@@ -5,7 +5,7 @@
 
 namespace nextar {
 
-	class _NexEngineExport BaseRenderDriver: public RenderDriver {
+	class _NexEngineAPI BaseRenderDriver: public RenderDriver {
 
 	public:
 		BaseRenderDriver();

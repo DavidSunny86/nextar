@@ -13,7 +13,7 @@ namespace nextar {
 		const StringRef NullRef(Null);
 		const StringRef DefaultRef(Default);
 
-		_NexBaseExport char* NewStr(const char* str) {
+		_NexBaseAPI char* NewStr(const char* str) {
 			size_t s;
 			char* str2;
 			s = StringUtils::Length(str) + 2;
@@ -23,7 +23,7 @@ namespace nextar {
 			return str2;
 		}
 
-		_NexBaseExport char* NewStr(const char* str, size_t count) {
+		_NexBaseAPI char* NewStr(const char* str, size_t count) {
 			char* str2;
 			str2 = (char*) NEX_ALLOC(count + 1, MEMCAT_STRINGPOOL);
 			std::memcpy(str2, str, count);
@@ -31,7 +31,7 @@ namespace nextar {
 			return str2;
 		}
 
-		_NexBaseExport wchar_t* NewStr(const wchar_t* str) {
+		_NexBaseAPI wchar_t* NewStr(const wchar_t* str) {
 			size_t s;
 			wchar_t* str2;
 
@@ -42,7 +42,7 @@ namespace nextar {
 			return str2;
 		}
 
-		_NexBaseExport char* NewStrConv(const wchar_t* str) {
+		_NexBaseAPI char* NewStrConv(const wchar_t* str) {
 			// this might actually be invalid
 			size_t s;
 			char *str2, *ret;
@@ -59,7 +59,7 @@ namespace nextar {
 			return ret;
 		}
 
-		_NexBaseExport wchar_t* NewStrConv(const char* str) {
+		_NexBaseAPI wchar_t* NewStrConv(const char* str) {
 			size_t s;
 			wchar_t *str2, *ret;
 			s = StringUtils::Length(str) + 1;
@@ -78,7 +78,7 @@ namespace nextar {
 #define utf32isspace(p) (((p) >= 0x09 && (p) <= 0x0D) || (p) == 0x20)
 #define utf8isspace(p) (((p) >= 0x09 && (p) <= 0x0D) || (p) == 0x20)
 
-		_NexBaseExport const utf8* GetNextWordEndPtrUtf8(const utf8* p,
+		_NexBaseAPI const utf8* GetNextWordEndPtrUtf8(const utf8* p,
 				const utf8**start) {
 			std::locale l;
 			while (*p && std::isspace((int) *p, l))
@@ -93,7 +93,7 @@ namespace nextar {
 			return p;
 		}
 
-		_NexBaseExport const utf32* GetNextWordEndPtrUtf32(const utf32* p,
+		_NexBaseAPI const utf32* GetNextWordEndPtrUtf32(const utf32* p,
 				const utf32**start) {
 			while (*p && utf32isspace(*p))
 				++p;
@@ -107,7 +107,7 @@ namespace nextar {
 			return p;
 		}
 
-		_NexBaseExport const utf8* GetWordEndPtrUtf8(const utf8* p) {
+		_NexBaseAPI const utf8* GetWordEndPtrUtf8(const utf8* p) {
 			while (*p) {
 				if (isspace(*p))
 					break;
@@ -116,7 +116,7 @@ namespace nextar {
 			return p;
 		}
 
-		_NexBaseExport const utf32* GetWordEndPtrUtf32(const utf32* p) {
+		_NexBaseAPI const utf32* GetWordEndPtrUtf32(const utf32* p) {
 			while (*p) {
 				if (utf32isspace(*p))
 					break;
@@ -125,7 +125,7 @@ namespace nextar {
 			return p;
 		}
 
-		/* returns the pointer where no whitespace [' ','\n','\t'] is encountered */_NexBaseExport const utf32* EatWhiteUtf32(
+		/* returns the pointer where no whitespace [' ','\n','\t'] is encountered */_NexBaseAPI const utf32* EatWhiteUtf32(
 				const utf32* p) {
 			if (!p)
 				return 0;
@@ -134,7 +134,7 @@ namespace nextar {
 			return p;
 		}
 
-		/* returns the pointer where no whitespace [' ','\n','\t'] is encountered */_NexBaseExport const utf8* EatWhiteUtf8(
+		/* returns the pointer where no whitespace [' ','\n','\t'] is encountered */_NexBaseAPI const utf8* EatWhiteUtf8(
 				const utf8* p) {
 			if (!p)
 				return 0;
@@ -145,7 +145,7 @@ namespace nextar {
 
 //@ returns at the encounter of 'indexofchar' or null
 
-		_NexBaseExport const utf8* GetIndexOfUtf8(const utf8* p, const utf8 c) {
+		_NexBaseAPI const utf8* GetIndexOfUtf8(const utf8* p, const utf8 c) {
 			while (*p && *p != c)
 				++p;
 			return p;
@@ -153,13 +153,13 @@ namespace nextar {
 
 //@ returns at the encounter of 'indexofchar' or null
 
-		_NexBaseExport const utf32* GetIndexOfUtf32(const utf32* p, const utf32 c) {
+		_NexBaseAPI const utf32* GetIndexOfUtf32(const utf32* p, const utf32 c) {
 			while (*p && *p != c)
 				++p;
 			return p;
 		}
 
-		/* returns the pointer where no whitespace [' ','\n','\t'] is encountered */_NexBaseExport const char* EatWhite(
+		/* returns the pointer where no whitespace [' ','\n','\t'] is encountered */_NexBaseAPI const char* EatWhite(
 				const char* p) {
 			if (!p)
 				return 0;
@@ -169,7 +169,7 @@ namespace nextar {
 			return p;
 		}
 
-		_NexBaseExport const char* MatchTag(const char* text, const char* tag) {
+		_NexBaseAPI const char* MatchTag(const char* text, const char* tag) {
 			const char *mtext = text;
 			mtext = EatWhite(mtext);
 			while (*mtext && *tag) {
@@ -185,21 +185,21 @@ namespace nextar {
 // ctype functions not as efficient as asm
 // but the return value is significant
 
-		_NexBaseExport char* CopyStr(char* dst, const char* src) {
+		_NexBaseAPI char* CopyStr(char* dst, const char* src) {
 			char * cp = dst;
 			while (*cp++ = *src++)
 				;
 			return (cp - 1);
 		}
 
-		_NexBaseExport wchar_t* CopyStr(wchar_t* dst, const wchar_t* src) {
+		_NexBaseAPI wchar_t* CopyStr(wchar_t* dst, const wchar_t* src) {
 			wchar_t * cp = dst;
 			while (*cp++ = *src++)
 				;
 			return (cp);
 		}
 
-		_NexBaseExport String& Replace(String &s, const String &sub,
+		_NexBaseAPI String& Replace(String &s, const String &sub,
 				const String &other) {
 			NEX_ASSERT(!sub.empty());
 			size_t b = 0;
@@ -210,7 +210,7 @@ namespace nextar {
 			return s;
 		}
 
-		_NexBaseExport bool PatternMatch(const char* pat, const char* str,
+		_NexBaseAPI bool PatternMatch(const char* pat, const char* str,
 				bool checkcase) {
 			while (*str) {
 				switch (*pat) {
@@ -249,19 +249,19 @@ namespace nextar {
 			return (*pat) == 0;
 		}
 
-		_NexBaseExport void ToLower(String& str) {
+		_NexBaseAPI void ToLower(String& str) {
 			std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 		}
 
-		_NexBaseExport void ToUpper(String& str) {
+		_NexBaseAPI void ToUpper(String& str) {
 			std::transform(str.begin(), str.end(), str.begin(), ::toupper);
 		}
 
-		_NexBaseExport void FreeStr(char* ptr) {
+		_NexBaseAPI void FreeStr(char* ptr) {
 			NEX_FREE(ptr, MEMCAT_STRINGPOOL);
 		}
 
-		_NexBaseExport void FreeStr(wchar_t* ptr) {
+		_NexBaseAPI void FreeStr(wchar_t* ptr) {
 			NEX_FREE(ptr, MEMCAT_STRINGPOOL);
 		}
 
@@ -285,7 +285,7 @@ namespace nextar {
 			return ret;
 		}
 
-		_NexBaseExport String FormatCamelCaseString(String& str) {
+		_NexBaseAPI String FormatCamelCaseString(String& str) {
 			String ret;
 			ret.reserve(str.length()+4);
 			size_t i = 1;
@@ -300,7 +300,7 @@ namespace nextar {
 			return ret;
 		}
 
-		_NexBaseExport String FormatName(String& str) {
+		_NexBaseAPI String FormatName(String& str) {
 			if (!str.length())
 				return StringUtils::Null;
 			if (str.find('_') != String::npos)

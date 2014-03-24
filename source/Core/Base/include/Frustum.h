@@ -5,7 +5,7 @@
 
 namespace nextar {
 
-	class _NexBaseExport Frustum: public AllocGeneral {
+	class _NexBaseAPI Frustum: public AllocGeneral {
 	public:
 		// common frustums will have these planes
 

@@ -76,14 +76,14 @@ namespace nextar {
 	}
 
 #ifdef NEX_EXTENSIVE_MEM_TRACKER
-	_NexBaseExport void Allocator_CheckLeaks(std::ostream& s) {
+	_NexBaseAPI void Allocator_CheckLeaks(std::ostream& s) {
 		memtracker::CheckLeaks(s);
 	}
-	_NexBaseExport void Allocator_DumpMemStats(std::ostream& s) {
+	_NexBaseAPI void Allocator_DumpMemStats(std::ostream& s) {
 		memtracker::OnDumpMemStats();
 	}
 
-	_NexBaseExport void Allocator_DoTracking(bool track) {
+	_NexBaseAPI void Allocator_DoTracking(bool track) {
 		G_TrackLeaks = track;
 	}
 #endif

@@ -45,7 +45,7 @@ namespace nextar {
 
     /** @remarks Output serialization
      * data is always in little endian format (unless configured otherwise) **/
-    class _NexBaseExport OutputSerializer : public AllocGeneral {
+    class _NexBaseAPI OutputSerializer : public AllocGeneral {
 
     public:
 
@@ -107,7 +107,7 @@ namespace nextar {
     };
 
     /** @remarks input serialization **/
-    class _NexBaseExport InputSerializer : public AllocGeneral {
+    class _NexBaseAPI InputSerializer : public AllocGeneral {
 
         NEX_LOG_HELPER(InputSerializer);
 
@@ -183,7 +183,7 @@ namespace nextar {
     	InputStreamPtr inStream;
     };
 
-    class _NexBaseExport ChunkInputStream : public InputSerializer {
+    class _NexBaseAPI ChunkInputStream : public InputSerializer {
     	static const Chunk First;
 
     public:

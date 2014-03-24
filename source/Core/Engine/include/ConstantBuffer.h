@@ -15,6 +15,11 @@ namespace nextar {
 	class ConstantBuffer : public ManagedBuffer {
 	public:
 
+		enum {
+			CUSTOM_BUFFER = ManagedBuffer::LAST_FLAG << 0,
+			LAST_FLAG = ManagedBuffer::LAST_FLAG << 1,
+		};
+
 		ConstantBuffer();
 		virtual ~ConstantBuffer();
 
@@ -30,28 +35,28 @@ namespace nextar {
 			return frequency;
 		}
 
-		inline uint32 GetCustomParamCount() const {
-			return customParamCount;
+		inline bool IsCustomBuffer() const {
+			return (flags & CUSTOM_BUFFER) != 0;
 		}
 
 		ShaderParamIterator GetParamIterator();
 		/* Must be called before Write is called */
-		virtual void BeginWrite(RenderContext* rc) =0;
+		virtual void BeginUpdate(RenderContext* rc, uint32 updateFlags) =0;
 		/* Must be called after Write operations are done */
-		virtual void EndWrite(RenderContext* rc) =0;
+		virtual void EndUpdate(RenderContext* rc) =0;
 		/** This function will fail unless a local copy of the data exists. The local
 		 * copy is created if the CPU_READ flag is set. **/
-		virtual void Read(RenderContext* rc, void *dest, size_t offset = 0, size_t size = 0) =0;
+		virtual void Read(RenderContext* rc, void *dest, size_t offset = 0, size_t size = 0) override =0;
 		/** Write to buffer */
-		virtual void Write(RenderContext* rc, const void *src, size_t offset = 0, size_t size = 0) =0;
+		virtual void Write(RenderContext* rc, const void *src, size_t offset = 0, size_t size = 0) override =0;
 		/** Copy from another buffer */
-		virtual void CopyFrom(RenderContext* rc, BufferPtr&) =0;
+		virtual void CopyFrom(RenderContext* rc, BufferPtr&) override =0;
 
 	protected:
-		// todo If frequency is exclusively PER_MATERIAL, then a copy of this
+		// todo If frequency is exclusively PER_MATERIAL or PER_PASS or PER_OBJECT_INSTANCE,
+		// and all parameters are custom then a copy of this
 		// block can be stored in material and updated accordingly.
 		uint32 frequency;
-		uint32 customParamCount;
 
 		ConstBufferParamDesc* paramDesc;
 		uint32 paramStride;
@@ -60,7 +65,7 @@ namespace nextar {
 		StringRef name;
 	};
 
-	typedef vector<ConstantBuffer*>::type ConstantBufferList;
+	typedef vector<ConstantBufferPtr>::type ConstantBufferList;
 } /* namespace nextar */
 
 #endif /* CONSTANTBUFFER_H_ */

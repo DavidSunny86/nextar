@@ -19,6 +19,7 @@ namespace nextar {
 	class Archive;
 	class FileSystem;
 	class FrameListener;
+	class RenderWindow;
 	class WindowManager;
 	class LogManager;
 

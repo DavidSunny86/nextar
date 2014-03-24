@@ -4,7 +4,7 @@
  *  Created on: 17-Nov-2013
  *      Author: obhi
  */
-
+#include <RenderSystem.h>
 #include <DeferredRenderSystem.h>
 
 namespace nextar {

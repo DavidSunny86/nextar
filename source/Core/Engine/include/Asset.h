@@ -28,7 +28,7 @@ namespace nextar {
 	 * @class    Asset
 	 * Type of @Component, assets are basic game data like mesh, texture, sound, shaders, etc.
 	 **/
-	class _NexEngineExport Asset:
+	class _NexEngineAPI Asset:
 	public PropertyInterface,
 	public Streamable,
 	public SharedComponent {

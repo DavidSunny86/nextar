@@ -28,14 +28,14 @@ namespace nextar {
 			STRING_ID_START_OFFSET = 10,
 		};
 
-		NEX_EXTERN_SYM _NexBaseExport const String Null;
-		NEX_EXTERN_SYM _NexBaseExport const String Default;
-		NEX_EXTERN_SYM _NexBaseExport const String Unknown;
-		NEX_EXTERN_SYM _NexBaseExport const UniString UniNull;
-		NEX_EXTERN_SYM _NexBaseExport const StringID NullID;
-		NEX_EXTERN_SYM _NexBaseExport const StringID DefaultID;
-		NEX_EXTERN_SYM _NexBaseExport const StringRef NullRef;
-		NEX_EXTERN_SYM _NexBaseExport const StringRef DefaultRef;
+		NEX_EXTERN_SYM _NexBaseAPI const String Null;
+		NEX_EXTERN_SYM _NexBaseAPI const String Default;
+		NEX_EXTERN_SYM _NexBaseAPI const String Unknown;
+		NEX_EXTERN_SYM _NexBaseAPI const UniString UniNull;
+		NEX_EXTERN_SYM _NexBaseAPI const StringID NullID;
+		NEX_EXTERN_SYM _NexBaseAPI const StringID DefaultID;
+		NEX_EXTERN_SYM _NexBaseAPI const StringRef NullRef;
+		NEX_EXTERN_SYM _NexBaseAPI const StringRef DefaultRef;
 
 		struct Less { // functor for operator <
 
@@ -294,8 +294,8 @@ namespace nextar {
 		 *
 		 * @return	null if it fails, else.
 		 **/
-		_NexBaseExport char* CopyStr(char*, const char*);
-		_NexBaseExport wchar_t* CopyStr(wchar_t*, const wchar_t*);
+		_NexBaseAPI char* CopyStr(char*, const char*);
+		_NexBaseAPI wchar_t* CopyStr(wchar_t*, const wchar_t*);
 
 		/**
 		 * @brief	Returns the pointer where no whitespace [' ','\n','\t','\r'] is encountered
@@ -307,7 +307,7 @@ namespace nextar {
 		 *
 		 * @return	null if it fails, else pointer where no whitespace [' ','\n','\t','\r'] is encountered.
 		 **/
-		_NexBaseExport const char* EatWhite(const char* sStr);
+		_NexBaseAPI const char* EatWhite(const char* sStr);
 
 		/**
 		 * @brief	Match tag marked by tag.
@@ -320,7 +320,7 @@ namespace nextar {
 		 *
 		 * @return	null if it fails, else the pointer right after the tag ends.
 		 **/
-		_NexBaseExport const char* MatchTag(const char* text, const char* tag);
+		_NexBaseAPI const char* MatchTag(const char* text, const char* tag);
 
 		/**
 		 * @brief	Allocates a new string based on old one.
@@ -332,8 +332,8 @@ namespace nextar {
 		 *
 		 * @return	null if it fails, else.
 		 **/
-		_NexBaseExport wchar_t* NewStr(const wchar_t*);
-		_NexBaseExport char* NewStr(const char*);
+		_NexBaseAPI wchar_t* NewStr(const wchar_t*);
+		_NexBaseAPI char* NewStr(const char*);
 
 		/**
 		 *
@@ -348,7 +348,7 @@ namespace nextar {
 		 *
 		 * @return	null if it fails, else.
 		 **/
-		_NexBaseExport char* NewStr(const char*, size_t count); //
+		_NexBaseAPI char* NewStr(const char*, size_t count); //
 
 		/**
 		 *
@@ -361,8 +361,8 @@ namespace nextar {
 		 *
 		 * @return	null if it fails, else.
 		 **/
-		_NexBaseExport wchar_t* NewStrConv(const char*);
-		_NexBaseExport char* NewStrConv(const wchar_t*);
+		_NexBaseAPI wchar_t* NewStrConv(const char*);
+		_NexBaseAPI char* NewStrConv(const wchar_t*);
 		/**
 		 *
 		 * @brief	Eat white utf 8.
@@ -374,7 +374,7 @@ namespace nextar {
 		 *
 		 * @return	null if it fails, else.
 		 **/
-		_NexBaseExport const utf8* EatWhiteUtf8(const utf8*);
+		_NexBaseAPI const utf8* EatWhiteUtf8(const utf8*);
 
 		/**
 		 *
@@ -387,7 +387,7 @@ namespace nextar {
 		 *
 		 * @return	null if it fails, else.
 		 **/
-		_NexBaseExport const utf32* EatWhiteUtf32(const utf32*);
+		_NexBaseAPI const utf32* EatWhiteUtf32(const utf32*);
 
 		/**
 		 *
@@ -401,7 +401,7 @@ namespace nextar {
 		 *
 		 * @return	returns at the encounter of 'indexofchar' or null
 		 **/
-		_NexBaseExport const utf8* GetIndexOfUtf8(const utf8*, const utf8);
+		_NexBaseAPI const utf8* GetIndexOfUtf8(const utf8*, const utf8);
 		/**
 		 *
 		 * @brief	Gets an indexof utf32.
@@ -414,7 +414,7 @@ namespace nextar {
 		 *
 		 * @return	returns at the encounter of 'indexofchar' or null
 		 **/
-		_NexBaseExport const utf32* GetIndexOfUtf32(const utf32*, const utf32);
+		_NexBaseAPI const utf32* GetIndexOfUtf32(const utf32*, const utf32);
 		/**
 		 *
 		 * @brief	Returns at the encounter of first whitespace character
@@ -428,7 +428,7 @@ namespace nextar {
 		 *
 		 * @return	null if it fails, else the word endptr utf 8.
 		 **/
-		_NexBaseExport const utf8* GetWordEndPtrUtf8(const utf8*);
+		_NexBaseAPI const utf8* GetWordEndPtrUtf8(const utf8*);
 		/**
 		 * @brief   Returns at the encounter of first whitespace character
 		 *          the returned poiner either points to the whitespace or
@@ -441,7 +441,7 @@ namespace nextar {
 		 *
 		 * @return	null if it fails, else the word endptr utf 32.
 		 **/
-		 _NexBaseExport const utf32* GetWordEndPtrUtf32(const utf32*);
+		 _NexBaseAPI const utf32* GetWordEndPtrUtf32(const utf32*);
 		/**
 		 *
 		 * @brief	First eats white then starts a scan.
@@ -457,7 +457,7 @@ namespace nextar {
 		 *
 		 * @return	null if it fails, else the nextword endptr utf 8.
 		 **/
-		 _NexBaseExport const utf8* GetNextWordEndPtrUtf8(const utf8*,
+		 _NexBaseAPI const utf8* GetNextWordEndPtrUtf8(const utf8*,
 				const utf8**start);
 		/**
 		 *
@@ -474,7 +474,7 @@ namespace nextar {
 		 *
 		 * @return	null if it fails, else the nextword endptr utf 32.
 		 **/
-		 _NexBaseExport const utf32* GetNextWordEndPtrUtf32(const utf32*,
+		 _NexBaseAPI const utf32* GetNextWordEndPtrUtf32(const utf32*,
 				const utf32**start);
 
 		/**
@@ -509,8 +509,8 @@ namespace nextar {
 		 * @date	11/9/2009
 		 *
 		 * @param [in,out]	ptr	If non-null, the pointer.
-		 **/_NexBaseExport void FreeStr(char* ptr);
-		_NexBaseExport void FreeStr(wchar_t* ptr);
+		 **/_NexBaseAPI void FreeStr(char* ptr);
+		_NexBaseAPI void FreeStr(wchar_t* ptr);
 
 		template<typename T> _NexInline void SafeFreeString(T*& ptr) {
 			if (ptr) {
@@ -537,7 +537,7 @@ namespace nextar {
 		 * @return	The string after replacements.
 		 *
 		 **/
-		_NexBaseExport String& Replace(String &s, const String &sub,
+		_NexBaseAPI String& Replace(String &s, const String &sub,
 				const String &other);
 
 		/**
@@ -553,7 +553,7 @@ namespace nextar {
 		 *
 		 * @return	true if it succeeds, false if it fails.
 		 **/
-		_NexBaseExport bool PatternMatch(const char* pattern, const char* str,
+		_NexBaseAPI bool PatternMatch(const char* pattern, const char* str,
 				bool checkcase = true);
 
 		/**
@@ -564,7 +564,7 @@ namespace nextar {
 		 *
 		 * @param [in,out]	str	The string to convert.
 		 **/
-		_NexBaseExport void ToLower(String& str);
+		_NexBaseAPI void ToLower(String& str);
 
 		/**
 		 * @brief	Convert string to upper case.
@@ -574,11 +574,11 @@ namespace nextar {
 		 *
 		 * @param [in,out]	str	The string to convert.
 		 **/
-		_NexBaseExport void ToUpper(String& str);
+		_NexBaseAPI void ToUpper(String& str);
 		/** Convert a camel or upper case name into a formatted string.
 		 * For Eg: "madeInChina" to "Made In China" or
 		 * MADE_IN_CHINA to "Made In China" */
-		_NexBaseExport String FormatName(const String& str);
+		_NexBaseAPI String FormatName(const String& str);
 
 		/** Seperates a string pair of the format Abc:efg into 'Abc' and 'efg' */
 		_NexInline StringPair Split(const String& name, char by = ':') {
@@ -604,8 +604,8 @@ namespace nextar {
 				str.erase(endpos + 1);
 		}
 		/* Unicode conversion UTF-8 to UTF-16 */
-		_NexBaseExport UniString ToUtf16(const String& utf8String);
-		_NexBaseExport String ToUtf8(const UniString& utf16String);
+		_NexBaseAPI UniString ToUtf16(const String& utf8String);
+		_NexBaseAPI String ToUtf8(const UniString& utf16String);
 
 		inline bool IsAscii(const String& utf8String) {
 			return std::find_if(utf8String.begin(), utf8String.end(),

@@ -12,7 +12,7 @@
 
 namespace nextar {
 
-	class _NexBaseExport WindowManager: public Singleton<WindowManager>,
+	class _NexBaseAPI WindowManager: public Singleton<WindowManager>,
 	public AllocGeneral {
 
 

@@ -12,7 +12,7 @@
 
 namespace nextar {
 
-	class _NexEngineExport VideoMode {
+	class _NexEngineAPI VideoMode {
 	public:
 
 		static inline String ToString(const VideoMode& vm) {

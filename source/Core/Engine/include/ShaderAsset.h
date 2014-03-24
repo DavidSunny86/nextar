@@ -10,10 +10,13 @@
 
 #include <NexBase.h>
 #include <Asset.h>
+#include <SortKeyHelper.h>
 #include <Pass.h>
 #include <ShaderParam.h>
 #include <FactoryPlugin.h>
 #include <GpuProgram.h>
+#include <ParameterBuffer.h>
+#include <ParameterIterator.h>
 
 namespace nextar {
 
@@ -23,7 +26,7 @@ namespace nextar {
 	 * 	ShaderPtr compiledShader;
 	 * }
 	 */
-	class _NexEngineExport ShaderAsset: public nextar::Asset,
+	class _NexEngineAPI ShaderAsset: public nextar::Asset,
 	public ContextObject {
 		NEX_LOG_HELPER(ShaderAsset);
 	public:
@@ -35,9 +38,6 @@ namespace nextar {
 		enum {
 			USE_FALLBACK = Asset::LAST_FLAG << 5,
 		};
-
-		typedef std::unique_ptr<Pass> PassPtr;
-		typedef vector<PassPtr>::type PassList;
 
 		class StreamRequest;
 		class Loader;
@@ -65,25 +65,17 @@ namespace nextar {
 			nextar::StreamRequest* shaderRequest;
 		};
 
-		/** Custom properties of shader are set via this class */
-		struct Parameter {
-			StringID name;
-			uint16	type;
-			uint16	count;
-			// The offset from the property buffer at which this parameter is found.
-			uint32	byteOffset;
-		};
-		typedef vector<Parameter>::type ParameterList;
-
 		struct StreamPass {
 			String name;
 			String programSources[Pass::NUM_STAGES];
 			RasterState rasterState;
 			BlendState blendState;
 			DepthStencilState depthStencilState;
+			Pass::TextureDescMap textureStates;
 			//Pass::DefaultTextureUnitMap defaultTextureUnits;
 		};
 
+		// todo Make this a list not a vector
 		typedef vector<StreamPass>::type StreamPassList;
 
 		class StreamRequest : public AllocGeneral,
@@ -104,15 +96,18 @@ namespace nextar {
 					const String& param, const String& description, bool defualtState);
 			/* Add Pass */
 			virtual void AddPass(const String& name);
-
+			/* Set pass paramter buffer data */
+			virtual void SetParamterBuffer(const ParameterBuffer&& data);
 			/* Pass related */
 			void SetOptions(const String& options);
 			void SetProgramSource(GpuProgram::Type, const String& src);
 			void SetRasterState(RasterState& state);
 			void SetBlendState(BlendState& state);
 			void SetDepthStencilState(DepthStencilState& state);
-			void BindDefaultTexture(const String& unitName, TextureBase* texture);
-			void AddTextureUnit(const String& unitName, TextureUnitParams& unit);
+			// If called multiple times for the same unit, the texture will be appended in a
+			// list and if the sampler is an array
+			void BindDefaultTexture(const String& unitName, TextureBase* texture, uint32 index);
+			void AddTextureUnit(const String& unitName, uint32 arrayCount, TextureUnitParams& unit);
 
 		protected:
 
@@ -130,20 +125,14 @@ namespace nextar {
 				SharedComponent::Group* group = nullptr);
 
 		inline uint16 GetShaderMask() const {
-			return ((std::ptrdiff_t)(this)) & SortKeyHelper::SHADER_KEY_MASK;
+			return ((std::ptrdiff_t)(this)) & (uint32)SortKeyHelper::SHADER_KEY_MASK;
 		}
 
 		inline uint16 GetTranslucency() const {
 			return translucency;
 		}
 
-		inline uint32 GetParameterBufferSize() const {
-			return parameterBufferSize;
-		}
-
-		inline const ParameterList& GetParameterList() const {
-			return properties;
-		}
+		ParameterIterator GetParameterIterator(uint32 type);
 
 		virtual void Create(nextar::RenderContext*);
 		virtual void Update(nextar::RenderContext*, ContextObject::UpdateParamPtr);
@@ -155,19 +144,6 @@ namespace nextar {
 		static ParamDataType MapParamType(const String& typeName);
 		
 	protected:
-		
-		inline void _ProcessParamIterator(ShaderParamIterator it, uint32& byteOffset) {
-			while(it.Next()) {
-				const ShaderParamDesc& spd = it.Get();
-				if (spd.autoName == (uint16)AutoParamName::AUTO_CUSTOM_CONSTANT) {
-					properties.emplace_back(spd.name,
-							spd.type,
-							spd.arrayCount,
-							byteOffset);
-					byteOffset += spd.size;
-				}
-			}
-		}
 
 		virtual void NotifyAssetLoaded();
 		virtual void NotifyAssetUnloaded();
@@ -184,13 +160,38 @@ namespace nextar {
 		virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);
 		virtual void DestroyStreamRequestImpl(nextar::StreamRequest*&, bool load=true);
 
-		void _UpdatePasses();
+		struct ParamTableBuilder {
+			uint32 viewParamCount;
+			uint32 frameParamCount;
+			uint32 passParamCount;
+			uint32 objectParamCount;
+			uint32 materialParamCount;
+
+			uint32 passParamOffset;
+			uint32 objectParamOffset;
+			uint32 materialParamOffset;
+
+			ParamEntryTable passTable;
+		};
+
+		void _Process(ShaderParamIterator& it, ParamTableBuilder& ptb);
+		void _BeginPass(PassPtr& p, ParamTableBuilder& ptb);
+		void _Finalize(ParamTableBuilder& ptb);
+		void _EndPass(PassPtr& p, ParamTableBuilder& ptb);
+		void _BuildParameterTable();
 
 		// used as sort key
 		uint8 translucency;
 		PassList passes;
-		uint32 parameterBufferSize;
-		ParameterList properties;
+		// required when parameter is looked up by name
+		ParamEntryTable paramLookup;
+
+		ParamEntryTableItem passProperties;
+		ParamEntryTableItem materialProperties;
+		ParamEntryTableItem objectProperties;
+
+		ParameterBuffer passParamData;
+
 		friend class StreamRequest;
 	};
 } /* namespace nextar */

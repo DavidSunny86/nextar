@@ -25,7 +25,7 @@ namespace nextar {
 	 * Components may depend on multiple components and will issue load/save calls using
 	 * dependency order.
 	 */
-	class _NexEngineExport Component: public NamedObject,
+	class _NexEngineAPI Component: public NamedObject,
 		public AllocComponent {
 		NEX_LOG_HELPER(Component);
 	public:
@@ -79,7 +79,7 @@ namespace nextar {
 
 	public:
 
-		Component(const StringID name = StringUtils::Null, Component* parent = nullptr);
+		Component(const StringID name = StringUtils::NullID, Component* parent = nullptr);
 		virtual ~Component();
 				
 		inline bool IsEnabled() const {
@@ -136,7 +136,7 @@ namespace nextar {
 		Component* parent;
 	};
 		
-	class _NexEngineExport SharedComponent :
+	class _NexEngineAPI SharedComponent :
 		public Referenced<SharedComponent, Component> {
 
 	public:

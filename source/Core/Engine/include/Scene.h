@@ -29,7 +29,7 @@ namespace nextar {
 	/**
 	 * Represents a game world.
 	 * */
-	class _NexEngineExport Scene: public Asset {
+	class _NexEngineAPI Scene: public Asset {
 	public:
 		enum {
 			CLASS_ID = Component::CLASS_SCENE,

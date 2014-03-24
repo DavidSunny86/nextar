@@ -9,6 +9,7 @@
 #define COMMITCONTEXT_H_
 
 #include <NexBase.h>
+#include <ShaderParam.h>
 
 namespace nextar {
 
@@ -24,7 +25,10 @@ namespace nextar {
 		uint32			viewNumber;
 		Size			targetDimension;
 
-		uint32 passParamIndex;
+		uint32 passParamOffset;
+		uint32 materialParamOffset;
+		uint32 objectParamOffset;
+
 		ConstantBuffer*		cbuffer;
 
 		Pass*				pass;
@@ -35,7 +39,11 @@ namespace nextar {
 		RenderTarget*		renderTarget;
 		Viewport* 			viewport;
 		VisiblePrimitive*	primitive;
-		MaterialAsset*			material;
+		MaterialAsset*		material;
+
+		ParameterBuffer*		passParameters;
+		ParameterBuffer*		materialParameters;
+		ParameterBuffer*		objectParameters;
 	};
 
 } /* namespace nextar */

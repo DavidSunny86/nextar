@@ -14,7 +14,7 @@
 namespace nextar {
 
 	class RenderWindowWin;
-	class _NexBaseExport WmInputListener: public Singleton<WmInputListener> {
+	class _NexBaseAPI WmInputListener: public Singleton<WmInputListener> {
 	public:
 		WmInputListener();
 		virtual ~WmInputListener();

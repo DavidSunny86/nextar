@@ -9,9 +9,11 @@
 
 namespace nextar {
 
-	ConstantBuffer::ConstantBuffer() {
-		// TODO Auto-generated constructor stub
-
+	ConstantBuffer::ConstantBuffer() : frequency(0)
+	,paramDesc(nullptr)
+	,paramStride(0)
+	,paramCount(0)
+	,name(StringUtils::NullRef) {
 	}
 
 	ConstantBuffer::~ConstantBuffer() {

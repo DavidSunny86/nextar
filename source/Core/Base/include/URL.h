@@ -15,7 +15,7 @@ namespace nextar {
 	 * Common archives:
 	 * {FileSystem::ArchiveEngineData}
 	 */
-	class _NexBaseExport URL {
+	class _NexBaseAPI URL {
 
 		NEX_LOG_HELPER(URL)
 		;

@@ -14,7 +14,7 @@
 
 namespace nextar {
 
-	class _NexEngineExport LightNode: public Movable, public VisibleLight {
+	class _NexEngineAPI LightNode: public Movable, public VisibleLight {
 	public:
 
 		enum {

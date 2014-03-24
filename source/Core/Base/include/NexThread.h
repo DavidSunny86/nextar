@@ -12,7 +12,7 @@ namespace nextar {
 		struct NullMutex {
 			void lock() {}
 			void unlock() noexcept {}
-			bool try_lock() {}
+			bool try_lock() { return true; }
 		};
 
 		typedef std::mutex Mutex;

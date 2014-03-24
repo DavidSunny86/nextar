@@ -52,8 +52,8 @@
  * Alterable via UI.
  */
 
-#ifdef _NexBaseExport
-#undef	_NexBaseExport
+#ifdef _NexBaseAPI
+#undef	_NexBaseAPI
 #endif
 #ifdef  max
 #undef  max			/* use __max */
@@ -62,7 +62,7 @@
 #undef  min			/*	use __min */
 #endif
 
-// define _NexBaseExport
+// define _NexBaseAPI
 #if defined(_MSC_VER)
 #	define _NexExportSym			__declspec(dllexport)
 #	define _NexImportSym			__declspec(dllimport)
@@ -81,12 +81,12 @@
 
 #ifdef NEXTAR_EXPORT_AS_DYNAMIC_LIB
 #	ifdef NE_Core_Base_EXPORTS
-#		define _NexBaseExport	_NexExportSym
+#		define _NexBaseAPI	_NexExportSym
 #	else
-#		define _NexBaseExport	_NexImportSym
+#		define _NexBaseAPI	_NexImportSym
 #	endif
 #else
-#	define _NexBaseExport
+#	define _NexBaseAPI
 #endif
 
 // try to determine platform if no specified

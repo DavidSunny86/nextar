@@ -18,7 +18,7 @@ namespace nextar {
 		Vector3 extends;
 		float radius;
 	};
-	class _NexBaseExport BoundingBox: public AllocMathPool<BoundingBox, NEX_BV_POOL_NUM_PER_BLOCK> {
+	class _NexBaseAPI BoundingBox: public AllocMathPool<BoundingBox, NEX_BV_POOL_NUM_PER_BLOCK> {
 	public:
 
 		static BoundingBox Null;

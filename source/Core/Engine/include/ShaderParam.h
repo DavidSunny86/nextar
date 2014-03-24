@@ -81,21 +81,24 @@ namespace nextar {
 		AUTO_COUNT,
 	};
 
-	enum class UpdateFrequency {
+	enum class UpdateFrequency : uint32 {
 		// changes per frame: time
 		// Type: shared
 		PER_FRAME = 1 << 0,
 		// changes per view: view matrix
 		// Type: shared
 		PER_VIEW = 1 << 1,
+		// Per pass change
+		PER_PASS = 1 << 2,
 		// changes per material instance: diffuseColor
 		// Type: local to material
-		PER_MATERIAL = 1 << 2,
+		PER_MATERIAL = 1 << 3,
 		// changes per object instance: worldMatrix
 		// Type: local to object/stored in shader
-		PER_OBJECT_INSTANCE = 1 << 3,
+		PER_OBJECT_INSTANCE = 1 << 4,
 	};
 
+	class AutoParamProcessor;
 	// todo Profile the usage of this struct with pure uint32 ints.
 	struct ShaderParamDesc {
 		AutoParamProcessor* processor;
@@ -107,12 +110,14 @@ namespace nextar {
 		String name;
 	};
 
-	struct ConstBufferParamDesc : public ShaderParamDesc {
+	struct ConstBufferParamDesc {
+		ShaderParamDesc paramDesc;
 		uint32 cbOffset;
 	};
 
-	struct TextureSamplerParamDesc : public ShaderParamDesc {
-		TextureUnitParams params;
+	struct TextureSamplerParamDesc {
+		ShaderParamDesc paramDesc;
+		TextureUnitParams texUnitParams;
 		union {
 			TextureUnit defaultTexture;
 			TextureUnit* defaultTextureArray;
@@ -122,24 +127,58 @@ namespace nextar {
 	class ShaderParamIterator : public AllocGeneral {
 	public:
 
-		ShaderParamIterator(ShaderParamDesc* _cursor, uint32 _count, uint32 _stride) :
-			cursor(reinterpret_cast<const ShaderParamDesc*>(reinterpret_cast<const uint8*>(_cursor) - _stride)),
+		ShaderParamIterator() : cursor(nullptr), count(0), stride(0) {
+		}
+
+		ShaderParamIterator(const ShaderParamDesc* _cursor, uint32 _count, uint32 _stride) :
+			cursor(reinterpret_cast<const ShaderParamDesc*>(reinterpret_cast<const uint8*>(_cursor))),
 			stride(_stride), count(_count) {
 		}
 
-		inline const ShaderParamDesc& Get() const {
+		operator bool() const {
+			return count != 0;
+		}
+
+		const ShaderParamDesc& operator *() const {
 			return *cursor;
 		}
 
-		inline bool Next() {
+		ShaderParamIterator& operator ++() {
 			cursor = reinterpret_cast<const ShaderParamDesc*>(reinterpret_cast<const uint8*>(cursor) + stride);
-			return (count--) != 0;
+			--count;
+			return *this;
 		}
 
 	protected:
-		ShaderParamDesc* cursor;
+		const ShaderParamDesc* cursor;
 		uint32 count;
 		uint32 stride;
 	};
+
+
+	class AutoParamProcessor {
+	public:
+		virtual void Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) = 0;
+	protected:
+		~AutoParamProcessor() {}
+	};
+
+	struct AutoParam {
+		uint32 type;
+		uint32 autoName;
+		uint32 frequency;
+		AutoParamProcessor* processor;
+		// todo May not be useful except in UI
+		StringRef name;
+		String desc;
+	};
+
+	struct ParamEntry {
+		ShaderParamDesc* descriptor;
+		uint32 offset;
+	};
+
+	typedef vector<ParamEntry>::type ParamEntryTable;
+	typedef std::pair<ParamEntryTable::iterator, ParamEntryTable::iterator> ParamEntryTableItem;
 } // namespace nextar
 #endif // SHADERPARAM_H_

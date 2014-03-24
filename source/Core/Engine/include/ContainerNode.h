@@ -21,7 +21,7 @@ namespace nextar {
 	 *      Regions are connected in space through Portals.
 	 * @}
 	 */
-	class _NexEngineExport ContainerNode: public Movable {
+	class _NexEngineAPI ContainerNode: public Movable {
 	protected:
 
 		NodeList children;

@@ -11,7 +11,7 @@ namespace nextar {
 		RELEASE_ON_FRAME_THRESHOLD,
 	};
 
-	class _NexEngineExport VertexBuffer: public ManagedBuffer {
+	class _NexEngineAPI VertexBuffer: public ManagedBuffer {
 
 	public:
 

@@ -60,7 +60,7 @@ namespace nextar {
 		_33 = 1 - 2 * (xx + yy);
 	}
 
-	_NexBaseExport Matrix3x3 Inverse(const Matrix3x3& m2) {
+	_NexBaseAPI Matrix3x3 Inverse(const Matrix3x3& m2) {
 		Matrix3x3 m1;
 		float d;
 		m1._11 = (m2._22 * m2._33 - m2._23 * m2._32);

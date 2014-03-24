@@ -135,6 +135,15 @@ namespace nextar {
 	typedef AllocObjectBase<AllocatorCacheAligned> AllocCacheAligned;
 	typedef AllocObjectBase<AllocatorComponent> AllocComponent;
 	typedef AllocObjectBase<AllocatorBufferData> AllocBufferData;
+
+
+	template <typename T>
+	class GenericDeleter {
+	public:
+		inline void operator () (T* ptr) const {
+			NEX_FREE(ptr, MEMCAT_GENERAL);
+		}
+	};
 }
 
 #include <STLAllocator.h>
