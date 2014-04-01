@@ -9,6 +9,7 @@
 #include <RenderDriverGL.h>
 #include <RenderWindow.h>
 #include <ShaderAsset.h>
+#include <PassGL.h>
 
 namespace RenderOpenGL {
 
@@ -20,9 +21,8 @@ namespace RenderOpenGL {
 
 	}
 
-	RenderWindowPtr RenderContextGL::CreateRenderWindowImpl() {
-		RenderWindow* gw = CreateWindowImpl();
-		return Assign(gw);
+	RenderWindow* RenderContextGL::CreateRenderWindowImpl() {
+		return CreateWindowImpl();
 	}
 
 	void RenderContextGL::PostWindowCreation(RenderWindow* gw) {
@@ -193,12 +193,19 @@ namespace RenderOpenGL {
 	    return inpCount;
 	}
 
-	void RenderContextGL::ReadUniforms(UniformBufferList& ubList, GLuint program) {
-		GLint numUblocks = 0;
-		GlGetProgramiv(program, GL_ACTIVE_UNIFORM_BLOCKS, &numUblocks);
+	void RenderContextGL::ReadUniforms(PassGL* pass, GLuint program) {
+		GLint numBlocks = 0;
+		GlGetProgramiv(program, GL_ACTIVE_UNIFORM_BLOCKS, &numBlocks);
 		char name[128];
-		ubList.reserve(numUblocks);
-		for (GLint i = 0; i < numUblocks; ++i) {
+
+		if(numBlocks > RenderConstants::MAX_CBUFFER_PER_PASS) {
+			Error("Pass has too many constant buffers!.");
+			NEX_THROW_GracefulError(EXCEPT_COMPILATION_FAILED);
+		}
+
+		Pass::ConstantBufferList ubList;
+
+		for (GLint i = 0; i < numBlocks; ++i) {
 			GLint size = 0;
 			GLint numParams = 0;
 			GlGetActiveUniformBlockName(program,
@@ -213,10 +220,12 @@ namespace RenderOpenGL {
 			}
 			String uniName = name;
 			//bool shareUb = true;
-			UniformBufferGL* ubPtr;
+			UniformBufferGL* ubPtr = nullptr;
+			ConstantBufferPtr cbPtr;
 			UniformBufferMap::iterator it = uniformBufferMap.find(uniName);
 			if (it != uniformBufferMap.end()) {
-				ubPtr = (*it).second;
+				cbPtr = (*it).second;
+				ubPtr = static_cast<UniformBufferGL*>(cbPtr.GetPtr());
 				if ( !(ubPtr && ubPtr->GetParamCount() == numParams &&
 						ubPtr->GetSize() == size) ) {
 					Warn(String("Uniform buffer cannot be registered"
@@ -227,47 +236,50 @@ namespace RenderOpenGL {
 				}
 			}
 
-			if (!ubPtr) {
+			if (!cbPtr) {
 				// create a new uniform buffer
-				UniformBufferMap::iterator it = uniformBufferMap.emplace(uniName, std::move(CreateUniformBuffer(i, program, numParams, size))).first;
-
-				ubPtr = &(*it).second;
-				ubPtr->SetName((*it).first);
+				ubPtr = CreateUniformBuffer(pass, i, program, numParams, size);
+				ubPtr->name = std::move(uniName);
+				cbPtr = nextar::Bind<ConstantBuffer>(ubPtr);
+				uniformBufferMap.emplace(std::cref(ubPtr->name),
+						cbPtr).first;
 				ubPtr->SetBinding((GLuint)uniformBufferMap.size());
-
 			}
 
-			ubList.push_back(ubPtr);
+			ubList[i] = cbPtr;
 			// sort ublist by name
-			std::sort(ubList.begin(), ubList.end(), [](const UniformBufferGL* first, const UniformBufferGL* second) {
-					if(first->GetUpdateFrequency() == second->GetUpdateFrequency())
-						return first->GetName() < second->GetName();
-					return (first->GetUpdateFrequency() < second->GetUpdateFrequency()) != 0;
-				});
-			GlBindBufferRange(GL_UNIFORM_BUFFER, ubPtr->GetBinding(), ubPtr->ubName, 0, ubPtr->size);
+			GlBindBufferRange(GL_UNIFORM_BUFFER, ubPtr->GetBinding(), ubPtr->ubNameGl, 0, ubPtr->size);
 			GlUniformBlockBinding(program, i, ubPtr->GetBinding());
 		}
+		std::sort(ubList.data(), ubList.data() + numBlocks,
+				[](const UniformBufferGL* first, const UniformBufferGL* second) {
+			if(first->GetFrequency() == second->GetFrequency())
+				return first->GetName() < second->GetName();
+			return (first->GetFrequency() < second->GetFrequency()) != 0;
+		});
+
+		pass->numConstBuffers = numBlocks;
+		pass->sharedParameters.swap(ubList);
 	}
 
-	UniformBufferGL RenderContextGL::CreateUniformBuffer(GLint blockIndex, GLuint prog,
+	UniformBufferGL* RenderContextGL::CreateUniformBuffer(PassGL* pass, GLint blockIndex, GLuint prog,
 			GLuint numParams, size_t size) {
 
 	    NEX_ASSERT(size > 0);
 	    uint16 numUnmappedParams = 0;
 
-	    UniformBufferGL u;
-	    u.ubName = GL_INVALID_VALUE;
-	    GlGenBuffers(1, &u.ubName);
+	    UniformBufferGL* pUb = NEX_NEW UniformBufferGL;
+	    UniformBufferGL& u = *pUb;
+	    u.ubNameGl = GL_INVALID_VALUE;
+	    GlGenBuffers(1, &u.ubNameGl);
 	    GL_CHECK();
-	    if (u.ubName == GL_INVALID_VALUE) {
+	    if (u.ubNameGl == GL_INVALID_VALUE) {
 	        Error("Failed to generate buffer name");
 	        NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 	    }
 
 	    uint8 mask = 0;
-	    UniformList uniforms;
-	    uniforms.reserve(numParams);
-
+	    UniformGL* uniforms = NEX_ALLOC_ARRAY_T(UniformGL, MEMCAT_GENERAL, numParams);
 	    void* tempBuffer = NEX_ALLOC(sizeof(GLint)*numParams*7 + 128, MEMCAT_GENERAL);
 	    GLint *indices = static_cast<GLint*>(tempBuffer) + numParams*0;
 	    GLint *type = static_cast<GLint*>(tempBuffer) + numParams*1;
@@ -295,58 +307,89 @@ namespace RenderOpenGL {
 	    GlGetActiveUniformsiv(prog, numParams, uindices, GL_UNIFORM_ARRAY_STRIDE, arrayStride);
 	    GL_CHECK();
 
-	    UniformGL uform;
+
+	    uint32 numCustomParams = 0;
 	    for (GLint i = 0; i < (GLint)numParams; ++i) {
+	    	UniformGL& uform = uniforms[i];
 	        GlGetActiveUniformName(prog, indices[i], 128, 0, uniName);
+	        String name = uniName;
 	        GL_CHECK();
 	        uform.isRowMajMatrix = rowMaj[i] ? true : false;
 	        uform.typeGl = uint8(type[i]);
 	        uform.matrixStride = matStride[i];
 	        uform.arrayStride = arrayStride[i];
-	        uform.arrayCount = uint16(arraynum[i]);
-	        ShaderAsset::ParamDef& paramDef = ShaderAsset::MapParamName(uform.name);
-	        uform.autoName = paramDef.autoName;
-	        uform.type = GetShaderParamType(uform.typeGl);
-	        uform.sizeInBytes = GetShaderParamSize(uform.typeGl) * uform.arrayCount;
-	        uform.updateFrequency = paramDef.updateFrequency;
-	        uform.offset =  offset[i];
-	        if (uform.autoName == (uint16)AutoParamName::AUTO_CUSTOM) {
-	        	uform.name = uniName;
-	        	numUnmappedParams++;
-	        } else if(paramDef.type != uform.type ) {
-	        	Warn("Auto parameter differs by type, please set appropriate type: " + uform.name);
-	        	continue;
+	        uform.constBufferDesc.cbOffset = offset[i];
+	        uform.constBufferDesc.paramDesc.arrayCount = uint16(arraynum[i]);
+	        uform.constBufferDesc.paramDesc.size =
+	        		GetShaderParamSize(uform.typeGl) * uform.constBufferDesc.paramDesc.arrayCount;
+	        uform.constBufferDesc.paramDesc.type = GetShaderParamType(uform.typeGl);
+
+	        // todo Make all possible shader paramter auto param/custom param
+	        // and register them to this table, thus a valid pointer is always
+	        // retrieved. For custom param, the processor will be set to custom
+	        // processor which knows how to retrieve from the parameter buffer.
+	        // Later on when the shader script is properly made, the script will
+	        // read the parameters from the script and automatically add them
+	        // to the mapped list for retrieval here.
+	        AutoParam* paramDef = pass->MapParam(name);
+	        // if this is not an auto param, we
+	        // use a custom processor
+	        if (paramDef == nullptr) {
+	        	numCustomParams++;
+	        	uform.constBufferDesc.paramDesc.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
+	        	uform.constBufferDesc.paramDesc.name = std::move(name);
+	        	uform.constBufferDesc.paramDesc.frequency = UpdateFrequency::PER_MATERIAL;
+	        	uform.constBufferDesc.paramDesc.processor = Pass::customConstantProcessorMaterial;
+	        } else {
+	        	uform.constBufferDesc.paramDesc.autoName = paramDef->autoName;
+				uform.constBufferDesc.paramDesc.frequency = paramDef->frequency;
+				uform.constBufferDesc.paramDesc.processor = paramDef->processor;
+				NEX_ASSERT(uform.constBufferDesc.paramDesc.type == paramDef->type);
 	        }
 
-	        mask |= uform.updateFrequency;
-	        uniforms.push_back(uform);
+	        mask |= uform.constBufferDesc.paramDesc.frequency;
 	    }
 
 	    // sort the resulting uniforms such that auto params come first
 	    // followed by unmapped params. Unmapped params are sorted by name.
-	    std::sort(uniforms.begin(), uniforms.end());
-	    u.numUnmappedParams = numUnmappedParams;
-	    u.uniforms.swap(uniforms);
-	    u.updateFrequency = mask;
+	    std::sort(uniforms, uniforms + numParams,
+	    		[] (const UniformGL& first, const UniformGL& second) {
+	    			if (first.constBufferDesc.paramDesc.autoName == second.constBufferDesc.paramDesc.autoName) {
+	    				NEX_ASSERT(first.constBufferDesc.paramDesc.autoName == AutoParamName::AUTO_CUSTOM_CONSTANT);
+	    				return first.constBufferDesc.cbOffset < first.constBufferDesc.cbOffset;
+	    			}
+	    			return (first.constBufferDesc.paramDesc.autoName <
+	    					second.constBufferDesc.paramDesc.autoName) != 0;
+			}
+	    );
+	    if (numCustomParams == numParams) {
+	    	u.SetFlags(ConstantBuffer::CUSTOM_STRUCT);
+	    	u.processor = Pass::customStructProcessorMaterial;
+	    }
+	    u.paramCount = numParams;
+	    u.paramDesc = &uniforms->constBufferDesc;
+	    u.frequency = mask;
 	    u.size = size;
 	    NEX_FREE(tempBuffer, MEMCAT_GENERAL);
-	    GlBindBuffer( GL_UNIFORM_BUFFER, u.ubName );
+	    GlBindBuffer( GL_UNIFORM_BUFFER, u.ubNameGl );
 	    GL_CHECK();
 	    GlBufferData( GL_UNIFORM_BUFFER, size, NULL, GL_DYNAMIC_DRAW );
 	    GL_CHECK();
 	    GlBindBuffer( GL_UNIFORM_BUFFER, 0 );
 	    GL_CHECK();
+
+	    return pUb;
 	}
 
-	void RenderContextGL::ReadSamplers(SamplerStateList& samplers, uint32& numUnmapped, const PassGL* shader, GLuint program) {
+	void RenderContextGL::ReadSamplers(PassGL* pass, GLuint program) {
 		/** todo Massive work left for sampler arrays */
 	    GLint numUni = 0;
 	    char name[128];
         size_t extra = 0;
 	    GlGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numUni);
-	    samplers.reserve(numUni);
-	    numUnmapped = 0;
-
+	    // assume all are samplers, otherwise we got a problem
+	    SamplerState* samplers = NEX_ALLOC_ARRAY_T(SamplerState, MEMCAT_GRAPHICS, numUni);
+	    uint32 mapped = 0;
         for (GLuint i = 0; i < (GLuint) numUni; ++i) {
 
             GlGetActiveUniformName(program, i, 128, 0, name);
@@ -359,22 +402,14 @@ namespace RenderOpenGL {
             GL_CHECK();
             if (IsSamplerType(type)) {
 
-            	SamplerState ss;
-            	/**
-            	 * todo Add sampler array support please
-            	 * */
-            	ss.samplerCount = 1;
-                //uint16 index = shader->GetTextureUnitIndex(unitName);
-                //if ((int16)index < 0) {
-                //    Error(String("Overflowing/Unspecified texture unit index for ") + name);
-                //    continue;
-                //}
-            	const TextureUnitParams& tu = *shader->GetTextureUnit(unitName);
+            	SamplerState& ss = samplers[mapped++];
+            	ss.desc.paramDesc.arrayCount = 1;
+            	const Pass::SamplerDesc& tu = *pass->MapSamplerParams(unitName);
             	if (&tu == nullptr) {
 				    Error(String("Overflowing/Unspecified texture unit index for ") + name);
 				    continue;
 				}
-            	const AutoParam* paramDef = Pass::MapParam(unitName);
+            	const AutoParam* paramDef = pass->MapParam(unitName);
                 ss.location = loc;
                 /**
                  * The index of the texture unit within the shader may not be stored
@@ -391,36 +426,36 @@ namespace RenderOpenGL {
                  * from the shader might not get used eventually.
                  * */
                 // ss.index = (uint8)index;
-
-                if (paramDef) {
-                	ss.autoName = paramDef->autoName;
-                	ss.frequency = paramDef->frequency;
-                	ss.processor = paramDef->processor;
+                if (paramDef == nullptr) {
+    	        	ss.desc.paramDesc.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
+    	        	ss.desc.paramDesc.name = std::move(unitName);
+    	        	ss.desc.paramDesc.frequency = UpdateFrequency::PER_MATERIAL;
+    	        	ss.desc.paramDesc.processor = Pass::customTextureProcessorMaterial;
                 } else {
-                	numUnmapped++;
-                	ss.autoName = AutoParamName::AUTO_CUSTOM;
-                	ss.processor = Pass::GetCustomTextureProcessor();
-                	ss.frequency = UpdateFrequency::PER_MATERIAL;
-                	ss.name = unitName;
+                	ss.desc.paramDesc.autoName = paramDef->autoName;
+                	ss.desc.paramDesc.frequency = paramDef->frequency;
+                	ss.desc.paramDesc.processor = paramDef->processor;
                 }
-
+                ss.desc.paramDesc.size = sizeof(SamplerState);
+                ss.desc.defaultTexture.texture = tu.defaultTexture;
+                const TextureUnitParams& params = tu.texUnitParams;
 
                 GlGenSamplers(1, &ss.sampler);
                 GL_CHECK();
                 if (ss.sampler) {
-                	GlSamplerParameteri(ss.sampler, GL_TEXTURE_MIN_FILTER, GetGlMinFilter(tu.minFilter));
+                	GlSamplerParameteri(ss.sampler, GL_TEXTURE_MIN_FILTER, GetGlMinFilter(params.minFilter));
                 	GL_CHECK();
-                	GlSamplerParameteri(ss.sampler, GL_TEXTURE_MAG_FILTER, GetGlMagFilter(tu.magFilter));
+                	GlSamplerParameteri(ss.sampler, GL_TEXTURE_MAG_FILTER, GetGlMagFilter(params.magFilter));
                 	GL_CHECK();
-                	GlSamplerParameteri(ss.sampler, GL_TEXTURE_WRAP_S, GetGlAddressMode(tu.uAddress));
+                	GlSamplerParameteri(ss.sampler, GL_TEXTURE_WRAP_S, GetGlAddressMode(params.uAddress));
                 	GL_CHECK();
-                	GlSamplerParameteri(ss.sampler, GL_TEXTURE_WRAP_T, GetGlAddressMode(tu.vAddress));
+                	GlSamplerParameteri(ss.sampler, GL_TEXTURE_WRAP_T, GetGlAddressMode(params.vAddress));
                 	GL_CHECK();
-                	GlSamplerParameteri(ss.sampler, GL_TEXTURE_WRAP_R, GetGlAddressMode(tu.wAddress));
+                	GlSamplerParameteri(ss.sampler, GL_TEXTURE_WRAP_R, GetGlAddressMode(params.wAddress));
                 	GL_CHECK();
                 }
-                if (tu.comparisonFunc) {
-                	GlSamplerParameteri(ss.sampler, GL_TEXTURE_COMPARE_FUNC, GetGlCompareFunc(tu.comparisonFunc));
+                if (params.comparisonFunc) {
+                	GlSamplerParameteri(ss.sampler, GL_TEXTURE_COMPARE_FUNC, GetGlCompareFunc(params.comparisonFunc));
                 	GL_CHECK();
                 	GlSamplerParameteri(ss.sampler, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
                 	GL_CHECK();
@@ -428,22 +463,96 @@ namespace RenderOpenGL {
                 	GlSamplerParameteri(ss.sampler, GL_TEXTURE_COMPARE_MODE, GL_NONE);
                 	GL_CHECK();
                 }
-                GlSamplerParameterf(ss.sampler, GL_TEXTURE_LOD_BIAS, tu.lodBias);
+                GlSamplerParameterf(ss.sampler, GL_TEXTURE_LOD_BIAS, params.lodBias);
 				GL_CHECK();
-				GlSamplerParameterf(ss.sampler, GL_TEXTURE_MIN_LOD, tu.minLod);
+				GlSamplerParameterf(ss.sampler, GL_TEXTURE_MIN_LOD, params.minLod);
 				GL_CHECK();
-				GlSamplerParameterf(ss.sampler, GL_TEXTURE_MAX_LOD, tu.maxLod);
+				GlSamplerParameterf(ss.sampler, GL_TEXTURE_MAX_LOD, params.maxLod);
                 GL_CHECK();
-                GlSamplerParameteri(ss.sampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, tu.maxAnisotropy);
+                GlSamplerParameteri(ss.sampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, params.maxAnisotropy);
 				GL_CHECK();
-				GlSamplerParameterfv(ss.sampler, GL_TEXTURE_BORDER_COLOR, tu.borderColor.AsFloatArray());
+				GlSamplerParameterfv(ss.sampler, GL_TEXTURE_BORDER_COLOR, params.borderColor.AsFloatArray());
 				GL_CHECK();
-				samplers.push_back(ss);
             }
-            std::sort(samplers.begin(), samplers.end(), [](const SamplerState& s1, const SamplerState& s2) {
-            	return s1.autoName == s2.autoName ? s1.name < s2.name : ((s1.autoName < s2.autoName) != 0);
+            std::sort(samplers, samplers + mapped, [](const SamplerState& s1, const SamplerState& s2) {
+            	return s1.desc.paramDesc.autoName == s2.desc.paramDesc.autoName ? s1.desc.paramDesc.name < s2.desc.paramDesc.name :
+            			((s1.desc.paramDesc.autoName < s2.desc.paramDesc.autoName) != 0);
             });
 	    }
+	}
+
+	void RenderContextGL::Capture(PixelBox& image,
+			RenderTarget* rt,
+			GLuint *pbo,
+			FrameBuffer frameBuffer) {
+		/* todo Expand this function for frame buffer,
+		 * depth map capture etc. */
+		GLenum readTargets[] = {
+				GL_FRONT_LEFT,
+				GL_FRONT_RIGHT,
+				GL_BACK_LEFT,
+				GL_BACK_RIGHT
+		};
+
+		Size size = rt->GetDimensions();
+		// assuming color buffer capture
+		size_t dataSize = size.dx*size.dy*4;
+        if (!image.Data())
+        	image.DataPtr(NEX_ALLOC(dataSize, MEMCAT_GENERAL));
+
+		bool asyncCapture =
+				RenderManager::Instance().GetRenderSettings().asyncCapture;
+
+		glReadBuffer(readTargets[frameBuffer]);
+		if (asyncCapture) {
+			uint32 next = RenderConstants::MAX_FRAME_PRE_CAPTURE-1;
+			if (!pbo[0]) {
+				// need to create pbo, and this is our first go
+				next = 0;
+		        GlGenBuffers(RenderConstants::MAX_FRAME_PRE_CAPTURE, pbo);
+	        	GL_CHECK();
+		        for(uint32 i = 0; i < RenderConstants::MAX_FRAME_PRE_CAPTURE; ++i) {
+		        	GlBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[0]);
+		        	GL_CHECK();
+		        	GlBufferData(GL_PIXEL_PACK_BUFFER, dataSize, 0, GL_STREAM_READ);
+			        GL_CHECK();
+		        }
+		        GlBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+			}
+
+	        GlBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[next]);
+	        GL_CHECK();
+	        glReadPixels(0, 0, size.dx, size.dy, GL_BGRA, GL_UNSIGNED_BYTE, 0);
+	        GL_CHECK();
+	        // map and read
+	        GLuint cur = pbo[0];
+	        for (uint32 i = 0; i < RenderConstants::MAX_FRAME_PRE_CAPTURE-1; ++i)
+	        	pbo[i] = pbo[i+1];
+	        pbo[RenderConstants::MAX_FRAME_PRE_CAPTURE-1] = cur;
+	        GlBindBuffer(GL_PIXEL_PACK_BUFFER, cur);
+	        GL_CHECK();
+	        void* data = GlMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
+	        GL_CHECK();
+	        std::memcpy(image.Data(), data, dataSize);
+	        GlUnmapBuffer(GL_PIXEL_PACK_BUFFER);
+	        GL_CHECK();
+	        GlBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+	        GL_CHECK();
+		} else {
+			glReadPixels(0, 0, size.dx, size.dy, GL_BGRA, GL_UNSIGNED_BYTE, image.Data());
+			GL_CHECK();
+		}
+
+		image.left = 0;
+		image.right = size.dx;
+		image.top = 0;
+		image.bottom = size.dy;
+		image.front = 0;
+		image.back = 1;
+		// todo
+		image.format = PixelFormat::BGRA8;
+		image.CalculatePitches();
+		glReadBuffer(GL_BACK);
 	}
 
 	bool RenderContextGL::IsSamplerType(GLint type) {
@@ -679,6 +788,44 @@ namespace RenderOpenGL {
 		}
 	}
 	
+	void RenderContextGL::SetCurrentTarget(RenderTarget* canvas) {
+		if (canvas == nullptr)
+			SetCurrentWindow(nullptr);
+		else {
+			switch (canvas->GetRenderTargetType()) {
+			case RenderTargetType::RENDER_TEXTURE:
+			case RenderTargetType::RENDER_WINDOW:
+				SetCurrentWindow(canvas);
+				break;
+			case RenderTargetType::MULTI_RENDER_TARGET:
+			}
+		}
+	}
+
+	void RenderContextGL::Clear(Color& c, float depth, uint16 stencil, uint16 flags) {
+		GLbitfield mask = 0;
+		if (flags & ClearFlags::CLEAR_COLOR) {
+			mask |= GL_COLOR_BUFFER_BIT;
+			glClearColor(c.red, c.green, c.blue, c.alpha);
+		}
+		if (flags & ClearFlags::CLEAR_DEPTH) {
+			mask |= GL_DEPTH_BUFFER_BIT;
+			glClearDepth(depth);
+		}
+		if (flags & ClearFlags::CLEAR_STENCIL) {
+			mask |= GL_STENCIL_BUFFER_BIT;
+			glClearStencil(stencil);
+		}
+		glClear(mask);
+		GL_CHECK();
+	}
+
+	void RenderContextGL::SetActivePass(Pass* pass) {
+		PassGL* passGl = static_cast<PassGL*>(pass);
+		GlUseProgram(passGl->GetProgram());
+		GL_CHECK();
+	}
+
 	GLuint RenderContextGL::CreateVertexBuffer(size_t size, GLenum usage) {
 		GLuint bufferId = 0;
 		GlGenBuffers(1, &bufferId);
@@ -717,8 +864,5 @@ namespace RenderOpenGL {
 	}
 
 }
-
-
-
 
 

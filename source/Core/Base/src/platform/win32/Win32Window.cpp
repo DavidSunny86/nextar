@@ -6,12 +6,12 @@
 
 namespace nextar {
 
-    void RenderWindowWin::WindowConfigChanged() {
+    void Win32Window::WindowConfigChanged() {
         // todo get the resized window
         GraphicsWindow::WindowConfigChanged();
     }
 
-	LRESULT CALLBACK RenderWindowWin::WndProc(HWND wnd, UINT message, WPARAM wparam,
+	LRESULT CALLBACK Win32Window::WndProc(HWND wnd, UINT message, WPARAM wparam,
 			LPARAM lparam) {
 
 		RenderWindow* wind = (RenderWindow*) GetWindowLongPtr(wnd,

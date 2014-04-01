@@ -8,17 +8,9 @@
 namespace RenderOpenGL {
 
 	struct SamplerState {
-		uint8 updateFrequency;
-		// uint8 index; /* within shader */
-		uint8 samplerCount;
-		uint16 autoName;
+		TextureSamplerParamDesc desc;
 		GLint location;
-		union {
-			GLuint sampler;
-			GLuint* samplerArr;
-		};
-
-		String name;
+		GLuint sampler;
 	};
 
 	struct VertexSemanticGL {
@@ -37,8 +29,6 @@ namespace RenderOpenGL {
 	 */
 	typedef vector<VertexSemanticGL>::type VertexSemanticListGL;
 
-	typedef vector<SamplerState>::type SamplerStateList;
-
 	class PassGL : public Pass {
 		NEX_LOG_HELPER(PassGL);
 
@@ -53,7 +43,11 @@ namespace RenderOpenGL {
 			return *inputSemantics;
 		}
 
-		virtual void UpdateParams(RenderContext* renderCtx, CommitContext& context, uint32 flags);
+		inline GLuint GetProgram() {
+			return iGlProgram;
+		}
+
+		virtual void SetTextureImpl(RenderContext* rc, const TextureSamplerParamDesc* desc, const TextureUnit* tu);
 
 	protected:
 		virtual bool Compile(nextar::RenderContext*);
@@ -64,23 +58,13 @@ namespace RenderOpenGL {
 		virtual bool UpdateRasterStates(nextar::RenderContext*) = 0;
 		virtual bool UpdateDepthStencilStates(nextar::RenderContext*) = 0;
 
-		/* Material Property Table:
-		 * [u1][u2]..[un][s1][s2]..[sm]
-		 * Uniforms are mapped to material properties directly indexing, the material properties
-		 * first contain the uniforms then the samplers in their table. */
-		UniformBufferList uniforms;
-		/* The samplers are bound following the uniforms, the samplers might refer to default textures,
-		 * which may be retrieved from the material via the name of the sampler in case the material
-		 * does not contain a valid value.
-		 * */
-		uint32 unmappedSamplers;
-		SamplerStateList samplers;
-
 		GLuint iGlProgram;
 		VertexSemanticListGL* inputSemantics;
 		
 		typedef vector<VertexSemanticListGL>::type VertexSemanticListList;
 		static VertexSemanticListList registeredSignatures;
+
+		friend class RenderContextGL;
 	};
 
 }

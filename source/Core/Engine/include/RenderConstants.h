@@ -23,6 +23,9 @@ namespace nextar {
 			MAX_PROGRAM_STAGES = 5,
 			MAX_VERTEX_ELEMENT = 32,
 			MAX_VERTEX_STREAMS = 4,
+			MAX_CBUFFER_PER_PASS = 4,
+			// for async capture, this will pre capture the n-3rd frame from before-hand
+			MAX_FRAME_PRE_CAPTURE = 3,
 	};
 }
 

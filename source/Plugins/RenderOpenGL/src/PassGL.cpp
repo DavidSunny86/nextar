@@ -5,7 +5,8 @@
 
 namespace RenderOpenGL {
 
-	PassGL::PassGL() : unmappedSamplers(0), inputSemantics(nullptr), iGlProgram(0) {
+	PassGL::PassGL() : inputSemantics(nullptr), iGlProgram(0) {
+		samplerStride = sizeof(SamplerState);
 	}
 
 	PassGL::~PassGL() {
@@ -41,9 +42,9 @@ namespace RenderOpenGL {
 		// this->inputLoc.reserve(numSemantics);
 		// this->inputLoc.assign(inputLoc, inputLoc + numSemantics);
 		// read uniform data and register to uniform buffer manager
-		ctx->ReadUniforms(uniforms, iGlProgram);
+		ctx->ReadUniforms(this, iGlProgram);
 		// read samplers
-		ctx->ReadSamplers(samplers, unmappedSamplers, this, iGlProgram);
+		ctx->ReadSamplers(this, iGlProgram);
 
 		/* Feedback data */
 		if (!IsProgramDataInited()) {
@@ -95,7 +96,6 @@ namespace RenderOpenGL {
 
 		return true;
 	}
-
 	
 	std::pair<uint16, VertexSemanticListGL*> PassGL::MapLayout(const VertexSemanticGL* semantics, uint32 numSemantics) {
 		uint16 index = 0;
@@ -109,18 +109,5 @@ namespace RenderOpenGL {
 
 		registeredSignatures.push_back(VertexSemanticListGL(semantics, semantics+numSemantics));
 		return std::pair<uint16, VertexSemanticListGL*>(index, &registeredSignatures.back());
-	}
-
-	void PassGL::UpdateParams(RenderContext* rc, CommitContext& ctx, uint32 flags) {
-		for(auto& u : uniforms) {
-			if (u->GetUpdateFrequency() & flags) {
-
-				for(auto& v : u->uniforms) {
-					if (v.updateFrequency & flags) {
-						Apply(v, ctx);
-					}
-				}
-			}
-		}
 	}
 }

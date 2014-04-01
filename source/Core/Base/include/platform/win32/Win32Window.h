@@ -6,7 +6,7 @@
 
 namespace nextar {
 
-    class RenderWindowWin : public RenderWindow {
+    class Win32Window : public RenderWindow {
     protected:
         HWND window;
         HDC window_dc;
@@ -15,7 +15,7 @@ namespace nextar {
 
     public:
 
-        inline RenderWindowWin() : window(0), full_control(false), original_proc(0) {
+        inline Win32Window() : window(0), full_control(false), original_proc(0) {
         }
 
         WNDPROC GetWindowProc() {
@@ -45,7 +45,7 @@ namespace nextar {
         /** @copydoc GraphicsWindow::WindowConfigChanged */
         virtual void WindowConfigChanged();
         
-	static LRESULT CALLBACK WndProc(HWND wnd, UINT message, WPARAM wparam,
+        static LRESULT CALLBACK WndProc(HWND wnd, UINT message, WPARAM wparam,
 			LPARAM lparam);
     };
 }

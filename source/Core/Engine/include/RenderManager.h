@@ -41,10 +41,17 @@ namespace nextar {
 
 		struct RenderSettings {
 			bool syncPresent;
+			/* capturing render targets will not return the immediate data
+			 * but the previous frame's data.  */
+			bool asyncCapture;
 		};
 
 		RenderManager();
 		virtual ~RenderManager();
+
+		inline const RenderSettings& GetRenderSettings() const {
+			return renderSettings;
+		}
 
 		/* */
 		virtual void Configure(const Config&);

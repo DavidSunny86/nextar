@@ -9,6 +9,7 @@
 #include <VertexElementGL.h>
 #include <VertexBufferGL.h>
 #include <IndexBufferGL.h>
+#include <RenderTarget.h>
 #include <PassGL.h>
 
 namespace RenderOpenGL {
@@ -25,9 +26,13 @@ namespace RenderOpenGL {
 
 		/* Implementation */
 		virtual void CreateImpl(const RenderDriver::ContextCreationParams& ctxParams);
-		virtual RenderWindowPtr CreateRenderWindowImpl();
+		virtual RenderWindow* CreateRenderWindowImpl();
 		virtual void PostWindowCreation(RenderWindow* windowGl);
 		virtual void PostWindowDestruction(RenderWindow* windowGl);
+		virtual void Draw(StreamData*, CommitContext&);
+		virtual void SetCurrentTarget(RenderTarget*);
+		virtual void Clear(Color& c, float depth, uint16 stencil, uint16 flags);
+		virtual void SetActivePass(Pass* pass);
 
 		/* HL Functions */
 
@@ -53,9 +58,9 @@ namespace RenderOpenGL {
 		uint32 ReadProgramSemantics(GLuint program,
 				VertexSemanticGL* inputSemantics);
 		/* Read uniform data */
-		void ReadUniforms(UniformBufferList&, GLuint program);
+		void ReadUniforms(PassGL*, GLuint program);
 		/* Read sampler information */
-		void ReadSamplers(SamplerStateList& samplers, uint32& numUnmapped, const PassGL* shader, GLuint program);
+		void ReadSamplers(PassGL*, GLuint program);
 
 		GLuint CreateVAO(VertexBufferBinding& binding, VertexAttribListGL& attribs, const VertexSemanticListGL& semantics);
 		GLuint CreateVertexBuffer(size_t size, GLenum usage);
@@ -71,12 +76,18 @@ namespace RenderOpenGL {
 		inline void SetVertexBuffer(VertexBufferPtr& vb);
 		inline void EnableVertexAttribute(const GLuint location, const VertexAttribGL& vegl);
 		inline void DisableVertexAttribute(const GLuint location);
-		inline void ReadBuffer(GLenum target, GLuint bufferId, void* dest, size_t offset, size_t size);
-		inline void WriteBuffer(GLenum target, GLuint bufferId, size_t totalSize, GLenum usage, 
+		inline void ReadBuffer(GLenum target, void* dest, size_t offset, size_t size);
+		inline void WriteBuffer(GLenum target, size_t totalSize, GLenum usage,
 			const void* src, size_t offset, size_t size);
-		
-				
-		virtual void Draw(StreamData*, CommitContext&);
+		inline void WriteSubData(GLenum target, const void* src, size_t offset, size_t size);
+		inline void Bind(GLenum target, GLuint bufferId);
+		inline void* Map(GLenum target, GLenum access);
+		inline void Unmap(GLenum target);
+		inline void* MapRange(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access);
+
+		// capture
+		void Capture(PixelBox& image, RenderTarget* rt, GLuint *pbo, FrameBuffer frameBuffer);
+
 	protected:
 
 		static uint16 GetShaderParamType(GLuint type);
@@ -88,7 +99,7 @@ namespace RenderOpenGL {
 		static GLint GetGlMagFilter(TextureMinFilterType t);
 		static GLint GetGlMinFilter(TextureMinFilterType t);
 		
-		UniformBufferGL CreateUniformBuffer(GLint blockIndex, GLuint prog, GLuint numParams, size_t size);
+		UniformBufferGL* CreateUniformBuffer(PassGL* pass, GLint blockIndex, GLuint prog, GLuint numParams, size_t size);
 
 		enum {
 			CONTEXT_READY = 1 << 0,
@@ -103,14 +114,16 @@ namespace RenderOpenGL {
 			return contextFlags & EXTENSIONS_READY;
 		}
 
+		// Implementation
 		virtual void SetCreationParams(const RenderDriver::ContextCreationParams& ctxParams) = 0;
 		virtual RenderWindow* CreateWindowImpl() = 0;
 		virtual void ReadyContext(RenderWindow*) = 0;
+		virtual void SetCurrentWindow(RenderTarget* rt) = 0;
 
 		uint32 contextFlags;
 		//GpuObjectTable gpuObjects;
 		/* uniform buffer table */
-		typedef unordered_map<StringRef, UniformBufferGL>::type UniformBufferMap;
+		typedef unordered_map<StringRef, ConstantBufferPtr>::type UniformBufferMap;
 
 		UniformBufferMap uniformBufferMap;
 		RenderDriver::ContextCreationParams contextCreationParams;
@@ -164,9 +177,7 @@ namespace RenderOpenGL {
 		GlDeleteBuffers(1, &bufferId);
 	}
 
-	inline void RenderContextGL::ReadBuffer(GLenum target, GLuint bufferId, void* dest, size_t offset, size_t size) {
-		GlBindBuffer(target, bufferId);
-		GL_CHECK();
+	inline void RenderContextGL::ReadBuffer(GLenum target, void* dest, size_t offset, size_t size) {
 		void* src = GlMapBuffer(target, GL_READ_ONLY);
 		GL_CHECK();
 		std::memcpy(dest, (uint8*) (src) + offset, size);
@@ -174,18 +185,42 @@ namespace RenderOpenGL {
 		GL_CHECK();
 	}
 
-	inline void RenderContextGL::WriteBuffer(GLenum target, GLuint bufferId, size_t totalSize, GLenum usage, 
+	inline void RenderContextGL::WriteBuffer(GLenum target, size_t totalSize, GLenum usage,
 		const void* src, size_t offset, size_t size) {
-		GlBindBuffer(target, bufferId);
 		if (!size) {
 			size = totalSize - offset;
 			GlBufferData(target, totalSize, NULL, usage);
 		}
 		GL_CHECK();
+		WriteSubData(target, src, offset, size);
+	}
+
+	inline void RenderContextGL::WriteSubData(GLenum target, const void* src, size_t offset, size_t size) {
 		GlBufferSubData(target, offset, size, src);
 		GL_CHECK();
 	}
 
+	inline void RenderContextGL::Bind(GLenum target, GLuint bufferId) {
+		GlBindBuffer(target, bufferId);
+		GL_CHECK();
+	}
+
+	inline void* RenderContextGL::Map(GLenum target, GLenum access) {
+		void* ret = GlMapBuffer(target, access);
+		GL_CHECK();
+		return ret;
+	}
+
+	inline void* RenderContextGL::MapRange(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access) {
+		void* ret = GlMapBufferRange(target, offset, length, access);
+		GL_CHECK();
+		return ret;
+	}
+
+	inline void RenderContextGL::Unmap(GLenum target) {
+		GlUnmapBuffer(target);
+		GlBindBuffer(target, 0);
+	}
 }
 
 #endif //RENDERCONTEXTGL_H_

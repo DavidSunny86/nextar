@@ -132,6 +132,10 @@ namespace nextar {
 			return translucency;
 		}
 
+		inline Pass* GetPass(uint32 i) {
+			return passes[i].get();
+		}
+
 		ParameterIterator GetParameterIterator(uint32 type);
 
 		virtual void Create(nextar::RenderContext*);

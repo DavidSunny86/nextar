@@ -5,8 +5,8 @@
 
 namespace nextar {
 
-	RenderWindow::RenderWindow() :
-			flags(WINDOW_CLOSED) {
+	RenderWindow::RenderWindow(Impl* _impl) :
+			flags(WINDOW_CLOSED), impl(_impl) {
 	}
 
 	RenderWindow::~RenderWindow() {
@@ -16,7 +16,7 @@ namespace nextar {
 			const NameValueMap* params) {
 		if (flags & WINDOW_CREATED)
 			return;
-		CreateImpl(width, height, fullscreen, params);
+		impl->Create(width, height, fullscreen, params);
 		WindowManager::Instance().RegisterWindow(this);
 		WinEventListnerList::iterator it = listeners.begin();
 		WinEventListnerList::iterator end = listeners.end();
@@ -41,7 +41,7 @@ namespace nextar {
 		}
 
 		WindowManager::Instance().UnregisterWindow(this);
-		DestroyImpl();
+		impl->Destroy();
 		flags &=~WINDOW_CREATED;
 		flags |= WINDOW_CLOSED;
 		Trace("Window Destroyed: " + windowTitle);
@@ -57,23 +57,23 @@ namespace nextar {
 	}
 
 	void RenderWindow::WindowConfigChanged() {
-
 		WinEventListnerList::iterator it = listeners.begin();
 		WinEventListnerList::iterator end = listeners.end();
 		while (it != end) {
 			(*it)->WindowConfigChanged(this);
 			++it;
 		}
+		impl->ApplyChangedAttributes();
 	}
 
 	void RenderWindow::WindowFocusChanged() {
-
 		WinEventListnerList::iterator it = listeners.begin();
 		WinEventListnerList::iterator end = listeners.end();
 		while (it != end) {
 			(*it)->WindowFocusChanged(this);
 			++it;
 		}
+		impl->ApplyChangedAttributes();
 	}
 
 	void RenderWindow::SetActive(bool act) {
@@ -82,5 +82,9 @@ namespace nextar {
 
 	void RenderWindow::SetVisible(bool val) {
 		flags = val ? flags | WINDOW_VISIBLE : flags & ~WINDOW_VISIBLE;
+	}
+
+	void RenderWindow::SetToFullScreen(bool full) {
+		impl->SetToFullScreen(full);
 	}
 }

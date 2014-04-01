@@ -2,7 +2,7 @@
 #ifndef _RENDEROPENGL_H_
 #define _RENDEROPENGL_H_
 
-#include <BaseHeaders.h>
+#include <NexEngine.h>
 #include <ConfigGL.h>
 #include <IncludeGL.h>
 

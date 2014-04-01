@@ -5,29 +5,16 @@
 # 11/02/2013
 ##---------------------------------------------------
 
-set(NEXIMGLD_ROOT ${NEX_PLUGINS}/ImageLoader)
-set(NEXIMGLD_INCLUDE ${NEXIMGLD_ROOT}/include)
-set(NEXIMGLD_SRC ${NEXIMGLD_ROOT}/src)
-
-## Source files
-file(GLOB NEXIMGLD_SRC_LIST 
-	${NEXIMGLD_SRC}/*.cpp 
-)
-
-## Project
-add_library(ImageLoader SHARED ${NEXIMGLD_SRC_LIST})
-
-## Platform specific dependencies
-#===========================================================
-
-
-include_directories(${NEXIMGLD_INCLUDE})
-target_link_libraries(ImageLoader ${LIBNEXTECH})
+# Add definition
+create_plugin("ImageLoader" "" "Lifetime" "${NEX_VERSION}" "false")
+add_dependency(Core Base)
+add_dependency(Core Engine)
 
 ## Find dependencies
 #===========================================================
 message("@Todo Make all libraries optional."
-  "Use a config.h for selective inclusion")
+	"Use a config.h for selective inclusion")
+
 if(NEX_OS MATCHES "Windows")
  # JPEG
  if(NOT LIBJPEG_ROOT)
@@ -42,17 +29,12 @@ endif(NEX_OS MATCHES "Windows")
 
 find_package(LIBJPEG REQUIRED)
 if (LIBJPEG_FOUND)
- include_directories( ${LIBJPEG_INCLUDE_DIRS} )
- target_link_libraries(ImageLoader ${LIBJPEG_LIBRARIES})
+ add_external_dependency(${LIBJPEG_INCLUDE_DIRS} ${LIBJPEG_LIBRARIES})
 endif (LIBJPEG_FOUND)
 
 find_package(PNG REQUIRED)
 if (PNG_FOUND)
- include_directories( ${PNG_INCLUDE_DIRS} )
- target_link_libraries(ImageLoader ${PNG_LIBRARIES})
+ add_external_dependency(${PNG_INCLUDE_DIRS} ${PNG_LIBRARIES})
 endif (PNG_FOUND)
 add_definitions(${PNG_DEFINITIONS})
-
-# Add plugin
-add_plugin("ImageLoader" "" "Lifetime" "${NEX_VERSION}" "false")
 

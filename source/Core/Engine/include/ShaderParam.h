@@ -117,11 +117,7 @@ namespace nextar {
 
 	struct TextureSamplerParamDesc {
 		ShaderParamDesc paramDesc;
-		TextureUnitParams texUnitParams;
-		union {
-			TextureUnit defaultTexture;
-			TextureUnit* defaultTextureArray;
-		};
+		TextureUnit defaultTexture;
 	};
 
 	class ShaderParamIterator : public AllocGeneral {
@@ -163,13 +159,13 @@ namespace nextar {
 		~AutoParamProcessor() {}
 	};
 
-	struct AutoParam {
+	struct AutoParam : public AllocGeneral {
 		uint32 type;
 		uint32 autoName;
 		uint32 frequency;
 		AutoParamProcessor* processor;
 		// todo May not be useful except in UI
-		StringRef name;
+		String name;
 		String desc;
 	};
 

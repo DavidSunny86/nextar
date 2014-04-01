@@ -80,7 +80,7 @@
 
 
 #ifdef NEXTAR_EXPORT_AS_DYNAMIC_LIB
-#	ifdef @NEXTAR_MODULE_DEFINE@_EXPORTS
+#	ifdef @NEXTAR_LIBRARY_DEFINE@_EXPORTS
 #		define _NexBaseAPI	_NexExportSym
 #	else
 #		define _NexBaseAPI	_NexImportSym

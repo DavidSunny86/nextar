@@ -8,7 +8,7 @@
 #include <RenderDriverGL.h>
 #include <glx/RenderDriverGLX.h>
 #include <glx/RenderContextGLX.h>
-#include <glx/GraphicsWindowGLX.h>
+#include <glx/WindowGLX.h>
 #include <X11/extensions/Xrandr.h>
 
 namespace RenderOpenGL {
@@ -25,7 +25,7 @@ namespace RenderOpenGL {
 
 	void RenderContextGLX::UnreadyContext() {
 		if (context) {
-			SetCurrentCanvas(0);
+			SetCurrentTarget(0);
 			Trace("Destroying render context.");
 			glXDestroyContext( display, context );
 			context = 0;
@@ -159,11 +159,11 @@ namespace RenderOpenGL {
 		else
 			Trace("Indirect GLX rendering context created!");
 
-		SetCurrentCanvas(gw->GetCanvas());
+		SetCurrentTarget(static_cast<RenderWindowImpl*>(gw->GetImpl()));
 	}
 
 	nextar::RenderWindow* RenderContextGLX::CreateWindowImpl() {
-		return NEX_NEW GraphicsWindowGLX(this);
+		return NEX_NEW WindowGLX(this);
 	}
 
 	Display* RenderContextGLX::OpenDisplay(int gpuIndex) {
@@ -285,14 +285,12 @@ namespace RenderOpenGL {
 		return chosenFb;
 	}
 
-	void RenderContextGLX::SetCurrentCanvas(RenderTarget* canvas) {
+	void RenderContextGLX::SetCurrentWindow(RenderTarget* canvas) {
 		if (canvas) {
-			CanvasGLX* glxCanvas = static_cast<CanvasGLX*>(canvas);
-			currentDrawable = glxCanvas->GetDrawable();
+			currentDrawable = static_cast<WindowGLX::Impl*>(canvas)->GetDrawable();
 			glXMakeCurrent(display, currentDrawable, context);
-		} else {
+		} else
 			glXMakeCurrent(display, 0, 0);
-		}
 	}
 
 	void RenderContextGLX::SetVideoModeImpl(const VideoMode& mode) {
@@ -363,7 +361,7 @@ namespace RenderOpenGL {
 					(unsigned char *)&hints,
 					5);
 		} else
-			Warn("WM is outdated, cannot switch to fullscreen");
+			Warn("Window manager is outdated, cannot switch to fullscreen");
 	}
 }
 

@@ -17,10 +17,10 @@ namespace nextar {
 
 			static void Transfer(PixelBox& dest, const PixelBox& src) {
 
-				C::SrcType* srcData = static_cast<C::SrcType*>(src.data)
+				C::SrcType* srcData = static_cast<C::SrcType*>(src.Data())
 						+ (src.front * src.slicePixelPitch)
 						+ (src.top * src.rowPixelPitch) + src.left;
-				C::DestType* destData = static_cast<C::DestType*>(dest.data)
+				C::DestType* destData = static_cast<C::DestType*>(dest.Data())
 						+ (dest.front * dest.slicePixelPitch)
 						+ (dest.top * dest.rowPixelPitch) + dest.left;
 

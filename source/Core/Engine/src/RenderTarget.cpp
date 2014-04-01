@@ -9,14 +9,14 @@
 
 namespace nextar {
 
-	RenderTarget::RenderTarget(uint16 ty) : targetType(ty), viewport(nullptr) {
+	RenderTarget::RenderTarget(RenderTargetType ty) : targetType(ty), viewport(nullptr) {
 	}
 
 	RenderTarget::~RenderTarget() {
 		for (Viewport::Iterator it(viewport); it;) {
-			Viewport::Iterator next = (*it)->GetNext();
-			NEX_DELETE (*it);
-			it = next;
+			Viewport* o = (*it);
+			++it;
+			NEX_DELETE o;
 		}
 	}
 

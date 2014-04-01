@@ -5,7 +5,7 @@
  *      Author: obhi
  */
 
-#include <NexBase.h>
+#include <NexEngine.h>
 #include <CommonTypes.h>
 #include <BlendStateCmd.h>
 #include <Shader.h>

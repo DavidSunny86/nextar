@@ -8,8 +8,8 @@
 # Source list
 #===========================================================
 
-create_module_default()
-add_external_dependency_default("" ${CMAKE_DL_LIBS})
+create_library()
+add_external_dependency("" ${CMAKE_DL_LIBS})
 
 # zlib
 if(NEX_OS MATCHES "Windows")
@@ -21,7 +21,7 @@ endif(NEX_OS MATCHES "Windows")
 
 find_package(ZLIB REQUIRED)
 if(ZLIB_FOUND)
-    add_external_dependency_default(${ZLIB_INCLUDE_DIRS} ${ZLIB_LIBRARIES})
+    add_external_dependency(${ZLIB_INCLUDE_DIRS} ${ZLIB_LIBRARIES})
 endif (ZLIB_FOUND)
 
 ## Platform specific dependencies
@@ -32,8 +32,7 @@ if ( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
     # X11
     find_package(X11 REQUIRED)
     if (X11_FOUND)
-        add_external_dependency_default(${X11_INCLUDE_DIR} ${X11_LIBRARIES})
+        add_external_dependency(${X11_INCLUDE_DIR} ${X11_LIBRARIES})
     endif (X11_FOUND)
 endif ( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
-
 

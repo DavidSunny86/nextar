@@ -74,10 +74,9 @@ namespace nextar {
 		COUNT = UNKNOWN
 	};
 
-	struct PixelBox {
+	class PixelBox {
 
-		void* data;
-
+	public:
 		uint32 left, right, top, bottom, front, back;
 		/** Amount of pixels to skip for the next row,
 		 * this is not in bytes, rather in pixels.*/
@@ -89,7 +88,7 @@ namespace nextar {
 		PixelFormat format;
 
 		PixelBox()
-				: data(0), left(0), right(0), top(0), bottom(0), front(0), back(
+				: data(nullptr), left(0), right(0), top(0), bottom(0), front(0), back(
 						0), rowPixelPitch(0), slicePixelPitch(0), format(
 						PixelFormat::UNKNOWN) {
 
@@ -99,6 +98,24 @@ namespace nextar {
 				: data(dat), left(0), right(width), top(0), bottom(height), front(
 						0), back(depth), format(f) {
 			CalculatePitches();
+		}
+
+		void* Data() const {
+			return data ? data : dataPtr.get();
+		}
+
+		void*& Data() {
+			return data;
+		}
+
+		void DataPtr(DataPtr&& dp) {
+			data = nullptr;
+			dataPtr = std::move(dp);
+		}
+
+		void DataPtr(void*& dp) {
+			data = nullptr;
+			dataPtr = std::move(dp);
 		}
 
 		uint32 GetWidth() const {
@@ -124,6 +141,15 @@ namespace nextar {
 			rowPixelPitch = GetWidth();
 			slicePixelPitch = GetHeight() * GetWidth();
 		}
+
+		Size GetSize() const {
+			return Size(GetWidth(), GetHeight());
+		}
+
+	protected:
+
+		void* data;
+		nextar::DataPtr dataPtr;
 	};
 
 	namespace PixelUtils {

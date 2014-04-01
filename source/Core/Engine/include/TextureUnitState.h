@@ -85,7 +85,7 @@ namespace nextar {
 	 */
 	class TextureUnit {
 	public:
-		uint16 bindPoint; // todo Might not be required
+		uint32 bindPoint; // todo Might not be required
 		Vector3 uvwTile;
 		Vector3 uvwOffset;
 		TextureBase* texture;
@@ -94,7 +94,7 @@ namespace nextar {
 				: bindPoint(-1), uvwTile(1, 1, 1), uvwOffset(0, 0, 0), texture(0) {
 		}
 
-		inline TextureUnit(int16 _bindPoint, TextureBase* _texture, const Vector3& tile,
+		inline TextureUnit(uint32 _bindPoint, TextureBase* _texture, const Vector3& tile,
 				const Vector3& offset)
 				: bindPoint(_bindPoint), texture(_texture), uvwTile(tile), uvwOffset(
 						offset) {
@@ -102,7 +102,7 @@ namespace nextar {
 				static_cast<TextureAsset*>(texture)->AddRef();
 		}
 
-		inline TextureUnit(int16 _bindPoint, TextureBase* _texture)
+		inline TextureUnit(uint32 _bindPoint, TextureBase* _texture)
 				: bindPoint(_bindPoint), texture(_texture), uvwTile(1, 1, 1), uvwOffset(
 						0, 0, 0) {
 			if (texture && texture->IsTextureAsset())

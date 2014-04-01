@@ -33,7 +33,6 @@ namespace nextar {
 		};
 
 		TextureBase(uint16 flags = 0);
-		virtual ~TextureBase();
 
 		inline float GetTextureLod() const {
 			return (float)currentMaxMipLevel / (float)numMipMaps;
@@ -44,6 +43,7 @@ namespace nextar {
 		}
 
 	protected:
+		virtual ~TextureBase();
 
 	    virtual void WriteBoxImpl(RenderContext*, size_t faceNum, size_t mipNum,
 	            PixelBox& box) = 0;

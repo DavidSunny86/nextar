@@ -1,7 +1,13 @@
 #include <BaseHeaders.h>
 #include <WindowManager.h>
-
 #include <RenderWindow.h>
+#if defined( NEX_WINDOWS )
+#	include <Win32Window.h>
+#elif defined( NEX_LINUX )
+#	include <XWindow.h>
+#else
+#	error Not defined
+#endif
 
 namespace nextar {
 
@@ -63,7 +69,7 @@ namespace nextar {
 		WindowList::iterator it = registeredWindows.begin();
 		WindowList::iterator end = registeredWindows.end();
 		while (it != end) {
-			RenderWindowX* wind = static_cast<RenderWindowX*>((*it));
+			XWindow* wind = static_cast<XWindow*>((*it));
 			Display* disp = wind->GetDisplay();
 			Window w = wind->GetWindow();
 			while (XCheckWindowEvent(
@@ -71,12 +77,12 @@ namespace nextar {
 							w,
 							StructureNotifyMask | VisibilityChangeMask | FocusChangeMask,
 							&event)) {
-				RenderWindowX::ProcessEvent(wind, event);
+				XWindow::ProcessEvent(wind, event);
 			}
 
 			// The ClientMessage event does not appear under any Event Mask
 			while (XCheckTypedWindowEvent(disp, w, ClientMessage, &event)) {
-				RenderWindowX::ProcessEvent(wind, event);
+				XWindow::ProcessEvent(wind, event);
 			}
 			++it;
 		}

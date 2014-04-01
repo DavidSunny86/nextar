@@ -3,6 +3,7 @@
 
 #include <RenderOpenGL.h>
 #include <RenderContextGL.h>
+#include <glx/WindowGLX.h>
 
 namespace RenderOpenGL {
 
@@ -33,11 +34,17 @@ namespace RenderOpenGL {
 		}
 
 		/* Implementations */
-		virtual void SetCurrentCanvas(RenderTarget*);
 		virtual void SetVideoModeImpl(const VideoMode& videoMode);
+		virtual void SetCurrentWindow(RenderTarget* rt);
 
 		/* Helpers */
 		void SwitchToFullScreen(Window drawable, bool value);
+
+
+		inline void Present(WindowGLX::Impl* window) {
+			glXSwapBuffers(display, window->GetDrawable());
+			GL_CHECK();
+		}
 
 	protected:
 
@@ -75,6 +82,5 @@ namespace RenderOpenGL {
 		GLXDrawable currentDrawable;
 		GLXContext  context;
 		GLXFBConfig frameBufferConfig;
-
 	};
 }

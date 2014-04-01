@@ -9,10 +9,11 @@
 
 namespace nextar {
 
+	uint32 ConstantBuffer::paramStride(0);
 	ConstantBuffer::ConstantBuffer() : frequency(0)
 	,paramDesc(nullptr)
-	,paramStride(0)
 	,paramCount(0)
+	,processor(nullptr)
 	,name(StringUtils::NullRef) {
 	}
 

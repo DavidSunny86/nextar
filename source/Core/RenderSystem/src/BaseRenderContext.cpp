@@ -3,6 +3,7 @@
 #include <VideoMode.h>
 #include <BaseRenderContext.h>
 #include <RenderWindow.h>
+#include <RenderWindowImpl.h>
 #include <NexThread.h>
 
 namespace nextar {
@@ -18,7 +19,7 @@ namespace nextar {
 		CreateImpl(contextCreationParams);
 				// default window present?
 		if (contextCreationParams.createDefaultWindow) {
-			RenderWindowPtr win = CreateRenderWindow(contextCreationParams.defaultWindowWidth,
+			RenderWindow* win = CreateRenderWindow(contextCreationParams.defaultWindowWidth,
 					contextCreationParams.defaultWindowHeight,
 					contextCreationParams.fullScreen,
 					&contextCreationParams.extraParams);
@@ -26,27 +27,29 @@ namespace nextar {
 		threadId = NEX_THREAD_ID();
 	}
 
-	RenderWindowPtr BaseRenderContext::CreateRenderWindow(uint32 width, uint32 height,
+	RenderWindow* BaseRenderContext::CreateRenderWindow(uint32 width, uint32 height,
 								  bool fullscreen, const NameValueMap* params) {
-		RenderWindowPtr graphicsWindow = CreateRenderWindowImpl();
+		RenderWindow* graphicsWindow = CreateRenderWindowImpl();
 		if (graphicsWindow) {
 			graphicsWindow->Create(width, height, fullscreen, params);
 			PostWindowCreation(graphicsWindow);
 			NEX_THREAD_LOCK_GUARD_MUTEX(accessLock);
-			graphicsWindowList.push_back(graphicsWindow);
+			RenderTargetPtr rt = Bind(static_cast<RenderWindowImpl*>(graphicsWindow->GetImpl()));
+			graphicsWindowList.push_back(rt);
 		}
 		return graphicsWindow;
 	}
 
-	void BaseRenderContext::DestroyedRenderWindow(RenderWindowPtr which) {
+	void BaseRenderContext::DestroyedRenderWindow(RenderWindow* which) {
 		if (which) {
 			PostWindowDestruction(which);
 			NEX_THREAD_LOCK_GUARD_MUTEX(accessLock);
-			graphicsWindowList.remove(which);
+			RenderTargetPtr rt = Bind(static_cast<RenderWindowImpl*>(which->GetImpl()));
+			graphicsWindowList.remove(rt);
 		}
 	}
 
-	RenderWindowPtr BaseRenderContext::GetRenderTarget(uint32 i) {
+	RenderTargetPtr BaseRenderContext::GetRenderTarget(uint32 i) {
 		return graphicsWindowList[i];
 	}
 
@@ -70,10 +73,42 @@ namespace nextar {
 		}
 	}
 
-	void BaseRenderContext::BeginFrame(uint32 frame) {
+	void BaseRenderContext::BeginFrame(uint32 frame, uint32 t) {
 		frameStats.frameID = frame;
+		frameStats.renderTargetsUsed = 0;
+		frameStats.polygonCount = 0;
+		frameStats.shaderSwitches = 0;
+		frameStats.textureFetches = 0;
+		frameStats.startTime = t;
 	}
 
-	void BaseRenderContext::EndFrame() {
+	void BaseRenderContext::EndFrame(uint32 t) {
+		frameStats.endTime = t;
 	}
+
+	void BaseRenderContext::BeginRender(RenderInfo* ri) {
+		if (currentTarget != ri->rt) {
+			currentTarget = ri->rt;
+			SetCurrentTarget(ri->rt);
+			frameStats.renderTargetsUsed++;
+		}
+		if (ri->clearFlags) {
+			Clear(ri->clearColor, ri->clearDepth, ri->clearStencil, ri->clearFlags);
+		}
+	}
+
+	void BaseRenderContext::EndRender() {
+		// todo Set a flag marking the current render target is pending a reset?
+	}
+
+	void BaseRenderContext::SwitchShader(uint16 pass, CommitContext& ctx, ShaderAsset* shader) {
+		ctx.shader = shader;
+		Pass* passPtr = shader->GetPass(pass);
+		if (activePass != passPtr) {
+			SetActivePass(ctx.pass = activePass = passPtr);
+		}
+	}
+
+
+
 }

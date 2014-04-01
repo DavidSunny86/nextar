@@ -6,7 +6,7 @@
 
 namespace nextar {
 
-	void RenderWindowX::ProcessEvent(RenderWindowX* wind, XEvent& event) {
+	void XWindow::ProcessEvent(XWindow* wind, XEvent& event) {
 
 		switch (event.type) {
 		case ClientMessage:

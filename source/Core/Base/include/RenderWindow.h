@@ -21,9 +21,23 @@ namespace nextar {
 		};
 		typedef list<EventListener*>::type WinEventListnerList;
 
+		class Impl {
+		public:
+			/**
+			 * @brief	Set to full screen
+			 **/
+			virtual void SetToFullScreen(bool fullscreen) = 0;
+			virtual void Destroy() = 0;
+			virtual void Create(uint32 width, uint32 height, bool fullscreen,
+					const NameValueMap* params) = 0;
+			virtual void ApplyChangedAttributes() = 0;
+			virtual void FocusChanged() = 0;
+			virtual ~Impl() {}
+		};
+
 	public:
 
-		RenderWindow();
+		RenderWindow(Impl* impl);
 		virtual ~RenderWindow();
 
 
@@ -48,9 +62,17 @@ namespace nextar {
 			return (flags & WINDOW_EXIT_ON_CLOSE) != 0;
 		}
 
+		inline bool IsFullScreen() const {
+			return (flags & WINDOW_FULLSCREEN) != 0;
+		}
+
 		// set flag
 		inline void SetFlag(uint32 flag, bool value) {
 			flags = value ? flags | flag : flags & (~flag);
+		}
+
+		inline Impl* GetImpl() const {
+			return impl;
 		}
 
 		/** @remarks Add winodw event listener */
@@ -83,16 +105,10 @@ namespace nextar {
 
 		/** @remarks Called by WM to indicate if window is active */
 		virtual void SetActive(bool act);
-
 		/**
 		 * @brief	Set to full screen
 		 **/
-		virtual void SetToFullScreen(bool fullscreen) = 0;
-
-		virtual void DestroyImpl() = 0;
-
-		virtual void CreateImpl(uint32 width, uint32 height, bool fullscreen,
-				const NameValueMap* params) = 0;
+		virtual void SetToFullScreen(bool fullscreen);
 	protected:
 		enum {
 			WINDOW_CREATED = 1 << 0,
@@ -105,19 +121,12 @@ namespace nextar {
 			WINDOW_EXIT_ON_CLOSE = 1 << 7,
 		};
 				
+		Impl* impl;
 		String windowTitle;
 		uint32 flags;
 		WinEventListnerList listeners;
 	};
 
 }
-
-#if defined(NEX_LINUX)
-#include <platform/linux/RenderWindowX.h>
-#elif defined(NEX_WINDOWS)
-#include <platform/win32/RenderWindowWin.h>
-#else
-#error Not supported
-#endif
 
 #endif //NEXTAR_GRAPHICS_WINDOW_H

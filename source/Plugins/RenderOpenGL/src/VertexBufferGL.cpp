@@ -55,7 +55,8 @@ namespace RenderOpenGL {
 	void VertexBufferGL::Read(RenderContext* rc, void *dest, size_t offset, size_t size) {
 		RenderContextGL* rcGL = static_cast<RenderContextGL*>(rc);
 		if (bufferId) {
-			rcGL->ReadBuffer(GL_ARRAY_BUFFER, bufferId, dest, offset, size);
+			rcGL->Bind(GL_ARRAY_BUFFER, bufferId);
+			rcGL->ReadBuffer(GL_ARRAY_BUFFER, dest, offset, size);
 		}
 	}
 
@@ -63,7 +64,8 @@ namespace RenderOpenGL {
 		if (!bufferId)
 			_Create(rc);
 		RenderContextGL* rcGL = static_cast<RenderContextGL*>(rc);
-		rcGL->WriteBuffer(GL_ARRAY_BUFFER, bufferId, GetSize(), usage, src, offset, size);
+		rcGL->Bind(GL_ARRAY_BUFFER, bufferId);
+		rcGL->WriteBuffer(GL_ARRAY_BUFFER, GetSize(), usage, src, offset, size);
 	}
 
 	void VertexBufferGL::CopyFrom(RenderContext* rc, BufferPtr& ptr) {

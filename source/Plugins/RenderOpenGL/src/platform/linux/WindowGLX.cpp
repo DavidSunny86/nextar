@@ -6,32 +6,37 @@
  */
 
 #include <RenderOpenGL.h>
-#include <glx/GraphicsWindowGLX.h>
+#include <glx/WindowGLX.h>
 #include <glx/RenderContextGLX.h>
 
 namespace RenderOpenGL {
-	GraphicsWindowGLX::GraphicsWindowGLX(RenderContextGLX* ctx) :
-		context(ctx), width(0), height(0), left(0), top(0), cmap(0), canvas(this, "Window") {
+
+	WindowGLX::WindowGLX(RenderContextGLX* ctx) :
+		context(ctx), nextar::XWindow(NEX_NEW WindowGLX::Impl(this))  {
 	}
 
-	GraphicsWindowGLX::~GraphicsWindowGLX() {
+	WindowGLX::~WindowGLX() {
+		NEX_DELETE impl;
+		impl = nullptr;
 	}
 
-	GraphicsWindowGLX::WindowCanvas::WindowCanvas(GraphicsWindowGLX* _parent, const nextar::String& name) : CanvasGLX(name, true),
-			parent(_parent) {
+	WindowGLX::Impl::Impl(WindowGLX* _parent) : parent(_parent)
+	,drawable(0)
+	,cmap(0)
+	,pbo({0}){
 	}
 
-	void GraphicsWindowGLX::CreateImpl(
+	void WindowGLX::Impl::Create(
 	        uint32 width, uint32 height,
 	        bool fullscreen,
 	        const NameValueMap* params) {
 
-		left = 0;
-	    top = 0;
+		position.x = 0;
+		position.y = 0;
 
-	    display = context->GetDisplay();
+	    parent->SetDisplay(context->GetDisplay());
 	    Window parentWindow = RootWindow(display, context->GetScreenIndex());
-	    windowTitle = "NexTech: Render Window";
+	    parent->SetWindowTitle("NexTech: Render Window");
 	    uint32 setVideoMode = -1;
 
 	    if (params) {
@@ -39,29 +44,29 @@ namespace RenderOpenGL {
 	        NameValueMap::const_iterator end = paramMap.end();
 	        NameValueMap::const_iterator attrib;
 	        if (((attrib = paramMap.find("WindowLeft")) != end))
-	            left = Convert::ToLong((*attrib).second);
+	        	position.x = Convert::ToLong((*attrib).second);
 	        if (((attrib = paramMap.find("WindowTop")) != end))
-	            top = Convert::ToLong((*attrib).second);
+	        	position.y = Convert::ToLong((*attrib).second);
 	        if (((attrib = paramMap.find("WindowTitle")) != end))
-	            windowTitle = (*attrib).second;
+	        	parent->SetWindowTitle((*attrib).second);
 	        if (((attrib = paramMap.find("IsMainWindow")) != end))
-	        	SetFlag(WINDOW_IS_MAIN, Convert::ToBool((*attrib).second));
+	        	parent->SetFlag(WINDOW_IS_MAIN, Convert::ToBool((*attrib).second));
 	        if (((attrib = paramMap.find("VideoMode")) != end))
 	        	setVideoMode = context->GetVideoModeIndex(VideoMode::FromString((*attrib).second));
 	        if (((attrib = paramMap.find("ExitOnClose")) != end))
-	        	SetFlag(WINDOW_EXIT_ON_CLOSE, Convert::ToBool((*attrib).second));
+	        	parent->SetFlag(WINDOW_EXIT_ON_CLOSE, Convert::ToBool((*attrib).second));
 	    }
 
-	    if (left < 0)
-	        left = 0;
-	    if (top < 0)
-	        top = 0;
+	    if (position.x < 0)
+	    	position.x = 0;
+	    if (position.y < 0)
+	    	position.y = 0;
 
-	    if (!IsMainWindow())
+	    if (!parent->IsMainWindow())
 	    	fullscreen = false;
 
-	    this->width = width;
-	    this->height = height;
+	    this->dimensions.dx = width;
+	    this->dimensions.dy = height;
 
 	    if (fullscreen && setVideoMode != -1) {
 	        context->SetVideoMode(setVideoMode);
@@ -81,8 +86,8 @@ namespace RenderOpenGL {
 	    swa.event_mask = StructureNotifyMask | VisibilityChangeMask | FocusChangeMask;
 	    mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
 
-	    window = XCreateWindow(display, parentWindow,
-	            left, top, width, height, 0, vi->depth,
+	    Window window = XCreateWindow(display, parentWindow,
+	            position.x, position.y, width, height, 0, vi->depth,
 	            InputOutput,
 	            vi->visual,
 	            mask, &swa);
@@ -95,7 +100,10 @@ namespace RenderOpenGL {
 	        NEX_THROW_FatalError(EXCEPT_INVALID_CALL);
 	    }
 
-	    this->msgDestroy = XInternAtom(display, "WM_DELETE_WINDOW", False);
+	    parent->SetWindow(window);
+
+	    Atom destroyMsg = XInternAtom(display, "WM_DELETE_WINDOW", False);
+	    parent->SetDestroyMsg(destroyMsg);
 	    // trap delete
 	    XSetWMProtocols(display, window, &msgDestroy, 1);
 
@@ -110,40 +118,83 @@ namespace RenderOpenGL {
 	    flags &= ~WINDOW_CLOSED;
 
 	    XFlush(display);
-	    canvas.SetDrawable(GetDrawable());
+	    drawable = window;
 	}
 
-	void GraphicsWindowGLX::SetToFullScreen(bool fullScreen) {
+	void WindowGLX::Impl::SetToFullScreen(bool fullScreen) {
 		if (fullScreen) {
 
-			if (!IsMainWindow()) {
+			if (!parent->IsMainWindow()) {
 				Warn("Window needs to be main window to set to fullscreen.");
 				return;
 			}
-			SetFlag(WINDOW_FULLSCREEN, true);
+			parent->SetFlag(WINDOW_FULLSCREEN, true);
 			// keep the current mode and switch
 			// update the client area
 			VideoMode mode = context->GetCurrentMode();
-		    height = mode.height;
-		    width = mode.width;
+		    dimensions.height = mode.height;
+		    dimensions.width = mode.width;
 		    context->SwitchToFullScreen(window, true);
 		} else {
 			XWindowAttributes attribs;
-			SetFlag(WINDOW_FULLSCREEN, false);
+			parent->SetFlag(WINDOW_FULLSCREEN, false);
 			Display* display = context->GetDisplay();
 			context->SwitchToFullScreen(window, false);
 			XGetWindowAttributes(display, window, &attribs);
-			width = attribs.width;
-			height = attribs.height;
+			dimensions.width = attribs.width;
+			dimensions.height = attribs.height;
 		}
 	}
 
-	void GraphicsWindowGLX::DestroyImpl() {
-		if (context->IsCurrentDrawable(GetDrawable()))
-			context->SetCurrentCanvas(0);
+	void WindowGLX::Impl::Destroy() {
+		if (context->IsCurrentDrawable(drawable))
+			context->SetCurrentTarget(nullptr);
 		XDestroyWindow(display, window);
 		window = 0;
 		XFreeColormap(display, cmap);
 		cmap = 0;
 	}
+
+	void WindowGLX::Impl::ApplyChangedAttributes() {
+		// todo
+	}
+
+	void WindowGLX::Impl::FocusChanged() {
+		// todo
+	}
+
+	PixelFormat WindowGLX::Impl::GetPixelFormat() const {
+		return PixelFormat::BGRA8;
+	}
+
+	void WindowGLX::Impl::Capture(RenderContext* rc, PixelBox& image,
+			FrameBuffer frameBuffer) {
+		if (rc != context) {
+			Error("Window created using a different context");
+			return;
+		}
+		if (!context->IsCurrentDrawable(drawable))
+			context->SetCurrentTarget(this);
+
+		context->Capture(image, this, pbo, frameBuffer);
+	}
+
+	void WindowGLX::Impl::Reset(RenderContext* rc, Size size,
+			PixelFormat format) {
+		if (parent->IsFullScreen())
+			SetToFullScreen(false);
+		XWindowAttributes attribs;
+		XResizeWindow(display, window, size.dx, size.dy);
+		dimensions.width = size.dx;
+		dimensions.height = size.dy;
+	}
+
+	void WindowGLX::Impl::Present(RenderContext* rc) {
+		if (rc != context) {
+			Error("Window created using a different context");
+			return;
+		}
+		context->Present(this);
+	}
+
 }

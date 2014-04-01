@@ -21,8 +21,10 @@ namespace nextar {
 
 	class Pass : public AllocGraphics {
 	public:
+
 		enum {
-			NUM_STAGES = (uint32)RenderConstants::MAX_PROGRAM_STAGES
+			NUM_STAGES = (uint32)RenderConstants::MAX_PROGRAM_STAGES,
+			MAX_CBUFFER = RenderConstants::MAX_CBUFFER_PER_PASS,
 		};
 
 		enum Flags {
@@ -41,13 +43,11 @@ namespace nextar {
 
 		struct SamplerDesc {
 			TextureUnitParams texUnitParams;
-			uint32 arrayCount;
-			TextureBase* defaultTexture0;
-			// rest of the default textures
-			TextureList defaultTextures;
+			TextureBase* defaultTexture;
 		};
 
 		typedef map<String, SamplerDesc>::type TextureDescMap;
+		typedef array<ConstantBufferPtr, MAX_CBUFFER>::type ConstantBufferList;
 
 		Pass();
 		virtual ~Pass();
@@ -64,10 +64,6 @@ namespace nextar {
 			return inputLayoutUniqueID;
 		}
 
-		inline ConstantBufferList& GetConstantBuffers() {
-			return constantBuffers;
-		}
-
 		inline ShaderParamIterator GetSamplerIterator() {
 			return ShaderParamIterator(&samplers->paramDesc, samplerStride, samplerCount);
 		}
@@ -78,12 +74,15 @@ namespace nextar {
 		TextureBase* GetDefaultTexture(const String& name, uint32 index) const;
 		const TextureUnitParams* GetTextureUnit(const String& name) const;
 
+		// todo refer to the static table as well as a custom table
+		// created from parsing the shader script
+		const AutoParam* MapParam(const String& name);
+		const SamplerDesc* MapSamplerParams(const String& name);
+
 		// todo
 		virtual void UpdateParams(RenderContext* renderCtx, CommitContext& context, uint32 flags);
 		// todo
 		static size_t ParamSizeFromType(ParamDataType);
-		// todo
-		static const AutoParam* MapParam(const String& name);
 
 
 		// Set texture states, called during pass creation
@@ -92,6 +91,19 @@ namespace nextar {
 		virtual void SetTextureImpl(RenderContext* rc, const TextureSamplerParamDesc* desc, const TextureUnit* tu) = 0;
 
 	protected:
+
+		inline void _UpdateConstBuffer(RenderContext* rc, CommitContext& ctx, ConstantBufferPtr& cb) {
+			AutoParamProcessor* proc = cb->GetProcessor();
+			if (proc) {
+				// we just update it in one go
+				proc->Apply(rc, nullptr, ctx);
+			} else {
+				cb->BeginUpdate(rc, flags);
+				ShaderParamIterator it = cb->GetParamIterator();
+				_ProcessShaderParamIterator(rc, ctx, it, flags);
+				cb->EndUpdate(rc);
+			}
+		}
 
 		inline void _ProcessShaderParamIterator(RenderContext* rc, CommitContext& ctx, ShaderParamIterator& it, uint32 flags) {
 			while(it) {
@@ -125,16 +137,11 @@ namespace nextar {
 		DepthStencilState depthStencilState;
 		TextureDescMap textureDescMap;
 
-		ConstantBufferList constantBuffers;
 		// updated per frame
-		//ConstantBufferPtr frameParameters;
-		// updated per view
-		//ConstantBufferPtr viewParameters;
-		// regularly updated
-		//ConstantBufferPtr objectParameters;
+		ConstantBufferList sharedParameters;
+		uint32 numConstBuffers;
 
 		TextureSamplerParamDesc* samplers;
-		uint32 samplerStride;
 		uint32 samplerCount;
 
 		uint32 passParamByteOffset;
@@ -150,6 +157,15 @@ namespace nextar {
 		static AutoParamProcessor* customTextureProcessorPass;
 		static AutoParamProcessor* customConstantProcessorObject;
 		static AutoParamProcessor* customTextureProcessorObject;
+		static AutoParamProcessor* customStructProcessorMaterial;
+		static AutoParamProcessor* customStructProcessorPass;
+		static AutoParamProcessor* customStructProcessorObject;
+
+		static uint32 samplerStride;
+
+		typedef map<StringRef, AutoParam*>::type AutoParamMap;
+
+		static AutoParamMap autoParams;
 
 		friend class ShaderAsset;
 	};

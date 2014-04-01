@@ -15,8 +15,13 @@
 namespace nextar {
 
 	enum class FrameBuffer {
-		FRONT,
-		BACK,
+		FRONT_LEFT,
+		FRONT_RIGHT,
+		BACK_LEFT,
+		FRONT_RIGHT,
+		DEPTH,
+		FRONT = FRONT_LEFT,
+		BACK = BACK_LEFT
 	};
 
 	enum class RenderTargetType : uint16 {
@@ -28,11 +33,11 @@ namespace nextar {
 	class RenderTarget : public Referenced<RenderTarget, AllocGraphics> {
 	public:
 
-		RenderTarget(uint16 type);
+		RenderTarget(RenderTargetType type);
 		virtual ~RenderTarget();
 
-		uint16 GetRenderTargetType() const {
-			return targetType;
+		RenderTargetType GetRenderTargetType() const {
+			return (RenderTargetType)targetType;
 		}
 		/**
 		 * Get the only viewport attached
@@ -58,7 +63,7 @@ namespace nextar {
 
 	protected:
 
-		const uint16 targetType;
+		const RenderTargetType targetType;
 		Viewport* viewport;
 	};
 

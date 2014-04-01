@@ -9,6 +9,8 @@
 
 namespace nextar {
 
+	uint32 Pass::samplerStride(0);
+
 	Pass::Pass() : passParamByteOffset(-1)
 	,materialParamByteOffset(-1)
 	,objectParamByteOffset(-1)
@@ -16,12 +18,10 @@ namespace nextar {
 	,flags(0)
 	,programs({0})
 	,samplers(nullptr)
-	,samplerStride(0)
 	,samplerCount(0)
 	,lastFrameUpdate(-1)
-	,lastViewUpdate(-1) {
-		// TODO Auto-generated constructor stub
-
+	,lastViewUpdate(-1)
+	,numConstBuffers(0) {
 	}
 
 	Pass::~Pass() {
@@ -51,6 +51,10 @@ namespace nextar {
 	}
 
 	void Pass::UpdateParams(RenderContext* rc, CommitContext& ctx, uint32 flags) {
+		NEX_ASSERT(this == ctx.pass);
+		ctx.passParamOffset = passParamByteOffset;
+		ctx.materialParamOffset = materialParamByteOffset;
+		ctx.objectParamOffset = objectParamByteOffset;
 
 		if (flags & UpdateFrequency::PER_FRAME) {
 			if (lastFrameUpdate == ctx.frameNumber)
@@ -66,23 +70,42 @@ namespace nextar {
 				lastViewUpdate = ctx.viewNumber;
 		}
 
-		NEX_ASSERT(this == ctx.pass);
-		ctx.passParamOffset = passParamByteOffset;
-		ctx.materialParamOffset = materialParamByteOffset;
-		ctx.objectParamOffset = objectParamByteOffset;
-		for (auto& a : constantBuffers) {
-			if ( (a->GetFrequency() & flags) ) {
-				ctx.cbuffer = a;
-				a->BeginUpdate(rc, flags);
-				ShaderParamIterator it = a->GetParamIterator();
-				_ProcessShaderParamIterator(rc, ctx, it, flags);
-				a->EndUpdate(rc);
+		for(uint32 i = 0; i < numConstBuffers; ++i) {
+			ConstantBufferPtr& cb = sharedParameters[i];
+			if (cb->GetFrequency() & flags) {
+				ctx.cbuffer = cb;
+				AutoParamProcessor* proc = cb->GetProcessor();
+				if (proc) {
+					// we just update it in one go
+					proc->Apply(rc, nullptr, ctx);
+				} else {
+					cb->BeginUpdate(rc, flags);
+					ShaderParamIterator it = cb->GetParamIterator();
+					_ProcessShaderParamIterator(rc, ctx, it, flags);
+					cb->EndUpdate(rc);
+				}
 			}
 		}
 
 		ctx.cbuffer = nullptr;
 		ShaderParamIterator it(samplers, samplerStride, samplerCount);
 		_ProcessShaderParamIterator(rc, ctx, it, flags);
+	}
+
+	const AutoParam* Pass::MapParam(const String& name) {
+		auto ap = autoParams.find(name);
+		if (ap == autoParams.end())
+			return nullptr;
+		// todo map parsed params
+		return (*ap).second;
+	}
+
+	const Pass::SamplerDesc* Pass::MapSamplerParams(const String& name) {
+		auto sp = textureDescMap.find(name);
+		if (sp == textureDescMap.end())
+			return nullptr;
+		// todo map parsed params
+		return &(*sp).second;
 	}
 
 	/****************************************************/
@@ -202,6 +225,63 @@ namespace nextar {
 		context.objectParamOffset += param->paramDesc.size;
 	}
 
+	/****************************************************/
+	/* ObjectStructProcessor
+	/****************************************************/
+	class ObjectStructProcessor : public AutoParamProcessor {
+	public:
+		static ObjectStructProcessor processor;
+
+		virtual void Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context);
+	protected:
+		~ObjectStructProcessor() {}
+	};
+
+	void ObjectStructProcessor::Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) {
+		NEX_ASSERT (d->type == AutoParamName::AUTO_CUSTOM_CONSTANT);
+		size_t s = context.cbuffer->GetSize();
+		context.cbuffer->Write(rc, context.objectParameters->AsRawData(context.objectParamOffset), s);
+		context.objectParamOffset += s;
+	}
+
+	/****************************************************/
+	/* MaterialStructProcessor
+	/****************************************************/
+	class MaterialStructProcessor : public AutoParamProcessor {
+	public:
+		static MaterialStructProcessor processor;
+
+		virtual void Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context);
+	protected:
+		~MaterialStructProcessor() {}
+	};
+
+	void MaterialStructProcessor::Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) {
+		NEX_ASSERT (d->type == AutoParamName::AUTO_CUSTOM_CONSTANT);
+		size_t s = context.cbuffer->GetSize();
+		context.cbuffer->Write(rc, context.materialParameters->AsRawData(context.materialParamOffset), s);
+		context.materialParamOffset += s;
+	}
+
+	/****************************************************/
+	/* PassStructProcessor
+	/****************************************************/
+	class PassStructProcessor : public AutoParamProcessor {
+	public:
+		static PassStructProcessor processor;
+
+		virtual void Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context);
+	protected:
+		~PassStructProcessor() {}
+	};
+
+	void PassStructProcessor::Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) {
+		NEX_ASSERT (d->type == AutoParamName::AUTO_CUSTOM_CONSTANT);
+		size_t s = context.cbuffer->GetSize();
+		context.cbuffer->Write(rc, context.passParameters->AsRawData(context.passParamOffset), s);
+		context.passParamOffset += s;
+	}
+
 	PassTextureProcessor PassTextureProcessor::processor;
 	PassParameterProcessor PassParameterProcessor::processor;
 	MaterialTextureProcessor MaterialTextureProcessor::processor;
@@ -209,11 +289,17 @@ namespace nextar {
 	ObjectTextureProcessor ObjectTextureProcessor::processor;
 	ObjectParameterProcessor ObjectParameterProcessor::processor;
 
+	PassStructProcessor PassStructProcessor::processor;
+	MaterialStructProcessor MaterialStructProcessor::processor;
+	ObjectStructProcessor ObjectStructProcessor::processor;
+
 	AutoParamProcessor* Pass::customConstantProcessorMaterial = &MaterialParameterProcessor::processor;
 	AutoParamProcessor* Pass::customTextureProcessorMaterial = &MaterialTextureProcessor::processor;
 	AutoParamProcessor* Pass::customConstantProcessorPass = &PassParameterProcessor::processor;
 	AutoParamProcessor* Pass::customTextureProcessorPass = &PassTextureProcessor::processor;
 	AutoParamProcessor* Pass::customConstantProcessorObject = &ObjectParameterProcessor::processor;
 	AutoParamProcessor* Pass::customTextureProcessorObject = &ObjectTextureProcessor::processor;
-
+	AutoParamProcessor* Pass::customStructProcessorObject = &ObjectStructProcessor::processor;
+	AutoParamProcessor* Pass::customStructProcessorMaterial = &MaterialStructProcessor::processor;
+	AutoParamProcessor* Pass::customStructProcessorPass = &PassStructProcessor::processor;
 } /* namespace nextar */

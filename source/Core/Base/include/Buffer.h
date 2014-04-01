@@ -27,9 +27,9 @@ namespace nextar {
 		}
 		/** This function will fail unless a local copy of the data exists. The local
 		 * copy is created if the CPU_READ flag is set. **/
-		virtual void Read(RenderContext* rc, void *dest, size_t offset = 0, size_t size = 0) =0;
+		virtual void Read(RenderContext* rc, void *dest, size_t offset, size_t size) =0;
 		/** Write to buffer */
-		virtual void Write(RenderContext* rc, const void *src, size_t offset = 0, size_t size = 0) =0;
+		virtual void Write(RenderContext* rc, const void *src, size_t offset, size_t size) =0;
 		/** Copy from another buffer */
 		virtual void CopyFrom(RenderContext* rc, BufferPtr&) =0;
 

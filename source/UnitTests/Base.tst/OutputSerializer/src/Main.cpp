@@ -4,7 +4,7 @@
  *  Created on: 04-Mar-2014
  *      Author: obhi
  */
-#include <BaseHeaders.h>
+#include <NexBase.h>
 
 NEX_IMPLEMENT_PLATFORM_APP();
 

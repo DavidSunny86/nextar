@@ -17,12 +17,15 @@ namespace nextar {
 		virtual ~BaseRenderContext();
 
 		virtual void Create(const RenderDriver::ContextCreationParams& ctxParams);
-		virtual RenderWindowPtr CreateRenderWindow(uint32 width, uint32 height,
+		virtual RenderWindow* CreateRenderWindow(uint32 width, uint32 height,
 								  bool fullscreen, const NameValueMap* params);
-		virtual void DestroyedRenderWindow(RenderWindowPtr);
-		virtual RenderWindowPtr GetRenderTarget(uint32 i);
+		virtual void DestroyedRenderWindow(RenderWindow*);
+		virtual RenderTargetPtr GetRenderTarget(uint32 i);
 		virtual RenderTargetList& GetRenderTargetList();
 		virtual void SetVideoMode(uint32 videoModeIndex);
+		virtual void BeginRender(RenderInfo*);
+		virtual void EndRender();
+		virtual void SwitchShader(uint16 pass, CommitContext&, ShaderAsset*);
 
 		/** todo Context objects */
 		virtual void RegisterObject(ContextObject*);
@@ -31,8 +34,12 @@ namespace nextar {
 
 		/* implement */
 		virtual void CreateImpl(const RenderDriver::ContextCreationParams& ctxParams) = 0;
-		virtual RenderWindowPtr CreateRenderWindowImpl() = 0;
+		virtual RenderWindow* CreateRenderWindowImpl() = 0;
 		virtual void SetVideoModeImpl(const VideoMode& videoMode) = 0;
+		virtual void Draw(StreamData*, CommitContext&) override = 0;
+		virtual void SetCurrentTarget(RenderTarget*) = 0;
+		virtual void Clear(Color& c, float depth, uint16 stencil, uint16 flags) = 0;
+		virtual void SetActivePass(Pass* pass) = 0;
 
 		/* helpers */
 		uint32 GetVideoModeIndex(const VideoMode& vm) const;
@@ -40,8 +47,9 @@ namespace nextar {
 			return videoModes[currentVideoMode];
 		}
 		
-		virtual void BeginFrame(uint32 frame);
-		virtual void EndFrame();
+		virtual void BeginFrame(uint32 frame, uint32 time);
+		virtual void EndFrame(uint32 time);
+		virtual FrameStats GetFrameStats();
 	
 	protected:
 
@@ -58,6 +66,8 @@ namespace nextar {
 		/* thread this context is bound to, 0 if none */
 		mt::ThreadID threadId;
 
+		Pass* activePass;
+		RenderTarget* currentTarget;
 		FrameStats frameStats;
 		RenderDriver* driver;
 		VideoModeList videoModes;

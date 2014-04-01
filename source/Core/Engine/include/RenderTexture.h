@@ -14,6 +14,7 @@
 namespace nextar {
 
 	class RenderTexture:
+			public TextureBase,
 			public RenderTarget {
 
 	public:

@@ -13,6 +13,8 @@ namespace nextar {
 		uint32 shaderSwitches;
 		uint32 renderTargetsUsed;
 		uint32 textureFetches;
+		uint32 startTime;
+		uint32 endTime;
 	};
 
 	struct RenderInfo {
@@ -53,12 +55,14 @@ namespace nextar {
 		virtual RenderTargetPtr GetRenderTarget(uint32 i) = 0;
 		virtual RenderTargetList& GetRenderTargetList() = 0;
 		virtual void SetVideoMode(uint32 videoModeIndex) = 0;
-		virtual void BeginFrame(uint32 frame) = 0;
-		virtual void EndFrame() = 0;
+		virtual void BeginFrame(uint32 frame, uint32 time) = 0;
+		virtual void EndFrame(uint32 time) = 0;
 		virtual FrameStats GetFrameStats() = 0;
+		virtual void BeginRender(RenderInfo*) = 0;
+		virtual void EndRender() = 0;
 
-		virtual void SwitchShader(uint16 pass, ShaderAsset*) = 0;
-		virtual void Draw(StreamData*) = 0;
+		virtual void SwitchShader(uint16 pass, CommitContext&, ShaderAsset*) = 0;
+		virtual void Draw(StreamData*, CommitContext&) = 0;
 
 		virtual void RegisterObject(ContextObject*) = 0;
 		virtual void UnregisterObject(ContextObject*) = 0;

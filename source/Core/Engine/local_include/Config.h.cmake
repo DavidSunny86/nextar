@@ -5,7 +5,7 @@
 #define NEXTAR_ENGINE_CONFIG_1_01
 
 #ifdef NEXTAR_EXPORT_AS_DYNAMIC_LIB
-#	ifdef @NEXTAR_MODULE_DEFINE@_EXPORTS
+#	ifdef @NEXTAR_LIBRARY_DEFINE@_EXPORTS
 #		define _NexEngineAPI	_NexExportSym
 #	else
 #		define _NexEngineAPI	_NexImportSym

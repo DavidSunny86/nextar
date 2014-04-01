@@ -7,7 +7,7 @@
 
 
 # Add definition
-create_module_default() 
-add_dependency_default(Core Base)
-add_dependency_default(Core Engine)
+create_library() 
+add_dependency(Core Base)
+add_dependency(Core Engine)
 

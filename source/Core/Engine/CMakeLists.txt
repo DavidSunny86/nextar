@@ -8,6 +8,6 @@
 # Source list
 #===========================================================
 
-create_module_default() 
-add_dependency_default(Core Base)
+create_library() 
+add_dependency(Core Base)
 

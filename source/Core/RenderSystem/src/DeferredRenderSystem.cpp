@@ -35,28 +35,28 @@ namespace nextar {
 		/* geometry pass */
 		VisibilitySet& visibles = *context.visibiles;
 		renderCtx->BeginRender(&gbufferRI);
-		VisibilityLayerList& layerList = visibles.GetLayerList();
+		RenderQueueList& layerList = visibles.GetRenderQueues();
 
-		MaterialAsset* currentMtl = nullptr;
-		ShaderAsset* currentShader = nullptr;
+
 		for(auto &layer : layerList) {
-			if (layer.flags & LayerFlags::DEFERRED) {
+			if (layer.flags & RenderQueueFlags::DEFERRED) {
 				for(auto &prim : layer.visibles) {
 					MaterialAsset* material = prim.second->GetMaterial();
 					ShaderAsset* shader = material->GetShader();
 					uint16 updateParamFlag = UpdateFrequency::PER_OBJECT_INSTANCE;
 					context.primitive = &prim;
-					if (currentMtl != material) {
-						context.material = currentMtl = material;
+					if (context.material != material) {
+						context.material = material;
 						updateParamFlag |= UpdateFrequency::PER_MATERIAL;
 					}
-					if (currentShader != shader) {
-						renderCtx->SwitchShader(0, currentShader = shader);
-						updateParamFlag |= UpdateFrequency::PER_FRAME|UpdateFrequency::PER_PASS;
+					if (context.shader != shader) {
+						renderCtx->SwitchShader(0, context, shader);
+						updateParamFlag |= UpdateFrequency::PER_FRAME|UpdateFrequency::PER_PASS|
+								UpdateFrequency::PER_VIEW;
 					}
 
-					shader->UpdateParams(renderCtx, context, updateParamFlag);
-					renderCtx->Draw(prim.second->GetStreamData());
+					context.pass->UpdateParams(renderCtx, context, updateParamFlag);
+					renderCtx->Draw(prim.second->GetStreamData(), context);
 				}
 			}
 		}
@@ -93,7 +93,7 @@ namespace nextar {
 		/* depth */
 		params.depth.useAsTexture = true;
 		params.depth.format = PixelFormat::D24S8;
-		renderTarget->NotifyUpdated(&params);
+		renderTarget->NotifyUpdated(reinterpret_cast<ContextObject::UpdateParamPtr>(&params));
 
 		depth = static_cast<RenderTexture*>(renderTarget->GetDepthAttachment());
 		normalGloss = static_cast<RenderTexture*>(renderTarget->GetAttachment(0));
