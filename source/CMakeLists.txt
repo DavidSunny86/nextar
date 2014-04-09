@@ -199,6 +199,7 @@ macro(config_src)
 		endif(NEX_OS MATCHES "Windows")
 	endif()
 
+	source_group(${NEX_FRAMEWORK}\\${NEX_TARGET} FILES ${NEXTAR_SRC_LIST})
 	file(GLOB NEXTAR_SRC_FILES 
 		${NEXTAR_SRC_LIST}
 		)
