@@ -64,7 +64,18 @@ namespace nextar {
 	}
 
 	void Asset::Unload(StreamRequest* req, bool async) {
-		// todo
+		// todo Background unload?? any advantage? saving mayb
+		if (IsLoaded() || IsLoading()) {
+			Debug("Asset being loaded: " + GetName());
+			return;
+		}
+		try {
+			NotifyAssetUnloaded();
+			UnloadImpl(req, false);
+		} catch(GracefulErrorExcept& e) {
+			Debug(e.GetMsg());
+			SetLoaded(false);
+		}
 	}
 
 	void Asset::NotifyAssetLoaded() {

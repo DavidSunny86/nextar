@@ -140,7 +140,7 @@ namespace nextar {
 			size_t streamSize, bool bfree) :
 			streamptr(stream), freedata(bfree) {
 		NEX_ASSERT(streamptr);
-		if (streamSize == CONST_INVALID_SIZE || !streamSize) {
+		if (streamSize == static_cast<uint32>(Constants::INVALID_SIZE) || !streamSize) {
 			std::streamoff off = stream->tellg();
 			stream->seekg(0, std::ios_base::end);
 			streamSize = static_cast<size_t>(stream->tellg());
@@ -186,7 +186,7 @@ namespace nextar {
 			size_t streamSize, bool bfreeStream) :
 			streamptr(strm), freedata(bfreeStream) {
 		NEX_ASSERT(streamptr);
-		if (streamSize == CONST_INVALID_SIZE) {
+		if (streamSize == static_cast<uint32>(Constants::INVALID_SIZE)) {
 			std::streamoff off = streamptr->tellp();
 			streamptr->seekp(0, std::ios_base::end);
 			streamSize = static_cast<size_t>(streamptr->tellp());
@@ -226,7 +226,7 @@ namespace nextar {
 	FileInputStream::FileInputStream(std::FILE* stream, size_t streamSize) :
 			streamptr(stream) {
 		NEX_ASSERT(streamptr);
-		if (streamSize == CONST_INVALID_SIZE || !streamSize) {
+		if (streamSize == static_cast<uint32>(Constants::INVALID_SIZE) || !streamSize) {
 			std::streamoff off = std::ftell(stream);
 			std::fseek(streamptr, 0, SEEK_END);
 			streamSize = static_cast<size_t>(std::ftell(stream));
@@ -262,7 +262,7 @@ namespace nextar {
 	FileOutputStream::FileOutputStream(std::FILE* strm, size_t streamSize) :
 			streamptr(strm) {
 		NEX_ASSERT(streamptr);
-		if (streamSize == CONST_INVALID_SIZE) {
+		if (streamSize == static_cast<uint32>(Constants::INVALID_SIZE)) {
 			std::streamoff off = std::ftell(streamptr);
 			std::fseek(streamptr, 0, std::ios_base::end);
 			streamSize = std::ftell(streamptr);

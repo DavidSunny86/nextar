@@ -28,7 +28,7 @@ namespace nextar {
 		ReverseMap::iterator it = reverseMap.find(std::cref(value));
 		if (it != reverseMap.end())
 			return (*it).second;
-		auto insertIt = forwardMap.emplace(forwardMap.size() + StringUtils::STRING_ID_START_OFFSET, value).first;
+		auto insertIt = forwardMap.emplace((StringID)(forwardMap.size() + StringUtils::STRING_ID_START_OFFSET), value).first;
 		saveToCache = true;
 		reverseMap.emplace(std::cref((*insertIt).second), (*insertIt).first);
 		return (*insertIt).first;

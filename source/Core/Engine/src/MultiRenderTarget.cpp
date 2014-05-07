@@ -6,6 +6,8 @@
  */
 #include <NexEngine.h>
 #include <MultiRenderTarget.h>
+#include <RenderContext.h>
+#include <RenderManager.h>
 
 namespace nextar {
 
@@ -24,16 +26,16 @@ namespace nextar {
 
 	void MultiRenderTarget::Reset() {
 		for(uint32 i = 0; i < numColorTargets; ++i)
-			NEX_DELETE color[i];
+			NEX_DELETE(color[i]);
 		numColorTargets = 0;
 		if (depth)
-			NEX_DELETE depth;
+			NEX_DELETE(depth);
 		depth = 0;
 	}
 
 	void MultiRenderTarget::NotifyUpdated(ContextObject::UpdateParamPtr updatePtr) {
 		/* create the individual textures */
-		UpdateParam* updateParams = static_cast<UpdateParam*>(updatePtr);
+		UpdateParam* updateParams = reinterpret_cast<UpdateParam*>(updatePtr);
 		if (updateParams->flags & UpdateParam::UPDATE_ALL)
 			Reset();
 
@@ -43,7 +45,7 @@ namespace nextar {
 		if(updateParams->numColorTargets != numColorTargets) {
 			if (updateParams->numColorTargets < numColorTargets) {
 				for(uint32 i = updateParams->numColorTargets; i < numColorTargets; ++i)
-					NEX_DELETE color[i];
+					NEX_DELETE(color[i]);
 			}
 			else {
 				for(uint32 i = numColorTargets; i < updateParams->numColorTargets; ++i)
@@ -56,7 +58,7 @@ namespace nextar {
 			if(validDepth)
 				depth = updateParams->depth.useTarget ? updateParams->depth.useTarget : RenderManager::Instance().CreateRenderTarget();
 			else {
-				NEX_DELETE depth;
+				NEX_DELETE(depth);
 				depth = 0;
 			}
 		}
@@ -65,7 +67,7 @@ namespace nextar {
 	}
 
 	void MultiRenderTarget::Update(RenderContext* rc, ContextObject::UpdateParamPtr updatePtr) {
-		UpdateParam* updateParams = static_cast<UpdateParam*>(updatePtr);
+		UpdateParam* updateParams = reinterpret_cast<UpdateParam*>(updatePtr);
 		TargetParamArray& tpa = updateParams->targets;
 		for(uint32 i = 0; i < numColorTargets; ++i)
 			color[i]->Reset(rc, dimensions, tpa[i].format);

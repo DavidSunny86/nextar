@@ -6,6 +6,7 @@
  */
 #include <NexEngine.h>
 #include <SceneTraversal.h>
+#include <Camera.h>
 
 namespace nextar {
 

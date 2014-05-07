@@ -35,7 +35,9 @@ namespace nextar {
 			}
 		}
 
-		~Pool();
+		~Pool() {
+			FreePool();
+		}
 
 		inline size_t GetChunkSize() const {
 			return CHUNK_SIZE;

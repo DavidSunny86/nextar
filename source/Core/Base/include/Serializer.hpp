@@ -280,8 +280,8 @@ inline InputSerializer& InputSerializer::operator >>(ByteArray& object) {
 		size_t c = std::min(r, left);
 		std::memcpy(b, moving, c);
 		moving += c;
-		left -= c;
-		r -= c;
+		left -= (int32)c;
+		r -= (int32)c;
 		b += c;
 	}
 

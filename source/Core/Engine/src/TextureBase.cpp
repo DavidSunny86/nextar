@@ -9,9 +9,9 @@
 
 namespace nextar {
 
-	TextureBase::TextureBase() : type(TEXTURE_TYPE_UNKNOWN),
+	TextureBase::TextureBase(uint16 flags) : type(TEXTURE_TYPE_UNKNOWN),
 		width(0), height(0), depth(0), faces(0), numMipMaps(0),
-		currentMaxMipLevel(0) {
+		currentMaxMipLevel(0), textureFlags(flags) {
 
 	}
 

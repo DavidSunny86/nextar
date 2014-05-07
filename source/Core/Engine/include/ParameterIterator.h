@@ -20,7 +20,10 @@ namespace nextar {
 	// Iterator is specific to the type of paramters requested.
 	class _NexEngineAPI ParameterIterator : public AllocGraphics {
 	public:
-		ParameterIterator(PassList& passes, uint32 type);
+
+		typedef Pass::ConstantBufferList  ConstantBufferList;
+
+		ParameterIterator(PassList& passes, UpdateFrequency type);
 		ParameterIterator(const ParameterIterator& it);
 
 		operator bool();
@@ -34,10 +37,11 @@ namespace nextar {
 
 		void _Init();
 		void _NextParam();
+		
 		PassList::iterator curPass;
 		ConstantBufferList::iterator curBuffer;
 		ShaderParamIterator curParam;
-		uint32 type;
+		UpdateFrequency frequency;
 
 		PassList& passes;
 

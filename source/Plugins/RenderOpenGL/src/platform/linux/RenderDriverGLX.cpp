@@ -15,7 +15,7 @@ namespace RenderOpenGL {
 	}
 
 	RenderContextGL* RenderDriverGLX::CreateContextImpl() {
-		return NEX_NEW RenderContextGLX(this);
+		return NEX_NEW(RenderContextGLX(this));
 	}
 
 	void* RenderDriverGL::GetExtension(const char* name) {
@@ -26,6 +26,6 @@ namespace RenderOpenGL {
 	}
 
 	RenderDriverGL* RenderDriverGL::CreateDriverGL(int32 gpuIndex) {
-		return NEX_NEW RenderDriverGLX(gpuIndex);
+		return NEX_NEW(RenderDriverGLX(gpuIndex));
 	}
 }

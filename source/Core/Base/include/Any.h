@@ -43,11 +43,11 @@ namespace nextar {
             };
 
             virtual PlaceHolder* Clone() const {
-                return NEX_NEW Holder(value);
+                return NEX_NEW( Holder(value) );
             }
 
             virtual void Dispose() {
-                NEX_DELETE this;
+                NEX_DELETE(this);
             }
 
             virtual debug::ConstTypeInfo GetTypeInfo() {
@@ -74,7 +74,7 @@ namespace nextar {
 
         template < typename ValueType >
         _NexInline Any(ValueType& v) :
-        contents(NEX_NEW Holder<ValueType>(v)) {
+        contents(NEX_NEW( Holder<ValueType>(v) )) {
         }
 
         _NexInline Any& Swap(Any& rhs) {

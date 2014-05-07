@@ -68,6 +68,10 @@ namespace nextar {
 			return ShaderParamIterator(&samplers->paramDesc, samplerStride, samplerCount);
 		}
 
+		inline ConstantBufferList& GetConstantBuffers() {
+			return sharedParameters;
+		}
+
 		virtual bool NotifyUpdated(nextar::RenderContext*);
 		virtual void NotifyDestroyed(nextar::RenderContext*);
 		
@@ -80,7 +84,7 @@ namespace nextar {
 		const SamplerDesc* MapSamplerParams(const String& name);
 
 		// todo
-		virtual void UpdateParams(RenderContext* renderCtx, CommitContext& context, uint32 flags);
+		virtual void UpdateParams(RenderContext* renderCtx, CommitContext& context, UpdateFrequency flags);
 		// todo
 		static size_t ParamSizeFromType(ParamDataType);
 
@@ -92,23 +96,10 @@ namespace nextar {
 
 	protected:
 
-		inline void _UpdateConstBuffer(RenderContext* rc, CommitContext& ctx, ConstantBufferPtr& cb) {
-			AutoParamProcessor* proc = cb->GetProcessor();
-			if (proc) {
-				// we just update it in one go
-				proc->Apply(rc, nullptr, ctx);
-			} else {
-				cb->BeginUpdate(rc, flags);
-				ShaderParamIterator it = cb->GetParamIterator();
-				_ProcessShaderParamIterator(rc, ctx, it, flags);
-				cb->EndUpdate(rc);
-			}
-		}
-
-		inline void _ProcessShaderParamIterator(RenderContext* rc, CommitContext& ctx, ShaderParamIterator& it, uint32 flags) {
+		static inline void _ProcessShaderParamIterator(RenderContext* rc, CommitContext& ctx, ShaderParamIterator& it, UpdateFrequency flags) {
 			while(it) {
 				const ShaderParamDesc& d = (*it);
-				if (d.frequency & flags) {
+				if (Test(d.frequency & flags)) {
 					NEX_ASSERT(d.processor);
 					d.processor->Apply(rc, &d, ctx);
 				}
@@ -126,11 +117,11 @@ namespace nextar {
 		
 		/* Unique number representing this pass */
 		uint16 inputLayoutUniqueID;
-
-		/* Base index to the parameter buffer */
-		uint16 flags;
 				
-		GpuProgram* programs[NUM_STAGES];
+		uint16 flags;
+		
+		typedef array<GpuProgram*, NUM_STAGES>::type GpuProgramArray;
+		GpuProgramArray programs;
 
 		RasterState rasterState;
 		BlendState blendState;
@@ -170,7 +161,7 @@ namespace nextar {
 		friend class ShaderAsset;
 	};
 
-	typedef std::unique_ptr<Pass> PassPtr;
+	typedef Pass* PassPtr;
 	typedef vector<PassPtr>::type PassList;
 
 } /* namespace nextar */

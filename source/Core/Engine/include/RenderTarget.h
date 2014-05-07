@@ -18,7 +18,7 @@ namespace nextar {
 		FRONT_LEFT,
 		FRONT_RIGHT,
 		BACK_LEFT,
-		FRONT_RIGHT,
+		BACK_RIGHT,
 		DEPTH,
 		FRONT = FRONT_LEFT,
 		BACK = BACK_LEFT

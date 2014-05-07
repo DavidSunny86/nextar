@@ -33,7 +33,7 @@ namespace nextar {
 		}
 
 		Trace("opened(r,c): " + fileName);
-		return Assign<InputStream>(NEX_NEW CompressedInputStream(file, archive));
+		return Assign<InputStream>(NEX_NEW(CompressedInputStream(file, archive)));
 	}
 
 	OutputStreamPtr CompressedArchive::OpenWrite(const String& fileName,
@@ -56,7 +56,7 @@ namespace nextar {
 
 		Trace("opened(w,c): " + fileName);
 		return Assign<OutputStream>(
-				NEX_NEW CompressedOutputStream(file, archive));
+				NEX_NEW(CompressedOutputStream(file, archive)));
 	}
 
 	void CompressedArchive::Scan(ScanCallback* callback, const String& pattern,
@@ -177,7 +177,7 @@ namespace nextar {
 
 	ArchivePtr CompressedArchive::Factory::CreateInstance(const String& baseDir,
 			const String& params) {
-		return Assign<Archive>(NEX_NEW CompressedArchive(baseDir, params));
+		return Assign<Archive>(NEX_NEW(CompressedArchive(baseDir, params)));
 	}
 
 }

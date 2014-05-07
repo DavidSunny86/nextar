@@ -113,7 +113,7 @@ namespace nextar {
 		std::istream* streamptr;bool freedata;
 	public:
 
-		GenericInputStream(std::istream* strm, size_t size = CONST_INVALID_SIZE,
+		GenericInputStream(std::istream* strm, size_t size = (size_t)Constants::INVALID_SIZE,
 				bool bfreeStream = false);
 		~GenericInputStream();
 
@@ -132,7 +132,7 @@ namespace nextar {
 		std::ostream* streamptr;bool freedata;
 	public:
 		GenericOutputStream(std::ostream* strm,
-				size_t size = CONST_INVALID_SIZE, bool bfreeStream = false);
+				size_t size = (size_t)Constants::INVALID_SIZE, bool bfreeStream = false);
 		~GenericOutputStream();
 
 		//! @copydoc OutputStream::Write(void*,size_t)
@@ -148,7 +148,7 @@ namespace nextar {
 		std::FILE* streamptr;
 	public:
 
-		FileInputStream(std::FILE* strm, size_t size = CONST_INVALID_SIZE);
+		FileInputStream(std::FILE* strm, size_t size = (size_t)Constants::INVALID_SIZE);
 		~FileInputStream();
 
 		//! @copydoc InputStream::Read(void*,size_t)
@@ -166,7 +166,7 @@ namespace nextar {
 		std::FILE* streamptr;
 	public:
 		FileOutputStream(std::FILE* streamptr,
-				size_t size = CONST_INVALID_SIZE);
+				size_t size = (size_t)Constants::INVALID_SIZE);
 		~FileOutputStream();
 
 		//! @copydoc OutputStream::Write(void*,size_t)

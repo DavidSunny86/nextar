@@ -8,6 +8,7 @@
 #include <VertexElement.h>
 #include <RenderManager.h>
 #include <RenderContext.h>
+#include <RenderTarget.h>
 #include <Viewport.h>
 
 namespace nextar {
@@ -97,7 +98,11 @@ namespace nextar {
 			Error("Render queue index must be less than 255");
 			return;
 		}
-		renderQueues.emplace_back(flags, priority, name);
+		RenderQueueDesc desc;
+		desc.name = name;
+		desc.priority = priority;
+		desc.flags = flags;
+		renderQueues.push_back(desc);
 		std::sort(renderQueues.begin(), renderQueues.end());
 	}
 
@@ -134,6 +139,7 @@ namespace nextar {
 	}
 
 	void RenderManager::RenderAllTargets(RenderContext* rc, uint32 frame, bool callPresent) {
+		
 		rc->BeginFrame(frame);
 		RenderTargetList& rtList = rc->GetRenderTargetList();
 		for (auto &rt : rtList) {

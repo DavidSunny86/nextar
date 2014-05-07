@@ -9,5 +9,5 @@
 #===========================================================
 
 create_library() 
-add_dependency(Core Base)
+add_chained_dependency(Core Base)
 

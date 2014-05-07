@@ -29,7 +29,7 @@ namespace nextar {
 			TYPE_COUNT,
 		};
 
-		Light(const String& name);
+		Light(const StringID name);
 		virtual ~Light();
 
 		/** @brief Get node type */

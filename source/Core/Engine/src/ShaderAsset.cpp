@@ -7,6 +7,8 @@
 #include <NexEngine.h>
 #include <Pass.h>
 #include <ShaderAsset.h>
+#include <ConstantBuffer.h>
+#include <ParameterIterator.h>
 
 namespace nextar {
 
@@ -15,10 +17,20 @@ namespace nextar {
 	/* Shader											 */
 	/*****************************************************/
 	ShaderAsset::ShaderAsset(const StringID name) : nextar::Asset(name)
-			,translucency(0) {
+	,translucency(0)
+	,singlePassShader(nullptr) {
 	}
 
 	ShaderAsset::~ShaderAsset() {
+		_DestroyPasses();
+	}
+
+	void ShaderAsset::_DestroyPasses() {
+		if (singlePassShader)
+			NEX_DELETE(singlePassShader);
+		for(auto &p : passes)
+			NEX_DELETE(p);
+		passes.clear();
 	}
 
 	ShaderAssetPtr ShaderAsset::Instance(Component::Factory* factory, const StringID name, const URL& loc,
@@ -40,14 +52,19 @@ namespace nextar {
 		ContextObject::NotifyCreated();
 		/* update programs */
 		/* build with compilation options */
+		_DestroyPasses();
+		
 		StreamPassList &spl = creationParams->passes;
-		passes.clear();
-		passes.reserve(creationParams->passes.size());
-		for(auto i = spl.begin(); i != spl.end(); ++i) {
-			PassPtr p(CreatePass((*i), creationParams->compilationOpt));
-			passes.push_back(std::move(p));
+		if (spl.size() > 1) {
+			passes.reserve(spl.size());
+			for(auto i = spl.begin(); i != spl.end(); ++i) {
+				PassPtr p(CreatePass((*i), creationParams->compilationOpt));
+				passes.push_back(std::move(p));
+			}
+		} else {
+			singlePassShader = CreatePass(spl[0], creationParams->compilationOpt);
 		}
-
+		
 		/* update */
 		ContextObject::NotifyUpdated(reinterpret_cast<UpdateParamPtr>(creationParams));
 		_BuildParameterTable();
@@ -83,14 +100,22 @@ namespace nextar {
 
 	void ShaderAsset::NotifyAssetUnloaded() {
 		ContextObject::NotifyDestroyed();
-
-		for(auto &p : passes) {
-			for(uint32 i = 0; i < Pass::NUM_STAGES; ++i)
-				if (p->programs[i])
-					p->programs[i]->NotifyDestroyed();
+		Pass **it, **en;
+		if(singlePassShader) {
+			it = &singlePassShader;
+			en = it + 1;
+		} else {
+			it = passes.data();
+			en = it + passes.size();
 		}
 
-		passes.clear();
+		for(; it != en; ++it) {
+			for(uint32 i = 0; i < Pass::NUM_STAGES; ++i)
+				if ((*it)->programs[i])
+					(*it)->programs[i]->NotifyDestroyed();
+		}
+
+		_DestroyPasses();
 		/* notify dependents */
 		Asset::NotifyAssetUnloaded();
 	}
@@ -101,7 +126,7 @@ namespace nextar {
 	}
 
 	void ShaderAsset::UnloadImpl(StreamRequest*, bool) {
-		passes.clear();
+		_DestroyPasses();
 	}
 
 	void ShaderAsset::NotifyAssetUpdated() {
@@ -116,10 +141,18 @@ namespace nextar {
 
 	void ShaderAsset::Update(RenderContext* rc, ContextObject::UpdateParamPtr streamRequest) {
 		StreamRequest* creationParams = reinterpret_cast<StreamRequest*>(streamRequest);
-
+		Pass **it, **en;
 		bool useFallback = false;
-		for(auto &p : passes) {
-			useFallback &= p->NotifyUpdated(rc);
+		if(singlePassShader) {
+			it = &singlePassShader;
+			en = it + 1;
+		} else {
+			it = passes.data();
+			en = it + passes.size();
+		}
+
+		for(; it != en; ++it) {
+			useFallback &= (*it)->NotifyUpdated(rc);
 		}
 
 		if (useFallback)
@@ -129,23 +162,31 @@ namespace nextar {
 	}
 
 	void ShaderAsset::Destroy(nextar::RenderContext* rc) {
+		Pass **it, **en;
+		if(singlePassShader) {
+			it = &singlePassShader;
+			en = it + 1;
+		} else {
+			it = passes.data();
+			en = it + passes.size();
+		}
 		Decompile(rc);
-		for(auto& p : passes) {
-			p->NotifyDestroyed(rc);
+		for(; it != en; ++it) {
+			(*it)->NotifyDestroyed(rc);
 		}
 	}
 
 	nextar::StreamRequest* ShaderAsset::CreateStreamRequestImpl(bool load) {
-		return NEX_NEW ShaderAsset::StreamRequest(this);
+		return NEX_NEW(ShaderAsset::StreamRequest(this));
 	}
 
 	void ShaderAsset::DestroyStreamRequestImpl(nextar::StreamRequest*& request, bool load) {
 		ShaderAsset::StreamRequest* req = static_cast<ShaderAsset::StreamRequest*>(request);
-		NEX_DELETE req;
+		NEX_DELETE(req);
 		request = nullptr;
 	}
 
-	void ShaderAsset::_BeginPass(PassPtr& p, ParamTableBuilder& ptb) {
+	void ShaderAsset::_BeginPass(PassPtr p, ParamTableBuilder& ptb) {
 		p->passParamByteOffset = ptb.passParamOffset;
 		p->materialParamByteOffset = ptb.materialParamOffset;
 		p->objectParamByteOffset = ptb.objectParamOffset;
@@ -209,8 +250,16 @@ namespace nextar {
 		paramLookup.clear();
 
 		ParamTableBuilder paramTableBuilder;
-
-		for(auto &p : passes) {
+		Pass **it, **en;
+		if(singlePassShader) {
+			it = &singlePassShader;
+			en = it + 1;
+		} else {
+			it = passes.data();
+			en = it + passes.size();
+		}
+		for(; it != en; ++it) {
+			PassPtr p = (*it);
 			_BeginPass(p, paramTableBuilder);
 			ConstantBufferList& cbl = p->GetConstantBuffers();
 			for(auto &c : cbl) {
@@ -255,36 +304,18 @@ namespace nextar {
 	void ShaderAsset::StreamRequest::AddMacro(const String& name,
 			const String& param, const String& description, bool defaultValue) {
 	}
-
-	void ShaderAsset::StreamRequest::BindDefaultTexture(const String& unitName, TextureBase* texture, uint32 index) {
+	
+	void ShaderAsset::StreamRequest::AddTextureUnit(const String& unitName, TextureUnitParams& tu, TextureBase* texture) {
 		ShaderAsset* shader = static_cast<ShaderAsset*>(streamedObject);
 		Pass::TextureDescMap& defaultTextureUnits = passes[currentPass].textureStates;
-		Pass::TextureDescMap::iterator it = defaultTextureUnits.find(unitName);
-		if (it == defaultTextureUnits.end()) {
-			Error("Bind point out of bounds for default texture in shader: " + shader->GetName());
-			return;
-		}
-		Pass::SamplerDesc& sd = (*it).second;
-		if (index == 0)
-			sd.defaultTexture0 = texture;
-		else if (index < sd.arrayCount) {
-			if (!sd.defaultTextures.size())
-				sd.defaultTextures.resize(sd.arrayCount-1);
-			sd.defaultTextures[index-1] = texture;
-		} else
-			return;
+		Pass::SamplerDesc& sd = defaultTextureUnits[unitName];
+		sd.texUnitParams = tu;
+		sd.defaultTexture = texture;
 		if (texture->IsTextureAsset())
 			metaInfo.AddDependency(static_cast<TextureAsset*>(texture));
 	}
 
-	void ShaderAsset::StreamRequest::AddTextureUnit(const String& unitName, uint32 count, TextureUnitParams& tu) {
-		Pass::TextureDescMap& defaultTextureUnits = passes[currentPass].textureStates;
-		Pass::SamplerDesc& sd = defaultTextureUnits[unitName];
-		sd.texUnitParams = tu;
-		sd.arrayCount = count;
-	}
-
-	ParameterIterator ShaderAsset::GetParameterIterator(uint32 type) {
+	ParameterIterator ShaderAsset::GetParameterIterator(UpdateFrequency type) {
 		return ParameterIterator(passes, type);
 	}
 
@@ -301,7 +332,7 @@ namespace nextar {
 	}
 
 	void ShaderAsset::StreamRequest::AddPass(const String& name) {
-		currentPass = passes.size();
+		currentPass = (uint32)passes.size();
 		passes.resize(currentPass+1);
 		passes[currentPass].name = name;
 	}

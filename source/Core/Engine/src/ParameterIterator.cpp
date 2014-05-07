@@ -12,13 +12,13 @@ namespace nextar {
 	/*****************************************************/
 	/* ParameterIterator             			 */
 	/*****************************************************/
-	ParameterIterator::ParameterIterator(PassList& _passes, uint32 _type) :
-	passes(_passes), type(_type) {
+	ParameterIterator::ParameterIterator(PassList& _passes, UpdateFrequency _type) :
+	passes(_passes), frequency(_type) {
 		_Init();
 	}
 
 	ParameterIterator::ParameterIterator(const ParameterIterator& it) :
-	passes(it.passes), type(it.type) {
+	passes(it.passes), frequency(it.frequency) {
 		_Init();
 	}
 
@@ -47,7 +47,7 @@ namespace nextar {
 
 	void ParameterIterator::_NextParam() {
 		while(curParam) {
-			if ((*curParam).frequency & type)
+			if (Test((*curParam).frequency & frequency))
 				break;
 			++curParam;
 		}

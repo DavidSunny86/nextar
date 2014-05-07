@@ -22,7 +22,7 @@ namespace nextar {
         LARGE_INTEGER frequency;
 
         //! the starting time after Reset was called.
-        DWORD start_tick;
+		ULONGLONG start_tick;
         //! the last time GetMilliSecs was called.
         LONGLONG last_time;
 

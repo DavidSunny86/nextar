@@ -163,7 +163,7 @@ namespace RenderOpenGL {
 	}
 
 	nextar::RenderWindow* RenderContextGLX::CreateWindowImpl() {
-		return NEX_NEW WindowGLX(this);
+		return NEX_NEW(WindowGLX(this));
 	}
 
 	Display* RenderContextGLX::OpenDisplay(int gpuIndex) {

@@ -9,8 +9,8 @@
 
 namespace nextar {
 
-	Renderable::Renderable(ComponentManager* creator, const String& name, Component* parent) :
-		Spatial(creator, name, parent) {
+	Renderable::Renderable(const StringID name, Component* parent) :
+		Spatial(name, parent) {
 	}
 
 	Renderable::~Renderable() {

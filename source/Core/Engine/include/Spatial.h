@@ -8,7 +8,9 @@
 #ifndef SPATIAL_H_
 #define SPATIAL_H_
 
+#include <NexBase.h>
 #include <Component.h>
+#include <SceneTraversal.h>
 
 namespace nextar {
 
@@ -30,7 +32,7 @@ namespace nextar {
 			LAST_FLAG = Component::LAST_FLAG << 3
 		};
 
-		Spatial(const String& name = StringUtils::Null, Component* parent = nullptr);
+		Spatial(const StringID name = StringUtils::NullID, Component* parent = nullptr);
 		virtual ~Spatial();
 		
 		inline const BoundingVolume& GetBoundsInfo() const {

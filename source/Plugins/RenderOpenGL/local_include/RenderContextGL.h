@@ -31,7 +31,7 @@ namespace RenderOpenGL {
 		virtual void PostWindowDestruction(RenderWindow* windowGl);
 		virtual void Draw(StreamData*, CommitContext&);
 		virtual void SetCurrentTarget(RenderTarget*);
-		virtual void Clear(Color& c, float depth, uint16 stencil, uint16 flags);
+		virtual void Clear(Color& c, float depth, uint16 stencil, ClearFlags flags);
 		virtual void SetActivePass(Pass* pass);
 
 		/* HL Functions */

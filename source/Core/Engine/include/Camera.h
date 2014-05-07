@@ -72,7 +72,7 @@ namespace nextar {
 			Plane camPlanes[6];
 		};
 
-		Camera(const String& name, Component* parent = nullptr);
+		Camera(const StringID name, Component* parent = nullptr);
 		virtual ~Camera();
 
 		/** This is basically the inverse of the world transform */
@@ -136,8 +136,7 @@ namespace nextar {
 		}
 
 		void _CalculateViewDimensions();
-	
-		/* true if this is the main camera */
+			
 		uint8 projectionType;
 
 		uint16 viewMatrixNumber;

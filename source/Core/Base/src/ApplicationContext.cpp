@@ -1,5 +1,10 @@
 #include <BaseHeaders.h>
 #include <ApplicationContext.h>
+#include <PluginRegistry.h>
+#include <PropertyInterface.h>
+#include <WindowManager.h>
+#include <BackgroundStreamer.h>
+#include <BackgroundStreamerImpl.h>
 
 namespace nextar {
 
@@ -9,8 +14,9 @@ namespace nextar {
 
 	ApplicationContext::ApplicationContext(const String& name) :
 			appName(name),
-			quitting(false) {
-		NEX_NEW LogManager();
+			quitting(false), 
+			runningLoop(false) {
+		NEX_NEW( LogManager() );
 #ifdef NEX_DEBUG
 		// add a default logger
 		static Logger logger("Debug");
@@ -19,7 +25,7 @@ namespace nextar {
 	}
 
 	ApplicationContext::~ApplicationContext(void) {
-		NEX_DELETE LogManager::InstancePtr();
+		NEX_DELETE(LogManager::InstancePtr());
 	}
 
 	void ApplicationContext::InitializeContext() {
@@ -77,13 +83,15 @@ namespace nextar {
 	}
 
 	void ApplicationContext::CreateServices() {
-		NEX_NEW FileSystem();
-		NEX_NEW PluginRegistry();
-		NEX_NEW WindowManager();
+		NEX_NEW(FileSystem());
+		NEX_NEW(PluginRegistry());
+		NEX_NEW(WindowManager());
+		NEX_NEW(BackgroundStreamerImpl());
 		// todo Moved to Engine
-		//NEX_NEW ComponentFactoryArchive();
+		//NEX_NEW(ComponentFactoryArchive());
 
 		CreateExtendedInterfacesImpl();
+
 	}
 
 	void ApplicationContext::DestroyServices() {
@@ -92,10 +100,11 @@ namespace nextar {
 		// todo Moved: RenderSystem
 		// NEX_ASSERT (!RenderManager::InstancePtr());
 		// todo Moved: Engine
-		// NEX_DELETE ComponentFactoryArchive::InstancePtr();
-		NEX_DELETE WindowManager::InstancePtr();
-		NEX_DELETE PluginRegistry::InstancePtr();
-		NEX_DELETE FileSystem::InstancePtr();
+		// NEX_DELETE(ComponentFactoryArchive::InstancePtr());
+		NEX_DELETE(BackgroundStreamer::InstancePtr());
+		NEX_DELETE(WindowManager::InstancePtr());
+		NEX_DELETE(PluginRegistry::InstancePtr());
+		NEX_DELETE(FileSystem::InstancePtr());
 	}
 
 	void ApplicationContext::SetQuitting(bool value) {
@@ -108,13 +117,14 @@ namespace nextar {
 
 		while (!quitting) {
 			frameClock.Tick();
-			{
-				NEX_THREAD_LOCK_GUARD_RECURSIVE_MUTEX(addListener);
+			
+			if(frameListenersToAdd.size()) {				
 				// process any add requests
 				frameListeners.insert(frameListenersToAdd.begin(), frameListenersToAdd.end());
 				frameListenersToAdd.clear();
 			}
 			{
+				runningLoop = true;
 				frameTimer.BeginFrame();
 				WindowManager::Instance().ProcessMessages();
 				// run the frame listeners
@@ -129,10 +139,10 @@ namespace nextar {
 				for(; it != en; ++it)
 					(*it).frameListener->EndFrame(elapsedMilSec);
 				frameTimer.EndFrame(elapsedMilSec);
+				runningLoop = false;
 			}
-
-			{
-				NEX_THREAD_LOCK_GUARD_RECURSIVE_MUTEX(removeListener);
+						
+			if(frameListenersToRemove.size()) {
 				// process any removal requests
 				FrameListenerSet::iterator it = frameListenersToRemove.begin();
 				FrameListenerSet::iterator en = frameListenersToRemove.end();
@@ -144,14 +154,18 @@ namespace nextar {
 		frameClock.StopClock();
 	}
 
-	void ApplicationContext::AsyncRegisterListener(const Listener& l) {
-		NEX_THREAD_LOCK_GUARD_RECURSIVE_MUTEX(addListener);
-		frameListenersToAdd.insert(l);
+	void ApplicationContext::RegisterListener(const Listener& l) {
+		if (runningLoop)
+			frameListenersToAdd.insert(l);
+		else
+			frameListeners.insert(l);
 	}
 
-	void ApplicationContext::AsyncUnregisterListener(const Listener& l) {
-		NEX_THREAD_LOCK_GUARD_RECURSIVE_MUTEX(removeListener);
-		frameListenersToRemove.insert(l);
+	void ApplicationContext::UnregisterListener(const Listener& l) {
+		if (runningLoop)
+			frameListenersToRemove.insert(l);
+		else
+			frameListeners.erase(l);
 	}
 
 }

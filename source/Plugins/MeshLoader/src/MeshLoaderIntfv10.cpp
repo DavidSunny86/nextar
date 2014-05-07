@@ -79,14 +79,14 @@ namespace MeshLoader {
 
 		Asset* mesh = static_cast<Asset*>(request->GetStreamedObject());
 		if (vertexElements)
-			NEX_DELETE vertexElements;
+			NEX_DELETE(vertexElements);
 		ser >> (vertexElementCount);
 		if (vertexElementCount >= VertexElement::MAX_VERTEX_ELEMENT) {
 			Error(String("Too many vertex elements: ") + mesh->GetName());
 			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
 		}
 
-		vertexElements = NEX_NEW VertexElement[vertexElementCount];
+		vertexElements = NEX_NEW(VertexElement[vertexElementCount]);
 		uint32 i = 0;
 		while (i < vertexElementCount) {
 			VertexElement element;
@@ -147,13 +147,13 @@ namespace MeshLoader {
 			VertexElement* vertexElements, uint16 vertexElementCount) {
 
 		Asset* mesh = static_cast<Asset*>(request->GetStreamedObject());
-		MeshVertexData* vertexData = NEX_NEW MeshVertexData;
+		MeshVertexData* vertexData = NEX_NEW(MeshVertexData);
 		// read some headers
 		ser >> vertexData->numVertexBuffers >> vertexData->vertexCount;
 
 		if (vertexData->numVertexBuffers >= MAX_STREAM_COUNT) {
 			Error(String("Too many vertex buffers: ") + mesh->GetName());
-			NEX_DELETE vertexData;
+			NEX_DELETE(vertexData);
 			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
 		}
 
@@ -162,7 +162,7 @@ namespace MeshLoader {
 		ser >> chunk;
 		if (chunk.first.first != MCID_VERTEX_ELEMENT_DATA && !vertexElements) {
 			Error(String("Vertex element data missing: ") + mesh->GetName());
-			NEX_DELETE vertexData;
+			NEX_DELETE(vertexData);
 			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
 		}
 
@@ -191,7 +191,7 @@ namespace MeshLoader {
 
 	MeshIndexData* MeshLoaderImplv1_0::ReadIndexData(MeshAsset::StreamRequest* request, InputSerializer& ser) {
 		Asset* mesh = static_cast<Asset*>(request->GetStreamedObject());
-		MeshIndexData* indexData = NEX_NEW MeshIndexData;
+		MeshIndexData* indexData = NEX_NEW(MeshIndexData);
 
 		uint32 size;
 		ser >> size >> indexData->indexCount >> indexData->twoBytePerElement;

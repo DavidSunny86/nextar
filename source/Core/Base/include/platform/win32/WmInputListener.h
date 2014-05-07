@@ -21,9 +21,6 @@ namespace nextar {
 
 		/* Received only when in foreground */
 		virtual void OnWmInput(Win32Window* window, HRAWINPUT) = 0;
-
-	private:
-
 	};
 }
 

@@ -26,9 +26,9 @@ namespace nextar {
 		if (type == Component::CLASS_UNKNOWN) {
 			NEX_THREAD_LOCK_GUARD_MUTEX(containerLock);
 			for( auto p = componentFactories.cbegin(); p != componentFactories.cend(); ) {
-				if( (*p).first ==  name) {
+				if( (*p).first.first ==  name) {
 					if (d)
-						NEX_DELETE (*p).second;
+						NEX_DELETE((*p).second);
 					componentFactories.erase(p++);
 				}
 				else {
@@ -40,7 +40,7 @@ namespace nextar {
 			auto it = componentFactories.find(FactoryID(name, type));
 			if (it != componentFactories.end()) {
 				if (d)
-					NEX_DELETE (*it).second;
+					NEX_DELETE((*it).second);
 				componentFactories.erase(it);
 			}
 		}
@@ -58,7 +58,7 @@ namespace nextar {
 		NEX_THREAD_LOCK_GUARD_MUTEX(containerLock);
 		for(auto &v : componentFactories)
 			if ( v.second )
-				NEX_DELETE v.second;
+				NEX_DELETE(v.second);
 		componentFactories.clear();
 	}
 

@@ -17,10 +17,10 @@ namespace nextar {
 
 			static void Transfer(PixelBox& dest, const PixelBox& src) {
 
-				C::SrcType* srcData = static_cast<C::SrcType*>(src.Data())
+				C::SrcType* srcData = reinterpret_cast<C::SrcType*>(src.Data())
 						+ (src.front * src.slicePixelPitch)
 						+ (src.top * src.rowPixelPitch) + src.left;
-				C::DestType* destData = static_cast<C::DestType*>(dest.Data())
+				C::DestType* destData = reinterpret_cast<C::DestType*>(dest.Data())
 						+ (dest.front * dest.slicePixelPitch)
 						+ (dest.top * dest.rowPixelPitch) + dest.left;
 
@@ -53,7 +53,7 @@ namespace nextar {
 			typedef D DestType;
 		};
 
-		template<enum PixelFormat srcFmt, enum PixelFormat destFmt>
+		template<PixelFormat srcFmt, PixelFormat destFmt>
 		class PixelMapper {
 		public:
 		};
@@ -61,7 +61,7 @@ namespace nextar {
 		template<>
 		class PixelMapper<PixelFormat::RGBA8, PixelFormat::BGRA8> : public PixMapperBase<uint32, uint32> {
 		public:
-			static _NexInline uint32 MapPixel(uint32 p) {
+			static inline uint32 MapPixel(uint32 p) {
 #if (NEX_ENDIANNESS == NEX_ENDIAN_LITTLE)
 				return (p & 0xff000000) | ((p & 0x00ff0000) >> 16)
 						| (p & 0x0000ff00) | ((p & 0x000000ff) << 16);
@@ -78,23 +78,23 @@ namespace nextar {
 		};
 
 		/* No format conversion is possible using this */
-		template<enum PixelFormat fmt>
+		template<PixelFormat fmt>
 		class PixelPacker {
 		public:
-			static _NexInline void Pack(ColorChannel& c, const void* pixMem) {
+			static inline void Pack(ColorChannel& c, const void* pixMem) {
 			}
-			static _NexInline void Unpack(void* pixMem, const ColorChannel& c) {
+			static inline void Unpack(void* pixMem, const ColorChannel& c) {
 			}
 		};
 
 		template<>
 		class PixelPacker<PixelFormat::A8> {
 		public:
-			static _NexInline void Pack(ColorChannel& c, const void* pixMem) {
+			static inline void Pack(ColorChannel& c, const void* pixMem) {
 				c.value[0] = (float) (*(const uint8*) pixMem) / 255.f;
 			}
 
-			static _NexInline void Unpack(void* pixMem, const ColorChannel& c) {
+			static inline void Unpack(void* pixMem, const ColorChannel& c) {
 				(*(uint8*) pixMem) = (uint8) (c.value[0] * 255.f);
 			}
 		};
@@ -102,7 +102,7 @@ namespace nextar {
 		template<>
 		class PixelPacker<PixelFormat::BGRA8> {
 		public:
-			static _NexInline void Pack(ColorChannel& c, const void* pixMem) {
+			static inline void Pack(ColorChannel& c, const void* pixMem) {
 				const uint8* memPtr = (const uint8*) pixMem;
 				c.value[0] = (float) (memPtr[0]) / 255.f;
 				c.value[1] = (float) (memPtr[1]) / 255.f;
@@ -110,7 +110,7 @@ namespace nextar {
 				c.value[3] = (float) (memPtr[3]) / 255.f;
 			}
 
-			static _NexInline void Unpack(void* pixMem, const ColorChannel& c) {
+			static inline void Unpack(void* pixMem, const ColorChannel& c) {
 				uint8* memPtr = (uint8*) pixMem;
 				memPtr[0] = (uint8) (c.value[0] * 255.f);
 				memPtr[1] = (uint8) (c.value[1] * 255.f);

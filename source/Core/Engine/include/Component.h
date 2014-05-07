@@ -8,7 +8,7 @@
 #ifndef COMPONENT_H_
 #define COMPONENT_H_
 
-#include <NexBase.h>
+#include <NexEngine.h>
 #include <BoundingVolume.h>
 #include <StringUtils.h>
 #include <NamedObject.h>
@@ -142,7 +142,8 @@ namespace nextar {
 	public:
 		static SharedComponentPtr Null;
 
-		class Group : public NamedObject {
+		class Group : public AllocGeneral,
+			public NamedObject {
 		public:
 
 			Group(const StringID name);

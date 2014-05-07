@@ -40,7 +40,7 @@ namespace RenderOpenGL {
 		}
 
 		/* Must be called before Write is called */
-		virtual void BeginUpdate(RenderContext* rc, uint32 updateFlags) override;
+		virtual void BeginUpdate(RenderContext* rc, UpdateFrequency updateFlags) override;
 		/* Must be called after Write operations are done */
 		virtual void EndUpdate(RenderContext* rc) override;
 		/** This function will fail unless a local copy of the data exists. The local

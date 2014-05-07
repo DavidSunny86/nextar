@@ -7,7 +7,6 @@
 
 # Add definition
 create_plugin("ImageLoader" "" "Lifetime" "${NEX_VERSION}" "false")
-add_dependency(Core Base)
 add_dependency(Core Engine)
 
 ## Find dependencies
@@ -22,19 +21,19 @@ if(NEX_OS MATCHES "Windows")
  endif(NOT LIBJPEG_ROOT)
  # PNG
   if(NOT PNG_ROOT)
-  set(PNG_NAMES libpng16)
-  set(PNG_ROOT ${NEX_DEPENDENCIES}/libpng)
+	set(PNG_NAMES libpng16)
+	set(PNG_ROOT ${NEX_DEPENDENCIES}/libpng)
  endif(NOT PNG_ROOT)
 endif(NEX_OS MATCHES "Windows")
 
 find_package(LIBJPEG REQUIRED)
 if (LIBJPEG_FOUND)
- add_external_dependency(${LIBJPEG_INCLUDE_DIRS} ${LIBJPEG_LIBRARIES})
+ add_external_dependency("${LIBJPEG_INCLUDE_DIRS}" "${LIBJPEG_LIBRARIES}")
 endif (LIBJPEG_FOUND)
 
 find_package(PNG REQUIRED)
 if (PNG_FOUND)
- add_external_dependency(${PNG_INCLUDE_DIRS} ${PNG_LIBRARIES})
+ add_external_dependency("${PNG_INCLUDE_DIRS}" "${PNG_LIBRARIES}")
 endif (PNG_FOUND)
 add_definitions(${PNG_DEFINITIONS})
 

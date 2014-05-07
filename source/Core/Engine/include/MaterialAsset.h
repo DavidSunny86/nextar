@@ -78,7 +78,7 @@ namespace nextar {
 					 StringID factory = StringUtils::DefaultID);
 			void SetParamBufferSize(uint32 paramBufferSize);
 			void SetParamValue(uint32 offset, const void* data, size_t amount);
-			void SetTextureValue(uint32 offset, const TextureUnit* texture, uint32 count);
+			void SetTextureValue(uint32 offset, const TextureUnit* texture);
 			void SetRenderLayer(uint8 layer);
 
 		protected:
@@ -125,10 +125,9 @@ namespace nextar {
 		virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);
 		virtual void DestroyStreamRequestImpl(nextar::StreamRequest*&, bool load=true);
 
-		void _VerifyParameterBuffer();
 		void _PrepareMaterial(MaterialAsset::StreamRequest*);
-		void _PreparePropertyBuffer();
-		void _RelievePropertyBuffer();
+		void _SetParamBufferSize(size_t size);
+		void _SetParamData(const void* data, size_t offset, size_t size);
 
 		// used as sort key
 		uint8 layerMask;
@@ -139,6 +138,8 @@ namespace nextar {
 
 		//ConstantBufferPtr materialParameters;
 		ParameterBuffer materialParamData;
+
+		friend class StreamRequest;
 	};
 
 } /* namespace nextar */

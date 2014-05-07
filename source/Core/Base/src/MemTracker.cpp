@@ -75,19 +75,21 @@ namespace nextar {
 
 			MemNd* newblock;
 			newblock = (MemNd*) _nalloc(sizeof(MemNd));
-			newblock->block = block;
+			if (newblock) {
+				newblock->block = block;
 
-			newblock->functiOn = GetTicket(funcmap, revfuncmap, functiOn);
-			newblock->srcfile = GetTicket(filemap, revfilemap, file);
-			newblock->line = line;
-			newblock->size = size;
-			//	strcpy(newblock->srcfile,file);
+				newblock->functiOn = GetTicket(funcmap, revfuncmap, functiOn);
+				newblock->srcfile = GetTicket(filemap, revfilemap, file);
+				newblock->line = line;
+				newblock->size = size;
+				//	strcpy(newblock->srcfile,file);
 
-			newblock->next = blockHead;
-			blockHead = newblock;
-			totalSize += size;
-			memBlocks++;
-
+				newblock->next = blockHead;
+			
+				blockHead = newblock;
+				totalSize += size;
+				memBlocks++;
+			}
 		}
 
 		void OnDumpMemStats() {

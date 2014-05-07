@@ -15,8 +15,6 @@ namespace nextar {
 	RenderQueue::RenderQueue() : descriptor(0), flags(DEFAULT_FLAGS) {
 	}
 
-	void RenderQueue::Sort() {
-	}
 
 	/******************************
 	 * VisibilitySet
@@ -38,6 +36,4 @@ namespace nextar {
 	VisibilitySet::~VisibilitySet() {
 	}
 
-	void VisibilitySet::SortSet() {
-	}
 } /* namespace nextar */

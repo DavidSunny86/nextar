@@ -159,8 +159,8 @@ namespace nextar {
 			if (libraries[i]->GetName() == name)
 				return;
 		libraries.push_back(
-				NEX_NEW DynLib(URL::GetAppendedPath(pluginSearchPath, path),
-						name, license, version, optional));
+				NEX_NEW( DynLib(URL::GetAppendedPath(pluginSearchPath, path),
+						name, license, version, optional)) );
 	}
 
 	void PluginRegistry::RequestPlugins(PluginLicenseType le,

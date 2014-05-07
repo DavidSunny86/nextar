@@ -9,6 +9,7 @@
 #define BACKGROUNDSTREAMER_H_
 
 #include <NexBase.h>
+#include <Singleton.h>
 
 namespace nextar {
 
@@ -44,13 +45,17 @@ namespace nextar {
 
 	struct StreamRequest {
 		enum StreamRequestFlags {
-			/* Indicates this request is of type AssetStreamRequest */
+			
+			// Indicates this request is of type AssetStreamRequest 
 			ASSET_STREAM_REQUEST = 1 << 0,
-			/* Indicates this request should be deleted, when completed */
+			// Indicates this request should be deleted, when completed 
 			AUTO_DELETE_REQUEST = 1 << 1,
-			/* Indicates this request was handled and no further processing is required. */
+			// Indicates this request was handled and no further processing is required. 
 			COMPLETED = 1 << 2,
-			LAST_FLAG = 1 << 3,
+			// Indicates AsyncUnload and NotifyUnloaded are to be called
+			REQUEST_UNLOAD = 1 << 4,
+
+			LAST_FLAG = 1 << 5,
 		};
 
 		uint16 flags;
@@ -69,15 +74,16 @@ namespace nextar {
 	};
 
 	// to extend this class to support external streaming as well as component streaming
-	class BackgroundStreamer :
-			public Singleton<BackgroundStreamer> {
+	class _NexBaseAPI BackgroundStreamer :
+			public Singleton<BackgroundStreamer>,
+			public AllocGeneral {
 
 	public:
 
 		BackgroundStreamer();
 		virtual ~BackgroundStreamer();
 
-		virtual void Stream(StreamRequest*);
+		virtual void AddRequest(StreamRequest*) = 0;
 	};
 
 } /* namespace nextar */

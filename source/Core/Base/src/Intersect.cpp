@@ -39,7 +39,7 @@ namespace nextar {
 				}
 			}
 
-			uint32 numPlanes = frustum.GetNumPlanes();
+			uint32 numPlanes = (uint32)frustum.GetNumPlanes();
 			for (i = 0, k = 1; i < numPlanes; i++, k += k) {
 
 				if ((i != lastPlane) && (k & inMask)) {

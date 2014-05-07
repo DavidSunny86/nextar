@@ -26,9 +26,14 @@ set(NEX_PLUGINS ${NEX_ROOT}/Plugins)
 set(NEX_UNIT_TESTS ${PROJECT_SOURCE_DIR}/UnitTests)
 
 ## Module path
-if(NOT CONFIG_VERBOSE)
-	set(CONFIG_VERBOSE TRUE)
+if(NOT NEX_CONFIG_VERBOSE)
+	set(NEX_CONFIG_VERBOSE TRUE CACHE BOOL "Outputs cmake parse.")
 endif()
+
+## Cmake setup
+#============================================================
+set(CMAKE_CONFIGURATION_TYPES "Release;Debug;UnitTests" CACHE STRING "Configurations" FORCE)
+set_property(GLOBAL PROPERTY DEBUG_CONFIGURATIONS "Debug;UnitTests")
 
 ## Module path
 #============================================================
@@ -42,11 +47,14 @@ set(GCC_COMPILE_FLAGS "-std=c++11 -pthread")
 #============================================================
 if(NOT CMAKE_BUILD_TYPE)
  set(NEX_BIN ${NEX_BIN_BASE})
+ set(NEX_BUILD "Release")
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
  set(NEX_BIN ${NEX_BIN_BASE}/debug)
+ set(NEX_BUILD "Debug")
 # append compiler flags here
 else()
  set(NEX_BIN ${NEX_BIN_BASE}/release)
+ set(NEX_BUILD "Release")
 endif()
 
 ## SSE Support check
@@ -82,6 +90,16 @@ option(NEX_DEBUG "Turn on debuginfo." ON)
 option(NEX_STORE_IN_LITTLEENDIN "Serialize data in little endian." ON)
 option(NEX_USE_PTMALLOC "Use PtMalloc instead of NedAlloc." OFF)
 option(NEX_SUPPORT_MULTITHREADING "Use multithreading." ON)
+option(NEX_USE_TBB "Use Intel Thread Building Blocks." OFF)
+option(NEX_CROSS_COMPILE "Cross compile for different architecture." ON)
+
+set(NEX_ARCHITECTURE_NAME "x86_64" CACHE STRING "Architecture chosen for cross compilation.")
+set(NEX_SUPPORTED_ARCHITECTURE_LIST "x86;x86_64;ia64;ppc;alpha")
+set_property(CACHE NEX_ARCHITECTURE_NAME PROPERTY STRINGS ${NEX_SUPPORTED_ARCHITECTURE_LIST})
+
+#if (NEX_CROSS_COMPILE)
+	string(TOUPPER ${NEX_ARCHITECTURE_NAME} NEX_ARCHITECTURE)
+#endif (NEX_CROSS_COMPILE)
 
 set(NEX_ENDIAN LITTLE)
 set(NEX_VER_MAJOR 1)
@@ -107,6 +125,10 @@ add_definitions( -DNEXTAR_EXPORT_AS_DYNAMIC_LIB )
 
 ## Setup compiler flags based on compiler
 #============================================================
+set(CMAKE_CXX_FLAGS_UNITTESTS "${CMAKE_CXX_FLAGS_DEBUG}")
+set(CMAKE_SHARED_LINKER_FLAGS_UNITTESTS "${CMAKE_SHARED_LINKER_FLAGS_DEBUG}")
+set(CMAKE_EXE_LINKER_FLAGS_UNITTESTS "${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
+
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 # using Clang
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -134,47 +156,98 @@ set(NEX_PLUGIN_CONFIG_FILE ${NEX_BIN}/Plugins.xml)
 
 ## Create nextar configuration file
 
+#============================================================
+# get_chained_include
+#============================================================
+macro(get_chained_include forTarget)
+	get_property(CHAINED_INCLUDE GLOBAL PROPERTY "${ARGV0}.ChainedInclude")
+endmacro(get_chained_include)
 
 #============================================================
-# Add_Dependency_Ex
+# append_chained_include
 #============================================================
-macro(add_dependency_ex target frameWorkName dependency)
-	if (${CONFIG_VERBOSE})
-	    message("-->> Dependency..: ${ARGV0} ->  ${ARGV1}.${ARGV2}")
+macro(append_chained_include ciArg)
+	get_property(CHAINED_INCLUDE GLOBAL PROPERTY "${NEXTAR_TARGET}.ChainedInclude")
+	if (CHAINED_INCLUDE)
+		set(CHAINED_INCLUDE "${CHAINED_INCLUDE};${ARGV0}")
+	else()
+		set(CHAINED_INCLUDE "${ARGV0}")
 	endif()
-	include_directories(${NEX_ROOT}/${ARGV1}/${ARGV2}/include)
-	target_link_libraries("${ARGV0}" "NE_${ARGV2}.${ARGV3}")
-endmacro(add_dependency_ex)
-
+	set_property(GLOBAL PROPERTY "${NEXTAR_TARGET}.ChainedInclude" "${CHAINED_INCLUDE}")
+endmacro(append_chained_include)
+#============================================================
+# Target_To_Var_Name
+#============================================================
+macro(target_to_var target)
+	string(REPLACE "." "_" TARGET_TO_VAR ${ARGV0})
+endmacro(target_to_var)
 #============================================================
 # Add_Dependency
 #============================================================
 macro(add_dependency frameWorkName dependency)
-	add_dependency_ex(${NEXTAR_TARGET} ${ARGV0} ${ARGV1})
+	if (${NEX_CONFIG_VERBOSE})
+	    message("-->> Dependency..: ${NEXTAR_TARGET} ->  ${ARGV0}.${ARGV1}")
+	endif()
+	set(DEP_INC_PATH ${NEX_ROOT}/${ARGV0}/${ARGV1}/include)
+	if(EXISTS "${DEP_INC_PATH}/platform")
+		if(NEX_OS MATCHES "Windows")
+			set(DEP_INC_PATH "${DEP_INC_PATH};${DEP_INC_PATH}/platform/win32")
+		elseif(NEX_OS MATCHES "Linux")
+			set(DEP_INC_PATH "${DEP_INC_PATH};${DEP_INC_PATH}/platform/linux")
+		elseif(NEX_OS MATCHES "MacOSX")
+			set(DEP_INC_PATH "${DEP_INC_PATH};${DEP_INC_PATH}/platform/macosx")
+		endif(NEX_OS MATCHES "Windows")
+	endif()
+	
+	include_directories(${DEP_INC_PATH})
+
+	set(DEP_NAME "NE_${ARGV0}.${ARGV1}")
+	get_chained_include(${DEP_NAME})
+	
+	if (CHAINED_INCLUDE)
+		if (${NEX_CONFIG_VERBOSE})
+			message("-->> Include Chain For: ${DEP_NAME}: ${CHAINED_INCLUDE}")
+		endif()
+		include_directories(${CHAINED_INCLUDE})
+		# This may be an explicit (chained) dependency, in which case
+		# the include here needs propagation
+		set(DEP_INC_PATH "${DEP_INC_PATH};${CHAINED_INCLUDE}")
+	endif()
+	target_link_libraries("${NEXTAR_TARGET}" "${DEP_NAME}")
 endmacro(add_dependency)
 
 #============================================================
 # Add_External_Dependency
 #============================================================
-macro(add_external_dependency_ex target includeFiles libraryName)
-	if (${CONFIG_VERBOSE})
-		message("-->> Dependency..: ${ARGV0} -> ${ARGV2}")
-	endif()
-	if(ARGV1)
-		include_directories(${ARGV1})
-	endif()
-	if(ARGV3)
-		target_link_libraries("${ARGV0}" ${ARGV2})
-	endif()
-endmacro(add_external_dependency_ex)
-
-#============================================================
-# Add_External_Dependency_Default
-#============================================================
 macro(add_external_dependency includeFiles libraryName)
-	add_external_dependency_ex(${NEXTAR_TARGET} "${ARGV0}" "${ARGV1}")
+	if (${NEX_CONFIG_VERBOSE})
+		message("-->> Dependency..: ${NEXTAR_TARGET} -> ${ARGV1}")
+	endif()
+	set(TMP_VAL ${ARGV0})
+	if(TMP_VAL)
+		include_directories(${TMP_VAL})
+	endif()
+	set(TMP_VAL ${ARGV1})
+	if(TMP_VAL)
+		target_link_libraries("${NEXTAR_TARGET}" ${TMP_VAL})
+	endif()
 endmacro(add_external_dependency)
 
+#============================================================
+# Add_Chained_Dependency
+#============================================================
+macro(add_chained_dependency framework dependency)
+	add_dependency( "${ARGV0}" "${ARGV1}")
+	append_chained_include("${DEP_INC_PATH}")
+endmacro(add_chained_dependency)
+
+#============================================================
+# Add_Chained_External_Dependency
+#============================================================
+macro(add_chained_external_dependency includeFiles libraryName)
+	add_external_dependency( "${ARGV0}" "${ARGV1}" )
+	append_chained_include("${ARGV0}")
+endmacro(add_chained_external_dependency)
 
 #============================================================
 # Config_Src
@@ -198,8 +271,7 @@ macro(config_src)
 			list(APPEND NEXTAR_SRC_LIST "${NEXTAR_TARGET_PATH}/src/platform/macosx/*.cpp")
 		endif(NEX_OS MATCHES "Windows")
 	endif()
-
-	source_group(${NEX_FRAMEWORK}\\${NEX_TARGET} FILES ${NEXTAR_SRC_LIST})
+	
 	file(GLOB NEXTAR_SRC_FILES 
 		${NEXTAR_SRC_LIST}
 		)
@@ -227,7 +299,7 @@ macro(configure_target)
 	if(EXISTS "${NEXTAR_TARGET_PATH}/local_include/Config.h.cmake")
 		configure_file(
 			"${NEXTAR_TARGET_PATH}/local_include/Config.h.cmake"
-			"${NEXTAR_TARGET_PATH}/include/${NEXTAR_TARGET}Config.h"
+			"${NEXTAR_TARGET_PATH}/include/${NEXTAR_CONFIG_NAME}Config.h"
 		)
 	endif()
 endmacro(configure_target)
@@ -268,7 +340,9 @@ endmacro(add_unit_test)
 macro(create_library)
 	set(NEXTAR_TARGET NE_${NEXTAR_FRAMEWORK}.${NEXTAR_MODULE})	
 	set(NEXTAR_TARGET_PATH ${NEX_ROOT}/${NEXTAR_FRAMEWORK}/${NEXTAR_MODULE})
-	set(NEXTAR_LIBRARY_DEFINE "NE_${NEXTAR_FRAMEWORK}_${NEXTAR_MODULE}")
+	set(NEXTAR_CONFIG_NAME ${NEXTAR_MODULE})
+	target_to_var(${NEXTAR_TARGET})
+	set(NEXTAR_LIBRARY_DEFINE "${TARGET_TO_VAR}")
 	config_src()
 	configure_target()
 	message("-->> Create Module..: ${NEXTAR_TARGET}")
@@ -281,6 +355,7 @@ endmacro(create_library)
 macro(create_exec)
 	set(NEXTAR_TARGET NE_${NEXTAR_FRAMEWORK}.${NEXTAR_MODULE})	
 	set(NEXTAR_TARGET_PATH ${NEX_ROOT}/${NEXTAR_FRAMEWORK}/${NEXTAR_MODULE})
+	set(NEXTAR_CONFIG_NAME ${NEXTAR_MODULE})
 	config_src()
 	configure_target()
 	message("-->> Create Exec..: ${NEXTAR_TARGET}")	
@@ -293,6 +368,7 @@ endmacro(create_exec)
 macro(create_ut consoleApp)
 	set(NEXTAR_TARGET "NE_${NEXTAR_FRAMEWORK}.${NEXTAR_MODULE}_${NEXTAR_UT}.tst")
 	set(NEXTAR_TARGET_PATH ${NEX_ROOT}/${NEXTAR_FRAMEWORK}/${NEXTAR_MODULE_PATH}/${NEXTAR_UT})
+	set(NEXTAR_CONFIG_NAME ${NEXTAR_UT})
 	if(${ARGV0})
 		add_definitions( -DNEX_CONSOLE_APP_ENTRY )
 	endif()

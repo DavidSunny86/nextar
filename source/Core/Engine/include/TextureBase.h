@@ -49,13 +49,13 @@ namespace nextar {
 	            PixelBox& box) = 0;
 
 		// type
-		uint8 type;
+		uint16 type;
 		// is an asset?
-		uint8 textureFlags;
+		uint16 textureFlags;
 		// texture dimensions
-		uint16 width, height, depth;
+		uint32 width, height, depth;
 		// cube map faces
-		uint16 faces;
+		uint32 faces;
 		// number of mip levels this texture will support
 		// when fully loaded
 		uint16 numMipMaps;

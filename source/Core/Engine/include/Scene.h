@@ -14,8 +14,8 @@
 
 namespace nextar {
 	
-	struct SceneParameters : public AllocGeneral {
-	
+	class SceneParameters : public AllocGeneral {
+	public:
 		SceneParameters();
 		~SceneParameters();
 
@@ -41,7 +41,7 @@ namespace nextar {
 		class SceneStreamRequest : public AssetStreamRequest {
 		};
 
-		Scene(const String& name);
+		Scene(const StringID name);
 		virtual ~Scene();
 		
 		/* internal API */

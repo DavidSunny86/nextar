@@ -9,10 +9,4 @@
 
 namespace nextar {
 
-	ShaderVariant::ShaderVariant(const ShaderVariant& v) : type(v.type),
-			count (v.count) {
-	}
-
-	ShaderVariant::~ShaderVariant() {
-	}
 } /* namespace nextar */

@@ -13,61 +13,6 @@
 
 namespace nextar {
 
-	/**
-	 * @class   ScopedPtr
-	 *
-	 * @remarks This class can be used to implement a managed
-	 *          pointer which is disposed when the object goes
-	 *          out of scope.
-	 **/
-	template<typename T, typename Disposer = DisposerDelete<T> >
-	class ScopedPtr: public AllocGeneral {
-		T* scopedPtr;
-
-	private:
-		ScopedPtr(const ScopedPtr& p);
-
-	public:
-		inline ScopedPtr() :
-				scopedPtr(0) {
-		}
-
-		inline ScopedPtr(T* obj) :
-				scopedPtr(obj) {
-		}
-
-		inline ~ScopedPtr() {
-			Clear();
-		}
-
-		inline void Clear() {
-			if (scopedPtr)
-				Disposer::Dispose(scopedPtr);
-			scopedPtr = 0;
-		}
-
-		inline T * operator =(T* obj) {
-			Clear();
-			scopedPtr = obj;
-			return obj;
-		}
-
-		inline operator T*() {
-			return scopedPtr;
-		}
-
-		inline operator const T*() const {
-			return scopedPtr;
-		}
-
-		inline T * operator ->() {
-			return scopedPtr;
-		}
-
-		inline	const T * operator ->() const {
-			return scopedPtr;
-		}
-	};
 
 	/**
 	 * @class	Referenced
@@ -88,7 +33,7 @@ namespace nextar {
 
 		Referenced() {
 			dbg_Ctor(refCount);
-			refCount = 1;
+			refCount.store(1, std::memory_order_relaxed);
 		}
 
 		virtual ~Referenced() {
@@ -96,19 +41,19 @@ namespace nextar {
 		}
 
 		inline int32 GetRefCount() const {
-			return refCount;
+			return refCount.load(std::memory_order_relaxed);
 		}
 
 		inline void AddRef() {
-			refCount++;
+			refCount.fetch_add(1, std::memory_order_relaxed);
 			dbg_IncRef();
 		}
 
 		inline void Release() {
-			NEX_ASSERT(refCount > 0);
+			NEX_ASSERT(GetRefCount() > 0);
 			dbg_DecRef();
-			if (--(refCount) == 0)
-			NEX_DELETE (static_cast<T*>(this));
+			if (refCount.fetch_sub(1, std::memory_order_relaxed) <= 0)
+				NEX_DELETE((static_cast<T*>(this)));
 		}
 	};
 
@@ -308,7 +253,6 @@ namespace nextar {
 		w.Assign(what);
 		return w;
 	}
-
 }
 
 #endif //NEXTAR_SHARED_PTR_H

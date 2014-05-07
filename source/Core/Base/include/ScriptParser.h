@@ -25,20 +25,32 @@ namespace nextar {
 		class StatementContext;
 		class RegionContext;
 
-		struct StatementListener {
+		class StatementListener {
+		public:
 			virtual void EnterStatement(ScriptParser::StatementContext& statement) {}
+		protected:
+			~StatementListener();
 		};
 
-		struct RegionListener {
+		class RegionListener {
+		public:
 			virtual void EnterRegion(ScriptParser::RegionContext& regionCtx) {}
+		protected:
+			~RegionListener();
 		};
 
-		struct BlockListener {
+		class BlockListener {
+		public:
 			virtual void EnterBlock(ScriptParser::BlockContext& block) {}
+		protected:
+			~BlockListener();
 		};
 
-		struct ScriptListener {
+		class ScriptListener {
+		public:
 			virtual void EnterScript(ScriptParser::ScriptContext& block) {}
+		protected:
+			~ScriptListener();
 		};
 
 		class ContextBase {

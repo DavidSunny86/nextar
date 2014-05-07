@@ -85,7 +85,7 @@ namespace nextar {
 			if (dot1 == '.' && dot2 == '.')
 				return NEX_MAKE_VERSION(maj, min, rev) ;
 			else
-				return CONST_INVALID_VERSION_ID;
+				return static_cast<uint32>(Constants::INVALID_VERSION_ID);
 		}
 
 		_NexBaseAPI String ToString(nextar::Vec4AF v) {

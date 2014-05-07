@@ -16,6 +16,6 @@ namespace nextar {
 	}
 
 	VertexBufferBinding* VertexBufferBinding::CreateInstance() {
-		return NEX_NEW VertexBufferBinding();
+		return NEX_NEW(VertexBufferBinding());
 	}
 }

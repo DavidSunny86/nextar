@@ -16,6 +16,7 @@
 
 #if defined( NEX_USE_TBB )
 #include <tbb/concurrent_unordered_map.h>
+#include <tbb/concurrent_unordered_set.h>
 #include <tbb/concurrent_vector.h>
 #elif defined(NEX_MSVC)
 #include <concurrent_unordered_map.h>
@@ -25,8 +26,8 @@
 
 namespace nextar {
 	// stl types
-	typedef STLAllocator<char, AllocatorString> STLAllocString;
-	typedef STLAllocator<char16_t, AllocatorString> STLAllocUniString;
+	typedef STDAllocator<char, AllocatorString> STLAllocString;
+	typedef STDAllocator<char16_t, AllocatorString> STLAllocUniString;
 
 	typedef std::basic_string<char, std::char_traits<char>, STLAllocString> String;
 	typedef std::basic_string<char16_t, std::char_traits<char16_t>,
@@ -47,24 +48,24 @@ namespace nextar {
 
 	template<typename T, typename Allocator = AllocatorGeneral>
 	struct vector {
-		typedef typename std::vector<T, STLAllocator<T, Allocator> > type;
+		typedef typename std::vector<T, STDAllocator<T, Allocator> > type;
 	};
 
 	template<typename T, typename Allocator = AllocatorGeneral>
 	struct list {
-		typedef typename std::list<T, STLAllocator<T, Allocator> > type;
+		typedef typename std::list<T, STDAllocator<T, Allocator> > type;
 	};
 
 
 	template<typename T, typename Allocator = AllocatorGeneral>
 	struct forward_list {
-		typedef typename std::forward_list<T, STLAllocator<T, Allocator> > type;
+		typedef typename std::forward_list<T, STDAllocator<T, Allocator> > type;
 	};
 
 	template<typename T, typename Pr = std::less<T>,
 			typename Allocator = AllocatorGeneral>
 	struct set {
-		typedef typename std::set<T, Pr, STLAllocator<T, Allocator> > type;
+		typedef typename std::set<T, Pr, STDAllocator<T, Allocator> > type;
 	};
 
 
@@ -72,52 +73,52 @@ namespace nextar {
 			typename Allocator = AllocatorGeneral>
 	struct map {
 		typedef typename std::map<Kty, T, Pr,
-				STLAllocator<std::pair<Kty, T>, Allocator> > type;
+				STDAllocator<std::pair<Kty, T>, Allocator> > type;
 	};
 
 	template<typename T, typename Hsh = std::hash<T>, typename Pr = std::equal_to<T>,
-			typename Allocator = AllocatorGeneral>
+			typename Allocator = AllocatorGeneral, typename STDAllocatorType = STDAllocator<T, Allocator> >
 	struct unordered_set {
-		typedef typename std::unordered_set<T, Hsh, Pr, STLAllocator<T, Allocator> > type;
+		typedef typename std::unordered_set<T, Hsh, Pr, STDAllocatorType> type;
 	};
 
 	template<typename Kty, typename T, typename Hsh = std::hash<Kty>, typename Pr = std::equal_to<Kty>,
 			typename Allocator = AllocatorGeneral>
 	struct unordered_map {
 		typedef typename std::unordered_map<Kty, T, Hsh, Pr,
-				STLAllocator<std::pair<Kty, T>, Allocator> > type;
+				STDAllocator<std::pair<Kty, T>, Allocator> > type;
 	};
 
 	template<typename Kty, typename T, typename Pr = std::less<Kty>,
 			typename Allocator = AllocatorGeneral>
 	struct multimap {
 		typedef typename std::multimap<Kty, T, Pr,
-				STLAllocator<std::pair<Kty, T>, Allocator> > type;
+				STDAllocator<std::pair<Kty, T>, Allocator> > type;
 	};
 
 	template<typename T, typename Allocator = AllocatorGeneral>
 	struct deque {
-		typedef typename std::deque<T, STLAllocator<T, Allocator> > type;
+		typedef typename std::deque<T, STDAllocator<T, Allocator> > type;
 	};
 
 #if defined( NEX_USE_TBB )
 #define NEX_HAS_CONCURRENT_CONTAINERS
-	template<typename Kty, typename T, typename Hsh = tbb_hash<Kty>, typename Pr = std::equal_to<Kty>,
+	template<typename Kty, typename T, typename Hsh = tbb::tbb_hash<Kty>, typename Pr = std::equal_to<Kty>,
 			typename Allocator = AllocatorGeneral>
 	struct concurrent_unordered_map {
 		typedef typename tbb::concurrent_unordered_map<Kty, T, Hsh, Pr,
-				STLAllocator<std::pair<Kty, T>, Allocator> > type;
+				STDAllocator<std::pair<Kty, T>, Allocator> > type;
 	};
 
 	template<typename T, typename Allocator = AllocatorGeneral>
 	struct concurrent_vector {
-		typedef typename tbb::concurrent_vector<T, STLAllocator<T, Allocator> > type;
+		typedef typename tbb::concurrent_vector<T, STDAllocator<T, Allocator> > type;
 	};
-	template<typename Kty, typename Hsh = tbb_hash<Kty>, typename Pr = std::equal_to<Kty>,
+	template<typename Kty, typename Hsh = tbb::tbb_hash<Kty>, typename Pr = std::equal_to<Kty>,
 			typename Allocator = AllocatorGeneral>
 	struct concurrent_unordered_set {
 		typedef typename tbb::concurrent_unordered_set<Kty, Hsh, Pr,
-				STLAllocator<Kty, Allocator> > type;
+				STDAllocator<Kty, Allocator> > type;
 	};
 #elif defined( NEX_MSVC )
 #define NEX_HAS_CONCURRENT_CONTAINERS
@@ -125,18 +126,18 @@ namespace nextar {
 			typename Allocator = AllocatorGeneral>
 	struct concurrent_unordered_map {
 		typedef typename concurrency::concurrent_unordered_map<Kty, T, Hsh, Pr,
-				STLAllocator<std::pair<Kty, T>, Allocator> > type;
+				STDAllocator<std::pair<Kty, T>, Allocator> > type;
 	};
 
 	template<typename T, typename Allocator = AllocatorGeneral>
 	struct concurrent_vector {
-		typedef typename concurrency::concurrent_vector<T, STLAllocator<T, Allocator> > type;
+		typedef typename concurrency::concurrent_vector<T, STDAllocator<T, Allocator> > type;
 	};
 	template<typename Kty, typename Hsh = std::hash<Kty>, typename Pr = std::equal_to<Kty>,
 			typename Allocator = AllocatorGeneral>
 	struct concurrent_unordered_set {
 		typedef typename concurrency::concurrent_unordered_set<Kty, Hsh, Pr,
-				STLAllocator<Kty, Allocator> > type;
+				STDAllocator<Kty, Allocator> > type;
 	};
 #else
 // never define

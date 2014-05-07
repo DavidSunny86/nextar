@@ -19,8 +19,7 @@
 #include <ParameterIterator.h>
 
 namespace nextar {
-
-	class SceneParameters;
+		
 	/**
 	 * ShaderUI : Shader {
 	 * 	ShaderPtr compiledShader;
@@ -30,7 +29,7 @@ namespace nextar {
 	public ContextObject {
 		NEX_LOG_HELPER(ShaderAsset);
 	public:
-
+		typedef Pass::ConstantBufferList ConstantBufferList;
 		enum {
 			CLASS_ID = Asset::CLASS_ASSET_SHADER,
 		};
@@ -106,8 +105,7 @@ namespace nextar {
 			void SetDepthStencilState(DepthStencilState& state);
 			// If called multiple times for the same unit, the texture will be appended in a
 			// list and if the sampler is an array
-			void BindDefaultTexture(const String& unitName, TextureBase* texture, uint32 index);
-			void AddTextureUnit(const String& unitName, uint32 arrayCount, TextureUnitParams& unit);
+			void AddTextureUnit(const String& unitName, TextureUnitParams& unit, TextureBase* defaultTexture);
 
 		protected:
 
@@ -133,10 +131,26 @@ namespace nextar {
 		}
 
 		inline Pass* GetPass(uint32 i) {
-			return passes[i].get();
+			if (singlePassShader) {
+				NEX_ASSERT(i == 0);
+				return singlePassShader;
+			} else
+				return passes[i];
 		}
 
-		ParameterIterator GetParameterIterator(uint32 type);
+		inline ConstParamEntryTableItem GetParamEntryForPass() {
+			return passProperties;
+		}
+
+		inline ConstParamEntryTableItem GetParamEntryForMaterial() {
+			return materialProperties;
+		}
+
+		inline ConstParamEntryTableItem GetParamEntryForObject() {
+			return objectProperties;
+		}
+
+		ParameterIterator GetParameterIterator(UpdateFrequency type);
 
 		virtual void Create(nextar::RenderContext*);
 		virtual void Update(nextar::RenderContext*, ContextObject::UpdateParamPtr);
@@ -178,14 +192,17 @@ namespace nextar {
 			ParamEntryTable passTable;
 		};
 
+		void _DestroyPasses();
 		void _Process(ShaderParamIterator& it, ParamTableBuilder& ptb);
-		void _BeginPass(PassPtr& p, ParamTableBuilder& ptb);
+		void _BeginPass(PassPtr p, ParamTableBuilder& ptb);
 		void _Finalize(ParamTableBuilder& ptb);
 		void _EndPass(PassPtr& p, ParamTableBuilder& ptb);
 		void _BuildParameterTable();
 
 		// used as sort key
 		uint8 translucency;
+		
+		Pass* singlePassShader;
 		PassList passes;
 		// required when parameter is looked up by name
 		ParamEntryTable paramLookup;

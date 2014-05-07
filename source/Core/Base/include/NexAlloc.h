@@ -96,14 +96,14 @@ namespace nextar {
 //! basic allocator functions
 #define NEX_ALLOC(size,catagory) (AllocatorBase<catagory>::Alloc(size,NEX_FUNCTION_NAME,NEX_SOURCEFILE_NAME,NEX_SOURCEFILE_LINE))
 //! new operator override
-#define NEX_NEW new (NEX_FUNCTION_NAME,NEX_SOURCEFILE_NAME,NEX_SOURCEFILE_LINE)
+#define NEX_NEW( statement ) new (NEX_FUNCTION_NAME,NEX_SOURCEFILE_NAME,NEX_SOURCEFILE_LINE) statement
 #else
 //! basic allocator functions
 #define NEX_ALLOCATOR_ALLOC(size,alloct) (alloct::Alloc(size))
 //! basic allocator functions
 #define NEX_ALLOC(size,catagory) AllocatorBase<catagory>::Alloc(size)
 //! new operator override
-#define NEX_NEW			new
+#define NEX_NEW( statement )			new statement
 #endif
 //! basic free
 #define NEX_ALLOCATOR_FREE(ptr,alloctor)		(alloctor::Free(ptr))
@@ -122,7 +122,11 @@ namespace nextar {
 //! basic deallocator for objects not using AllocObjectBase
 #define NEX_FREE_ARRAY_T(T,catagory,num,ptr)  DestroyObjects<T>(ptr,num); NEX_FREE_ARRAY(ptr, sizeof(T)*num, catagory)
 //! delete operator override
-#define NEX_DELETE	delete
+#ifdef NEX_DEBUG
+#	define NEX_DELETE( statement )	if ( (statement) ) delete statement
+#else
+#	define NEX_DELETE( statement )	delete statement
+#endif
 	//! AllocObjectBase classes
 	typedef AllocObjectBase<AllocatorGeneral> AllocGeneral;
 	typedef AllocObjectBase<AllocatorScene> AllocScene;
@@ -138,14 +142,22 @@ namespace nextar {
 
 
 	template <typename T>
-	class GenericDeleter {
+	class GenericFree {
 	public:
 		inline void operator () (T* ptr) const {
 			NEX_FREE(ptr, MEMCAT_GENERAL);
 		}
 	};
+
+	template <typename T>
+	class GenericDelete {
+	public:
+		inline void operator () (T* ptr) const {
+			NEX_DELETE(ptr);
+		}
+	};
 }
 
-#include <STLAllocator.h>
+#include <StdAllocator.h>
 
 #endif //NEXTAR_NEXALLOC_H

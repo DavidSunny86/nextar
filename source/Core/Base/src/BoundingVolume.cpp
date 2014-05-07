@@ -1,3 +1,5 @@
+
+#include <NexBase.h>
 #include <BaseHeaders.h>
 #include <BoundingVolume.h>
 #include <CommonPools.h>
@@ -75,12 +77,12 @@ namespace nextar {
 	 * BoundingVolume
 	 *********************************/
 	BoundingVolume::BoundingVolume() {
-		box = NEX_NEW BoundingBox;
+		box = NEX_NEW(BoundingBox);
 		radius = 0;
 	}
 
 	BoundingVolume::~BoundingVolume() {
-		NEX_DELETE (box);
+		NEX_DELETE((box));
 	}
 		
 	void BoundingVolume::MergeBounds(const BoundingVolume& vol) {

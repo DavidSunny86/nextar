@@ -7,10 +7,12 @@
 
 #include <NexEngine.h>
 #include <BVCullingSystem.h>
+#include <Camera.h>
 
 namespace nextar {
 
-	BVCullingSystem::BVCullingSystem(ComponentManager *creator, const String& name, Component* parent) :
+	BVCullingSystem::BVCullingSystem(const StringID name, Component* parent) :
+	CullingSystem(name, parent),
 	coherentCam(nullptr) {
 	}
 

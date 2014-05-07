@@ -14,7 +14,8 @@
 namespace nextar {
 
 	class MultiRenderTarget: public nextar::RenderTarget,
-		public Referenced<nextar::ContextObject, AllocGraphics>{
+		public nextar::ContextObject,
+		public Referenced<MultiRenderTarget, AllocGraphics>{
 	public:
 
 		enum {
@@ -58,7 +59,7 @@ namespace nextar {
 		virtual void Capture(RenderContext* rc, PixelBox& image, FrameBuffer);
 
 		virtual Size GetDimensions() const;
-		virtual void NotifyUpdated(ContextObject::UpdateParamPtr);
+		virtual void NotifyUpdated(ContextObject::UpdateParamPtr) override;
 
 		virtual void Update(nextar::RenderContext*, ContextObject::UpdateParamPtr);
 

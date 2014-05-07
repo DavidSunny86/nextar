@@ -25,7 +25,6 @@ namespace nextar {
 
 		void AsyncAddGroup(SharedComponent::Group*);
 		void AsyncRemoveGroup(StringID name, bool del = true);
-		SharedComponent::Group* AsyncFindGroup(StringID name);
 		void AsyncDeleteAll();
 
 		inline SharedComponent::Group* AsyncFindOrCreate(StringID name) {

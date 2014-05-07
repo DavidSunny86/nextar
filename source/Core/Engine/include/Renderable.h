@@ -9,6 +9,7 @@
 #define RENDERABLE_H_
 
 #include <Spatial.h>
+#include <VisiblePrimitive.h>
 
 namespace nextar {
 
@@ -18,7 +19,7 @@ namespace nextar {
 			CATAGORY = Component::CAT_RENDERABLE
 		};
 		
-		Renderable(const String& name, Component* parent = nullptr);
+		Renderable(const StringID name, Component* parent = nullptr);
 		virtual ~Renderable();
 
 		virtual uint32 GetClassID() const override = 0;

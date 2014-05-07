@@ -4,17 +4,20 @@
 
 #if defined(NEX_WINDOWS)
 
-namespace nextar {
+#include <Win32Window.h>
+#include <WmInputListener.h>
 
+namespace nextar {
+		
     void Win32Window::WindowConfigChanged() {
         // todo get the resized window
-        GraphicsWindow::WindowConfigChanged();
+        RenderWindow::WindowConfigChanged();
     }
 
 	LRESULT CALLBACK Win32Window::WndProc(HWND wnd, UINT message, WPARAM wparam,
 			LPARAM lparam) {
 
-		RenderWindow* wind = (RenderWindow*) GetWindowLongPtr(wnd,
+		Win32Window* wind = (Win32Window*) GetWindowLongPtr(wnd,
 				GWLP_USERDATA);
 
 		switch (message) {
@@ -53,7 +56,7 @@ namespace nextar {
 			break;
 		case WM_INPUT:
 			if (WmInputListener::InstancePtr() && wparam == RIM_INPUT)
-				WmInputListener::Instance().OnWmInput((HRAWINPUT) lparam);
+				WmInputListener::Instance().OnWmInput(wind, (HRAWINPUT) lparam);
 			break;
 		}
 

@@ -6,6 +6,5 @@
 ##---------------------------------------------------
 # Add plugin
 create_plugin("ShaderCompiler" "" "Lifetime" "${NEX_VERSION}" "false")
-add_dependency(Core Base)
-add_dependency(Core Engine)
+add_dependency(Core RenderSystem)
 

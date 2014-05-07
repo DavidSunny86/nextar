@@ -4,6 +4,7 @@
 #include <BaseTypes.h>
 #include <thread>
 #include <mutex>
+#include <condition_variable>
 #include <atomic>
 
 namespace nextar {

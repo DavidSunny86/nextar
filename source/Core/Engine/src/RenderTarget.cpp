@@ -16,7 +16,7 @@ namespace nextar {
 		for (Viewport::Iterator it(viewport); it;) {
 			Viewport* o = (*it);
 			++it;
-			NEX_DELETE o;
+			NEX_DELETE(o);
 		}
 	}
 

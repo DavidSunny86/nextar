@@ -5,14 +5,14 @@
 
 namespace nextar {
 
-	Moveable::Moveable(const String& nodeName, Component* parent)
+	Moveable::Moveable(const StringID nodeName, Component* parent)
 			: Component(nodeName, parent), transform(NEX_NEW TransformData) {
 		flags = DEFAULT_FLAGS;
 		SetIdentityTransforms();
 	}
 
 	Moveable::~Moveable() {
-		NEX_DELETE (transform);
+		NEX_DELETE((transform));
 		transform = nullptr;
 	}
 

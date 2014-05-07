@@ -18,23 +18,25 @@ namespace nextar {
 
 	AssetStreamer::~AssetStreamer() {
 	}
-
+		
 	void AssetStreamer::RequestLoad(Asset* asset) {
 		NEX_ASSERT(asset);
 		StreamRequest* req = asset->GetStreamRequest();
 		if (!(req->flags & StreamRequest::ASSET_STREAM_REQUEST)) {
 			Warn("Cannot register a generic load request for asset, "
-					"request must be of type AssetStreamRequest: " + asset->GetName());
+					"request must be of type AssetStreamRequest: " + 
+					Convert::ToString(asset->GetID()));
 			return;
 		}
 		/** */
 		if (asset->IsLoading()) {
-			Warn("Redundant load request for asset: " + asset->GetName());
+			Warn("Redundant load request for asset: " + 
+				Convert::ToString(asset->GetID()));
 			return;
 		}
 		asset->SetLoading(true);
 		req->streamHandler = this;
-		BackgroundStreamer::Instance().Stream(req);
+		BackgroundStreamer::Instance().AddRequest(req);
 	}
 
 	void AssetStreamer::NotifyLoaded(StreamRequest* request) {
@@ -46,6 +48,10 @@ namespace nextar {
 			_NotifyAssetLoaded(asset, assetReq);
 		} else {
 			AssetSet& dependencies = meta.GetDependencies();
+			// NB: It would probably be better to check an unresolved asset state atomically if 
+			// its in loading state and then push it for loading directly to the queue. This will
+			// probably kill starvation, but two things need to be atomic in such a case (or may
+			// be one depending on memory ordering). The request pointer, and the atomic state.
 			for(auto it = dependencies.begin(); it != dependencies.end(); ) {
 				if ((*it)->IsLoaded())
 					dependencies.erase(it++);
@@ -72,7 +78,7 @@ namespace nextar {
 		if (assetReq->returnCode == (uint16)StreamResult::LOAD_SUCCESS)
 			asset->SetLoaded(true);
 		// do a quick swap for the dependent set, as the request might
-		// get deleted in notify, and dependents are no more required.
+		// get deleted in notify, and request pointer is no more required.
 		AssetStreamRequestSet reqSet;
 		reqSet.swap(meta.GetDependents());
 		asset->NotifyAssetLoaded();
@@ -94,6 +100,14 @@ namespace nextar {
 			if(!d->GetMetaInfo().RemoveDependency(asset)) {
 				_NotifyAssetLoaded(static_cast<Asset*>(d->streamedObject), d);
 			}
+		}
+	}
+
+	void AssetStreamer::RequestUnload(Asset* asset) {
+		if (asset->IsLoading() || !asset->IsLoaded()) {
+			Warn("Incorrect state for unload: " + 
+				Convert::ToString(asset->GetID()));
+			return;
 		}
 	}
 } /* namespace nextar */

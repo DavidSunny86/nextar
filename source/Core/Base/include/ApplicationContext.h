@@ -17,6 +17,12 @@ namespace nextar {
 
 	public:
 
+		enum ListnerPriority {
+			PRIORITY_LOW =    999999,
+			PRIORITY_NORMAL = 500000,
+			PRIORITY_HIGH =   100000,
+		};
+
 		struct Listener {
 			FrameListener* frameListener;
 			uint32 priority;
@@ -26,7 +32,7 @@ namespace nextar {
 			}
 			
 			inline bool operator < (const Listener& other) const {
-				return priority < other.priority || (priority == other.priority && frameListener < other.frameListener);
+				return priority < other.priority;
 			}
 		};
 
@@ -48,8 +54,8 @@ namespace nextar {
 
 		virtual void Run();
 
-		virtual void AsyncRegisterListener(const Listener&);
-		virtual void AsyncUnregisterListener(const Listener&);
+		virtual void RegisterListener(const Listener&);
+		virtual void UnregisterListener(const Listener&);
 
 	protected:
 		void CreateServices();
@@ -70,8 +76,6 @@ namespace nextar {
 	private:
 
 		NEX_THREAD_RECURSIVE_MUTEX(appLock);
-		NEX_THREAD_RECURSIVE_MUTEX(addListener);
-		NEX_THREAD_RECURSIVE_MUTEX(removeListener);
 
 		typedef set<Listener>::type FrameListenerSet;
 
@@ -86,9 +90,9 @@ namespace nextar {
 		URL defaultConfigPath;
 		String appName;
 
+		bool runningLoop;
 		FrameListenerSet frameListenersToRemove;
 		FrameListenerSet frameListenersToAdd;
-
 		FrameListenerSet frameListeners;
 
 		static String _configPathName;

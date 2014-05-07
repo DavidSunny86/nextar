@@ -18,7 +18,7 @@ namespace nextar {
 	 */
 	class CullingSystem : public Spatial {
 	public:
-		CullingSystem(const String& name = StringUtils::Null, Component* parent = nullptr);
+		CullingSystem(const StringID name = StringUtils::NullID, Component* parent = nullptr);
 		virtual ~CullingSystem();
 				
 		virtual void AddBody(Spatial*) = 0;

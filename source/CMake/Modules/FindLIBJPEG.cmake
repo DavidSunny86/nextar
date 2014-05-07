@@ -69,6 +69,7 @@ else (LIBJPEG_LIBRARIES AND LIBJPEG_INCLUDE_DIRS)
       /usr/local/lib
       /opt/local/lib
       /sw/lib
+	  ${LIBJPEG_ROOT}/lib
     NO_DEFAULT_PATH
   )
   find_path(LIBJPEG_STATIC_DIR

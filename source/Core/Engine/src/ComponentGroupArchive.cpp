@@ -32,7 +32,7 @@ namespace nextar {
 		auto it = componentGroups.find(name);
 		if (it != componentGroups.end()) {
 			if (d)
-				NEX_DELETE (*it).second;
+				NEX_DELETE((*it).second);
 			componentGroups.erase(it);
 		}
 		if (name == StringUtils::DefaultID)
@@ -52,7 +52,7 @@ namespace nextar {
 		if (f)
 			return f;
 		NEX_THREAD_LOCK_GUARD_MUTEX(containerLock);
-		f = NEX_NEW ComponentGroupSet(name);
+		f = NEX_NEW(ComponentGroupSet(name));
 		componentGroups.emplace(name, f);
 		return f;
 	}
@@ -61,7 +61,7 @@ namespace nextar {
 		NEX_THREAD_LOCK_GUARD_MUTEX(containerLock);
 		for(auto &v : componentGroups)
 			if ( v.second )
-				NEX_DELETE v.second;
+				NEX_DELETE(v.second);
 		componentGroups.clear();
 	}
 

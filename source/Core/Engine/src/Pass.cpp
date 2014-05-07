@@ -4,8 +4,11 @@
  *  Created on: 23-Nov-2013
  *      Author: obhi
  */
-
+#include <NexEngine.h>
 #include <Pass.h>
+#include <CommitContext.h>
+#include <ShaderParam.h>
+#include <ConstantBuffer.h>
 
 namespace nextar {
 
@@ -16,7 +19,7 @@ namespace nextar {
 	,objectParamByteOffset(-1)
 	,inputLayoutUniqueID(-1)
 	,flags(0)
-	,programs({0})
+	,programs()
 	,samplers(nullptr)
 	,samplerCount(0)
 	,lastFrameUpdate(-1)
@@ -50,20 +53,20 @@ namespace nextar {
 		flags |= COMPILE_NEEDED;
 	}
 
-	void Pass::UpdateParams(RenderContext* rc, CommitContext& ctx, uint32 flags) {
+	void Pass::UpdateParams(RenderContext* rc, CommitContext& ctx, UpdateFrequency flags) {
 		NEX_ASSERT(this == ctx.pass);
-		ctx.passParamOffset = passParamByteOffset;
-		ctx.materialParamOffset = materialParamByteOffset;
-		ctx.objectParamOffset = objectParamByteOffset;
+		ctx.shaderParamContext[CommitContext::PASS_PARAM_CONTEXT].first = passParamByteOffset;
+		ctx.shaderParamContext[CommitContext::MATERIAL_PARAM_CONTEXT].first = materialParamByteOffset;
+		ctx.shaderParamContext[CommitContext::OBJECT_PARAM_CONTEXT].first = objectParamByteOffset;
 
-		if (flags & UpdateFrequency::PER_FRAME) {
+		if (Test(flags & UpdateFrequency::PER_FRAME)) {
 			if (lastFrameUpdate == ctx.frameNumber)
 				flags &= ~UpdateFrequency::PER_FRAME;
 			else
 				lastFrameUpdate = ctx.frameNumber;
 		}
 
-		if (flags & UpdateFrequency::PER_VIEW) {
+		if (Test(flags & UpdateFrequency::PER_VIEW)) {
 			if (lastViewUpdate == ctx.viewNumber)
 				flags &= ~UpdateFrequency::PER_VIEW;
 			else
@@ -72,7 +75,7 @@ namespace nextar {
 
 		for(uint32 i = 0; i < numConstBuffers; ++i) {
 			ConstantBufferPtr& cb = sharedParameters[i];
-			if (cb->GetFrequency() & flags) {
+			if (Test(cb->GetFrequency() & flags)) {
 				ctx.cbuffer = cb;
 				AutoParamProcessor* proc = cb->GetProcessor();
 				if (proc) {
@@ -88,7 +91,7 @@ namespace nextar {
 		}
 
 		ctx.cbuffer = nullptr;
-		ShaderParamIterator it(samplers, samplerStride, samplerCount);
+		ShaderParamIterator it(&samplers->paramDesc, samplerStride, samplerCount);
 		_ProcessShaderParamIterator(rc, ctx, it, flags);
 	}
 
@@ -109,197 +112,99 @@ namespace nextar {
 	}
 
 	/****************************************************/
-	/* MaterialTextureProcessor
+	/* CustomTextureProcessor
 	/****************************************************/
-	class PassTextureProcessor : public AutoParamProcessor {
+	class CustomTextureProcessor : public AutoParamProcessor {
 	public:
-		static PassTextureProcessor processor;
+		static CustomTextureProcessor passProcessor;
+		static CustomTextureProcessor materialProcessor;
+		static CustomTextureProcessor objectProcessor;
 
 		virtual void Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context);
 	protected:
-		~PassTextureProcessor() {}
+		CustomTextureProcessor(uint32 context) : paramContext(context) {}
+		~CustomTextureProcessor() {}
+		const uint32 paramContext;
 	};
 
-	void PassTextureProcessor::Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) {
-		NEX_ASSERT (d->type == AutoParamName::AUTO_CUSTOM_CONSTANT);
-		const TextureSamplerParamDesc* sampler = static_cast<const TextureSamplerParamDesc*>(d);
-		context.pass->SetTextureImpl(rc, sampler, context.passParameters->AsTexture(context.passParamOffset));
-		context.passParamOffset += sampler->paramDesc.size;
+	void CustomTextureProcessor::Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) {
+		NEX_ASSERT (d->autoName == AutoParamName::AUTO_CUSTOM_CONSTANT);
+		const TextureSamplerParamDesc* sampler = reinterpret_cast<const TextureSamplerParamDesc*>(d);
+		CommitContext::ParamContext& pc = context.shaderParamContext[paramContext];
+		context.pass->SetTextureImpl(rc, sampler, pc.second->AsTexture(pc.first));
+		pc.first += sampler->paramDesc.size;
 	}
 
 	/****************************************************/
-	/* MaterialParameterProcessor
+	/* CustomParameterProcessor
 	/****************************************************/
-	class PassParameterProcessor : public AutoParamProcessor {
+	class CustomParameterProcessor : public AutoParamProcessor {
 	public:
-		static PassParameterProcessor processor;
+		static CustomParameterProcessor passProcessor;
+		static CustomParameterProcessor materialProcessor;
+		static CustomParameterProcessor objectProcessor;
 
 		virtual void Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context);
 	protected:
-		~PassParameterProcessor() {}
+		CustomParameterProcessor(uint32 context) : paramContext(context) {}
+		~CustomParameterProcessor() {}
+		const uint32 paramContext;
 	};
 
-	void PassParameterProcessor::Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) {
-		NEX_ASSERT (d->type == AutoParamName::AUTO_CUSTOM_CONSTANT);
-		const ConstBufferParamDesc* param = static_cast<const ConstBufferParamDesc*>(d);
-		context.cbuffer->Write(rc, context.passParameters->AsRawData(context.passParamOffset),
+	void CustomParameterProcessor::Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) {
+		NEX_ASSERT (d->autoName == AutoParamName::AUTO_CUSTOM_CONSTANT);
+		const ConstBufferParamDesc* param = reinterpret_cast<const ConstBufferParamDesc*>(d);
+		CommitContext::ParamContext& pc = context.shaderParamContext[paramContext];
+		context.cbuffer->Write(rc, pc.second->AsRawData(pc.first),
 				param->cbOffset, param->paramDesc.size);
-		context.passParamOffset += param->paramDesc.size;
+		pc.first += param->paramDesc.size;
 	}
 
 	/****************************************************/
-	/* MaterialTextureProcessor
+	/* CustomStructProcessor
 	/****************************************************/
-	class MaterialTextureProcessor : public AutoParamProcessor {
+	class CustomStructProcessor : public AutoParamProcessor {
 	public:
-		static MaterialTextureProcessor processor;
+		static CustomStructProcessor passProcessor;
+		static CustomStructProcessor materialProcessor;
+		static CustomStructProcessor objectProcessor;
 
 		virtual void Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context);
 	protected:
-		~MaterialTextureProcessor() {}
+		CustomStructProcessor(uint32 custom) : paramContext(custom) {}
+		~CustomStructProcessor() {}
+		const uint32 paramContext;
 	};
 
-	void MaterialTextureProcessor::Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) {
-		NEX_ASSERT (d->type == AutoParamName::AUTO_CUSTOM_CONSTANT);
-		const TextureSamplerParamDesc* sampler = static_cast<const TextureSamplerParamDesc*>(d);
-		context.pass->SetTextureImpl(rc, sampler, context.materialParameters->AsTexture(context.materialParamOffset));
-		context.materialParamOffset += sampler->paramDesc.size;
-	}
-
-	/****************************************************/
-	/* MaterialParameterProcessor
-	/****************************************************/
-	class MaterialParameterProcessor : public AutoParamProcessor {
-	public:
-		static MaterialParameterProcessor processor;
-
-		virtual void Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context);
-	protected:
-		~MaterialParameterProcessor() {}
-	};
-
-	void MaterialParameterProcessor::Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) {
-		NEX_ASSERT (d->type == AutoParamName::AUTO_CUSTOM_CONSTANT);
-		const ConstBufferParamDesc* param = static_cast<const ConstBufferParamDesc*>(d);
-		context.cbuffer->Write(rc, context.materialParameters->AsRawData(context.materialParamOffset),
-				param->cbOffset, param->paramDesc.size);
-		context.materialParamOffset += param->paramDesc.size;
-	}
-
-	/****************************************************/
-	/* ObjectTextureProcessor
-	/****************************************************/
-	class ObjectTextureProcessor : public AutoParamProcessor {
-	public:
-		static ObjectTextureProcessor processor;
-
-		virtual void Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context);
-	protected:
-		~ObjectTextureProcessor() {}
-	};
-
-	void ObjectTextureProcessor::Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) {
-		NEX_ASSERT (d->type == AutoParamName::AUTO_CUSTOM_CONSTANT);
-		const TextureSamplerParamDesc* sampler = static_cast<const TextureSamplerParamDesc*>(d);
-		context.pass->SetTextureImpl(rc, sampler, context.objectParameters->AsTexture(context.objectParamOffset));
-		context.objectParamOffset += sampler->paramDesc.size;
-	}
-
-	/****************************************************/
-	/* ObjectParameterProcessor
-	/****************************************************/
-	class ObjectParameterProcessor : public AutoParamProcessor {
-	public:
-		static ObjectParameterProcessor processor;
-
-		virtual void Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context);
-	protected:
-		~ObjectParameterProcessor() {}
-	};
-
-	void ObjectParameterProcessor::Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) {
-		NEX_ASSERT (d->type == AutoParamName::AUTO_CUSTOM_CONSTANT);
-		const ConstBufferParamDesc* param = static_cast<const ConstBufferParamDesc*>(d);
-		context.cbuffer->Write(rc, context.objectParameters->AsRawData(context.objectParamOffset),
-				param->cbOffset, param->paramDesc.size);
-		context.objectParamOffset += param->paramDesc.size;
-	}
-
-	/****************************************************/
-	/* ObjectStructProcessor
-	/****************************************************/
-	class ObjectStructProcessor : public AutoParamProcessor {
-	public:
-		static ObjectStructProcessor processor;
-
-		virtual void Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context);
-	protected:
-		~ObjectStructProcessor() {}
-	};
-
-	void ObjectStructProcessor::Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) {
-		NEX_ASSERT (d->type == AutoParamName::AUTO_CUSTOM_CONSTANT);
+	void CustomStructProcessor::Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) {
+		NEX_ASSERT (d->autoName == AutoParamName::AUTO_CUSTOM_CONSTANT);
 		size_t s = context.cbuffer->GetSize();
-		context.cbuffer->Write(rc, context.objectParameters->AsRawData(context.objectParamOffset), s);
-		context.objectParamOffset += s;
+		CommitContext::ParamContext& pc = context.shaderParamContext[paramContext];
+		context.cbuffer->Write(rc, pc.second->AsRawData(pc.first), s);
+		pc.first += (uint32)s;
 	}
+		
+	CustomTextureProcessor CustomTextureProcessor::passProcessor(CommitContext::PASS_PARAM_CONTEXT);
+	CustomTextureProcessor CustomTextureProcessor::materialProcessor(CommitContext::MATERIAL_PARAM_CONTEXT);
+	CustomTextureProcessor CustomTextureProcessor::objectProcessor(CommitContext::OBJECT_PARAM_CONTEXT);
 
-	/****************************************************/
-	/* MaterialStructProcessor
-	/****************************************************/
-	class MaterialStructProcessor : public AutoParamProcessor {
-	public:
-		static MaterialStructProcessor processor;
+	CustomParameterProcessor CustomParameterProcessor::passProcessor(CommitContext::PASS_PARAM_CONTEXT);
+	CustomParameterProcessor CustomParameterProcessor::materialProcessor(CommitContext::MATERIAL_PARAM_CONTEXT);
+	CustomParameterProcessor CustomParameterProcessor::objectProcessor(CommitContext::OBJECT_PARAM_CONTEXT);
 
-		virtual void Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context);
-	protected:
-		~MaterialStructProcessor() {}
-	};
+	CustomStructProcessor CustomStructProcessor::passProcessor(CommitContext::PASS_PARAM_CONTEXT);
+	CustomStructProcessor CustomStructProcessor::materialProcessor(CommitContext::MATERIAL_PARAM_CONTEXT);
+	CustomStructProcessor CustomStructProcessor::objectProcessor(CommitContext::OBJECT_PARAM_CONTEXT);
 
-	void MaterialStructProcessor::Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) {
-		NEX_ASSERT (d->type == AutoParamName::AUTO_CUSTOM_CONSTANT);
-		size_t s = context.cbuffer->GetSize();
-		context.cbuffer->Write(rc, context.materialParameters->AsRawData(context.materialParamOffset), s);
-		context.materialParamOffset += s;
-	}
+	AutoParamProcessor* Pass::customConstantProcessorMaterial = &CustomParameterProcessor::materialProcessor;
+	AutoParamProcessor* Pass::customConstantProcessorPass = &CustomParameterProcessor::passProcessor;
+	AutoParamProcessor* Pass::customConstantProcessorObject = &CustomParameterProcessor::objectProcessor;
+	
+	AutoParamProcessor* Pass::customTextureProcessorMaterial = &CustomTextureProcessor::materialProcessor;
+	AutoParamProcessor* Pass::customTextureProcessorPass = &CustomTextureProcessor::passProcessor;
+	AutoParamProcessor* Pass::customTextureProcessorObject = &CustomTextureProcessor::objectProcessor;
 
-	/****************************************************/
-	/* PassStructProcessor
-	/****************************************************/
-	class PassStructProcessor : public AutoParamProcessor {
-	public:
-		static PassStructProcessor processor;
-
-		virtual void Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context);
-	protected:
-		~PassStructProcessor() {}
-	};
-
-	void PassStructProcessor::Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) {
-		NEX_ASSERT (d->type == AutoParamName::AUTO_CUSTOM_CONSTANT);
-		size_t s = context.cbuffer->GetSize();
-		context.cbuffer->Write(rc, context.passParameters->AsRawData(context.passParamOffset), s);
-		context.passParamOffset += s;
-	}
-
-	PassTextureProcessor PassTextureProcessor::processor;
-	PassParameterProcessor PassParameterProcessor::processor;
-	MaterialTextureProcessor MaterialTextureProcessor::processor;
-	MaterialParameterProcessor MaterialParameterProcessor::processor;
-	ObjectTextureProcessor ObjectTextureProcessor::processor;
-	ObjectParameterProcessor ObjectParameterProcessor::processor;
-
-	PassStructProcessor PassStructProcessor::processor;
-	MaterialStructProcessor MaterialStructProcessor::processor;
-	ObjectStructProcessor ObjectStructProcessor::processor;
-
-	AutoParamProcessor* Pass::customConstantProcessorMaterial = &MaterialParameterProcessor::processor;
-	AutoParamProcessor* Pass::customTextureProcessorMaterial = &MaterialTextureProcessor::processor;
-	AutoParamProcessor* Pass::customConstantProcessorPass = &PassParameterProcessor::processor;
-	AutoParamProcessor* Pass::customTextureProcessorPass = &PassTextureProcessor::processor;
-	AutoParamProcessor* Pass::customConstantProcessorObject = &ObjectParameterProcessor::processor;
-	AutoParamProcessor* Pass::customTextureProcessorObject = &ObjectTextureProcessor::processor;
-	AutoParamProcessor* Pass::customStructProcessorObject = &ObjectStructProcessor::processor;
-	AutoParamProcessor* Pass::customStructProcessorMaterial = &MaterialStructProcessor::processor;
-	AutoParamProcessor* Pass::customStructProcessorPass = &PassStructProcessor::processor;
+	AutoParamProcessor* Pass::customStructProcessorMaterial = &CustomStructProcessor::materialProcessor;
+	AutoParamProcessor* Pass::customStructProcessorPass = &CustomStructProcessor::passProcessor;
+	AutoParamProcessor* Pass::customStructProcessorObject = &CustomStructProcessor::objectProcessor;
 } /* namespace nextar */

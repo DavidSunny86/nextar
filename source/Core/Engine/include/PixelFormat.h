@@ -77,6 +77,7 @@ namespace nextar {
 	class PixelBox {
 
 	public:
+		
 		uint32 left, right, top, bottom, front, back;
 		/** Amount of pixels to skip for the next row,
 		 * this is not in bytes, rather in pixels.*/
@@ -84,40 +85,38 @@ namespace nextar {
 		/** Amount of pixels to skip for the next plane,
 		 * this is not in bytes, rather in pixels  */
 		uint32 slicePixelPitch;
-
 		PixelFormat format;
+		// data
+		uint8* data;
+
+		bool deleteData;
 
 		PixelBox()
 				: data(nullptr), left(0), right(0), top(0), bottom(0), front(0), back(
 						0), rowPixelPitch(0), slicePixelPitch(0), format(
-						PixelFormat::UNKNOWN) {
+						PixelFormat::UNKNOWN), deleteData(false) {
 
 		}
 
-		PixelBox(uint32 width, uint32 height, uint32 depth, PixelFormat f, void* dat = 0)
-				: data(dat), left(0), right(width), top(0), bottom(height), front(
-						0), back(depth), format(f) {
+		PixelBox(uint32 width, uint32 height, uint32 depth, PixelFormat f, void* dat = 0, bool _deleteData = false)
+				: data(reinterpret_cast<uint8*>(dat)), left(0), right(width), top(0), bottom(height), front(
+						0), back(depth), format(f), deleteData(_deleteData) {
 			CalculatePitches();
 		}
 
-		void* Data() const {
-			return data ? data : dataPtr.get();
+		~PixelBox() {
+			if (deleteData && data)
+				NEX_FREE(data, MEMCAT_GENERAL);
 		}
 
-		void*& Data() {
+		void* Data() const {
 			return data;
 		}
 
-		void DataPtr(DataPtr&& dp) {
-			data = nullptr;
-			dataPtr = std::move(dp);
+		uint8*& Data() {
+			return data;
 		}
-
-		void DataPtr(void*& dp) {
-			data = nullptr;
-			dataPtr = std::move(dp);
-		}
-
+		
 		uint32 GetWidth() const {
 			return right - left;
 		}
@@ -146,10 +145,6 @@ namespace nextar {
 			return Size(GetWidth(), GetHeight());
 		}
 
-	protected:
-
-		void* data;
-		nextar::DataPtr dataPtr;
 	};
 
 	namespace PixelUtils {

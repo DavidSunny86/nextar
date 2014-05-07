@@ -7,11 +7,11 @@ namespace nextar {
 
 	MeshVertexData::~MeshVertexData() {
 		if (binding)
-			NEX_DELETE binding;
+			NEX_DELETE(binding);
 		if (vertexElements)
-			NEX_DELETE [] vertexElements;
+			NEX_DELETE([] vertexElements);
 		if (layout)
-			NEX_DELETE layout;
+			NEX_DELETE(layout);
 		vertexElements = 0;
 
 	}
@@ -54,11 +54,11 @@ namespace nextar {
 
 	void MeshAsset::UnloadImpl(nextar::StreamRequest* req, bool isAsync) {
 		if (sharedVertexData) {
-			NEX_DELETE sharedVertexData;
+			NEX_DELETE(sharedVertexData);
 			sharedVertexData = 0;
 		}
 		if (sharedIndexData) {
-			NEX_DELETE sharedIndexData;
+			NEX_DELETE(sharedIndexData);
 			sharedIndexData = 0;
 		}
 	}
@@ -78,7 +78,7 @@ namespace nextar {
 		if (data->vertexElements) {
 			data->layout = BufferManager::Instance().CreateVertexLayout(data->vertexElements,
 					data->numVertexElements);
-			NEX_DELETE [] data->vertexElements;
+			NEX_DELETE([] data->vertexElements);
 			data->vertexElements = nullptr;
 		}
 	}
@@ -207,7 +207,7 @@ namespace nextar {
 
 	Component* MeshAsset::Factory::AsyncCreate(uint32 classId, const StringID name) {
 		if (classId == MeshAsset::CLASS_ID) {
-			return NEX_NEW MeshAsset(name);
+			return NEX_NEW(MeshAsset(name));
 		}
 		return nullptr;
 	}

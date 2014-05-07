@@ -22,9 +22,9 @@ namespace RenderOpenGL {
 	
 	VertexLayout* BufferManagerGL::CreateVertexLayoutImpl(bool usesDynamicBuffers) {
 			if (usesDynamicBuffers)  
-				return NEX_NEW VertexLayoutDynamicGL();
+				return NEX_NEW(VertexLayoutDynamicGL());
 			else
-				return NEX_NEW VertexLayoutStaticGL();
+				return NEX_NEW(VertexLayoutStaticGL());
 	}
 	
 	VertexBufferPtr BufferManagerGL::CreateVertexBuffer(
@@ -33,7 +33,7 @@ namespace RenderOpenGL {
 		RelocationPolicy policy
 		) {
 
-			VertexBufferGL* vb = NEX_NEW VertexBufferGL(bufferSize, accessFlags, policy);
+			VertexBufferGL* vb = NEX_NEW(VertexBufferGL(bufferSize, accessFlags, policy));
 
 			if (policy != RelocationPolicy::NEVER_RELEASE)
 				tempBuffers.push_back(vb);
@@ -51,7 +51,7 @@ namespace RenderOpenGL {
 		IndexBuffer::Type type
 		) {
 
-			IndexBufferGL* ib = NEX_NEW IndexBufferGL(bufferSize, accessFlags, type);
+			IndexBufferGL* ib = NEX_NEW(IndexBufferGL(bufferSize, accessFlags, type));
 
 			memoryInUse += bufferSize;
 			if (memoryBudget < memoryInUse)

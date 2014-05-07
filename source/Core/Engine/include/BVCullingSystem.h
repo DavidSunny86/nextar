@@ -20,7 +20,7 @@ namespace nextar {
 	public:
 		typedef vector<Spatial*>::type SpatialList;
 
-		BVCullingSystem(ComponentManager *creator = nullptr, const String& name = StringUtils::Null, Component* parent = nullptr);
+		BVCullingSystem(const StringID name = StringUtils::NullID, Component* parent = nullptr);
 		virtual ~BVCullingSystem();
 				
 		virtual void AddBody(Spatial*) override;

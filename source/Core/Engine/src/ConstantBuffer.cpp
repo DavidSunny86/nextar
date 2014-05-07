@@ -10,7 +10,9 @@
 namespace nextar {
 
 	uint32 ConstantBuffer::paramStride(0);
-	ConstantBuffer::ConstantBuffer() : frequency(0)
+	ConstantBuffer::ConstantBuffer(size_t bufferSize, uint32 flags) : 
+	ManagedBuffer(bufferSize, flags)
+	,frequency(UpdateFrequency::NEVER)
 	,paramDesc(nullptr)
 	,paramCount(0)
 	,processor(nullptr)

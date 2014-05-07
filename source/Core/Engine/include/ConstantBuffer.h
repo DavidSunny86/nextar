@@ -9,6 +9,7 @@
 #define CONSTANTBUFFER_H_
 
 #include <ShaderParam.h>
+#include <ManagedBuffer.h>
 
 namespace nextar {
 
@@ -21,7 +22,7 @@ namespace nextar {
 			LAST_FLAG = ManagedBuffer::LAST_FLAG << 2,
 		};
 
-		ConstantBuffer();
+		ConstantBuffer(size_t bufferSize, uint32 flags = Buffer::DEFAULT_FLAGS);
 		virtual ~ConstantBuffer();
 
 		inline void SetName(const String& name) {
@@ -32,7 +33,7 @@ namespace nextar {
 			return name;
 		}
 
-		inline uint32 GetFrequency() const {
+		inline UpdateFrequency GetFrequency() const {
 			return frequency;
 		}
 
@@ -50,7 +51,7 @@ namespace nextar {
 
 		ShaderParamIterator GetParamIterator();
 		/* Must be called before Write is called */
-		virtual void BeginUpdate(RenderContext* rc, uint32 updateFlags) =0;
+		virtual void BeginUpdate(RenderContext* rc, UpdateFrequency updateFlags) =0;
 		/* Must be called after Write operations are done */
 		virtual void EndUpdate(RenderContext* rc) =0;
 		/* Write in one go, does not require a begin and end update */
@@ -70,7 +71,7 @@ namespace nextar {
 		// will update it accordingly
 		AutoParamProcessor* processor;
 
-		uint32 frequency;
+		UpdateFrequency frequency;
 
 		ConstBufferParamDesc* paramDesc;
 		uint32 paramCount;

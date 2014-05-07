@@ -12,6 +12,7 @@
 #include <VertexBuffer.h>
 #include <IndexBuffer.h>
 #include <VertexElement.h>
+#include <StreamData.h>
 
 namespace nextar {
 

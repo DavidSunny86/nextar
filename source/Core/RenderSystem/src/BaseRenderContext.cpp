@@ -73,17 +73,17 @@ namespace nextar {
 		}
 	}
 
-	void BaseRenderContext::BeginFrame(uint32 frame, uint32 t) {
+	void BaseRenderContext::BeginFrame(uint32 frame) {
 		frameStats.frameID = frame;
 		frameStats.renderTargetsUsed = 0;
 		frameStats.polygonCount = 0;
 		frameStats.shaderSwitches = 0;
 		frameStats.textureFetches = 0;
-		frameStats.startTime = t;
+		// todo while profiling this will be fetched and populated
+		frameStats.elapsedMilliSeconds = 0;
 	}
 
-	void BaseRenderContext::EndFrame(uint32 t) {
-		frameStats.endTime = t;
+	void BaseRenderContext::EndFrame() {
 	}
 
 	void BaseRenderContext::BeginRender(RenderInfo* ri) {

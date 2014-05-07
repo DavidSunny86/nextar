@@ -38,7 +38,7 @@ namespace nextar {
 		virtual void SetVideoModeImpl(const VideoMode& videoMode) = 0;
 		virtual void Draw(StreamData*, CommitContext&) override = 0;
 		virtual void SetCurrentTarget(RenderTarget*) = 0;
-		virtual void Clear(Color& c, float depth, uint16 stencil, uint16 flags) = 0;
+		virtual void Clear(Color& c, float depth, uint16 stencil, ClearFlags flags) = 0;
 		virtual void SetActivePass(Pass* pass) = 0;
 
 		/* helpers */
@@ -47,8 +47,8 @@ namespace nextar {
 			return videoModes[currentVideoMode];
 		}
 		
-		virtual void BeginFrame(uint32 frame, uint32 time);
-		virtual void EndFrame(uint32 time);
+		virtual void BeginFrame(uint32 frame);
+		virtual void EndFrame();
 		virtual FrameStats GetFrameStats();
 	
 	protected:

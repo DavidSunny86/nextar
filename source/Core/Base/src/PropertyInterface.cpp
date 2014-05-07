@@ -26,7 +26,7 @@ namespace nextar {
 			if (it != dictionaryMap.end()) {
 				return (*it).second;
 			}
-			PropertyDictionary* dictionary = NEX_NEW PropertyDictionary(name, parent);
+			PropertyDictionary* dictionary = NEX_NEW(PropertyDictionary(name, parent));
 			dictionaryMap.insert(
 					PropertyDictionaryMap::value_type(name, dictionary));
 			return dictionary;
@@ -42,7 +42,7 @@ namespace nextar {
 			PropertyDictionaryMap::iterator end = dictionaryMap.end();
 			if (it != end) {
 				// erase
-				NEX_DELETE(*it).second;
+				NEX_DELETE((*it).second);
 #if !defined(NEX_HAS_CONCURRENT_CONTAINERS)
 				dictionaryMap.erase(it);
 #else
@@ -59,7 +59,7 @@ namespace nextar {
 			PropertyDictionaryMap::iterator it = dictionaryMap.begin();
 			PropertyDictionaryMap::iterator end = dictionaryMap.end();
 			while (it != end) {
-				NEX_DELETE(*it).second;
+				NEX_DELETE( (*it).second );
 				++it;
 			}
 			dictionaryMap.clear();

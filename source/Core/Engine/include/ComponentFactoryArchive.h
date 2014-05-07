@@ -42,13 +42,13 @@ namespace nextar {
 
 		typedef std::pair<StringID, uint32> FactoryID;
 
-		inline bool operator < (const FactoryID& id1, const FactoryID& id2) {
+		inline friend bool operator < (const FactoryID& id1, const FactoryID& id2) {
 			return id1.first == id2.first?
 					(id1.second < id2.second) != 0 :
 					(id1.first < id2.first) != 0;
 		}
 
-		inline bool operator == (const FactoryID& id1, const FactoryID& id2) {
+		inline friend bool operator == (const FactoryID& id1, const FactoryID& id2) {
 			return (id1.first == id2.first && id1.second == id2.second) != 0;
 		}
 

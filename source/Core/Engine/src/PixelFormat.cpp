@@ -75,7 +75,7 @@ namespace nextar {
 								| PIXFLAG_DEPTH } };
 
 		PixelFormat GetFormatFromString(const String& name) {
-			for (uint32 i = 0; i < PixelFormat::COUNT; ++i)
+			for (uint32 i = 0; i < (uint32)PixelFormat::COUNT; ++i)
 				if (!name.compare(formatDescTable[i].name))
 					return (PixelFormat) i;
 			return PixelFormat::UNKNOWN;
@@ -83,7 +83,7 @@ namespace nextar {
 
 		bool IsDepthFormat(PixelFormat pf) {
 			const int index = (const int) pf;
-			if (index >= 0 && index <= PixelFormat::COUNT) {
+			if (index >= 0 && index <= (uint32)PixelFormat::COUNT) {
 				uint32 flags = formatDescTable[index].flags;
 				return (flags & PIXFLAG_DEPTH) != 0;
 			}
@@ -92,7 +92,7 @@ namespace nextar {
 
 		bool IsStencilFormat(PixelFormat pf) {
 			const int index = (const int) pf;
-			if (index >= 0 && index <= PixelFormat::COUNT) {
+			if (index >= 0 && index <= (uint32)PixelFormat::COUNT) {
 				uint32 flags = formatDescTable[index].flags;
 				return (flags & PIXFLAG_STENCIL) != 0;
 			}
@@ -101,7 +101,7 @@ namespace nextar {
 
 		bool IsDepthStencilFormat(PixelFormat pf) {
 			const int index = (const int) pf;
-			if (index >= 0 && index <= PixelFormat::COUNT) {
+			if (index >= 0 && index <= (uint32)PixelFormat::COUNT) {
 				uint32 flags = formatDescTable[index].flags;
 				return (flags & PIXFLAG_DEPTH) && (flags & PIXFLAG_STENCIL);
 			}
@@ -110,19 +110,19 @@ namespace nextar {
 
 		String GetStringFromFormat(PixelFormat pf) {
 			const int index = (const int) pf;
-			if (index >= 0 && index <= PixelFormat::COUNT)
+			if (index >= 0 && index <= (uint32)PixelFormat::COUNT)
 				return formatDescTable[index].name;
 			return StringUtils::Null;
 		}
 
 		inline bool IsCompressed(PixelFormat pf) {
 			const int index = (const int) pf;
-			NEX_ASSERT(index >= 0 && index <= PixelFormat::COUNT);
+			NEX_ASSERT(index >= 0 && index <= (uint32)PixelFormat::COUNT);
 			return (formatDescTable[index].flags & PIXFLAG_COMPRESSED) != 0;
 		}
 
 		bool IsValidTextureFormat(PixelFormat pf) {
-			return (formatDescTable[pf].flags & PIXFLAG_TEXTURE_FORMAT) != 0;
+			return (formatDescTable[(uint32)pf].flags & PIXFLAG_TEXTURE_FORMAT) != 0;
 		}
 
 		PixelFormat GetNearestTextureFormat(PixelFormat fmt) {
@@ -143,7 +143,7 @@ namespace nextar {
 
 		uint32 BytesPerPixel(PixelFormat pf) {
 			const int index = (const int) pf;
-			if(index >= 0 && index <= PixelFormat::COUNT)
+			if(index >= 0 && index <= (int)PixelFormat::COUNT)
 				return formatDescTable[index].pixelSize;
 			return 0;
 		}
@@ -211,7 +211,7 @@ namespace nextar {
 			if (src.format != dest.format) {
 				if (needsResize) {
 					freeProxySrc = true;
-					proxySrc.data =
+					proxySrc.data = (uint8*)
 							NEX_ALLOC(
 									GetBufferSize(proxySrc.GetWidth(),
 											proxySrc.GetHeight(),
@@ -222,6 +222,7 @@ namespace nextar {
 					proxySrc.rowPixelPitch = proxySrc.GetWidth();
 					proxySrc.slicePixelPitch = proxySrc.GetWidth()
 							* proxySrc.GetHeight();
+					proxySrc.deleteData = true;
 					_PixelTransferImpl(proxySrc, src);
 				} else
 					_PixelTransferImpl(dest, src);
@@ -271,7 +272,7 @@ namespace nextar {
 
 			NEX_ASSERT(src.format == dest.format);
 			size_t bytesPerPix = BytesPerPixel(src.format);
-			size_t numChannels = formatDescTable[src.format].numChannels;
+			size_t numChannels = formatDescTable[static_cast<uint32>(src.format)].numChannels;
 			NEX_ASSERT(bytesPerPix == BytesPerPixel(dest.format));
 			float dstep = ((float) src.GetDepth() / (float) dest.GetDepth()) * .5f;
 			float hstep = ((float) src.GetHeight() / (float) dest.GetHeight()) * .5f;

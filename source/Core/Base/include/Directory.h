@@ -22,7 +22,7 @@ namespace nextar {
 			/** @copydoc ArchiveFactory::CreateInstance */
 			virtual ArchivePtr CreateInstance(const String& name,
 					const String& path);
-			static void Register(FileSys*);
+			static void Register(FileSystem*);
 		};
 
 		Directory(const String& name, const String& path);

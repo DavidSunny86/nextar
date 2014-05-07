@@ -1,6 +1,7 @@
 
 #include <NexEngine.h>
 #include <ContextObject.h>
+#include <RenderManager.h>
 
 namespace nextar {
 

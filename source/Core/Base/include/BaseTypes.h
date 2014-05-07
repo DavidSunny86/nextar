@@ -31,7 +31,17 @@ namespace nextar {
 	typedef uint32 VersionID;
 	typedef uint8 ColorMaskType;
 
-	typedef std::unique_ptr<uint8, GenericDeleter<uint8> > DataPtr;
+	template <typename T> struct BasicUniquePtr {
+		typedef std::unique_ptr<T,  GenericFree<T> > type;
+	};
+
+	template <typename T> 
+	struct UniquePtr  {
+		typedef std::unique_ptr<T,  GenericDelete<T> > type;
+	};
+
+
+	typedef BasicUniquePtr<uint8>::type DataPtr;
 
 	union Size {
 		uint32 combined;
@@ -53,21 +63,25 @@ namespace nextar {
 		inline Point(int16 a, int16 b) : x(a), y(b) {}
 	};
 
-	enum ColorMask {
+	// todo Does not belong here
+	enum class ColorMask {
 		// Color mask red
-		COLOR_MASK_RED = 1,
+		MASK_RED = 1,
 		// Color mask green
-		COLOR_MASK_GREEN = 2,
+		MASK_GREEN = 2,
 		// Color mask blue
-		COLOR_MASK_BLUE = 4,
+		MASK_BLUE = 4,
 		// Color mask alpha
-		COLOR_MASK_ALPHA = 8,
+		MASK_ALPHA = 8,
 		// Color mask combined
-		COLOR_MASK_ALL = 0xff
+		MASK_ALL = 0xff
 	};
 
-	enum Constants {
-		CONST_INVALID_VERSION_ID = -1, CONST_INVALID_SIZE = -1,
+	// todo May be entirely useless
+	enum class Constants : uint32 {
+		INVALID_VERSION_ID = 0xffffffff, 
+		INVALID_SIZE = 0xffffffff,
+		MAX_LOADER_THREAD = 2,
 	};
 
 	namespace debug {
@@ -102,6 +116,56 @@ namespace nextar {
 		&& (NEX_GET_VER_MINREV(present) <= NEX_GET_VER_MINREV(query)))!= 0;
 	}
 }
+
+#define NEX_ENUM_FLAGS(EnumName, IntType)									\
+	inline constexpr EnumName												\
+		operator&(EnumName __x, EnumName __y) {								\
+		return static_cast<EnumName>										\
+			(static_cast<IntType>(__x) & static_cast<IntType>(__y));		\
+	}																		\
+																			\
+	inline constexpr EnumName												\
+		operator|(EnumName __x, EnumName __y) {								\
+		return static_cast<EnumName>										\
+			(static_cast<IntType>(__x) | static_cast<IntType>(__y));		\
+	}																		\
+																			\
+	inline constexpr EnumName												\
+		operator^(EnumName __x, EnumName __y) {								\
+		return static_cast<EnumName>										\
+			(static_cast<IntType>(__x) ^ static_cast<IntType>(__y));		\
+	}																		\
+																			\
+	inline constexpr EnumName												\
+		operator~(EnumName __x)	{											\
+		return static_cast<EnumName>(~static_cast<IntType>(__x));			\
+	}																		\
+																			\
+	inline EnumName &														\
+		operator&=(EnumName & __x, EnumName __y) {							\
+		__x = __x & __y;													\
+		return __x;															\
+	}																		\
+																			\
+	inline EnumName &														\
+		operator|=(EnumName & __x, EnumName __y) {							\
+		__x = __x | __y;													\
+		return __x;															\
+	}																		\
+																			\
+	inline EnumName &														\
+		operator^=(EnumName & __x, EnumName __y) {							\
+		__x = __x ^ __y;													\
+		return __x;															\
+	}																		\
+																			\
+	inline bool operator ! (EnumName __x) {									\
+		return static_cast<uint32>(__x) == 0;								\
+	}																		\
+																			\
+	inline bool Test(EnumName __x) {										\
+		return static_cast<uint32>(__x) != 0;								\
+	}
 
 #include <Containers.h>
 #include <ErrorDefs.h>

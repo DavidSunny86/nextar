@@ -6,13 +6,14 @@
  */
 #include <NexEngine.h>
 #include <Camera.h>
+#include <CullingSystem.h>
 
 namespace nextar {
 
-	Camera::Camera(const String& name, Component* parent) :
+	Camera::Camera(const StringID name, Component* parent) :
 		Spatial(name, parent), projectMatrixNumber(0), 
 			visibilityMask(VisibilitySet::VM_ALL) {
-		_SetCameraMatrixDataPtr(NEX_NEW Camera::Matrix);
+		_SetCameraMatrixDataPtr(NEX_NEW(Camera::Matrix));
 	}
 
 	Camera::~Camera() {
@@ -20,7 +21,7 @@ namespace nextar {
 		/** @remarks Expect the derived class to delete it anyway */
 		if (matrixData) {
 			Camera::Matrix* m = static_cast<Camera::Matrix*>(matrixData);
-			NEX_DELETE m;
+			NEX_DELETE(m);
 			matrixData = nullptr;
 		}
 	}
@@ -183,5 +184,20 @@ namespace nextar {
 	
 	uint32 Camera::GetClassID() const {
 		return CLASS_ID;
+	}
+
+	const Camera::PerspectiveParams& Camera::GetPerspectiveParams() const {
+		NEX_ASSERT(projectionType == PERSPECTIVE);
+		return perspective;
+	}
+
+	const Camera::OrthographicParams& Camera::GetOrthographicParams() const {
+		NEX_ASSERT(projectionType == ORTHOGRAPHIC);
+		return orthographic;
+	}
+
+	const Camera::AsymmetricParams& Camera::GetAsymmetricParams() const {
+		NEX_ASSERT(projectionType == ASYMMETRIC);
+		return asymmetric;
 	}
 }

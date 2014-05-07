@@ -59,7 +59,7 @@ namespace nextar {
 	class MeshAsset;
 
 	class AssetStreamRequest;
-	struct AssetCallback;
+	class AssetCallback;
 
 	typedef RefPtr<LightSystem> LightSystemPtr;
 
@@ -83,6 +83,10 @@ namespace nextar {
 	typedef RefPtr<Entity> EntityPtr;
 	typedef RefPtr<Scene> ScenePtr;
 
+	enum class EngineConstants : uint32 {
+		NUM_ASSET_POINTER_PER_POOL_BLOCK = 128,
+		NUM_STREAM_REQ_POINTER_PER_POOL_BLOCK = 32,
+	};
 }
 
 

@@ -4,6 +4,7 @@
 #include <NexBase.h>
 #include <ContextObject.h>
 #include <StreamData.h>
+#include <RenderDriver.h>
 
 namespace nextar {
 
@@ -13,8 +14,7 @@ namespace nextar {
 		uint32 shaderSwitches;
 		uint32 renderTargetsUsed;
 		uint32 textureFetches;
-		uint32 startTime;
-		uint32 endTime;
+		uint32 elapsedMilliSeconds;
 	};
 
 	struct RenderInfo {
@@ -31,6 +31,8 @@ namespace nextar {
 		CLEAR_STENCIL = 1 << 2,
 		CLEAR_ALL = CLEAR_COLOR|CLEAR_DEPTH|CLEAR_STENCIL
 	};
+
+	NEX_ENUM_FLAGS(ClearFlags, uint16);
 
 	typedef list<RenderTargetPtr>::type RenderTargetList;
 
@@ -55,8 +57,8 @@ namespace nextar {
 		virtual RenderTargetPtr GetRenderTarget(uint32 i) = 0;
 		virtual RenderTargetList& GetRenderTargetList() = 0;
 		virtual void SetVideoMode(uint32 videoModeIndex) = 0;
-		virtual void BeginFrame(uint32 frame, uint32 time) = 0;
-		virtual void EndFrame(uint32 time) = 0;
+		virtual void BeginFrame(uint32 frame) = 0;
+		virtual void EndFrame() = 0;
 		virtual FrameStats GetFrameStats() = 0;
 		virtual void BeginRender(RenderInfo*) = 0;
 		virtual void EndRender() = 0;

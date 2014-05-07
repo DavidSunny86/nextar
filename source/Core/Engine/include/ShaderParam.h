@@ -81,7 +81,8 @@ namespace nextar {
 		AUTO_COUNT,
 	};
 
-	enum class UpdateFrequency : uint32 {
+	enum class UpdateFrequency : uint16 {
+		NEVER = 0,
 		// changes per frame: time
 		// Type: shared
 		PER_FRAME = 1 << 0,
@@ -96,16 +97,19 @@ namespace nextar {
 		// changes per object instance: worldMatrix
 		// Type: local to object/stored in shader
 		PER_OBJECT_INSTANCE = 1 << 4,
+
 	};
 
+	NEX_ENUM_FLAGS(UpdateFrequency, uint16);
+	
 	class AutoParamProcessor;
 	// todo Profile the usage of this struct with pure uint32 ints.
 	struct ShaderParamDesc {
 		AutoParamProcessor* processor;
-		uint16 autoName;
+		UpdateFrequency frequency;
 		uint16 type;
-		uint16 frequency;
 		uint16 arrayCount;
+		AutoParamName autoName;
 		uint32 size;
 		String name;
 	};
@@ -176,5 +180,6 @@ namespace nextar {
 
 	typedef vector<ParamEntry>::type ParamEntryTable;
 	typedef std::pair<ParamEntryTable::iterator, ParamEntryTable::iterator> ParamEntryTableItem;
+	typedef std::pair<ParamEntryTable::const_iterator, ParamEntryTable::const_iterator> ConstParamEntryTableItem;
 } // namespace nextar
 #endif // SHADERPARAM_H_

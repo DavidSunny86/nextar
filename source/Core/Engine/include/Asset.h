@@ -11,6 +11,7 @@
 namespace nextar {
 	
 	class AssetCallback {
+	public:
 		virtual void AssetUnloaded(Asset*) = 0;
 		virtual void AssetLoaded(Asset*) = 0;
 		virtual void AssetUpdated(Asset*) = 0;
@@ -21,8 +22,11 @@ namespace nextar {
 	class Asset;
 	class AssetStreamRequest;
 
-	typedef unordered_set<AssetStreamRequest*, std::hash<AssetStreamRequest*> >::type AssetStreamRequestSet;
-	typedef unordered_set<Asset*>::type AssetSet;
+	typedef STDPoolAllocator<AssetStreamRequest*, (uint32)EngineConstants::NUM_STREAM_REQ_POINTER_PER_POOL_BLOCK, MEMCAT_GENERAL> AssetStreamRequestSetAllocator;
+	typedef STDPoolAllocator<Asset*, (uint32)EngineConstants::NUM_ASSET_POINTER_PER_POOL_BLOCK, MEMCAT_GENERAL> AssetSetAllocator;
+
+	typedef unordered_set<AssetStreamRequest*, std::hash<AssetStreamRequest*>, std::equal_to<AssetStreamRequest*>, AllocatorGeneral, AssetStreamRequestSetAllocator >::type AssetStreamRequestSet;
+	typedef unordered_set<Asset*, std::hash<Asset*>, std::equal_to<Asset*>, AllocatorGeneral, AssetSetAllocator >::type AssetSet;
 
 	/**
 	 * @class    Asset
@@ -104,26 +108,32 @@ namespace nextar {
 		/* Populate dictionary */
 		static void Populate(PropertyDictionary* dict);
 
+		// This should not be called from any thread other than main thread
 		inline void SetLoading(bool b) {
 			SetFlag(ASSET_LOADING, b);
 		}
 
+		// This should not be called from any thread other than main thread
 		inline bool IsLoading() const {
 			return (flags & ASSET_LOADING) != 0;
 		}
 
+		// This should not be called from any thread other than main thread
 		inline void SetReady(bool b) {
 			SetFlag(ASSET_READY, b);
 		}
 
+		// This should not be called from any thread other than main thread
 		inline bool IsReady() const {
 			return (flags & ASSET_READY) != 0;
 		}
 
+		// This should not be called from any thread other than main thread
 		inline void SetLoaded(bool l) {
 			SetFlag(ASSET_LOADED, true);
 		}
 
+		// This should not be called from any thread other than main thread
 		inline bool IsLoaded() const {
 			return (flags & ASSET_LOADED) != 0;
 		}

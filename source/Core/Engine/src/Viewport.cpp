@@ -2,7 +2,7 @@
 #include <NexEngine.h>
 #include <Viewport.h>
 #include <Camera.h>
-
+#include <RenderManager.h>
 
 namespace nextar {
 
@@ -55,7 +55,7 @@ namespace nextar {
 		//traversal.visibleBoundsInfo = &(camera->GetBoundsInfo());
 		//traversal.visibilityMask = camera->GetVisibilityMask();
 		traversal.visibilitySet = &visibleSet;
-		camera->FindVisiblePrimitives(traversal);
+		camera->Visit(traversal);
 		// if we registered any offscreen viewports, lets call push on those
 		for(auto &s : offscreen) {
 			s->PushPrimitives(frameNumber);

@@ -5,6 +5,8 @@
 #include <Color.h>
 #include <CommitContext.h>
 #include <SceneTraversal.h>
+#include <VisibilitySet.h>
+#include <RenderSystem.h>
 
 namespace nextar {
 	struct ViewportCallback;

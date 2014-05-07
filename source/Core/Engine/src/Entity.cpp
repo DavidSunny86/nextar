@@ -1,9 +1,9 @@
 /*
- * Entity.cpp
- *
- *  Created on: 25-Jan-2014
- *      Author: obhi
- */
+* Entity.cpp
+*
+*  Created on: 25-Jan-2014
+*      Author: obhi
+*/
 
 #include <NexEngine.h>
 #include <Entity.h>
@@ -11,14 +11,16 @@
 #include <Light.h>
 #include <Moveable.h>
 #include <Camera.h>
+#include <Scene.h>
+#include <MeshAsset.h>
 
 namespace nextar {
 
 	/*************************************
-	 * Entity::Factory
-	 *************************************/
+	* Entity::Factory
+	*************************************/
 	Entity::Factory::Factory(const StringID name) :
-			Component::Factory(name) {
+		Component::Factory(name) {
 	}
 
 	EntityPtr Entity::Factory::AsyncCreateCameraEntity(const StringID name) {
@@ -40,7 +42,7 @@ namespace nextar {
 	}
 
 	EntityPtr Entity::Factory::AsyncCreateAndAttach(const StringID name, uint32 subType, const StringID subName, Component** _subComponent) {
-		EntityPtr ent = Assign(AsyncCreate(Entity::CLASS_ID, name));
+		EntityPtr ent = Assign(static_cast<Entity*>(AsyncCreate(Entity::CLASS_ID, name)));
 		Component* subComponent = AsyncCreate(subType, subName);
 		if (subComponent) {
 			ent->AttachComponent(subComponent);
@@ -55,32 +57,32 @@ namespace nextar {
 	Component* Entity::Factory::AsyncCreate(uint32 type, const StringID name) {
 		switch(type) {
 		case Entity::CLASS_ID:
-			return NEX_NEW Entity(name);
+			return NEX_NEW(Entity(name));
 		case Light::CLASS_ID:
-			return NEX_NEW Light(name);
+			return NEX_NEW(Light(name));
 		case Mesh::CLASS_ID:
-			return NEX_NEW Mesh(name);
+			return NEX_NEW(Mesh(name));
 		case Moveable::CLASS_ID:
-			return NEX_NEW Moveable(name);
+			return NEX_NEW(Moveable(name));
 		case Camera::CLASS_ID:
-			return NEX_NEW Camera(name);
+			return NEX_NEW(Camera(name));
 		}
 		return 0;
 	}
 
 	/*************************************
-	 * Entity
-	 *************************************/
-	Entity::Entity(const String& name) : 
+	* Entity
+	*************************************/
+	Entity::Entity(const StringID name) : 
 		SharedComponent(name),
 		moveable(nullptr),	spatial(nullptr), scene(nullptr) {
 	}
 
 	Entity::~Entity() {
 		if (moveable)
-			NEX_DELETE moveable;
+			NEX_DELETE(moveable);
 		if (spatial)
-			NEX_DELETE spatial;
+			NEX_DELETE(spatial);
 	}
 
 	void Entity::AttachComponent(Component* comp) {
@@ -99,13 +101,13 @@ namespace nextar {
 			spatial = static_cast<Spatial*>(comp);
 			spatial->SetMoveable(moveable);
 		}
-			
+
 		if(catagory & Moveable::CATAGORY) {
 			moveable = static_cast<Moveable*>(comp);
 			if (spatial)
 				spatial->SetMoveable(moveable);
 		}
-		
+
 		comp->SetParent(this);
 		/* todo Fire event */
 	}
@@ -133,7 +135,7 @@ namespace nextar {
 
 		if (toDetach) {
 			toDetach->SetParent(nullptr);
-			NEX_DELETE toDetach;
+			NEX_DELETE(toDetach);
 		} // else report error ??
 	}
 
@@ -154,4 +156,5 @@ namespace nextar {
 		if (removeFromGroup) 
 			RemoveFromGroup();
 	}
+
 } /* namespace nextar */

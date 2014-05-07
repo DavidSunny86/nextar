@@ -21,13 +21,13 @@ namespace nextar {
 
 	void WindowManager::RegisterWindow(RenderWindow* winPtr) {
 #if defined( NEX_WINDOWS )
-		RenderWindowWin* window = static_cast<RenderWindowWin*>(winPtr);
+		Win32Window* window = static_cast<Win32Window*>(winPtr);
 		HWND wndH = window->GetWindowHandle();
 		SetWindowLongPtr(wndH, GWLP_USERDATA,
 				reinterpret_cast<LONG_PTR>(window));
 
 		WNDPROC proc = reinterpret_cast<WNDPROC>(SetWindowLongPtr(wndH,
-				GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&RenderWindowWin::WndProc)));
+				GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&Win32Window::WndProc)));
 		window->SetWindowProc(proc);
 
 #endif
@@ -37,7 +37,7 @@ namespace nextar {
 	void WindowManager::_Unregister(RenderWindow* winPtr) {
 		registeredWindows.remove(winPtr);
 #if defined( NEX_WINDOWS )
-		RenderWindowWin* window = static_cast<RenderWindowWin*>(winPtr);
+		Win32Window* window = static_cast<Win32Window*>(winPtr);
 		HWND wndH = window->GetWindowHandle();
 		SetWindowLongPtr(wndH, GWLP_WNDPROC,
 				reinterpret_cast<LONG_PTR>(window->GetWindowProc()));

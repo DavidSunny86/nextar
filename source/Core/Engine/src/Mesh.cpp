@@ -9,10 +9,12 @@
 #include <ShaderAsset.h>
 #include <MeshAsset.h>
 #include <Mesh.h>
+#include <SceneTraversal.h>
+#include <Camera.h>
 
 namespace nextar {
 
-	Mesh::Mesh(const String& name, Component* parent) :
+	Mesh::Mesh(const StringID name, Component* parent) :
 			Renderable(name, parent), defaultRenderQueue(0) {
 	}
 
@@ -45,7 +47,7 @@ namespace nextar {
 				prim.layer = 0;
 				prim.sortKey = SortKeyHelper::KeyOpaque(prim.layer, 0, 0);
 				primitives.push_back(prim);
-				SetMaterial(primitives.size()-1, mtl);
+				SetMaterial((uint32)primitives.size()-1, mtl);
 			}
 		}
 	}

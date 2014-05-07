@@ -268,7 +268,7 @@ namespace RenderOpenGL {
 	    NEX_ASSERT(size > 0);
 	    uint16 numUnmappedParams = 0;
 
-	    UniformBufferGL* pUb = NEX_NEW UniformBufferGL;
+	    UniformBufferGL* pUb = NEX_NEW(UniformBufferGL);
 	    UniformBufferGL& u = *pUb;
 	    u.ubNameGl = GL_INVALID_VALUE;
 	    GlGenBuffers(1, &u.ubNameGl);
@@ -802,17 +802,17 @@ namespace RenderOpenGL {
 		}
 	}
 
-	void RenderContextGL::Clear(Color& c, float depth, uint16 stencil, uint16 flags) {
+	void RenderContextGL::Clear(Color& c, float depth, uint16 stencil, ClearFlags flags) {
 		GLbitfield mask = 0;
-		if (flags & ClearFlags::CLEAR_COLOR) {
+		if (Test(flags & ClearFlags::CLEAR_COLOR)) {
 			mask |= GL_COLOR_BUFFER_BIT;
 			glClearColor(c.red, c.green, c.blue, c.alpha);
 		}
-		if (flags & ClearFlags::CLEAR_DEPTH) {
+		if (Test(flags & ClearFlags::CLEAR_DEPTH)) {
 			mask |= GL_DEPTH_BUFFER_BIT;
 			glClearDepth(depth);
 		}
-		if (flags & ClearFlags::CLEAR_STENCIL) {
+		if (Test(flags & ClearFlags::CLEAR_STENCIL)) {
 			mask |= GL_STENCIL_BUFFER_BIT;
 			glClearStencil(stencil);
 		}

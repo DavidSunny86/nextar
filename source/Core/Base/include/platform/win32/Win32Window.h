@@ -15,7 +15,8 @@ namespace nextar {
 
     public:
 
-        inline Win32Window() : window(0), full_control(false), original_proc(0) {
+		inline Win32Window(Impl* impl) : RenderWindow(impl),
+			window(0), full_control(false), original_proc(0) {
         }
 
         WNDPROC GetWindowProc() {
@@ -42,7 +43,7 @@ namespace nextar {
             window_dc = dc;
         }
         
-        /** @copydoc GraphicsWindow::WindowConfigChanged */
+        /** @copydoc RenderWindow::WindowConfigChanged */
         virtual void WindowConfigChanged();
         
         static LRESULT CALLBACK WndProc(HWND wnd, UINT message, WPARAM wparam,

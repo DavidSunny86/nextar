@@ -22,22 +22,27 @@
 #define NEX_ARCH_PPC		3
 #define NEX_ARCH_ALPHA		4
 
-/*
- * Determine architecture
- * =============================================
- */
-#if defined(_M_ALPHA) || defined(__alpha__)
-#define NEX_ARCH NEX_ARCH_ALPHA
-#elif defined(__ia64__) || defined(_M_IA64)
-#define NEX_ARCH NEX_ARCH_IA64
-#elif defined(__x86_64__) || defined(_M_X64) || defined(_AMD64_)
-#define NEX_ARCH NEX_ARCH_X86_64
-#elif defined(__i386__) || defined(_M_IX86) || defined(_X86_)
-#define NEX_ARCH NEX_ARCH_X86
-#elif defined(__powerpc__) || defined(_M_PPC)
-#define NEX_ARCH NEX_ARCH_PPC
-#else
-#error Failed to identify architecture.
+#cmakedefine NEX_CROSS_COMPILE 
+
+#ifdef NEX_CROSS_COMPILE
+// Prespecified architecture
+	#define NEX_ARCH NEX_ARCH_@NEX_ARCHITECTURE@
+// Determine architecture
+#endif
+#ifndef NEX_ARCH
+	#if defined(_M_ALPHA) || defined(__alpha__)
+		#define NEX_ARCH NEX_ARCH_ALPHA
+	#elif defined(__ia64__) || defined(_M_IA64)
+		#define NEX_ARCH NEX_ARCH_IA64
+	#elif defined(__x86_64__) || defined(_M_X64) || defined(_AMD64_)
+		#define NEX_ARCH NEX_ARCH_X86_64
+	#elif defined(__i386__) || defined(_M_IX86) || defined(_X86_)
+		#define NEX_ARCH NEX_ARCH_X86
+	#elif defined(__powerpc__) || defined(_M_PPC)
+		#define NEX_ARCH NEX_ARCH_PPC
+	#else
+		#error Failed to identify architecture.
+	#endif
 #endif
 
 #if (NEX_ARCH==NEX_ARCH_IA64) || (NEX_ARCH==NEX_ARCH_X86_64)
@@ -310,5 +315,9 @@ typedef unsigned short wchar_t;
 // more macros
 #define NEX_4LETTER_KEY(a,b,c,d) \
 	((long)a + ((long)b << 8) + ((long)c << 16) + ((long)d << 24))
+
+#if defined(NEX_DEBUG) && defined(NEX_USE_TBB)
+#	define TBB_USE_DEBUG	1
+#endif
 
 #endif //NEXTAR_USER_CONFIG_1_01

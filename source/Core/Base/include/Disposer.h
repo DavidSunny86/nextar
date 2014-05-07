@@ -32,12 +32,12 @@ namespace nextar {
 	public:
 		_NexInline
 		void operator ()(T*& obj) {
-			NEX_DELETE obj;
+			NEX_DELETE(obj);
 			obj = 0;
 		}
 		_NexInline
 		static void Dispose(T*& obj) {
-			NEX_DELETE obj;
+			NEX_DELETE(obj);
 			obj = 0;
 		}
 	};

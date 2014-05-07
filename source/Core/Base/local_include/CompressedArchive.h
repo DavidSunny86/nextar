@@ -6,7 +6,7 @@
 #include <DataStream.h>
 #include <GenericStreams.h>
 #include <Archive.h>
-#include <archive/ZipArchive.h>
+#include <ZipArchive.h>
 
 namespace nextar {
 

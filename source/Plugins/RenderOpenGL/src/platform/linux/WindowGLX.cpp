@@ -16,7 +16,7 @@ namespace RenderOpenGL {
 	}
 
 	WindowGLX::~WindowGLX() {
-		NEX_DELETE impl;
+		NEX_DELETE(impl);
 		impl = nullptr;
 	}
 

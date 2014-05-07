@@ -20,7 +20,7 @@ namespace nextar {
 	}
 
 	/** Scene ******************************/
-	Scene::Scene(AssetManager* creator, const String& name) : Asset(creator, name),
+	Scene::Scene(const StringID name) : Asset(name),
 	cullingSystem(nullptr) {
 	}
 

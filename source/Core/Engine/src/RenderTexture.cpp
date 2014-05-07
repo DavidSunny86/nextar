@@ -28,14 +28,14 @@ namespace nextar {
 	}
 
 	void RenderTexture::NotifyUpdated(ContextObject::UpdateParamPtr ptr) {
-		Params* p = static_cast<Params*>(ptr);
+		Params* p = reinterpret_cast<Params*>(ptr);
 		width = p->dimensions.width;
 		height = p->dimensions.height;
 		ContextObject::NotifyUpdated(ptr);
 	}
 
 	void RenderTexture::Update(RenderContext* rc, ContextObject::UpdateParamPtr ptr) {
-		Params* p = static_cast<Params*>(ptr);
+		Params* p = reinterpret_cast<Params*>(ptr);
 		Reset(rc, p->dimensions, p->format);
 	}
 

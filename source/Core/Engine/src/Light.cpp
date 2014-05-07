@@ -11,7 +11,7 @@
 
 namespace nextar {
 
-	Light::Light(const String& name) : Renderable(name), sortKey(0) {
+	Light::Light(const StringID name) : Renderable(name), sortKey(0) {
 	}
 
 	Light::~Light() {

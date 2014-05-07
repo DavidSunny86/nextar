@@ -23,7 +23,7 @@ namespace nextar {
 		ParameterBuffer();
 		virtual ~ParameterBuffer();
 
-		void Prepare(ParamEntryTableItem* table);
+		void Prepare(ConstParamEntryTableItem& table);
 		void Prepare(void* data, size_t size);
 		void Prepare(DataPtr&& data, size_t size);
 
@@ -35,12 +35,18 @@ namespace nextar {
 			return static_cast<const void*>(data.get() + offset);
 		}
 
+		void SetParamEntryTable(ConstParamEntryTableItem& paramTable) {
+			this->paramTable = paramTable;
+		}
+
+		void SetData(const void* data, size_t offset, size_t size);
+
 	protected:
 
 		const ParamEntry* _GetParameter(const String& name) const;
 
 		size_t size;
-		ParamEntryTableItem* paramTable;
+		ConstParamEntryTableItem paramTable;
 		//uint8 smallBuffer[16];
 		DataPtr data;
 	};

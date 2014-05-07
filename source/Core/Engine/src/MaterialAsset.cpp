@@ -9,6 +9,7 @@
 #include <TextureAsset.h>
 #include <ShaderAsset.h>
 #include <ComponentGroupArchive.h>
+#include <ComponentFactoryArchive.h>
 
 namespace nextar {
 	/****************************************
@@ -19,7 +20,7 @@ namespace nextar {
 
 	Component* MaterialAsset::Factory::AsyncCreate(uint32 type, const StringID name) {
 		if (type == MaterialAsset::CLASS_ID)
-			return NEX_NEW MaterialAsset(name);
+			return NEX_NEW(MaterialAsset(name));
 		return 0;
 	}
 
@@ -31,7 +32,6 @@ namespace nextar {
 	}
 
 	MaterialAsset::~MaterialAsset() {
-		_RelievePropertyBuffer();
 	}
 
 	MaterialAssetPtr MaterialAsset::Instance(MaterialAsset::Factory* factory, const StringID name, const URL& location) {
@@ -63,17 +63,7 @@ namespace nextar {
 	}
 
 	void MaterialAsset::_PrepareMaterial(MaterialAsset::StreamRequest* req) {
-		_VerifyParameterBuffer();
-		memoryCost += parameters.size();
-		parameterDef = &shader->GetParameterList();
-	}
-
-	void MaterialAsset::_VerifyParameterBuffer() {
-		if(parameters.size() != shader->GetParameterBufferSize())
-			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
-	}
-
-	void MaterialAsset::_PreparePropertyBuffer() {
+		materialParamData.SetParamEntryTable(shader->GetParamEntryForMaterial());
 	}
 
 	void MaterialAsset::LoadImpl(nextar::StreamRequest* request, bool) {
@@ -86,26 +76,21 @@ namespace nextar {
 	}
 
 	nextar::StreamRequest* MaterialAsset::CreateStreamRequestImpl(bool load) {
-		return NEX_NEW MaterialAsset::StreamRequest(this);
+		return NEX_NEW(MaterialAsset::StreamRequest(this));
 	}
 
 	void MaterialAsset::DestroyStreamRequestImpl(nextar::StreamRequest*& request, bool load) {
 		MaterialAsset::StreamRequest* req = static_cast<MaterialAsset::StreamRequest*>(request);
-		NEX_DELETE req;
+		NEX_DELETE(req);
 		request = nullptr;
 	}
-
-	void MaterialAsset::SetParamBufferSize(uint32 size) {
-		parameters.resize(size);
+	
+	void MaterialAsset::_SetParamBufferSize(size_t size) {
+		materialParamData.Prepare(nullptr, size);
 	}
 
-	void MaterialAsset::SetParamDataByOffset(uint32 offset, const void* data, size_t amt) {
-		NEX_ASSERT(offset+amt <= parameters.size());
-		std::memcpy((parameters.data() + offset), data, amt);
-	}
-
-	void MaterialAsset::SetParamTextureByOffset(uint32 offset, const TextureUnit* data, size_t count) {
-		SetParamDataByOffset(offset, data, count*sizeof(TextureUnit));
+	void MaterialAsset::_SetParamData(const void* data, size_t offset, size_t size) {
+		materialParamData.SetData(data, offset, size);
 	}
 
 	/*****************************************************/
@@ -127,7 +112,7 @@ namespace nextar {
 		SharedComponent::Group* groupPtr = ComponentGroupArchive::Instance().AsyncFindOrCreate(group);
 		NEX_ASSERT(groupPtr);
 
-		Asset* shader = static_cast<Asset*>(groupPtr->AsyncFind(name));
+		AssetPtr shader = groupPtr->AsyncFind(name);
 
 		if (shader == nullptr) {
 			Component::Factory* factoryPtr =
@@ -146,22 +131,21 @@ namespace nextar {
 
 	void MaterialAsset::StreamRequest::SetParamBufferSize(uint32 paramBufferSize) {
 		MaterialAsset* material = static_cast<MaterialAsset*>(GetStreamedObject());
-		material->SetParamBufferSize(paramBufferSize);
+		material->_SetParamBufferSize(paramBufferSize);
 	}
 
 	void MaterialAsset::StreamRequest::SetParamValue(uint32 offset, const void* data, size_t amount) {
 		MaterialAsset* material = static_cast<MaterialAsset*>(GetStreamedObject());
-		material->SetParamDataByOffset(offset, data, amount);
+		material->_SetParamData(data, offset, amount);
 	}
 
-	void MaterialAsset::StreamRequest::SetTextureValue(uint32 offset, const TextureUnit* tu, uint32 count) {
+	void MaterialAsset::StreamRequest::SetTextureValue(uint32 offset, const TextureUnit* tu) {
 		MaterialAsset* material = static_cast<MaterialAsset*>(GetStreamedObject());
-		material->SetParamTextureByOffset(offset, tu, count);
-		for(uint16 i = 0; i < count; ++i) {
-			TextureBase* tb = tu[i].texture;
-			if (tb && tb->IsTextureAsset()) {
-				GetMetaInfo().AddDependency(static_cast<TextureAsset*>(tb));
-			}
+		material->_SetParamData(tu, offset, sizeof(TextureUnit));
+		// add dependency
+		if(tu->texture && tu->texture->IsTextureAsset()) {
+			Asset* asset = static_cast<TextureAsset*>(tu->texture);
+			GetMetaInfo().AddDependency(asset);
 		}
 	}
 

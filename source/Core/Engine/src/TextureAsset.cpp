@@ -7,6 +7,7 @@
 
 #include <NexEngine.h>
 #include <TextureAsset.h>
+#include <AssetStreamer.h>
 
 namespace nextar {
 
@@ -23,9 +24,9 @@ namespace nextar {
 		}
 	};
 
-	TextureAsset::TextureAsset(AssetManager* assetManager, const String& name) :
+	TextureAsset::TextureAsset(const StringID name) :
 		TextureBase(TextureBase::TEXTURE_ASSET),
-		Asset(assetManager, name),
+		Asset(name),
 		lodStrategy(&DefaultTextureLodStrategy::strategy) {
 
 		flags |= (AUTOGEN_MIP_MAPS_ENABLED|AUTOSTREAM_ENABLED);
@@ -34,16 +35,16 @@ namespace nextar {
 	TextureAsset::~TextureAsset() {
 	}
 
-	int TextureAsset::GetType() const {
-		return TextureAsset::TYPE;
+	uint32 TextureAsset::GetClassID() const {
+		return TextureAsset::CLASS_ID;
 	}
 
-	TextureAsset* TextureAsset::Instance(AssetManager* am, const String& name) {
-		return am->AsyncCreate(TextureAsset::TYPE, name);
+	TextureAsset* TextureAsset::Instance(TextureAsset::Factory* factory, const StringID name) {
+		return static_cast<TextureAsset*>(factory->AsyncCreate(TextureAsset::CLASS_ID, name));
 	}
 
-	TextureAsset* TextureAsset::Instance(AssetManager* am, const String& name, const URL& locator) {
-		TextureAsset* texture = Instance(am, name);
+	TextureAsset* TextureAsset::Instance(TextureAsset::Factory* factory, const StringID name, const URL& locator) {
+		TextureAsset* texture = static_cast<TextureAsset*>(factory->AsyncCreate(TextureAsset::CLASS_ID, name));
 		if (texture)
 			texture->SetAssetLocator(locator);
 		return texture;
@@ -102,7 +103,7 @@ namespace nextar {
 				type = TEXTURE_CUBE_MAP;
 		}
 
-		ContextObject::NotifyUpdated(textureParams);
+		ContextObject::NotifyUpdated(reinterpret_cast<ContextObject::UpdateParamPtr>(textureParams));
 		/* should we stream again, in case it was not fully loaded ? */
 		if (currentMaxMipLevel < numMipMaps) {
 			if (IsAutoStreamEnabled()) {
@@ -116,7 +117,7 @@ namespace nextar {
 
 		uint16 reqflags = streamRequest->flags;
 		if ((reqflags & (StreamRequest::AUTO_DELETE_REQUEST|StreamRequest::COMPLETED)) ==
-				StreamRequest::AUTO_DELETE_REQUEST|StreamRequest::COMPLETED)
+				(StreamRequest::AUTO_DELETE_REQUEST|StreamRequest::COMPLETED))
 			DestroyStreamRequestImpl(streamRequest);
 
 		if (!IsTextureInited()) {
@@ -134,7 +135,7 @@ namespace nextar {
 	}
 
 	void TextureAsset::Update(nextar::RenderContext* rc, ContextObject::UpdateParamPtr params) {
-		TextureStreamRequest* textureParams = static_cast<TextureStreamRequest*>(params);
+		TextureStreamRequest* textureParams = reinterpret_cast<TextureStreamRequest*>(params);
 		Image& img = textureParams->image;
 		uint32 numMips = img.GetNumMipMaps();
 		uint32 numFaces = img.GetNumFaces();
@@ -161,7 +162,7 @@ namespace nextar {
 		TextureStreamRequest* textureParams = static_cast<TextureStreamRequest*>(
 						GetStreamRequest());
 		// @TODO update parameters?
-		ContextObject::NotifyUpdated(textureParams);
+		ContextObject::NotifyUpdated(reinterpret_cast<ContextObject::UpdateParamPtr>(textureParams));
 		Asset::NotifyAssetUpdated();
 	}
 
@@ -170,12 +171,12 @@ namespace nextar {
 	}
 
 	StreamRequest* TextureAsset::CreateStreamRequestImpl(bool load) {
-		return NEX_NEW TextureStreamRequest(this);
+		return NEX_NEW(TextureStreamRequest(this));
 	}
 
 	void TextureAsset::DestroyStreamRequestImpl(StreamRequest*& request, bool load) {
 		TextureStreamRequest* req = static_cast<TextureStreamRequest*>(request);
-		NEX_DELETE req;
+		NEX_DELETE(req);
 		request = nullptr;
 	}
 

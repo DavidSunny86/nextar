@@ -256,7 +256,7 @@ namespace nextar {
 				newOffs = curOffs + sizeof(hdrLocal)
 						+ ZIP_LOCAL_FILE_HEADER_SIZE + lfh.filenameLength
 						+ lfh.extraFieldLength + lfh.csize;
-				if ((lfh.filenameLength > sizeof(buff))
+				if ((lfh.filenameLength >= sizeof(buff))
 						|| (infile->Read(buff, lfh.filenameLength)
 								< lfh.filenameLength))
 					return; /* Broken zipfile? */
@@ -305,7 +305,7 @@ namespace nextar {
 			if ((long) (curOffs = (size_t) infile->Tell()) == -1)
 				return 0; /* Can't get file position */
 
-			arch = NEX_NEW ZipArchive();
+			arch = NEX_NEW(ZipArchive());
 			//std::memset(arch, 0, sizeof(ZipArchive));
 
 			if (curOffs
@@ -424,7 +424,7 @@ namespace nextar {
 			OutputStreamPtr file = fileSys.OpenWrite(fileURL);
 			if (!file)
 				return 0;
-			ZipArchive* z = NEX_NEW ZipArchive();
+			ZipArchive* z = NEX_NEW(ZipArchive());
 			z->flags |= (NEX_ZIP_DIRTY);
 			z->outfile = file;
 			z->numRefs = 1;
@@ -811,7 +811,7 @@ namespace nextar {
 			if (!(tempFile))
 				return false;
 
-			OutputStreamPtr temp = Assign(NEX_NEW FileOutputStream(tempFile));
+			OutputStreamPtr temp = Assign(NEX_NEW(FileOutputStream(tempFile)));
 			InputStreamPtr& file = arch->infile;
 			file->Seek(0, std::ios_base::beg);
 			while (file->Read(buff, sizeof(hdrLocal)) == sizeof(hdrLocal)) {
@@ -942,7 +942,7 @@ namespace nextar {
 					OutputStreamPtr outFile = fileSys.OpenWrite(
 							arch->fileName);
 					InputStreamPtr inpFile = Assign(
-							NEX_NEW FileInputStream(tempFile));
+							NEX_NEW(FileInputStream(tempFile)));
 					if (outFile)
 						FileSystem::CopyStream(inpFile, outFile);
 					outFile.Clear();

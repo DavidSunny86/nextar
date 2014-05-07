@@ -24,14 +24,14 @@ namespace nextar {
 		NEX_THREAD_LOCK_GUARD_MUTEX(archiveLock);
 		GroupMap::iterator it = groups.find(name);
 		if (deleteGroup)
-			NEX_DELETE (*it).second;
+			NEX_DELETE((*it).second);
 		groups.erase(it);
 	}
 
 	void ComponentArchive::AsyncRemoveAll() {
 		NEX_THREAD_LOCK_GUARD_MUTEX(archiveLock);
 		for(auto &it : groups) {
-			NEX_DELETE it.second;
+			NEX_DELETE(it.second);
 		}
 		groups.clear();
 	}

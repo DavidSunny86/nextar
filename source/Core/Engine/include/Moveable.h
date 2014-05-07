@@ -32,7 +32,7 @@ namespace nextar {
 			LAST_FLAG = Component::LAST_FLAG << 0,
 		};
 				
-		Moveable(const String& name = StringUtils::Null, Component* parent = nullptr);
+		Moveable(const StringID name = StringUtils::NullID, Component* parent = nullptr);
 		virtual ~Moveable();
 
 		/** @remarks Returns the local rotation for parent */

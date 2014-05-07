@@ -56,7 +56,7 @@ namespace nextar {
 			VertexLayout::UpdateParam up;
 			up.numElements = numElements;
 			up.elements = elements;
-			layout->NotifyUpdated(&up);
+			layout->NotifyUpdated(reinterpret_cast<ContextObject::UpdateParamPtr>(&up));
 		}
 		return layout;
 	}

@@ -32,7 +32,7 @@ void ClockImpl::Reset() {
     // query counters
     QueryPerformanceFrequency(&frequency);
     QueryPerformanceCounter(&start_time);
-    start_tick = GetTickCount();
+	start_tick = GetTickCount64();
     SetThreadAffinityMask(Thread, olmask);
     last_time = 0;
 }
@@ -47,7 +47,7 @@ uint32 ClockImpl::GetMilliSecs() {
 
     LONGLONG elapsed_time = cur_time.QuadPart - start_time.QuadPart;
     uint32 per_elapsed = static_cast<uint32> ((1000 * elapsed_time) / frequency.QuadPart);
-    uint32 tick_elapsed = GetTickCount() - start_tick;
+    ULONGLONG tick_elapsed = GetTickCount64() - start_tick;
     long leap = static_cast<long> (per_elapsed - tick_elapsed);
     if (abs(leap) > 100) {
         LONGLONG adjust = std::min(leap * frequency.QuadPart / 1000, elapsed_time - last_time);
