@@ -13,7 +13,8 @@
 namespace nextar {
 
 	uint32 Pass::samplerStride(0);
-
+	Pass::AutoParamMap Pass::autoParams;
+	
 	Pass::Pass() : passParamByteOffset(-1)
 	,materialParamByteOffset(-1)
 	,objectParamByteOffset(-1)

@@ -11,6 +11,8 @@
 
 namespace nextar {
 
+	NEX_DEFINE_SINGLETON_PTR(ComponentGroupArchive);
+
 	ComponentGroupArchive::ComponentGroupArchive() : defaultGroup(nullptr) {
 		// TODO Auto-generated constructor stub
 

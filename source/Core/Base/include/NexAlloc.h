@@ -124,8 +124,10 @@ namespace nextar {
 //! delete operator override
 #ifdef NEX_DEBUG
 #	define NEX_DELETE( statement )	if ( (statement) ) delete statement
+#	define NEX_DELETE_ARRAY( statement )	if ( (statement) ) delete [] statement
 #else
 #	define NEX_DELETE( statement )	delete statement
+#	define NEX_DELETE_ARRAY( statement )	delete [] statement
 #endif
 	//! AllocObjectBase classes
 	typedef AllocObjectBase<AllocatorGeneral> AllocGeneral;

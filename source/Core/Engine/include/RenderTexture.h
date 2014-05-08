@@ -40,7 +40,7 @@ namespace nextar {
 
 		/* throws INVALID_CALL */
 		virtual void WriteBoxImpl(RenderContext*, size_t faceNum, size_t mipNum,
-			            PixelBox& box);
+			            PixelBox& box) = 0;
 	};
 
 } /* namespace nextar */

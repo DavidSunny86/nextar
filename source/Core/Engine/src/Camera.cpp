@@ -185,19 +185,4 @@ namespace nextar {
 	uint32 Camera::GetClassID() const {
 		return CLASS_ID;
 	}
-
-	const Camera::PerspectiveParams& Camera::GetPerspectiveParams() const {
-		NEX_ASSERT(projectionType == PERSPECTIVE);
-		return perspective;
-	}
-
-	const Camera::OrthographicParams& Camera::GetOrthographicParams() const {
-		NEX_ASSERT(projectionType == ORTHOGRAPHIC);
-		return orthographic;
-	}
-
-	const Camera::AsymmetricParams& Camera::GetAsymmetricParams() const {
-		NEX_ASSERT(projectionType == ASYMMETRIC);
-		return asymmetric;
-	}
 }

@@ -49,7 +49,10 @@ namespace nextar {
 			return processor;
 		}
 
-		ShaderParamIterator GetParamIterator();
+		inline ShaderParamIterator GetParamIterator() {
+			return ShaderParamIterator(&paramDesc->paramDesc, paramCount, paramStride);
+		}
+
 		/* Must be called before Write is called */
 		virtual void BeginUpdate(RenderContext* rc, UpdateFrequency updateFlags) =0;
 		/* Must be called after Write operations are done */

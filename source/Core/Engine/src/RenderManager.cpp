@@ -162,4 +162,12 @@ namespace nextar {
 		}
 	}
 
+	RenderSystemList& RenderManager::GetRenderSystems()	{
+		return renderSystems;
+	}
+
+
+
+
+
 } /* namespace nextar */

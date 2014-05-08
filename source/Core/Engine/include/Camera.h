@@ -76,50 +76,50 @@ namespace nextar {
 		virtual ~Camera();
 
 		/** This is basically the inverse of the world transform */
-		const Matrix4x4& GetViewMatrix();
+		inline const Matrix4x4& GetViewMatrix();
 		/* Projection matrix as determined by the current projection parameters */
-		const Matrix4x4& GetProjectionMatrix();
+		inline const Matrix4x4& GetProjectionMatrix();
 		/* Pre-multiplied view projection matrix */
-		const Matrix4x4& GetViewProjectionMatrix();
+		inline const Matrix4x4& GetViewProjectionMatrix();
 		/* Projection type */
-		uint8 GetProjectionType() const;
+		inline uint8 GetProjectionType() const;
 		/* */
-		const PerspectiveParams& GetPerspectiveParams() const;
+		inline const PerspectiveParams& GetPerspectiveParams() const;
 		/* */
-		const OrthographicParams& GetOrthographicParams() const;
+		inline const OrthographicParams& GetOrthographicParams() const;
 		/* */
-		const AsymmetricParams& GetAsymmetricParams() const;
+		inline const AsymmetricParams& GetAsymmetricParams() const;
 		/* */
-		const Frustum& GetFrustum() const;
-		void SetPerspectiveParams(const PerspectiveParams& params);
-		void SetOrthographicParams(const OrthographicParams& params);
-		void SetAsymmetricParams(const AsymmetricParams& params);
-		void SetNearDistance(float d);
-		void SetFarDistance(float d);
+		inline const Frustum& GetFrustum() const;
+		inline void SetPerspectiveParams(const PerspectiveParams& params);
+		inline void SetOrthographicParams(const OrthographicParams& params);
+		inline void SetAsymmetricParams(const AsymmetricParams& params);
+		inline void SetNearDistance(float d);
+		inline void SetFarDistance(float d);
 
 		inline bool IsViewDimOutOfDate() const;
 		inline bool IsBoundsOutOfDate() const;
 		inline bool IsProjectionDirty() const;
 
-		void	SetCullMask(uint32 cullMask);
-		uint32	GetCullMask() const;
-		void	SetVisibilityMask(uint32 visibilityMask);
-		uint32	GetVisibilityMask() const;
-		float	GetDepth(Vec3AF ofPoint);
-		float	GetNormalizedDepth(Vec3AF ofPoint);
+		inline void	SetCullMask(uint32 cullMask);
+		inline uint32	GetCullMask() const;
+		inline void	SetVisibilityMask(uint32 visibilityMask);
+		inline uint32	GetVisibilityMask() const;
+		inline float	GetDepth(Vec3AF ofPoint);
+		inline float	GetNormalizedDepth(Vec3AF ofPoint);
 
 		/** Visibility tests */
-		bool IsVisible(const BoundingVolume& vol, std::ptrdiff_t& coherencyData) const;
-		bool IsVisible(const BoundingVolume& vol) const;
-		bool IsVisible(Vec3AF center, float radius) const;
+		inline bool IsVisible(const BoundingVolume& vol, std::ptrdiff_t& coherencyData) const;
+		inline bool IsVisible(const BoundingVolume& vol) const;
+		inline bool IsVisible(Vec3AF center, float radius) const;
 
 		void UpdateProjection();
 		void UpdateFrustum();
 
-		Vector3A GetRightDirection() const;
-		Vector3A GetUpDirection() const;
-		Vector3A GetViewDirection() const;
-		Vector3A GetEyePosition() const;
+		inline Vector3A GetRightDirection() const;
+		inline Vector3A GetUpDirection() const;
+		inline Vector3A GetViewDirection() const;
+		inline Vector3A GetEyePosition() const;
 
 		const Vector3A* GetCorners();
 				/** @remarks Called to update the render queue with renderable data. */

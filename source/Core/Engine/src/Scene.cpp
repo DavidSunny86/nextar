@@ -38,4 +38,13 @@ namespace nextar {
 		NEX_ASSERT(entity->GetScene() == this);
 		sceneEntities.remove(Bind(entity));
 	}
+
+	void Scene::LoadImpl(StreamRequest* req, bool isAsync) {
+		NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
+	}
+
+	void Scene::UnloadImpl(StreamRequest* req, bool isAsync) {
+		NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
+	}
+
 } /* namespace nextar */

@@ -74,9 +74,9 @@ namespace nextar {
 		virtual ShaderProgramLanguage GetProgramLanguage() = 0;
 		virtual String GetInfo() = 0;
 		/* Create objects */
-		virtual GpuProgram* CreateProgram(GpuProgram::Type type); //todo
-		virtual RenderTarget* CreateRenderTarget(bool textureTarget = true);
-		virtual MultiRenderTarget* CreateMultiRenderTarget();
+		virtual GpuProgram* CreateProgram(GpuProgram::Type type) = 0; //todo
+		virtual RenderTarget* CreateRenderTarget(bool textureTarget = true) = 0;
+		virtual MultiRenderTarget* CreateMultiRenderTarget() = 0;
 
 		/* Render a single frame for a specific window, should be called
 		   from the thread this window was created in */
@@ -91,10 +91,7 @@ namespace nextar {
 		typedef vector<RenderContextPtr>::type RenderContextList;
 		typedef vector<ContextObject*>::type GpuObjectTraitsList;
 		typedef map<String, uint16>::type RenderLayerNameMap;
-
-		/* Implement */
-		virtual GpuProgram* CreateProgramImpl() = 0;
-		virtual void DestroyProgramImpl(GpuProgram*) = 0;
+				
 
 		virtual RenderDriverPtr CreateDriverImpl(DriverCreationParams&) = 0;
 		virtual void ConfigureImpl(const NameValueMap&) = 0;

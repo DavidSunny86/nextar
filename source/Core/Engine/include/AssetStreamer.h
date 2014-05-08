@@ -34,6 +34,7 @@ namespace nextar {
 	protected:
 
 		void _NotifyAssetLoaded(Asset* asset, AssetStreamRequest* req);
+		void _NotifyAssetUnloaded(Asset* asset, AssetStreamRequest* req);
 		void _NotifyDependents(Asset*, AssetStreamRequestSet&);
 	};
 

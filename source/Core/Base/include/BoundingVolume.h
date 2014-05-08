@@ -53,7 +53,7 @@ namespace nextar {
 		friend class BoundingVolume;
 	};
 
-	class BoundingVolume : public AllocGeneral {
+	class _NexBaseAPI BoundingVolume : public AllocGeneral {
 		BoundingBox* box;
 		float radius;
 	public:

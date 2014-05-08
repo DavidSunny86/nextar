@@ -279,7 +279,7 @@ namespace nextar {
 		virtual void LoadImpl(nextar::StreamRequest* req, bool isAsync);
 		virtual void UnloadImpl(nextar::StreamRequest* req, bool isAsync);
 
-		virtual StreamRequest* CreateStreamRequestImpl(bool load);
+		virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);
 		virtual void DestroyStreamRequestImpl(StreamRequest*&, bool load=true);
 
 		static void _FillVertexData(MeshVertexData*, MeshBufferData::BufferList::iterator&);

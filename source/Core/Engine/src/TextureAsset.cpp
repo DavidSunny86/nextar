@@ -24,6 +24,8 @@ namespace nextar {
 		}
 	};
 
+	DefaultTextureLodStrategy DefaultTextureLodStrategy::strategy;
+
 	TextureAsset::TextureAsset(const StringID name) :
 		TextureBase(TextureBase::TEXTURE_ASSET),
 		Asset(name),

@@ -336,6 +336,12 @@ namespace nextar {
 		passes.resize(currentPass+1);
 		passes[currentPass].name = name;
 	}
+
+	void ShaderAsset::StreamRequest::SetParamterBuffer(ParameterBuffer&& data) {
+		ShaderAsset* shader = static_cast<ShaderAsset*>(streamedObject);
+		shader->passParamData = std::move(data);
+	}
+
 	/*****************************************************/
 	/* Shader::Loader       							 */
 	/*****************************************************/

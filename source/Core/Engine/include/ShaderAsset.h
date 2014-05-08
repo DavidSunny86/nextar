@@ -96,7 +96,7 @@ namespace nextar {
 			/* Add Pass */
 			virtual void AddPass(const String& name);
 			/* Set pass paramter buffer data */
-			virtual void SetParamterBuffer(const ParameterBuffer&& data);
+			virtual void SetParamterBuffer(ParameterBuffer&& data);
 			/* Pass related */
 			void SetOptions(const String& options);
 			void SetProgramSource(GpuProgram::Type, const String& src);

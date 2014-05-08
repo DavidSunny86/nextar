@@ -39,6 +39,31 @@ namespace nextar {
 		BackgroundStreamer::Instance().AddRequest(req);
 	}
 
+	void AssetStreamer::RequestUnload(Asset* asset) {
+		if (asset->IsLoading() || !asset->IsLoaded()) {
+			Warn("Incorrect state for unload: " + 
+				Convert::ToString(asset->GetID()));
+			return;
+		}
+		StreamRequest* req = asset->GetStreamRequest(false);
+		if (!(req->flags & StreamRequest::ASSET_STREAM_REQUEST)) {
+			Warn("Cannot register a generic load request for asset, "
+				"request must be of type AssetStreamRequest: " + 
+				Convert::ToString(asset->GetID()));
+			return;
+		}
+		req->flags |= StreamRequest::REQUEST_UNLOAD;
+		BackgroundStreamer::Instance().AddRequest(req);
+	}
+
+	void AssetStreamer::NotifyUnloaded(StreamRequest* request) {
+		NEX_ASSERT(request->flags & StreamRequest::REQUEST_UNLOAD);
+		AssetStreamRequest* assetReq = static_cast<AssetStreamRequest*>(request);
+		Asset* asset = static_cast<Asset*>(assetReq->streamedObject);
+		// no dependencies, just notify
+		_NotifyAssetUnloaded(asset, assetReq);
+	}
+
 	void AssetStreamer::NotifyLoaded(StreamRequest* request) {
 		NEX_ASSERT(request->flags & StreamRequest::ASSET_STREAM_REQUEST);
 		AssetStreamRequest* assetReq = static_cast<AssetStreamRequest*>(request);
@@ -85,6 +110,12 @@ namespace nextar {
 		_NotifyDependents(asset, reqSet);
 	}
 
+	void AssetStreamer::_NotifyAssetUnloaded(Asset* asset, AssetStreamRequest* assetReq) {
+		if (assetReq->returnCode == (uint16)StreamResult::LOAD_SUCCESS)
+			asset->SetLoaded(false);
+		asset->NotifyAssetUnloaded();
+	}
+
 	void AssetStreamer::_NotifyDependents(Asset* asset, AssetStreamRequestSet& reqSet) {
 		/**
 		 * Important: the unresolvedDependency list in the MetaInfo class is filled up
@@ -103,11 +134,4 @@ namespace nextar {
 		}
 	}
 
-	void AssetStreamer::RequestUnload(Asset* asset) {
-		if (asset->IsLoading() || !asset->IsLoaded()) {
-			Warn("Incorrect state for unload: " + 
-				Convert::ToString(asset->GetID()));
-			return;
-		}
-	}
 } /* namespace nextar */

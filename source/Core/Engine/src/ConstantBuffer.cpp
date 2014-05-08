@@ -22,5 +22,6 @@ namespace nextar {
 	ConstantBuffer::~ConstantBuffer() {
 		// TODO Auto-generated destructor stub
 	}
+	
 
 } /* namespace nextar */

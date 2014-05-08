@@ -14,6 +14,12 @@
 
 namespace nextar {
 
+	Mesh::Primitive::~Primitive() {
+	}
+
+	/************************************************************************/
+	/* Mesh                                                                 */
+	/************************************************************************/
 	Mesh::Mesh(const StringID name, Component* parent) :
 			Renderable(name, parent), defaultRenderQueue(0) {
 	}

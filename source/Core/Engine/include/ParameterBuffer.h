@@ -21,6 +21,8 @@ namespace nextar {
 	class _NexEngineAPI ParameterBuffer : public AllocGraphics {
 	public:
 		ParameterBuffer();
+		ParameterBuffer(const ParameterBuffer&);
+		ParameterBuffer(ParameterBuffer&&);
 		virtual ~ParameterBuffer();
 
 		void Prepare(ConstParamEntryTableItem& table);
@@ -41,6 +43,8 @@ namespace nextar {
 
 		void SetData(const void* data, size_t offset, size_t size);
 
+		ParameterBuffer& operator = (const ParameterBuffer& pb); 
+		ParameterBuffer& operator = (ParameterBuffer&& pb);
 	protected:
 
 		const ParamEntry* _GetParameter(const String& name) const;

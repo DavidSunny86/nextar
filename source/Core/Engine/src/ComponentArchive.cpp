@@ -9,6 +9,8 @@
 
 namespace nextar {
 
+	NEX_DEFINE_SINGLETON_PTR(ComponentArchive);
+
 	ComponentArchive::ComponentArchive() {
 	}
 

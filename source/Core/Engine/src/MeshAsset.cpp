@@ -2,14 +2,17 @@
 #include <NexEngine.h>
 #include <MeshAsset.h>
 #include <BufferManager.h>
+#include <VertexElement.h>
 
 namespace nextar {
+
+	NEX_IMPLEMENT_FACTORY(MeshAsset::Loader);
 
 	MeshVertexData::~MeshVertexData() {
 		if (binding)
 			NEX_DELETE(binding);
 		if (vertexElements)
-			NEX_DELETE([] vertexElements);
+			NEX_DELETE_ARRAY(vertexElements);
 		if (layout)
 			NEX_DELETE(layout);
 		vertexElements = 0;
@@ -61,6 +64,8 @@ namespace nextar {
 			NEX_DELETE(sharedIndexData);
 			sharedIndexData = 0;
 		}
+		PrimitiveGroupList localPrimitives;
+		primitives.swap(localPrimitives);
 	}
 
 	void MeshAsset::_FillVertexData(MeshVertexData* data, MeshBufferData::BufferList::iterator& vertexBufferIt) {
@@ -78,7 +83,7 @@ namespace nextar {
 		if (data->vertexElements) {
 			data->layout = BufferManager::Instance().CreateVertexLayout(data->vertexElements,
 					data->numVertexElements);
-			NEX_DELETE([] data->vertexElements);
+			NEX_DELETE_ARRAY(data->vertexElements);
 			data->vertexElements = nullptr;
 		}
 	}
@@ -117,6 +122,23 @@ namespace nextar {
 				_FillIndexData(p.indexData, indexBufferIt);
 			}
 		}
+	}
+
+	void MeshAsset::NotifyAssetUnloaded() {
+		// todo
+	}
+
+	void MeshAsset::NotifyAssetUpdated() {
+		// todo
+	}
+
+	StreamRequest* MeshAsset::CreateStreamRequestImpl(bool load) {
+		return NEX_NEW( MeshAsset::StreamRequest(this) );
+	}
+
+	void MeshAsset::DestroyStreamRequestImpl(StreamRequest*& request, bool load/*=true*/) {
+		NEX_DELETE(request);
+		request = nullptr;
 	}
 
 	/*********************************

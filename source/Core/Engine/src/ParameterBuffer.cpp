@@ -14,6 +14,14 @@ namespace nextar {
 			size(0), data(nullptr) {
 	}
 
+	ParameterBuffer::ParameterBuffer(const ParameterBuffer& pb) {
+		*this = pb;
+	}
+
+	ParameterBuffer::ParameterBuffer(ParameterBuffer&& pb)	{
+		*this = std::move(pb);
+	}
+
 	ParameterBuffer::~ParameterBuffer() {
 	}
 
@@ -53,6 +61,22 @@ namespace nextar {
 	void ParameterBuffer::SetData(const void* data, size_t offset, size_t size) {
 		if (data && this->data)
 			std::memcpy(this->data.get() + offset, data, size);
+	}
+
+	ParameterBuffer& ParameterBuffer::operator=(const ParameterBuffer& pb) {
+		size = pb.size;
+		paramTable = pb.paramTable;
+		this->data.reset((uint8*)NEX_ALLOC(size, MEMCAT_GENERAL));
+		if (pb.data)
+			std::memcpy(this->data.get(), pb.data.get(), size);
+		return *this;
+	}
+
+	ParameterBuffer& ParameterBuffer::operator=(ParameterBuffer&& pb) {
+		size = pb.size;
+		paramTable = std::move(pb.paramTable);
+		data = std::move(pb.data);
+		return *this;
 	}
 
 } /* namespace nextar */
