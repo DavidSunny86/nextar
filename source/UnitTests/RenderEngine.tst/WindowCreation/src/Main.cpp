@@ -1,5 +1,5 @@
 
-#include <NexEngine.h>
+#include <EngineHeaders.h>
 
 NEX_IMPLEMENT_APP();
 
@@ -29,13 +29,13 @@ void SetupDriver(RenderManager& renderManager) {
 	params["WindowTitle"] = "Secondary Window";
 	params["WindowLeft"] = "801";
 	params["WindowTop"] = "0";
-	driver->AsyncGetContext(0)->CreateGraphicsWindow(800, 600, false, &params);
+	driver->AsyncGetContext(0)->CreateRenderWindow(800, 600, false, &params);
 }
 
 int NextarMain(int argc, char* argv[]) {
 	nextar::ApplicationContext application("WindowCreation");
 	application.InitializeContext();
-	RenderManager& renderManager = application.GetRenderManager();
+	RenderManager& renderManager = RenderManager::Instance();
 	SetupDriver(renderManager);
 	application.Run();
 	application.DestroyContext();

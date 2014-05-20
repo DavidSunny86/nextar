@@ -1,5 +1,5 @@
 /*
- * Scene.h
+ * SceneAsset.h
  *
  *  Created on: 27-Jan-2014
  *      Author: obhi
@@ -29,7 +29,7 @@ namespace nextar {
 	/**
 	 * Represents a game world.
 	 * */
-	class _NexEngineAPI Scene: public Asset {
+	class _NexEngineAPI SceneAsset: public Asset {
 	public:
 		enum {
 			CLASS_ID = Component::CLASS_SCENE,
@@ -37,12 +37,14 @@ namespace nextar {
 		};
 
 		typedef list<EntityPtr>::type EntityList;
+		typedef AssetTraits<SceneAsset> Traits;
+		typedef FactoryTraits<SceneAsset> FactoryTraits;
 
 		class SceneStreamRequest : public AssetStreamRequest {
 		};
 
-		Scene(const StringID name);
-		virtual ~Scene();
+		SceneAsset(const StringID name);
+		virtual ~SceneAsset();
 		
 		/* internal API */
 		virtual void _AddEntity(Entity* entity);

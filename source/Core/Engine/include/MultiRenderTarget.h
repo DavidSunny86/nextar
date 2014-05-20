@@ -14,8 +14,7 @@
 namespace nextar {
 
 	class MultiRenderTarget: public nextar::RenderTarget,
-		public nextar::ContextObject,
-		public Referenced<MultiRenderTarget, AllocGraphics>{
+		public nextar::ContextObject {
 	public:
 
 		enum {

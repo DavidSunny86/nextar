@@ -8,6 +8,7 @@
 #ifndef PLUGIN_H_
 #define PLUGIN_H_
 
+#include <RenderEngineHeaders.h>
 #include <ShaderLoaderImplv10.h>
 
 using namespace nextar;

@@ -186,7 +186,7 @@ namespace ImageLoader {
 	 * */
 	//--------------------------------------------------------------------------------------
 	/**** File Structure Defs ****/
-#pragma pack(push, 1)
+
 	struct DDS_PIXELFORMAT {
 		uint32 size;
 		uint32 flags;
@@ -222,7 +222,7 @@ namespace ImageLoader {
 		uint32 arraySize;
 		uint32 reserved;
 	};
-#pragma pack(pop)
+
 
 	static DXGI_FORMAT GetDXGIFormat(const DDS_PIXELFORMAT& ddpf) {
 		if (ddpf.flags & DDS_RGB) {

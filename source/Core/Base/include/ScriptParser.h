@@ -53,7 +53,7 @@ namespace nextar {
 			~ScriptListener();
 		};
 
-		class ContextBase {
+		class _NexBaseAPI ContextBase {
 		public:
 			ContextBase(ScriptContext& scriptContext);
 
@@ -63,10 +63,14 @@ namespace nextar {
 			ScriptContext& scriptContext;
 		};
 
-		class RegionContext: public ContextBase {
+		class _NexBaseAPI RegionContext: public ContextBase {
 			friend class ScriptContext;
 		public:
 			RegionContext(ScriptContext& context);
+
+			inline const String& GetName() const {
+				return name;
+			}
 
 			/* Returns the complete text under this region */
 			void ParseText(String&);
@@ -77,7 +81,7 @@ namespace nextar {
 			String name;
 		};
 
-		class StatementContext : public ContextBase {
+		class _NexBaseAPI StatementContext : public ContextBase {
 			friend class BlockContext;
 			friend class ScriptContext;
 		public:
@@ -95,7 +99,7 @@ namespace nextar {
 			StringUtils::WordList paramContext;
 		};
 
-		class BlockContext : public ContextBase {
+		class _NexBaseAPI BlockContext : public ContextBase {
 			friend class ScriptContext;
 			friend class StatementContext;
 		public:
@@ -106,7 +110,7 @@ namespace nextar {
 
 		};
 
-		class ScriptContext {
+		class _NexBaseAPI ScriptContext {
 			friend class BlockContext;
 			friend class StatementContext;
 			friend class RegionContext;
@@ -117,6 +121,7 @@ namespace nextar {
 			void Error(const String& error);
 			bool IsErrorBitSet() const;
 			const String& GetErrors() const;
+
 		protected:
 			StreamLexer& lexer;
 			const String& scriptName;

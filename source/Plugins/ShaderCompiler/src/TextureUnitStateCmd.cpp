@@ -5,10 +5,10 @@
  *      Author: obhi
  */
 
-#include <BaseHeaders.h>
+#include <EngineHeaders.h>
 #include <TextureUnitState.h>
 #include <TextureUnitStateCmd.h>
-#include <Shader.h>
+#include <ShaderAsset.h>
 
 namespace ShaderCompiler {
 
@@ -100,7 +100,7 @@ namespace ShaderCompiler {
 		}
 		// todo else throw error command not supported
 		if (!ctx.IsErrorBitSet()) {
-			shader->AddTextureUnit(name, texUnitParams);
+			shader->AddTextureUnit(name, texUnitParams, nullptr);
 		}
 	}
 

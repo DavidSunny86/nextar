@@ -27,6 +27,8 @@ namespace nextar {
 			// for async capture, this will pre capture the n-3rd frame from before-hand
 			MAX_FRAME_PRE_CAPTURE = 3,
 	};
+
+	NEX_ENUM_UINT(RenderConstants, uint32);
 }
 
 

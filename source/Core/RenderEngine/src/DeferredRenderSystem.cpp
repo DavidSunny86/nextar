@@ -4,8 +4,12 @@
  *  Created on: 17-Nov-2013
  *      Author: obhi
  */
-#include <RenderSystem.h>
+
+#include <RenderEngineHeaders.h>
 #include <DeferredRenderSystem.h>
+#include <MultiRenderTarget.h>
+#include <RenderTexture.h>
+#include <DebugDisplay.h>
 
 namespace nextar {
 
@@ -39,12 +43,12 @@ namespace nextar {
 
 
 		for(auto &layer : layerList) {
-			if (layer.flags & RenderQueueFlags::DEFERRED) {
+			if (Test(layer.flags & RenderQueueFlags::DEFERRED)) {
 				for(auto &prim : layer.visibles) {
 					MaterialAsset* material = prim.second->GetMaterial();
 					ShaderAsset* shader = material->GetShader();
-					uint16 updateParamFlag = UpdateFrequency::PER_OBJECT_INSTANCE;
-					context.primitive = &prim;
+					UpdateFrequency updateParamFlag = UpdateFrequency::PER_OBJECT_INSTANCE;
+					context.primitive = prim.second;
 					if (context.material != material) {
 						context.material = material;
 						updateParamFlag |= UpdateFrequency::PER_MATERIAL;
@@ -67,7 +71,7 @@ namespace nextar {
 		/* etc */
 		PixelBox image;
 		gbuffer.normalGloss->Capture(renderCtx, image, FrameBuffer::FRONT);
-		Image imageObj(image);
+		Image imageObj(std::move(image));
 		/* Display Image */
 		if (context.debugDisplay) {
 			Box2D box(0, 0, 0.25f, 0.25f);

@@ -9,6 +9,7 @@
 #include <BufferManager.h>
 #include <VertexElement.h>
 #include <GenericStreams.h>
+#include <ComponentFactoryArchive.h>
 
 namespace MeshLoader {
 
@@ -31,17 +32,14 @@ namespace MeshLoader {
 		MCID_END
 	};
 
-	MaterialAsset* MeshLoaderImplv1_0::ReadMaterialData(MeshAsset::StreamRequest* mesh, InputSerializer& ser) {
+	MaterialAssetPtr MeshLoaderImplv1_0::ReadMaterialData(MeshAsset::StreamRequest* mesh, InputSerializer& ser) {
 		StringID factory, name, materialGroup;
 		String path;
 		ser >> factory >> name >> materialGroup >> path;
-		MaterialAsset* mtl = 0;
+		MaterialAssetPtr mtl;
 		URL location(path);
-		Asset::Factory* managerPtr = ComponentFactoryArchive::Instance().AsyncFindFactory(MaterialAsset::CLASS_ID, name);
-		if (managerPtr) {
-			// create a new request for material load??
-			mtl = MaterialAsset::Instance(managerPtr, name, location);
-		}
+		// create a new request for material load??
+		mtl = MaterialAsset::Traits::Instance(name, location, factory, materialGroup);
 		return mtl;
 	}
 
@@ -132,12 +130,13 @@ namespace MeshLoader {
 		stream.resize(size);
 		uint8* vertexBuffer = &stream[0];
 
-		ser >> InputSerializer::ByteArray(vertexBuffer, size);
+		InputSerializer::UByteArray readBuffer(vertexBuffer, size);
+		ser >> readBuffer;
 		if (!InputSerializer::IsEndianCorrected()) {
 			const VertexElement* start, *end;
 			FindStreamVertexElements(request, start, end, streamIndex,
 					vertexData->vertexElements, vertexData->numVertexElements);
-			MeshAsset::Loader::EndianFlip(vertexBuffer, start, end, vertexCount);
+			MeshAsset::EndianFlip(vertexBuffer, start, end, vertexCount);
 		}
 	}
 
@@ -199,10 +198,14 @@ namespace MeshLoader {
 		stream.resize(size);
 		uint8* indexBuffer = &stream[0];
 
-		if (indexData->twoBytePerElement)
-			ser >> InputSerializer::UShortArray(static_cast<uint16*>((indexBuffer)), size/2);
-		else
-			ser >> InputSerializer::UIntArray(static_cast<uint32*>((indexBuffer)), size/4);
+		if (indexData->twoBytePerElement) {
+			InputSerializer::UShortArray dataBuff(reinterpret_cast<uint16*>(indexBuffer), size/2);
+			ser >> dataBuff;
+		}
+		else {
+			InputSerializer::UIntArray dataBuff(reinterpret_cast<uint32*>(indexBuffer), size/4);
+			ser >> dataBuff;
+		}
 
 		return indexData;
 	}
@@ -211,11 +214,11 @@ namespace MeshLoader {
 		BoundsInfo bv;
 		float radius;
 		float extendsAndCenter[6];
-
-		ser >> radius >> InputSerializer::FloatArray(extendsAndCenter, 6);
-		bv.linearRadius = radius;
-		bv.origRadius = Vector3(extendsAndCenter);
-		bv.origCenter = Vector3(extendsAndCenter + 3);
+		InputSerializer::FloatArray extends(extendsAndCenter, 6);
+		ser >> radius >> extends;
+		bv.radius = radius;
+		bv.center = Vector3(extendsAndCenter);
+		bv.extends = Vector3(extendsAndCenter + 3);
 		return bv;
 	}
 
@@ -223,7 +226,7 @@ namespace MeshLoader {
 		Asset* mesh = static_cast<Asset*>(request->GetStreamedObject());
 		uint32 subMesh = request->AddPrimitiveGroup();
 		// right now all buffers are shared by subMesh
-		InputSerializer::Chunk chunk(MARKER_INVALID_CHUNK, 0);
+		InputSerializer::Chunk chunk(InputSerializer::ChunkHeader(MARKER_INVALID_CHUNK, 0), 0);
 
 		MaterialAssetPtr mtl;
 		MeshVertexData* vertexData = 0;
@@ -318,7 +321,7 @@ namespace MeshLoader {
 					}
 					break;
 				case MCID_MATERIAL_DATA:
-					mtl = Bind(ReadMaterialData(request, ser));
+					mtl = ReadMaterialData(request, ser);
 					request->SetSharedMaterial(mtl);
 					break;
 				case MCID_SUBMESH_DATA:
@@ -351,7 +354,7 @@ namespace MeshLoader {
 	MeshLoaderImplv1_0::~MeshLoaderImplv1_0() {
 	}
 
-	void MeshLoaderImplv1_0::Load(InputSerializer& streamPtr, MeshAsset::Loader& loader) {
+	void MeshLoaderImplv1_0::Load(InputSerializer& streamPtr, AssetLoader& loader) {
 		MeshAsset::StreamRequest* request = static_cast<MeshAsset::StreamRequest*>(loader.GetRequestPtr());
 		ReadMeshChunk(request, streamPtr);
 	}

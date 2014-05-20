@@ -87,7 +87,7 @@ namespace ShaderCompiler {
 		static ComparisonFunc GetComparisonFunc(const String& val);
 		static StencilOpType GetStencilOp(const String& val);
 		static DepthStencilCompareType GetDepthStencilFunc(const String& val);
-		static ColorMaskType GetColorMask(const String& val);
+		static ColorMask GetColorMask(const String& val);
 		static BlendDataSourceType GetBlendSource(const String& val);
 		static BlendOpType GetColorOperation(const String& val);
 		static FillModeType GetFillMode(const String& val);

@@ -12,63 +12,84 @@
 
 namespace ShaderCompiler {
 	/** BlendState {} */
-	struct RasterStateCmd :
+	class RasterStateCmd :
 			public CommandDelegate {
+	public:
 		static RasterStateCmd command;
 		virtual void Execute(int parentType,
 				void* parentParam,
 				ScriptParser::StatementContext& statement);
+	protected:
+		~RasterStateCmd() {}
 	};
 
-	struct RasterStateListener :
+	class RasterStateListener :
 			public ScriptParser::BlockListener,
 			public ScriptParser::StatementListener {
+	public:
 		static CommandNamePair commands[];
 		static const size_t commandCount;
 		RasterState state;
 
 		virtual void EnterBlock(ScriptParser::BlockContext& block);
 		virtual void EnterStatement(ScriptParser::StatementContext& statement);
+	protected:
+		~RasterStateListener() {}
 	};
 
-	struct RasterCmd :
+	class RasterCmd :
 			public CommandDelegate {
+	public:
 		static RasterCmd command;
 		virtual void Execute(int parentType,
 				void* parentParam,
 				ScriptParser::StatementContext& statement);
+	protected:
+		~RasterCmd() {}
 	};
 
-	struct ScissorCmd :
+	class ScissorCmd :
 			public CommandDelegate {
+	public:
 		static ScissorCmd command;
 		virtual void Execute(int parentType,
 				void* parentParam,
 				ScriptParser::StatementContext& statement);
+	protected:
+		~ScissorCmd() {}
 	};
 
-	struct AntiAliasingCmd :
+	class AntiAliasingCmd :
 			public CommandDelegate {
+	public:
 		static AntiAliasingCmd command;
 		virtual void Execute(int parentType,
 				void* parentParam,
 				ScriptParser::StatementContext& statement);
+	protected:
+		~AntiAliasingCmd() {}
 	};
 
-	struct DepthClipCmd :
+	class DepthClipCmd :
 			public CommandDelegate {
+	public:
 		static DepthClipCmd command;
 		virtual void Execute(int parentType,
 				void* parentParam,
 				ScriptParser::StatementContext& statement);
+	protected:
+		~DepthClipCmd() {}
 	};
 
-	struct DepthBiasCmd :
+	class DepthBiasCmd :
 			public CommandDelegate {
+	public:
 		static DepthBiasCmd command;
 		virtual void Execute(int parentType,
 				void* parentParam,
 				ScriptParser::StatementContext& statement);
+	protected:
+		~DepthBiasCmd() {}
 	};
 }
 

@@ -5,7 +5,7 @@
  *      Author: obhi
  */
 
-#include <Scene.h>
+#include <SceneAsset.h>
 
 namespace nextar {
 
@@ -20,31 +20,23 @@ namespace nextar {
 	}
 
 	/** Scene ******************************/
-	Scene::Scene(const StringID name) : Asset(name),
+	SceneAsset::SceneAsset(const StringID name) : Asset(name),
 	cullingSystem(nullptr) {
 	}
 
-	Scene::~Scene() {
+	SceneAsset::~SceneAsset() {
 	}
 
-	void Scene::_AddEntity(Entity* entity) {
+	void SceneAsset::_AddEntity(Entity* entity) {
 		sceneEntities.push_back(Bind(entity));
 		if (cullingSystem) {
 			cullingSystem->AddBody(entity->GetSpatial());
 		}
 	}
 
-	void Scene::_RemoveEntity(Entity* entity) {
+	void SceneAsset::_RemoveEntity(Entity* entity) {
 		NEX_ASSERT(entity->GetScene() == this);
 		sceneEntities.remove(Bind(entity));
-	}
-
-	void Scene::LoadImpl(StreamRequest* req, bool isAsync) {
-		NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
-	}
-
-	void Scene::UnloadImpl(StreamRequest* req, bool isAsync) {
-		NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
 	}
 
 } /* namespace nextar */

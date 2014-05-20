@@ -16,15 +16,18 @@
 #include <RenderConstants.h>
 #include <ShaderParam.h>
 #include <ConstantBuffer.h>
+#include <NamedObject.h>
 
 namespace nextar {
 
-	class Pass : public AllocGraphics {
+	class Pass :
+			public NamedObject,
+			public AllocGraphics {
 	public:
 
 		enum {
 			NUM_STAGES = (uint32)RenderConstants::MAX_PROGRAM_STAGES,
-			MAX_CBUFFER = RenderConstants::MAX_CBUFFER_PER_PASS,
+			MAX_CBUFFER = (uint32)RenderConstants::MAX_CBUFFER_PER_PASS,
 		};
 
 		enum Flags {
@@ -47,9 +50,9 @@ namespace nextar {
 		};
 
 		typedef map<String, SamplerDesc>::type TextureDescMap;
-		typedef array<ConstantBufferPtr, MAX_CBUFFER>::type ConstantBufferList;
+		typedef array<ConstantBufferPtr, (uint32)MAX_CBUFFER>::type ConstantBufferList;
 
-		Pass();
+		Pass(StringID name);
 		virtual ~Pass();
 		
 		inline bool IsProgramDataInited() const {

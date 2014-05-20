@@ -3,7 +3,7 @@
 #ifndef NEXTAR_LINUX_OSDEFS_H
 #define NEXTAR_LINUX_OSDEFS_H
 
-#include <NexBase.h>
+#include <BaseTypes.h>
 #include <dlfcn.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>

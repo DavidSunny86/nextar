@@ -20,7 +20,6 @@ namespace nextar {
 		virtual RenderWindow* CreateRenderWindow(uint32 width, uint32 height,
 								  bool fullscreen, const NameValueMap* params);
 		virtual void DestroyedRenderWindow(RenderWindow*);
-		virtual RenderTargetPtr GetRenderTarget(uint32 i);
 		virtual RenderTargetList& GetRenderTargetList();
 		virtual void SetVideoMode(uint32 videoModeIndex);
 		virtual void BeginRender(RenderInfo*);

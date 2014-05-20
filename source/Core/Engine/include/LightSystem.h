@@ -27,7 +27,7 @@ namespace nextar {
 	class LightKeyHelper {
 	public:
 
-		inline friend bool operator < (const KeyVisibleLightPair& kvp1, const KeyVisibleLightPair& kvp2) {
+		inline bool operator () (const KeyVisibleLightPair& kvp1, const KeyVisibleLightPair& kvp2) {
 			return kvp1.first < kvp2.first;
 		}
 	};
@@ -40,8 +40,8 @@ namespace nextar {
 	public:
 		enum {
 			/* The first 255 sorted lights are taken into account for forward lights */
-			FORWARD_MAX_LIGHT_COUNT = RenderConstants::FORWARD_MAX_LIGHT_COUNT,
-			FORWARD_MAX_LIGHT_PER_PRIMITIVE = RenderConstants::FORWARD_MAX_LIGHT_PER_PRIMITIVE,
+			FORWARD_MAX_LIGHT_COUNT = (uint32)RenderConstants::FORWARD_MAX_LIGHT_COUNT,
+			FORWARD_MAX_LIGHT_PER_PRIMITIVE = (uint32)RenderConstants::FORWARD_MAX_LIGHT_PER_PRIMITIVE,
 		};
 
 		typedef array<uint8, FORWARD_MAX_LIGHT_PER_PRIMITIVE>::type LightSet;

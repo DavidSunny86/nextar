@@ -124,7 +124,7 @@ namespace nextar {
 				NEX_THROW_GracefulError(EXCEPT_CAN_NOT_OPEN_FILE);
 			}
 		}
-		archive = Assign<zip::ZipArchive>(arch);
+		archive = Assign<zip::ZipArchive, zip::ZipArchive>(arch);
 		flags |= FLAG_ARCHIVE_OPENED;
 	}
 

@@ -112,11 +112,16 @@ namespace nextar {
 		}
 	}
 
+	void Asset::LoadImpl(nextar::StreamRequest* request, bool) {
+		AssetLoader loader(static_cast<AssetStreamRequest*>(request));
+		loader.Serialize();
+	}
+
 	StreamRequest* Asset::CreateStreamRequestImpl(bool) {
 		return NEX_ALLOC_INIT_T(AssetStreamRequest, MEMCAT_GENERAL, this);
 	}
 
-	void Asset::DestroyStreamRequestImpl(StreamRequest*& request) {
+	void Asset::DestroyStreamRequestImpl(StreamRequest*& request, bool) {
 		NEX_FREE_T(AssetStreamRequest, MEMCAT_GENERAL, static_cast<AssetStreamRequest*>(request));
 		request = nullptr;
 	}
@@ -143,6 +148,40 @@ namespace nextar {
 		AssetSet& s = req->GetMetaInfo().GetDependencies();
 		for(auto a : s) {
 			a->Load(false);
+		}
+	}
+
+	/*********************************
+	 * Mesh::Loader
+	 *********************************/
+	NEX_IMPLEMENT_COMPONENT_FACTORY(AssetLoader);
+
+	AssetLoader::AssetLoader(nextar::AssetStreamRequest* req) : request(req) {
+	}
+
+	AssetLoader::~AssetLoader() {
+	}
+
+	void AssetLoader::Serialize() {
+		Asset* assetPtr = static_cast<Asset*>(request->GetStreamedObject());
+		const URL& location = assetPtr->GetAssetLocator();
+		String ext = location.GetExtension();
+		StringUtils::ToUpper(ext);
+		AssetLoaderImpl* impl = GetImpl(ext,assetPtr->GetClassID());
+		if (!impl) {
+			Error("No mesh loader for type.");
+			NEX_THROW_GracefulError(EXCEPT_MISSING_PLUGIN);
+		}
+
+		InputStreamPtr input = FileSystem::Instance().OpenRead(location);
+
+		if (input) {
+			impl->Load(input, *this);
+		} else {
+			Error(
+					String("Could not open mesh file: ")
+							+ assetPtr->GetAssetLocator().ToString());
+			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOCATE_ASSET);
 		}
 	}
 

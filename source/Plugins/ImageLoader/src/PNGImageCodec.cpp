@@ -5,6 +5,7 @@
  * Created on May 8, 2011, 4:57 AM
  */
 #include <BaseHeaders.h>
+#include <EngineHeaders.h>
 #include <PNGImageCodec.h>
 #include <png.h>
 
@@ -22,6 +23,13 @@ namespace ImageLoader {
 	void PngReadFile(png_structp png_ptr, png_bytep data, png_size_t length) {
 	    if (!((InputStream*) png_get_io_ptr(png_ptr))->Read((void*) data, (uint32) length))
 	        png_error(png_ptr, "-read error");
+	}
+
+	void PngWriteFile(png_structp png_ptr, const png_bytep data, png_size_t length) {
+	    ((OutputStream*) png_get_io_ptr(png_ptr))->Write((const void*) data, (uint32) length);
+	}
+
+	void PngFlushFile(png_structp png_ptr) {
 	}
 
 	void PngWarn(png_structp png_ptr, png_const_charp msg) {
@@ -297,5 +305,54 @@ namespace ImageLoader {
 	    }
 
 	    return img;
+	}
+
+	void PNGImageCodec::Save(OutputStreamPtr& file, const ImageParams& params, const ImageData& data) {
+		OutputStream* writr = file.GetPtr();
+		if(data.format != PixelFormat::BGRA8 &&
+			data.format != PixelFormat::RGBA8)
+			// todo support formats like rgba16 etc.
+			NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
+		png_structp pngPtr = nullptr;
+		png_infop infoPtr = nullptr;
+		png_byte ** rowPointers = nullptr;
+
+		// todo Fix for 64
+		uint32 bitDepth = 32;
+		size_t rowStride = data.width*bitDepth;
+		bool flip = (data.format == PixelFormat::BGRA8);
+
+		pngPtr = png_create_write_struct (PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+		if (pngPtr == nullptr)
+			goto failed;
+		infoPtr = png_create_info_struct (pngPtr);
+		if (infoPtr == nullptr)
+			goto failed;
+
+		png_set_error_fn(pngPtr, (void *) (writr), PngWarn, PngWarn);
+		png_set_write_fn(pngPtr, (void *) (writr), PngWriteFile, PngFlushFile);
+
+		png_set_IHDR(pngPtr,
+		             infoPtr,
+		             data.width,
+		             data.height,
+		             bitDepth, // assumed
+		             PNG_COLOR_TYPE_RGB_ALPHA,
+		             PNG_INTERLACE_NONE,
+		             PNG_COMPRESSION_TYPE_DEFAULT,
+		             PNG_FILTER_TYPE_DEFAULT);
+		rowPointers = (png_byte**)NEX_ALLOC(sizeof(png_byte*) * data.height, MEMCAT_GENERAL);
+
+		for(uint32 i = 0; i < data.height; ++i) {
+			rowPointers[i] = (static_cast<uint8*>(data.data)) + i*rowStride;
+		}
+		png_set_rows (pngPtr, infoPtr, rowPointers);
+		png_write_png (pngPtr, infoPtr, flip?PNG_TRANSFORM_BGR : PNG_TRANSFORM_IDENTITY, NULL);
+
+	failed:
+		if(rowPointers)
+			NEX_FREE(rowPointers, MEMCAT_GENERAL);
+		if (pngPtr)
+			png_destroy_write_struct(&pngPtr, &infoPtr);
 	}
 }

@@ -8,11 +8,13 @@
 #ifndef DEFERREDRENDERSYSTEM_H_
 #define DEFERREDRENDERSYSTEM_H_
 
+#include <RenderEngine.h>
+#include <EngineHeaders.h>
 #include <RenderSystem.h>
 
 namespace nextar {
 
-	class GBuffer : public AllocGeneral {
+	class _NexRenderAPI GBuffer : public AllocGeneral {
 	public:
 
 		void Create();
@@ -25,7 +27,7 @@ namespace nextar {
 		MultiRenderTargetPtr renderTarget;
 	};
 
-	class DeferredRenderSystem: public nextar::RenderSystem {
+	class _NexRenderAPI DeferredRenderSystem: public nextar::RenderSystem {
 	public:
 		DeferredRenderSystem();
 		virtual ~DeferredRenderSystem();

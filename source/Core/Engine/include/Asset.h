@@ -6,7 +6,8 @@
 #include <Component.h>
 #include <BackgroundStreamer.h>
 #include <URL.h>
-
+#include <ComponentFactoryArchive.h>
+#include <ComponentGroupArchive.h>
 
 namespace nextar {
 	
@@ -56,6 +57,69 @@ namespace nextar {
 
 			virtual void SetStringValue(PropertyInterface*, const String&);
 			virtual const String GetStringValue(const PropertyInterface*) const;
+		};
+
+		template <typename AssetType>
+		class AssetTraits {
+		public:
+			enum {
+				CLASS_ID = AssetType::CLASS_ID
+			};
+
+			typedef RefPtr<AssetType> AssetTypePtr;
+
+			inline static AssetTypePtr Instance(const StringID name, const StringID factory = StringUtils::DefaultID,
+					const StringID group = StringUtils::DefaultID) {
+				Factory* factoryPtr = ComponentFactoryArchive::Instance().AsyncFindFactory(
+										CLASS_ID, factory);
+				Group* groupPtr = nullptr;
+				if (group != StringUtils::NullID)
+					groupPtr = ComponentGroupArchive::Instance().AsyncFindGroup(group);
+				return SharedComponent::Instance(CLASS_ID, name, factoryPtr, groupPtr);
+			}
+
+			inline static AssetTypePtr Instance(const StringID name, Component::Factory* factory = nullptr, SharedComponent::Group* group = nullptr) {
+				return SharedComponent::Instance(CLASS_ID, name, factory, group);
+			}
+
+			inline static AssetTypePtr Instance(const StringID name, const URL& locator, Component::Factory* factory = nullptr, SharedComponent::Group* group = nullptr) {
+				AssetTypePtr asset = SharedComponent::Instance(CLASS_ID, name, factory, group);
+				if (asset)
+					asset->SetAssetLocator(locator);
+				return asset;
+			}
+		};
+
+		template <typename AssetType>
+		class FactoryTraits : public Factory {
+		public:
+			typedef typename AssetType::Traits AssetTraits;
+			typedef typename AssetTraits::AssetTypePtr AssetTypePtr;
+			typedef FactoryTraits<AssetType> Type;
+			FactoryTraits(const StringID name);
+
+			inline static Type* FindFactory(const StringID name) {
+				return ComponentFactoryArchive::Instance().AsyncFindFactory(
+						AssetTraits::CLASS_ID, name);
+			}
+
+			virtual AssetTypePtr AsyncCreateInstance(const StringID name,
+						const URL& location) {
+				AssetTypePtr asset = Assign(static_cast<AssetType*>(
+					AsyncCreate(AssetTraits::CLASS_ID, name)));
+				if (asset) {
+					asset->SetAssetLocator(location);
+				}
+				return asset;
+			}
+
+			/* Implementation */
+			virtual Component* AsyncCreate(uint32 classId, const StringID name) {
+				if (classId == AssetTraits::CLASS_ID) {
+					return NEX_NEW(AssetType(name));
+				}
+				return nullptr;
+			}
 		};
 
 		/**
@@ -198,11 +262,11 @@ namespace nextar {
 		virtual void AsyncUnload(StreamRequest* req);
 
 		/** @param isStreamed is true when the call is made from @Asset::AsyncLoad rather than @Asset::Load */
-		virtual void LoadImpl(StreamRequest* req, bool isAsync) = 0;
+		virtual void LoadImpl(StreamRequest* req, bool isAsync);
 		virtual void UnloadImpl(StreamRequest* req, bool isAsync) = 0;
 
 		virtual StreamRequest* CreateStreamRequestImpl(bool load);
-		virtual void DestroyStreamRequestImpl(StreamRequest*&);
+		virtual void DestroyStreamRequestImpl(StreamRequest*&, bool load=true);
 
 		void _FireCallbacksLoaded();
 		void _FireCallbacksUnloaded();
@@ -237,6 +301,36 @@ namespace nextar {
 
 	protected:
 		Asset::MetaInfo metaInfo;
+	};
+
+	class AssetLoader;
+	class AssetLoaderImpl {
+	public:
+
+		virtual void Configure(const Config&) {}
+		virtual void Load(InputStreamPtr&, AssetLoader&) = 0;
+
+	protected:
+		~AssetLoaderImpl() {}
+	};
+
+	class _NexEngineAPI AssetLoader : public AllocGeneral {
+
+		NEX_LOG_HELPER(AssetLoader);
+		NEX_DECLARE_COMPONENT_FACTORY(AssetLoaderImpl);
+
+	public:
+		AssetLoader(AssetStreamRequest* req);
+		~AssetLoader();
+
+		inline AssetStreamRequest* GetRequestPtr() {
+			return request;
+		}
+
+		void Serialize();
+
+	protected:
+		AssetStreamRequest* request;
 	};
 
 }

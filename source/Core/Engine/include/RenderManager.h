@@ -66,7 +66,7 @@ namespace nextar {
 		/** This function might alter the actual layer indexes which are referred to
 		 * by materials. So, this should be called at the start of engine initialization and
 		 * not modified later. */
-		virtual void AddRenderQueue(const String& name, uint16 priority, uint16 flags);
+		virtual void AddRenderQueue(const String& name, uint16 priority, RenderQueueFlags flags);
 		virtual const RenderQueueDescList& GetRenderQueueInfo() const;
 
 		virtual RenderSystemList& GetRenderSystems();
@@ -77,6 +77,7 @@ namespace nextar {
 		virtual GpuProgram* CreateProgram(GpuProgram::Type type) = 0; //todo
 		virtual RenderTarget* CreateRenderTarget(bool textureTarget = true) = 0;
 		virtual MultiRenderTarget* CreateMultiRenderTarget() = 0;
+		virtual Pass* CreatePass(StringID name) = 0;
 
 		/* Render a single frame for a specific window, should be called
 		   from the thread this window was created in */

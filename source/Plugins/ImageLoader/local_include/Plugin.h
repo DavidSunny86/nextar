@@ -5,10 +5,10 @@
  * Created on May 8, 2011, 2:23 AM
  */
 
-#ifndef GENIMAGELOADER_H
-#define	GENIMAGELOADER_H
+#ifndef GENIMAGELOADER_PLUGIN_H
+#define	GENIMAGELOADER_PLUGIN_H
 
-
+#include <EngineHeaders.h>
 #include <Image.h>
 #include <JPEGImageCodec.h>
 #include <PNGImageCodec.h>
@@ -46,5 +46,5 @@ namespace ImageLoader {
 
 }
 
-#endif	/* GENIMAGELOADER_H */
+#endif	/* GENIMAGELOADER_PLUGIN_H */
 

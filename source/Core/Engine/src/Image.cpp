@@ -17,6 +17,19 @@ namespace nextar {
 			  numMipMaps(0), format(PixelFormat::UNKNOWN), dataBuffer(0) {
 	}
 
+	Image::Image(PixelBox&& pb) {
+		width = pb.GetWidth();
+		height = pb.GetHeight();
+		depth = pb.GetDepth();
+		numFaces = 1;
+		totalMipMapCount = 1;
+		numMipMaps = 1;
+		format = pb.format;
+		dataBuffer = pb.data;
+		pb.data = nullptr;
+		pb.deleteData = false;
+	}
+
 	Image::~Image() {
 		if (dataBuffer)
 			NEX_FREE(dataBuffer, MEMCAT_GENERAL);

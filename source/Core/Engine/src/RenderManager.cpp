@@ -93,7 +93,7 @@ namespace nextar {
 		}
 	}
 
-	void RenderManager::AddRenderQueue(const String& name, uint16 priority, uint16 flags) {
+	void RenderManager::AddRenderQueue(const String& name, uint16 priority, RenderQueueFlags flags) {
 		if (renderQueues.size() >= 255) {
 			Error("Render queue index must be less than 255");
 			return;

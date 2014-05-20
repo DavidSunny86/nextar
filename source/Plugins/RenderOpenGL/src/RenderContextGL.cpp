@@ -239,7 +239,7 @@ namespace RenderOpenGL {
 			if (!cbPtr) {
 				// create a new uniform buffer
 				ubPtr = CreateUniformBuffer(pass, i, program, numParams, size);
-				ubPtr->name = std::move(uniName);
+				ubPtr->name = uniName;
 				cbPtr = nextar::Bind<ConstantBuffer>(ubPtr);
 				uniformBufferMap.emplace(std::cref(ubPtr->name),
 						cbPtr).first;
@@ -278,7 +278,7 @@ namespace RenderOpenGL {
 	        NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 	    }
 
-	    uint8 mask = 0;
+	    UpdateFrequency mask = (UpdateFrequency)0;
 	    UniformGL* uniforms = NEX_ALLOC_ARRAY_T(UniformGL, MEMCAT_GENERAL, numParams);
 	    void* tempBuffer = NEX_ALLOC(sizeof(GLint)*numParams*7 + 128, MEMCAT_GENERAL);
 	    GLint *indices = static_cast<GLint*>(tempBuffer) + numParams*0;
@@ -331,7 +331,7 @@ namespace RenderOpenGL {
 	        // Later on when the shader script is properly made, the script will
 	        // read the parameters from the script and automatically add them
 	        // to the mapped list for retrieval here.
-	        AutoParam* paramDef = pass->MapParam(name);
+	        const AutoParam* paramDef = pass->MapParam(name);
 	        // if this is not an auto param, we
 	        // use a custom processor
 	        if (paramDef == nullptr) {

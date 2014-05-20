@@ -13,40 +13,52 @@
 
 namespace ShaderCompiler {
 	/** BlendState {} */
-	struct BlendStateCmd :
+	class BlendStateCmd :
 			public CommandDelegate {
+	public:
 		static BlendStateCmd command;
 		virtual void Execute(int parentType,
 				void* parentParam,
 				ScriptParser::StatementContext& statement);
-
+	protected:
+		~BlendStateCmd() {}
 	};
 
-	struct BlendStateListener :
+	class BlendStateListener :
 			public ScriptParser::BlockListener,
 			public ScriptParser::StatementListener {
+	public:
 		static CommandNamePair commands[];
 		static const size_t commandCount;
 		BlendState state;
 
 		virtual void EnterBlock(ScriptParser::BlockContext& block);
 		virtual void EnterStatement(ScriptParser::StatementContext& statement);
+
+	protected:
+		~BlendStateListener() {}
 	};
 
-	struct BlendCmd :
+	class BlendCmd :
 			public CommandDelegate {
+	public:
 		static BlendCmd command;
 		virtual void Execute(int parentType,
 				void* parentParam,
 				ScriptParser::StatementContext& statement);
+	protected:
+		~BlendCmd() {}
 	};
 
 	struct BlendTargetCmd :
 			public CommandDelegate {
+	public:
 		static BlendTargetCmd command;
 		virtual void Execute(int parentType,
 				void* parentParam,
 				ScriptParser::StatementContext& statement);
+	protected:
+		~BlendTargetCmd() {}
 	};
 
 }

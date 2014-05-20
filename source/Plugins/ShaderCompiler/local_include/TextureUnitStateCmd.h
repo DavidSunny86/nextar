@@ -8,6 +8,7 @@
 #ifndef TEXTUREUNITSTATECMD_H_
 #define TEXTUREUNITSTATECMD_H_
 
+#include <EngineHeaders.h>
 #include <CommonTypes.h>
 
 namespace ShaderCompiler {

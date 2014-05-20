@@ -8,7 +8,9 @@
 #include <BaseHeaders.h>
 #include <CommonTypes.h>
 #include <DepthStencilStateCmd.h>
-#include <Shader.h>
+#include <ShaderAsset.h>
+#include <ScriptStrings.h>
+#include <ShaderScript.h>
 
 namespace ShaderCompiler {
 
@@ -18,10 +20,10 @@ namespace ShaderCompiler {
 	StencilOpCmd StencilOpCmd::command;
 
 	CommandNamePair DepthStencilStateListener::commands[] = {
-		{ "DepthState", &DepthStateCmd::command },
-		{ "StencilBackOp", &StencilOpCmd::command },
-		{ "StencilFrontOp", &StencilOpCmd::command },
-		{ "StencilTest", &StencilTestCmd::command },
+		{ _SS(CMD_DEPTH_STATE), &DepthStateCmd::command },
+		{ _SS(CMD_STENCIL_BACK_OP), &StencilOpCmd::command },
+		{ _SS(CMD_STENCIL_FRONT_OP), &StencilOpCmd::command },
+		{ _SS(CMD_STENCIL_TEST), &StencilTestCmd::command },
 	};
 
 	const size_t DepthStencilStateListener::commandCount =
@@ -34,7 +36,7 @@ namespace ShaderCompiler {
 			ScriptParser::StatementContext& ctx) {
 		if (parentType == CommandDelegate::SHADER_BLOCK) {
 			DepthStencilStateListener depthStencil;
-			ShaderAsset::StreamRequest* shader = static_cast<ShaderAsset::StreamRequest*>(parentParam);
+			ShaderAsset::StreamRequest* shader = static_cast<ShaderScript*>(parentParam)->GetRequest();
 			ctx.ParseBlock(&depthStencil);
 			if (!ctx.IsErrorBitSet()) {
 				shader->SetDepthStencilState(depthStencil.state);

@@ -6,8 +6,6 @@
 
 namespace nextar {
 
-	NEX_IMPLEMENT_FACTORY(MeshAsset::Loader);
-
 	MeshVertexData::~MeshVertexData() {
 		if (binding)
 			NEX_DELETE(binding);
@@ -30,29 +28,8 @@ namespace nextar {
 	MeshAsset::~MeshAsset() {
 	}
 
-	MeshAssetPtr MeshAsset::Instance(Component::Factory* factory, const StringID name,
-			SharedComponent::Group* group) {
-		MeshAssetPtr mesh = Assign(static_cast<MeshAsset*>(
-				factory->AsyncCreate(MeshAsset::CLASS_ID, name)));
-		if (group)
-			mesh->AddToGroup(group);
-		return mesh;
-	}
-
-	MeshAssetPtr MeshAsset::Instance(Component::Factory* factory, const StringID name, const URL& locator, SharedComponent::Group* group) {
-		MeshAssetPtr mesh = Instance(factory, name, group);
-		if (mesh)
-			mesh->SetAssetLocator(locator);
-		return mesh;
-	}
-
 	uint32 MeshAsset::GetClassID() const {
 		return CLASS_ID;
-	}
-
-	void MeshAsset::LoadImpl(nextar::StreamRequest* req, bool isAsync) {
-		Loader loader(req);
-		loader.Serialize();
 	}
 
 	void MeshAsset::UnloadImpl(nextar::StreamRequest* req, bool isAsync) {
@@ -141,34 +118,7 @@ namespace nextar {
 		request = nullptr;
 	}
 
-	/*********************************
-	 * Mesh::StreamRequest
-	 *********************************/
-	MeshAsset::StreamRequest::StreamRequest(MeshAsset* mesh) :
-			AssetStreamRequest(mesh), sharedVertexData(0),
-			sharedIndexData(0) {
-	}
-
-	ByteStream& MeshAsset::StreamRequest::AddIndexBuffer() {
-		bufferData.indexBuffers.resize(bufferData.indexBuffers.size()+1);
-		return bufferData.indexBuffers.back();
-	}
-
-	ByteStream& MeshAsset::StreamRequest::AddVertexBuffer() {
-		bufferData.vertexBuffers.resize(bufferData.vertexBuffers.size()+1);
-		return bufferData.vertexBuffers.back();
-	}
-
-	/*********************************
-	 * Mesh::Loader
-	 *********************************/
-	MeshAsset::Loader::Loader(nextar::StreamRequest* req) : meshRequest(req) {
-	}
-
-	MeshAsset::Loader::~Loader() {
-	}
-
-	void MeshAsset::Loader::EndianFlip(void* data, const VertexElement* veBegin,
+	void MeshAsset::EndianFlip(void* data, const VertexElement* veBegin,
 			const VertexElement* veEnd, size_t count) {
 
 		uint16 stride = veBegin->desc.stride;
@@ -198,50 +148,22 @@ namespace nextar {
 
 	}
 
-	void MeshAsset::Loader::Serialize() {
-		MeshAsset* meshPtr = static_cast<MeshAsset*>(meshRequest->GetStreamedObject());
-		const URL& location = meshPtr->GetAssetLocator();
-		String ext = location.GetExtension();
-		StringUtils::ToUpper(ext);
-		MeshAsset::LoaderImpl* impl = GetImpl(ext);
-		if (!impl) {
-			Error("No mesh loader for type.");
-			NEX_THROW_GracefulError(EXCEPT_MISSING_PLUGIN);
-		}
-
-		InputStreamPtr input = FileSystem::Instance().OpenRead(location);
-
-		if (input) {
-			impl->Load(input, *this);
-		} else {
-			Error(
-					String("Could not open mesh file: ")
-							+ meshPtr->GetAssetLocator().ToString());
-			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOCATE_ASSET);
-		}
-	}
-
 	/*********************************
-	 * MeshAsset::Factory
+	 * Mesh::StreamRequest
 	 *********************************/
-	MeshAsset::Factory::Factory(const StringID name) : Asset::Factory(name) {
+	MeshAsset::StreamRequest::StreamRequest(MeshAsset* mesh) :
+			AssetStreamRequest(mesh), sharedVertexData(0),
+			sharedIndexData(0) {
 	}
 
-	Component* MeshAsset::Factory::AsyncCreate(uint32 classId, const StringID name) {
-		if (classId == MeshAsset::CLASS_ID) {
-			return NEX_NEW(MeshAsset(name));
-		}
-		return nullptr;
+	ByteStream& MeshAsset::StreamRequest::AddIndexBuffer() {
+		bufferData.indexBuffers.resize(bufferData.indexBuffers.size()+1);
+		return bufferData.indexBuffers.back();
 	}
 
-	MeshAssetPtr MeshAsset::Factory::AsyncCreateInstance(const StringID name,
-		const URL& location) {
-		MeshAssetPtr mesh = Assign(static_cast<MeshAsset*>(
-				AsyncCreate(MeshAsset::CLASS_ID, name)));
-		if (mesh) {
-			mesh->SetAssetLocator(location);
-		}
-		return mesh;
+	ByteStream& MeshAsset::StreamRequest::AddVertexBuffer() {
+		bufferData.vertexBuffers.resize(bufferData.vertexBuffers.size()+1);
+		return bufferData.vertexBuffers.back();
 	}
 
 	/*********************************

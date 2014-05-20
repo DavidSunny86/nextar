@@ -1,4 +1,8 @@
 
+#ifndef UTAPPLICATION_H_
+#define UTAPPLICATION_H_
+
+#include <RenderEngineHeaders.h>
 #include <ApplicationContext.h>
 
 using namespace nextar;
@@ -15,9 +19,11 @@ public:
 
 protected:
 	
-	virtual void _SetupScene(ScenePtr&);
+	virtual void _SetupScene(SceneAssetPtr&);
 	virtual void _SetupRenderDriver();
-	virtual ScenePtr _CreateDefaultScene();
+	virtual SceneAssetPtr _CreateDefaultScene();
 
-	RenderWindowPtr window;
+	RenderTargetPtr window;
 };
+
+#endif //UTAPPLICATION_H_

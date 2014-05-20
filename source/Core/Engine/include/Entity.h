@@ -64,7 +64,7 @@ namespace nextar {
 			return spatial;
 		}
 
-		inline Scene* GetScene() {
+		inline SceneAsset* GetScene() {
 			return scene;
 		}
 		
@@ -75,7 +75,7 @@ namespace nextar {
 		virtual uint32 GetClassID() const override;
 
 		/* @brief Add entity to scene */
-		virtual void AddToScene(Scene*);
+		virtual void AddToScene(SceneAsset*);
 		/** @brief Detach the entity from current scene and also optionally
 		 * remove it from group it is added to, the entity will still exist to the
 		 * caller, which can dereference it for proper destruction.
@@ -84,7 +84,7 @@ namespace nextar {
 
 	protected:
 
-		Scene* scene;
+		SceneAsset* scene;
 		Moveable* moveable;
 		/* Only a single spatial object can be attached to an entity
 		 * at a given time. So camera and renderable cannot be attached to the

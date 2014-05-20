@@ -49,7 +49,7 @@ namespace nextar {
 	class Spatial;
 	class CullingSystem;
 
-	class Scene;
+	class SceneAsset;
 
 	class Asset;
 	class AssetStreamRequest;
@@ -81,7 +81,7 @@ namespace nextar {
 	typedef RefPtr<MeshAsset> MeshAssetPtr;
 
 	typedef RefPtr<Entity> EntityPtr;
-	typedef RefPtr<Scene> ScenePtr;
+	typedef RefPtr<SceneAsset> SceneAssetPtr;
 
 	enum class EngineConstants : uint32 {
 		NUM_ASSET_POINTER_PER_POOL_BLOCK = 128,

@@ -25,6 +25,8 @@ namespace ImageLoader {
 
 	    virtual bool TryLoad(InputStreamPtr& file, const ImageParams& params);
 	    virtual ImageData Load(InputStreamPtr& file, const ImageParams& params);
+	    virtual void Save(OutputStreamPtr& file, const ImageParams& params, const ImageData& data);
+
 	private:
 	};
 }

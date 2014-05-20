@@ -197,5 +197,11 @@ namespace std {
 	    	return std::_Hash_impl::hash(x.data(), x.length());
 	    }
 	  };
+	template <> struct hash<nextar::StringRef> {
+		size_t operator()(const nextar::StringRef& x) const  {
+			// ugly hack
+			return std::_Hash_impl::hash(x.get().data(), x.get().length());
+		}
+	  };
 }
 #endif

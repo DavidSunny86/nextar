@@ -12,17 +12,6 @@
 #include <ComponentFactoryArchive.h>
 
 namespace nextar {
-	/****************************************
-	 * Material::Factory
-	 ****************************************/
-	MaterialAsset::Factory::Factory(const StringID name) : Asset::Factory(name) {
-	}
-
-	Component* MaterialAsset::Factory::AsyncCreate(uint32 type, const StringID name) {
-		if (type == MaterialAsset::CLASS_ID)
-			return NEX_NEW(MaterialAsset(name));
-		return 0;
-	}
 
 	/****************************************
 	 * Material
@@ -32,13 +21,6 @@ namespace nextar {
 	}
 
 	MaterialAsset::~MaterialAsset() {
-	}
-
-	MaterialAssetPtr MaterialAsset::Instance(MaterialAsset::Factory* factory, const StringID name, const URL& location) {
-		MaterialAssetPtr material = Assign(static_cast<MaterialAsset*>(factory->AsyncCreate(MaterialAsset::CLASS_ID, name)));
-		if(material)
-			material->SetAssetLocator(location);
-		return material;
 	}
 
 	uint32 MaterialAsset::GetClassID() const {
@@ -63,12 +45,8 @@ namespace nextar {
 	}
 
 	void MaterialAsset::_PrepareMaterial(MaterialAsset::StreamRequest* req) {
-		materialParamData.SetParamEntryTable(shader->GetParamEntryForMaterial());
-	}
-
-	void MaterialAsset::LoadImpl(nextar::StreamRequest* request, bool) {
-		Loader loader(request);
-		loader.Serialize();
+		ConstParamEntryTableItem item = shader->GetParamEntryForMaterial();
+		materialParamData.SetParamEntryTable(item);
 	}
 
 	void MaterialAsset::UnloadImpl(nextar::StreamRequest* req, bool isStreamed) {
@@ -118,7 +96,7 @@ namespace nextar {
 			Component::Factory* factoryPtr =
 					ComponentFactoryArchive::Instance().AsyncFindFactory(
 							ShaderAsset::CLASS_ID, factory);
-			shader = ShaderAsset::Instance(factoryPtr, name, location, groupPtr);
+			shader = ShaderAsset::Traits::Instance(name, location, factoryPtr, groupPtr);
 		}
 
 		if(!shader) {
@@ -152,39 +130,6 @@ namespace nextar {
 	void MaterialAsset::StreamRequest::SetRenderLayer(uint8 l) {
 		MaterialAsset* material = static_cast<MaterialAsset*>(GetStreamedObject());
 		material->SetRenderLayer(l);
-	}
-
-	/*****************************************************/
-	/* Material::Loader       							 */
-	/*****************************************************/
-	NEX_IMPLEMENT_FACTORY(MaterialAsset::Loader);
-	MaterialAsset::Loader::Loader(nextar::StreamRequest* material) : requestPtr(material) {
-	}
-
-	MaterialAsset::Loader::~Loader() {
-	}
-
-	void MaterialAsset::Loader::Serialize() {
-		MaterialAsset* materialPtr = static_cast<MaterialAsset*>(requestPtr->GetStreamedObject());
-		const URL& location = materialPtr->GetAssetLocator();
-		String ext = location.GetExtension();
-		StringUtils::ToUpper(ext);
-		MaterialAsset::LoaderImpl* impl = GetImpl(ext);
-		if (!impl) {
-			Error("No material compiler registered.");
-			NEX_THROW_GracefulError(EXCEPT_MISSING_PLUGIN);
-		}
-
-		InputStreamPtr input = FileSystem::Instance().OpenRead(location);
-
-		if (input) {
-			impl->Load(input, *this);
-		} else {
-			Error(
-					String("Could not open material file: ")
-							+ materialPtr->GetAssetLocator().ToString());
-			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOCATE_ASSET);
-		}
 	}
 
 } /* namespace nextar */

@@ -11,7 +11,7 @@
 #include <Light.h>
 #include <Moveable.h>
 #include <Camera.h>
-#include <Scene.h>
+#include <SceneAsset.h>
 #include <MeshAsset.h>
 
 namespace nextar {
@@ -143,7 +143,7 @@ namespace nextar {
 		return Entity::CLASS_ID;
 	}
 
-	void Entity::AddToScene(Scene* scene) {
+	void Entity::AddToScene(SceneAsset* scene) {
 		this->scene = scene;
 		scene->_AddEntity(this);
 	}

@@ -27,43 +27,10 @@ namespace nextar {
 			CATAGORY = COMPONENT_CAT(CLASS_ID),
 		};
 
-		class Loader;
-		struct LoaderImpl;
 		class StreamRequest;
 
-		
-		class Factory: public Asset::Factory {
-		protected:
-
-		public:
-			Factory(const StringID name);
-			
-			/* Implementation */
-			virtual Component* AsyncCreate(uint32 type, const StringID name);
-		};
-
-
-		struct LoaderImpl {
-			virtual void Load(InputStreamPtr& input, Loader& shader) = 0;
-		};
-
-		class Loader {
-			NEX_LOG_HELPER(Loader);
-			NEX_DECLARE_FACTORY(LoaderImpl);
-
-		public:
-			Loader(nextar::StreamRequest* material);
-			~Loader();
-
-			inline nextar::StreamRequest* GetRequestPtr() {
-				return requestPtr;
-			}
-
-			void Serialize();
-
-		protected:
-			nextar::StreamRequest* requestPtr;
-		};
+		typedef AssetTraits<MaterialAsset> Traits;
+		typedef FactoryTraits<MaterialAsset> FactoryTraits;
 
 		class StreamRequest : public AllocGeneral,
 		public AssetStreamRequest {
@@ -109,8 +76,6 @@ namespace nextar {
 			renderLayer = l;
 		}
 
-		static MaterialAssetPtr Instance(MaterialAsset::Factory* factory, const StringID name, const URL& location);
-
 		virtual uint32 GetClassID() const;
 
 	protected:
@@ -119,7 +84,6 @@ namespace nextar {
 		virtual void NotifyAssetUnloaded();
 		virtual void NotifyAssetUpdated();
 
-		virtual void LoadImpl(nextar::StreamRequest* req, bool isStreamed);
 		virtual void UnloadImpl(nextar::StreamRequest* req, bool isStreamed);
 
 		virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);

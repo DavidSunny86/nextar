@@ -80,7 +80,7 @@ namespace nextar {
 		uint32 paramCount;
 		static uint32 paramStride;
 
-		StringRef name;
+		String name;
 	};
 
 } /* namespace nextar */

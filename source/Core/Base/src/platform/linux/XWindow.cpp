@@ -4,6 +4,8 @@
 
 #if defined(NEX_LINUX)
 
+#include <XWindow.h>
+
 namespace nextar {
 
 	void XWindow::ProcessEvent(XWindow* wind, XEvent& event) {

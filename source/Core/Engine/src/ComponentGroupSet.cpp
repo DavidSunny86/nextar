@@ -52,7 +52,7 @@ nbvc	 * ComponentManagerImpl
 		if (ofType == Component::CLASS_UNKNOWN)
 			componentMap.clear();
 		else {
-			auto &a = componentMap.begin();
+			auto a = componentMap.begin();
 			while(a != componentMap.end()) {
 				if ((*a).second->GetClassID() == ofType)
 					a = componentMap.erase(a);
@@ -64,7 +64,7 @@ nbvc	 * ComponentManagerImpl
 		uint32 ofType) {
 		NEX_THREAD_LOCK_GUARD_MUTEX(containerLock);
 		NEX_ASSERT (ofType != Component::CLASS_UNKNOWN);
-		auto &a = componentMap.begin();
+		auto a = componentMap.begin();
 		while(a != componentMap.end()) {
 			if ((*a).second->GetClassID() == ofType)
 				container->AsyncAdd((*a).second);

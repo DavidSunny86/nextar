@@ -1,33 +1,33 @@
 
-#include <NexEngine.h>
+#include <EngineHeaders.h>
 #include <UTApplication.h>
 
 
 UTApplication::UTApplication() : ApplicationContext("UTApplication") {
 }
 
-ScenePtr UTApplication::_CreateDefaultScene() {
-	SceneManager* sceneManager =
+SceneAssetPtr UTApplication::_CreateDefaultScene() {
+	SceneAsset* sceneAs = SceneAsset::Instance()
 			static_cast<SceneManager*>(ComponentFactoryArchive::Instance().AsyncFindManager(
-			Scene::CLASS_ID));
+			SceneAsset::CLASS_ID));
 	return sceneManager->AsyncCreateEmptyScene("UTScene");
 }
 
-void UTApplication::_SetupScene(ScenePtr& scene) {
+void UTApplication::_SetupScene(SceneAssetPtr& scene) {
 	EntityManager* entityManager =
 			static_cast<EntityManager*>(
 			ComponentFactoryArchive::Instance().AsyncFindManager(Entity::CLASS_ID));
 
 	EntityPtr camera = entityManager->AsyncCreateCameraEntity("Main");
 	camera->AddToScene(scene);
-	window->CreateViewport(camera->GetCamera());
+	window->CreateViewport(static_cast<Camera*>(camera->GetSpatial()));
 }
 
 void UTApplication::ConfigureExtendedInterfacesImpl() {
 	_SetupRenderDriver();
-	ScenePtr scene = _CreateDefaultScene();
+	SceneAssetPtr scene = _CreateDefaultScene();
 	_SetupScene(scene);
-	AsyncRegisterListener(Listener(this, 0));
+	RegisterListener(Listener(this, 0));
 }
 
 void UTApplication::BeginFrame(uint32 frameNumber) {
@@ -59,5 +59,5 @@ void UTApplication::_SetupRenderDriver() {
 	dcp.defaultContextParams.extraParams["WindowTitle"] = "UTApplication";
 
 	RenderDriverPtr driver = RenderManager::Instance().AsyncCreateDriver(dcp);
-	window = driver->AsyncGetContext(0)->GetRenderWindow(0);
+	window = *driver->AsyncGetContext(0)->GetRenderTargetList().begin();
 }

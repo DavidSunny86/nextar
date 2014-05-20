@@ -5,15 +5,15 @@
  * Created on May 8, 2011, 2:23 AM
  */
 
-#include <BaseHeaders.h>
+#include <EngineHeaders.h>
 #include <Plugin.h>
-#include <Image.h>
+#include <MeshLoaderImpl.h>
 
-NEX_IMPLEMENT_PLUGIN(ImageLoader) {
-	return &ImageLoader::Plugin::plugin;
+NEX_IMPLEMENT_PLUGIN(MeshLoader) {
+	return &MeshLoader::Plugin::plugin;
 }
 
-namespace ImageLoader {
+namespace MeshLoader {
 
 	Plugin Plugin::plugin;
 
@@ -27,15 +27,11 @@ namespace ImageLoader {
 	}
 
 	void Plugin::LicenseRenewed() {
-		Image::Serializer::RegisterFactory("PNG", &PNGImageCodec::codec);
-	    Image::Serializer::RegisterFactory("JPG", &JPEGImageCodec::codec);
-	    Image::Serializer::RegisterFactory("DDS", &DDSImageCodec::codec);
+		MeshAsset::Loader::RegisterFactory("MESH", &MeshLoaderImpl::impl);
 	}
 
 	bool Plugin::LicenseExpired() {
-		Image::Serializer::UnregisterFactory("PNG");
-	    Image::Serializer::UnregisterFactory("JPG");
-	    Image::Serializer::UnregisterFactory("DDS");
+		MeshAsset::Loader::UnregisterFactory("MESH");
 	    return true;
 	}
 

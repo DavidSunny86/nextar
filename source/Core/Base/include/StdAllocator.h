@@ -48,6 +48,10 @@ namespace nextar {
 		}
 		//    construction/destruction
 
+		inline void construct(pointer p) const {
+			nextar::ConstructObject(p);
+		}
+
 		inline void construct(pointer p, const T& t) const {
 			nextar::ConstructObject(p, t);
 		}

@@ -17,14 +17,6 @@ namespace nextar {
 		uint32 elapsedMilliSeconds;
 	};
 
-	struct RenderInfo {
-		RenderTarget* rt;
-		uint16 clearFlags;
-		Color clearColor;
-		float clearDepth;
-		uint16 clearStencil;
-	};
-
 	enum class ClearFlags {
 		CLEAR_COLOR = 1 << 0,
 		CLEAR_DEPTH = 1 << 1,
@@ -33,6 +25,14 @@ namespace nextar {
 	};
 
 	NEX_ENUM_FLAGS(ClearFlags, uint16);
+
+	struct RenderInfo {
+		RenderTarget* rt;
+		ClearFlags clearFlags;
+		Color clearColor;
+		float clearDepth;
+		uint16 clearStencil;
+	};
 
 	typedef list<RenderTargetPtr>::type RenderTargetList;
 
@@ -53,8 +53,6 @@ namespace nextar {
 
 		/* Called by the window to indicate it was destroyed */
 		virtual void DestroyedRenderWindow(RenderWindow*) = 0;
-		/* Get the i'th window created. */
-		virtual RenderTargetPtr GetRenderTarget(uint32 i) = 0;
 		virtual RenderTargetList& GetRenderTargetList() = 0;
 		virtual void SetVideoMode(uint32 videoModeIndex) = 0;
 		virtual void BeginFrame(uint32 frame) = 0;

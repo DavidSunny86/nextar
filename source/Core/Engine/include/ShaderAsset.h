@@ -29,6 +29,7 @@ namespace nextar {
 	public ContextObject {
 		NEX_LOG_HELPER(ShaderAsset);
 	public:
+
 		typedef Pass::ConstantBufferList ConstantBufferList;
 		enum {
 			CLASS_ID = Asset::CLASS_ASSET_SHADER,
@@ -39,33 +40,11 @@ namespace nextar {
 		};
 
 		class StreamRequest;
-		class Loader;
-		struct LoaderImpl;
-
-		struct LoaderImpl {
-			virtual void Load(InputStreamPtr& input, ShaderAsset::Loader& shader) = 0;
-		};
-
-		class Loader {
-			NEX_LOG_HELPER(ShaderAsset::Loader);
-			NEX_DECLARE_FACTORY(LoaderImpl);
-
-		public:
-			Loader(nextar::StreamRequest* shader);
-			~Loader();
-
-			inline nextar::StreamRequest* GetRequestPtr() {
-				return shaderRequest;
-			}
-
-			void Serialize();
-
-		protected:
-			nextar::StreamRequest* shaderRequest;
-		};
+		typedef AssetTraits<ShaderAsset> Traits;
+		typedef FactoryTraits<ShaderAsset> FactoryTraits;
 
 		struct StreamPass {
-			String name;
+			StringID name;
 			String programSources[Pass::NUM_STAGES];
 			RasterState rasterState;
 			BlendState blendState;
@@ -94,12 +73,12 @@ namespace nextar {
 			virtual void AddMacro(const String& name,
 					const String& param, const String& description, bool defualtState);
 			/* Add Pass */
-			virtual void AddPass(const String& name);
+			virtual void AddPass(StringID name);
 			/* Set pass paramter buffer data */
 			virtual void SetParamterBuffer(ParameterBuffer&& data);
 			/* Pass related */
 			void SetOptions(const String& options);
-			void SetProgramSource(GpuProgram::Type, const String& src);
+			void SetProgramSource(GpuProgram::Type, String&& src);
 			void SetRasterState(RasterState& state);
 			void SetBlendState(BlendState& state);
 			void SetDepthStencilState(DepthStencilState& state);
@@ -118,9 +97,6 @@ namespace nextar {
 
 		ShaderAsset(const StringID);
 		virtual ~ShaderAsset();
-
-		static ShaderAssetPtr Instance(Component::Factory* factory, const StringID name, const URL& location,
-				SharedComponent::Group* group = nullptr);
 
 		inline uint16 GetShaderMask() const {
 			return ((std::ptrdiff_t)(this)) & (uint32)SortKeyHelper::SHADER_KEY_MASK;
@@ -167,13 +143,8 @@ namespace nextar {
 		virtual void NotifyAssetUnloaded();
 		virtual void NotifyAssetUpdated();
 		
-		virtual Pass* CreatePass(StreamPass&, const String& compilationOpt);
-		virtual Pass* CreatePassImpl(const String& name) = 0;
-		virtual bool Compile(nextar::RenderContext*) = 0;
-		virtual void Decompile(nextar::RenderContext*) = 0;
-
-		virtual void LoadImpl(StreamRequest* req, bool async = true);
-		virtual void UnloadImpl(StreamRequest* req, bool async);
+		virtual void LoadImpl(nextar::StreamRequest* req, bool async = true);
+		virtual void UnloadImpl(nextar::StreamRequest* req, bool async);
 				
 		virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);
 		virtual void DestroyStreamRequestImpl(nextar::StreamRequest*&, bool load=true);
@@ -192,6 +163,8 @@ namespace nextar {
 			ParamEntryTable passTable;
 		};
 
+
+		Pass* _CreatePass(StreamPass&, const String& compilationOpt);
 		void _DestroyPasses();
 		void _Process(ShaderParamIterator& it, ParamTableBuilder& ptb);
 		void _BeginPass(PassPtr p, ParamTableBuilder& ptb);

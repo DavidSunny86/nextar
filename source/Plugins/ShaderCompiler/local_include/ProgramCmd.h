@@ -12,40 +12,51 @@
 
 namespace ShaderCompiler {
 
-	struct ProgramCmd :
+	class ProgramCmd :
 		public CommandDelegate {
+	public:
 		static ProgramCmd command;
 		virtual void Execute(int parentType,
 				void* parentParam,
 				ScriptParser::StatementContext& statement);
-
+	protected:
+		~ProgramCmd() {}
 	};
 
-	struct ProgramListener :
+	class ProgramListener :
 			public ScriptParser::BlockListener,
 			public ScriptParser::StatementListener {
+	public:
 		static CommandNamePair commands[];
 		static const size_t commandCount;
-		ShaderAsset::StreamRequest* shader;
-		inline ProgramListener(ShaderAsset::StreamRequest* s) : shader(s) {}
+		ShaderScript* shaderScript;
+		inline ProgramListener(ShaderScript* s) : shaderScript(s) {}
 		virtual void EnterBlock(ScriptParser::BlockContext& block);
 		virtual void EnterStatement(ScriptParser::StatementContext& statement);
+	protected:
+		~ProgramListener() {}
 	};
 
-	struct ParamCmd :
+	class ParamCmd :
 			public CommandDelegate {
+	public:
 		static ParamCmd command;
 		virtual void Execute(int parentType,
 				void* parentParam,
 				ScriptParser::StatementContext& statement);
+	protected:
+		~ParamCmd() {}
 	};
 
-	struct ShaderCmd :
+	class ShaderCmd :
 			public CommandDelegate {
+	public:
 		static ShaderCmd command;
 		virtual void Execute(int parentType,
 				void* parentParam,
 				ScriptParser::StatementContext& statement);
+	protected:
+		~ShaderCmd() {}
 	};
 
 } /* namespace ShaderCompiler */

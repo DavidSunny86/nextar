@@ -4,10 +4,11 @@
  *  Created on: 03-Nov-2013
  *      Author: obhi
  */
-#include <BaseHeaders.h>
+#include <EngineHeaders.h>
 #include <DDSImageCodec.h>
 #include <DXGIFormat.h>
 #include <Serializer.h>
+#include <RenderManager.h>
 
 namespace ImageLoader {
 
@@ -177,14 +178,14 @@ namespace ImageLoader {
 		}
 
 		// Bound sizes (for security purposes we don't trust DDS file metadata larger than the D3D 11.x hardware requirements)
-		if (image.totalMipMapCount > RenderManager::MAX_MIP_LEVELS) {
+		if (image.totalMipMapCount > RenderConstants::MAX_MIP_LEVELS) {
 			NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 		}
 
 		switch (resDim) {
 		case DDS_DIMENSION_TEXTURE1D:
-			if ((arraySize > RenderManager::MAX_TEXTURE_LAYER)
-					|| (image.width > RenderManager::MAX_TEXTURE_DIM)) {
+			if ((arraySize > RenderConstants::MAX_TEXTURE_LAYER)
+					|| (image.width > RenderConstants::MAX_TEXTURE_DIM)) {
 				NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 			}
 			break;
@@ -192,23 +193,23 @@ namespace ImageLoader {
 		case DDS_DIMENSION_TEXTURE2D:
 			if (isCubeMap) {
 				// This is the right bound because we set arraySize to (NumCubes*6) above
-				if ((arraySize > RenderManager::MAX_TEXTURE_LAYER)
-						|| (image.width > RenderManager::MAX_TEXTURE_DIM)
-						|| (image.height > RenderManager::MAX_TEXTURE_DIM)) {
+				if ((arraySize > RenderConstants::MAX_TEXTURE_LAYER)
+						|| (image.width > RenderConstants::MAX_TEXTURE_DIM)
+						|| (image.height > RenderConstants::MAX_TEXTURE_DIM)) {
 					NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 				}
-			} else if ((arraySize > RenderManager::MAX_TEXTURE_LAYER)
-					|| (image.width > RenderManager::MAX_TEXTURE_DIM)
-					|| (image.height > RenderManager::MAX_TEXTURE_DIM)) {
+			} else if ((arraySize > RenderConstants::MAX_TEXTURE_LAYER)
+					|| (image.width > RenderConstants::MAX_TEXTURE_DIM)
+					|| (image.height > RenderConstants::MAX_TEXTURE_DIM)) {
 				NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 			}
 			break;
 
 		case DDS_DIMENSION_TEXTURE3D:
 			if ((arraySize > 1)
-					|| (image.width > RenderManager::MAX_TEXTURE_DIM)
-					|| (image.height > RenderManager::MAX_TEXTURE_DIM)
-					|| (image.depth > RenderManager::MAX_TEXTURE_DIM)) {
+					|| (image.width > RenderConstants::MAX_TEXTURE_DIM)
+					|| (image.height > RenderConstants::MAX_TEXTURE_DIM)
+					|| (image.depth > RenderConstants::MAX_TEXTURE_DIM)) {
 				NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 			}
 			break;
@@ -444,5 +445,7 @@ namespace ImageLoader {
 		return ret;
 	}
 
-
+	void DDSImageCodec::Save(OutputStreamPtr& file, const ImageParams& params, const ImageData& data) {
+		NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
+	}
 } /* namespace nextar */

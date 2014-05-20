@@ -14,10 +14,14 @@
 
 namespace nextar {
 
-	enum class RenderQueueFlags {
+	enum class RenderQueueFlags : uint16 {
 		TRANSLUCENCY = 1 << 0,
 		DEFERRED = 1 << 1,
+		SORT_ENABLED = 1 << 2,
+		DEFAULT_FLAGS = SORT_ENABLED|DEFERRED,
 	};
+
+	NEX_ENUM_FLAGS(RenderQueueFlags, uint16);
 	/**
 	 * @remarks Sort key can be defined as or something similar:
 	 *
@@ -46,7 +50,7 @@ namespace nextar {
 	};
 
 	struct RenderQueueDesc {
-		uint16 flags;
+		RenderQueueFlags flags;
 		uint16 priority;
 		String name;
 
@@ -62,14 +66,10 @@ namespace nextar {
 	typedef vector<RenderQueueDesc>::type RenderQueueDescList;
 	class RenderQueue : public AllocScene {
 	public:
-		enum {
-			SORT_ENABLED = 1 << 0,
-			DEFAULT_FLAGS = SORT_ENABLED
-		};
 
-		uint16 flags;
-		const RenderQueueDesc* descriptor;
+		RenderQueueFlags flags;
 		VisibilityList visibles;
+		const RenderQueueDesc* descriptor;
 
 		RenderQueue();
 
@@ -87,7 +87,7 @@ namespace nextar {
 		}
 
 		inline bool IsSorted() const {
-			return (flags & SORT_ENABLED) != 0;
+			return Test(flags & RenderQueueFlags::SORT_ENABLED);
 		}
 
 		inline void AddPrimitive(VisiblePrimitive* primitive, uint32 sortKey) {

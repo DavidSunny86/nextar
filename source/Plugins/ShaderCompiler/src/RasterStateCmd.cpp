@@ -8,16 +8,18 @@
 #include <NexEngine.h>
 #include <RasterState.h>
 #include <RasterStateCmd.h>
-#include <Shader.h>
+#include <ShaderAsset.h>
+#include <ScriptStrings.h>
+#include <ShaderScript.h>
 
 namespace ShaderCompiler {
 
 	CommandNamePair RasterStateListener::commands[] = {
-		{ "AntiAliasing", &AntiAliasingCmd::command },
-		{ "DepthBias", &DepthBiasCmd::command },
-		{ "DepthClip", &DepthClipCmd::command },
-		{ "Raster", &RasterCmd::command },
-		{ "Scissor", &ScissorCmd::command },
+		{ _SS(CMD_ANTI_ALIASING), &AntiAliasingCmd::command },
+		{ _SS(CMD_DEPTH_BIAS), &DepthBiasCmd::command },
+		{ _SS(CMD_DEPTH_CLIP), &DepthClipCmd::command },
+		{ _SS(CMD_RASTER), &RasterCmd::command },
+		{ _SS(CMD_SCISSOR), &ScissorCmd::command },
 	};
 
 	const size_t RasterStateListener::commandCount =
@@ -29,7 +31,7 @@ namespace ShaderCompiler {
 			ScriptParser::StatementContext& ctx) {
 		if (parentType == CommandDelegate::SHADER_BLOCK) {
 			RasterStateListener raster;
-			ShaderAsset::StreamRequest* shader = static_cast<ShaderAsset::StreamRequest*>(parentParam);
+			ShaderAsset::StreamRequest* shader = static_cast<ShaderScript*>(parentParam)->GetRequest();
 			ctx.ParseBlock(&raster);
 			if (!ctx.IsErrorBitSet()) {
 				shader->SetRasterState(raster.state);

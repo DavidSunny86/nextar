@@ -22,7 +22,7 @@ namespace nextar {
 		sceneLights.clear();
 	}
 
-	void DefaultLightSystem::PushLight(uint32 sortKey, VisibleLight* vl) {
+	void DefaultLightSystem::PushLight(uint32 sortKey, Light* vl) {
 		sceneLights.emplace_back(sortKey, vl);
 	}
 

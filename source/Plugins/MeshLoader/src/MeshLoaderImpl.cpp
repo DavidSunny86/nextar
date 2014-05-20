@@ -16,6 +16,7 @@ namespace MeshLoader {
 		FILE_MAGIC_MESH = 0xff811901
 	};
 
+	MeshLoaderImpl MeshLoaderImpl::impl;
 	/*****************************************************/
 	/* MeshLoaderImpl      								 */
 	/*****************************************************/
@@ -25,11 +26,11 @@ namespace MeshLoader {
 	MeshLoaderImpl::~MeshLoaderImpl() {
 	}
 
-	void MeshLoaderImpl::Load(InputStreamPtr& input, MeshAsset::Loader& loader) {
+	void MeshLoaderImpl::Load(InputStreamPtr& input, AssetLoader& loader) {
 
 		static MeshLoaderImplv1_0 loaderImplv1_0;
 		StreamRequest* request = loader.GetRequestPtr();
-		MeshAsset* mesh = static_cast<StreamRequest*>(request->GetStreamedObject());
+		MeshAsset* mesh = static_cast<MeshAsset*>(request->GetStreamedObject());
 
 		if (input) {
 

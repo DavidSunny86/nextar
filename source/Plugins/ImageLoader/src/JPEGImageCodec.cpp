@@ -4,7 +4,8 @@
  * 
  * Created on May 8, 2011, 2:29 AM
  */
-#include <BaseHeaders.h>
+
+#include <EngineHeaders.h>
 #include <JPEGImageCodec.h>
 
 extern "C" {
@@ -203,5 +204,10 @@ namespace ImageLoader {
 	    (void) jpeg_finish_decompress(&cinfo);
 	    jpeg_destroy_decompress(&cinfo);
 	    return img;
+	}
+
+	void JPEGImageCodec::Save(OutputStreamPtr& file,
+			const ImageParams& params, const ImageData& data) {
+		NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
 	}
 }

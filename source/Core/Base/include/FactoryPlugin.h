@@ -54,6 +54,31 @@ namespace nextar {
     NEX_EXTERNC_SYM _NexExportSym nextar::FactoryPlugin*      \
     NEX_TOKEN_PASTE(pluginName,CreateFactory)()
 
+#define NEX_DECLARE_COMPONENT_FACTORY(Impl)					\
+	typedef map<String, Impl*>::type FactoryMap;	\
+	private:										\
+		static FactoryMap sImplMap;					\
+	public:	\
+	inline static void RegisterFactory(const String& name, uint32 classId, Impl* impl)	{\
+		String modifiedName = name + Convert::ToString(classId, ' ', std::ios::hex);	\
+		sImplMap[modifiedName] = impl;	\
+	}	\
+	inline static void UnregisterFactory(const String& name, uint32 classId) {\
+		String modifiedName = name + Convert::ToString(classId, ' ', std::ios::hex);	\
+		sImplMap.erase(modifiedName);	\
+	}	\
+	inline static Impl* GetImpl(const String& name, uint32 classId) {\
+		String modifiedName = name + Convert::ToString(classId, ' ', std::ios::hex);	\
+		FactoryMap::iterator it = sImplMap.find(modifiedName); \
+		if (it != sImplMap.end()) \
+			return (*it).second; \
+		return 0;	\
+	}
+
+#define NEX_IMPLEMENT_COMPONENT_FACTORY(Class)	\
+		Class::FactoryMap Class::sImplMap;
+
+
 #define NEX_DECLARE_FACTORY(Impl)					\
 	typedef map<String, Impl*>::type FactoryMap;	\
 	private:										\

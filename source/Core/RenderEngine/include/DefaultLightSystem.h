@@ -18,7 +18,7 @@ namespace nextar {
 		virtual ~DefaultLightSystem();
 
 		virtual void Prepare();
-		virtual void PushLight(uint32 sortKey, VisibleLight*);
+		virtual void PushLight(uint32 sortKey, Light*);
 		virtual void Sort();
 		virtual void NearbyLights(LightSet& ls, BoundingVolume*);
 		virtual LightList& GetLights();

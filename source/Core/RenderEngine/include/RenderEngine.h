@@ -5,10 +5,11 @@
  *      Author: obhi
  */
 
-#ifndef RENDERSYSTEM_H_
-#define RENDERSYSTEM_H_
+#ifndef RENDERENGINE_H_
+#define RENDERENGINE_H_
 
-#include <NexEngine.h>
+#include <EngineHeaders.h>
+#include <RenderEngineConfig.h>
 
 namespace nextar {
 
@@ -20,4 +21,4 @@ namespace nextar {
 }
 
 
-#endif /* RENDERSYSTEM_H_ */
+#endif /* RENDERENGINE_H_ */

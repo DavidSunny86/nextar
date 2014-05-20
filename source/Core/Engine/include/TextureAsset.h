@@ -34,9 +34,15 @@ namespace nextar {
 		class TextureStreamRequest;
 		struct LodStrategy;
 
-		struct LodStrategy {
+		typedef AssetTraits<TextureAsset> Traits;
+
+		class LodStrategy {
+		public:
 			virtual uint32 GetNumLevelsToLoad(TextureAsset*) = 0;
 			virtual uint32 GetNumLevelsToUnload(TextureAsset*) = 0;
+
+		protected:
+			~LodStrategy() {}
 		};
 
 		class TextureStreamRequest : public AllocGeneral,
@@ -60,9 +66,6 @@ namespace nextar {
 
 		TextureAsset(const StringID);
 		virtual ~TextureAsset();
-
-		static TextureAsset* Instance(TextureAsset::Factory* factory, const StringID);
-		static TextureAsset* Instance(TextureAsset::Factory* factory, const StringID, const URL& locator);
 
 		inline bool IsTextureInited() const {
 			return (flags & TEXTURE_INITED) != 0;

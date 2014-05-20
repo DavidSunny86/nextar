@@ -7,6 +7,7 @@
 
 #include <BaseHeaders.h>
 #include <CommonTypes.h>
+#include <ScriptStrings.h>
 
 namespace ShaderCompiler {
 
@@ -24,14 +25,14 @@ namespace ShaderCompiler {
 
 	ComparisonFunc Helper::GetComparisonFunc(const String& val) {
 	    static EnumNamePair names[] = {
-	        { NFX_COMP_ALWAYS, "always"},
-	        { NFX_COMP_EQUAL, "equal"},
-	        { NFX_COMP_GREATER, "greater"},
-	        { NFX_COMP_GREATER_EQUAL, "greaterEq"},
-	        { NFX_COMP_LESS, "less"},
-	        { NFX_COMP_LESS_EQUAL, "lessEq"},
-	        { NFX_COMP_NEVER, "never"},
-	        { NFX_COMP_NOT_EQUAL, "notEq"},
+	        { NFX_COMP_ALWAYS, _SS(ARG_ALWAYS)},
+	        { NFX_COMP_EQUAL, _SS(ARG_EQUAL)},
+	        { NFX_COMP_GREATER, _SS(ARG_GREATER)},
+	        { NFX_COMP_GREATER_EQUAL, _SS(ARG_GREATER_EQUAL)},
+	        { NFX_COMP_LESS, _SS(ARG_LESS)},
+	        { NFX_COMP_LESS_EQUAL, _SS(ARG_LESS_EQUAL)},
+	        { NFX_COMP_NEVER, _SS(ARG_NEVER)},
+	        { NFX_COMP_NOT_EQUAL, _SS(ARG_NOT_EQUAL)},
 	    };
 
 	    const size_t arraySize = sizeof (names) / sizeof (names[0]);
@@ -47,14 +48,14 @@ namespace ShaderCompiler {
 
 	StencilOpType Helper::GetStencilOp(const String& val) {
 	    static EnumNamePair names[] = {
-	        { STENCILOP_DECR, "dec"},
-	        { STENCILOP_DECR_SAT, "decSat"},
-	        { STENCILOP_INCR, "inc"},
-	        { STENCILOP_INCR_SAT, "incSat"},
-	        { STENCILOP_INVERT, "invert"},
-	        { STENCILOP_KEEP, "keep"},
-	        { STENCILOP_REPLACE, "replace"},
-	        { STENCILOP_ZERO, "zero"},
+	        { STENCILOP_DECR, _SS(ARG_DECREMENT)},
+	        { STENCILOP_DECR_SAT, _SS(ARG_DECREMENT_SATURATE)},
+	        { STENCILOP_INCR, _SS(ARG_INCREMENT)},
+	        { STENCILOP_INCR_SAT, _SS(ARG_INCREMENT_SATURATE)},
+	        { STENCILOP_INVERT, _SS(ARG_INVERT)},
+	        { STENCILOP_KEEP, _SS(ARG_KEEP)},
+	        { STENCILOP_REPLACE, _SS(ARG_REPLACE)},
+	        { STENCILOP_ZERO, _SS(ARG_ZERO)},
 	    };
 
 	    const size_t array_size = sizeof (names) / sizeof (names[0]);
@@ -82,15 +83,15 @@ namespace ShaderCompiler {
 	    return DSCOMP_DEFAULT;
 	}
 
-	ColorMaskType Helper::GetColorMask(const String& val) {
-	    uint8 mask = 0;
+	ColorMask Helper::GetColorMask(const String& val) {
+	    ColorMask mask = (ColorMask)0;
 	    uint32 trv = std::min((uint32)4, (uint32)val.length());
 	    for(size_t i = 0; i < trv; ++i) {
 	    	switch(val[i]) {
-	    	case 'r': mask |= COLOR_MASK_RED; break;
-	    	case 'g': mask |= COLOR_MASK_GREEN; break;
-	    	case 'b': mask |= COLOR_MASK_BLUE; break;
-	    	case 'a': mask |= COLOR_MASK_ALPHA; break;
+	    	case 'r': mask |= ColorMask::MASK_RED; break;
+	    	case 'g': mask |= ColorMask::MASK_GREEN; break;
+	    	case 'b': mask |= ColorMask::MASK_BLUE; break;
+	    	case 'a': mask |= ColorMask::MASK_ALPHA; break;
 	    	}
 	    }
 	    return mask;
@@ -98,16 +99,16 @@ namespace ShaderCompiler {
 
 	BlendDataSourceType Helper::GetBlendSource(const String& val) {
 	    static EnumNamePair names[] = {
-	        { BDS_DST_ALPHA, "dstAlpha"},
-	        { BDS_DST_COLOR, "dstColor"},
-	        { BDS_INV_DST_ALPHA, "invDstAlpha"},
-	        { BDS_INV_DST_COLOR, "invDstColor"},
-	        { BDS_INV_ALPHA, "invSrcAlpha"},
-	        { BDS_INV_SRC_COLOR, "invSrcColor"},
-	        { BDS_ONE, "one"},
-	        { BDS_ALPHA, "srcAlpha"},
-	        { BDS_SRC_COLOR, "srcColor"},
-	        { BDS_ZERO, "zero"},
+	        { BDS_DST_ALPHA, _SS(ARG_DEST_ALPHA)},
+	        { BDS_DST_COLOR, _SS(ARG_DEST_COLOR)},
+	        { BDS_INV_DST_ALPHA, _SS(ARG_INV_DEST_ALPHA)},
+	        { BDS_INV_DST_COLOR, _SS(ARG_INV_DEST_COLOR)},
+	        { BDS_INV_ALPHA, _SS(ARG_INV_SRC_ALPHA)},
+	        { BDS_INV_SRC_COLOR, _SS(ARG_INV_SRC_COLOR)},
+	        { BDS_ONE, _SS(ARG_ONE)},
+	        { BDS_ALPHA, _SS(ARG_SRC_ALPHA)},
+	        { BDS_SRC_COLOR, _SS(ARG_SRC_COLOR)},
+	        { BDS_ZERO, _SS(ARG_ZERO)},
 	    };
 
 	    const size_t array_size = sizeof (names) / sizeof (names[0]);
@@ -122,11 +123,11 @@ namespace ShaderCompiler {
 
 	BlendOpType Helper::GetColorOperation(const String& val) {
 	    static EnumNamePair names[] = {
-	        { BOP_ADD, "add"},
-	        { BOP_INV_SUB, "invSub"},
-	        { BOP_MAX, "max"},
-	        { BOP_MIN, "min"},
-	        { BOP_SUB, "sub"},
+	        { BOP_ADD, _SS(ARG_ADD)},
+	        { BOP_INV_SUB, _SS(ARG_INV_SUB)},
+	        { BOP_MAX, _SS(ARG_MAX)},
+	        { BOP_MIN, _SS(ARG_MIN)},
+	        { BOP_SUB, _SS(ARG_SUB)},
 	    };
 
 	    const size_t array_size = sizeof (names) / sizeof (names[0]);
@@ -140,23 +141,23 @@ namespace ShaderCompiler {
 	}
 
 	FillModeType Helper::GetFillMode(const String& val) {
-	    if (val == "solid")
+	    if (val == _SS(ARG_SOLID))
 	        return FM_SOLID;
-	    if (val == "wire")
+	    if (val == _SS(ARG_WIRE))
 	        return FM_WIREFRAME;
-	    if (val == "point")
+	    if (val == _SS(ARG_POINT))
 	        return FM_POINT;
 	    return FM_DEFAULT;
 	}
 
 	FillModeType Helper::GetCullMode(const String& val) {
-	    if (val == "front")
+	    if (val == _SS(ARG_FRONT))
 	        return CULL_FRONT;
-	    if (val == "back")
+	    if (val == _SS(ARG_BACK))
 	        return CULL_BACK;
-	    if (val == "none")
+	    if (val == _SS(ARG_NONE))
 	        return CULL_NONE;
-	    if (val == "all")
+	    if (val == _SS(ARG_ALL))
 	        return CULL_ALL;
 	    return CULL_DEFAULT;
 	}
@@ -178,12 +179,12 @@ namespace ShaderCompiler {
 
 	FilterType Helper::GetFilterType(const String& val) {
 	    static EnumNamePair names[] = {
-	        { NFX_LINEAR, "linear"},
-	        { NFX_LINEAR_MIPMAP_LINEAR, "linearMipLinear"},
-	        { NFX_LINEAR_MIPMAP_NEAREST, "linearMipNearest"},
-	        { NFX_NEAREST, "nearest"},
-	        { NFX_NEAREST_MIPMAP_LINEAR, "nearestMipLinear"},
-	        { NFX_NEAREST_MIPMAP_NEAREST, "nearestMipNearest"},
+	        { NFX_LINEAR, _SS(ARG_LINEAR)},
+	        { NFX_LINEAR_MIPMAP_LINEAR, _SS(ARG_LINEAR_MIP_LINEAR)},
+	        { NFX_LINEAR_MIPMAP_NEAREST, _SS(ARG_LINEAR_MIP_NEAREST)},
+	        { NFX_NEAREST, _SS(ARG_NEAREST)},
+	        { NFX_NEAREST_MIPMAP_LINEAR, _SS(ARG_NEAREST_MIP_LINEAR)},
+	        { NFX_NEAREST_MIPMAP_NEAREST, _SS(ARG_NEAREST_MIP_NEAREST)},
 	    };
 
 	    const size_t array_size = sizeof (names) / sizeof (names[0]);
@@ -227,10 +228,10 @@ namespace ShaderCompiler {
 
 	TextureAddressModeType Helper::GetTextureAddressMode(const String& val) {
 	    static EnumNamePair names[] = {
-	        { TAM_BORDER, "border" },
-	        { TAM_CLAMP, "clamp" },
-	        { TAM_MIRROR, "mirror" },
-	        { TAM_WRAP, "warp" },
+	        { TAM_BORDER, _SS(ARG_BORDER) },
+	        { TAM_CLAMP, _SS(ARG_CLAMP) },
+	        { TAM_MIRROR, _SS(ARG_MIRROR) },
+	        { TAM_WRAP, _SS(ARG_WARP) },
 	    };
 
 	    const size_t array_size = sizeof (names) / sizeof (names[0]);

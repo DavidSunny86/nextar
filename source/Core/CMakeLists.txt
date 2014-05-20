@@ -11,5 +11,5 @@
 #============================================================
 add_module(Base)
 add_module(Engine)
-add_module(RenderSystem)
+add_module(RenderEngine)
 

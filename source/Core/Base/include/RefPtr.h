@@ -99,6 +99,26 @@ namespace nextar {
 				object->AddRef();
 		}
 
+		inline RefPtr(RefPtr<T>&& p) :
+				object(p.object) {
+			p.SetPtr(nullptr);
+		}
+
+		//template <typename T2>
+		//RefPtr(T2* obj) : object(static_cast<T*>(obj))
+		//{
+		//}
+
+		template<typename T2>
+		inline RefPtr(RefPtr<T2>&& p) :
+				object(static_cast<T*>(const_cast<T2*>(p.GetPtr()))) {
+			p.SetPtr(nullptr);
+		}
+
+		inline ~RefPtr() {
+			Clear();
+		}
+
 		inline RefPtr & operator =(const RefPtr& p) {
 			if (p.GetPtr() != object) {
 				Clear();
@@ -120,8 +140,23 @@ namespace nextar {
 			return *this;
 		}
 
-		inline ~RefPtr() {
-			Clear();
+		inline RefPtr & operator =(RefPtr&& p) {
+			if (p.GetPtr() != object) {
+				Clear();
+				object = const_cast<T*>(p.GetPtr());
+				p.SetPtr(nullptr);
+			}
+			return *this;
+		}
+
+		template<typename T2>
+		inline RefPtr & operator =(RefPtr<T2>&& p) {
+			if (p.GetPtr() != static_cast<T2*>(object)) {
+				Clear();
+				object = static_cast<T*>(const_cast<T2*>(p.GetPtr()));
+				p.SetPtr(nullptr);
+			}
+			return *this;
 		}
 
 		inline operator T*() {
@@ -150,6 +185,10 @@ namespace nextar {
 			return object;
 		}
 
+		inline void SetPtr(T* ptr) {
+			object = ptr;
+		}
+
 		inline int32 GetRefCount() const {
 			return object ? object->GetRefCount() : -1; // invalid call
 		}
@@ -160,8 +199,7 @@ namespace nextar {
 		 *          that are returned by allocators or Create
 		 *          methods.
 		 **/
-		inline
-		void Assign(T* ptr) {
+		inline void Assign(T* ptr) {
 			Clear();
 			NEX_ASSERT(ptr);
 			object = ptr;
@@ -179,21 +217,18 @@ namespace nextar {
 		 *          that are not returned by allocators or Create
 		 *          methods.
 		 **/
-		inline
-		void Bind(T* ptr) {
+		inline void Bind(T* ptr) {
 			Clear();
 			NEX_ASSERT(ptr);
 			object = ptr;
 			object->AddRef();
 		}
 
-		inline
-		bool IsNotNull() const {
+		inline bool IsNotNull() const {
 			return object != 0;
 		}
 
-		inline
-		bool IsNull() const {
+		inline bool IsNull() const {
 			return object == 0;
 		}
 
@@ -201,13 +236,11 @@ namespace nextar {
 			return object != 0;
 		}
 
-		inline
-		bool operator !() const {
+		inline bool operator !() const {
 			return object == 0;
 		}
 
-		inline
-		void Clear() {
+		inline void Clear() {
 			if (object) {
 				NEX_ASSERT(object->GetRefCount() > 0);
 				object->Release();
@@ -249,6 +282,26 @@ namespace nextar {
 	 */
 	template<typename T>
 	inline RefPtr<T> Assign(T* what) {
+		RefPtr<T> w;
+		w.Assign(what);
+		return w;
+	}
+
+	/** Assign the pointer to smart pointer and add
+	 * an extra reference.
+	 */
+	template<typename T, typename U>
+	inline RefPtr<T> Bind(U* what) {
+		RefPtr<T> w;
+		w.Bind(what);
+		return w;
+	}
+
+	/** Just assign the pointer to smart pointer without adding
+	 * any extra reference.
+	 */
+	template<typename T, typename U>
+	inline RefPtr<T> Assign(U* what) {
 		RefPtr<T> w;
 		w.Assign(what);
 		return w;

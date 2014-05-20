@@ -24,7 +24,7 @@ namespace nextar {
 		VisibilitySet* visibilitySet;
 		BoundingVolume* visibleBoundsInfo;
 		LightSystem* lightSystem;
-		Scene* scene;
+		SceneAsset* scene;
 		/* Layer mask */
 		uint32 visibilityMask;
 		uint32 frameNumber;

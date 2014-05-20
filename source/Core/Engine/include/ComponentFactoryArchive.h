@@ -15,7 +15,7 @@ namespace nextar {
 	/*
 	 *
 	 */
-	class ComponentFactoryArchive: public Singleton<ComponentFactoryArchive>,
+	class _NexEngineAPI ComponentFactoryArchive: public Singleton<ComponentFactoryArchive>,
 		public AllocGeneral {
 	public:
 

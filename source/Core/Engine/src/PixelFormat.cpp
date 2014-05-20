@@ -15,14 +15,14 @@ namespace nextar {
 
 		/* All sizes are in bytes */
 		struct PixelFormatDesc {
-			char* name;
+			const char* name;
 			uint8 pixelSize;
 			uint8 numChannels;
 			uint16 flags;
 		};
 
 // descriptor table
-		static PixelFormatDesc formatDescTable[PixelFormat::COUNT] = { {
+		static PixelFormatDesc formatDescTable[(uint32)PixelFormat::COUNT] = { {
 // name
 				"A8",
 				// pixelSize, numChannels, flags

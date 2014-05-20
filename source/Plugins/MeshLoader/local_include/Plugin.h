@@ -5,18 +5,14 @@
  * Created on May 8, 2011, 2:23 AM
  */
 
-#ifndef GENIMAGELOADER_H
-#define	GENIMAGELOADER_H
+#ifndef MESLOADER_PLUGIN_H_
+#define	MESLOADER_PLUGIN_H_
 
-
-#include <Image.h>
-#include <JPEGImageCodec.h>
-#include <PNGImageCodec.h>
-#include <DDSImageCodec.h>
+#include <EngineHeaders.h>
 
 using namespace nextar;
 
-namespace ImageLoader {
+namespace MeshLoader {
 
 	class Plugin : public FactoryPlugin {
 	public:
@@ -46,5 +42,5 @@ namespace ImageLoader {
 
 }
 
-#endif	/* GENIMAGELOADER_H */
+#endif	/* MESLOADER_PLUGIN_H_ */
 

@@ -32,10 +32,14 @@ namespace nextar {
 		void* data;
 	};
 
-	struct ImageCodec {
+	class ImageCodec {
+	public:
 		virtual bool TryLoad(InputStreamPtr& file, const ImageParams& params) = 0;
 		virtual ImageData Load(InputStreamPtr& file, const ImageParams& params) = 0;
 		virtual void Save(OutputStreamPtr& file, const ImageParams& params, const ImageData& data) = 0;
+
+	protected:
+		~ImageCodec() {}
 	};
 
 	/* One Dimension array of bytes, accessed as per requirements.
@@ -45,9 +49,13 @@ namespace nextar {
 	 * (face1,mip0) imagedata(x,y,z)
 	 * (face1,mip1) imagedata(x,y,z)
 	 */
-	class _NexEngineAPI Image: public AllocGraphics {
+	class _NexEngineAPI Image : public AllocGraphics {
 		NEX_LOG_HELPER(Image);
 	public:
+
+		enum {
+			CLASS_ID = 0xffba, // arbitrary number?
+		};
 
 		class Serializer : public AllocGeneral {
 			NEX_DECLARE_FACTORY(ImageCodec);

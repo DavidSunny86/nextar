@@ -22,6 +22,9 @@ namespace nextar {
 		virtual uint32 GetNumLevelsToUnload(TextureAsset* texture) {
 			return 2;
 		}
+
+	protected:
+		~DefaultTextureLodStrategy() {}
 	};
 
 	DefaultTextureLodStrategy DefaultTextureLodStrategy::strategy;
@@ -39,17 +42,6 @@ namespace nextar {
 
 	uint32 TextureAsset::GetClassID() const {
 		return TextureAsset::CLASS_ID;
-	}
-
-	TextureAsset* TextureAsset::Instance(TextureAsset::Factory* factory, const StringID name) {
-		return static_cast<TextureAsset*>(factory->AsyncCreate(TextureAsset::CLASS_ID, name));
-	}
-
-	TextureAsset* TextureAsset::Instance(TextureAsset::Factory* factory, const StringID name, const URL& locator) {
-		TextureAsset* texture = static_cast<TextureAsset*>(factory->AsyncCreate(TextureAsset::CLASS_ID, name));
-		if (texture)
-			texture->SetAssetLocator(locator);
-		return texture;
 	}
 
 	void TextureAsset::LoadImpl(StreamRequest* request, bool isStreamed) {
@@ -72,7 +64,7 @@ namespace nextar {
 			img.name = GetName();
 		} else
 			img.baseMipLevel = currentMaxMipLevel;
-		InputStreamPtr& is = FileSystem::Instance().OpenRead(GetAssetLocator());
+		InputStreamPtr is = FileSystem::Instance().OpenRead(GetAssetLocator());
 		if (is) {
 			// todo handle error here? try catch {}
 			textureParams->image.Load(is, img);

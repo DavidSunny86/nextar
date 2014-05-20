@@ -49,10 +49,6 @@ namespace nextar {
 		}
 	}
 
-	RenderTargetPtr BaseRenderContext::GetRenderTarget(uint32 i) {
-		return graphicsWindowList[i];
-	}
-
 	RenderTargetList& BaseRenderContext::GetRenderTargetList() {
 		return graphicsWindowList;
 	}
@@ -92,7 +88,7 @@ namespace nextar {
 			SetCurrentTarget(ri->rt);
 			frameStats.renderTargetsUsed++;
 		}
-		if (ri->clearFlags) {
+		if (Test(ri->clearFlags)) {
 			Clear(ri->clearColor, ri->clearDepth, ri->clearStencil, ri->clearFlags);
 		}
 	}

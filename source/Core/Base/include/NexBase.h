@@ -3,6 +3,7 @@
 
 #include <BaseTypes.h>
 #include <RefPtr.h>
+#include <OsDefs.h>
 
 namespace nextar {
 

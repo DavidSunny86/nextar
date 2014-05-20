@@ -15,12 +15,14 @@ namespace nextar {
 		class PixelConverter {
 		public:
 
-			static void Transfer(PixelBox& dest, const PixelBox& src) {
+			typedef typename C::SrcType SrcType;
+			typedef typename C::DestType DestType;
 
-				C::SrcType* srcData = reinterpret_cast<C::SrcType*>(src.Data())
+			static void Transfer(PixelBox& dest, const PixelBox& src) {
+				SrcType* srcData = reinterpret_cast<SrcType*>(src.Data())
 						+ (src.front * src.slicePixelPitch)
 						+ (src.top * src.rowPixelPitch) + src.left;
-				C::DestType* destData = reinterpret_cast<C::DestType*>(dest.Data())
+				DestType* destData = reinterpret_cast<DestType*>(dest.Data())
 						+ (dest.front * dest.slicePixelPitch)
 						+ (dest.top * dest.rowPixelPitch) + dest.left;
 

@@ -21,14 +21,14 @@ namespace MeshLoader {
 		MeshLoaderImplv1_0();
 		virtual ~MeshLoaderImplv1_0();
 
-		virtual void Load(InputSerializer&, MeshAsset::Loader& loader);
+		virtual void Load(InputSerializer&, AssetLoader& loader);
 
 		MeshVertexData* ReadVertexData(MeshAsset::StreamRequest*, InputSerializer& ser,
 						VertexElement* vertexElement, uint16 vertexElementCount);
 		void ReadMeshHeader(MeshAsset::StreamRequest*, InputSerializer& ser);
 		BoundsInfo ReadBoundsInfo(MeshAsset::StreamRequest*, InputSerializer& ser);
 		MeshIndexData* ReadIndexData(MeshAsset::StreamRequest*, InputSerializer& ser);
-		MaterialAsset* ReadMaterialData(MeshAsset::StreamRequest*, InputSerializer& ser);
+		MaterialAssetPtr ReadMaterialData(MeshAsset::StreamRequest*, InputSerializer& ser);
 
 		void ReadSubMesh(MeshAsset::StreamRequest*, InputSerializer& ser);
 

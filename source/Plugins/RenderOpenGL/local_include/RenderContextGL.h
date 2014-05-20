@@ -11,6 +11,7 @@
 #include <IndexBufferGL.h>
 #include <RenderTarget.h>
 #include <PassGL.h>
+#include <BufferManagerGL.h>
 
 namespace RenderOpenGL {
 
@@ -151,10 +152,12 @@ namespace RenderOpenGL {
 	inline void RenderContextGL::EnableVertexAttribute(const GLuint sem, const VertexAttribGL& vegl) {
 		if (vegl.integer)
 			GlVertexAttribIPointer(sem, vegl.elementCount,
-				vegl.dttype, vegl.element.desc.stride, (const GLvoid*) (vegl.element.desc.offset));
+				vegl.dttype, vegl.element.desc.stride,
+				(const GLvoid*) (std::size_t) (vegl.element.desc.offset));
 		else
 			GlVertexAttribPointer(sem, vegl.elementCount,
-				vegl.dttype, vegl.normalize, vegl.element.desc.stride, (const GLvoid*) (vegl.element.desc.offset));
+				vegl.dttype, vegl.normalize, vegl.element.desc.stride,
+				(const GLvoid*) (std::size_t) (vegl.element.desc.offset));
 		GL_CHECK();
 		GlEnableVertexAttribArray(sem);
 		GL_CHECK();

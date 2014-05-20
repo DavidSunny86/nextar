@@ -8,7 +8,7 @@
 #ifdef NEX_EXTENSIVE_MEM_TRACKER
 
 #if defined( NEX_USE_PTMALLOC ) || !defined(NEX_MSVC)
-#include <ned/nedmalloc.h>
+#include <nedmalloc.h>
 #define _nalloc       nedalloc::nedmalloc
 #define _nfree        nedalloc::nedfree
 #else

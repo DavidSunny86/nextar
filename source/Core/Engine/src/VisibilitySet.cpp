@@ -12,7 +12,7 @@ namespace nextar {
 	/******************************
 	 * RenderQueue
 	 */
-	RenderQueue::RenderQueue() : descriptor(0), flags(DEFAULT_FLAGS) {
+	RenderQueue::RenderQueue() : descriptor(0), flags(RenderQueueFlags::DEFAULT_FLAGS) {
 	}
 
 

@@ -33,16 +33,6 @@ namespace nextar {
 		passes.clear();
 	}
 
-	ShaderAssetPtr ShaderAsset::Instance(Component::Factory* factory, const StringID name, const URL& loc,
-			SharedComponent::Group* group) {
-		ShaderAssetPtr shader = Assign(static_cast<ShaderAsset*>(factory->AsyncCreate(ShaderAsset::CLASS_ID, name)));
-		if(shader)
-			shader->SetAssetLocator(loc);
-		if(group)
-			shader->AddToGroup(group);
-		return shader;
-	}
-
 	uint32 ShaderAsset::GetClassID() const {
 		return CLASS_ID;
 	}
@@ -58,11 +48,11 @@ namespace nextar {
 		if (spl.size() > 1) {
 			passes.reserve(spl.size());
 			for(auto i = spl.begin(); i != spl.end(); ++i) {
-				PassPtr p(CreatePass((*i), creationParams->compilationOpt));
+				PassPtr p(_CreatePass((*i), creationParams->compilationOpt));
 				passes.push_back(std::move(p));
 			}
 		} else {
-			singlePassShader = CreatePass(spl[0], creationParams->compilationOpt);
+			singlePassShader = _CreatePass(spl[0], creationParams->compilationOpt);
 		}
 		
 		/* update */
@@ -75,8 +65,9 @@ namespace nextar {
 		SetReady(true);
 	}
 
-	Pass* ShaderAsset::CreatePass(ShaderAsset::StreamPass& p, const String& co) {
-		Pass* r = CreatePassImpl(p.name);
+	Pass* ShaderAsset::_CreatePass(ShaderAsset::StreamPass& p, const String& co) {
+
+		Pass* r = RenderManager::Instance().CreatePass(p.name);
 		r->blendState = p.blendState;
 		r->depthStencilState = p.depthStencilState;
 		r->rasterState = p.rasterState;
@@ -120,12 +111,12 @@ namespace nextar {
 		Asset::NotifyAssetUnloaded();
 	}
 
-	void ShaderAsset::LoadImpl(StreamRequest* request, bool) {
+	void ShaderAsset::LoadImpl(nextar::StreamRequest* request, bool) {
 		Loader loader(request);
 		loader.Serialize();
 	}
 
-	void ShaderAsset::UnloadImpl(StreamRequest*, bool) {
+	void ShaderAsset::UnloadImpl(nextar::StreamRequest*, bool) {
 		_DestroyPasses();
 	}
 
@@ -157,8 +148,6 @@ namespace nextar {
 
 		if (useFallback)
 			Warn("Shader compilation failed.");
-		else
-			Compile(rc);
 	}
 
 	void ShaderAsset::Destroy(nextar::RenderContext* rc) {
@@ -170,7 +159,6 @@ namespace nextar {
 			it = passes.data();
 			en = it + passes.size();
 		}
-		Decompile(rc);
 		for(; it != en; ++it) {
 			(*it)->NotifyDestroyed(rc);
 		}
@@ -292,8 +280,8 @@ namespace nextar {
 		compilationOpt = options;
 	}
 
-	void ShaderAsset::StreamRequest::SetProgramSource(GpuProgram::Type type, const String& src) {
-		passes[currentPass].programSources[type] = src;
+	void ShaderAsset::StreamRequest::SetProgramSource(GpuProgram::Type type, String&& src) {
+		passes[currentPass].programSources[type] = std::move(src);
 	}
 
 	void ShaderAsset::StreamRequest::AddParam(const String& name,
@@ -331,7 +319,7 @@ namespace nextar {
 		passes[currentPass].depthStencilState = state;
 	}
 
-	void ShaderAsset::StreamRequest::AddPass(const String& name) {
+	void ShaderAsset::StreamRequest::AddPass(StringID name) {
 		currentPass = (uint32)passes.size();
 		passes.resize(currentPass+1);
 		passes[currentPass].name = name;
@@ -340,39 +328,5 @@ namespace nextar {
 	void ShaderAsset::StreamRequest::SetParamterBuffer(ParameterBuffer&& data) {
 		ShaderAsset* shader = static_cast<ShaderAsset*>(streamedObject);
 		shader->passParamData = std::move(data);
-	}
-
-	/*****************************************************/
-	/* Shader::Loader       							 */
-	/*****************************************************/
-	NEX_IMPLEMENT_FACTORY(ShaderAsset::Loader);
-	ShaderAsset::Loader::Loader(nextar::StreamRequest* shader) : shaderRequest(shader) {
-	}
-
-	ShaderAsset::Loader::~Loader() {
-	}
-
-	void ShaderAsset::Loader::Serialize() {
-		ShaderAsset* shaderPtr = static_cast<ShaderAsset*>(shaderRequest->GetStreamedObject());
-		const URL& location = shaderPtr->GetAssetLocator();
-		String ext = location.GetExtension();
-		StringUtils::ToUpper(ext);
-		ShaderAsset::LoaderImpl* impl = GetImpl(ext);
-		if (!impl) {
-			Error("No shader compiler registered.");
-			NEX_THROW_GracefulError(EXCEPT_MISSING_PLUGIN);
-		}
-
-		InputStreamPtr input = FileSystem::Instance().OpenRead(location);
-
-		if (input) {
-			impl->Load(input, *this);
-		} else {
-			Error(
-					String("Could not open shader file: ")
-							+ shaderPtr->GetAssetLocator().ToString());
-			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOCATE_ASSET);
-		}
-
 	}
 } /* namespace nextar */

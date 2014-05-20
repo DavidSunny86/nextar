@@ -98,48 +98,9 @@ namespace nextar {
 			CLASS_ID = Component::CLASS_ASSET_MESH,
 			CATAGORY = COMPONENT_CAT(CLASS_ID),
 		};
-		class Loader;
-		class LoaderImpl;
 
-		class LoaderImpl {
-		public:
-			virtual void Load(InputStreamPtr&, MeshAsset::Loader&) = 0;
-		};
-				
-		class Factory: public Asset::Factory {
-		protected:
-
-		public:
-			Factory(const StringID name);
-			
-			virtual MeshAssetPtr AsyncCreateInstance(const StringID name,
-				const URL& location);
-
-			/* Implementation */
-			virtual Component* AsyncCreate(uint32 type, const StringID name);
-		};
-
-
-		class Loader : public AllocGeneral {
-			NEX_LOG_HELPER(MeshLoader);
-			NEX_DECLARE_FACTORY(LoaderImpl);
-
-		public:
-			Loader(nextar::StreamRequest* req);
-			~Loader();
-
-			inline nextar::StreamRequest* GetRequestPtr() {
-				return meshRequest;
-			}
-
-			static void EndianFlip(void* data, const VertexElement* veBegin,
-					const VertexElement* veEnd, size_t count);
-
-			void Serialize();
-
-		protected:
-			nextar::StreamRequest* meshRequest;
-		};
+		typedef AssetTraits<MeshAsset> Traits;
+		typedef FactoryTraits<MeshAsset> FactoryTraits;
 
 		class StreamRequest : public AllocGeneral,
 		public AssetStreamRequest {
@@ -227,9 +188,6 @@ namespace nextar {
 		MeshAsset(const StringID);
 		~MeshAsset();
 
-		static MeshAssetPtr Instance(Component::Factory* factory, const StringID, SharedComponent::Group* group = nullptr);
-		static MeshAssetPtr Instance(Component::Factory* factory, const StringID, const URL& locator, SharedComponent::Group* group = nullptr);
-
 		const BoundsInfo& GetBoundsInfo() const {
 			return boundsInfo;
 		}
@@ -270,13 +228,15 @@ namespace nextar {
 		virtual uint32 GetClassID() const override;
 
 
+		static void EndianFlip(void* data, const VertexElement* veBegin,
+				const VertexElement* veEnd, size_t count);
+
 	protected:
 
 		virtual void NotifyAssetLoaded();
 		virtual void NotifyAssetUnloaded();
 		virtual void NotifyAssetUpdated();
 
-		virtual void LoadImpl(nextar::StreamRequest* req, bool isAsync);
 		virtual void UnloadImpl(nextar::StreamRequest* req, bool isAsync);
 
 		virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);

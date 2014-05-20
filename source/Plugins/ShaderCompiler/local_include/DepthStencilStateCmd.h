@@ -13,48 +13,63 @@
 namespace ShaderCompiler {
 
 	/** DepthStencil {} */
-	struct DepthStencilStateCmd :
+	class DepthStencilStateCmd :
 			public CommandDelegate {
+	public:
 		static DepthStencilStateCmd command;
 		virtual void Execute(int parentType,
 				void* parentParam,
 				ScriptParser::StatementContext& statement);
+	protected:
+		~DepthStencilStateCmd() {}
 
 	};
 
-	struct DepthStencilStateListener :
+	class DepthStencilStateListener :
 			public ScriptParser::BlockListener,
 			public ScriptParser::StatementListener {
+	public:
 		static CommandNamePair commands[];
 		static const size_t commandCount;
 		DepthStencilState state;
 
 		virtual void EnterBlock(ScriptParser::BlockContext& block);
 		virtual void EnterStatement(ScriptParser::StatementContext& statement);
+	protected:
+		~DepthStencilStateListener() {}
 	};
 
-	struct DepthStateCmd :
+	class DepthStateCmd :
 			public CommandDelegate {
+	public:
 		static DepthStateCmd command;
 		virtual void Execute(int parentType,
 				void* parentParam,
 				ScriptParser::StatementContext& statement);
+	protected:
+		~DepthStateCmd() {}
 	};
 
-	struct StencilTestCmd :
+	class StencilTestCmd :
 			public CommandDelegate {
+	public:
 		static StencilTestCmd command;
 		virtual void Execute(int parentType,
 				void* parentParam,
 				ScriptParser::StatementContext& statement);
+	protected:
+		~StencilTestCmd() {}
 	};
 
-	struct StencilOpCmd :
+	class StencilOpCmd :
 			public CommandDelegate {
+	public:
 		static StencilOpCmd command;
 		virtual void Execute(int parentType,
 				void* parentParam,
 				ScriptParser::StatementContext& statement);
+	protected:
+		~StencilOpCmd() {}
 	};
 
 } /* namespace nextar */

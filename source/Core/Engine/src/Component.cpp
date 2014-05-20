@@ -54,6 +54,21 @@ namespace nextar {
 		NEX_ASSERT(group==nullptr);
 	}
 
+	SharedComponentPtr SharedComponent::Instance(uint32 classId,
+			StringID name, Factory* factory, Group* group) {
+		if (!factory)
+			factory = ComponentFactoryArchive::Instance().AsyncFindFactory(classId);
+		if(factory) {
+			SharedComponentPtr comp = Assign<SharedComponent>(
+					factory->AsyncCreate(classId, name));
+			if(group)
+				group->AsyncAdd(comp);
+			return comp;
+		}
+
+		return SharedComponentPtr();
+	}
+
 	void SharedComponent::AddToGroup(Group* g) {
 		if (group) {
 			group->AsyncRemove(GetID());

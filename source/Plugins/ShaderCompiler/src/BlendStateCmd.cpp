@@ -5,10 +5,12 @@
  *      Author: obhi
  */
 
-#include <NexEngine.h>
+#include <EngineHeaders.h>
 #include <CommonTypes.h>
 #include <BlendStateCmd.h>
-#include <Shader.h>
+#include <ShaderAsset.h>
+#include <ScriptStrings.h>
+#include <ShaderScript.h>
 
 namespace ShaderCompiler {
 
@@ -17,8 +19,8 @@ namespace ShaderCompiler {
 	BlendTargetCmd BlendTargetCmd::command;
 
 	CommandNamePair BlendStateListener::commands[] = {
-		{ "Blend", &BlendCmd::command },
-		{ "Target", &BlendTargetCmd::command },
+		{ _SS(CMD_BLEND), &BlendCmd::command },
+		{ _SS(CMD_TARGET), &BlendTargetCmd::command },
 	};
 
 	const size_t BlendStateListener::commandCount =
@@ -31,7 +33,7 @@ namespace ShaderCompiler {
 			ScriptParser::StatementContext& ctx) {
 		if (parentType == CommandDelegate::SHADER_BLOCK) {
 			BlendStateListener blend;
-			ShaderAsset::StreamRequest* shader = static_cast<ShaderAsset::StreamRequest*>(parentParam);
+			ShaderAsset::StreamRequest* shader = static_cast<ShaderScript*>(parentParam)->GetRequest();
 			ctx.ParseBlock(&blend);
 			if (!ctx.IsErrorBitSet()) {
 				shader->SetBlendState(blend.state);

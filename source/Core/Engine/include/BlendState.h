@@ -35,7 +35,7 @@ namespace nextar {
 	struct RenderTargetBlendOp {
 		/* default: false */
 		bool enabled;
-		ColorMaskType mask;
+		ColorMask mask;
 		BlendDataSourceType srcCol;
 		BlendDataSourceType destCol;
 		BlendOpType colOp;
@@ -44,7 +44,7 @@ namespace nextar {
 		BlendOpType alphaOp;
 
 		RenderTargetBlendOp()
-				: enabled(false), mask(0xff), srcCol(BDS_ZERO), destCol(
+				: enabled(false), mask((ColorMask)0xff), srcCol(BDS_ZERO), destCol(
 						BDS_ZERO), colOp(BOP_NONE), srcAlpha(BDS_ZERO), destAlpha(
 						BDS_ZERO), alphaOp(BOP_NONE) {
 		}

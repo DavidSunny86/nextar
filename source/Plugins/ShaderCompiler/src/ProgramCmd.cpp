@@ -7,7 +7,9 @@
 
 #include <BaseHeaders.h>
 #include <ProgramCmd.h>
-#include <Shader.h>
+#include <ShaderAsset.h>
+#include <ScriptStrings.h>
+#include <ShaderScript.h>
 
 namespace ShaderCompiler {
 
@@ -18,11 +20,11 @@ namespace ShaderCompiler {
 
 	CommandNamePair ProgramListener::commands[] = {
 		//{ "AutoParam", &AutoParamCmd::command },
-		{ "FragmentProgram", &ShaderCmd::command },
-		{ "GeometryProgram", &ShaderCmd::command },
-		{ "Option", &ParamCmd::command },
-		{ "Param", &ParamCmd::command },
-		{ "VertexProgram", &ShaderCmd::command },
+		{ _SS(CMD_FRAGMENT_PROG), &ShaderCmd::command },
+		{ _SS(CMD_GEOMETRY_PROG), &ShaderCmd::command },
+		{ _SS(CMD_OPTION), &ParamCmd::command },
+		{ _SS(CMD_PARAM), &ParamCmd::command },
+		{ _SS(CMD_VERTEX_PROG), &ShaderCmd::command },
 	};
 
 	const size_t ProgramListener::commandCount =
@@ -50,14 +52,14 @@ namespace ShaderCompiler {
 		CommandDelegate* cmd = Helper::FindCommand(ProgramListener::commands,
 			ProgramListener::commandCount, ctx.GetCommand());
 		if (cmd)
-			cmd->Execute(CommandDelegate::SHADER_BLOCK, shader, ctx);
+			cmd->Execute(CommandDelegate::SHADER_BLOCK, shaderScript, ctx);
 		// todo else throw error command not supported
 	}
 
 	void ParamCmd::Execute(int parentType, void* state,
 			ScriptParser::StatementContext& ctx) {
 		NEX_ASSERT (parentType == CommandDelegate::SHADER_BLOCK);
-		ShaderAsset::StreamRequest* shader = (static_cast<ShaderAsset::StreamRequest*>(state));
+		ShaderAsset::StreamRequest* shader = (static_cast<ShaderScript*>(state)->GetRequest());
 		StringUtils::TokenIterator it = 0;
 		String value;
 		String name, param, defaultVal, desc;
@@ -101,18 +103,19 @@ namespace ShaderCompiler {
 	void ShaderCmd::Execute(int parentType, void* parentParam,
 			ScriptParser::StatementContext& statement) {
 		NEX_ASSERT (parentType == CommandDelegate::SHADER_BLOCK);
-		ShaderAsset::StreamRequest* shader = (static_cast<ShaderAsset::StreamRequest*>(parentParam));
-		String value;
+		ShaderScript* script = (static_cast<ShaderScript*>(parentParam));
+		String programRegion;
 		StringUtils::TokenIterator it = 0;
-		it = StringUtils::NextWord(statement.paramContext, value, it);
+		it = StringUtils::NextWord(statement.paramContext, programRegion, it);
 		if (it != String::npos) {
 			GpuProgram::Type type = GpuProgram::TYPE_VERTEX;
-			if (statement.command == "FragmentProgram")
+			if (statement.command == _SS(CMD_FRAGMENT_PROG))
 				type = GpuProgram::TYPE_FRAGMENT;
-			else if (statement.command == "GeometryProgram")
+			else if (statement.command == _SS(CMD_GEOMETRY_PROG))
 				type = GpuProgram::TYPE_GEOMETRY;
-			shader->SetProgramSource(type, URL(value));
+			script->SetRegionAsSource(type, programRegion);
 		}
 	}
 
 } /* namespace ShaderCompiler */
+

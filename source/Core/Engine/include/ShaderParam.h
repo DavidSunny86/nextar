@@ -165,8 +165,8 @@ namespace nextar {
 
 	struct AutoParam : public AllocGeneral {
 		uint32 type;
-		uint32 autoName;
-		uint32 frequency;
+		AutoParamName autoName;
+		UpdateFrequency frequency;
 		AutoParamProcessor* processor;
 		// todo May not be useful except in UI
 		String name;

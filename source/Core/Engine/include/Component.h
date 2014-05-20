@@ -81,7 +81,11 @@ namespace nextar {
 
 		Component(const StringID name = StringUtils::NullID, Component* parent = nullptr);
 		virtual ~Component();
-				
+
+		static Component* Instance(uint32 classId,
+			StringID name,
+			Component::Factory* factory = nullptr);
+
 		inline bool IsEnabled() const {
 			return (flags & ENABLED) != 0;
 		}
@@ -158,6 +162,11 @@ namespace nextar {
 		SharedComponent(const StringID name = StringUtils::NullID,
 				Component* parent = nullptr, Group* addToGroup = nullptr);
 		virtual ~SharedComponent();
+
+		static SharedComponentPtr Instance(uint32 classId,
+				StringID name,
+				Component::Factory* factory = nullptr,
+				SharedComponent::Group* group = nullptr);
 
 		inline Group* GetGroup() const {
 			return group;

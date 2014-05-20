@@ -8,7 +8,7 @@
 #ifndef NEXTAR_OSDEFS_H
 #define	NEXTAR_OSDEFS_H
 
-#include <NexBase.h>
+#include <BaseTypes.h>
 
 #define NEX_PLATFORM_APP_BEGIN()	NEXTAR_START_LEAK_TRACKING()
 #define NEX_PLATFORM_APP_END(argC, argV, nexMainRet) \
