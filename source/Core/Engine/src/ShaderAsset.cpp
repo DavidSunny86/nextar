@@ -9,6 +9,7 @@
 #include <ShaderAsset.h>
 #include <ConstantBuffer.h>
 #include <ParameterIterator.h>
+#include <RenderManager.h>
 
 namespace nextar {
 
@@ -109,11 +110,6 @@ namespace nextar {
 		_DestroyPasses();
 		/* notify dependents */
 		Asset::NotifyAssetUnloaded();
-	}
-
-	void ShaderAsset::LoadImpl(nextar::StreamRequest* request, bool) {
-		Loader loader(request);
-		loader.Serialize();
 	}
 
 	void ShaderAsset::UnloadImpl(nextar::StreamRequest*, bool) {

@@ -13,6 +13,22 @@
 
 namespace nextar {
 
+	/************************************************************************/
+	/* GBuffer                                                              */
+	/************************************************************************/
+	GBuffer::~GBuffer() {
+	}
+
+	void GBuffer::Create() {
+		depth = static_cast<RenderTexture*>(
+			RenderManager::Instance().CreateRenderTarget(true));
+		albedoSpecular = static_cast<RenderTexture*>(
+			RenderManager::Instance().CreateRenderTarget(true));
+	}
+
+	/************************************************************************/
+	/* DeferredRenderSystem                                                 */
+	/************************************************************************/
 	DeferredRenderSystem::DeferredRenderSystem() {
 		// TODO Auto-generated constructor stub
 

@@ -9,7 +9,8 @@ namespace nextar {
 	 * @author	Abhishek Dey
 	 * @date	12/24/2010
 	 */
-	struct Color {
+	class _NexBaseAPI Color {
+	public:
 		float red;
 		float green;
 		float blue;
@@ -18,6 +19,8 @@ namespace nextar {
 		static const Color Black;
 		static const Color White;
 		static const Color Red;
+		static const Color Green;
+		static const Color Blue;
 
 		inline Color() : red(0), green(0), blue(0), alpha(1) {
 		}
@@ -32,11 +35,18 @@ namespace nextar {
 	};
 
 // a 32bit color component
-	struct Color32 {
+	class _NexBaseAPI Color32 {
+	public:
 		uint8 red;
 		uint8 green;
 		uint8 blue;
 		uint8 alpha;
+
+		static const Color32 Black;
+		static const Color32 White;
+		static const Color32 Red;
+		static const Color32 Green;
+		static const Color32 Blue;
 
 		inline Color32() : red(0), green(0), blue(0), alpha(0xff) {
 		}

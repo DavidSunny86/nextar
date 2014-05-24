@@ -10,6 +10,7 @@
 #include <RenderContext.h>
 #include <RenderTarget.h>
 #include <Viewport.h>
+#include <VideoMode.h>
 
 namespace nextar {
 
@@ -165,9 +166,5 @@ namespace nextar {
 	RenderSystemList& RenderManager::GetRenderSystems()	{
 		return renderSystems;
 	}
-
-
-
-
-
+	
 } /* namespace nextar */

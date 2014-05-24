@@ -20,7 +20,7 @@
 
 namespace nextar {
 
-	class Pass :
+	class _NexEngineAPI Pass :
 			public NamedObject,
 			public AllocGraphics {
 	public:
@@ -85,13 +85,9 @@ namespace nextar {
 		// created from parsing the shader script
 		const AutoParam* MapParam(const String& name);
 		const SamplerDesc* MapSamplerParams(const String& name);
-
-		// todo
+				
 		virtual void UpdateParams(RenderContext* renderCtx, CommitContext& context, UpdateFrequency flags);
-		// todo
-		static size_t ParamSizeFromType(ParamDataType);
-
-
+		
 		// Set texture states, called during pass creation
 
 		// Bind texture to a shader parameter. The number of units must match the desc->numUnits count.

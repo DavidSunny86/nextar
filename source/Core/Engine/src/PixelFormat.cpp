@@ -7,6 +7,7 @@
 #include <NexEngine.h>
 #include <PixelFormat.h>
 #include <PixelConversion.hpp>
+#include <Color.h>
 
 #define PixelConversionTypeId(from,to) (((uint32)from << 16) | (uint32)to)
 namespace nextar {
@@ -160,8 +161,8 @@ namespace nextar {
 
 		static void _PixelTransferImpl(PixelBox& dest, const PixelBox& src) {
 #define PIXCONV_ROUTINE(from,to)  case PixelConversionTypeId(from,to):  \
-        PixelConverter< PixelMapper< from, to > >::Transfer(dest, src); \
-        return;
+		PixelConverter< PixelMapper< from, to > >::Transfer(dest, src); \
+		return;
 
 			// the dimensions are same
 			NEX_ASSERT(

@@ -8,6 +8,7 @@
 #ifndef RENDERWINDOWIMPL_H_
 #define RENDERWINDOWIMPL_H_
 
+#include <RenderEngine.h>
 #include <RenderWindow.h>
 #include <RenderTarget.h>
 
@@ -16,7 +17,7 @@ namespace nextar {
 	/*
 	 *
 	 */
-	class RenderWindowImpl :
+	class _NexRenderAPI RenderWindowImpl :
 			public RenderTarget,
 			public RenderWindow::Impl {
 	public:

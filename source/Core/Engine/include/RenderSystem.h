@@ -13,7 +13,7 @@
 
 namespace nextar {
 
-	class RenderSystem : public AllocGraphics {
+	class _NexEngineAPI RenderSystem : public AllocGraphics {
 	public:
 
 		RenderSystem();

@@ -18,7 +18,7 @@
 
 namespace nextar {
 
-	class RenderManager : public Singleton<RenderManager>,
+	class _NexEngineAPI RenderManager : public Singleton<RenderManager>,
 		public AllocGraphics {
 		NEX_LOG_HELPER(RenderManager);
 	public:

@@ -120,7 +120,7 @@
 /* In order to support multithreading statically this flag is set. */
 #define NEX_SUPPORT_MULTITHREADING 
 /* Use thread building blocks. */
-/* #undef NEX_USE_TBB */
+#define NEX_USE_TBB
 
 /* Endianness */
 #define NEX_ENDIAN_LITTLE   0

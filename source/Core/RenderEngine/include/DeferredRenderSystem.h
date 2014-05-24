@@ -17,6 +17,8 @@ namespace nextar {
 	class _NexRenderAPI GBuffer : public AllocGeneral {
 	public:
 
+		~GBuffer();
+
 		void Create();
 		void Setup(Size dimensions);
 

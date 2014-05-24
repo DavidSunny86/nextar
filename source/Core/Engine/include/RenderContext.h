@@ -36,7 +36,7 @@ namespace nextar {
 
 	typedef list<RenderTargetPtr>::type RenderTargetList;
 
-	class RenderContext : public Referenced<RenderContext, AllocGraphics> {
+	class _NexEngineAPI RenderContext : public Referenced<RenderContext, AllocGraphics> {
 	public:
 		RenderContext(void);
 		virtual ~RenderContext(void);

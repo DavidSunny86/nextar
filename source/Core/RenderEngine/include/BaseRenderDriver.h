@@ -1,11 +1,12 @@
 #pragma once
 
-#include <NexBase.h>
+
+#include <RenderEngine.h>
 #include <RenderDriver.h>
 
 namespace nextar {
 
-	class _NexEngineAPI BaseRenderDriver: public RenderDriver {
+	class _NexRenderAPI BaseRenderDriver: public RenderDriver {
 
 	public:
 		BaseRenderDriver();

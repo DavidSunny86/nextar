@@ -32,7 +32,7 @@ namespace nextar {
 		};
 
 		class TextureStreamRequest;
-		struct LodStrategy;
+		class LodStrategy;
 
 		typedef AssetTraits<TextureAsset> Traits;
 

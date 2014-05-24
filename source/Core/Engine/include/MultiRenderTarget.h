@@ -13,7 +13,7 @@
 
 namespace nextar {
 
-	class MultiRenderTarget: public nextar::RenderTarget,
+	class _NexEngineAPI MultiRenderTarget: public nextar::RenderTarget,
 		public nextar::ContextObject {
 	public:
 

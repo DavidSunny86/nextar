@@ -1,14 +1,14 @@
 
 #pragma once
 
-#include <NexBase.h>
+#include <RenderEngine.h>
 #include <RenderContext.h>
 #include <VideoMode.h>
 #include <ContextObject.h>
 
 namespace nextar {
 
-	class _NexEngineAPI BaseRenderContext : public RenderContext {
+	class _NexRenderAPI BaseRenderContext : public RenderContext {
 
 		NEX_LOG_HELPER(BaseRenderContext);
 
@@ -63,7 +63,7 @@ namespace nextar {
 		uint32 originalVideoMode;
 		uint32 currentVideoMode;
 		/* thread this context is bound to, 0 if none */
-		mt::ThreadID threadId;
+		std::thread::id threadId;
 
 		Pass* activePass;
 		RenderTarget* currentTarget;

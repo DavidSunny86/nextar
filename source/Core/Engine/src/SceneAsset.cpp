@@ -39,4 +39,9 @@ namespace nextar {
 		sceneEntities.remove(Bind(entity));
 	}
 
+	void SceneAsset::UnloadImpl(StreamRequest* req, bool isAsync) {
+		EntityList emptyList;
+		std::swap(sceneEntities, emptyList);
+	}
+
 } /* namespace nextar */

@@ -30,7 +30,7 @@ namespace nextar {
 		MULTI_RENDER_TARGET,
 	};
 
-	class RenderTarget : public Referenced<RenderTarget, AllocGraphics> {
+	class _NexEngineAPI RenderTarget : public Referenced<RenderTarget, AllocGraphics> {
 	public:
 
 		RenderTarget(RenderTargetType type);

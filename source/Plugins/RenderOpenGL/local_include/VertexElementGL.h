@@ -56,7 +56,7 @@ namespace RenderOpenGL {
 
 		/* Element count */
 		virtual uint32 GetNumElements() const {
-			return attributes.size();
+			return (uint32)attributes.size();
 		}
 
 		static uint16 GetFromGlType(GLenum);

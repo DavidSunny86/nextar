@@ -1,5 +1,5 @@
 
-#include <RenderSystem.h>
+#include <RenderEngine.h>
 #include <VideoMode.h>
 #include <BaseRenderContext.h>
 #include <RenderWindow.h>
@@ -105,6 +105,19 @@ namespace nextar {
 		}
 	}
 
+	void BaseRenderContext::RegisterObject(ContextObject* object) {
+	}
 
+	void BaseRenderContext::UnregisterObject(ContextObject* object) {
+	}
 
+	void BaseRenderContext::UpdateObject(ContextObject* object, 
+		ContextObject::UpdateParamPtr updateParam) {
+		NEX_ASSERT(threadId == std::this_thread::get_id());
+		object->Update(this, updateParam);
+	}
+
+	FrameStats BaseRenderContext::GetFrameStats() {
+		return frameStats;
+	}
 }

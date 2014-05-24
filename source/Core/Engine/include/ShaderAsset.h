@@ -143,7 +143,6 @@ namespace nextar {
 		virtual void NotifyAssetUnloaded();
 		virtual void NotifyAssetUpdated();
 		
-		virtual void LoadImpl(nextar::StreamRequest* req, bool async = true);
 		virtual void UnloadImpl(nextar::StreamRequest* req, bool async);
 				
 		virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);

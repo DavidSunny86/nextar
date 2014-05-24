@@ -58,14 +58,12 @@ namespace nextar {
 						other.refreshRate) {
 		}
 
-		inline
-		bool operator ==(const VideoMode & other) const {
+		inline	bool operator ==(const VideoMode & other) const {
 			return width == other.width && height == other.height
 					&& refreshRate == other.refreshRate;
 		}
 
-		inline
-		bool operator<(const VideoMode & other) const {
+		inline	bool operator<(const VideoMode & other) const {
 			return width < other.width || height < other.height
 					|| refreshRate < other.refreshRate;
 		}

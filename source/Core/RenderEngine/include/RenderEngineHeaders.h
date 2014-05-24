@@ -7,7 +7,6 @@
 #include <BaseRenderContext.h>
 #include <BaseRenderManager.h>
 #include <DefaultLightSystem.h>
-#include <RenderSystemConfig.h>
 #include <DeferredRenderSystem.h>
 #include <RenderWindowImpl.h>
 

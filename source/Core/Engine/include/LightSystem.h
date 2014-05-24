@@ -36,7 +36,7 @@ namespace nextar {
 	 * light system, which will later be used by the render system to
 	 * determine scene lighting for the current frame.
 	 */
-	class LightSystem : public Referenced<LightSystem, AllocScene> {
+	class _NexEngineAPI LightSystem : public Referenced<LightSystem, AllocScene> {
 	public:
 		enum {
 			/* The first 255 sorted lights are taken into account for forward lights */

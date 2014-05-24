@@ -51,8 +51,7 @@ namespace nextar {
 		virtual void _RemoveEntity(Entity* entity);
 
 	protected:
-
-		virtual void LoadImpl(StreamRequest* req, bool isAsync);
+				
 		virtual void UnloadImpl(StreamRequest* req, bool isAsync);
 
 		SceneParameters parameters;

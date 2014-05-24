@@ -83,40 +83,40 @@ namespace RenderOpenGL {
 	}
 
 	GLuint RenderContextGL::CreateProgram(GLuint shaders[]) {
-	    /* create the program object */
-	    GLuint program = GlCreateProgram();
+		/* create the program object */
+		GLuint program = GlCreateProgram();
 		for(nextar::uint32 i = 0; i < Pass::NUM_STAGES; ++i) {
 			if(shaders[i]) {
 				GlAttachShader(program, shaders[i]);
 				GL_CHECK();
 			}
 		}
-	    /* link the program and let it allocate the attribute
-	     * indices. These default allocations will be used to
-	     * create the vertex signature. This will enable the program
-	     * to determine:
-	     * 1. What are the active attributes?
-	     * 2. How they are bound (i.e. index numbers)?
-	     */
-	    GlLinkProgram(program);
-	    GL_CHECK();
-	    GLint linkstatus = 0;
-	    bool relink = false;
-	    bool validation = false;
-	    GlGetProgramiv(program, GL_LINK_STATUS, &linkstatus);
-	    GL_CHECK();
-	    if (linkstatus == GL_TRUE) {
-	        GLint validstatus = 0;
-	        GlValidateProgram(program);
-	        GL_CHECK();
-	        GlGetProgramiv(program, GL_VALIDATE_STATUS, &validstatus);
-	        GL_CHECK();
-	        if (validstatus == GL_TRUE) {
-	            validation = true;
-	        }
-	    }
+		/* link the program and let it allocate the attribute
+		 * indices. These default allocations will be used to
+		 * create the vertex signature. This will enable the program
+		 * to determine:
+		 * 1. What are the active attributes?
+		 * 2. How they are bound (i.e. index numbers)?
+		 */
+		GlLinkProgram(program);
+		GL_CHECK();
+		GLint linkstatus = 0;
+		bool relink = false;
+		bool validation = false;
+		GlGetProgramiv(program, GL_LINK_STATUS, &linkstatus);
+		GL_CHECK();
+		if (linkstatus == GL_TRUE) {
+			GLint validstatus = 0;
+			GlValidateProgram(program);
+			GL_CHECK();
+			GlGetProgramiv(program, GL_VALIDATE_STATUS, &validstatus);
+			GL_CHECK();
+			if (validstatus == GL_TRUE) {
+				validation = true;
+			}
+		}
 
-	    if (!validation) {
+		if (!validation) {
 			GLint infoLogLen = 0;
 			GLchar* infoLog;
 			// debug out the error messages
@@ -131,9 +131,9 @@ namespace RenderOpenGL {
 				GL_CHECK();
 				program = 0;
 			}
-	    }
+		}
 
-	    return program;
+		return program;
 
 	}
 
@@ -146,51 +146,51 @@ namespace RenderOpenGL {
 			VertexSemanticGL* inpComp
 			) {
 
-	    GLint numAttribs = 0;
-	    // outputSignature = 0;
+		GLint numAttribs = 0;
+		// outputSignature = 0;
 		
-	    char attribName[64];
-	    size_t inpCount = 0;
-	    size_t outCount = 0;
+		char attribName[64];
+		size_t inpCount = 0;
+		size_t outCount = 0;
 
-	    GlGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &numAttribs);
-	    String signature;
-	    for (GLint i = 0; i < numAttribs; ++i) {
-	        GLuint attribLoc = 0;
-	        GLint attribSize = 0;
-	        GLenum attribType = 0;
-	        GlGetActiveAttrib(program, i, 128, NULL, &attribSize, &attribType,
-	                attribName);
-	        // map this to a matching semantic
-	        // if no match is found, we have a problem
-	        SemanticDef semantic = VertexSemantic::MapSemantic(attribName);
-	        if (semantic.semantic >= COMP_RESERVED_COUNT) {
-	            Warn("Unmatched input semantic.");
-	            return 0;
-	        }
-	        attribLoc = GlGetAttribLocation(program, attribName);
-	        /* We do not think about output formats now */
-	        if (semantic.inputSemantic) {
-	            NEX_ASSERT(inpCount < VertexElement::MAX_VERTEX_ELEMENT);
+		GlGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &numAttribs);
+		String signature;
+		for (GLint i = 0; i < numAttribs; ++i) {
+			GLuint attribLoc = 0;
+			GLint attribSize = 0;
+			GLenum attribType = 0;
+			GlGetActiveAttrib(program, i, 128, NULL, &attribSize, &attribType,
+					attribName);
+			// map this to a matching semantic
+			// if no match is found, we have a problem
+			SemanticDef semantic = VertexSemantic::MapSemantic(attribName);
+			if (semantic.semantic >= COMP_RESERVED_COUNT) {
+				Warn("Unmatched input semantic.");
+				return 0;
+			}
+			attribLoc = GlGetAttribLocation(program, attribName);
+			/* We do not think about output formats now */
+			if (semantic.inputSemantic) {
+				NEX_ASSERT(inpCount < VertexElement::MAX_VERTEX_ELEMENT);
 				inpComp[inpCount].index = attribLoc;
 				inpComp[inpCount].semantic.type = GetSemanticType(attribType);
-	            inpComp[inpCount].semantic.instanceData = semantic.instanceData;
-	            inpComp[inpCount].semantic.semanticIndex = semantic.semanticIndex;
+				inpComp[inpCount].semantic.instanceData = semantic.instanceData;
+				inpComp[inpCount].semantic.semanticIndex = semantic.semanticIndex;
 				inpComp[inpCount].semantic.semantic = semantic.semantic;
-	            inpCount++;
-	        } else {
-	            /** todo Add support for output semantic */
-	        }
-	    }
+				inpCount++;
+			} else {
+				/** todo Add support for output semantic */
+			}
+		}
 
-	    if (inpCount <= 0) {
-	        Warn("No input semantics found to map into the shader!");
-	        return 0;
-	    }
+		if (inpCount <= 0) {
+			Warn("No input semantics found to map into the shader!");
+			return 0;
+		}
 
-	    /* sort based on semantic + index to keep signature consistents */
-	    //std::sort( inpComp, inpComp + inpCount );
-	    return inpCount;
+		/* sort based on semantic + index to keep signature consistents */
+		//std::sort( inpComp, inpComp + inpCount );
+		return inpCount;
 	}
 
 	void RenderContextGL::ReadUniforms(PassGL* pass, GLuint program) {
@@ -229,7 +229,7 @@ namespace RenderOpenGL {
 				if ( !(ubPtr && ubPtr->GetParamCount() == numParams &&
 						ubPtr->GetSize() == size) ) {
 					Warn(String("Uniform buffer cannot be registered"
-					            " (name already registered with different contents): ") + uniName);
+								" (name already registered with different contents): ") + uniName);
 					ubPtr = 0;
 					// we can surely register it as unshared ub
 					continue;
@@ -265,220 +265,220 @@ namespace RenderOpenGL {
 	UniformBufferGL* RenderContextGL::CreateUniformBuffer(PassGL* pass, GLint blockIndex, GLuint prog,
 			GLuint numParams, size_t size) {
 
-	    NEX_ASSERT(size > 0);
-	    uint16 numUnmappedParams = 0;
+		NEX_ASSERT(size > 0);
+		uint16 numUnmappedParams = 0;
 
-	    UniformBufferGL* pUb = NEX_NEW(UniformBufferGL);
-	    UniformBufferGL& u = *pUb;
-	    u.ubNameGl = GL_INVALID_VALUE;
-	    GlGenBuffers(1, &u.ubNameGl);
-	    GL_CHECK();
-	    if (u.ubNameGl == GL_INVALID_VALUE) {
-	        Error("Failed to generate buffer name");
-	        NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
-	    }
+		UniformBufferGL* pUb = NEX_NEW(UniformBufferGL);
+		UniformBufferGL& u = *pUb;
+		u.ubNameGl = GL_INVALID_VALUE;
+		GlGenBuffers(1, &u.ubNameGl);
+		GL_CHECK();
+		if (u.ubNameGl == GL_INVALID_VALUE) {
+			Error("Failed to generate buffer name");
+			NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
+		}
 
-	    UpdateFrequency mask = (UpdateFrequency)0;
-	    UniformGL* uniforms = NEX_ALLOC_ARRAY_T(UniformGL, MEMCAT_GENERAL, numParams);
-	    void* tempBuffer = NEX_ALLOC(sizeof(GLint)*numParams*7 + 128, MEMCAT_GENERAL);
-	    GLint *indices = static_cast<GLint*>(tempBuffer) + numParams*0;
-	    GLint *type = static_cast<GLint*>(tempBuffer) + numParams*1;
-	    GLint *offset = static_cast<GLint*>(tempBuffer) + numParams*2;
-	    GLint *arraynum = static_cast<GLint*>(tempBuffer) + numParams*3;
-	    GLint *rowMaj = static_cast<GLint*>(tempBuffer) + numParams*4;
-	    GLint *matStride = static_cast<GLint*>(tempBuffer) + numParams*5;
-	    GLint *arrayStride = static_cast<GLint*>(tempBuffer) + numParams*6;
-	    char *uniName = reinterpret_cast<char*>(static_cast<GLint*>(tempBuffer) + numParams*7);
+		UpdateFrequency mask = (UpdateFrequency)0;
+		UniformGL* uniforms = NEX_ALLOC_ARRAY_T(UniformGL, MEMCAT_GENERAL, numParams);
+		void* tempBuffer = NEX_ALLOC(sizeof(GLint)*numParams*7 + 128, MEMCAT_GENERAL);
+		GLint *indices = static_cast<GLint*>(tempBuffer) + numParams*0;
+		GLint *type = static_cast<GLint*>(tempBuffer) + numParams*1;
+		GLint *offset = static_cast<GLint*>(tempBuffer) + numParams*2;
+		GLint *arraynum = static_cast<GLint*>(tempBuffer) + numParams*3;
+		GLint *rowMaj = static_cast<GLint*>(tempBuffer) + numParams*4;
+		GLint *matStride = static_cast<GLint*>(tempBuffer) + numParams*5;
+		GLint *arrayStride = static_cast<GLint*>(tempBuffer) + numParams*6;
+		char *uniName = reinterpret_cast<char*>(static_cast<GLint*>(tempBuffer) + numParams*7);
 
-	    const GLuint* uindices = (GLuint*)indices;
-	    //GLuint blockIndex = GlGetUniformBlockIndex(prog, (const GLchar*)name.c_str());
-	    GlGetActiveUniformBlockiv(prog, blockIndex, GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES, indices);
-	    GL_CHECK();
-	    GlGetActiveUniformsiv(prog, numParams, uindices, GL_UNIFORM_TYPE, type);
-	    GL_CHECK();
-	    GlGetActiveUniformsiv(prog, numParams, uindices, GL_UNIFORM_OFFSET, offset);
-	    GL_CHECK();
-	    GlGetActiveUniformsiv(prog, numParams, uindices, GL_UNIFORM_SIZE, arraynum);
-	    GL_CHECK();
-	    GlGetActiveUniformsiv(prog, numParams, uindices, GL_UNIFORM_IS_ROW_MAJOR, rowMaj);
-	    GL_CHECK();
-	    GlGetActiveUniformsiv(prog, numParams, uindices, GL_UNIFORM_MATRIX_STRIDE, matStride);
-	    GL_CHECK();
-	    GlGetActiveUniformsiv(prog, numParams, uindices, GL_UNIFORM_ARRAY_STRIDE, arrayStride);
-	    GL_CHECK();
+		const GLuint* uindices = (GLuint*)indices;
+		//GLuint blockIndex = GlGetUniformBlockIndex(prog, (const GLchar*)name.c_str());
+		GlGetActiveUniformBlockiv(prog, blockIndex, GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES, indices);
+		GL_CHECK();
+		GlGetActiveUniformsiv(prog, numParams, uindices, GL_UNIFORM_TYPE, type);
+		GL_CHECK();
+		GlGetActiveUniformsiv(prog, numParams, uindices, GL_UNIFORM_OFFSET, offset);
+		GL_CHECK();
+		GlGetActiveUniformsiv(prog, numParams, uindices, GL_UNIFORM_SIZE, arraynum);
+		GL_CHECK();
+		GlGetActiveUniformsiv(prog, numParams, uindices, GL_UNIFORM_IS_ROW_MAJOR, rowMaj);
+		GL_CHECK();
+		GlGetActiveUniformsiv(prog, numParams, uindices, GL_UNIFORM_MATRIX_STRIDE, matStride);
+		GL_CHECK();
+		GlGetActiveUniformsiv(prog, numParams, uindices, GL_UNIFORM_ARRAY_STRIDE, arrayStride);
+		GL_CHECK();
 
 
-	    uint32 numCustomParams = 0;
-	    for (GLint i = 0; i < (GLint)numParams; ++i) {
-	    	UniformGL& uform = uniforms[i];
-	        GlGetActiveUniformName(prog, indices[i], 128, 0, uniName);
-	        String name = uniName;
-	        GL_CHECK();
-	        uform.isRowMajMatrix = rowMaj[i] ? true : false;
-	        uform.typeGl = uint8(type[i]);
-	        uform.matrixStride = matStride[i];
-	        uform.arrayStride = arrayStride[i];
-	        uform.constBufferDesc.cbOffset = offset[i];
-	        uform.constBufferDesc.paramDesc.arrayCount = uint16(arraynum[i]);
-	        uform.constBufferDesc.paramDesc.size =
-	        		GetShaderParamSize(uform.typeGl) * uform.constBufferDesc.paramDesc.arrayCount;
-	        uform.constBufferDesc.paramDesc.type = GetShaderParamType(uform.typeGl);
+		uint32 numCustomParams = 0;
+		for (GLint i = 0; i < (GLint)numParams; ++i) {
+			UniformGL& uform = uniforms[i];
+			GlGetActiveUniformName(prog, indices[i], 128, 0, uniName);
+			String name = uniName;
+			GL_CHECK();
+			uform.isRowMajMatrix = rowMaj[i] ? true : false;
+			uform.typeGl = uint8(type[i]);
+			uform.matrixStride = matStride[i];
+			uform.arrayStride = arrayStride[i];
+			uform.constBufferDesc.cbOffset = offset[i];
+			uform.constBufferDesc.paramDesc.arrayCount = uint16(arraynum[i]);
+			uform.constBufferDesc.paramDesc.size =
+					GetShaderParamSize(uform.typeGl) * uform.constBufferDesc.paramDesc.arrayCount;
+			uform.constBufferDesc.paramDesc.type = GetShaderParamType(uform.typeGl);
 
-	        // todo Make all possible shader paramter auto param/custom param
-	        // and register them to this table, thus a valid pointer is always
-	        // retrieved. For custom param, the processor will be set to custom
-	        // processor which knows how to retrieve from the parameter buffer.
-	        // Later on when the shader script is properly made, the script will
-	        // read the parameters from the script and automatically add them
-	        // to the mapped list for retrieval here.
-	        const AutoParam* paramDef = pass->MapParam(name);
-	        // if this is not an auto param, we
-	        // use a custom processor
-	        if (paramDef == nullptr) {
-	        	numCustomParams++;
-	        	uform.constBufferDesc.paramDesc.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
-	        	uform.constBufferDesc.paramDesc.name = std::move(name);
-	        	uform.constBufferDesc.paramDesc.frequency = UpdateFrequency::PER_MATERIAL;
-	        	uform.constBufferDesc.paramDesc.processor = Pass::customConstantProcessorMaterial;
-	        } else {
-	        	uform.constBufferDesc.paramDesc.autoName = paramDef->autoName;
+			// todo Make all possible shader paramter auto param/custom param
+			// and register them to this table, thus a valid pointer is always
+			// retrieved. For custom param, the processor will be set to custom
+			// processor which knows how to retrieve from the parameter buffer.
+			// Later on when the shader script is properly made, the script will
+			// read the parameters from the script and automatically add them
+			// to the mapped list for retrieval here.
+			const AutoParam* paramDef = pass->MapParam(name);
+			// if this is not an auto param, we
+			// use a custom processor
+			if (paramDef == nullptr) {
+				numCustomParams++;
+				uform.constBufferDesc.paramDesc.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
+				uform.constBufferDesc.paramDesc.name = std::move(name);
+				uform.constBufferDesc.paramDesc.frequency = UpdateFrequency::PER_MATERIAL;
+				uform.constBufferDesc.paramDesc.processor = Pass::customConstantProcessorMaterial;
+			} else {
+				uform.constBufferDesc.paramDesc.autoName = paramDef->autoName;
 				uform.constBufferDesc.paramDesc.frequency = paramDef->frequency;
 				uform.constBufferDesc.paramDesc.processor = paramDef->processor;
 				NEX_ASSERT(uform.constBufferDesc.paramDesc.type == paramDef->type);
-	        }
-
-	        mask |= uform.constBufferDesc.paramDesc.frequency;
-	    }
-
-	    // sort the resulting uniforms such that auto params come first
-	    // followed by unmapped params. Unmapped params are sorted by name.
-	    std::sort(uniforms, uniforms + numParams,
-	    		[] (const UniformGL& first, const UniformGL& second) {
-	    			if (first.constBufferDesc.paramDesc.autoName == second.constBufferDesc.paramDesc.autoName) {
-	    				NEX_ASSERT(first.constBufferDesc.paramDesc.autoName == AutoParamName::AUTO_CUSTOM_CONSTANT);
-	    				return first.constBufferDesc.cbOffset < first.constBufferDesc.cbOffset;
-	    			}
-	    			return (first.constBufferDesc.paramDesc.autoName <
-	    					second.constBufferDesc.paramDesc.autoName) != 0;
 			}
-	    );
-	    if (numCustomParams == numParams) {
-	    	u.SetFlags(ConstantBuffer::CUSTOM_STRUCT);
-	    	u.processor = Pass::customStructProcessorMaterial;
-	    }
-	    u.paramCount = numParams;
-	    u.paramDesc = &uniforms->constBufferDesc;
-	    u.frequency = mask;
-	    u.size = size;
-	    NEX_FREE(tempBuffer, MEMCAT_GENERAL);
-	    GlBindBuffer( GL_UNIFORM_BUFFER, u.ubNameGl );
-	    GL_CHECK();
-	    GlBufferData( GL_UNIFORM_BUFFER, size, NULL, GL_DYNAMIC_DRAW );
-	    GL_CHECK();
-	    GlBindBuffer( GL_UNIFORM_BUFFER, 0 );
-	    GL_CHECK();
 
-	    return pUb;
+			mask |= uform.constBufferDesc.paramDesc.frequency;
+		}
+
+		// sort the resulting uniforms such that auto params come first
+		// followed by unmapped params. Unmapped params are sorted by name.
+		std::sort(uniforms, uniforms + numParams,
+				[] (const UniformGL& first, const UniformGL& second) {
+					if (first.constBufferDesc.paramDesc.autoName == second.constBufferDesc.paramDesc.autoName) {
+						NEX_ASSERT(first.constBufferDesc.paramDesc.autoName == AutoParamName::AUTO_CUSTOM_CONSTANT);
+						return first.constBufferDesc.cbOffset < first.constBufferDesc.cbOffset;
+					}
+					return (first.constBufferDesc.paramDesc.autoName <
+							second.constBufferDesc.paramDesc.autoName) != 0;
+			}
+		);
+		if (numCustomParams == numParams) {
+			u.SetFlags(ConstantBuffer::CUSTOM_STRUCT);
+			u.processor = Pass::customStructProcessorMaterial;
+		}
+		u.paramCount = numParams;
+		u.paramDesc = &uniforms->constBufferDesc;
+		u.frequency = mask;
+		u.size = size;
+		NEX_FREE(tempBuffer, MEMCAT_GENERAL);
+		GlBindBuffer( GL_UNIFORM_BUFFER, u.ubNameGl );
+		GL_CHECK();
+		GlBufferData( GL_UNIFORM_BUFFER, size, NULL, GL_DYNAMIC_DRAW );
+		GL_CHECK();
+		GlBindBuffer( GL_UNIFORM_BUFFER, 0 );
+		GL_CHECK();
+
+		return pUb;
 	}
 
 	void RenderContextGL::ReadSamplers(PassGL* pass, GLuint program) {
 		/** todo Massive work left for sampler arrays */
-	    GLint numUni = 0;
-	    char name[128];
-        size_t extra = 0;
-	    GlGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numUni);
-	    // assume all are samplers, otherwise we got a problem
-	    SamplerState* samplers = NEX_ALLOC_ARRAY_T(SamplerState, MEMCAT_GRAPHICS, numUni);
-	    uint32 mapped = 0;
-        for (GLuint i = 0; i < (GLuint) numUni; ++i) {
+		GLint numUni = 0;
+		char name[128];
+		size_t extra = 0;
+		GlGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numUni);
+		// assume all are samplers, otherwise we got a problem
+		SamplerState* samplers = NEX_ALLOC_ARRAY_T(SamplerState, MEMCAT_GRAPHICS, numUni);
+		uint32 mapped = 0;
+		for (GLuint i = 0; i < (GLuint) numUni; ++i) {
 
-            GlGetActiveUniformName(program, i, 128, 0, name);
-	        GLint loc = GlGetUniformLocation(program, name);
-	        String unitName = name;
-            GLint type;
+			GlGetActiveUniformName(program, i, 128, 0, name);
+			GLint loc = GlGetUniformLocation(program, name);
+			String unitName = name;
+			GLint type;
 
-            GlGetActiveUniformsiv(program, 1, &i, GL_UNIFORM_TYPE, &type);
+			GlGetActiveUniformsiv(program, 1, &i, GL_UNIFORM_TYPE, &type);
 
-            GL_CHECK();
-            if (IsSamplerType(type)) {
+			GL_CHECK();
+			if (IsSamplerType(type)) {
 
-            	SamplerState& ss = samplers[mapped++];
-            	ss.desc.paramDesc.arrayCount = 1;
-            	const Pass::SamplerDesc& tu = *pass->MapSamplerParams(unitName);
-            	if (&tu == nullptr) {
-				    Error(String("Overflowing/Unspecified texture unit index for ") + name);
-				    continue;
+				SamplerState& ss = samplers[mapped++];
+				ss.desc.paramDesc.arrayCount = 1;
+				const Pass::SamplerDesc& tu = *pass->MapSamplerParams(unitName);
+				if (&tu == nullptr) {
+					Error(String("Overflowing/Unspecified texture unit index for ") + name);
+					continue;
 				}
-            	const AutoParam* paramDef = pass->MapParam(unitName);
-                ss.location = loc;
-                /**
-                 * The index of the texture unit within the shader may not be stored
-                 * as we have already created the sampler object from the data provided.
-                 * Update on a state parameter might require that the sampler object
-                 * be recreated. Now, we choose not to store this index on to the shader
-                 * texture table here, as we can search via name to obtain the same. To
-                 * make it more efficient, we may eventually store the texture units as
-                 * in a map (marked as todo) in the shader. This index will not be the
-                 * location the texture will be bound to, or the sampler will be bound to.
-                 * The sampler will be bound to the index in which it gets stored in the
-                 * sampler table. This will be efficient and will result in no gaps in
-                 * between consecutive texture units as all the texture units parsed
-                 * from the shader might not get used eventually.
-                 * */
-                // ss.index = (uint8)index;
-                if (paramDef == nullptr) {
-    	        	ss.desc.paramDesc.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
-    	        	ss.desc.paramDesc.name = std::move(unitName);
-    	        	ss.desc.paramDesc.frequency = UpdateFrequency::PER_MATERIAL;
-    	        	ss.desc.paramDesc.processor = Pass::customTextureProcessorMaterial;
-                } else {
-                	ss.desc.paramDesc.autoName = paramDef->autoName;
-                	ss.desc.paramDesc.frequency = paramDef->frequency;
-                	ss.desc.paramDesc.processor = paramDef->processor;
-                }
-                ss.desc.paramDesc.size = sizeof(SamplerState);
-                ss.desc.defaultTexture.texture = tu.defaultTexture;
-                const TextureUnitParams& params = tu.texUnitParams;
+				const AutoParam* paramDef = pass->MapParam(unitName);
+				ss.location = loc;
+				/**
+				 * The index of the texture unit within the shader may not be stored
+				 * as we have already created the sampler object from the data provided.
+				 * Update on a state parameter might require that the sampler object
+				 * be recreated. Now, we choose not to store this index on to the shader
+				 * texture table here, as we can search via name to obtain the same. To
+				 * make it more efficient, we may eventually store the texture units as
+				 * in a map (marked as todo) in the shader. This index will not be the
+				 * location the texture will be bound to, or the sampler will be bound to.
+				 * The sampler will be bound to the index in which it gets stored in the
+				 * sampler table. This will be efficient and will result in no gaps in
+				 * between consecutive texture units as all the texture units parsed
+				 * from the shader might not get used eventually.
+				 * */
+				// ss.index = (uint8)index;
+				if (paramDef == nullptr) {
+					ss.desc.paramDesc.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
+					ss.desc.paramDesc.name = std::move(unitName);
+					ss.desc.paramDesc.frequency = UpdateFrequency::PER_MATERIAL;
+					ss.desc.paramDesc.processor = Pass::customTextureProcessorMaterial;
+				} else {
+					ss.desc.paramDesc.autoName = paramDef->autoName;
+					ss.desc.paramDesc.frequency = paramDef->frequency;
+					ss.desc.paramDesc.processor = paramDef->processor;
+				}
+				ss.desc.paramDesc.size = sizeof(SamplerState);
+				ss.desc.defaultTexture.texture = tu.defaultTexture;
+				const TextureUnitParams& params = tu.texUnitParams;
 
-                GlGenSamplers(1, &ss.sampler);
-                GL_CHECK();
-                if (ss.sampler) {
-                	GlSamplerParameteri(ss.sampler, GL_TEXTURE_MIN_FILTER, GetGlMinFilter(params.minFilter));
-                	GL_CHECK();
-                	GlSamplerParameteri(ss.sampler, GL_TEXTURE_MAG_FILTER, GetGlMagFilter(params.magFilter));
-                	GL_CHECK();
-                	GlSamplerParameteri(ss.sampler, GL_TEXTURE_WRAP_S, GetGlAddressMode(params.uAddress));
-                	GL_CHECK();
-                	GlSamplerParameteri(ss.sampler, GL_TEXTURE_WRAP_T, GetGlAddressMode(params.vAddress));
-                	GL_CHECK();
-                	GlSamplerParameteri(ss.sampler, GL_TEXTURE_WRAP_R, GetGlAddressMode(params.wAddress));
-                	GL_CHECK();
-                }
-                if (params.comparisonFunc) {
-                	GlSamplerParameteri(ss.sampler, GL_TEXTURE_COMPARE_FUNC, GetGlCompareFunc(params.comparisonFunc));
-                	GL_CHECK();
-                	GlSamplerParameteri(ss.sampler, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-                	GL_CHECK();
-                } else {
-                	GlSamplerParameteri(ss.sampler, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-                	GL_CHECK();
-                }
-                GlSamplerParameterf(ss.sampler, GL_TEXTURE_LOD_BIAS, params.lodBias);
+				GlGenSamplers(1, &ss.sampler);
+				GL_CHECK();
+				if (ss.sampler) {
+					GlSamplerParameteri(ss.sampler, GL_TEXTURE_MIN_FILTER, GetGlMinFilter(params.minFilter));
+					GL_CHECK();
+					GlSamplerParameteri(ss.sampler, GL_TEXTURE_MAG_FILTER, GetGlMagFilter(params.magFilter));
+					GL_CHECK();
+					GlSamplerParameteri(ss.sampler, GL_TEXTURE_WRAP_S, GetGlAddressMode(params.uAddress));
+					GL_CHECK();
+					GlSamplerParameteri(ss.sampler, GL_TEXTURE_WRAP_T, GetGlAddressMode(params.vAddress));
+					GL_CHECK();
+					GlSamplerParameteri(ss.sampler, GL_TEXTURE_WRAP_R, GetGlAddressMode(params.wAddress));
+					GL_CHECK();
+				}
+				if (params.comparisonFunc) {
+					GlSamplerParameteri(ss.sampler, GL_TEXTURE_COMPARE_FUNC, GetGlCompareFunc(params.comparisonFunc));
+					GL_CHECK();
+					GlSamplerParameteri(ss.sampler, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+					GL_CHECK();
+				} else {
+					GlSamplerParameteri(ss.sampler, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+					GL_CHECK();
+				}
+				GlSamplerParameterf(ss.sampler, GL_TEXTURE_LOD_BIAS, params.lodBias);
 				GL_CHECK();
 				GlSamplerParameterf(ss.sampler, GL_TEXTURE_MIN_LOD, params.minLod);
 				GL_CHECK();
 				GlSamplerParameterf(ss.sampler, GL_TEXTURE_MAX_LOD, params.maxLod);
-                GL_CHECK();
-                GlSamplerParameteri(ss.sampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, params.maxAnisotropy);
+				GL_CHECK();
+				GlSamplerParameteri(ss.sampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, params.maxAnisotropy);
 				GL_CHECK();
 				GlSamplerParameterfv(ss.sampler, GL_TEXTURE_BORDER_COLOR, params.borderColor.AsFloatArray());
 				GL_CHECK();
-            }
-            std::sort(samplers, samplers + mapped, [](const SamplerState& s1, const SamplerState& s2) {
-            	return s1.desc.paramDesc.autoName == s2.desc.paramDesc.autoName ? s1.desc.paramDesc.name < s2.desc.paramDesc.name :
-            			((s1.desc.paramDesc.autoName < s2.desc.paramDesc.autoName) != 0);
-            });
-	    }
+			}
+			std::sort(samplers, samplers + mapped, [](const SamplerState& s1, const SamplerState& s2) {
+				return s1.desc.paramDesc.autoName == s2.desc.paramDesc.autoName ? s1.desc.paramDesc.name < s2.desc.paramDesc.name :
+						((s1.desc.paramDesc.autoName < s2.desc.paramDesc.autoName) != 0);
+			});
+		}
 	}
 
 	void RenderContextGL::Capture(PixelBox& image,
@@ -497,8 +497,8 @@ namespace RenderOpenGL {
 		Size size = rt->GetDimensions();
 		// assuming color buffer capture
 		size_t dataSize = size.dx*size.dy*4;
-        if (!image.Data())
-        	image.DataPtr(NEX_ALLOC(dataSize, MEMCAT_GENERAL));
+		if (!image.Data())
+			image.DataPtr(NEX_ALLOC(dataSize, MEMCAT_GENERAL));
 
 		bool asyncCapture =
 				RenderManager::Instance().GetRenderSettings().asyncCapture;
@@ -509,35 +509,35 @@ namespace RenderOpenGL {
 			if (!pbo[0]) {
 				// need to create pbo, and this is our first go
 				next = 0;
-		        GlGenBuffers(RenderConstants::MAX_FRAME_PRE_CAPTURE, pbo);
-	        	GL_CHECK();
-		        for(uint32 i = 0; i < RenderConstants::MAX_FRAME_PRE_CAPTURE; ++i) {
-		        	GlBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[0]);
-		        	GL_CHECK();
-		        	GlBufferData(GL_PIXEL_PACK_BUFFER, dataSize, 0, GL_STREAM_READ);
-			        GL_CHECK();
-		        }
-		        GlBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+				GlGenBuffers(RenderConstants::MAX_FRAME_PRE_CAPTURE, pbo);
+				GL_CHECK();
+				for(uint32 i = 0; i < RenderConstants::MAX_FRAME_PRE_CAPTURE; ++i) {
+					GlBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[0]);
+					GL_CHECK();
+					GlBufferData(GL_PIXEL_PACK_BUFFER, dataSize, 0, GL_STREAM_READ);
+					GL_CHECK();
+				}
+				GlBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 			}
 
-	        GlBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[next]);
-	        GL_CHECK();
-	        glReadPixels(0, 0, size.dx, size.dy, GL_BGRA, GL_UNSIGNED_BYTE, 0);
-	        GL_CHECK();
-	        // map and read
-	        GLuint cur = pbo[0];
-	        for (uint32 i = 0; i < RenderConstants::MAX_FRAME_PRE_CAPTURE-1; ++i)
-	        	pbo[i] = pbo[i+1];
-	        pbo[RenderConstants::MAX_FRAME_PRE_CAPTURE-1] = cur;
-	        GlBindBuffer(GL_PIXEL_PACK_BUFFER, cur);
-	        GL_CHECK();
-	        void* data = GlMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
-	        GL_CHECK();
-	        std::memcpy(image.Data(), data, dataSize);
-	        GlUnmapBuffer(GL_PIXEL_PACK_BUFFER);
-	        GL_CHECK();
-	        GlBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
-	        GL_CHECK();
+			GlBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[next]);
+			GL_CHECK();
+			glReadPixels(0, 0, size.dx, size.dy, GL_BGRA, GL_UNSIGNED_BYTE, 0);
+			GL_CHECK();
+			// map and read
+			GLuint cur = pbo[0];
+			for (uint32 i = 0; i < RenderConstants::MAX_FRAME_PRE_CAPTURE-1; ++i)
+				pbo[i] = pbo[i+1];
+			pbo[RenderConstants::MAX_FRAME_PRE_CAPTURE-1] = cur;
+			GlBindBuffer(GL_PIXEL_PACK_BUFFER, cur);
+			GL_CHECK();
+			void* data = GlMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
+			GL_CHECK();
+			std::memcpy(image.Data(), data, dataSize);
+			GlUnmapBuffer(GL_PIXEL_PACK_BUFFER);
+			GL_CHECK();
+			GlBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+			GL_CHECK();
 		} else {
 			glReadPixels(0, 0, size.dx, size.dy, GL_BGRA, GL_UNSIGNED_BYTE, image.Data());
 			GL_CHECK();
