@@ -27,12 +27,15 @@ namespace nextar {
 		virtual void Destroy(nextar::RenderContext*) {}
 		/* Called by the class who is responsible for its creation
 		 * and destruction */
-		virtual void NotifyCreated();
+		virtual void RequestCreate();
+		virtual void NotifyCreated() {}
 		/* Called by the class who is responsible for its creation
 		 * and destruction */
-		virtual void NotifyDestroyed();
+		virtual void RequestDestroy();
+		virtual void NotifyDestroyed() {}
 		/* Called by the class when the object is updated */
-		virtual void NotifyUpdated(ContextObject::UpdateParamPtr);
+		virtual void RequestUpdate(ContextObject::UpdateParamPtr);
+		virtual void NotifyUpdated(ContextObject::UpdateParamPtr) {}
 	};
 
 } /* namespace RenderOpenGL */

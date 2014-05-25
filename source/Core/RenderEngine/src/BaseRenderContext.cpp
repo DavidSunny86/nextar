@@ -9,7 +9,7 @@
 namespace nextar {
 
 	BaseRenderContext::BaseRenderContext(RenderDriver* _driver) : driver(_driver),
-			originalVideoMode(-1), currentVideoMode(-1) {
+			originalVideoMode(-1), currentVideoMode(-1), activePass(nullptr) {
 	}
 
 	BaseRenderContext::~BaseRenderContext(void) {
@@ -106,15 +106,20 @@ namespace nextar {
 	}
 
 	void BaseRenderContext::RegisterObject(ContextObject* object) {
+		object->Create(this);
+		object->NotifyCreated();
 	}
 
 	void BaseRenderContext::UnregisterObject(ContextObject* object) {
+		object->Destroy(this);
+		object->NotifyDestroyed();
 	}
 
 	void BaseRenderContext::UpdateObject(ContextObject* object, 
 		ContextObject::UpdateParamPtr updateParam) {
 		NEX_ASSERT(threadId == std::this_thread::get_id());
 		object->Update(this, updateParam);
+		object->NotifyDestroyed();
 	}
 
 	FrameStats BaseRenderContext::GetFrameStats() {

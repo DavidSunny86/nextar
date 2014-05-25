@@ -336,6 +336,9 @@ namespace RenderOpenGL {
 			// use a custom processor
 			if (paramDef == nullptr) {
 				numCustomParams++;
+				// todo There are a lot of assumptions here. We assume, all parameters
+				// are material parameters. They could well be any other type custom
+				// parameter (read Object).
 				uform.constBufferDesc.paramDesc.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
 				uform.constBufferDesc.paramDesc.name = std::move(name);
 				uform.constBufferDesc.paramDesc.frequency = UpdateFrequency::PER_MATERIAL;
@@ -402,7 +405,8 @@ namespace RenderOpenGL {
 			GL_CHECK();
 			if (IsSamplerType(type)) {
 
-				SamplerState& ss = samplers[mapped++];
+				SamplerState& ss = samplers[mapped];
+				ss.index = mapped++;
 				ss.desc.paramDesc.arrayCount = 1;
 				const Pass::SamplerDesc& tu = *pass->MapSamplerParams(unitName);
 				if (&tu == nullptr) {
@@ -411,21 +415,7 @@ namespace RenderOpenGL {
 				}
 				const AutoParam* paramDef = pass->MapParam(unitName);
 				ss.location = loc;
-				/**
-				 * The index of the texture unit within the shader may not be stored
-				 * as we have already created the sampler object from the data provided.
-				 * Update on a state parameter might require that the sampler object
-				 * be recreated. Now, we choose not to store this index on to the shader
-				 * texture table here, as we can search via name to obtain the same. To
-				 * make it more efficient, we may eventually store the texture units as
-				 * in a map (marked as todo) in the shader. This index will not be the
-				 * location the texture will be bound to, or the sampler will be bound to.
-				 * The sampler will be bound to the index in which it gets stored in the
-				 * sampler table. This will be efficient and will result in no gaps in
-				 * between consecutive texture units as all the texture units parsed
-				 * from the shader might not get used eventually.
-				 * */
-				// ss.index = (uint8)index;
+
 				if (paramDef == nullptr) {
 					ss.desc.paramDesc.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
 					ss.desc.paramDesc.name = std::move(unitName);
@@ -497,8 +487,11 @@ namespace RenderOpenGL {
 		Size size = rt->GetDimensions();
 		// assuming color buffer capture
 		size_t dataSize = size.dx*size.dy*4;
-		if (!image.Data())
-			image.DataPtr(NEX_ALLOC(dataSize, MEMCAT_GENERAL));
+
+		if (!image.Data()) {
+			image.Data() = (NEX_ALLOC(dataSize, MEMCAT_GENERAL));
+			image.deleteData = true;
+		}
 
 		bool asyncCapture =
 				RenderManager::Instance().GetRenderSettings().asyncCapture;
@@ -824,6 +817,38 @@ namespace RenderOpenGL {
 		PassGL* passGl = static_cast<PassGL*>(pass);
 		GlUseProgram(passGl->GetProgram());
 		GL_CHECK();
+	}
+
+	GLuint RenderContextGL::CreateVAO(VertexBufferBinding& binding,
+			VertexAttribListGL& attributes,
+			const VertexSemanticListGL& semantics) {
+
+		uint16 outElements[RenderConstants::MAX_VERTEX_ELEMENT];
+		uint32 numMapped = BufferManager::MapSignatureToSemantics(
+				&semantics[0].semantic, sizeof(VertexSemanticGL), semantics.size(),
+				&attributes[0].element, sizeof(VertexAttribGL), attributes.size(),
+				outElements);
+
+		if (numMapped) {
+			uint16 stream = -1;
+			GLuint vao;
+			GlGenVertexArrays(1, &vao);
+			GL_CHECK();
+			GlBindVertexArray(vao);
+			GL_CHECK();
+			for(uint32 j = 0; j < numMapped; ++j) {
+				NEX_ASSERT(semantics[j].index < (uint16)-1);
+				VertexAttribGL& vegl = attributes[outElements[j]];
+				if( vegl.element.streamIndex != stream ) {
+					stream = vegl.element.streamIndex;
+					SetVertexBuffer(binding.GetBuffer(stream));
+				}
+				EnableVertexAttribute(semantics[j].index, vegl);
+
+			}
+			return vao;
+		}
+		return 0;
 	}
 
 	GLuint RenderContextGL::CreateVertexBuffer(size_t size, GLenum usage) {

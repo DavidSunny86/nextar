@@ -9,6 +9,7 @@ namespace RenderOpenGL {
 
 	struct SamplerState {
 		TextureSamplerParamDesc desc;
+		uint32 index;
 		GLint location;
 		GLuint sampler;
 	};

@@ -31,7 +31,7 @@ namespace nextar {
 		std::atomic_int_fast32_t refCount;
 	public:
 
-		Referenced() {
+		inline Referenced() {
 			dbg_Ctor(refCount);
 			refCount.store(1, std::memory_order_relaxed);
 		}

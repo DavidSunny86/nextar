@@ -85,32 +85,25 @@ namespace nextar {
 	 */
 	class TextureUnit {
 	public:
-		uint32 bindPoint; // todo Might not be required
-		Vector3 uvwTile;
-		Vector3 uvwOffset;
 		TextureBase* texture;
 
 		inline TextureUnit()
-				: bindPoint(-1), uvwTile(1, 1, 1), uvwOffset(0, 0, 0), texture(0) {
+				: texture(0) {
 		}
 
-		inline TextureUnit(uint32 _bindPoint, TextureBase* _texture, const Vector3& tile,
-				const Vector3& offset)
-				: bindPoint(_bindPoint), texture(_texture), uvwTile(tile), uvwOffset(
-						offset) {
+		inline TextureUnit(TextureBase* _texture)
+				: texture(_texture) {
 			if (texture && texture->IsTextureAsset())
 				static_cast<TextureAsset*>(texture)->AddRef();
 		}
 
-		inline TextureUnit(uint32 _bindPoint, TextureBase* _texture)
-				: bindPoint(_bindPoint), texture(_texture), uvwTile(1, 1, 1), uvwOffset(
-						0, 0, 0) {
+		inline TextureUnit(TextureBase* _texture)
+				: texture(_texture) {
 			if (texture && texture->IsTextureAsset())
 				static_cast<TextureAsset*>(texture)->AddRef();
 		}
 
-		inline TextureUnit(const TextureUnit& tu) : bindPoint(tu.bindPoint), texture(tu.texture), 
-			uvwTile(tu.uvwTile), uvwOffset(tu.uvwOffset) {
+		inline TextureUnit(const TextureUnit& tu) : texture(tu.texture) {
 		}
 
 		inline ~TextureUnit() {
@@ -148,7 +141,6 @@ namespace nextar {
 		}
 	};
 
-	//typedef map<String, TextureUnit>::type TextureUnitMap;
 }
 
 #endif	/* TEXTUREUNITSTATE_H */

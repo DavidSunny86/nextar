@@ -12,6 +12,14 @@ namespace RenderOpenGL {
 	PassGL::~PassGL() {
 	}
 
+	void PassGL::SetTextureImpl(RenderContext* _ctx,
+			const TextureSamplerParamDesc* desc, const TextureUnit* tu) {
+		RenderContextGL* ctx = static_cast<RenderContextGL*>(_ctx);
+		const SamplerState* samplerState = static_cast<const SamplerState*>(desc);
+		ctx->SetSampler(samplerState->index, samplerState->location, samplerState->sampler);
+		ctx->SetTexture(samplerState->index, tu);
+	}
+
 	void PassGL::Decompile(RenderContext* _ctx) {
 		RenderContextGL* ctx = static_cast<RenderContextGL*>(_ctx);
 		ctx->DestroyProgram(iGlProgram);

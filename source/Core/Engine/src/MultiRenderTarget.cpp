@@ -63,7 +63,7 @@ namespace nextar {
 			}
 		}
 
-		ContextObject::NotifyUpdated(updatePtr);
+		ContextObject::RequestUpdate(updatePtr);
 	}
 
 	void MultiRenderTarget::Update(RenderContext* rc, ContextObject::UpdateParamPtr updatePtr) {

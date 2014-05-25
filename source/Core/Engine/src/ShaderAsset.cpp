@@ -40,7 +40,7 @@ namespace nextar {
 
 	void ShaderAsset::NotifyAssetLoaded() {
 		StreamRequest* creationParams = static_cast<StreamRequest*>(streamRequest);
-		ContextObject::NotifyCreated();
+		ContextObject::RequestCreate();
 		/* update programs */
 		/* build with compilation options */
 		_DestroyPasses();
@@ -57,7 +57,7 @@ namespace nextar {
 		}
 		
 		/* update */
-		ContextObject::NotifyUpdated(reinterpret_cast<UpdateParamPtr>(creationParams));
+		ContextObject::RequestUpdate(reinterpret_cast<UpdateParamPtr>(creationParams));
 		_BuildParameterTable();
 		/* mark request as complete */
 		creationParams->flags |= StreamRequest::COMPLETED;
@@ -83,7 +83,7 @@ namespace nextar {
 						source.c_str(),
 						&co
 				};
-				r->programs[i]->NotifyUpdated(reinterpret_cast<ContextObject::UpdateParamPtr>(&update));
+				r->programs[i]->RequestUpdate(reinterpret_cast<ContextObject::UpdateParamPtr>(&update));
 			}
 		}
 
@@ -91,7 +91,7 @@ namespace nextar {
 	}
 
 	void ShaderAsset::NotifyAssetUnloaded() {
-		ContextObject::NotifyDestroyed();
+		ContextObject::RequestDestroy();
 		Pass **it, **en;
 		if(singlePassShader) {
 			it = &singlePassShader;
@@ -104,7 +104,7 @@ namespace nextar {
 		for(; it != en; ++it) {
 			for(uint32 i = 0; i < Pass::NUM_STAGES; ++i)
 				if ((*it)->programs[i])
-					(*it)->programs[i]->NotifyDestroyed();
+					(*it)->programs[i]->RequestDestroy();
 		}
 
 		_DestroyPasses();
@@ -117,7 +117,7 @@ namespace nextar {
 	}
 
 	void ShaderAsset::NotifyAssetUpdated() {
-		ContextObject::NotifyUpdated(0);
+		ContextObject::RequestUpdate(0);
 		_BuildParameterTable();
 		Asset::NotifyAssetUpdated();
 	}

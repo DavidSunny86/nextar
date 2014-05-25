@@ -101,6 +101,7 @@ namespace nextar {
 		String options;
 
 		//ConstantBufferPtr materialParameters;
+		// todo
 		ParameterBuffer materialParamData;
 
 		friend class StreamRequest;

@@ -183,6 +183,7 @@ namespace nextar {
 		ParamEntryTableItem materialProperties;
 		ParamEntryTableItem objectProperties;
 
+		// todo
 		ParameterBuffer passParamData;
 
 		friend class StreamRequest;

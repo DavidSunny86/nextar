@@ -23,7 +23,7 @@ namespace nextar {
 		p.readBox.bufferPtr = dest;
 		p.readBox.offset = offset;
 		p.readBox.size = amount;
-		NotifyUpdated(reinterpret_cast<ContextObject::UpdateParamPtr>(&p));
+		RequestUpdate(reinterpret_cast<ContextObject::UpdateParamPtr>(&p));
 	}
 
 	void ManagedBuffer::Write(const void* dest, size_t offset, size_t amount) {
@@ -32,7 +32,7 @@ namespace nextar {
 		p.writeBox.bufferPtr = dest;
 		p.writeBox.offset = offset;
 		p.writeBox.size = amount;
-		NotifyUpdated(reinterpret_cast<ContextObject::UpdateParamPtr>(&p));
+		RequestUpdate(reinterpret_cast<ContextObject::UpdateParamPtr>(&p));
 	}
 
 	void ManagedBuffer::Update(RenderContext* context, ContextObject::UpdateParamPtr param) {

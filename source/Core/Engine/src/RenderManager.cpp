@@ -58,7 +58,7 @@ namespace nextar {
 		}
 	}
 
-	void RenderManager::NotifyObjectCreated(ContextObject* traits) {
+	void RenderManager::RequestObjectCreate(ContextObject* traits) {
 		if (primaryContext) {
 			primaryContext->RegisterObject(traits);
 		} else {
@@ -70,7 +70,7 @@ namespace nextar {
 		}
 	}
 
-	void RenderManager::NotifyObjectDestroyed(ContextObject* traits) {
+	void RenderManager::RequestObjectDestroy(ContextObject* traits) {
 		if (primaryContext) {
 			primaryContext->UnregisterObject(traits);
 		} else {
@@ -82,7 +82,7 @@ namespace nextar {
 		}
 	}
 
-	void RenderManager::NotifyObjectUpdated(ContextObject* traits, ContextObject::UpdateParamPtr params) {
+	void RenderManager::RequestObjectUpdate(ContextObject* traits, ContextObject::UpdateParamPtr params) {
 		if (primaryContext) {
 			primaryContext->UpdateObject(traits, params);
 		} else {

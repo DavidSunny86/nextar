@@ -27,10 +27,6 @@ namespace nextar {
 		virtual ~RenderTexture();
 
 
-		virtual bool IsRenderTexture() const {
-			return true;
-		}
-
 		virtual Size GetDimensions() const;
 		virtual PixelFormat GetPixelFormat() const;
 		/* update */

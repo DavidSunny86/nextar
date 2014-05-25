@@ -31,7 +31,7 @@ namespace nextar {
 		Params* p = reinterpret_cast<Params*>(ptr);
 		width = p->dimensions.width;
 		height = p->dimensions.height;
-		ContextObject::NotifyUpdated(ptr);
+		ContextObject::RequestUpdate(ptr);
 	}
 
 	void RenderTexture::Update(RenderContext* rc, ContextObject::UpdateParamPtr ptr) {

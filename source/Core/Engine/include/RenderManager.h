@@ -59,9 +59,9 @@ namespace nextar {
 		virtual void Close();
 		virtual void RegisterRenderContext(RenderContextPtr&);
 
-		virtual void NotifyObjectCreated(ContextObject*);
-		virtual void NotifyObjectDestroyed(ContextObject*);
-		virtual void NotifyObjectUpdated(ContextObject*, ContextObject::UpdateParamPtr);
+		virtual void RequestObjectCreate(ContextObject*);
+		virtual void RequestObjectDestroy(ContextObject*);
+		virtual void RequestObjectUpdate(ContextObject*, ContextObject::UpdateParamPtr);
 
 		/** This function might alter the actual layer indexes which are referred to
 		 * by materials. So, this should be called at the start of engine initialization and

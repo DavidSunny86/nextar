@@ -112,6 +112,10 @@ namespace nextar {
 			return totalMipMapCount;
 		}
 
+		inline uint16 GetArrayElementCount() const {
+			return arrayElementCount;
+		}
+
 		void Load(InputStreamPtr& input, const ImageParams& params);
 		void Save(OutputStreamPtr& input, const ImageParams& params);
 
@@ -121,7 +125,7 @@ namespace nextar {
 		 * is equal to numMipMaps if the whole file was loaded
 		 * or the maximum levels present in th file  */
 		uint8 totalMipMapCount;
-
+		uint8 arrayElementCount;
 		uint8 numFaces;
 		uint8 numMipMaps;
 		uint16 depth;

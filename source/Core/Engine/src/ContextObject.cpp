@@ -9,22 +9,22 @@ namespace nextar {
 	 * GpuObjectTraits
 	 ***************************************/
 	ContextObject::ContextObject() {
-		NotifyCreated();
+		RequestCreate();
 	}
 
 	ContextObject::~ContextObject() {
-		NotifyDestroyed();
+		RequestDestroy();
 	}
 
-	void ContextObject::NotifyCreated() {
-		RenderManager::Instance().NotifyObjectCreated(this);
+	void ContextObject::RequestCreate() {
+		RenderManager::Instance().RequestObjectCreate(this);
 	}
 
-	void ContextObject::NotifyDestroyed() {
-		RenderManager::Instance().NotifyObjectDestroyed(this);
+	void ContextObject::RequestDestroy() {
+		RenderManager::Instance().RequestObjectDestroy(this);
 	}
 
-	void ContextObject::NotifyUpdated(ContextObject::UpdateParamPtr params) {
-		RenderManager::Instance().NotifyObjectUpdated(this, params);
+	void ContextObject::RequestUpdate(ContextObject::UpdateParamPtr params) {
+		RenderManager::Instance().RequestObjectUpdate(this, params);
 	}
 }

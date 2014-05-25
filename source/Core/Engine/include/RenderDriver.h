@@ -30,6 +30,8 @@ namespace nextar {
 			uint32 maxClipPlanes;
 			/* Max texture stages */
 			uint32 maxTextureStages;
+			// GL_MAX_ARRAY_TEXTURE_LAYERS_EXT
+			uint32 maxTextureArrayLayers;
 		};
 
 		struct ContextCreationParams {

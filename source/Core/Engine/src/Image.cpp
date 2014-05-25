@@ -14,7 +14,7 @@ namespace nextar {
 	/*****************************************************/
 	Image::Image()
 			: width(0), height(0), depth(1), numFaces(0), totalMipMapCount(0),
-			  numMipMaps(0), format(PixelFormat::UNKNOWN), dataBuffer(0) {
+			  arrayElementCount(1), numMipMaps(0), format(PixelFormat::UNKNOWN), dataBuffer(0) {
 	}
 
 	Image::Image(PixelBox&& pb) {
@@ -24,6 +24,7 @@ namespace nextar {
 		numFaces = 1;
 		totalMipMapCount = 1;
 		numMipMaps = 1;
+		arrayElementCount = 1;
 		format = pb.format;
 		dataBuffer = pb.data;
 		pb.data = nullptr;

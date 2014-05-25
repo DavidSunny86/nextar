@@ -85,6 +85,7 @@ namespace RenderOpenGL {
 		inline void* Map(GLenum target, GLenum access);
 		inline void Unmap(GLenum target);
 		inline void* MapRange(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access);
+		inline void SetTexture(uint32 texIdx, GLint samplerLocation, GLuint samplerObject, const TextureUnit* tu);
 
 		// capture
 		void Capture(PixelBox& image, RenderTarget* rt, GLuint *pbo, FrameBuffer frameBuffer);
@@ -224,6 +225,16 @@ namespace RenderOpenGL {
 		GlUnmapBuffer(target);
 		GlBindBuffer(target, 0);
 	}
+
+	inline void RenderContextGL::SetTexture(uint32 texIdx, GLint samplerLocation,
+			GLuint samplerObject, const TextureUnit* tu) {
+		tu->texture;
+		GlActiveTexture(GL_TEXTURE0 + texIdx);
+		todo todo
+		GlBindTexture()
+		GlBindSampler(texIdx, samplerObject);
+	}
+
 }
 
 #endif //RENDERCONTEXTGL_H_

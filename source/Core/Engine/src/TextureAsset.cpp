@@ -70,7 +70,7 @@ namespace nextar {
 			textureParams->image.Load(is, img);
 		}
 
-		if(textureParams->flags & TextureStreamRequest::TEXTURE_PARAMS_INITED) {
+		if(!(textureParams->flags & TextureStreamRequest::TEXTURE_PARAMS_INITED)) {
 			textureParams->maxLodLevels = textureParams->image.GetTotalMipMapCount();
 			textureParams->flags |= TextureStreamRequest::TEXTURE_PARAMS_INITED;
 		}
@@ -86,7 +86,6 @@ namespace nextar {
 		faces = textureParams->image.GetNumFaces();
 
 		if (!IsTextureInited()) {
-			ContextObject::NotifyCreated();
 			numMipMaps = textureParams->maxLodLevels;
 			type = TEXTURE_2D;
 			if (height == 1)
@@ -95,9 +94,10 @@ namespace nextar {
 				type = TEXTURE_3D;
 			if (faces == 6)
 				type = TEXTURE_CUBE_MAP;
+			ContextObject::RequestCreate();
 		}
 
-		ContextObject::NotifyUpdated(reinterpret_cast<ContextObject::UpdateParamPtr>(textureParams));
+		ContextObject::RequestUpdate(reinterpret_cast<ContextObject::UpdateParamPtr>(textureParams));
 		/* should we stream again, in case it was not fully loaded ? */
 		if (currentMaxMipLevel < numMipMaps) {
 			if (IsAutoStreamEnabled()) {
@@ -156,7 +156,7 @@ namespace nextar {
 		TextureStreamRequest* textureParams = static_cast<TextureStreamRequest*>(
 						GetStreamRequest());
 		// @TODO update parameters?
-		ContextObject::NotifyUpdated(reinterpret_cast<ContextObject::UpdateParamPtr>(textureParams));
+		ContextObject::RequestUpdate(reinterpret_cast<ContextObject::UpdateParamPtr>(textureParams));
 		Asset::NotifyAssetUpdated();
 	}
 
