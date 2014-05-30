@@ -22,41 +22,68 @@ namespace nextar {
 	,objectParamByteOffset(-1)
 	,inputLayoutUniqueID(-1)
 	,flags(0)
-	,programs()
+	,programs() // todo is this enough?? or do null out
 	,samplers(nullptr)
 	,samplerCount(0)
 	,lastFrameUpdate(-1)
 	,lastViewUpdate(-1)
 	,numConstBuffers(0) {
+		// null all programs
+		for(uint32 i = 0; i < Pass::NUM_STAGES; ++i) {
+			programs[i] = nullptr;
+		}
 	}
 
 	Pass::~Pass() {
 		// TODO Auto-generated destructor stub
 	}
 
-	bool Pass::NotifyUpdated(RenderContext* rc) {
-		bool useFallback = false;
+	void Pass::RequestUpdate(ContextObject::ContextParamPtr param) {
+		CompileParams& p = *reinterpret_cast<CompileParams*>(param);
+		//blendState = p.blendState;
+		//depthStencilState = p.depthStencilState;
+		//rasterState = p.rasterState;
+		//textureDescMap.swap(p.textureStates);
+
+		for(uint32 i = 0; i < Pass::NUM_STAGES; ++i) {
+			GpuProgram::Type t = (GpuProgram::Type)i;
+			const String& source = p.programSources[i];
+			if (programs[i])
+				NEX_DELETE(programs[i]);
+			programs[i] = nullptr;
+			if (source.length()) {
+				programs[i] = GpuProgram::Instance(t);
+				GpuProgram::ContextParam update = {
+						source.c_str(),
+						p.compileOptions
+				};
+				programs[i]->RequestUpdate(reinterpret_cast<ContextObject::ContextParamPtr>(&update));
+			}
+		}
+		ContextObject::RequestUpdate(reinterpret_cast<ContextObject::ContextParamPtr>(param));
+	}
+
+	void Pass::RequestDestroy() {
+		for(uint32 i = 0; i < Pass::NUM_STAGES; ++i) {
+			if (programs[i]) {
+				NEX_DELETE(programs[i]);
+				programs[i] = nullptr;
+			}
+		}
+		ContextObject::RequestDestroy();
+	}
+
+	void Pass::View::Update(RenderContext* rc, ContextParamPtr param) {
+		CompileParams& p = *reinterpret_cast<CompileParams*>(param);
 		/** todo Change to bool inliners */
-		if( (flags & DIRTY_RASTER_STATE) )
-			useFallback &= UpdateRasterStates(rc);
-		if( (flags & DIRTY_BLEND_STATE) && !useFallback)
-			useFallback &= UpdateBlendStates(rc);
-		if( (flags & DIRTY_DEPTHSTENCIL_STATE) && !useFallback)
-			useFallback &= UpdateDepthStencilStates(rc);
-		if( (flags & DIRTY_TEXUNIT_STATE) && !useFallback )
-			useFallback &= UpdateTextureStates(rc);
-		if( (flags & COMPILE_NEEDED) && !useFallback )
-			useFallback &= Compile(rc);
-		return useFallback;
-
+		UpdateRasterStates(rc, p.rasterState);
+		UpdateBlendStates(rc, p.blendState);
+		UpdateDepthStencilStates(rc, p.depthStencilState);
+		Compile(rc, p);
 	}
 
-	void Pass::NotifyDestroyed(RenderContext* rc) {
-		Decompile(rc);
-		flags |= COMPILE_NEEDED;
-	}
-
-	void Pass::UpdateParams(RenderContext* rc, CommitContext& ctx, UpdateFrequency flags) {
+	// todo This function is currently not implemented correctly.
+	void Pass::View::UpdateParams(RenderContext* rc, CommitContext& ctx, UpdateFrequency flags) {
 		NEX_ASSERT(this == ctx.pass);
 		ctx.shaderParamContext[CommitContext::PASS_PARAM_CONTEXT].first = passParamByteOffset;
 		ctx.shaderParamContext[CommitContext::MATERIAL_PARAM_CONTEXT].first = materialParamByteOffset;
@@ -78,17 +105,20 @@ namespace nextar {
 
 		for(uint32 i = 0; i < numConstBuffers; ++i) {
 			ConstantBufferPtr& cb = sharedParameters[i];
+			ConstantBuffer::View* cbView = static_cast<ConstantBuffer::View*>(
+					cb->GetView(rc));
 			if (Test(cb->GetFrequency() & flags)) {
-				ctx.cbuffer = cb;
+				ctx.cbuffer = cbView;
+				ctx.cbufferSize = cb->GetSize();
 				AutoParamProcessor* proc = cb->GetProcessor();
 				if (proc) {
 					// we just update it in one go
 					proc->Apply(rc, nullptr, ctx);
 				} else {
-					cb->BeginUpdate(rc, flags);
+					cbView->BeginUpdate(rc, flags);
 					ShaderParamIterator it = cb->GetParamIterator();
 					_ProcessShaderParamIterator(rc, ctx, it, flags);
-					cb->EndUpdate(rc);
+					cbView->EndUpdate(rc);
 				}
 			}
 		}
@@ -106,9 +136,9 @@ namespace nextar {
 		return (*ap).second;
 	}
 
-	const Pass::SamplerDesc* Pass::MapSamplerParams(const String& name) {
-		auto sp = textureDescMap.find(name);
-		if (sp == textureDescMap.end())
+	const Pass::SamplerDesc* Pass::MapSamplerParams(const String& name, const TextureDescMap& texMap) {
+		auto sp = texMap.find(name);
+		if (sp == texMap.end())
 			return nullptr;
 		// todo map parsed params
 		return &(*sp).second;
@@ -181,7 +211,7 @@ namespace nextar {
 
 	void CustomStructProcessor::Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) {
 		NEX_ASSERT (d->autoName == AutoParamName::AUTO_CUSTOM_CONSTANT);
-		size_t s = context.cbuffer->GetSize();
+		size_t s = context.cbufferSize;
 		CommitContext::ParamContext& pc = context.shaderParamContext[paramContext];
 		context.cbuffer->Write(rc, pc.second->AsRawData(pc.first), s);
 		pc.first += (uint32)s;

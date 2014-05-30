@@ -18,10 +18,6 @@ namespace nextar {
 			public RenderTarget {
 
 	public:
-		struct Params {
-			Size dimensions;
-			PixelFormat format;
-		};
 
 		RenderTexture();
 		virtual ~RenderTexture();
@@ -29,14 +25,13 @@ namespace nextar {
 
 		virtual Size GetDimensions() const;
 		virtual PixelFormat GetPixelFormat() const;
-		/* update */
-		virtual void NotifyUpdated(UpdateParamPtr);
-		virtual void Update(nextar::RenderContext*, UpdateParamPtr);
+
+		virtual void Create(TextureType type, PixelFormat format, uint32 width, uint32 height, uint32 depth);
+		virtual void Capture(RenderContext* rc, PixelBox& image, FrameBuffer);
+		virtual void Present(RenderContext* rc);
+
 	protected:
 
-		/* throws INVALID_CALL */
-		virtual void WriteBoxImpl(RenderContext*, size_t faceNum, size_t mipNum,
-			            PixelBox& box) = 0;
 	};
 
 } /* namespace nextar */

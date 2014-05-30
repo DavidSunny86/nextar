@@ -8,23 +8,18 @@
 #include <MultiRenderTarget.h>
 #include <RenderContext.h>
 #include <RenderManager.h>
+#include <RenderTexture.h>
+#include <RenderBuffer.h>
 
 namespace nextar {
 
 	MultiRenderTarget::MultiRenderTarget() :
 			RenderTarget(RenderTargetType::MULTI_RENDER_TARGET),
+			ContextObject(ContextObject::TYPE_MULTI_RENDER_TARGET),
 			flags(0), depth(nullptr), dimensions(0,0), numColorTargets(0) {
 	}
 
 	MultiRenderTarget::~MultiRenderTarget() {
-		Reset();
-	}
-
-	Size MultiRenderTarget::GetDimensions() const {
-		return dimensions;
-	}
-
-	void MultiRenderTarget::Reset() {
 		for(uint32 i = 0; i < numColorTargets; ++i)
 			NEX_DELETE(color[i]);
 		numColorTargets = 0;
@@ -33,30 +28,26 @@ namespace nextar {
 		depth = 0;
 	}
 
-	void MultiRenderTarget::NotifyUpdated(ContextObject::UpdateParamPtr updatePtr) {
+	Size MultiRenderTarget::GetDimensions() const {
+		return dimensions;
+	}
+
+	void MultiRenderTarget::Create(const CreateParam& params) {
 		/* create the individual textures */
-		UpdateParam* updateParams = reinterpret_cast<UpdateParam*>(updatePtr);
-		if (updateParams->flags & UpdateParam::UPDATE_ALL)
-			Reset();
+		TargetParamArray& tpa = params.targets;
+		dimensions = params.dimensions;
+		numColorTargets = params.numColorTargets;
+		for(uint32 i = numColorTargets; i < params.numColorTargets; ++i) {
+			if ()
+				color[i] = tpa[i].useTarget ? tpa[i].useTarget :
+				CreateColorTexture(tpa[i]);
 
-		TargetParamArray& tpa = updateParams->targets;
-		dimensions = updateParams->dimensions;
-
-		if(updateParams->numColorTargets != numColorTargets) {
-			if (updateParams->numColorTargets < numColorTargets) {
-				for(uint32 i = updateParams->numColorTargets; i < numColorTargets; ++i)
-					NEX_DELETE(color[i]);
-			}
-			else {
-				for(uint32 i = numColorTargets; i < updateParams->numColorTargets; ++i)
-						color[i] = tpa[i].useTarget ? tpa[i].useTarget : RenderManager::Instance().CreateRenderTarget(tpa[i].useAsTexture);
-			}
 		}
 
-		bool validDepth = (updateParams->flags & UpdateParam::INCLUDE_DEPTH);
+		bool validDepth = (params.useDepth);
 		if (validDepth != (IsDepthBufferValid())) {
 			if(validDepth)
-				depth = updateParams->depth.useTarget ? updateParams->depth.useTarget : RenderManager::Instance().CreateRenderTarget();
+				depth = params.depth.useTarget ? params.depth.useTarget : RenderManager::Instance().CreateRenderTarget();
 			else {
 				NEX_DELETE(depth);
 				depth = 0;
@@ -64,16 +55,6 @@ namespace nextar {
 		}
 
 		ContextObject::RequestUpdate(updatePtr);
-	}
-
-	void MultiRenderTarget::Update(RenderContext* rc, ContextObject::UpdateParamPtr updatePtr) {
-		UpdateParam* updateParams = reinterpret_cast<UpdateParam*>(updatePtr);
-		TargetParamArray& tpa = updateParams->targets;
-		for(uint32 i = 0; i < numColorTargets; ++i)
-			color[i]->Reset(rc, dimensions, tpa[i].format);
-		if (depth)
-			depth->Reset(rc, dimensions, updateParams->depth.format);
-		UpdateImpl(rc, updateParams);
 	}
 
 	PixelFormat MultiRenderTarget::GetPixelFormat() const {
@@ -92,4 +73,17 @@ namespace nextar {
 	RenderTarget* MultiRenderTarget::GetDepthAttachment() {
 		return depth;
 	}
+
+	RenderTarget* MultiRenderTarget::CreateColorTexture(const TargetParam& tp) {
+		if(tp.useAsTexture) {
+			RenderTexture* rt = NEX_NEW( RenderTexture() );
+			rt->Create(TextureBase::TEXTURE_2D, tp.format, dimensions.width, dimensions.height, 1);
+			return rt;
+		} else {
+			RenderBuffer* rt = NEX_NEW( RenderBuffer() );
+			rt->Create(tp.format, dimensions.width, dimensions.height);
+			return rt;
+		}
+	}
+
 } /* namespace nextar */

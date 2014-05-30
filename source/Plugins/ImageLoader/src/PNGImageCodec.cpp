@@ -216,7 +216,7 @@ namespace ImageLoader {
 	        fmt = PixelFormat::RGBA8;
 	        bpp = 4;
 	    } else if (imagetype == GrayAlpha && bytes_per_row == 1)
-	        fmt = PixelFormat::A8;
+	        fmt = PixelFormat::R8;
 	    else { // pallete
 	        // cant handle this
 	        Warn(String("PixelFormat not supported.") + params.name);
@@ -266,7 +266,7 @@ namespace ImageLoader {
 	                            else
 	                                *(imgDest++) = 0xff;
 	                            break;
-	                        case PixelFormat::A8:
+	                        case PixelFormat::R8:
 	                            *(imgDest++) = *(rowPtr++);
 	                            break;
 	                    }
@@ -293,7 +293,7 @@ namespace ImageLoader {
 	                            imgDest[2] == keycolor.blue)
 	                            imgDest[3] = 0;
 	                        break;
-	                    case PixelFormat::A8:
+	                    case PixelFormat::R8:
 	                        if( imgDest[0] == keycolor.alpha )
 	                            imgDest[0] = 0;
 	                        break;

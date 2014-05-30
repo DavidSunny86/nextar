@@ -18,7 +18,13 @@ namespace nextar {
 	public:
 
 		enum {
+			CO_TYPE = TYPE_MULTI_RENDER_TARGET,
 			MAX_TARGET = 4
+		};
+
+		enum UpdateMessage {
+			MSG_RT_CREATE = 1 << 1,
+			MSG_RT_RESIZE = 1 << 2,
 		};
 
 		typedef array<RenderTarget*,MAX_TARGET>::type ColorAttachmentArray;
@@ -31,13 +37,8 @@ namespace nextar {
 
 		typedef array<TargetParam,MAX_TARGET>::type TargetParamArray;
 
-		struct UpdateParam {
-			enum {
-				UPDATE_DIMENSIONS = 1 << 0,
-				UPDATE_ALL = 1 << 1,
-				INCLUDE_DEPTH = 1 << 2,
-			};
-			uint16 flags;
+		struct CreateParam {
+			bool useDepth;
 			uint16 numColorTargets;
 			Size dimensions;
 			TargetParamArray targets;
@@ -51,23 +52,20 @@ namespace nextar {
 			return depth != nullptr;
 		}
 
-		virtual void Reset();
 		/* throws INVALID_CALL */
 		virtual PixelFormat GetPixelFormat() const;
 		/* throws INVALID_CALL */
 		virtual void Capture(RenderContext* rc, PixelBox& image, FrameBuffer);
-
 		virtual Size GetDimensions() const;
-		virtual void NotifyUpdated(ContextObject::UpdateParamPtr) override;
 
-		virtual void Update(nextar::RenderContext*, ContextObject::UpdateParamPtr);
+		virtual void Create(const CreateParam& params);
 
 		RenderTarget* GetAttachment(uint16 index);
 		RenderTarget* GetDepthAttachment();
 
 	protected:
 
-		virtual void UpdateImpl(RenderContext*, UpdateParam*) = 0;
+		RenderTarget* CreateColorTexture(const TargetParam& tp);
 
 		uint16 flags;
 		uint16 numColorTargets;

@@ -51,27 +51,34 @@ namespace nextar {
 		/* exclusive call between NotifyLoaded and LoadImpl */
 		if (IsTextureInited()) {
 			textureParams->flags |= TextureStreamRequest::TEXTURE_PARAMS_INITED;
-			textureParams->imageParams.name = GetName();
 		} else
 			textureParams->flags &=~TextureStreamRequest::TEXTURE_PARAMS_INITED;
 
 		ImageParams& img = textureParams->imageParams;
-		img.numMipLevelToLoad = IsAutoStreamEnabled() ? lodStrategy->GetNumLevelsToLoad(this) :
+		img.progressiveLoad = IsAutoStreamEnabled();
+		img.numMipLevelToLoad = (img.progressiveLoad)? lodStrategy->GetNumLevelsToLoad(this) :
 				Image::IMAGE_ALL_MIP_LEVELS;
 		/* was the texture ever loaded? */
 		if(!(textureParams->flags & TextureStreamRequest::TEXTURE_PARAMS_INITED)) {
+			img.codecName = GetAssetLocator().GetExtension();
+			img.name = GetNameID();
 			img.baseMipLevel = Image::IMAGE_LOWEST_MIP_LEVEL;
-			img.name = GetName();
+			textureParams->inputStream = FileSystem::Instance().OpenRead(GetAssetLocator());
+			if (!textureParams->inputStream) {
+				Warn("Texture not found: " + GetAssetLocator().ToString());
+				request->returnCode = -1; // todo Not found return code. unify return codes??
+				return;
+			}
 		} else
 			img.baseMipLevel = currentMaxMipLevel;
-		InputStreamPtr is = FileSystem::Instance().OpenRead(GetAssetLocator());
-		if (is) {
+
+		if (textureParams->inputStream) {
 			// todo handle error here? try catch {}
-			textureParams->image.Load(is, img);
+			textureParams->inputStream->Rewind();
+			textureParams->image.Load(textureParams->inputStream, img, textureParams->codecInfo);
 		}
 
 		if(!(textureParams->flags & TextureStreamRequest::TEXTURE_PARAMS_INITED)) {
-			textureParams->maxLodLevels = textureParams->image.GetTotalMipMapCount();
 			textureParams->flags |= TextureStreamRequest::TEXTURE_PARAMS_INITED;
 		}
 	}
@@ -80,13 +87,18 @@ namespace nextar {
 		TextureStreamRequest* textureParams = static_cast<TextureStreamRequest*>(
 				GetStreamRequest());
 
+		// set up the highest dimensions currently available
 		width = textureParams->image.GetWidth();
 		height = textureParams->image.GetHeight();
 		depth = textureParams->image.GetDepth();
 		faces = textureParams->image.GetNumFaces();
 
 		if (!IsTextureInited()) {
-			numMipMaps = textureParams->maxLodLevels;
+			numMipMaps = textureParams->codecInfo.metaInfo.maxMipMapCount;
+			textureParams->createParams.image = &textureParams->image;
+			textureParams->createParams.textureFormat = PixelUtils::GetNearestTextureFormat(textureParams->image.GetFormat());
+			textureParams->createParams.textureFlags = GetTextureFlags();
+			// todo Texture array support
 			type = TEXTURE_2D;
 			if (height == 1)
 				type = TEXTURE_1D;
@@ -94,10 +106,18 @@ namespace nextar {
 				type = TEXTURE_3D;
 			if (faces == 6)
 				type = TEXTURE_CUBE_MAP;
-			ContextObject::RequestCreate();
+
+			textureParams->createParams.type = GetTextureType();
 		}
 
-		ContextObject::RequestUpdate(reinterpret_cast<ContextObject::UpdateParamPtr>(textureParams));
+
+		textureParams->createParams.baseMipLevel = textureParams->codecInfo.mipLevelsToRead;
+		textureParams->createParams.desc = textureParams->codecInfo.metaInfo;
+
+
+		ContextObject::RequestUpdate(
+				MSG_TEX_CREATE|MSG_TEX_UPLOAD,
+				reinterpret_cast<ContextObject::ContextParamPtr>(&textureParams->createParams));
 		/* should we stream again, in case it was not fully loaded ? */
 		if (currentMaxMipLevel < numMipMaps) {
 			if (IsAutoStreamEnabled()) {
@@ -123,30 +143,6 @@ namespace nextar {
 		}
 	}
 
-	void TextureAsset::Create(nextar::RenderContext* rc) {
-		/* unload */
-		NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
-	}
-
-	void TextureAsset::Update(nextar::RenderContext* rc, ContextObject::UpdateParamPtr params) {
-		TextureStreamRequest* textureParams = reinterpret_cast<TextureStreamRequest*>(params);
-		Image& img = textureParams->image;
-		uint32 numMips = img.GetNumMipMaps();
-		uint32 numFaces = img.GetNumFaces();
-		for (uint32 f = 0; f < numFaces; ++f) {
-			for(uint32 i = 0; i < numMips; ++i) {
-				PixelBox box = img.GetPixelBox(f, i);
-				WriteBoxImpl(rc, f, currentMaxMipLevel + i, box);
-			}
-		}
-		currentMaxMipLevel += numMips;
-	}
-
-	void TextureAsset::Destroy(nextar::RenderContext* rc) {
-		/* unload */
-		NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
-	}
-
 	void TextureAsset::NotifyAssetUnloaded() {
 		NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
 		Asset::NotifyAssetUnloaded();
@@ -156,11 +152,14 @@ namespace nextar {
 		TextureStreamRequest* textureParams = static_cast<TextureStreamRequest*>(
 						GetStreamRequest());
 		// @TODO update parameters?
-		ContextObject::RequestUpdate(reinterpret_cast<ContextObject::UpdateParamPtr>(textureParams));
+		ContextObject::RequestUpdate(
+				MSG_TEX_RESIZE,
+				reinterpret_cast<ContextObject::ContextParamPtr>(textureParams));
 		Asset::NotifyAssetUpdated();
 	}
 
 	void TextureAsset::UnloadImpl(StreamRequest* req, bool isStreamed) {
+		ContextObject::RequestDestroy();
 		NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
 	}
 

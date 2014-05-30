@@ -13,8 +13,8 @@ namespace nextar {
 	/* Image			       							 */
 	/*****************************************************/
 	Image::Image()
-			: width(0), height(0), depth(1), numFaces(0), totalMipMapCount(0),
-			  arrayElementCount(1), numMipMaps(0), format(PixelFormat::UNKNOWN), dataBuffer(0) {
+			: width(0), height(0), depth(1), numFaces(0),
+			  numMipMaps(0), format(PixelFormat::UNKNOWN), dataBuffer(0) {
 	}
 
 	Image::Image(PixelBox&& pb) {
@@ -22,9 +22,7 @@ namespace nextar {
 		height = pb.GetHeight();
 		depth = pb.GetDepth();
 		numFaces = 1;
-		totalMipMapCount = 1;
 		numMipMaps = 1;
-		arrayElementCount = 1;
 		format = pb.format;
 		dataBuffer = pb.data;
 		pb.data = nullptr;
@@ -72,11 +70,11 @@ namespace nextar {
 		return ret;
 	}
 
-	void Image::Load(InputStreamPtr& stream, const ImageParams& params) {
+	void Image::Load(InputStreamPtr& stream, const ImageParams& params, ImageCodecMetaInfo& metaInfo) {
 		if (dataBuffer)
 			NEX_FREE(dataBuffer, MEMCAT_GENERAL);
 		Serializer l(params);
-		ImageData data = l.Serialize(stream);
+		ImageData data = l.Serialize(stream, metaInfo);
 		if (data.data) {
 			numFaces = data.numFaces;
 			numMipMaps = data.numMipMaps;
@@ -85,9 +83,8 @@ namespace nextar {
 			width = data.width;
 			format = data.format;
 			dataBuffer = data.data;
-			totalMipMapCount = data.totalMipMapCount;
 		} else {
-			Error(String("Failed to load image ") + params.name);
+			Error(String("Failed to load image ") + Convert::ToString(params.name));
 			NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 		}
 	}
@@ -96,24 +93,16 @@ namespace nextar {
 	/* Image::Loader        							 */
 	/*****************************************************/
 	NEX_IMPLEMENT_FACTORY(Image::Serializer);
-	ImageData Image::Serializer::Serialize(InputStreamPtr& stream) {
+	ImageData Image::Serializer::Serialize(InputStreamPtr& stream, ImageCodecMetaInfo& metaInfo) {
 		String fakeLoaderName = params.codecName;
-		if (!fakeLoaderName.length()) {
-			const String& name = params.name;
-			size_t pos = name.find_first_of('.');
-			if (pos != String::npos) {
-				fakeLoaderName = (name.substr(pos + 1));
-				StringUtils::ToUpper(fakeLoaderName);
-			}
-		}
 
 		ImageCodec* codec = GetImpl(fakeLoaderName);
 		if (!codec) {
-			Error(String("Couldn't find image codec for: ") + params.name);
+			Error(String("Couldn't find image codec for: ") + Convert::ToString(params.name));
 			NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 		}
 
-		return codec->Load(stream, params);
+		return codec->Load(stream, params, metaInfo);
 	}
 }
 

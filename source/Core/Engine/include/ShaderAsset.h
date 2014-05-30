@@ -25,8 +25,7 @@ namespace nextar {
 	 * 	ShaderPtr compiledShader;
 	 * }
 	 */
-	class _NexEngineAPI ShaderAsset: public nextar::Asset,
-	public ContextObject {
+	class _NexEngineAPI ShaderAsset: public nextar::Asset {
 		NEX_LOG_HELPER(ShaderAsset);
 	public:
 
@@ -45,11 +44,7 @@ namespace nextar {
 
 		struct StreamPass {
 			StringID name;
-			String programSources[Pass::NUM_STAGES];
-			RasterState rasterState;
-			BlendState blendState;
-			DepthStencilState depthStencilState;
-			Pass::TextureDescMap textureStates;
+			Pass::CompileParams compileParams;
 			//Pass::DefaultTextureUnitMap defaultTextureUnits;
 		};
 
@@ -127,10 +122,6 @@ namespace nextar {
 		}
 
 		ParameterIterator GetParameterIterator(UpdateFrequency type);
-
-		virtual void Create(nextar::RenderContext*);
-		virtual void Update(nextar::RenderContext*, ContextObject::UpdateParamPtr);
-		virtual void Destroy(nextar::RenderContext*);
 
 		virtual uint32 GetClassID() const override;
 

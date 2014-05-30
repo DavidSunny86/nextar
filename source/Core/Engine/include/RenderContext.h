@@ -1,9 +1,7 @@
+#ifndef RENDERCONTEXT_H_
+#define RENDERCONTEXT_H_
 
-#pragma once
-
-#include <NexBase.h>
-#include <ContextObject.h>
-#include <StreamData.h>
+#include <NexEngine.h>
 #include <RenderDriver.h>
 
 namespace nextar {
@@ -66,7 +64,10 @@ namespace nextar {
 
 		virtual void RegisterObject(ContextObject*) = 0;
 		virtual void UnregisterObject(ContextObject*) = 0;
-		virtual void UpdateObject(ContextObject*, ContextObject::UpdateParamPtr) = 0;
+		virtual void UpdateObject(ContextObject*, uint32 updateMsg, ContextObject::ContextParamPtr) = 0;
+		virtual ContextObject::View* GetView(ContextObject*) = 0;
 	};
 
 }
+
+#endif //RENDERCONTEXT_H_

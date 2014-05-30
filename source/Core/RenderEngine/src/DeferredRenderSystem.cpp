@@ -100,9 +100,9 @@ namespace nextar {
 		if (!renderTarget)
 			renderTarget = Bind(RenderManager::Instance().CreateMultiRenderTarget());
 		/* Clean setup */
-		MultiRenderTarget::UpdateParam params;
+		MultiRenderTarget::CreateParam params;
 		params.dimensions = dimensions;
-		params.flags = MultiRenderTarget::UpdateParam::INCLUDE_DEPTH;
+		params.flags = MultiRenderTarget::CreateParam::INCLUDE_DEPTH;
 		params.numColorTargets = 2;
 		/* normal & gloss */
 		params.targets[0].useAsTexture = true;
@@ -113,7 +113,7 @@ namespace nextar {
 		/* depth */
 		params.depth.useAsTexture = true;
 		params.depth.format = PixelFormat::D24S8;
-		renderTarget->NotifyUpdated(reinterpret_cast<ContextObject::UpdateParamPtr>(&params));
+		renderTarget->NotifyUpdated(reinterpret_cast<ContextObject::ContextParamPtr>(&params));
 
 		depth = static_cast<RenderTexture*>(renderTarget->GetDepthAttachment());
 		normalGloss = static_cast<RenderTexture*>(renderTarget->GetAttachment(0));

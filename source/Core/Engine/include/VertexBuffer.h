@@ -1,7 +1,7 @@
 #ifndef NEXTAR_VERTEXBUFFER_H
 #define NEXTAR_VERTEXBUFFER_H
 
-#include <ManagedBuffer.h>
+#include <GpuBuffer.h>
 
 namespace nextar {
 
@@ -11,7 +11,7 @@ namespace nextar {
 		RELEASE_ON_FRAME_THRESHOLD,
 	};
 
-	class _NexEngineAPI VertexBuffer: public ManagedBuffer {
+	class _NexEngineAPI VertexBuffer: public GpuBuffer {
 
 	public:
 

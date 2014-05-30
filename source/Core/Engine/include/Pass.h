@@ -21,8 +21,9 @@
 namespace nextar {
 
 	class _NexEngineAPI Pass :
-			public NamedObject,
-			public AllocGraphics {
+		public ContextObject,
+		public NamedObject,
+		public AllocGraphics {
 	public:
 
 		enum {
@@ -31,14 +32,7 @@ namespace nextar {
 		};
 
 		enum Flags {
-			DIRTY_RASTER_STATE = 1 << 0,
-			DIRTY_BLEND_STATE = 1 << 1,
-			DIRTY_DEPTHSTENCIL_STATE = 1 << 2,
-			DIRTY_TEXUNIT_STATE = 1 << 3,
-			COMPILE_NEEDED = 1 << 4,
 			PROGRAM_DATA_INITED = 1 << 5,
-			DIRTY_FLAG = (DIRTY_RASTER_STATE|DIRTY_BLEND_STATE|DIRTY_DEPTHSTENCIL_STATE|
-					DIRTY_TEXUNIT_STATE|COMPILE_NEEDED)
 		};
 		// todo 7 or 8 is a good cap for this array, and
 		// can make do with a static array in that case.
@@ -51,6 +45,40 @@ namespace nextar {
 
 		typedef map<String, SamplerDesc>::type TextureDescMap;
 		typedef array<ConstantBufferPtr, (uint32)MAX_CBUFFER>::type ConstantBufferList;
+
+		struct CompileParams {
+			const StringUtils::WordList* compileOptions;
+			String programSources[Pass::NUM_STAGES];
+			RasterState rasterState;
+			BlendState blendState;
+			DepthStencilState depthStencilState;
+			Pass::TextureDescMap textureStates;
+		};
+
+		class View : public ContextObject::View {
+		public:
+			virtual void UpdateParams(RenderContext* renderCtx, CommitContext& context, UpdateFrequency flags);
+			// Bind texture to a shader parameter. The number of units must match the desc->numUnits count.
+			virtual void SetTextureImpl(RenderContext* rc, const TextureSamplerParamDesc* desc, const TextureUnit* tu) = 0;
+
+			virtual void Update(nextar::RenderContext*, ContextParamPtr);
+
+			virtual void Compile(nextar::RenderContext*, const CompileParams&) = 0;
+			virtual void UpdateBlendStates(nextar::RenderContext*, const BlendState& state) = 0;
+			virtual void UpdateRasterStates(nextar::RenderContext*, const RasterState& state) = 0;
+			virtual void UpdateDepthStencilStates(nextar::RenderContext*, const DepthStencilState& state) = 0;
+
+			static inline void _ProcessShaderParamIterator(RenderContext* rc, CommitContext& ctx, ShaderParamIterator& it, UpdateFrequency flags) {
+				while(it) {
+					const ShaderParamDesc& d = (*it);
+					if (Test(d.frequency & flags)) {
+						NEX_ASSERT(d.processor);
+						d.processor->Apply(rc, &d, ctx);
+					}
+					++it;
+				}
+			}
+		};
 
 		Pass(StringID name);
 		virtual ~Pass();
@@ -75,45 +103,23 @@ namespace nextar {
 			return sharedParameters;
 		}
 
-		virtual bool NotifyUpdated(nextar::RenderContext*);
-		virtual void NotifyDestroyed(nextar::RenderContext*);
-		
 		TextureBase* GetDefaultTexture(const String& name, uint32 index) const;
 		const TextureUnitParams* GetTextureUnit(const String& name) const;
 
 		// todo refer to the static table as well as a custom table
 		// created from parsing the shader script
 		const AutoParam* MapParam(const String& name);
-		const SamplerDesc* MapSamplerParams(const String& name);
-				
-		virtual void UpdateParams(RenderContext* renderCtx, CommitContext& context, UpdateFrequency flags);
-		
-		// Set texture states, called during pass creation
 
-		// Bind texture to a shader parameter. The number of units must match the desc->numUnits count.
-		virtual void SetTextureImpl(RenderContext* rc, const TextureSamplerParamDesc* desc, const TextureUnit* tu) = 0;
+		static const SamplerDesc* MapSamplerParams(const String& name, const TextureDescMap& texMap);
+
+		// override RequestUpdate
+		virtual void RequestUpdate(ContextObject::ContextParamPtr);
+		virtual void RequestDestroy();
+		// Set texture states, called during pass creation
 
 	protected:
 
-		static inline void _ProcessShaderParamIterator(RenderContext* rc, CommitContext& ctx, ShaderParamIterator& it, UpdateFrequency flags) {
-			while(it) {
-				const ShaderParamDesc& d = (*it);
-				if (Test(d.frequency & flags)) {
-					NEX_ASSERT(d.processor);
-					d.processor->Apply(rc, &d, ctx);
-				}
-				++it;
-			}
-		}
 
-		virtual bool Compile(nextar::RenderContext*) = 0;
-		virtual void Decompile(nextar::RenderContext*) = 0;
-
-		virtual bool UpdateTextureStates(nextar::RenderContext*) = 0;
-		virtual bool UpdateBlendStates(nextar::RenderContext*) = 0;
-		virtual bool UpdateRasterStates(nextar::RenderContext*) = 0;
-		virtual bool UpdateDepthStencilStates(nextar::RenderContext*) = 0;
-		
 		/* Unique number representing this pass */
 		uint16 inputLayoutUniqueID;
 				
@@ -122,10 +128,10 @@ namespace nextar {
 		typedef array<GpuProgram*, NUM_STAGES>::type GpuProgramArray;
 		GpuProgramArray programs;
 
-		RasterState rasterState;
-		BlendState blendState;
-		DepthStencilState depthStencilState;
-		TextureDescMap textureDescMap;
+		// RasterState rasterState;
+		// BlendState blendState;
+		// DepthStencilState depthStencilState;
+		// TextureDescMap textureDescMap;
 
 		// updated per frame
 		ConstantBufferList sharedParameters;

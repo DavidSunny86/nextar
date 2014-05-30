@@ -25,7 +25,7 @@ namespace nextar {
 // descriptor table
 		static PixelFormatDesc formatDescTable[(uint32)PixelFormat::COUNT] = { {
 // name
-				"A8",
+				"R8",
 				// pixelSize, numChannels, flags
 				1, 1, PIXFLAG_INTEGRAL | PIXFLAG_HAS_ALPHA
 						| PIXFLAG_TEXTURE_FORMAT | PIXFLAG_UNSIGNED
@@ -44,7 +44,7 @@ namespace nextar {
 				"BGRA8",
 				// pixelSize, numChannels, flags
 				4, 4, PIXFLAG_INTEGRAL | PIXFLAG_HAS_ALPHA
-						| PIXFLAG_TEXTURE_FORMAT | PIXFLAG_UNSIGNED
+						| PIXFLAG_UNSIGNED
 						| PIXFLAG_NORMALIZED },
 
 		{ "D16",
@@ -75,14 +75,14 @@ namespace nextar {
 								| PIXFLAG_UNSIGNED | PIXFLAG_NORMALIZED
 								| PIXFLAG_DEPTH } };
 
-		PixelFormat GetFormatFromString(const String& name) {
+		_NexEngineAPI PixelFormat GetFormatFromString(const String& name) {
 			for (uint32 i = 0; i < (uint32)PixelFormat::COUNT; ++i)
 				if (!name.compare(formatDescTable[i].name))
 					return (PixelFormat) i;
 			return PixelFormat::UNKNOWN;
 		}
 
-		bool IsDepthFormat(PixelFormat pf) {
+		_NexEngineAPI bool IsDepthFormat(PixelFormat pf) {
 			const int index = (const int) pf;
 			if (index >= 0 && index <= (uint32)PixelFormat::COUNT) {
 				uint32 flags = formatDescTable[index].flags;
@@ -91,7 +91,7 @@ namespace nextar {
 			return false;
 		}
 
-		bool IsStencilFormat(PixelFormat pf) {
+		_NexEngineAPI bool IsStencilFormat(PixelFormat pf) {
 			const int index = (const int) pf;
 			if (index >= 0 && index <= (uint32)PixelFormat::COUNT) {
 				uint32 flags = formatDescTable[index].flags;
@@ -100,7 +100,7 @@ namespace nextar {
 			return false;
 		}
 
-		bool IsDepthStencilFormat(PixelFormat pf) {
+		_NexEngineAPI bool IsDepthStencilFormat(PixelFormat pf) {
 			const int index = (const int) pf;
 			if (index >= 0 && index <= (uint32)PixelFormat::COUNT) {
 				uint32 flags = formatDescTable[index].flags;
@@ -109,28 +109,29 @@ namespace nextar {
 			return false;
 		}
 
-		String GetStringFromFormat(PixelFormat pf) {
+		_NexEngineAPI String GetStringFromFormat(PixelFormat pf) {
 			const int index = (const int) pf;
 			if (index >= 0 && index <= (uint32)PixelFormat::COUNT)
 				return formatDescTable[index].name;
 			return StringUtils::Null;
 		}
 
-		inline bool IsCompressed(PixelFormat pf) {
+		_NexEngineAPI inline bool IsCompressed(PixelFormat pf) {
 			const int index = (const int) pf;
 			NEX_ASSERT(index >= 0 && index <= (uint32)PixelFormat::COUNT);
 			return (formatDescTable[index].flags & PIXFLAG_COMPRESSED) != 0;
 		}
 
-		bool IsValidTextureFormat(PixelFormat pf) {
+		_NexEngineAPI bool IsValidTextureFormat(PixelFormat pf) {
 			return (formatDescTable[(uint32)pf].flags & PIXFLAG_TEXTURE_FORMAT) != 0;
 		}
 
-		PixelFormat GetNearestTextureFormat(PixelFormat fmt) {
+		_NexEngineAPI PixelFormat GetNearestTextureFormat(PixelFormat fmt) {
 			switch (fmt) {
 			case PixelFormat::BGRA8:
+				return PixelFormat::RGBA8;
 			case PixelFormat::RGBA8:
-			case PixelFormat::A8:
+			case PixelFormat::R8:
 			case PixelFormat::D16:
 			case PixelFormat::D24S8:
 			case PixelFormat::D32:
@@ -142,7 +143,7 @@ namespace nextar {
 
 // include conversion routines
 
-		uint32 BytesPerPixel(PixelFormat pf) {
+		_NexEngineAPI uint32 BytesPerPixel(PixelFormat pf) {
 			const int index = (const int) pf;
 			if(index >= 0 && index <= (int)PixelFormat::COUNT)
 				return formatDescTable[index].pixelSize;
@@ -151,7 +152,7 @@ namespace nextar {
 
 // get buffer size
 
-		size_t GetBufferSize(uint32 width, uint32 height, uint32 depth,
+		_NexEngineAPI size_t GetBufferSize(uint32 width, uint32 height, uint32 depth,
 				PixelFormat fmt) {
 			if (IsCompressed(fmt)) {
 				/* todo for compressed formats */
@@ -159,7 +160,7 @@ namespace nextar {
 			return BytesPerPixel(fmt) * width * height * depth;
 		}
 
-		static void _PixelTransferImpl(PixelBox& dest, const PixelBox& src) {
+		_NexEngineAPI static void _PixelTransferImpl(PixelBox& dest, const PixelBox& src) {
 #define PIXCONV_ROUTINE(from,to)  case PixelConversionTypeId(from,to):  \
 		PixelConverter< PixelMapper< from, to > >::Transfer(dest, src); \
 		return;
@@ -183,7 +184,7 @@ namespace nextar {
 				PixelFormat fmt) {
 #define PIXPACK_ROUTINE(format) case format: PixelPacker<format>::Pack(c, data); break;
 			switch (fmt) {
-			PIXPACK_ROUTINE(PixelFormat::A8)
+			PIXPACK_ROUTINE(PixelFormat::R8)
 			PIXPACK_ROUTINE(PixelFormat::RGBA8)
 			PIXPACK_ROUTINE(PixelFormat::BGRA8)
 			}
@@ -193,7 +194,7 @@ namespace nextar {
 		static void _UnpackPixel(ColorChannel& c, void *data, PixelFormat fmt) {
 #define PIXUNPACK_ROUTINE(format) case format: PixelPacker<format>::Unpack(data, c); break;
 			switch (fmt) {
-			PIXUNPACK_ROUTINE(PixelFormat::A8)
+			PIXUNPACK_ROUTINE(PixelFormat::R8)
 			PIXUNPACK_ROUTINE(PixelFormat::RGBA8)
 			PIXUNPACK_ROUTINE(PixelFormat::BGRA8)
 			}
@@ -201,7 +202,7 @@ namespace nextar {
 		}
 
 		/* Pixel transfer */
-		void PixelTransfer(PixelBox& dest, const PixelBox& src, Filter filter) {
+		_NexEngineAPI void PixelTransfer(PixelBox& dest, const PixelBox& src, Filter filter) {
 			/* do some validation*/
 			/* end of validation */
 			bool needsResize = !IsPixelVolumeSame(dest, src);
@@ -399,7 +400,7 @@ _PackPixel( to, reinterpret_cast<uint8*>(src.data) + \
 			}
 		}
 
-		void ResizeBox(PixelBox& dest, const PixelBox& src, Filter filter) {
+		_NexEngineAPI void ResizeBox(PixelBox& dest, const PixelBox& src, Filter filter) {
 			switch (filter) {
 			case FILTER_ANISOTROPIC:
 			case FILTER_LINEAR:

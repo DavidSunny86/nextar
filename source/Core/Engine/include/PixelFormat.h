@@ -52,8 +52,8 @@ namespace nextar {
 	 * Basic pixel formats
 	 */
 	enum class PixelFormat : int16 {
-		/* Alpha only, unsigned, normalized 8 bits per pixel */
-		A8 = 0,
+		/* Red only (encoding alpha), unsigned, normalized 8 bits per pixel */
+		R8 = 0,
 		/* RRGGBBAA, unsigned, normalized 32 bits per pixel. */
 		RGBA8,
 		/* BBGGRRAA, unsigned, normalized 32 bits per pixel. */
@@ -74,7 +74,7 @@ namespace nextar {
 		COUNT = UNKNOWN
 	};
 
-	class PixelBox {
+	class _NexEngineAPI PixelBox {
 
 	public:
 		
@@ -145,21 +145,22 @@ namespace nextar {
 			return Size(GetWidth(), GetHeight());
 		}
 
+		size_t GetDataSize() const;
 	};
 
 	namespace PixelUtils {
 
 		/* Get pixel format from string */
-		PixelFormat GetFormatFromString(const String& name);
+		_NexEngineAPI PixelFormat GetFormatFromString(const String& name);
 
 		/* Get pixel format string */
-		String GetStringFromFormat(PixelFormat);
+		_NexEngineAPI String GetStringFromFormat(PixelFormat);
 
 		/* Get buffer size */
-		size_t GetBufferSize(uint32 width, uint32 height, uint32 depth, PixelFormat fmt);
+		_NexEngineAPI size_t GetBufferSize(uint32 width, uint32 height, uint32 depth, PixelFormat fmt);
 
 		/* Get bytes per pixel */
-		uint32 BytesPerPixel(PixelFormat);
+		_NexEngineAPI uint32 BytesPerPixel(PixelFormat);
 
 		/**
 		 * Returns true if the pixel volume is same.
@@ -174,13 +175,13 @@ namespace nextar {
 		/**
 		 * Returns true if this is a valid depth format.
 		 */
-		bool IsDepthFormat(PixelFormat);
+		_NexEngineAPI bool IsDepthFormat(PixelFormat);
 
 		/** Returns true if this is a valid stencil format. */
-		bool IsStencilFormat(PixelFormat);
+		_NexEngineAPI bool IsStencilFormat(PixelFormat);
 
 		/** Returns true if this is a valid depth and stencil format. */
-		bool IsDepthStencilFormat(PixelFormat);
+		_NexEngineAPI bool IsDepthStencilFormat(PixelFormat);
 
 		/**
 		 * All pixel formats are not acceptable texture formats, those which are,
@@ -191,14 +192,14 @@ namespace nextar {
 		 * @return 
 		 * true if this pixel format is supported.
 		 */
-		bool IsValidTextureFormat(PixelFormat);
+		_NexEngineAPI bool IsValidTextureFormat(PixelFormat);
 
 		/**
 		 * Return a pixel format that closely resembles the source format
 		 * @param Source format
 		 * @return The texture pixel format
 		 */
-		PixelFormat GetNearestTextureFormat(PixelFormat);
+		_NexEngineAPI PixelFormat GetNearestTextureFormat(PixelFormat);
 
 		/**
 		 * Perform a pixel transfer operation, on the software. In cases where the
@@ -210,7 +211,7 @@ namespace nextar {
 		 * @param
 		 * The filtering to perform.
 		 */
-		void PixelTransfer(PixelBox& dest, const PixelBox& src, Filter);
+		_NexEngineAPI void PixelTransfer(PixelBox& dest, const PixelBox& src, Filter);
 
 		/**
 		 * This function assumes that the src and dest are in the same format,
@@ -221,8 +222,12 @@ namespace nextar {
 		 * @param dest
 		 * @param 
 		 */
-		void ResizeBox(PixelBox& dest, const PixelBox& src, Filter);
+		_NexEngineAPI void ResizeBox(PixelBox& dest, const PixelBox& src, Filter);
 
+	}
+
+	inline size_t PixelBox::GetDataSize() const {
+		return PixelUtils::GetBufferSize(GetWidth(), GetHeight(), GetDepth(), format);
 	}
 }
 

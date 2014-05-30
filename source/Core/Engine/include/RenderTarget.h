@@ -11,6 +11,7 @@
 #include <TextureBase.h>
 #include <RefPtr.h>
 #include <Viewport.h>
+#include <ContextObject.h>
 
 namespace nextar {
 
@@ -30,6 +31,8 @@ namespace nextar {
 		MULTI_RENDER_TARGET,
 	};
 
+	// @remarks
+	// Sub-classed by @RenderTexture, @MultiRenderTarget and @RenderBuffer
 	class _NexEngineAPI RenderTarget : public Referenced<RenderTarget, AllocGraphics> {
 	public:
 
@@ -52,19 +55,29 @@ namespace nextar {
 		virtual Viewport* CreateViewport(Camera*, float x = 0.0f,
 				float y = 0.0f, float width = 1.0f, float height = 1.0f,
 				int32 priority = 0);
+
+
 		/* pixel format */
 		virtual PixelFormat GetPixelFormat() const = 0;
 		/* Dimensions */
 		virtual Size GetDimensions() const = 0;
-		/* Capture render target */
+		/* Capture render target from a single context */
 		virtual void Capture(RenderContext* rc, PixelBox& image, FrameBuffer) = 0;
-		virtual void Reset(RenderContext* rc, Size size, PixelFormat format) = 0;
+		// virtual void Reset(RenderContext* rc, Size size, PixelFormat format) = 0;
+		// todo This call should be replaced by the view->Present, may be a list of views
+		// should be maintaned instead of targets.
 		virtual void Present(RenderContext* rc) = 0;
 
 	protected:
 
 		const RenderTargetType targetType;
 		Viewport* viewport;
+	};
+
+	class RenderTargetView : public ContextObject::View {
+	public:
+		virtual void Capture(RenderContext* rc, PixelBox& image, FrameBuffer) = 0;
+		virtual void Present(RenderContext* rc) = 0;
 	};
 
 } /* namespace nextar */

@@ -14,28 +14,43 @@
 
 namespace nextar {
 
-
-	class ContextObject {
+	typedef std::ptrdiff_t ContextID;
+	class _NexEngineAPI ContextObject {
 	public:
-		typedef std::ptrdiff_t UpdateParamPtr;
 
-		ContextObject();
+		typedef const void* ContextParamPtr;
+
+		enum Type {
+			TYPE_TEXTURE,
+			TYPE_RENDER_TEXTURE,
+			TYPE_MULTI_RENDER_TARGET,
+			TYPE_RENDER_BUFFER,
+		};
+
+		class View {
+		public:
+			virtual void Create(nextar::RenderContext*) {}
+			virtual void Update(nextar::RenderContext*, uint32 msg, ContextParamPtr) {}
+			virtual void Destroy(nextar::RenderContext*) {}
+
+			virtual ~View() {}
+		};
+
+		ContextObject(Type type);
 		virtual ~ContextObject();
 
-		virtual void Create(nextar::RenderContext*) {}
-		virtual void Update(nextar::RenderContext*, UpdateParamPtr) {}
-		virtual void Destroy(nextar::RenderContext*) {}
-		/* Called by the class who is responsible for its creation
-		 * and destruction */
-		virtual void RequestCreate();
-		virtual void NotifyCreated() {}
-		/* Called by the class who is responsible for its creation
-		 * and destruction */
-		virtual void RequestDestroy();
-		virtual void NotifyDestroyed() {}
-		/* Called by the class when the object is updated */
-		virtual void RequestUpdate(ContextObject::UpdateParamPtr);
-		virtual void NotifyUpdated(ContextObject::UpdateParamPtr) {}
+		inline void SetContextID(ContextID id) {
+			contextId = id;
+		}
+
+		/* Called by the class when the object is updated
+		 * todo Extend the functionality to include wait-for or wait-less update.
+		 * What the later would do is, RequestUpdate will immediately return after
+		 * the call and register a callback to be called when the update is done. */
+		virtual void RequestUpdate(uint32 updateMsg, ContextObject::ContextParamPtr);
+
+	protected:
+		ContextID contextId;
 	};
 
 } /* namespace RenderOpenGL */

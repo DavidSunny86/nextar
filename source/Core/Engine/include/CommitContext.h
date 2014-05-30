@@ -11,6 +11,7 @@
 #include <NexBase.h>
 #include <ShaderParam.h>
 #include <ParameterBuffer.h>
+#include <ConstantBuffer.h>
 
 namespace nextar {
 
@@ -37,9 +38,10 @@ namespace nextar {
 
 		ParamContext	shaderParamContext[PARAM_CONTEXT_COUNT];
 		
-		ConstantBuffer*		cbuffer;
+		ConstantBuffer::View*		cbuffer;
+		uint32						cbufferSize;
 
-		Pass*				pass;
+		Pass::View*			pass;
 		ShaderAsset*		shader;
 		DebugDisplay*		debugDisplay;
 		VisibilitySet*		visibiles;

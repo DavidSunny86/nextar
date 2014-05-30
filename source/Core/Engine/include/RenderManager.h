@@ -57,11 +57,12 @@ namespace nextar {
 		virtual void Configure(const Config&);
 		virtual RenderDriverPtr AsyncCreateDriver(DriverCreationParams&);
 		virtual void Close();
-		virtual void RegisterRenderContext(RenderContextPtr&);
 
-		virtual void RequestObjectCreate(ContextObject*);
-		virtual void RequestObjectDestroy(ContextObject*);
-		virtual void RequestObjectUpdate(ContextObject*, ContextObject::UpdateParamPtr);
+		virtual void RegisterRenderContext(RenderContextPtr&) = 0;
+
+		virtual ContextID RequestObjectCreate(ContextObject::Type) = 0;
+		virtual void RequestObjectDestroy(ContextID) = 0;
+		virtual void RequestObjectUpdate(ContextObject*, uint32 updateMsg, ContextObject::ContextParamPtr) = 0;
 
 		/** This function might alter the actual layer indexes which are referred to
 		 * by materials. So, this should be called at the start of engine initialization and
@@ -75,18 +76,13 @@ namespace nextar {
 		virtual String GetInfo() = 0;
 		/* Create objects */
 		virtual GpuProgram* CreateProgram(GpuProgram::Type type) = 0; //todo
-		virtual RenderTarget* CreateRenderTarget(bool textureTarget = true) = 0;
-		virtual MultiRenderTarget* CreateMultiRenderTarget() = 0;
 		virtual Pass* CreatePass(StringID name) = 0;
 
 		/* Render a single frame for a specific window, should be called
 		   from the thread this window was created in */
-		virtual void RenderFrame(uint32 frameNumber);
+		virtual void RenderFrame(uint32 frameNumber) = 0;
 		
 	protected:
-
-		virtual void RenderAllTargets(RenderContext* rc, uint32 frame, bool callPresent);
-		virtual void PresentSwapChains(RenderContext* rc);
 
 		typedef vector<RenderDriverPtr>::type RenderDriverList;
 		typedef vector<RenderContextPtr>::type RenderContextList;
@@ -108,10 +104,6 @@ namespace nextar {
 		/* List of objects needs readying */
 		GpuObjectTraitsList objectsToReady;
 		bool usingMultiGpuSetup;
-		/* The first registered context is always the primary context, other
-		 * contexts are present if usingMultiGpuSetup is true */
-		RenderContextPtr primaryContext;
-		RenderContextList activeContexts;
 		RenderDriverList renderDrivers;
 	};
 } /* namespace nextar */

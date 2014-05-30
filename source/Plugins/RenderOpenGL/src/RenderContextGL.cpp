@@ -547,153 +547,6 @@ namespace RenderOpenGL {
 		image.CalculatePitches();
 		glReadBuffer(GL_BACK);
 	}
-
-	bool RenderContextGL::IsSamplerType(GLint type) {
-		switch (type) {
-			case GL_SAMPLER_1D: //sampler1D
-			case GL_SAMPLER_2D: //sampler2D
-			case GL_SAMPLER_3D: //sampler3D
-			case GL_SAMPLER_CUBE: //samplerCube
-			case GL_SAMPLER_1D_SHADOW: //sampler1DShadow
-			case GL_SAMPLER_2D_SHADOW: //sampler2DShadow
-			case GL_SAMPLER_1D_ARRAY: //sampler1DArray
-			case GL_SAMPLER_2D_ARRAY: //sampler2DArray
-			case GL_SAMPLER_1D_ARRAY_SHADOW: //sampler1DArrayShadow
-			case GL_SAMPLER_2D_ARRAY_SHADOW: //sampler2DArrayShadow
-			case GL_SAMPLER_2D_MULTISAMPLE: //sampler2DMS
-			case GL_SAMPLER_2D_MULTISAMPLE_ARRAY: //sampler2DMSArray
-			case GL_SAMPLER_CUBE_SHADOW: //samplerCubeShadow
-			case GL_SAMPLER_BUFFER: //samplerBuffer
-			case GL_SAMPLER_2D_RECT: //sampler2DRect
-			case GL_SAMPLER_2D_RECT_SHADOW: //sampler2DRectShadow
-			case GL_INT_SAMPLER_1D: //isampler1D
-			case GL_INT_SAMPLER_2D: //isampler2D
-			case GL_INT_SAMPLER_3D: //isampler3D
-			case GL_INT_SAMPLER_CUBE: //isamplerCube
-			case GL_INT_SAMPLER_1D_ARRAY: //isampler1DArray
-			case GL_INT_SAMPLER_2D_ARRAY: //isampler2DArray
-			case GL_INT_SAMPLER_2D_MULTISAMPLE: //isampler2DMS
-			case GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY: //isampler2DMSArray
-			case GL_INT_SAMPLER_BUFFER: //isamplerBuffer
-			case GL_INT_SAMPLER_2D_RECT: //isampler2DRect
-			case GL_UNSIGNED_INT_SAMPLER_1D: //usampler1D
-			case GL_UNSIGNED_INT_SAMPLER_2D: //usampler2D
-			case GL_UNSIGNED_INT_SAMPLER_3D: //usampler3D
-			case GL_UNSIGNED_INT_SAMPLER_CUBE: //usamplerCube
-			case GL_UNSIGNED_INT_SAMPLER_1D_ARRAY: //usampler2DArray
-			case GL_UNSIGNED_INT_SAMPLER_2D_ARRAY: //usampler2DArray
-			case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE: //usampler2DMS
-			case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY: //usampler2DMSArray
-			case GL_UNSIGNED_INT_SAMPLER_BUFFER: //usamplerBuffer
-			case GL_UNSIGNED_INT_SAMPLER_2D_RECT: //usampler2DRect
-				return true;
-		}
-		return false;
-	}
-
-	GLint RenderContextGL::GetGlMinFilter(TextureMinFilterType t) {
-		switch(t) {
-			case TF_MIN_NEAREST: return GL_NEAREST;
-			case TF_MIN_LINEAR: return GL_LINEAR;
-			case TF_MIN_NEAREST_MIPMAP_NEAREST: return GL_NEAREST_MIPMAP_NEAREST;
-			case TF_MIN_LINEAR_MIPMAP_NEAREST: return GL_LINEAR_MIPMAP_NEAREST;
-			case TF_MIN_NEAREST_MIPMAP_LINEAR: return GL_NEAREST_MIPMAP_LINEAR;
-			case TF_MIN_LINEAR_MIPMAP_LINEAR: return GL_LINEAR_MIPMAP_LINEAR;
-		}
-		return GL_LINEAR;
-	}
-
-	GLint RenderContextGL::GetGlMagFilter(TextureMinFilterType t) {
-		switch(t) {
-			case TF_MAG_NEAREST: return GL_NEAREST;
-			case TF_MAG_LINEAR: return GL_LINEAR;
-		}
-		return GL_LINEAR;
-	}
-
-	GLint RenderContextGL::GetGlAddressMode(TextureAddressModeType t) {
-		switch(t) {
-			case TAM_BORDER: return GL_CLAMP_TO_BORDER;
-			case TAM_CLAMP: return GL_CLAMP_TO_EDGE;
-			case TAM_MIRROR: return GL_MIRRORED_REPEAT;
-			case TAM_WRAP: return GL_REPEAT;
-		}
-		return GL_REPEAT;
-	}
-
-	GLenum RenderContextGL::GetGlCompareFunc(TextureComparisonModeType type) {
-		switch(type) {
-			case TEXCOMP_NEVER:
-				return GL_NEVER;
-			case TEXCOMP_LESS:
-				return GL_LESS;
-			case TEXCOMP_EQUAL:
-				return GL_EQUAL;
-			case TEXCOMP_LESS_EQUAL:
-				return GL_LEQUAL;
-			case TEXCOMP_GREATER:
-				return GL_GREATER;
-			case TEXCOMP_NOT_EQUAL:
-				return GL_NOTEQUAL;
-			case TEXCOMP_GREATER_EQUAL:
-				return GL_GEQUAL;
-		}
-		return 0;
-	}
-
-	uint16 RenderContextGL::GetSemanticType(GLenum e) {
-		switch (e) {
-			case GL_FLOAT:
-				return COMP_TYPE_FLOAT1;
-			case GL_FLOAT_VEC2:
-				return COMP_TYPE_FLOAT2;
-			case GL_FLOAT_VEC3:
-				return COMP_TYPE_FLOAT3;
-			case GL_FLOAT_VEC4:
-				return COMP_TYPE_FLOAT4;
-			case GL_UNSIGNED_INT:
-				return COMP_TYPE_UNSIGNED_INT;
-			default:
-				NEX_ASSERT(0);
-		}
-		return -1;
-	}
-
-	uint16 RenderContextGL::GetShaderParamSize(GLuint type) {
-		switch(type) {
-			case GL_BOOL: return (uint16)1;
-			case GL_UNSIGNED_INT: return (uint16)sizeof(uint32);
-			case GL_INT: return (uint16)sizeof(int32);
-			case GL_FLOAT: return (uint16)sizeof(float);
-			case GL_FLOAT_VEC2: return (uint16)sizeof(float)*2;
-			case GL_FLOAT_VEC3: return (uint16)sizeof(float)*3;
-			case GL_FLOAT_VEC4: return (uint16)sizeof(float)*4;
-			case GL_INT_VEC2: return (uint16)sizeof(int32)*2;
-			case GL_INT_VEC3: return (uint16)sizeof(int32)*3;
-			case GL_INT_VEC4: return (uint16)sizeof(int32)*4;
-			case GL_FLOAT_MAT3x4: return (uint16)sizeof(float)*12;
-			case GL_FLOAT_MAT4: return (uint16)sizeof(float)*16;
-		}
-		return (uint16)0;
-	}
-
-	uint16 RenderContextGL::GetShaderParamType(GLuint type) {
-		switch(type) {
-			case GL_BOOL: return (uint16)ParamDataType::PDT_BOOL;
-			case GL_UNSIGNED_INT: return (uint16)ParamDataType::PDT_UINT;
-			case GL_INT: return (uint16)ParamDataType::PDT_INT;
-			case GL_FLOAT: return (uint16)ParamDataType::PDT_FLOAT;
-			case GL_FLOAT_VEC2: return (uint16)ParamDataType::PDT_VEC2;
-			case GL_FLOAT_VEC3: return (uint16)ParamDataType::PDT_VEC3;
-			case GL_FLOAT_VEC4: return (uint16)ParamDataType::PDT_VEC4;
-			case GL_INT_VEC2: return (uint16)ParamDataType::PDT_IVEC2;
-			case GL_INT_VEC3: return (uint16)ParamDataType::PDT_IVEC3;
-			case GL_INT_VEC4: return (uint16)ParamDataType::PDT_IVEC4;
-			case GL_FLOAT_MAT3x4: return (uint16)ParamDataType::PDT_MAT3x4;
-			case GL_FLOAT_MAT4: return (uint16)ParamDataType::PDT_MAT4x4;
-		}
-		return (uint16)ParamDataType::PDT_UNKNOWN;
-	}
 		
 	void RenderContextGL::Draw(StreamData* streamData, CommitContext& ctx) {
 		/**
@@ -888,6 +741,314 @@ namespace RenderOpenGL {
 		GlBindBuffer(GL_COPY_WRITE_BUFFER, 0);
 	}
 
+	void RenderContextGL::AllocateTexture(GLenum target, GLint levels,
+			GLenum format, GLsizei width, GLsizei height, GLsizei depth) {
+		switch(target) {
+		case GL_TEXTURE_1D:
+			GlTexStorage1D(target, levels, format, width);
+			break;
+		case GL_TEXTURE_2D:
+		case GL_TEXTURE_RECTANGLE:
+		case GL_TEXTURE_CUBE_MAP:
+		case GL_TEXTURE_1D_ARRAY:
+			GlTexStorage2D(target, levels, format, width, height);
+			break;
+		case GL_TEXTURE_3D:
+		case GL_TEXTURE_2D_ARRAY:
+		case GL_TEXTURE_CUBE_MAP_ARRAY:
+			GlTexStorage3D(target, levels, format, width, height, depth);
+			break;
+		}
+		GL_CHECK();
+	}
+
+	void RenderContextGL::AllocateTextureLevel(GLenum target, GLint level,
+			const PixelFormatGl&  format,	GLsizei width,
+			GLsizei height, GLsizei depth, const uint8* data, size_t size) {
+		switch(target) {
+		case GL_TEXTURE_1D:
+			if (format.isCompressed)
+				glCompressedTexImage1D(target, level, format.internalFormat, width, 0, size, data);
+			else
+				glTexImage1D(target, level, format.internalFormat, width, 0, format.sourceFormat, format.dataType, data);
+			break;
+		case GL_TEXTURE_2D:
+		case GL_TEXTURE_RECTANGLE:
+		case GL_TEXTURE_CUBE_MAP:
+		case GL_TEXTURE_1D_ARRAY:
+			if (format.isCompressed)
+				glCompressedTexImage2D(target, level, format.internalFormat, width, height, 0, size, data);
+			else
+				glTexImage2D(target, level, format.internalFormat, width, height, 0, format.sourceFormat, format.dataType, data);
+			break;
+		case GL_TEXTURE_3D:
+		case GL_TEXTURE_2D_ARRAY:
+		case GL_TEXTURE_CUBE_MAP_ARRAY:
+			if (format.isCompressed)
+				glCompressedTexImage3D(target, level, format.internalFormat, width, height, depth, 0, size, data);
+			else
+				glTexImage3D(target, level, format.internalFormat, width, height, depth, 0, format.sourceFormat, format.dataType, data);
+			break;
+		}
+		GL_CHECK();
+	}
+
+	void RenderContextGL::WriteTextureLevel(GLenum target, GLint level,
+			const PixelFormatGl&  format, GLsizei width,
+			GLsizei height, GLsizei depth, const uint8* data, size_t size) {
+		// todo Not sure if it will work for compressed formats
+		switch(target) {
+		case GL_TEXTURE_1D:
+				glTexSubImage1D(target, level, 0, width, format.sourceFormat, format.dataType, data);
+			break;
+		case GL_TEXTURE_2D:
+		case GL_TEXTURE_RECTANGLE:
+		case GL_TEXTURE_CUBE_MAP:
+		case GL_TEXTURE_1D_ARRAY:
+				glTexSubImage2D(target, level, 0, 0, width, height, format.sourceFormat, format.dataType, data);
+			break;
+		case GL_TEXTURE_3D:
+		case GL_TEXTURE_2D_ARRAY:
+		case GL_TEXTURE_CUBE_MAP_ARRAY:
+				glTexSubImage3D(target, level, 0, 0, 0, width, height, depth, format.sourceFormat, format.dataType, data);
+			break;
+		}
+		GL_CHECK();
+
+	}
+
+	bool RenderContextGL::IsSamplerType(GLint type) {
+		switch (type) {
+			case GL_SAMPLER_1D: //sampler1D
+			case GL_SAMPLER_2D: //sampler2D
+			case GL_SAMPLER_3D: //sampler3D
+			case GL_SAMPLER_CUBE: //samplerCube
+			case GL_SAMPLER_1D_SHADOW: //sampler1DShadow
+			case GL_SAMPLER_2D_SHADOW: //sampler2DShadow
+			case GL_SAMPLER_1D_ARRAY: //sampler1DArray
+			case GL_SAMPLER_2D_ARRAY: //sampler2DArray
+			case GL_SAMPLER_1D_ARRAY_SHADOW: //sampler1DArrayShadow
+			case GL_SAMPLER_2D_ARRAY_SHADOW: //sampler2DArrayShadow
+			case GL_SAMPLER_2D_MULTISAMPLE: //sampler2DMS
+			case GL_SAMPLER_2D_MULTISAMPLE_ARRAY: //sampler2DMSArray
+			case GL_SAMPLER_CUBE_SHADOW: //samplerCubeShadow
+			case GL_SAMPLER_BUFFER: //samplerBuffer
+			case GL_SAMPLER_2D_RECT: //sampler2DRect
+			case GL_SAMPLER_2D_RECT_SHADOW: //sampler2DRectShadow
+			case GL_INT_SAMPLER_1D: //isampler1D
+			case GL_INT_SAMPLER_2D: //isampler2D
+			case GL_INT_SAMPLER_3D: //isampler3D
+			case GL_INT_SAMPLER_CUBE: //isamplerCube
+			case GL_INT_SAMPLER_1D_ARRAY: //isampler1DArray
+			case GL_INT_SAMPLER_2D_ARRAY: //isampler2DArray
+			case GL_INT_SAMPLER_2D_MULTISAMPLE: //isampler2DMS
+			case GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY: //isampler2DMSArray
+			case GL_INT_SAMPLER_BUFFER: //isamplerBuffer
+			case GL_INT_SAMPLER_2D_RECT: //isampler2DRect
+			case GL_UNSIGNED_INT_SAMPLER_1D: //usampler1D
+			case GL_UNSIGNED_INT_SAMPLER_2D: //usampler2D
+			case GL_UNSIGNED_INT_SAMPLER_3D: //usampler3D
+			case GL_UNSIGNED_INT_SAMPLER_CUBE: //usamplerCube
+			case GL_UNSIGNED_INT_SAMPLER_1D_ARRAY: //usampler2DArray
+			case GL_UNSIGNED_INT_SAMPLER_2D_ARRAY: //usampler2DArray
+			case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE: //usampler2DMS
+			case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY: //usampler2DMSArray
+			case GL_UNSIGNED_INT_SAMPLER_BUFFER: //usamplerBuffer
+			case GL_UNSIGNED_INT_SAMPLER_2D_RECT: //usampler2DRect
+				return true;
+		}
+		return false;
+	}
+
+	GLint RenderContextGL::GetGlMinFilter(TextureMinFilterType t) {
+		switch(t) {
+			case TF_MIN_NEAREST: return GL_NEAREST;
+			case TF_MIN_LINEAR: return GL_LINEAR;
+			case TF_MIN_NEAREST_MIPMAP_NEAREST: return GL_NEAREST_MIPMAP_NEAREST;
+			case TF_MIN_LINEAR_MIPMAP_NEAREST: return GL_LINEAR_MIPMAP_NEAREST;
+			case TF_MIN_NEAREST_MIPMAP_LINEAR: return GL_NEAREST_MIPMAP_LINEAR;
+			case TF_MIN_LINEAR_MIPMAP_LINEAR: return GL_LINEAR_MIPMAP_LINEAR;
+		}
+		return GL_LINEAR;
+	}
+
+	GLint RenderContextGL::GetGlMagFilter(TextureMinFilterType t) {
+		switch(t) {
+			case TF_MAG_NEAREST: return GL_NEAREST;
+			case TF_MAG_LINEAR: return GL_LINEAR;
+		}
+		return GL_LINEAR;
+	}
+
+	GLint RenderContextGL::GetGlAddressMode(TextureAddressModeType t) {
+		switch(t) {
+			case TAM_BORDER: return GL_CLAMP_TO_BORDER;
+			case TAM_CLAMP: return GL_CLAMP_TO_EDGE;
+			case TAM_MIRROR: return GL_MIRRORED_REPEAT;
+			case TAM_WRAP: return GL_REPEAT;
+		}
+		return GL_REPEAT;
+	}
+
+	GLenum RenderContextGL::GetGlCompareFunc(TextureComparisonModeType type) {
+		switch(type) {
+			case TEXCOMP_NEVER:
+				return GL_NEVER;
+			case TEXCOMP_LESS:
+				return GL_LESS;
+			case TEXCOMP_EQUAL:
+				return GL_EQUAL;
+			case TEXCOMP_LESS_EQUAL:
+				return GL_LEQUAL;
+			case TEXCOMP_GREATER:
+				return GL_GREATER;
+			case TEXCOMP_NOT_EQUAL:
+				return GL_NOTEQUAL;
+			case TEXCOMP_GREATER_EQUAL:
+				return GL_GEQUAL;
+		}
+		return 0;
+	}
+
+	uint16 RenderContextGL::GetSemanticType(GLenum e) {
+		switch (e) {
+			case GL_FLOAT:
+				return COMP_TYPE_FLOAT1;
+			case GL_FLOAT_VEC2:
+				return COMP_TYPE_FLOAT2;
+			case GL_FLOAT_VEC3:
+				return COMP_TYPE_FLOAT3;
+			case GL_FLOAT_VEC4:
+				return COMP_TYPE_FLOAT4;
+			case GL_UNSIGNED_INT:
+				return COMP_TYPE_UNSIGNED_INT;
+			default:
+				NEX_ASSERT(0);
+		}
+		return -1;
+	}
+
+	uint16 RenderContextGL::GetShaderParamSize(GLuint type) {
+		switch(type) {
+			case GL_BOOL: return (uint16)1;
+			case GL_UNSIGNED_INT: return (uint16)sizeof(uint32);
+			case GL_INT: return (uint16)sizeof(int32);
+			case GL_FLOAT: return (uint16)sizeof(float);
+			case GL_FLOAT_VEC2: return (uint16)sizeof(float)*2;
+			case GL_FLOAT_VEC3: return (uint16)sizeof(float)*3;
+			case GL_FLOAT_VEC4: return (uint16)sizeof(float)*4;
+			case GL_INT_VEC2: return (uint16)sizeof(int32)*2;
+			case GL_INT_VEC3: return (uint16)sizeof(int32)*3;
+			case GL_INT_VEC4: return (uint16)sizeof(int32)*4;
+			case GL_FLOAT_MAT3x4: return (uint16)sizeof(float)*12;
+			case GL_FLOAT_MAT4: return (uint16)sizeof(float)*16;
+		}
+		return (uint16)0;
+	}
+
+	uint16 RenderContextGL::GetShaderParamType(GLuint type) {
+		switch(type) {
+			case GL_BOOL: return (uint16)ParamDataType::PDT_BOOL;
+			case GL_UNSIGNED_INT: return (uint16)ParamDataType::PDT_UINT;
+			case GL_INT: return (uint16)ParamDataType::PDT_INT;
+			case GL_FLOAT: return (uint16)ParamDataType::PDT_FLOAT;
+			case GL_FLOAT_VEC2: return (uint16)ParamDataType::PDT_VEC2;
+			case GL_FLOAT_VEC3: return (uint16)ParamDataType::PDT_VEC3;
+			case GL_FLOAT_VEC4: return (uint16)ParamDataType::PDT_VEC4;
+			case GL_INT_VEC2: return (uint16)ParamDataType::PDT_IVEC2;
+			case GL_INT_VEC3: return (uint16)ParamDataType::PDT_IVEC3;
+			case GL_INT_VEC4: return (uint16)ParamDataType::PDT_IVEC4;
+			case GL_FLOAT_MAT3x4: return (uint16)ParamDataType::PDT_MAT3x4;
+			case GL_FLOAT_MAT4: return (uint16)ParamDataType::PDT_MAT4x4;
+		}
+		return (uint16)ParamDataType::PDT_UNKNOWN;
+	}
+
+	GLenum RenderContextGL::GetGlTextureType(TextureBase::TextureType type) {
+		switch(type) {
+		case TextureBase::TEXTURE_1D:
+			return GL_TEXTURE_1D;
+		case TextureBase::TEXTURE_1D_ARRAY:
+			return GL_TEXTURE_1D_ARRAY;
+		case TextureBase::TEXTURE_2D:
+			return GL_TEXTURE_2D;
+		case TextureBase::TEXTURE_2D_ARRAY:
+			return GL_TEXTURE_2D_ARRAY;
+		case TextureBase::TEXTURE_3D:
+			return GL_TEXTURE_3D;
+		case TextureBase::TEXTURE_CUBE_MAP:
+			return GL_TEXTURE_CUBE_MAP;
+		case TextureBase::TEXTURE_CUBE_MAP_ARRAY:
+			return GL_TEXTURE_CUBE_MAP_ARRAY;
+		}
+		return 0;
+	}
+
+	RenderContextGL::PixelFormatGl RenderContextGL::GetGlPixelFormat(PixelFormat imageFormat, PixelFormat textureFormat) {
+		NEX_ASSERT(PixelUtils::IsValidTextureFormat(textureFormat));
+		PixelFormatGl pft;
+		// todo Check for floating point components
+		pft.isCompressed = false;
+		pft.internalFormat = GL_NONE;
+		pft.sourceFormat = GL_NONE;
+		switch(textureFormat) {
+		case PixelFormat::R8:
+			NEX_ASSERT(imageFormat == PixelFormat::R8);
+			pft.internalFormat = GL_R8;
+			pft.sourceFormat = GL_R8;
+			pft.dataType = GL_UNSIGNED_BYTE;
+			break;
+		case PixelFormat::BGRA8:
+			pft.internalFormat = GL_RGBA8;
+			pft.sourceFormat = GL_BGRA;
+#if (NEX_ENDIANNESS == NEX_ENDIAN_LITTLE)
+			pft.dataType = GL_UNSIGNED_INT_8_8_8_8_REV;
+#else
+			pft.dataType = GL_UNSIGNED_INT_8_8_8_8;
+#endif
+			break;
+		case PixelFormat::RGBA8:
+			NEX_ASSERT(imageFormat == PixelFormat::RGBA8 || imageFormat == PixelFormat::BGRA8);
+			pft.internalFormat = GL_RGBA8;
+			pft.sourceFormat = imageFormat == PixelFormat::RGBA8 ? GL_RGBA : GL_BGRA;
+#if (NEX_ENDIANNESS == NEX_ENDIAN_LITTLE)
+			pft.dataType = GL_UNSIGNED_INT_8_8_8_8_REV;
+#else
+			pft.dataType = GL_UNSIGNED_INT_8_8_8_8;
+#endif
+			break;
+		case PixelFormat::D16:
+			NEX_ASSERT(imageFormat == PixelFormat::D16);
+			pft.internalFormat = GL_DEPTH_COMPONENT16;
+			pft.sourceFormat = GL_DEPTH_COMPONENT;
+			pft.dataType = GL_FLOAT;
+			break;
+		case PixelFormat::D24:
+			NEX_ASSERT(imageFormat == PixelFormat::D24);
+			pft.internalFormat = GL_DEPTH_COMPONENT24;
+			pft.sourceFormat = GL_DEPTH_COMPONENT;
+			pft.dataType = GL_FLOAT;
+			break;
+		case PixelFormat::D24S8:
+			NEX_ASSERT(imageFormat == PixelFormat::D24S8);
+			pft.internalFormat = GL_DEPTH24_STENCIL8;
+			pft.sourceFormat = GL_DEPTH_STENCIL;
+			pft.dataType = GL_FLOAT; // irrelevant
+			break;
+		case PixelFormat::D32:
+			NEX_ASSERT(imageFormat == PixelFormat::D32);
+			pft.internalFormat = GL_DEPTH_COMPONENT32;
+			pft.sourceFormat = GL_DEPTH_COMPONENT;
+			pft.dataType = GL_FLOAT;
+			break;
+		case PixelFormat::RGBA16F:
+			NEX_ASSERT(imageFormat == PixelFormat::RGBA16F);
+			pft.internalFormat = GL_RGBA16F;
+			pft.sourceFormat = GL_RGBA;
+			pft.dataType = GL_FLOAT;
+		}
+		return pft;
+	}
 }
 
 

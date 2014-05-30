@@ -67,9 +67,9 @@ namespace RenderOpenGL {
 		}
 	}
 
-	void VertexLayoutGL::Update(nextar::RenderContext* rc, UpdateParamPtr param) {
+	void VertexLayoutGL::Update(nextar::RenderContext* rc, ContextParamPtr param) {
 		if(param) {
-			VertexLayout::UpdateParam* up = reinterpret_cast<UpdateParam*>(param);
+			VertexLayout::ContextParam* up = reinterpret_cast<ContextParam*>(param);
 			attributes.resize(up->numElements);
 			const VertexElement* el = up->elements;
 			for(auto& a : attributes) {
@@ -96,7 +96,7 @@ namespace RenderOpenGL {
 		passVertexArrayPairs.clear();
 	}
 
-	void VertexLayoutStaticGL::Update(nextar::RenderContext* rc, UpdateParamPtr param) {
+	void VertexLayoutStaticGL::Update(nextar::RenderContext* rc, ContextParamPtr param) {
 		VertexLayoutGL::Update(rc, param);
 		RenderContextGL* rcGL = static_cast<RenderContextGL*>(rc);
 		for (auto &p : passVertexArrayPairs) {

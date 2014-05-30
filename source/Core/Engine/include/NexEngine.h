@@ -32,6 +32,7 @@ namespace nextar {
 	class CommitContext;
 	class DebugDisplay;
 	class Pass;
+	class ContextObject;
 
 	class Component;
 	class SharedComponent;

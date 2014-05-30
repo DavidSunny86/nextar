@@ -18,7 +18,18 @@ namespace nextar {
 			public AllocGraphics {
 	public:
 
-		struct UpdateParam {
+		class View : public ContextObject::View {
+		public:
+
+			virtual void Create(nextar::RenderContext*);
+			virtual void Update(nextar::RenderContext*, ContextObject::ContextParamPtr);
+			virtual void Destroy(nextar::RenderContext*);
+
+			virtual bool Compile(nextar::RenderContext* ctx, const char* src, const nextar::StringUtils::WordList& macroList) = 0;
+			virtual void Decompile(nextar::RenderContext* ctx) = 0;
+		};
+
+		struct ContextParam {
 			const char* programSource;
 			const StringUtils::WordList* compileOptions;
 		};
@@ -46,15 +57,7 @@ namespace nextar {
 			return type;
 		}
 
-
-		virtual void Create(nextar::RenderContext*);
-		virtual void Update(nextar::RenderContext*, ContextObject::UpdateParamPtr);
-		virtual void Destroy(nextar::RenderContext*);
-
 	protected:
-
-		virtual bool Compile(nextar::RenderContext* ctx, const char* src, const nextar::StringUtils::WordList& macroList) = 0;
-		virtual void Decompile(nextar::RenderContext* ctx) = 0;
 
 		uint16 flags;
 		int16 type;

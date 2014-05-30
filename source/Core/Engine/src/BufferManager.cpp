@@ -53,10 +53,10 @@ namespace nextar {
 		bool usesDynamicBinding) {
 		VertexLayout* layout = CreateVertexLayoutImpl(usesDynamicBinding);
 		if (layout) {
-			VertexLayout::UpdateParam up;
+			VertexLayout::ContextParam up;
 			up.numElements = numElements;
 			up.elements = elements;
-			layout->RequestUpdate(reinterpret_cast<ContextObject::UpdateParamPtr>(&up));
+			layout->RequestUpdate(reinterpret_cast<ContextObject::ContextParamPtr>(&up));
 		}
 		return layout;
 	}

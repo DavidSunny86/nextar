@@ -106,20 +106,17 @@ namespace nextar {
 	}
 
 	void BaseRenderContext::RegisterObject(ContextObject* object) {
-		object->Create(this);
-		object->NotifyCreated();
+		object->GetView(this)->Create(this);
 	}
 
 	void BaseRenderContext::UnregisterObject(ContextObject* object) {
-		object->Destroy(this);
-		object->NotifyDestroyed();
+		object->GetView(this)->Destroy(this);
 	}
 
 	void BaseRenderContext::UpdateObject(ContextObject* object, 
-		ContextObject::UpdateParamPtr updateParam) {
+		ContextObject::ContextParamPtr updateParam) {
 		NEX_ASSERT(threadId == std::this_thread::get_id());
-		object->Update(this, updateParam);
-		object->NotifyDestroyed();
+		object->GetView(this)->Update(this, updateParam);
 	}
 
 	FrameStats BaseRenderContext::GetFrameStats() {

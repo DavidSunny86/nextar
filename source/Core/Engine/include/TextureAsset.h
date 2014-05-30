@@ -35,6 +35,7 @@ namespace nextar {
 		class LodStrategy;
 
 		typedef AssetTraits<TextureAsset> Traits;
+		typedef FactoryTraits<TextureAsset> FactoryTraits;
 
 		class LodStrategy {
 		public:
@@ -56,11 +57,13 @@ namespace nextar {
 			};
 
 			InputStreamPtr inputStream;
-			ImageParams imageParams;
 			Image image;
-			uint32 maxLodLevels;
+			ImageParams imageParams;
+			ImageCodecMetaInfo codecInfo;
+			UpdateParams createParams;
 
-			TextureStreamRequest(TextureAsset* texture) : AssetStreamRequest(texture), maxLodLevels(-1) {
+			TextureStreamRequest(TextureAsset* texture) : AssetStreamRequest(texture) {
+				codecInfo.metaInfo.maxMipMapCount = -1;
 			}
 		};
 
@@ -83,10 +86,6 @@ namespace nextar {
 			SetFlag(TEXTURE_COMPLETE, t);
 		}
 
-		virtual void Create(nextar::RenderContext*);
-		virtual void Update(nextar::RenderContext*, ContextObject::UpdateParamPtr update);
-		virtual void Destroy(nextar::RenderContext*);
-
 		virtual uint32 GetClassID() const;
 
 	protected:
@@ -100,9 +99,6 @@ namespace nextar {
 
 		virtual StreamRequest* CreateStreamRequestImpl(bool load);
 		virtual void DestroyStreamRequestImpl(StreamRequest*&, bool load=true);
-
-	    virtual void WriteBoxImpl(RenderContext*, size_t faceNum, size_t mipNum,
-	            PixelBox& box) = 0;
 
 		LodStrategy* lodStrategy;
 	};

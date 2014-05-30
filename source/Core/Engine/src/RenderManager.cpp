@@ -49,50 +49,6 @@ namespace nextar {
 		return renderDrvPtr;
 	}
 
-	void RenderManager::RegisterRenderContext(RenderContextPtr& ptr) {
-		NEX_THREAD_LOCK_GUARD_MUTEX(accessLock);
-		if (!primaryContext && !usingMultiGpuSetup)
-			primaryContext = ptr;
-		else {
-			activeContexts.push_back(ptr);
-		}
-	}
-
-	void RenderManager::RequestObjectCreate(ContextObject* traits) {
-		if (primaryContext) {
-			primaryContext->RegisterObject(traits);
-		} else {
-			RenderContextList::iterator it = activeContexts.begin();
-			RenderContextList::iterator en = activeContexts.end();
-			for(; it != en; ++it) {
-				(*it)->RegisterObject(traits);
-			}
-		}
-	}
-
-	void RenderManager::RequestObjectDestroy(ContextObject* traits) {
-		if (primaryContext) {
-			primaryContext->UnregisterObject(traits);
-		} else {
-			RenderContextList::iterator it = activeContexts.begin();
-			RenderContextList::iterator en = activeContexts.end();
-			for(; it != en; ++it) {
-				(*it)->UnregisterObject(traits);
-			}
-		}
-	}
-
-	void RenderManager::RequestObjectUpdate(ContextObject* traits, ContextObject::UpdateParamPtr params) {
-		if (primaryContext) {
-			primaryContext->UpdateObject(traits, params);
-		} else {
-			RenderContextList::iterator it = activeContexts.begin();
-			RenderContextList::iterator en = activeContexts.end();
-			for(; it != en; ++it) {
-				(*it)->UpdateObject(traits, params);
-			}
-		}
-	}
 
 	void RenderManager::AddRenderQueue(const String& name, uint16 priority, RenderQueueFlags flags) {
 		if (renderQueues.size() >= 255) {
@@ -111,57 +67,6 @@ namespace nextar {
 		return renderQueues;
 	}
 
-	void RenderManager::RenderFrame(uint32 frameNumber) {
-		/**
-		 * Handle culling step followed by rendering step.
-		 */
-		if (primaryContext) {
-			RenderAllTargets(primaryContext, frameNumber, !renderSettings.syncPresent);
-		} else {
-			RenderContextList::iterator it = activeContexts.begin();
-			RenderContextList::iterator en = activeContexts.end();
-			for(; it != en; ++it) {
-				RenderAllTargets((*it), frameNumber, !renderSettings.syncPresent);
-			}
-		}
-
-		if (renderSettings.syncPresent) {
-			if (primaryContext) {
-				PresentSwapChains(primaryContext);
-			} else {
-
-				RenderContextList::iterator it = activeContexts.begin();
-				RenderContextList::iterator en = activeContexts.end();
-				for(; it != en; ++it) {
-					PresentSwapChains((*it));
-				}
-			}
-		}
-	}
-
-	void RenderManager::RenderAllTargets(RenderContext* rc, uint32 frame, bool callPresent) {
-		
-		rc->BeginFrame(frame);
-		RenderTargetList& rtList = rc->GetRenderTargetList();
-		for (auto &rt : rtList) {
-
-			Viewport::Iterator it = rt->GetViewports();
-			for(; it; ++it) {
-				(*it)->Render(rc, frame);
-			}
-
-			if (callPresent) 
-				rt->Present(rc);
-		}
-		rc->EndFrame();
-	}
-
-	void RenderManager::PresentSwapChains(RenderContext* rc) {
-		RenderTargetList& rtList = rc->GetRenderTargetList();
-		for (auto &rt : rtList) {
-			rt->Present(rc);
-		}
-	}
 
 	RenderSystemList& RenderManager::GetRenderSystems()	{
 		return renderSystems;

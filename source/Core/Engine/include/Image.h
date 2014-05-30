@@ -13,7 +13,22 @@
 
 namespace nextar {
 
+
+	struct ImageMetaInfo {
+		uint16 maxDepth;
+		uint16 maxHeight;
+		uint16 maxWidth;
+		uint16  maxMipMapCount;
+	};
+
+	struct ImageCodecMetaInfo {
+		bool metaInfoInited;
+		uint16 mipLevelsToRead;
+		ImageMetaInfo metaInfo;
+	};
+
 	struct ImageParams {
+		bool progressiveLoad;
 		String name;
 		String codecName;
 		uint16 baseMipLevel;
@@ -34,8 +49,8 @@ namespace nextar {
 
 	class ImageCodec {
 	public:
-		virtual bool TryLoad(InputStreamPtr& file, const ImageParams& params) = 0;
-		virtual ImageData Load(InputStreamPtr& file, const ImageParams& params) = 0;
+		virtual bool TryLoad(InputStreamPtr& file, const ImageParams& params, ImageCodecMetaInfo& metaInfo) = 0;
+		virtual ImageData Load(InputStreamPtr& file, const ImageParams& params, ImageCodecMetaInfo& metaInfo) = 0;
 		virtual void Save(OutputStreamPtr& file, const ImageParams& params, const ImageData& data) = 0;
 
 	protected:
@@ -64,7 +79,7 @@ namespace nextar {
 		public:
 
 			inline Serializer(const ImageParams& imgparams) : params(imgparams) {}
-			ImageData Serialize(InputStreamPtr& stream);
+			ImageData Serialize(InputStreamPtr& stream, ImageCodecMetaInfo& metaInfo);
 			void Serialize(OutputStreamPtr& stream, const ImageData& data);
 		};
 
@@ -108,15 +123,7 @@ namespace nextar {
 			return numFaces;
 		}
 
-		inline uint16 GetTotalMipMapCount() const {
-			return totalMipMapCount;
-		}
-
-		inline uint16 GetArrayElementCount() const {
-			return arrayElementCount;
-		}
-
-		void Load(InputStreamPtr& input, const ImageParams& params);
+		void Load(InputStreamPtr& input, const ImageParams& params, ImageCodecMetaInfo& metaInfo);
 		void Save(OutputStreamPtr& input, const ImageParams& params);
 
 	private:
@@ -124,8 +131,6 @@ namespace nextar {
 		/* total mip map count in this image file,
 		 * is equal to numMipMaps if the whole file was loaded
 		 * or the maximum levels present in th file  */
-		uint8 totalMipMapCount;
-		uint8 arrayElementCount;
 		uint8 numFaces;
 		uint8 numMipMaps;
 		uint16 depth;

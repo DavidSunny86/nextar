@@ -23,7 +23,7 @@ namespace nextar {
 	class VertexLayout: public ContextObject,
 		public AllocGraphics {
 	public:
-		struct UpdateParam {
+		struct ContextParam {
 			uint32 numElements;
 			const VertexElement* elements;
 		};

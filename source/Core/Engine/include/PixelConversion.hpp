@@ -90,7 +90,7 @@ namespace nextar {
 		};
 
 		template<>
-		class PixelPacker<PixelFormat::A8> {
+		class PixelPacker<PixelFormat::R8> {
 		public:
 			static inline void Pack(ColorChannel& c, const void* pixMem) {
 				c.value[0] = (float) (*(const uint8*) pixMem) / 255.f;

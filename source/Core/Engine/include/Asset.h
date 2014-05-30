@@ -43,6 +43,7 @@ namespace nextar {
 
 		typedef SharedComponent::Factory Factory;
 		typedef list<AssetCallback*>::type AssetCallbackList;
+		typedef SharedComponent InstanceImplementor;
 
 		enum Flags {
 			BACKGROUND_LOADED = Component::LAST_FLAG << 0,
@@ -66,6 +67,7 @@ namespace nextar {
 				CLASS_ID = AssetType::CLASS_ID
 			};
 
+			typedef typename AssetType::InstanceImplementor InstanceImplementor;
 			typedef RefPtr<AssetType> AssetTypePtr;
 
 			inline static AssetTypePtr Instance(const StringID name, const StringID factory = StringUtils::DefaultID,
@@ -75,15 +77,15 @@ namespace nextar {
 				Group* groupPtr = nullptr;
 				if (group != StringUtils::NullID)
 					groupPtr = ComponentGroupArchive::Instance().AsyncFindGroup(group);
-				return SharedComponent::Instance(CLASS_ID, name, factoryPtr, groupPtr);
+				return InstanceImplementor::Instance(CLASS_ID, name, factoryPtr, groupPtr);
 			}
 
 			inline static AssetTypePtr Instance(const StringID name, Component::Factory* factory = nullptr, SharedComponent::Group* group = nullptr) {
-				return SharedComponent::Instance(CLASS_ID, name, factory, group);
+				return InstanceImplementor::Instance(CLASS_ID, name, factory, group);
 			}
 
 			inline static AssetTypePtr Instance(const StringID name, const URL& locator, Component::Factory* factory = nullptr, SharedComponent::Group* group = nullptr) {
-				AssetTypePtr asset = SharedComponent::Instance(CLASS_ID, name, factory, group);
+				AssetTypePtr asset = InstanceImplementor::Instance(CLASS_ID, name, factory, group);
 				if (asset)
 					asset->SetAssetLocator(locator);
 				return asset;

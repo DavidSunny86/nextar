@@ -30,6 +30,10 @@ namespace nextar {
 			return name;
 		}
 
+		inline String GetNameID() const {
+			return Convert::ToString((uint32)name);
+		}
+
 		static StringID AsyncStringID(const String&);
 
 	protected:

@@ -46,7 +46,7 @@ namespace RenderOpenGL {
 		VertexLayoutGL();
 		~VertexLayoutGL() {}
 
-		virtual void Update(nextar::RenderContext*, UpdateParamPtr);
+		virtual void Update(nextar::RenderContext*, ContextParamPtr);
 		virtual void Enable(VertexBufferBinding& binding, PassGL* pass, RenderContextGL* rc) = 0;
 		virtual void Disable(RenderContextGL* rc) = 0;
 		/* Get ith element */
@@ -77,7 +77,7 @@ namespace RenderOpenGL {
 		VertexLayoutStaticGL();
 		~VertexLayoutStaticGL();
 
-		virtual void Update(nextar::RenderContext*, UpdateParamPtr);
+		virtual void Update(nextar::RenderContext*, ContextParamPtr);
 		virtual void Destroy(nextar::RenderContext*);
 
 		virtual void Enable(VertexBufferBinding& binding, PassGL* pass, RenderContextGL* rc);
@@ -95,7 +95,7 @@ namespace RenderOpenGL {
 		VertexLayoutDynamicGL();
 		~VertexLayoutDynamicGL();
 
-		virtual void Update(nextar::RenderContext*, UpdateParamPtr);
+		virtual void Update(nextar::RenderContext*, ContextParamPtr);
 		virtual void Enable(VertexBufferBinding& binding, PassGL* pass, RenderContextGL* rc);
 		virtual void Disable(RenderContextGL* rc);
 

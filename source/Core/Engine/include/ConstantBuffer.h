@@ -9,20 +9,30 @@
 #define CONSTANTBUFFER_H_
 
 #include <ShaderParam.h>
-#include <ManagedBuffer.h>
+#include <GpuBuffer.h>
 
 namespace nextar {
 
-	class ConstantBuffer : public ManagedBuffer {
+	class ConstantBuffer : public GpuBuffer {
 	public:
 
 		enum {
-			CUSTOM_BUFFER = ManagedBuffer::LAST_FLAG << 0,
-			CUSTOM_STRUCT = ManagedBuffer::LAST_FLAG << 1,
-			LAST_FLAG = ManagedBuffer::LAST_FLAG << 2,
+			CUSTOM_BUFFER = GpuBuffer::LAST_FLAG << 0,
+			CUSTOM_STRUCT = GpuBuffer::LAST_FLAG << 1,
+			LAST_FLAG = GpuBuffer::LAST_FLAG << 2,
 		};
 
-		ConstantBuffer(size_t bufferSize, uint32 flags = Buffer::DEFAULT_FLAGS);
+		class View : public GpuBuffer::View {
+		public:
+			/* Must be called before Write is called */
+			virtual void BeginUpdate(RenderContext* rc, UpdateFrequency updateFlags) =0;
+			/* Must be called after Write operations are done */
+			virtual void EndUpdate(RenderContext* rc) =0;
+			/* Write in one go, does not require a begin and end update */
+			virtual void Write(RenderContext* rc, const void *src, size_t size) =0;
+		};
+
+		ConstantBuffer(size_t bufferSize, uint32 flags = GpuBuffer::DEFAULT_FLAGS);
 		virtual ~ConstantBuffer();
 
 		inline void SetName(const String& name) {
@@ -53,19 +63,6 @@ namespace nextar {
 			return ShaderParamIterator(&paramDesc->paramDesc, paramCount, paramStride);
 		}
 
-		/* Must be called before Write is called */
-		virtual void BeginUpdate(RenderContext* rc, UpdateFrequency updateFlags) =0;
-		/* Must be called after Write operations are done */
-		virtual void EndUpdate(RenderContext* rc) =0;
-		/* Write in one go, does not require a begin and end update */
-		virtual void Write(RenderContext* rc, const void *src, size_t size) =0;
-		/** This function will fail unless a local copy of the data exists. The local
-		 * copy is created if the CPU_READ flag is set. **/
-		virtual void Read(RenderContext* rc, void *dest, size_t offset, size_t size) override =0;
-		/** Write to buffer */
-		virtual void Write(RenderContext* rc, const void *src, size_t offset, size_t size) override =0;
-		/** Copy from another buffer */
-		virtual void CopyFrom(RenderContext* rc, BufferPtr&) override =0;
 
 	protected:
 		// If frequency is exclusively PER_MATERIAL or PER_PASS or PER_OBJECT_INSTANCE,

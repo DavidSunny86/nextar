@@ -29,7 +29,7 @@ namespace nextar {
 		/** todo Context objects */
 		virtual void RegisterObject(ContextObject*);
 		virtual void UnregisterObject(ContextObject*);
-		virtual void UpdateObject(ContextObject*, ContextObject::UpdateParamPtr);
+		virtual void UpdateObject(ContextObject*, ContextObject::ContextParamPtr);
 
 		/* implement */
 		virtual void CreateImpl(const RenderDriver::ContextCreationParams& ctxParams) = 0;

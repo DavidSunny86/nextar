@@ -31,6 +31,7 @@ namespace nextar {
 	typedef uint32 utf32;
 	typedef uint32 VersionID;
 
+
 	template <typename T> struct BasicUniquePtr {
 		typedef std::unique_ptr<T,  GenericFree<T> > type;
 	};

@@ -20,6 +20,14 @@ namespace RenderOpenGL {
 		NEX_LOG_HELPER(RenderContextGL);
 	public:
 
+		struct PixelFormatGl {
+			bool isCompressed;
+			GLenum internalFormat;
+			GLenum sourceFormat;
+			GLenum dataType;
+		};
+
+
 		//typedef vector<GpuObject*>::type GpuObjectTable;
 
 		RenderContextGL(RenderDriverGL*);
@@ -66,6 +74,12 @@ namespace RenderOpenGL {
 		GLuint CreateVAO(VertexBufferBinding& binding, VertexAttribListGL& attribs, const VertexSemanticListGL& semantics);
 		GLuint CreateVertexBuffer(size_t size, GLenum usage);
 		GLuint CreateIndexBuffer(size_t size, GLenum usage);
+		GLuint CreateTexture();
+		void ActivateTexture(GLenum target, GLuint texture);
+		void AllocateTexture(GLenum target, GLint levels, GLenum format, GLsizei width, GLsizei height, GLsizei depth);
+		void AllocateTextureLevel(GLenum target, GLint level, );
+		void AllocateTextureLevel(GLenum target, GLint level, const PixelFormatGl& format, GLsizei width, GLsizei height, GLsizei depth, const uint8* data, size_t size);
+		void WriteTextureLevel(GLenum target, GLint level, const PixelFormatGl& format, GLsizei width, GLsizei height, GLsizei depth, const uint8* data, size_t size);
 
 		void CopyBuffer(GLuint src, GLuint dest, size_t size);
 
@@ -90,7 +104,6 @@ namespace RenderOpenGL {
 		// capture
 		void Capture(PixelBox& image, RenderTarget* rt, GLuint *pbo, FrameBuffer frameBuffer);
 
-	protected:
 
 		static uint16 GetShaderParamType(GLuint type);
 		static uint16 GetShaderParamSize(GLuint type);
@@ -100,7 +113,11 @@ namespace RenderOpenGL {
 		static GLenum GetGlCompareFunc(TextureComparisonModeType type);
 		static GLint GetGlMagFilter(TextureMinFilterType t);
 		static GLint GetGlMinFilter(TextureMinFilterType t);
-		
+		static GLenum GetGlTextureType(TextureBase::TextureType type);
+		static PixelFormatGl GetGlPixelFormat(PixelFormat imageFormat, PixelFormat textureFormat);
+
+	protected:
+
 		UniformBufferGL* CreateUniformBuffer(PassGL* pass, GLint blockIndex, GLuint prog, GLuint numParams, size_t size);
 
 		enum {
@@ -233,6 +250,18 @@ namespace RenderOpenGL {
 		todo todo
 		GlBindTexture()
 		GlBindSampler(texIdx, samplerObject);
+	}
+
+	inline GLuint RenderContextGL::CreateTexture() {
+		GLuint texture;
+		glGenTextures(1, &texture);
+		GL_CHECK();
+		return texture;
+	}
+
+	inline void RenderContextGL::ActivateTexture(GLenum target, GLuint texture) {
+		glBindTexture(target, texture);
+		GL_CHECK();
 	}
 
 }

@@ -17,12 +17,12 @@ namespace nextar {
 	GpuProgram::~GpuProgram() {
 	}
 
-	void GpuProgram::Create(RenderContext* rc) {
+	void GpuProgram::View::Create(RenderContext* rc) {
 		// todo
 	}
 
-	void GpuProgram::Update(RenderContext* rc, ContextObject::UpdateParamPtr ptr) {
-		UpdateParam* param = reinterpret_cast<UpdateParam*>(ptr);
+	void GpuProgram::View::Update(RenderContext* rc, ContextObject::ContextParamPtr ptr) {
+		ContextParam* param = reinterpret_cast<ContextParam*>(ptr);
 		if ((flags & PROG_COMPILED)) {
 			Decompile(rc);
 		}
@@ -34,7 +34,7 @@ namespace nextar {
 		}
 	}
 
-	void GpuProgram::Destroy(RenderContext* rc) {
+	void GpuProgram::View::Destroy(RenderContext* rc) {
 		if ((flags & PROG_COMPILED)) {
 			Decompile(rc);
 			flags &= ~PROG_COMPILED;

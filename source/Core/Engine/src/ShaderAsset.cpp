@@ -40,7 +40,6 @@ namespace nextar {
 
 	void ShaderAsset::NotifyAssetLoaded() {
 		StreamRequest* creationParams = static_cast<StreamRequest*>(streamRequest);
-		ContextObject::RequestCreate();
 		/* update programs */
 		/* build with compilation options */
 		_DestroyPasses();
@@ -57,7 +56,6 @@ namespace nextar {
 		}
 		
 		/* update */
-		ContextObject::RequestUpdate(reinterpret_cast<UpdateParamPtr>(creationParams));
 		_BuildParameterTable();
 		/* mark request as complete */
 		creationParams->flags |= StreamRequest::COMPLETED;
@@ -67,46 +65,13 @@ namespace nextar {
 	}
 
 	Pass* ShaderAsset::_CreatePass(ShaderAsset::StreamPass& p, const String& co) {
-
 		Pass* r = RenderManager::Instance().CreatePass(p.name);
-		r->blendState = p.blendState;
-		r->depthStencilState = p.depthStencilState;
-		r->rasterState = p.rasterState;
-		r->textureDescMap.swap(p.textureStates);
-		//r->defaultTextureUnits.swap(p.defaultTextureUnits);
-		for(uint32 i = 0; i < Pass::NUM_STAGES; ++i) {
-			GpuProgram::Type t = (GpuProgram::Type)i;
-			const String& source = p.programSources[i];
-			if (source.length()) {
-				r->programs[i] = GpuProgram::Instance(t);
-				GpuProgram::UpdateParam update = {
-						source.c_str(),
-						&co
-				};
-				r->programs[i]->RequestUpdate(reinterpret_cast<ContextObject::UpdateParamPtr>(&update));
-			}
-		}
-
+		p.compileParams = &co;
+		r->RequestUpdate(reinterpret_cast<ContextObject::ContextParamPtr>(&p.compileParams));
 		return r;
 	}
 
 	void ShaderAsset::NotifyAssetUnloaded() {
-		ContextObject::RequestDestroy();
-		Pass **it, **en;
-		if(singlePassShader) {
-			it = &singlePassShader;
-			en = it + 1;
-		} else {
-			it = passes.data();
-			en = it + passes.size();
-		}
-
-		for(; it != en; ++it) {
-			for(uint32 i = 0; i < Pass::NUM_STAGES; ++i)
-				if ((*it)->programs[i])
-					(*it)->programs[i]->RequestDestroy();
-		}
-
 		_DestroyPasses();
 		/* notify dependents */
 		Asset::NotifyAssetUnloaded();
@@ -117,47 +82,8 @@ namespace nextar {
 	}
 
 	void ShaderAsset::NotifyAssetUpdated() {
-		ContextObject::RequestUpdate(0);
-		_BuildParameterTable();
+		// _BuildParameterTable();
 		Asset::NotifyAssetUpdated();
-	}
-
-	void ShaderAsset::Create(nextar::RenderContext*) {
-		// todo
-	}
-
-	void ShaderAsset::Update(RenderContext* rc, ContextObject::UpdateParamPtr streamRequest) {
-		StreamRequest* creationParams = reinterpret_cast<StreamRequest*>(streamRequest);
-		Pass **it, **en;
-		bool useFallback = false;
-		if(singlePassShader) {
-			it = &singlePassShader;
-			en = it + 1;
-		} else {
-			it = passes.data();
-			en = it + passes.size();
-		}
-
-		for(; it != en; ++it) {
-			useFallback &= (*it)->NotifyUpdated(rc);
-		}
-
-		if (useFallback)
-			Warn("Shader compilation failed.");
-	}
-
-	void ShaderAsset::Destroy(nextar::RenderContext* rc) {
-		Pass **it, **en;
-		if(singlePassShader) {
-			it = &singlePassShader;
-			en = it + 1;
-		} else {
-			it = passes.data();
-			en = it + passes.size();
-		}
-		for(; it != en; ++it) {
-			(*it)->NotifyDestroyed(rc);
-		}
 	}
 
 	nextar::StreamRequest* ShaderAsset::CreateStreamRequestImpl(bool load) {
@@ -277,7 +203,7 @@ namespace nextar {
 	}
 
 	void ShaderAsset::StreamRequest::SetProgramSource(GpuProgram::Type type, String&& src) {
-		passes[currentPass].programSources[type] = std::move(src);
+		passes[currentPass].compileParams.programSources[type] = std::move(src);
 	}
 
 	void ShaderAsset::StreamRequest::AddParam(const String& name,
@@ -291,7 +217,7 @@ namespace nextar {
 	
 	void ShaderAsset::StreamRequest::AddTextureUnit(const String& unitName, TextureUnitParams& tu, TextureBase* texture) {
 		ShaderAsset* shader = static_cast<ShaderAsset*>(streamedObject);
-		Pass::TextureDescMap& defaultTextureUnits = passes[currentPass].textureStates;
+		Pass::TextureDescMap& defaultTextureUnits = passes[currentPass].compileParams.textureStates;
 		Pass::SamplerDesc& sd = defaultTextureUnits[unitName];
 		sd.texUnitParams = tu;
 		sd.defaultTexture = texture;
@@ -304,15 +230,15 @@ namespace nextar {
 	}
 
 	void ShaderAsset::StreamRequest::SetBlendState(BlendState& state) {
-		passes[currentPass].blendState = state;
+		passes[currentPass].compileParams.blendState = state;
 	}
 
 	void ShaderAsset::StreamRequest::SetRasterState(RasterState& state) {
-		passes[currentPass].rasterState = state;
+		passes[currentPass].compileParams.rasterState = state;
 	}
 
 	void ShaderAsset::StreamRequest::SetDepthStencilState(DepthStencilState& state) {
-		passes[currentPass].depthStencilState = state;
+		passes[currentPass].compileParams.depthStencilState = state;
 	}
 
 	void ShaderAsset::StreamRequest::AddPass(StringID name) {
