@@ -49,12 +49,8 @@ namespace nextar {
 
 	void RenderTexture::Capture(RenderContext* rc, PixelBox& image,
 			FrameBuffer frameBuffer) {
-		RenderTargetView* v = static_cast<RenderTargetView*>(rc->GetView(this));
-		v->Capture(rc, image, frameBuffer);
+		View* v = static_cast<View*>(rc->GetView(this));
+		v->Update(rc, MSG_TEX_READ, &image);
 	}
 
-	void RenderTexture::Present(RenderContext* rc) {
-		RenderTargetView* v = static_cast<RenderTargetView*>(rc->GetView(this));
-		v->Present(rc);
-	}
 } /* namespace nextar */

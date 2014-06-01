@@ -12,30 +12,47 @@ namespace nextar {
 
 
 	void GpuBuffer::Read(void* dest, size_t offset, size_t amount) {
-		ContextParam p;
-		p.operation = OP_READ;
-		p.readBox.bufferPtr = dest;
-		p.readBox.offset = offset;
-		p.readBox.size = amount;
-		RequestUpdate(reinterpret_cast<ContextObject::ContextParamPtr>(&p));
+		ReadParams p;
+		p.bufferPtr = dest;
+		p.offset = offset;
+		p.size = amount;
+		RequestUpdate(MSG_OP_READ, reinterpret_cast<ContextObject::ContextParamPtr>(&p));
 	}
 
 	void GpuBuffer::Write(const void* dest, size_t offset, size_t amount) {
-		ContextParam p;
-		p.operation = OP_READ;
-		p.writeBox.bufferPtr = dest;
-		p.writeBox.offset = offset;
-		p.writeBox.size = amount;
-		RequestUpdate(reinterpret_cast<ContextObject::ContextParamPtr>(&p));
+		WriteParams p;
+		p.bufferPtr = dest;
+		p.offset = offset;
+		p.size = amount;
+		RequestUpdate(MSG_OP_WRITE, reinterpret_cast<ContextObject::ContextParamPtr>(&p));
 	}
 
-	void GpuBuffer::View::Update(RenderContext* context, ContextObject::ContextParamPtr param) {
-		ContextParam* p = reinterpret_cast<ContextParam*>(param);
-		//@ use a switch for more than 2 operations
-		if(p->operation == OP_READ) {
-			Read(context, p->readBox.bufferPtr, p->readBox.offset, p->readBox.size);
-		} else {
-			Write(context, p->writeBox.bufferPtr, p->writeBox.offset, p->writeBox.size);
+	void GpuBuffer::CopyFrom(GpuBufferPtr& ptr) {
+		RequestUpdate(MSG_OP_COPYBUFFER, reinterpret_cast<ContextObject::ContextParamPtr>(ptr.GetPtr()));
+	}
+
+	void GpuBuffer::View::Update(RenderContext* context, uint32 msg, ContextObject::ContextParamPtr param) {
+		switch(msg) {
+		case MSG_OP_READ:
+			{
+				ReadParams* p = reinterpret_cast<ReadParams*>(param);
+				Read(context, p->bufferPtr, p->offset, p->size);
+			}
+			break;
+		case MSG_OP_WRITE:
+			{
+				WriteParams* p = reinterpret_cast<ReadParams*>(param);
+				Write(context, p->bufferPtr, p->offset, p->size);
+			}
+			break;
+		case MSG_OP_COPYBUFFER:
+			{
+				GpuBuffer::View* view = static_cast<GpuBuffer::View*>(
+						context->GetView(reinterpret_cast<GpuBuffer*>(param)));
+				CopyFrom(context, view);
+			}
+			break;
 		}
 	}
+
 } /* namespace nextar */

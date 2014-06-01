@@ -56,7 +56,7 @@ namespace nextar {
 		}
 		
 		/* update */
-		_BuildParameterTable();
+		_BuildParameterTable(spl);
 		/* mark request as complete */
 		creationParams->flags |= StreamRequest::COMPLETED;
 		/* notify dependents */
@@ -65,9 +65,9 @@ namespace nextar {
 	}
 
 	Pass* ShaderAsset::_CreatePass(ShaderAsset::StreamPass& p, const String& co) {
-		Pass* r = RenderManager::Instance().CreatePass(p.name);
+		Pass* r = NEX_NEW( Pass(p.name) );
 		p.compileParams = &co;
-		r->RequestUpdate(reinterpret_cast<ContextObject::ContextParamPtr>(&p.compileParams));
+		r->RequestUpdate(Pass::MSG_PASS_COMPILE, reinterpret_cast<ContextObject::ContextParamPtr>(&p.compileParams));
 		return r;
 	}
 
@@ -96,10 +96,10 @@ namespace nextar {
 		request = nullptr;
 	}
 
-	void ShaderAsset::_BeginPass(PassPtr p, ParamTableBuilder& ptb) {
-		p->passParamByteOffset = ptb.passParamOffset;
-		p->materialParamByteOffset = ptb.materialParamOffset;
-		p->objectParamByteOffset = ptb.objectParamOffset;
+	void ShaderAsset::_BeginPass(Pass::OffsetParams& p, ParamTableBuilder& ptb) {
+		p.passParamByteOffset = ptb.passParamOffset;
+		p.materialParamByteOffset = ptb.materialParamOffset;
+		p.objectParamByteOffset = ptb.objectParamOffset;
 	}
 
 	void ShaderAsset::_Process(ShaderParamIterator& it, ParamTableBuilder& ptb) {
@@ -132,8 +132,8 @@ namespace nextar {
 		ptb.passTable.push_back(pe);
 	}
 
-	void ShaderAsset::_EndPass(PassPtr& p, ParamTableBuilder& ptb) {
-
+	void ShaderAsset::_EndPass(PassPtr& p, Pass::OffsetParams& offsets, ParamTableBuilder& ptb) {
+		p->RequestUpdate(Pass::MSG_PASS_UPDATE_OFFSET, static_cast<const Pass::OffsetParams*>(&offsets));
 	}
 
 	void ShaderAsset::_Finalize(ParamTableBuilder& ptb) {
@@ -154,9 +154,10 @@ namespace nextar {
 		objectProperties.first = materialProperties.second = paramLookup.begin() + offset;
 		offset += ptb.objectParamCount;
 		objectProperties.second = paramLookup.begin() + offset;
+
 	}
 
-	void ShaderAsset::_BuildParameterTable() {
+	void ShaderAsset::_BuildParameterTable(StreamPassList& spl) {
 		paramLookup.clear();
 
 		ParamTableBuilder paramTableBuilder;
@@ -168,9 +169,10 @@ namespace nextar {
 			it = passes.data();
 			en = it + passes.size();
 		}
-		for(; it != en; ++it) {
+		uint32 index = 0;
+		for(; it != en; ++it, ++index) {
 			PassPtr p = (*it);
-			_BeginPass(p, paramTableBuilder);
+			_BeginPass(spl[index].offsets, paramTableBuilder);
 			ConstantBufferList& cbl = p->GetConstantBuffers();
 			for(auto &c : cbl) {
 				ShaderParamIterator it = c->GetParamIterator();
@@ -179,7 +181,7 @@ namespace nextar {
 					++it;
 				}
 			}
-			_EndPass(p, paramTableBuilder);
+			_EndPass(p, spl[index].offsets, paramTableBuilder);
 			ShaderParamIterator it = p->GetSamplerIterator();
 			while(it) {
 				_Process(it, paramTableBuilder);

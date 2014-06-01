@@ -8,6 +8,7 @@
 #ifndef TEXTUREVIEWGL_H_
 #define TEXTUREVIEWGL_H_
 
+#include <RenderOpenGL.h>
 #include <TextureBase.h>
 
 namespace RenderOpenGL {
@@ -21,6 +22,14 @@ namespace RenderOpenGL {
 		virtual ~TextureViewGL();
 
 		virtual void Update(RenderContext*, uint32 msg, ContextObject::ContextParamPtr);
+
+		GLenum GetType() const {
+			return target;
+		}
+
+		GLuint GetTexture() const {
+			return texture;
+		}
 
 		bool IsCreated() const {
 			return texture == 0;

@@ -18,49 +18,45 @@ namespace nextar {
 			public AllocGraphics {
 	public:
 
-		class View : public ContextObject::View {
-		public:
-
-			virtual void Create(nextar::RenderContext*);
-			virtual void Update(nextar::RenderContext*, ContextObject::ContextParamPtr);
-			virtual void Destroy(nextar::RenderContext*);
-
-			virtual bool Compile(nextar::RenderContext* ctx, const char* src, const nextar::StringUtils::WordList& macroList) = 0;
-			virtual void Decompile(nextar::RenderContext* ctx) = 0;
+		enum {
+			MSG_COMPILE,
 		};
 
-		struct ContextParam {
+		enum ProgramType : uint16 {
+			TYPE_VERTEX = ContextObject::TYPE_GPU_VERTEX_PROGRAM,
+			TYPE_HULL = ContextObject::TYPE_GPU_HULL_PROGRAM,
+			TYPE_DOMAIN = ContextObject::TYPE_GPU_DOMAIN_PROGRAM,
+			TYPE_GEOMETRY = ContextObject::TYPE_GPU_GEOMETRY_PROGRAM,
+			TYPE_FRAGMENT = ContextObject::TYPE_GPU_FRAGMENT_PROGRAM,
+			TYPE_COMPUTE = ContextObject::TYPE_GPU_COMPUTE_PROGRAM,
+		};
+
+		struct CompileParam {
 			const char* programSource;
 			const StringUtils::WordList* compileOptions;
 		};
 
-		enum {
-			PROG_CREATED = 1 << 0,
-			PROG_COMPILED = 1 << 1,
-		};
+		class View : public ContextObject::View {
+		public:
 
-		enum Type {
-			TYPE_VERTEX,
-			TYPE_HULL,
-			TYPE_DOMAIN,
-			TYPE_GEOMETRY,
-			TYPE_FRAGMENT,
-			TYPE_COMPUTE,
+			virtual void Update(nextar::RenderContext*, uint32 msg, ContextObject::ContextParamPtr);
+			virtual bool Compile(nextar::RenderContext* ctx, const char* src, const nextar::StringUtils::WordList& macroList) = 0;
 		};
 
 		GpuProgram(Type type);
 		virtual ~GpuProgram();
 
-		static GpuProgram* Instance(Type t);
+		inline static GpuProgram* Instance(Type t) {
+			return NEX_NEW(GpuProgram(t));
+		}
 
-		inline int16 GetType() {
+		inline ProgramType GetProgramType() {
 			return type;
 		}
 
 	protected:
 
-		uint16 flags;
-		int16 type;
+		ProgramType type;
 	};
 
 } /* namespace nextar */

@@ -21,7 +21,8 @@ namespace nextar {
         };
         typedef uint8 TypeTag;
 
-        inline IndexBuffer(size_t size, uint32 flags, Type type) :  GpuBuffer(size, flags), indexType(static_cast<TypeTag>(type)) {
+        inline IndexBuffer(size_t size, uint32 flags, Type type) :
+        		GpuBuffer(TYPE_INDEX_BUFFER, size, flags), indexType(static_cast<TypeTag>(type)) {
         }
         virtual ~IndexBuffer();
 

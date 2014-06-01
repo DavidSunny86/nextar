@@ -34,6 +34,12 @@ namespace nextar {
 		enum Flags {
 			PROGRAM_DATA_INITED = 1 << 5,
 		};
+
+		enum Message {
+			MSG_PASS_COMPILE,
+			MSG_PASS_UPDATE_OFFSET,
+		};
+
 		// todo 7 or 8 is a good cap for this array, and
 		// can make do with a static array in that case.
 		typedef vector<TextureBase*>::type TextureList;
@@ -47,6 +53,7 @@ namespace nextar {
 		typedef array<ConstantBufferPtr, (uint32)MAX_CBUFFER>::type ConstantBufferList;
 
 		struct CompileParams {
+
 			const StringUtils::WordList* compileOptions;
 			String programSources[Pass::NUM_STAGES];
 			RasterState rasterState;
@@ -55,18 +62,24 @@ namespace nextar {
 			Pass::TextureDescMap textureStates;
 		};
 
+		struct OffsetParams {
+			uint32 passParamByteOffset;
+			uint32 materialParamByteOffset;
+			uint32 objectParamByteOffset;
+		};
+
 		class View : public ContextObject::View {
 		public:
+
+			View();
+
 			virtual void UpdateParams(RenderContext* renderCtx, CommitContext& context, UpdateFrequency flags);
 			// Bind texture to a shader parameter. The number of units must match the desc->numUnits count.
 			virtual void SetTextureImpl(RenderContext* rc, const TextureSamplerParamDesc* desc, const TextureUnit* tu) = 0;
 
-			virtual void Update(nextar::RenderContext*, ContextParamPtr);
+			virtual void Update(nextar::RenderContext*, uint32 msg, ContextParamPtr);
 
 			virtual void Compile(nextar::RenderContext*, const CompileParams&) = 0;
-			virtual void UpdateBlendStates(nextar::RenderContext*, const BlendState& state) = 0;
-			virtual void UpdateRasterStates(nextar::RenderContext*, const RasterState& state) = 0;
-			virtual void UpdateDepthStencilStates(nextar::RenderContext*, const DepthStencilState& state) = 0;
 
 			static inline void _ProcessShaderParamIterator(RenderContext* rc, CommitContext& ctx, ShaderParamIterator& it, UpdateFrequency flags) {
 				while(it) {
@@ -78,6 +91,14 @@ namespace nextar {
 					++it;
 				}
 			}
+
+		protected:
+
+			uint32 passParamByteOffset;
+			uint32 materialParamByteOffset;
+			uint32 objectParamByteOffset;
+			uint32 lastFrameUpdate;
+			uint32 lastViewUpdate;
 		};
 
 		Pass(StringID name);
@@ -113,8 +134,7 @@ namespace nextar {
 		static const SamplerDesc* MapSamplerParams(const String& name, const TextureDescMap& texMap);
 
 		// override RequestUpdate
-		virtual void RequestUpdate(ContextObject::ContextParamPtr);
-		virtual void RequestDestroy();
+		virtual void RequestUpdate(uint32 updateMsg, ContextObject::ContextParamPtr);
 		// Set texture states, called during pass creation
 
 	protected:
@@ -140,12 +160,6 @@ namespace nextar {
 		TextureSamplerParamDesc* samplers;
 		uint32 samplerCount;
 
-		uint32 passParamByteOffset;
-		uint32 materialParamByteOffset;
-		uint32 objectParamByteOffset;
-
-		uint32 lastFrameUpdate;
-		uint32 lastViewUpdate;
 		//static AutoParam autoParams[AutoParamName::AUTO_COUNT];
 		static AutoParamProcessor* customConstantProcessorMaterial;
 		static AutoParamProcessor* customTextureProcessorMaterial;

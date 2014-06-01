@@ -27,6 +27,7 @@ namespace nextar {
 
 	enum class RenderTargetType : uint16 {
 		RENDER_TEXTURE,
+		RENDER_BUFFER,
 		RENDER_WINDOW,
 		MULTI_RENDER_TARGET,
 	};
@@ -62,22 +63,16 @@ namespace nextar {
 		/* Dimensions */
 		virtual Size GetDimensions() const = 0;
 		/* Capture render target from a single context */
-		virtual void Capture(RenderContext* rc, PixelBox& image, FrameBuffer) = 0;
+		virtual void Capture(RenderContext* rc, PixelBox& image, FrameBuffer);
 		// virtual void Reset(RenderContext* rc, Size size, PixelFormat format) = 0;
 		// todo This call should be replaced by the view->Present, may be a list of views
 		// should be maintaned instead of targets.
-		virtual void Present(RenderContext* rc) = 0;
+		virtual void Present(RenderContext* rc);
 
 	protected:
 
 		const RenderTargetType targetType;
 		Viewport* viewport;
-	};
-
-	class RenderTargetView : public ContextObject::View {
-	public:
-		virtual void Capture(RenderContext* rc, PixelBox& image, FrameBuffer) = 0;
-		virtual void Present(RenderContext* rc) = 0;
 	};
 
 } /* namespace nextar */

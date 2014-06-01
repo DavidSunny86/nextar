@@ -25,10 +25,20 @@ namespace nextar {
 			TYPE_RENDER_TEXTURE,
 			TYPE_MULTI_RENDER_TARGET,
 			TYPE_RENDER_BUFFER,
+			TYPE_CONSTANT_BUFFER,
+			TYPE_INDEX_BUFFER,
+			TYPE_VERTEX_BUFFER,
+			TYPE_GPU_VERTEX_PROGRAM,
+			TYPE_GPU_HULL_PROGRAM,
+			TYPE_GPU_DOMAIN_PROGRAM,
+			TYPE_GPU_GEOMETRY_PROGRAM,
+			TYPE_GPU_FRAGMENT_PROGRAM,
+			TYPE_GPU_COMPUTE_PROGRAM,
 		};
 
 		class View {
 		public:
+
 			virtual void Create(nextar::RenderContext*) {}
 			virtual void Update(nextar::RenderContext*, uint32 msg, ContextParamPtr) {}
 			virtual void Destroy(nextar::RenderContext*) {}

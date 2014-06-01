@@ -29,7 +29,7 @@ namespace nextar {
 			/* Must be called after Write operations are done */
 			virtual void EndUpdate(RenderContext* rc) =0;
 			/* Write in one go, does not require a begin and end update */
-			virtual void Write(RenderContext* rc, const void *src, size_t size) =0;
+			virtual void Write(RenderContext* rc, const void *src, size_t offset, size_t size) =0;
 		};
 
 		ConstantBuffer(size_t bufferSize, uint32 flags = GpuBuffer::DEFAULT_FLAGS);

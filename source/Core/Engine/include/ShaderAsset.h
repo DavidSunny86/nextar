@@ -45,6 +45,7 @@ namespace nextar {
 		struct StreamPass {
 			StringID name;
 			Pass::CompileParams compileParams;
+			Pass::OffsetParams offsets;
 			//Pass::DefaultTextureUnitMap defaultTextureUnits;
 		};
 
@@ -153,14 +154,14 @@ namespace nextar {
 			ParamEntryTable passTable;
 		};
 
-
-		Pass* _CreatePass(StreamPass&, const String& compilationOpt);
 		void _DestroyPasses();
+		void _CompilePasses(StreamPassList& spl);
 		void _Process(ShaderParamIterator& it, ParamTableBuilder& ptb);
-		void _BeginPass(PassPtr p, ParamTableBuilder& ptb);
+		void _BeginPass(Pass::OffsetParams& p, ParamTableBuilder& ptb);
 		void _Finalize(ParamTableBuilder& ptb);
-		void _EndPass(PassPtr& p, ParamTableBuilder& ptb);
-		void _BuildParameterTable();
+		void _EndPass(PassPtr& p, Pass::OffsetParams& offsets, ParamTableBuilder& ptb);
+		void _BuildParameterTable(StreamPassList& spl);
+		Pass* _CreatePass(StreamPass&, const String& co);
 
 		// used as sort key
 		uint8 translucency;

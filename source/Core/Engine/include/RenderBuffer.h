@@ -19,6 +19,7 @@ namespace nextar {
 
 		enum {
 			MSG_RB_CREATE = 1 << 1,
+			MSG_RB_READ = 1 << 2,
 		};
 
 		struct CreateParams {
@@ -26,6 +27,7 @@ namespace nextar {
 			uint16 width;
 			uint16 height;
 		};
+
 
 		RenderBuffer();
 		virtual ~RenderBuffer();
@@ -35,8 +37,7 @@ namespace nextar {
 
 		virtual void Create(PixelFormat format, uint32 width, uint32 height);
 		virtual void Capture(RenderContext* rc, PixelBox& image, FrameBuffer);
-		virtual void Present(RenderContext* rc);
-z
+
 	protected:
 		uint16 width, height;
 		PixelFormat format;

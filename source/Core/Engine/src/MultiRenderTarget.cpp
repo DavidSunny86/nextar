@@ -20,12 +20,6 @@ namespace nextar {
 	}
 
 	MultiRenderTarget::~MultiRenderTarget() {
-		for(uint32 i = 0; i < numColorTargets; ++i)
-			NEX_DELETE(color[i]);
-		numColorTargets = 0;
-		if (depth)
-			NEX_DELETE(depth);
-		depth = 0;
 	}
 
 	Size MultiRenderTarget::GetDimensions() const {
@@ -38,20 +32,15 @@ namespace nextar {
 		dimensions = params.dimensions;
 		numColorTargets = params.numColorTargets;
 		for(uint32 i = numColorTargets; i < params.numColorTargets; ++i) {
-			if ()
-				color[i] = tpa[i].useTarget ? tpa[i].useTarget :
-				CreateColorTexture(tpa[i]);
+			color[i] = tpa[i].useTarget ? tpa[i].useTarget :
+				CreateTexture(tpa[i]);
 
 		}
 
 		bool validDepth = (params.useDepth);
-		if (validDepth != (IsDepthBufferValid())) {
-			if(validDepth)
-				depth = params.depth.useTarget ? params.depth.useTarget : RenderManager::Instance().CreateRenderTarget();
-			else {
-				NEX_DELETE(depth);
-				depth = 0;
-			}
+		if (validDepth) {
+			depth = params.depth.useTarget? params.depth.useTarget :
+					CreateTexture(params.depth);
 		}
 
 		ContextObject::RequestUpdate(updatePtr);
@@ -62,27 +51,23 @@ namespace nextar {
 		return PixelFormat::UNKNOWN;
 	}
 
-	void MultiRenderTarget::Capture(RenderContext* rc, PixelBox& image, FrameBuffer fb) {
-		NEX_THROW_FatalError(EXCEPT_INVALID_CALL);
-	}
-
-	RenderTarget* MultiRenderTarget::GetAttachment(uint16 i) {
+	RenderTargetPtr MultiRenderTarget::GetAttachment(uint16 i) {
 		return color[i];
 	}
 
-	RenderTarget* MultiRenderTarget::GetDepthAttachment() {
+	RenderTargetPtr MultiRenderTarget::GetDepthAttachment() {
 		return depth;
 	}
 
-	RenderTarget* MultiRenderTarget::CreateColorTexture(const TargetParam& tp) {
+	RenderTargetPtr MultiRenderTarget::CreateTexture(const TargetParam& tp) {
 		if(tp.useAsTexture) {
 			RenderTexture* rt = NEX_NEW( RenderTexture() );
 			rt->Create(TextureBase::TEXTURE_2D, tp.format, dimensions.width, dimensions.height, 1);
-			return rt;
+			return Assign(rt);
 		} else {
 			RenderBuffer* rt = NEX_NEW( RenderBuffer() );
 			rt->Create(tp.format, dimensions.width, dimensions.height);
-			return rt;
+			return Assign(rt);
 		}
 	}
 

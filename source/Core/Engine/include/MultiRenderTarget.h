@@ -27,12 +27,12 @@ namespace nextar {
 			MSG_RT_RESIZE = 1 << 2,
 		};
 
-		typedef array<RenderTarget*,MAX_TARGET>::type ColorAttachmentArray;
+		typedef array<RenderTargetPtr,MAX_TARGET>::type ColorAttachmentArray;
 
 		struct TargetParam {
 			bool useAsTexture;
 			PixelFormat format;
-			RenderTarget* useTarget;
+			RenderTargetPtr useTarget;
 		};
 
 		typedef array<TargetParam,MAX_TARGET>::type TargetParamArray;
@@ -60,18 +60,18 @@ namespace nextar {
 
 		virtual void Create(const CreateParam& params);
 
-		RenderTarget* GetAttachment(uint16 index);
-		RenderTarget* GetDepthAttachment();
+		RenderTargetPtr GetAttachment(uint16 index);
+		RenderTargetPtr GetDepthAttachment();
 
 	protected:
 
-		RenderTarget* CreateColorTexture(const TargetParam& tp);
+		RenderTargetPtr CreateTexture(const TargetParam& tp);
 
 		uint16 flags;
 		uint16 numColorTargets;
 		Size dimensions;
 		ColorAttachmentArray color;
-		RenderTarget* depth;
+		RenderTargetPtr depth;
 	};
 
 } /* namespace nextar */

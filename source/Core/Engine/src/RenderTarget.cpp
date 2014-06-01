@@ -34,4 +34,12 @@ namespace nextar {
 		return Viewport::Iterator(viewport);
 	}
 
+	void RenderTarget::Present(RenderContext* rc) {
+		NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
+	}
+
+	void RenderTarget::Capture(RenderContext* rc, PixelBox& image, FrameBuffer fb) {
+		NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
+	}
+
 } /* namespace nextar */

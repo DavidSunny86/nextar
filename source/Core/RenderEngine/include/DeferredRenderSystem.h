@@ -17,15 +17,14 @@ namespace nextar {
 	class _NexRenderAPI GBuffer : public AllocGeneral {
 	public:
 
+		GBuffer();
 		~GBuffer();
 
-		void Create();
 		void Setup(Size dimensions);
 
-
-		RenderTexture* depth;
-		RenderTexture* albedoSpecular;
-		RenderTexture* normalGloss;
+		RenderTexturePtr depth;
+		RenderTexturePtr albedoSpecular;
+		RenderTexturePtr normalGloss;
 		MultiRenderTargetPtr renderTarget;
 	};
 

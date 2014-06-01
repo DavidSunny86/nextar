@@ -16,15 +16,38 @@ namespace nextar {
 	/************************************************************************/
 	/* GBuffer                                                              */
 	/************************************************************************/
+	GBuffer::GBuffer() {
+		renderTarget = Assign(NEX_NEW(MultiRenderTarget()));
+	}
+
 	GBuffer::~GBuffer() {
 	}
 
-	void GBuffer::Create() {
-		depth = static_cast<RenderTexture*>(
-			RenderManager::Instance().CreateRenderTarget(true));
-		albedoSpecular = static_cast<RenderTexture*>(
-			RenderManager::Instance().CreateRenderTarget(true));
+	void GBuffer::Setup(Size dimensions) {
+		if (!renderTarget)
+
+		/* Clean setup */
+		MultiRenderTarget::CreateParam params;
+		params.dimensions = dimensions;
+		params.useDepth = true;
+		params.numColorTargets = 2;
+		/* normal & gloss */
+		params.targets[0].useAsTexture = true;
+		params.targets[0].format = PixelFormat::RGBA8;
+		/* albedo & specular */
+		params.targets[1].useAsTexture = true;
+		params.targets[1].format = PixelFormat::RGBA8;
+		/* depth */
+		params.depth.useAsTexture = true;
+		params.depth.format = PixelFormat::D24S8;
+		renderTarget->Create(params);
+
+		depth = static_cast<RenderTexture*>(renderTarget->GetDepthAttachment());
+		normalGloss = static_cast<RenderTexture*>(renderTarget->GetAttachment(0));
+		albedoSpecular = static_cast<RenderTexture*>(renderTarget->GetAttachment(1));
+
 	}
+
 
 	/************************************************************************/
 	/* DeferredRenderSystem                                                 */
@@ -39,7 +62,6 @@ namespace nextar {
 	}
 
 	void DeferredRenderSystem::PrepareGeometryBuffer() {
-		gbuffer.Create();
 		gbufferRI.rt = gbuffer.renderTarget;
 		gbufferRI.clearColor = Color::Black;
 		gbufferRI.clearStencil = 0;
@@ -93,32 +115,6 @@ namespace nextar {
 			Box2D box(0, 0, 0.25f, 0.25f);
 			context.debugDisplay->Register(box, Color::Red, gbuffer.normalGloss);
 		}
-	}
-
-	/** GBuffer ************************/
-	void GBuffer::Setup(Size dimensions) {
-		if (!renderTarget)
-			renderTarget = Bind(RenderManager::Instance().CreateMultiRenderTarget());
-		/* Clean setup */
-		MultiRenderTarget::CreateParam params;
-		params.dimensions = dimensions;
-		params.flags = MultiRenderTarget::CreateParam::INCLUDE_DEPTH;
-		params.numColorTargets = 2;
-		/* normal & gloss */
-		params.targets[0].useAsTexture = true;
-		params.targets[0].format = PixelFormat::RGBA8;
-		/* albedo & specular */
-		params.targets[1].useAsTexture = true;
-		params.targets[1].format = PixelFormat::RGBA8;
-		/* depth */
-		params.depth.useAsTexture = true;
-		params.depth.format = PixelFormat::D24S8;
-		renderTarget->NotifyUpdated(reinterpret_cast<ContextObject::ContextParamPtr>(&params));
-
-		depth = static_cast<RenderTexture*>(renderTarget->GetDepthAttachment());
-		normalGloss = static_cast<RenderTexture*>(renderTarget->GetAttachment(0));
-		albedoSpecular = static_cast<RenderTexture*>(renderTarget->GetAttachment(1));
-
 	}
 
 } /* namespace nextar */

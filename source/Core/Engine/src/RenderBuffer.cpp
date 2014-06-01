@@ -33,13 +33,8 @@ namespace nextar {
 
 	void RenderBuffer::Capture(RenderContext* rc, PixelBox& image,
 			FrameBuffer frameBuffer) {
-		RenderTargetView* v = static_cast<RenderTargetView*>(rc->GetView(this));
-		v->Capture(rc, image, frameBuffer);
-	}
-
-	void RenderBuffer::Present(RenderContext* rc) {
-		RenderTargetView* v = static_cast<RenderTargetView*>(rc->GetView(this));
-		v->Present(rc);
+		View* v = static_cast<View*>(rc->GetView(this));
+		v->Update(rc, MSG_RB_READ, &image);
 	}
 
 } /* namespace nextar */

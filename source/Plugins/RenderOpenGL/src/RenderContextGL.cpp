@@ -10,6 +10,7 @@
 #include <RenderWindow.h>
 #include <ShaderAsset.h>
 #include <PassGL.h>
+#include <FrameBufferObjectGL.h>
 
 namespace RenderOpenGL {
 
@@ -640,10 +641,22 @@ namespace RenderOpenGL {
 		else {
 			switch (canvas->GetRenderTargetType()) {
 			case RenderTargetType::RENDER_TEXTURE:
+				RenderTextureViewGL* textureView =
+						static_cast<RenderTextureViewGL*>(
+								GetView(static_cast<RenderTexture*>(canvas)));
+				FrameBufferObjectGL& fbo = textureView->GetFBO();
+				if (!fbo.IsValid())
+					textureView->CreateFBO();
+				fbo.Bind(false, this);
+
+				break;
+			case RenderTargetType::RENDER_BUFFER:
+				break;
 			case RenderTargetType::RENDER_WINDOW:
 				SetCurrentWindow(canvas);
 				break;
 			case RenderTargetType::MULTI_RENDER_TARGET:
+				break;
 			}
 		}
 	}

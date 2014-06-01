@@ -15,18 +15,14 @@ namespace nextar {
 	uint32 Pass::samplerStride(0);
 	Pass::AutoParamMap Pass::autoParams;
 	
+
 	Pass::Pass(StringID name) :
 	NamedObject(name)
-	,passParamByteOffset(-1)
-	,materialParamByteOffset(-1)
-	,objectParamByteOffset(-1)
 	,inputLayoutUniqueID(-1)
 	,flags(0)
 	,programs() // todo is this enough?? or do null out
 	,samplers(nullptr)
 	,samplerCount(0)
-	,lastFrameUpdate(-1)
-	,lastViewUpdate(-1)
 	,numConstBuffers(0) {
 		// null all programs
 		for(uint32 i = 0; i < Pass::NUM_STAGES; ++i) {
@@ -35,51 +31,80 @@ namespace nextar {
 	}
 
 	Pass::~Pass() {
-		// TODO Auto-generated destructor stub
-	}
-
-	void Pass::RequestUpdate(ContextObject::ContextParamPtr param) {
-		CompileParams& p = *reinterpret_cast<CompileParams*>(param);
-		//blendState = p.blendState;
-		//depthStencilState = p.depthStencilState;
-		//rasterState = p.rasterState;
-		//textureDescMap.swap(p.textureStates);
-
-		for(uint32 i = 0; i < Pass::NUM_STAGES; ++i) {
-			GpuProgram::Type t = (GpuProgram::Type)i;
-			const String& source = p.programSources[i];
-			if (programs[i])
-				NEX_DELETE(programs[i]);
-			programs[i] = nullptr;
-			if (source.length()) {
-				programs[i] = GpuProgram::Instance(t);
-				GpuProgram::ContextParam update = {
-						source.c_str(),
-						p.compileOptions
-				};
-				programs[i]->RequestUpdate(reinterpret_cast<ContextObject::ContextParamPtr>(&update));
-			}
-		}
-		ContextObject::RequestUpdate(reinterpret_cast<ContextObject::ContextParamPtr>(param));
-	}
-
-	void Pass::RequestDestroy() {
 		for(uint32 i = 0; i < Pass::NUM_STAGES; ++i) {
 			if (programs[i]) {
 				NEX_DELETE(programs[i]);
 				programs[i] = nullptr;
 			}
 		}
-		ContextObject::RequestDestroy();
 	}
 
-	void Pass::View::Update(RenderContext* rc, ContextParamPtr param) {
-		CompileParams& p = *reinterpret_cast<CompileParams*>(param);
-		/** todo Change to bool inliners */
-		UpdateRasterStates(rc, p.rasterState);
-		UpdateBlendStates(rc, p.blendState);
-		UpdateDepthStencilStates(rc, p.depthStencilState);
-		Compile(rc, p);
+	void Pass::RequestUpdate(uint32 msg, ContextObject::ContextParamPtr param) {
+		if (msg == Pass::MSG_PASS_COMPILE) {
+			CompileParams& p = *reinterpret_cast<CompileParams*>(param);
+			//blendState = p.blendState;
+			//depthStencilState = p.depthStencilState;
+			//rasterState = p.rasterState;
+			//textureDescMap.swap(p.textureStates);
+
+			for(uint32 i = 0; i < Pass::NUM_STAGES; ++i) {
+				GpuProgram::Type t = (GpuProgram::Type)i;
+				const String& source = p.programSources[i];
+				if (programs[i])
+					NEX_DELETE(programs[i]);
+				programs[i] = nullptr;
+				if (source.length()) {
+					programs[i] = GpuProgram::Instance(t);
+					GpuProgram::CompileParam update = {
+							source.c_str(),
+							p.compileOptions
+					};
+					programs[i]->RequestUpdate(GpuProgram::MSG_COMPILE,
+							reinterpret_cast<ContextObject::ContextParamPtr>(&update));
+				}
+			}
+		}
+		ContextObject::RequestUpdate(msg, reinterpret_cast<ContextObject::ContextParamPtr>(param));
+	}
+
+
+	const AutoParam* Pass::MapParam(const String& name) {
+		auto ap = autoParams.find(name);
+		if (ap == autoParams.end())
+			return nullptr;
+		// todo map parsed params
+		return (*ap).second;
+	}
+
+	const Pass::SamplerDesc* Pass::MapSamplerParams(const String& name, const TextureDescMap& texMap) {
+		auto sp = texMap.find(name);
+		if (sp == texMap.end())
+			return nullptr;
+		// todo map parsed params
+		return &(*sp).second;
+	}
+
+	/****************************************************/
+	/* Pass::View
+	/****************************************************/
+	Pass::View::View() :
+	passParamByteOffset(0)
+	,materialParamByteOffset(0)
+	,objectParamByteOffset(0)
+	,lastFrameUpdate(-1)
+	,lastViewUpdate(-1) {
+	}
+
+	void Pass::View::Update(RenderContext* rc, uint32 msg, ContextParamPtr param) {
+		if (msg == Pass::MSG_PASS_COMPILE) {
+			CompileParams& p = *reinterpret_cast<CompileParams*>(param);
+			Compile(rc, p);
+		} else if (msg == Pass::MSG_PASS_UPDATE_OFFSET) {
+			OffsetParams& p = *reinterpret_cast<OffsetParams*>(param);
+			passParamByteOffset = p.passParamByteOffset;
+			materialParamByteOffset = p.materialParamByteOffset;
+			objectParamByteOffset = p.objectParamByteOffset;
+		}
 	}
 
 	// todo This function is currently not implemented correctly.
@@ -106,7 +131,7 @@ namespace nextar {
 		for(uint32 i = 0; i < numConstBuffers; ++i) {
 			ConstantBufferPtr& cb = sharedParameters[i];
 			ConstantBuffer::View* cbView = static_cast<ConstantBuffer::View*>(
-					cb->GetView(rc));
+					rc->GetView(cb));
 			if (Test(cb->GetFrequency() & flags)) {
 				ctx.cbuffer = cbView;
 				ctx.cbufferSize = cb->GetSize();
@@ -126,22 +151,6 @@ namespace nextar {
 		ctx.cbuffer = nullptr;
 		ShaderParamIterator it(&samplers->paramDesc, samplerStride, samplerCount);
 		_ProcessShaderParamIterator(rc, ctx, it, flags);
-	}
-
-	const AutoParam* Pass::MapParam(const String& name) {
-		auto ap = autoParams.find(name);
-		if (ap == autoParams.end())
-			return nullptr;
-		// todo map parsed params
-		return (*ap).second;
-	}
-
-	const Pass::SamplerDesc* Pass::MapSamplerParams(const String& name, const TextureDescMap& texMap) {
-		auto sp = texMap.find(name);
-		if (sp == texMap.end())
-			return nullptr;
-		// todo map parsed params
-		return &(*sp).second;
 	}
 
 	/****************************************************/
@@ -213,7 +222,7 @@ namespace nextar {
 		NEX_ASSERT (d->autoName == AutoParamName::AUTO_CUSTOM_CONSTANT);
 		size_t s = context.cbufferSize;
 		CommitContext::ParamContext& pc = context.shaderParamContext[paramContext];
-		context.cbuffer->Write(rc, pc.second->AsRawData(pc.first), s);
+		context.cbuffer->Write(rc, pc.second->AsRawData(pc.first), 0, s);
 		pc.first += (uint32)s;
 	}
 		

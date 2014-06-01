@@ -22,42 +22,35 @@ namespace nextar {
 			DEFAULT_FLAGS = GPU_ACCESS,
 		};
 
-		enum Op {
-			OP_READ,
-			OP_WRITE,
+		enum Message {
+			MSG_OP_READ,
+			MSG_OP_WRITE,
+			MSG_OP_COPYBUFFER,
 		};
 
-		struct ReadStruct {
+		struct ReadParams {
 			void* bufferPtr;
 			size_t offset;
 			size_t size;
 		};
 
-		struct WriteStruct {
+		struct WriteParams {
 			const void* bufferPtr;
 			size_t offset;
 			size_t size;
 		};
 
-		struct ContextParam {
-			uint8 operation;
-			union {
-				ReadStruct readBox;
-				WriteStruct writeBox;
-			};
-		};
-
 		class View : public ContextObject::View {
 		protected:
-			virtual void Update(nextar::RenderContext*, ContextObject::ContextParamPtr);
+			virtual void Update(nextar::RenderContext*, uint32 msg, ContextParamPtr) {}
 			virtual void Read(RenderContext* rc, void *dest, size_t offset, size_t size) = 0;
 			virtual void Write(RenderContext* rc, const void *src, size_t offset, size_t size) = 0;
-			virtual void CopyFrom(RenderContext* rc, BufferPtr&) = 0;
-
+			virtual void CopyFrom(RenderContext* rc, GpuBuffer::View*) = 0;
 		};
 
-		GpuBuffer(size_t bufferSize, uint32 flags) : creator(0),
-				size(bufferSize), flags(flags) {
+		GpuBuffer(ContextObject::Type type, size_t bufferSize, uint32 flags) :
+			ContextObject(type),
+			size(bufferSize), flags(flags) {
 		}
 
 		virtual ~GpuBuffer() {
@@ -67,17 +60,11 @@ namespace nextar {
 		virtual void Read(void *dest, size_t offset = 0, size_t size = 0);
 		/** Write to buffer */
 		virtual void Write(const void *src, size_t offset = 0, size_t size = 0);
-
-		inline BufferManager *GetCreator() const {
-			return creator;
-		}
+		/** Copy the contents of one buffer */
+		virtual void CopyFrom(GpuBufferPtr&);
 
 		inline size_t GetSize() const {
 			return size;
-		}
-
-		inline void SetCreator(BufferManager *creator) {
-			this->creator = creator;
 		}
 
 		inline uint32 GetFlags() const {
@@ -89,8 +76,6 @@ namespace nextar {
 		}
 
 	protected:
-
-		BufferManager* creator;
 		uint32 flags;
 		size_t size;
 	};

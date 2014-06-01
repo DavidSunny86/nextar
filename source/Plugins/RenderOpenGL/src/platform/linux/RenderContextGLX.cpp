@@ -6,9 +6,9 @@
  */
 #include <RenderOpenGL.h>
 #include <RenderDriverGL.h>
-#include <glx/RenderDriverGLX.h>
-#include <glx/RenderContextGLX.h>
-#include <glx/WindowGLX.h>
+#include <RenderDriverGLX.h>
+#include <RenderContextGLX.h>
+#include <WindowGLX.h>
 #include <X11/extensions/Xrandr.h>
 
 namespace RenderOpenGL {

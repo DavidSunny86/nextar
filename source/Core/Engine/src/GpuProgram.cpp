@@ -10,38 +10,21 @@
 
 namespace nextar {
 
-	GpuProgram::GpuProgram(Type t) :
-		type(t), flags(PROG_CREATED) {
+	GpuProgram::GpuProgram(GpuProgram::Type t) :
+		ContextObject((ContextObject::Type)t),
+		type(t) {
 	}
 
 	GpuProgram::~GpuProgram() {
 	}
 
-	void GpuProgram::View::Create(RenderContext* rc) {
-		// todo
-	}
-
-	void GpuProgram::View::Update(RenderContext* rc, ContextObject::ContextParamPtr ptr) {
-		ContextParam* param = reinterpret_cast<ContextParam*>(ptr);
-		if ((flags & PROG_COMPILED)) {
-			Decompile(rc);
+	void GpuProgram::View::Update(RenderContext* rc, uint32 msg, ContextObject::ContextParamPtr ptr) {
+		if (msg == MSG_COMPILE) {
+			CompileParam* param = reinterpret_cast<CompileParam*>(ptr);
+			if (param->programSource) {
+				Compile(rc, param->programSource,
+						param->compileOptions? *(param->compileOptions) : StringUtils::Null);
+			}
 		}
-
-		if (param->programSource) {
-			if(Compile(rc, param->programSource,
-					param->compileOptions? *(param->compileOptions) : StringUtils::Null))
-					flags |= PROG_COMPILED;
-		}
-	}
-
-	void GpuProgram::View::Destroy(RenderContext* rc) {
-		if ((flags & PROG_COMPILED)) {
-			Decompile(rc);
-			flags &= ~PROG_COMPILED;
-		}
-	}
-
-	GpuProgram* GpuProgram::Instance(GpuProgram::Type t) {
-		return RenderManager::Instance().CreateProgram(t);
 	}
 } /* namespace nextar */

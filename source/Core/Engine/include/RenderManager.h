@@ -74,9 +74,6 @@ namespace nextar {
 		/* Implement */
 		virtual ShaderProgramLanguage GetProgramLanguage() = 0;
 		virtual String GetInfo() = 0;
-		/* Create objects */
-		virtual GpuProgram* CreateProgram(GpuProgram::Type type) = 0; //todo
-		virtual Pass* CreatePass(StringID name) = 0;
 
 		/* Render a single frame for a specific window, should be called
 		   from the thread this window was created in */

@@ -45,6 +45,7 @@ namespace nextar {
 			MSG_TEX_RESIZE = 1 << 1,
 			MSG_TEX_UPLOAD = 1 << 2,
 			MSG_TEX_CREATE = 1 << 3,
+			MSG_TEX_READ = 1 << 4,
 		};
 
 		struct UpdateParams {
