@@ -15,7 +15,6 @@
 #include <GpuProgram.h>
 #include <RenderConstants.h>
 #include <ShaderParam.h>
-#include <ConstantBuffer.h>
 #include <NamedObject.h>
 
 namespace nextar {
@@ -28,7 +27,6 @@ namespace nextar {
 
 		enum {
 			NUM_STAGES = (uint32)RenderConstants::MAX_PROGRAM_STAGES,
-			MAX_CBUFFER = (uint32)RenderConstants::MAX_CBUFFER_PER_PASS,
 		};
 
 		enum Flags {
@@ -37,7 +35,7 @@ namespace nextar {
 
 		enum Message {
 			MSG_PASS_COMPILE,
-			MSG_PASS_UPDATE_OFFSET,
+			MSG_PASS_UPDATE_PARAMS,
 		};
 
 		// todo 7 or 8 is a good cap for this array, and
@@ -50,8 +48,6 @@ namespace nextar {
 		};
 
 		typedef map<String, SamplerDesc>::type TextureDescMap;
-		typedef array<ConstantBufferPtr, (uint32)MAX_CBUFFER>::type ConstantBufferList;
-
 		struct CompileParams {
 
 			const StringUtils::WordList* compileOptions;
@@ -62,43 +58,25 @@ namespace nextar {
 			Pass::TextureDescMap textureStates;
 		};
 
-		struct OffsetParams {
-			uint32 passParamByteOffset;
-			uint32 materialParamByteOffset;
-			uint32 objectParamByteOffset;
-		};
-
 		class View : public ContextObject::View {
 		public:
 
 			View();
 
-			virtual void UpdateParams(RenderContext* renderCtx, CommitContext& context, UpdateFrequency flags);
+			void UpdateParams(CommitContext& context, ParameterContext paramContext, uint32 updateId);
 			// Bind texture to a shader parameter. The number of units must match the desc->numUnits count.
-			virtual void SetTextureImpl(RenderContext* rc, const TextureSamplerParamDesc* desc, const TextureUnit* tu) = 0;
-
+			virtual void SetTexture(RenderContext* rc, const SamplerParameter& desc, const TextureUnit* tu) = 0;
+			
 			virtual void Update(nextar::RenderContext*, uint32 msg, ContextParamPtr);
-
 			virtual void Compile(nextar::RenderContext*, const CompileParams&) = 0;
-
-			static inline void _ProcessShaderParamIterator(RenderContext* rc, CommitContext& ctx, ShaderParamIterator& it, UpdateFrequency flags) {
-				while(it) {
-					const ShaderParamDesc& d = (*it);
-					if (Test(d.frequency & flags)) {
-						NEX_ASSERT(d.processor);
-						d.processor->Apply(rc, &d, ctx);
-					}
-					++it;
-				}
-			}
 
 		protected:
 
-			uint32 passParamByteOffset;
-			uint32 materialParamByteOffset;
-			uint32 objectParamByteOffset;
-			uint32 lastFrameUpdate;
-			uint32 lastViewUpdate;
+			ParameterGroupList sharedParameters;
+			ParameterGroupEntries paramGroupEntries;
+			SamplerParameter* samplers;
+			uint32 numSamplerCount;
+
 		};
 
 		Pass(StringID name);
@@ -114,14 +92,6 @@ namespace nextar {
 				
 		inline uint16 GetInputLayoutID() const {
 			return inputLayoutUniqueID;
-		}
-
-		inline ShaderParamIterator GetSamplerIterator() {
-			return ShaderParamIterator(&samplers->paramDesc, samplerStride, samplerCount);
-		}
-
-		inline ConstantBufferList& GetConstantBuffers() {
-			return sharedParameters;
 		}
 
 		TextureBase* GetDefaultTexture(const String& name, uint32 index) const;
@@ -148,35 +118,14 @@ namespace nextar {
 		typedef array<GpuProgram*, NUM_STAGES>::type GpuProgramArray;
 		GpuProgramArray programs;
 
-		// RasterState rasterState;
-		// BlendState blendState;
-		// DepthStencilState depthStencilState;
-		// TextureDescMap textureDescMap;
-
-		// updated per frame
-		ConstantBufferList sharedParameters;
-		uint32 numConstBuffers;
-
-		TextureSamplerParamDesc* samplers;
-		uint32 samplerCount;
-
+		
 		//static AutoParam autoParams[AutoParamName::AUTO_COUNT];
-		static AutoParamProcessor* customConstantProcessorMaterial;
-		static AutoParamProcessor* customTextureProcessorMaterial;
-		static AutoParamProcessor* customConstantProcessorPass;
-		static AutoParamProcessor* customTextureProcessorPass;
-		static AutoParamProcessor* customConstantProcessorObject;
-		static AutoParamProcessor* customTextureProcessorObject;
-		static AutoParamProcessor* customStructProcessorMaterial;
-		static AutoParamProcessor* customStructProcessorPass;
-		static AutoParamProcessor* customStructProcessorObject;
-
-		static uint32 samplerStride;
-
+		static AutoParamProcessor* customConstantProcessor;
+		static AutoParamProcessor* customTextureProcessor;
+		static AutoParamProcessor* customStructProcessor;
+	
 		typedef map<StringRef, AutoParam*>::type AutoParamMap;
-
 		static AutoParamMap autoParams;
-
 		friend class ShaderAsset;
 	};
 

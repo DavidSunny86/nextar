@@ -16,7 +16,7 @@ namespace nextar {
 	MultiRenderTarget::MultiRenderTarget() :
 			RenderTarget(RenderTargetType::MULTI_RENDER_TARGET),
 			ContextObject(ContextObject::TYPE_MULTI_RENDER_TARGET),
-			flags(0), depth(nullptr), dimensions(0,0), numColorTargets(0) {
+			flags(0), dimensions(0,0), numColorTargets(0) {
 	}
 
 	MultiRenderTarget::~MultiRenderTarget() {
@@ -28,7 +28,7 @@ namespace nextar {
 
 	void MultiRenderTarget::Create(const CreateParam& params) {
 		/* create the individual textures */
-		TargetParamArray& tpa = params.targets;
+		const TargetParamArray& tpa = params.targets;
 		dimensions = params.dimensions;
 		numColorTargets = params.numColorTargets;
 		for(uint32 i = numColorTargets; i < params.numColorTargets; ++i) {
@@ -43,7 +43,8 @@ namespace nextar {
 					CreateTexture(params.depth);
 		}
 
-		ContextObject::RequestUpdate(updatePtr);
+		ContextObject::RequestUpdate(MSG_RT_CREATE, 
+			reinterpret_cast<ContextObject::ContextParamPtr>(this));
 	}
 
 	PixelFormat MultiRenderTarget::GetPixelFormat() const {

@@ -34,6 +34,7 @@ namespace nextar {
 
 	typedef list<RenderTargetPtr>::type RenderTargetList;
 
+	class StreamData;
 	class _NexEngineAPI RenderContext : public Referenced<RenderContext, AllocGraphics> {
 	public:
 		RenderContext(void);
@@ -65,7 +66,7 @@ namespace nextar {
 		virtual void RegisterObject(ContextObject*) = 0;
 		virtual void UnregisterObject(ContextObject*) = 0;
 		virtual void UpdateObject(ContextObject*, uint32 updateMsg, ContextObject::ContextParamPtr) = 0;
-		virtual ContextObject::View* GetView(ContextObject*) = 0;
+		virtual ContextObject::View* GetView(const ContextObject*) = 0;
 	};
 
 }

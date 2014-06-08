@@ -43,10 +43,10 @@ namespace nextar {
 			virtual bool Compile(nextar::RenderContext* ctx, const char* src, const nextar::StringUtils::WordList& macroList) = 0;
 		};
 
-		GpuProgram(Type type);
+		GpuProgram(ProgramType type);
 		virtual ~GpuProgram();
 
-		inline static GpuProgram* Instance(Type t) {
+		inline static GpuProgram* Instance(ProgramType t) {
 			return NEX_NEW(GpuProgram(t));
 		}
 

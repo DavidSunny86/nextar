@@ -1,9 +1,9 @@
 /* 
- * File:   IndexBuffer.h
- * Author: obhi
- *
- * Created on February 6, 2011, 10:23 PM
- */
+* File:   IndexBuffer.h
+* Author: obhi
+*
+* Created on February 6, 2011, 10:23 PM
+*/
 
 #ifndef INDEXBUFFER_H
 #define	INDEXBUFFER_H
@@ -12,28 +12,27 @@
 
 namespace nextar {
 
-    class IndexBuffer : public GpuBuffer {
-    public:
+	class IndexBuffer : public GpuBuffer {
+	public:
 
-        enum Type {
-            TYPE_32BIT,
-            TYPE_16BIT
-        };
-        typedef uint8 TypeTag;
+		enum Type : uint8 {
+			TYPE_32BIT,
+			TYPE_16BIT
+		};
+		
+		inline IndexBuffer(size_t size, uint32 flags, Type type, RelocationPolicy policy = NEVER_RELEASED) :
+		GpuBuffer(TYPE_INDEX_BUFFER, size, flags, policy), indexType(type) {
+		}
+		virtual ~IndexBuffer();
 
-        inline IndexBuffer(size_t size, uint32 flags, Type type) :
-        		GpuBuffer(TYPE_INDEX_BUFFER, size, flags), indexType(static_cast<TypeTag>(type)) {
-        }
-        virtual ~IndexBuffer();
+		Type GetIndexType() const {
+			return static_cast<Type>(indexType);
+		}
 
-        Type GetIndexType() const {
-            return static_cast<Type>(indexType);
-        }
-       
-    private:
+	private:
 
-        TypeTag indexType;
-    };
+		Type indexType;
+	};
 }
 
 #endif	/* INDEXBUFFER_H */

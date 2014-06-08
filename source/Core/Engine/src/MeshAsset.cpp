@@ -53,7 +53,7 @@ namespace nextar {
 			ByteStream& byteData = (*vertexBufferIt);
 			VertexBufferPtr& streamPtr = data->streams[stream];
 			streamPtr = BufferManager::Instance().CreateVertexBuffer(byteData.size(),
-							Buffer::GPU_READ, RelocationPolicy::NEVER_RELEASE);
+							GpuBuffer::GPU_READ, RelocationPolicy::NEVER_RELEASE);
 			streamPtr->Write(byteData.data(), 0, byteData.size());
 			data->binding->BindBuffer(stream, streamPtr);
 		}
@@ -68,7 +68,7 @@ namespace nextar {
 	void MeshAsset::_FillIndexData(MeshIndexData* data, MeshBufferData::BufferList::iterator& indexBufferIt) {
 		ByteStream& byteData = (*indexBufferIt);
 		data->ibdata = BufferManager::Instance().CreateIndexBuffer(byteData.size(),
-				Buffer::GPU_READ, data->twoBytePerElement ?
+				GpuBuffer::GPU_READ, data->twoBytePerElement ?
 						IndexBuffer::TYPE_16BIT : IndexBuffer::TYPE_32BIT);
 		indexBufferIt++;
 	}

@@ -84,7 +84,7 @@ namespace nextar {
 			format = data.format;
 			dataBuffer = data.data;
 		} else {
-			Error(String("Failed to load image ") + Convert::ToString(params.name));
+			Error(String("Failed to load image ") + (params.name));
 			NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 		}
 	}
@@ -98,7 +98,7 @@ namespace nextar {
 
 		ImageCodec* codec = GetImpl(fakeLoaderName);
 		if (!codec) {
-			Error(String("Couldn't find image codec for: ") + Convert::ToString(params.name));
+			Error(String("Couldn't find image codec for: ") + (params.name));
 			NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 		}
 

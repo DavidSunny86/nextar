@@ -13,7 +13,7 @@
 
 namespace nextar {
 
-	enum class ParamDataType {
+	enum class ParamDataType : uint16 {
 		PDT_UNKNOWN,
 		PDT_BOOL,
 		PDT_UINT,
@@ -28,6 +28,7 @@ namespace nextar {
 		PDT_IVEC4,
 		PDT_MAT4x4,
 		PDT_MAT3x4,
+		PDT_STRUCT,
 		PDT_COUNT,
 	};
 
@@ -77,88 +78,119 @@ namespace nextar {
 		// Custom generic parameter, could be texture or constant
 		// accessed from property buffer.
 		AUTO_CUSTOM_CONSTANT,
+		
 		// Count
 		AUTO_COUNT,
 	};
 
-	enum class UpdateFrequency : uint16 {
-		NEVER = 0,
+	enum class ParameterContext : uint8 {
 		// changes per frame: time
 		// Type: shared
-		PER_FRAME = 1 << 0,
+		CTX_FRAME = 0,
 		// changes per view: view matrix
 		// Type: shared
-		PER_VIEW = 1 << 1,
+		CTX_VIEW,
 		// Per pass change
-		PER_PASS = 1 << 2,
+		CTX_PASS,
 		// changes per material instance: diffuseColor
 		// Type: local to material
-		PER_MATERIAL = 1 << 3,
+		CTX_MATERIAL,
 		// changes per object instance: worldMatrix
 		// Type: local to object/stored in shader
-		PER_OBJECT_INSTANCE = 1 << 4,
-
+		CTX_OBJECT,
+		CTX_COUNT
 	};
 
-	NEX_ENUM_FLAGS(UpdateFrequency, uint16);
+	NEX_ENUM_UINT(ParameterContext, uint8);
 	
 	class AutoParamProcessor;
-	// todo Profile the usage of this struct with pure uint32 ints.
-	struct ShaderParamDesc {
+	
+	/**
+	 * This struct serves as a parameter entry. 
+	 * Materials, Objects, Cameras will contain cpu buffers with paramter data.
+	 * Most individual paramters will be grouped into structures (identified by groupId)
+	 * so that they can be easily passed to a constant buffer and hence updated in one go.
+	 * The other way is to obtain the data from various places, and update the buffer
+	 * gradually.
+	 * todo Profile the usage of this struct with pure uint32 ints.
+	 */
+	class _NexEngineAPI ShaderParameter : public AllocGeneral {
+	public:
 		AutoParamProcessor* processor;
-		UpdateFrequency frequency;
-		uint16 type;
+		ParamDataType type;
 		uint16 arrayCount;
 		AutoParamName autoName;
 		uint32 size;
-		String name;
 	};
 
-	struct ConstBufferParamDesc {
-		ShaderParamDesc paramDesc;
-		uint32 cbOffset;
+	class _NexEngineAPI ConstantParameter : public ShaderParameter {
+	public:
+		inline static ConstantParameter* Next(ConstantParameter* parameter) {
+			return reinterpret_cast<ConstantParameter*>(
+				reinterpret_cast<uint8*>(parameter) + ConstantParameter::stride);
+		}
+
+		inline static ConstantParameter* At(ConstantParameter* start, uint32 index) {
+			return reinterpret_cast<ConstantParameter*>(
+				reinterpret_cast<uint8*>(start) + index*ConstantParameter::stride);
+		}
+
+		static uint32 stride;
+		ShaderParameter paramDesc;
+		uint32 bufferOffset;
 	};
 
-	struct TextureSamplerParamDesc {
-		ShaderParamDesc paramDesc;
+	class _NexEngineAPI SamplerParameter : public ShaderParameter {
+	public:
+		inline static SamplerParameter* Next(SamplerParameter* parameter) {
+			return reinterpret_cast<SamplerParameter*>(
+				reinterpret_cast<uint8*>(parameter) + SamplerParameter::stride);
+		}
+
+		inline static SamplerParameter* At(SamplerParameter* start, uint32 index) {
+			return reinterpret_cast<SamplerParameter*>(
+				reinterpret_cast<uint8*>(start) + index*SamplerParameter::stride);
+		}
+
+		static uint32 stride;
 		TextureUnit defaultTexture;
 	};
 
-	class ShaderParamIterator : public AllocGeneral {
+	class _NexEngineAPI ParameterGroup : public ShaderParameter {
 	public:
 
-		ShaderParamIterator() : cursor(nullptr), count(0), stride(0) {
+		inline ConstantParameter* GetParamByIndex(uint32 index) {
+			return ConstantParameter::At(parameter, index);
 		}
 
-		ShaderParamIterator(const ShaderParamDesc* _cursor, uint32 _count, uint32 _stride) :
-			cursor(reinterpret_cast<const ShaderParamDesc*>(reinterpret_cast<const uint8*>(_cursor))),
-			stride(_stride), count(_count) {
-		}
+		virtual void Map(RenderContext* rc) = 0;
+		virtual void SetRawBuffer(RenderContext* rc, const ConstantParameter& desc, const void* data) = 0;
+		virtual void Unmap(RenderContext* rc) = 0;
 
-		operator bool() const {
-			return count != 0;
-		}
+		virtual void WriteRawData(RenderContext* rc, const void* data, size_t offset = 0, size_t size = 0) = 0;
 
-		const ShaderParamDesc& operator *() const {
-			return *cursor;
-		}
-
-		ShaderParamIterator& operator ++() {
-			cursor = reinterpret_cast<const ShaderParamDesc*>(reinterpret_cast<const uint8*>(cursor) + stride);
-			--count;
-			return *this;
-		}
-
-	protected:
-		const ShaderParamDesc* cursor;
-		uint32 count;
-		uint32 stride;
+		uint32 lastUpdateId;
+		ParameterContext context;
+		ConstantParameter* parameter;
+		uint32 numParams;
 	};
 
+	typedef vector<ParameterGroup*>::type ParameterGroupList;
+	
+	struct ParameterGroupItem {
+		ParameterGroupList::iterator beginIt;
+		ParameterGroupList::iterator endIt;
+		SamplerParameter* beginSamplerIt;
+		SamplerParameter* endSamplerIt;
+
+		uint32 offsetInParamBuffer;
+	};
+
+	typedef array<ParameterGroupItem, (size_t)ParameterContext::CTX_COUNT>::type ParameterGroupEntries;
 
 	class AutoParamProcessor {
 	public:
-		virtual void Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) = 0;
+		virtual void Apply(CommitContext& context, const ShaderParameter* d) = 0;
 	protected:
 		~AutoParamProcessor() {}
 	};
@@ -166,7 +198,7 @@ namespace nextar {
 	struct AutoParam : public AllocGeneral {
 		uint32 type;
 		AutoParamName autoName;
-		UpdateFrequency frequency;
+		ParameterContext context;
 		AutoParamProcessor* processor;
 		// todo May not be useful except in UI
 		String name;
@@ -174,12 +206,16 @@ namespace nextar {
 	};
 
 	struct ParamEntry {
-		ShaderParamDesc* descriptor;
-		uint32 offset;
+		AutoParamName autoName;
+		uint16 type;
+		uint16 arrayCount;
+		uint32 maxSize;
+		String name;
 	};
 
 	typedef vector<ParamEntry>::type ParamEntryTable;
 	typedef std::pair<ParamEntryTable::iterator, ParamEntryTable::iterator> ParamEntryTableItem;
 	typedef std::pair<ParamEntryTable::const_iterator, ParamEntryTable::const_iterator> ConstParamEntryTableItem;
+
 } // namespace nextar
 #endif // SHADERPARAM_H_

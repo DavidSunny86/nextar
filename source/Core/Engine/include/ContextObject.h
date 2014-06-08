@@ -34,6 +34,7 @@ namespace nextar {
 			TYPE_GPU_GEOMETRY_PROGRAM,
 			TYPE_GPU_FRAGMENT_PROGRAM,
 			TYPE_GPU_COMPUTE_PROGRAM,
+			TYPE_PASS,
 		};
 
 		class View {

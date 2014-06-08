@@ -10,7 +10,7 @@
 
 namespace nextar {
 
-	GpuProgram::GpuProgram(GpuProgram::Type t) :
+	GpuProgram::GpuProgram(GpuProgram::ProgramType t) :
 		ContextObject((ContextObject::Type)t),
 		type(t) {
 	}
@@ -20,7 +20,7 @@ namespace nextar {
 
 	void GpuProgram::View::Update(RenderContext* rc, uint32 msg, ContextObject::ContextParamPtr ptr) {
 		if (msg == MSG_COMPILE) {
-			CompileParam* param = reinterpret_cast<CompileParam*>(ptr);
+			const CompileParam* param = reinterpret_cast<const CompileParam*>(ptr);
 			if (param->programSource) {
 				Compile(rc, param->programSource,
 						param->compileOptions? *(param->compileOptions) : StringUtils::Null);

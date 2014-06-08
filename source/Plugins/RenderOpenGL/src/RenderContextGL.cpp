@@ -199,7 +199,7 @@ namespace RenderOpenGL {
 		GlGetProgramiv(program, GL_ACTIVE_UNIFORM_BLOCKS, &numBlocks);
 		char name[128];
 
-		if(numBlocks > RenderConstants::MAX_CBUFFER_PER_PASS) {
+		if((uint32)numBlocks > RenderConstants::MAX_CBUFFER_PER_PASS) {
 			Error("Pass has too many constant buffers!.");
 			NEX_THROW_GracefulError(EXCEPT_COMPILATION_FAILED);
 		}

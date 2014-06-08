@@ -8,22 +8,20 @@
 #include <Pass.h>
 #include <CommitContext.h>
 #include <ShaderParam.h>
-#include <ConstantBuffer.h>
+#include <RenderContext.h>
 
 namespace nextar {
-
-	uint32 Pass::samplerStride(0);
+		
 	Pass::AutoParamMap Pass::autoParams;
 	
 
 	Pass::Pass(StringID name) :
-	NamedObject(name)
+	ContextObject(TYPE_PASS)
+	,NamedObject(name)
 	,inputLayoutUniqueID(-1)
 	,flags(0)
 	,programs() // todo is this enough?? or do null out
-	,samplers(nullptr)
-	,samplerCount(0)
-	,numConstBuffers(0) {
+	{
 		// null all programs
 		for(uint32 i = 0; i < Pass::NUM_STAGES; ++i) {
 			programs[i] = nullptr;
@@ -41,14 +39,14 @@ namespace nextar {
 
 	void Pass::RequestUpdate(uint32 msg, ContextObject::ContextParamPtr param) {
 		if (msg == Pass::MSG_PASS_COMPILE) {
-			CompileParams& p = *reinterpret_cast<CompileParams*>(param);
+			const CompileParams& p = *reinterpret_cast<const CompileParams*>(param);
 			//blendState = p.blendState;
 			//depthStencilState = p.depthStencilState;
 			//rasterState = p.rasterState;
 			//textureDescMap.swap(p.textureStates);
 
 			for(uint32 i = 0; i < Pass::NUM_STAGES; ++i) {
-				GpuProgram::Type t = (GpuProgram::Type)i;
+				GpuProgram::ProgramType t = (GpuProgram::ProgramType)(GpuProgram::TYPE_VERTEX + i);
 				const String& source = p.programSources[i];
 				if (programs[i])
 					NEX_DELETE(programs[i]);
@@ -63,6 +61,8 @@ namespace nextar {
 							reinterpret_cast<ContextObject::ContextParamPtr>(&update));
 				}
 			}
+		} else if (msg == Pass::MSG_PASS_UPDATE_PARAMS) {
+
 		}
 		ContextObject::RequestUpdate(msg, reinterpret_cast<ContextObject::ContextParamPtr>(param));
 	}
@@ -87,70 +87,51 @@ namespace nextar {
 	/****************************************************/
 	/* Pass::View
 	/****************************************************/
-	Pass::View::View() :
-	passParamByteOffset(0)
-	,materialParamByteOffset(0)
-	,objectParamByteOffset(0)
-	,lastFrameUpdate(-1)
-	,lastViewUpdate(-1) {
+	Pass::View::View() : samplers(nullptr)
+	,numSamplerCount(0) {
 	}
 
 	void Pass::View::Update(RenderContext* rc, uint32 msg, ContextParamPtr param) {
 		if (msg == Pass::MSG_PASS_COMPILE) {
-			CompileParams& p = *reinterpret_cast<CompileParams*>(param);
+			const CompileParams& p = *reinterpret_cast<const CompileParams*>(param);
 			Compile(rc, p);
-		} else if (msg == Pass::MSG_PASS_UPDATE_OFFSET) {
-			OffsetParams& p = *reinterpret_cast<OffsetParams*>(param);
-			passParamByteOffset = p.passParamByteOffset;
-			materialParamByteOffset = p.materialParamByteOffset;
-			objectParamByteOffset = p.objectParamByteOffset;
 		}
 	}
-
-	// todo This function is currently not implemented correctly.
-	void Pass::View::UpdateParams(RenderContext* rc, CommitContext& ctx, UpdateFrequency flags) {
+	
+	// todo Optimize.
+	void Pass::View::UpdateParams(CommitContext& ctx, ParameterContext type, uint32 id) {
 		NEX_ASSERT(this == ctx.pass);
-		ctx.shaderParamContext[CommitContext::PASS_PARAM_CONTEXT].first = passParamByteOffset;
-		ctx.shaderParamContext[CommitContext::MATERIAL_PARAM_CONTEXT].first = materialParamByteOffset;
-		ctx.shaderParamContext[CommitContext::OBJECT_PARAM_CONTEXT].first = objectParamByteOffset;
+		
+		ParameterGroupItem& item = paramGroupEntries[(uint32)type];
+		ctx.currentParamContext = CommitContext::ParamContext(item.offsetInParamBuffer, 
+			ctx.paramBuffers[(uint32)type]);
 
-		if (Test(flags & UpdateFrequency::PER_FRAME)) {
-			if (lastFrameUpdate == ctx.frameNumber)
-				flags &= ~UpdateFrequency::PER_FRAME;
-			else
-				lastFrameUpdate = ctx.frameNumber;
-		}
-
-		if (Test(flags & UpdateFrequency::PER_VIEW)) {
-			if (lastViewUpdate == ctx.viewNumber)
-				flags &= ~UpdateFrequency::PER_VIEW;
-			else
-				lastViewUpdate = ctx.viewNumber;
-		}
-
-		for(uint32 i = 0; i < numConstBuffers; ++i) {
-			ConstantBufferPtr& cb = sharedParameters[i];
-			ConstantBuffer::View* cbView = static_cast<ConstantBuffer::View*>(
-					rc->GetView(cb));
-			if (Test(cb->GetFrequency() & flags)) {
-				ctx.cbuffer = cbView;
-				ctx.cbufferSize = cb->GetSize();
-				AutoParamProcessor* proc = cb->GetProcessor();
-				if (proc) {
-					// we just update it in one go
-					proc->Apply(rc, nullptr, ctx);
-				} else {
-					cbView->BeginUpdate(rc, flags);
-					ShaderParamIterator it = cb->GetParamIterator();
-					_ProcessShaderParamIterator(rc, ctx, it, flags);
-					cbView->EndUpdate(rc);
+		for(auto it = item.beginIt; it != item.endIt; ++it) {
+			ParameterGroup* group = (*it);
+			NEX_ASSERT(group->context == type);
+			if (group->lastUpdateId == id)
+				continue;
+			ctx.currentGroup = group;
+			if (group->processor) {
+				group->processor->Apply(ctx, group);
+			} else {
+				group->Map(ctx.context);
+				for(uint32 i = 0; i < group->numParams; ++i) {
+					ConstantParameter* parameter = group->GetParamByIndex(i);
+					NEX_ASSERT (parameter->processor);
+					parameter->processor->Apply(ctx, parameter);
 				}
+				group->Unmap(ctx.context);
 			}
+			(*it)->lastUpdateId = id;
 		}
 
-		ctx.cbuffer = nullptr;
-		ShaderParamIterator it(&samplers->paramDesc, samplerStride, samplerCount);
-		_ProcessShaderParamIterator(rc, ctx, it, flags);
+		ctx.currentGroup = nullptr;
+		for(auto it = item.beginSamplerIt; it != item.endSamplerIt; 
+			it = SamplerParameter::Next(it)) {
+			NEX_ASSERT(it->processor);
+			it->processor->Apply(ctx, it);
+		}
 	}
 
 	/****************************************************/
@@ -158,23 +139,19 @@ namespace nextar {
 	/****************************************************/
 	class CustomTextureProcessor : public AutoParamProcessor {
 	public:
-		static CustomTextureProcessor passProcessor;
-		static CustomTextureProcessor materialProcessor;
-		static CustomTextureProcessor objectProcessor;
+		static CustomTextureProcessor instance;
 
-		virtual void Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context);
+		virtual void Apply(CommitContext& context, const ShaderParameter* param);
 	protected:
-		CustomTextureProcessor(uint32 context) : paramContext(context) {}
 		~CustomTextureProcessor() {}
-		const uint32 paramContext;
 	};
 
-	void CustomTextureProcessor::Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) {
-		NEX_ASSERT (d->autoName == AutoParamName::AUTO_CUSTOM_CONSTANT);
-		const TextureSamplerParamDesc* sampler = reinterpret_cast<const TextureSamplerParamDesc*>(d);
-		CommitContext::ParamContext& pc = context.shaderParamContext[paramContext];
-		context.pass->SetTextureImpl(rc, sampler, pc.second->AsTexture(pc.first));
-		pc.first += sampler->paramDesc.size;
+	void CustomTextureProcessor::Apply(CommitContext& context, const ShaderParameter* param) {
+		NEX_ASSERT (param->autoName == AutoParamName::AUTO_CUSTOM_CONSTANT);
+		const SamplerParameter* sampler = reinterpret_cast<const SamplerParameter*>(param);
+		CommitContext::ParamContext& pc = context.currentParamContext;
+		context.pass->SetTexture(context.context, *sampler, pc.second->AsTexture(pc.first));
+		pc.first += sampler->size;
 	}
 
 	/****************************************************/
@@ -182,24 +159,19 @@ namespace nextar {
 	/****************************************************/
 	class CustomParameterProcessor : public AutoParamProcessor {
 	public:
-		static CustomParameterProcessor passProcessor;
-		static CustomParameterProcessor materialProcessor;
-		static CustomParameterProcessor objectProcessor;
+		static CustomParameterProcessor instance;
 
-		virtual void Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context);
+		virtual void Apply(CommitContext& context, const ShaderParameter* param);
 	protected:
-		CustomParameterProcessor(uint32 context) : paramContext(context) {}
 		~CustomParameterProcessor() {}
-		const uint32 paramContext;
 	};
 
-	void CustomParameterProcessor::Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) {
-		NEX_ASSERT (d->autoName == AutoParamName::AUTO_CUSTOM_CONSTANT);
-		const ConstBufferParamDesc* param = reinterpret_cast<const ConstBufferParamDesc*>(d);
-		CommitContext::ParamContext& pc = context.shaderParamContext[paramContext];
-		context.cbuffer->Write(rc, pc.second->AsRawData(pc.first),
-				param->cbOffset, param->paramDesc.size);
-		pc.first += param->paramDesc.size;
+	void CustomParameterProcessor::Apply(CommitContext& context, const ShaderParameter* param) {
+		NEX_ASSERT (param->autoName == AutoParamName::AUTO_CUSTOM_CONSTANT);
+		const ConstantParameter* constParam = reinterpret_cast<const ConstantParameter*>(param);
+		CommitContext::ParamContext& pc = context.currentParamContext;
+		context.currentGroup->SetRawBuffer(context.context, *constParam, pc.second->AsRawData(pc.first));
+		pc.first += param->size;
 	}
 
 	/****************************************************/
@@ -207,46 +179,25 @@ namespace nextar {
 	/****************************************************/
 	class CustomStructProcessor : public AutoParamProcessor {
 	public:
-		static CustomStructProcessor passProcessor;
-		static CustomStructProcessor materialProcessor;
-		static CustomStructProcessor objectProcessor;
+		static CustomStructProcessor instance;
 
-		virtual void Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context);
+		virtual void Apply(CommitContext& context, const ShaderParameter* param);
 	protected:
-		CustomStructProcessor(uint32 custom) : paramContext(custom) {}
 		~CustomStructProcessor() {}
 		const uint32 paramContext;
 	};
 
-	void CustomStructProcessor::Apply(RenderContext* rc, const ShaderParamDesc* d, CommitContext& context) {
-		NEX_ASSERT (d->autoName == AutoParamName::AUTO_CUSTOM_CONSTANT);
-		size_t s = context.cbufferSize;
-		CommitContext::ParamContext& pc = context.shaderParamContext[paramContext];
-		context.cbuffer->Write(rc, pc.second->AsRawData(pc.first), 0, s);
-		pc.first += (uint32)s;
-	}
+	void CustomStructProcessor::Apply(CommitContext& context, const ShaderParameter* param) {
+		NEX_ASSERT (param->type == ParamDataType::PDT_STRUCT);
 		
-	CustomTextureProcessor CustomTextureProcessor::passProcessor(CommitContext::PASS_PARAM_CONTEXT);
-	CustomTextureProcessor CustomTextureProcessor::materialProcessor(CommitContext::MATERIAL_PARAM_CONTEXT);
-	CustomTextureProcessor CustomTextureProcessor::objectProcessor(CommitContext::OBJECT_PARAM_CONTEXT);
+		CommitContext::ParamContext& pc = context.currentParamContext;
+		size_t size = pc.second->GetSize();
+		context.currentGroup->WriteRawData(context.context, 
+			pc.second->AsRawData(pc.first), 0, size);
+		pc.first += size;
+	}
 
-	CustomParameterProcessor CustomParameterProcessor::passProcessor(CommitContext::PASS_PARAM_CONTEXT);
-	CustomParameterProcessor CustomParameterProcessor::materialProcessor(CommitContext::MATERIAL_PARAM_CONTEXT);
-	CustomParameterProcessor CustomParameterProcessor::objectProcessor(CommitContext::OBJECT_PARAM_CONTEXT);
-
-	CustomStructProcessor CustomStructProcessor::passProcessor(CommitContext::PASS_PARAM_CONTEXT);
-	CustomStructProcessor CustomStructProcessor::materialProcessor(CommitContext::MATERIAL_PARAM_CONTEXT);
-	CustomStructProcessor CustomStructProcessor::objectProcessor(CommitContext::OBJECT_PARAM_CONTEXT);
-
-	AutoParamProcessor* Pass::customConstantProcessorMaterial = &CustomParameterProcessor::materialProcessor;
-	AutoParamProcessor* Pass::customConstantProcessorPass = &CustomParameterProcessor::passProcessor;
-	AutoParamProcessor* Pass::customConstantProcessorObject = &CustomParameterProcessor::objectProcessor;
-	
-	AutoParamProcessor* Pass::customTextureProcessorMaterial = &CustomTextureProcessor::materialProcessor;
-	AutoParamProcessor* Pass::customTextureProcessorPass = &CustomTextureProcessor::passProcessor;
-	AutoParamProcessor* Pass::customTextureProcessorObject = &CustomTextureProcessor::objectProcessor;
-
-	AutoParamProcessor* Pass::customStructProcessorMaterial = &CustomStructProcessor::materialProcessor;
-	AutoParamProcessor* Pass::customStructProcessorPass = &CustomStructProcessor::passProcessor;
-	AutoParamProcessor* Pass::customStructProcessorObject = &CustomStructProcessor::objectProcessor;
+	AutoParamProcessor* Pass::customConstantProcessor = &CustomParameterProcessor::instance;
+	AutoParamProcessor* Pass::customTextureProcessor = &CustomTextureProcessor::instance;
+	AutoParamProcessor* Pass::customStructProcessor = &CustomStructProcessor::instance;
 } /* namespace nextar */

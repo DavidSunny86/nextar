@@ -7,6 +7,7 @@
 
 #include <NexEngine.h>
 #include <GpuBuffer.h>
+#include <RenderContext.h>
 
 namespace nextar {
 
@@ -35,20 +36,20 @@ namespace nextar {
 		switch(msg) {
 		case MSG_OP_READ:
 			{
-				ReadParams* p = reinterpret_cast<ReadParams*>(param);
+				const ReadParams* p = reinterpret_cast<const ReadParams*>(param);
 				Read(context, p->bufferPtr, p->offset, p->size);
 			}
 			break;
 		case MSG_OP_WRITE:
 			{
-				WriteParams* p = reinterpret_cast<ReadParams*>(param);
+				const WriteParams* p = reinterpret_cast<const WriteParams*>(param);
 				Write(context, p->bufferPtr, p->offset, p->size);
 			}
 			break;
 		case MSG_OP_COPYBUFFER:
 			{
 				GpuBuffer::View* view = static_cast<GpuBuffer::View*>(
-						context->GetView(reinterpret_cast<GpuBuffer*>(param)));
+						context->GetView(reinterpret_cast<const GpuBuffer*>(param)));
 				CopyFrom(context, view);
 			}
 			break;

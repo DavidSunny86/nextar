@@ -97,12 +97,6 @@ namespace nextar {
 				static_cast<TextureAsset*>(texture)->AddRef();
 		}
 
-		inline TextureUnit(TextureBase* _texture)
-				: texture(_texture) {
-			if (texture && texture->IsTextureAsset())
-				static_cast<TextureAsset*>(texture)->AddRef();
-		}
-
 		inline TextureUnit(const TextureUnit& tu) : texture(tu.texture) {
 		}
 

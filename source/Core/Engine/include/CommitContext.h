@@ -11,18 +11,12 @@
 #include <NexBase.h>
 #include <ShaderParam.h>
 #include <ParameterBuffer.h>
-#include <ConstantBuffer.h>
+#include <Pass.h>
 
 namespace nextar {
 
 	class CommitContext : public AllocGeneral {
 	public:
-		enum {
-			PASS_PARAM_CONTEXT = 0,
-			MATERIAL_PARAM_CONTEXT,
-			OBJECT_PARAM_CONTEXT,
-			PARAM_CONTEXT_COUNT,
-		};
 
 		typedef std::pair<uint32, ParameterBuffer*> ParamContext;
 
@@ -36,10 +30,10 @@ namespace nextar {
 		uint32			viewNumber;
 		Size			targetDimension;
 
-		ParamContext	shaderParamContext[PARAM_CONTEXT_COUNT];
+		ParameterBuffer*	paramBuffers[(uint32)ParameterContext::CTX_COUNT];
 		
-		ConstantBuffer::View*		cbuffer;
-		uint32						cbufferSize;
+		ParamContext		currentParamContext;
+		ParameterGroup*		currentGroup;
 
 		Pass::View*			pass;
 		ShaderAsset*		shader;
@@ -50,8 +44,7 @@ namespace nextar {
 		Viewport* 			viewport;
 		VisiblePrimitive*	primitive;
 		MaterialAsset*		material;
-
+		RenderContext*		context;
 	};
-
 } /* namespace nextar */
 #endif /* COMMITCONTEXT_H_ */

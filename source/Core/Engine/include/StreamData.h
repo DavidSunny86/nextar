@@ -23,7 +23,11 @@ namespace nextar {
 	class VertexLayout: public ContextObject,
 		public AllocGraphics {
 	public:
-		struct ContextParam {
+		enum Message {
+			MSG_CREATE,
+		};
+
+		struct CreateParam {
 			uint32 numElements;
 			const VertexElement* elements;
 		};
@@ -91,8 +95,8 @@ namespace nextar {
 
 	typedef uint8 PrimitiveType;
 
-	struct VertexData: public AllocGraphics {
-
+	class VertexData: public AllocGraphics {
+	public:
 		size_t start;
 		size_t count;
 
@@ -105,8 +109,8 @@ namespace nextar {
 		}
 	};
 
-	struct IndexData {
-
+	class IndexData {
+	public:
 		size_t start;
 		size_t count;
 
@@ -129,7 +133,8 @@ namespace nextar {
 	 * simply use an instance of this class rather than
 	 * the stream pass map (StreamData)
 	 */
-	struct _NexEngineAPI StreamData: public AllocGeneral {
+	class _NexEngineAPI StreamData: public AllocGeneral {
+	public:
 			/* This is a hint to the renderer for optimization saying
 		 * it doesn't use any dynamic vertex buffer */
 		bool usesOnlyStaticVb;

@@ -10,6 +10,17 @@ namespace nextar {
 			public ContextObject,
 			public Referenced<GpuBuffer, AllocGeneral> {
 	public:
+		enum RelocationPolicy : uint32 {
+			// Forever: Static meshes.
+			NEVER_RELEASED,
+			// Long Lived: Characters
+			SELDOM_RELEASED,
+			// Transient: Text, UI
+			REGULARLY_RELEASED,
+			// Temporary: particles
+			IMMEDIATELY_RELEASED,
+		};
+
 		enum Flags {
 			GPU_READ = 1 << 0,
 			GPU_WRITE = 1 << 1,
@@ -42,15 +53,17 @@ namespace nextar {
 
 		class View : public ContextObject::View {
 		protected:
-			virtual void Update(nextar::RenderContext*, uint32 msg, ContextParamPtr) {}
+			virtual void Update(nextar::RenderContext*, uint32 msg, ContextParamPtr);
 			virtual void Read(RenderContext* rc, void *dest, size_t offset, size_t size) = 0;
 			virtual void Write(RenderContext* rc, const void *src, size_t offset, size_t size) = 0;
 			virtual void CopyFrom(RenderContext* rc, GpuBuffer::View*) = 0;
 		};
 
-		GpuBuffer(ContextObject::Type type, size_t bufferSize, uint32 flags) :
+		GpuBuffer(ContextObject::Type type, size_t bufferSize, uint32 flags, RelocationPolicy relocPolicy) :
 			ContextObject(type),
-			size(bufferSize), flags(flags) {
+			size(bufferSize), 
+			flags(flags),
+			policy(relocPolicy) {
 		}
 
 		virtual ~GpuBuffer() {
@@ -76,6 +89,7 @@ namespace nextar {
 		}
 
 	protected:
+		RelocationPolicy policy;
 		uint32 flags;
 		size_t size;
 	};

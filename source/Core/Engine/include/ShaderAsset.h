@@ -157,9 +157,9 @@ namespace nextar {
 		void _DestroyPasses();
 		void _CompilePasses(StreamPassList& spl);
 		void _Process(ShaderParamIterator& it, ParamTableBuilder& ptb);
-		void _BeginPass(Pass::OffsetParams& p, ParamTableBuilder& ptb);
+		void _BeginPass(Pass::ShaderParams& p, ParamTableBuilder& ptb);
 		void _Finalize(ParamTableBuilder& ptb);
-		void _EndPass(PassPtr& p, Pass::OffsetParams& offsets, ParamTableBuilder& ptb);
+		void _EndPass(PassPtr& p, Pass::ShaderParams& offsets, ParamTableBuilder& ptb);
 		void _BuildParameterTable(StreamPassList& spl);
 		Pass* _CreatePass(StreamPass&, const String& co);
 

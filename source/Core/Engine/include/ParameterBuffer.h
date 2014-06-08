@@ -41,6 +41,10 @@ namespace nextar {
 			this->paramTable = paramTable;
 		}
 
+		inline size_t GetSize() const {
+			return size;
+		}
+
 		void SetData(const void* data, size_t offset, size_t size);
 
 		ParameterBuffer& operator = (const ParameterBuffer& pb); 

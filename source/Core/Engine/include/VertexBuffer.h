@@ -5,12 +5,7 @@
 
 namespace nextar {
 
-	enum class RelocationPolicy {
-		NEVER_RELEASE,
-		RELEASE_IMMEDIATELY,
-		RELEASE_ON_FRAME_THRESHOLD,
-	};
-
+	
 	class _NexEngineAPI VertexBuffer: public GpuBuffer {
 
 	public:
@@ -25,18 +20,9 @@ namespace nextar {
 			return frameThreshold;
 		}
 
-		virtual void SetPolicy(RelocationPolicy policy) {
-			this->policy = policy;
-		}
-
-		RelocationPolicy GetPolicy() const {
-			return policy;
-		}
-
 	protected:
 		/* Vertex buffer relocation policy */
 		uint32 frameThreshold;
-		RelocationPolicy policy;
 	};
 
 }

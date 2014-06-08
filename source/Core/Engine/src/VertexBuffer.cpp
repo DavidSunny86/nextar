@@ -5,7 +5,7 @@
 namespace nextar {
 
 	VertexBuffer::VertexBuffer(size_t bufferSize, uint32 accessFlags, RelocationPolicy p) : 
-		GpuBuffer(TYPE_VERTEX_BUFFER, bufferSize, accessFlags), policy(p), frameThreshold(0) {
+		GpuBuffer(TYPE_VERTEX_BUFFER, bufferSize, accessFlags, p), frameThreshold(0) {
 	}
 	
 }

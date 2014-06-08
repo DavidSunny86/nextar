@@ -47,8 +47,8 @@ namespace RenderOpenGL {
 		inline GLuint GetProgram() {
 			return iGlProgram;
 		}
-
-		virtual void SetTextureImpl(RenderContext* rc, const TextureSamplerParamDesc* desc, const TextureUnit* tu);
+				
+		virtual void SetTexture(RenderContext* rc, const SamplerParameter& desc, const TextureUnit* tu) = 0;
 
 	protected:
 		virtual bool Compile(nextar::RenderContext*);
