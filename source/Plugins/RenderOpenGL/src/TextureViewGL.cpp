@@ -13,9 +13,16 @@ namespace RenderOpenGL {
 
 	TextureViewGL::TextureViewGL() :
 			texture(0), target(0) {
+		pixelFormat.internalFormat = GL_NONE;
 	}
 
 	TextureViewGL::~TextureViewGL() {
+	}
+
+	void TextureViewGL::Destroy(nextar::RenderContext* rc) {
+		auto gl = static_cast<RenderContextGL*>(rc);
+		gl->DestroyTexture(texture);
+		texture = 0;
 	}
 
 	void TextureViewGL::Update(nextar::RenderContext* rc,
@@ -30,19 +37,20 @@ namespace RenderOpenGL {
 		if(textureParams.image)
 			imageFormat = textureParams.image->GetFormat();
 
-		auto pixelFormat = RenderContextGL::GetGlPixelFormat(
-				imageFormat,
-				textureParams.textureFormat);
-
-		if (pixelFormat.internalFormat == GL_NONE) {
-			Warn("Currently image should be of compatible format with texture!");
-			return;
-		}
-
 		if (!IsCreated()) {
+			pixelFormat = RenderContextGL::GetGlPixelFormat(
+							imageFormat,
+							textureParams.textureFormat);
+
+			if (pixelFormat.internalFormat == GL_NONE) {
+				Warn("Currently image should be of compatible format with texture!");
+				return;
+			}
+
 			texture = gl->CreateTexture();
 			target = RenderContextGL::GetGlTextureType(textureParams.type);
 			gl->ActivateTexture(target, texture);
+
 			if (textureParams.textureFlags
 					& TextureBase::PRE_ALLOCATE_STORAGE) {
 				gl->AllocateTexture(target, (GLint) textureParams.desc.maxMipMapCount,

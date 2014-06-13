@@ -28,23 +28,25 @@ namespace nextar {
 			TYPE_CONSTANT_BUFFER,
 			TYPE_INDEX_BUFFER,
 			TYPE_VERTEX_BUFFER,
-			TYPE_GPU_VERTEX_PROGRAM,
-			TYPE_GPU_HULL_PROGRAM,
-			TYPE_GPU_DOMAIN_PROGRAM,
-			TYPE_GPU_GEOMETRY_PROGRAM,
-			TYPE_GPU_FRAGMENT_PROGRAM,
-			TYPE_GPU_COMPUTE_PROGRAM,
 			TYPE_PASS,
 		};
 
 		class View {
 		public:
-
+			//View(ContextObject* _parent) : parentObject(_parent) {}
+			/*
+			template <typename T>
+			inline const T* GetContextObject() const {
+				return static_cast<const T*>(parentObject);
+			}*/
 			virtual void Create(nextar::RenderContext*) {}
 			virtual void Update(nextar::RenderContext*, uint32 msg, ContextParamPtr) {}
 			virtual void Destroy(nextar::RenderContext*) {}
 
 			virtual ~View() {}
+
+		protected:
+			//ContextObject* parentObject;
 		};
 
 		ContextObject(Type type);

@@ -13,6 +13,15 @@
 
 namespace RenderOpenGL {
 
+	struct PixelFormatGl {
+		bool isCompressed;
+		bool isDepthSencil;
+		GLenum attachmentType;
+		GLenum internalFormat;
+		GLenum sourceFormat;
+		GLenum dataType;
+	};
+
 	class TextureViewGL: public nextar::TextureBase::View {
 		NEX_LOG_HELPER(TextureViewGL);
 
@@ -22,6 +31,11 @@ namespace RenderOpenGL {
 		virtual ~TextureViewGL();
 
 		virtual void Update(RenderContext*, uint32 msg, ContextObject::ContextParamPtr);
+		virtual void Destroy(RenderContext*);
+
+		GLenum GetAttachment() const {
+			return pixelFormat.attachmentType;
+		}
 
 		GLenum GetType() const {
 			return target;
@@ -36,6 +50,7 @@ namespace RenderOpenGL {
 		}
 	protected:
 
+		PixelFormatGl pixelFormat;
 		GLenum target;
 		GLuint texture;
 	};

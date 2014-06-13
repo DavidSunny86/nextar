@@ -12,7 +12,6 @@
 #include <BlendState.h>
 #include <RasterState.h>
 #include <TextureUnitState.h>
-#include <GpuProgram.h>
 #include <RenderConstants.h>
 #include <ShaderParam.h>
 #include <NamedObject.h>
@@ -25,8 +24,13 @@ namespace nextar {
 		public AllocGraphics {
 	public:
 
-		enum {
-			NUM_STAGES = (uint32)RenderConstants::MAX_PROGRAM_STAGES,
+		enum ProgramStage : uint16 {
+			STAGE_VERTEX,
+			STAGE_HULL,
+			STAGE_DOMAIN,
+			STAGE_GEOMETRY,
+			STAGE_FRAGMENT,
+			STAGE_COUNT,
 		};
 
 		enum Flags {
@@ -35,7 +39,7 @@ namespace nextar {
 
 		enum Message {
 			MSG_PASS_COMPILE,
-			MSG_PASS_UPDATE_PARAMS,
+			MSG_PASS_UPDATE_PARAMBUFFER_OFFSET
 		};
 
 		// todo 7 or 8 is a good cap for this array, and
@@ -48,14 +52,22 @@ namespace nextar {
 		};
 
 		typedef map<String, SamplerDesc>::type TextureDescMap;
-		struct CompileParams {
 
+		struct ParamBufferOffsetParams {
+			uint32 offset[(size_t)ParameterContext::CTX_COUNT];
+		};
+
+		struct CompileParams {
+			std::atomic_int_fast32_t inited;
 			const StringUtils::WordList* compileOptions;
-			String programSources[Pass::NUM_STAGES];
 			RasterState rasterState;
 			BlendState blendState;
 			DepthStencilState depthStencilState;
 			Pass::TextureDescMap textureStates;
+			ParamEntryTable* parameters;
+			//uint16* inputLayoutId;
+			uint32 passIndex;
+			String programSources[Pass::STAGE_COUNT];
 		};
 
 		class View : public ContextObject::View {
@@ -68,7 +80,13 @@ namespace nextar {
 			virtual void SetTexture(RenderContext* rc, const SamplerParameter& desc, const TextureUnit* tu) = 0;
 			
 			virtual void Update(nextar::RenderContext*, uint32 msg, ContextParamPtr);
-			virtual void Compile(nextar::RenderContext*, const CompileParams&) = 0;
+			virtual void Compile(nextar::RenderContext*, const Pass::CompileParams&) = 0;
+
+			// todo refer to the static table as well as a custom table
+			// created from parsing the shader script
+			inline const AutoParam* MapParam(const String& name) {
+				return Pass::MapParam(name);
+			}
 
 		protected:
 
@@ -79,7 +97,7 @@ namespace nextar {
 
 		};
 
-		Pass(StringID name);
+		Pass();
 		virtual ~Pass();
 		
 		inline bool IsProgramDataInited() const {
@@ -90,33 +108,37 @@ namespace nextar {
 			flags = v ? flags | PROGRAM_DATA_INITED : flags & ~PROGRAM_DATA_INITED;
 		}
 				
-		inline uint16 GetInputLayoutID() const {
-			return inputLayoutUniqueID;
-		}
+		//inline uint16 GetInputLayoutID() const {
+		//	return inputLayoutUniqueID;
+		//}
 
 		TextureBase* GetDefaultTexture(const String& name, uint32 index) const;
 		const TextureUnitParams* GetTextureUnit(const String& name) const;
 
-		// todo refer to the static table as well as a custom table
-		// created from parsing the shader script
-		const AutoParam* MapParam(const String& name);
-
+		static const AutoParam* MapParam(const String& name);
 		static const SamplerDesc* MapSamplerParams(const String& name, const TextureDescMap& texMap);
 
-		// override RequestUpdate
-		virtual void RequestUpdate(uint32 updateMsg, ContextObject::ContextParamPtr);
 		// Set texture states, called during pass creation
+
+		static inline AutoParamProcessor* GetStructProcessor() {
+			return customStructProcessor;
+		}
+
+		static inline AutoParamProcessor* GetConstantProcessor() {
+			return customConstantProcessor;
+		}
+
+		static inline AutoParamProcessor* GetTextureProcessor() {
+			return customTextureProcessor;
+		}
 
 	protected:
 
 
 		/* Unique number representing this pass */
-		uint16 inputLayoutUniqueID;
+		//uint16 inputLayoutUniqueID;
 				
 		uint16 flags;
-		
-		typedef array<GpuProgram*, NUM_STAGES>::type GpuProgramArray;
-		GpuProgramArray programs;
 
 		
 		//static AutoParam autoParams[AutoParamName::AUTO_COUNT];
@@ -130,7 +152,7 @@ namespace nextar {
 	};
 
 	typedef Pass* PassPtr;
-	typedef vector<PassPtr>::type PassList;
+	typedef vector<Pass>::type PassList;
 
 } /* namespace nextar */
 #endif /* PASS_H_ */

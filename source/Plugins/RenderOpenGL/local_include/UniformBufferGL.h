@@ -12,8 +12,8 @@
 
 namespace RenderOpenGL {
 
-	struct UniformGL {
-		ConstBufferParamDesc constBufferDesc;
+	struct UniformGL : public ConstantParameter {
+	public:
 		bool	isRowMajMatrix;
 		uint16	typeGl;
 	    uint16 matrixStride; // matrix/array
@@ -22,14 +22,11 @@ namespace RenderOpenGL {
 
 	typedef vector<UniformGL>::type UniformList;
 
-	class UniformBufferGL : public ConstantBuffer {
+	class UniformBufferGL : public ParameterGroup {
 	public:
 		UniformBufferGL();
 		virtual ~UniformBufferGL();
 
-		inline uint16 GetParamCount() const {
-			return 0;
-		}
 
 		inline void SetBinding(GLuint binding) {
 			ubBindingGl = binding;
@@ -39,19 +36,11 @@ namespace RenderOpenGL {
 			return ubBindingGl;
 		}
 
-		/* Must be called before Write is called */
-		virtual void BeginUpdate(RenderContext* rc, UpdateFrequency updateFlags) override;
-		/* Must be called after Write operations are done */
-		virtual void EndUpdate(RenderContext* rc) override;
-		/** This function will fail unless a local copy of the data exists. The local
-		 * copy is created if the CPU_READ flag is set. **/
-		virtual void Read(RenderContext* rc, void *dest, size_t offset = 0, size_t size = 0) override;
-		/** Write to buffer */
-		virtual void Write(RenderContext* rc, const void *src, size_t offset, size_t size) override;
-		/* Write in one go, does not require a begin and end update */
-		virtual void Write(RenderContext* rc, const void *src, size_t size) override;
-		/** Copy from another buffer */
-		virtual void CopyFrom(RenderContext* rc, BufferPtr&) override;
+		virtual void Map(RenderContext* rc);
+		virtual void SetRawBuffer(RenderContext* rc, const ConstantParameter& desc, const void* data);
+		virtual void Unmap(RenderContext* rc);
+
+		virtual void WriteRawData(RenderContext* rc, const void* data, size_t offset = 0, size_t size = 0);
 
 	protected:
 
@@ -59,7 +48,7 @@ namespace RenderOpenGL {
 		GLuint ubNameGl;
 
 		uint8* mappedMem;
-		friend class PassGL;
+		friend class PassViewGL;
 		friend class RenderContextGL;
 	};
 

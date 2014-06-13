@@ -8,12 +8,13 @@
 #include <RenderOpenGL.h>
 #include <RenderManagerGL.h>
 #include <RenderDriverGL.h>
+#include <PassViewGL.h>
 
 namespace RenderOpenGL {
 
 	RenderManagerGL::RenderManagerGL() {
-		// TODO Auto-generated constructor stub
-
+		ConstantParameter::stride = sizeof(UniformGL);
+		SamplerParameter::stride = sizeof(SamplerState);
 	}
 
 	RenderManagerGL::~RenderManagerGL() {

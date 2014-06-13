@@ -52,11 +52,11 @@ namespace nextar {
 		return PixelFormat::UNKNOWN;
 	}
 
-	RenderTargetPtr MultiRenderTarget::GetAttachment(uint16 i) {
+	RenderTargetPtr MultiRenderTarget::GetAttachment(uint16 i) const {
 		return color[i];
 	}
 
-	RenderTargetPtr MultiRenderTarget::GetDepthAttachment() {
+	RenderTargetPtr MultiRenderTarget::GetDepthAttachment() const {
 		return depth;
 	}
 

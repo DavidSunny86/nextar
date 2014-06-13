@@ -52,6 +52,10 @@ namespace nextar {
 			return depth != nullptr;
 		}
 
+		inline uint32 GetColorTargetsCount() const {
+			return numColorTargets;
+		}
+
 		/* throws INVALID_CALL */
 		virtual PixelFormat GetPixelFormat() const;
 		/* throws INVALID_CALL */
@@ -60,8 +64,8 @@ namespace nextar {
 
 		virtual void Create(const CreateParam& params);
 
-		RenderTargetPtr GetAttachment(uint16 index);
-		RenderTargetPtr GetDepthAttachment();
+		RenderTargetPtr GetAttachment(uint16 index) const;
+		RenderTargetPtr GetDepthAttachment() const;
 
 	protected:
 

@@ -29,7 +29,6 @@ namespace nextar {
 		NEX_LOG_HELPER(ShaderAsset);
 	public:
 
-		typedef Pass::ConstantBufferList ConstantBufferList;
 		enum {
 			CLASS_ID = Asset::CLASS_ASSET_SHADER,
 		};
@@ -44,8 +43,8 @@ namespace nextar {
 
 		struct StreamPass {
 			StringID name;
+			Pass::ParamBufferOffsetParams offsets;
 			Pass::CompileParams compileParams;
-			Pass::OffsetParams offsets;
 			//Pass::DefaultTextureUnitMap defaultTextureUnits;
 		};
 
@@ -87,7 +86,6 @@ namespace nextar {
 			friend class ShaderAsset;
 			uint32 currentPass;
 			StreamPassList passes;
-
 			String compilationOpt;
 		};
 
@@ -102,27 +100,9 @@ namespace nextar {
 			return translucency;
 		}
 
-		inline Pass* GetPass(uint32 i) {
-			if (singlePassShader) {
-				NEX_ASSERT(i == 0);
-				return singlePassShader;
-			} else
-				return passes[i];
+		inline const Pass& GetPass(uint32 i) const {
+			return passes[i];
 		}
-
-		inline ConstParamEntryTableItem GetParamEntryForPass() {
-			return passProperties;
-		}
-
-		inline ConstParamEntryTableItem GetParamEntryForMaterial() {
-			return materialProperties;
-		}
-
-		inline ConstParamEntryTableItem GetParamEntryForObject() {
-			return objectProperties;
-		}
-
-		ParameterIterator GetParameterIterator(UpdateFrequency type);
 
 		virtual uint32 GetClassID() const override;
 
@@ -156,25 +136,17 @@ namespace nextar {
 
 		void _DestroyPasses();
 		void _CompilePasses(StreamPassList& spl);
-		void _Process(ShaderParamIterator& it, ParamTableBuilder& ptb);
-		void _BeginPass(Pass::ShaderParams& p, ParamTableBuilder& ptb);
-		void _Finalize(ParamTableBuilder& ptb);
-		void _EndPass(PassPtr& p, Pass::ShaderParams& offsets, ParamTableBuilder& ptb);
 		void _BuildParameterTable(StreamPassList& spl);
-		Pass* _CreatePass(StreamPass&, const String& co);
+		void _CompilePass(Pass& pass, StreamPass&, const String& co);
 
 		// used as sort key
 		uint8 translucency;
 		
-		Pass* singlePassShader;
 		PassList passes;
 		// required when parameter is looked up by name
 		ParamEntryTable paramLookup;
 
-		ParamEntryTableItem passProperties;
-		ParamEntryTableItem materialProperties;
-		ParamEntryTableItem objectProperties;
-
+		ParamEntryTableItem paramsPerContext[(uint32)ParameterContext::CTX_COUNT];
 		// todo
 		ParameterBuffer passParamData;
 

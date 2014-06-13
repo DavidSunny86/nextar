@@ -10,7 +10,7 @@
 #include <VertexBufferGL.h>
 #include <IndexBufferGL.h>
 #include <RenderTarget.h>
-#include <PassGL.h>
+#include <PassViewGL.h>
 #include <BufferManagerGL.h>
 
 namespace RenderOpenGL {
@@ -19,14 +19,6 @@ namespace RenderOpenGL {
 	public ExtensionsGL {
 		NEX_LOG_HELPER(RenderContextGL);
 	public:
-
-		struct PixelFormatGl {
-			bool isCompressed;
-			GLenum internalFormat;
-			GLenum sourceFormat;
-			GLenum dataType;
-		};
-
 
 		//typedef vector<GpuObject*>::type GpuObjectTable;
 
@@ -67,9 +59,9 @@ namespace RenderOpenGL {
 		uint32 ReadProgramSemantics(GLuint program,
 				VertexSemanticGL* inputSemantics);
 		/* Read uniform data */
-		void ReadUniforms(PassGL*, GLuint program);
+		void ReadUniforms(PassViewGL*, uint32 passIndex, GLuint program, ParamEntryTable*);
 		/* Read sampler information */
-		void ReadSamplers(PassGL*, GLuint program);
+		void ReadSamplers(PassViewGL*, uint32 passIndex, GLuint program, ParamEntryTable*, const Pass::TextureDescMap& texMap);
 
 		GLuint CreateVAO(VertexBufferBinding& binding, VertexAttribListGL& attribs, const VertexSemanticListGL& semantics);
 		GLuint CreateVertexBuffer(size_t size, GLenum usage);
@@ -86,6 +78,7 @@ namespace RenderOpenGL {
 		inline void DestroyVAO(GLuint vao);
 		inline void DestroyVertexBuffer(GLuint vbo);
 		inline void DestroyIndexBuffer(GLuint ibo);
+		inline void DestroyTexture(GLuint texture);
 		inline void EnableVertexArrayObject(GLuint vao);
 		inline void DisableVertexArrayObject();
 		inline void SetVertexBuffer(VertexBufferPtr& vb);
@@ -99,7 +92,7 @@ namespace RenderOpenGL {
 		inline void* Map(GLenum target, GLenum access);
 		inline void Unmap(GLenum target);
 		inline void* MapRange(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access);
-		inline void SetTexture(uint32 texIdx, GLint samplerLocation, GLuint samplerObject, const TextureUnit* tu);
+		inline void SetTexture(uint32 texIdx, GLuint samplerObject, TextureViewGL* tu);
 
 		// capture
 		void Capture(PixelBox& image, RenderTarget* rt, GLuint *pbo, FrameBuffer frameBuffer);
@@ -114,11 +107,23 @@ namespace RenderOpenGL {
 		static GLint GetGlMagFilter(TextureMinFilterType t);
 		static GLint GetGlMinFilter(TextureMinFilterType t);
 		static GLenum GetGlTextureType(TextureBase::TextureType type);
+		// @optimize Return from a table a const reference rather than the object
+		// and store that in texture view.
 		static PixelFormatGl GetGlPixelFormat(PixelFormat imageFormat, PixelFormat textureFormat);
+		static ParameterContext GuessContextByName(const String& name,
+				ParameterContext defaultContext = ParameterContext::CTX_UNKNOWN);
 
 	protected:
 
-		UniformBufferGL* CreateUniformBuffer(PassGL* pass, GLint blockIndex, GLuint prog, GLuint numParams, size_t size);
+		UniformBufferGL* CreateUniformBuffer(
+				PassViewGL* pass,
+				uint32 passIndex,
+				const String& name,
+				GLint blockIndex,
+				GLuint prog,
+				GLuint numParams,
+				size_t size,
+				ParamEntryTable* paramTable);
 
 		enum {
 			CONTEXT_READY = 1 << 0,
@@ -142,7 +147,7 @@ namespace RenderOpenGL {
 		uint32 contextFlags;
 		//GpuObjectTable gpuObjects;
 		/* uniform buffer table */
-		typedef unordered_map<StringRef, ConstantBufferPtr>::type UniformBufferMap;
+		typedef unordered_map<String, UniformBufferGL>::type UniformBufferMap;
 
 		UniformBufferMap uniformBufferMap;
 		RenderDriver::ContextCreationParams contextCreationParams;
@@ -243,13 +248,14 @@ namespace RenderOpenGL {
 		GlBindBuffer(target, 0);
 	}
 
-	inline void RenderContextGL::SetTexture(uint32 texIdx, GLint samplerLocation,
-			GLuint samplerObject, const TextureUnit* tu) {
-		tu->texture;
+	inline void RenderContextGL::SetTexture(
+			uint32 texIdx, GLuint samplerObject, TextureViewGL* texture) {
 		GlActiveTexture(GL_TEXTURE0 + texIdx);
-		todo todo
-		GlBindTexture()
+		GL_CHECK();
+		glBindTexture(texture->GetType(), texture->GetTexture());
+		GL_CHECK();
 		GlBindSampler(texIdx, samplerObject);
+		GL_CHECK();
 	}
 
 	inline GLuint RenderContextGL::CreateTexture() {
@@ -257,6 +263,11 @@ namespace RenderOpenGL {
 		glGenTextures(1, &texture);
 		GL_CHECK();
 		return texture;
+	}
+
+	inline void RenderContextGL::DestroyTexture(GLuint tex) {
+		glDeleteTextures(1, &tex);
+		GL_CHECK();
 	}
 
 	inline void RenderContextGL::ActivateTexture(GLenum target, GLuint texture) {

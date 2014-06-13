@@ -8,28 +8,30 @@
 #ifndef GLSHADER_H_
 #define GLSHADER_H_
 
-#include <GpuProgram.h>
+#include <RenderOpenGL.h>
 
 namespace RenderOpenGL {
 
 	/**
 	 * @shared Shared across contexts from same driver object.
 	 * */
-	class GpuProgramGL: public nextar::GpuProgram {
+	class GpuProgramGL {
 		NEX_LOG_HELPER(GpuProgramGL);
 	public:
-		GpuProgramGL(GpuProgram* parentProgram);
+		GpuProgramGL();
 		virtual ~GpuProgramGL();
 
 		inline GLuint GetShaderObject() {
 			return iGlShader;
 		}
 
-		virtual bool Compile(nextar::RenderContext*, const char* src, const nextar::StringUtils::WordList& macroList);
-		virtual void Uncompile(nextar::RenderContext*);
+		bool Compile(
+				GLenum shaderType,
+				nextar::RenderContext*, const char* src,
+				const nextar::StringUtils::WordList& macroList);
+		void Destroy(RenderContext* rc);
 
 	protected:
-		GpuProgram* parentProgram;
 		GLuint iGlShader;
 	};
 

@@ -9,9 +9,9 @@
 #include <RenderDriverGL.h>
 #include <RenderWindow.h>
 #include <ShaderAsset.h>
-#include <PassGL.h>
+#include <PassViewGL.h>
 #include <FrameBufferObjectGL.h>
-
+#include <MultiRenderTargetViewGL.h>
 namespace RenderOpenGL {
 
 	RenderContextGL::RenderContextGL(RenderDriverGL* _driver) : BaseRenderContext(_driver),
@@ -86,7 +86,7 @@ namespace RenderOpenGL {
 	GLuint RenderContextGL::CreateProgram(GLuint shaders[]) {
 		/* create the program object */
 		GLuint program = GlCreateProgram();
-		for(nextar::uint32 i = 0; i < Pass::NUM_STAGES; ++i) {
+		for(nextar::uint32 i = 0; i < Pass::STAGE_COUNT; ++i) {
 			if(shaders[i]) {
 				GlAttachShader(program, shaders[i]);
 				GL_CHECK();
@@ -194,18 +194,14 @@ namespace RenderOpenGL {
 		return inpCount;
 	}
 
-	void RenderContextGL::ReadUniforms(PassGL* pass, GLuint program) {
+	void RenderContextGL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
+			GLuint program,
+			ParamEntryTable* paramTable) {
 		GLint numBlocks = 0;
 		GlGetProgramiv(program, GL_ACTIVE_UNIFORM_BLOCKS, &numBlocks);
 		char name[128];
-
-		if((uint32)numBlocks > RenderConstants::MAX_CBUFFER_PER_PASS) {
-			Error("Pass has too many constant buffers!.");
-			NEX_THROW_GracefulError(EXCEPT_COMPILATION_FAILED);
-		}
-
-		Pass::ConstantBufferList ubList;
-
+		ParameterGroupList& ubList = pass->sharedParameters;
+		ubList.reserve(numBlocks);
 		for (GLint i = 0; i < numBlocks; ++i) {
 			GLint size = 0;
 			GLint numParams = 0;
@@ -222,13 +218,11 @@ namespace RenderOpenGL {
 			String uniName = name;
 			//bool shareUb = true;
 			UniformBufferGL* ubPtr = nullptr;
-			ConstantBufferPtr cbPtr;
 			UniformBufferMap::iterator it = uniformBufferMap.find(uniName);
 			if (it != uniformBufferMap.end()) {
-				cbPtr = (*it).second;
-				ubPtr = static_cast<UniformBufferGL*>(cbPtr.GetPtr());
-				if ( !(ubPtr && ubPtr->GetParamCount() == numParams &&
-						ubPtr->GetSize() == size) ) {
+				ubPtr = &(*it).second;
+				if ( !(ubPtr && ubPtr->numParams == numParams &&
+						ubPtr->size == size) ) {
 					Warn(String("Uniform buffer cannot be registered"
 								" (name already registered with different contents): ") + uniName);
 					ubPtr = 0;
@@ -237,41 +231,40 @@ namespace RenderOpenGL {
 				}
 			}
 
-			if (!cbPtr) {
+			if (!ubPtr) {
 				// create a new uniform buffer
-				ubPtr = CreateUniformBuffer(pass, i, program, numParams, size);
-				ubPtr->name = uniName;
-				cbPtr = nextar::Bind<ConstantBuffer>(ubPtr);
-				uniformBufferMap.emplace(std::cref(ubPtr->name),
-						cbPtr).first;
+				ubPtr = CreateUniformBuffer(pass, passIndex, uniName, i, program, numParams, size, paramTable);
 				ubPtr->SetBinding((GLuint)uniformBufferMap.size());
 			}
 
-			ubList[i] = cbPtr;
+			ubList.push_back(ubPtr);
 			// sort ublist by name
-			GlBindBufferRange(GL_UNIFORM_BUFFER, ubPtr->GetBinding(), ubPtr->ubNameGl, 0, ubPtr->size);
+			GlBindBufferRange(GL_UNIFORM_BUFFER,
+					ubPtr->GetBinding(), ubPtr->ubNameGl, 0, ubPtr->size);
 			GlUniformBlockBinding(program, i, ubPtr->GetBinding());
 		}
-		std::sort(ubList.data(), ubList.data() + numBlocks,
-				[](const UniformBufferGL* first, const UniformBufferGL* second) {
-			if(first->GetFrequency() == second->GetFrequency())
-				return first->GetName() < second->GetName();
-			return (first->GetFrequency() < second->GetFrequency()) != 0;
-		});
-
-		pass->numConstBuffers = numBlocks;
-		pass->sharedParameters.swap(ubList);
 	}
 
-	UniformBufferGL* RenderContextGL::CreateUniformBuffer(PassGL* pass, GLint blockIndex, GLuint prog,
-			GLuint numParams, size_t size) {
+	UniformBufferGL* RenderContextGL::CreateUniformBuffer(
+			PassViewGL* pass,
+			uint32 passIndex,
+			const String& name,
+			GLint blockIndex, GLuint prog,
+			GLuint numParams,
+			size_t size,
+			ParamEntryTable* table) {
 
 		NEX_ASSERT(size > 0);
 		uint16 numUnmappedParams = 0;
-
-		UniformBufferGL* pUb = NEX_NEW(UniformBufferGL);
-		UniformBufferGL& u = *pUb;
+		UniformBufferGL& u = uniformBufferMap[name];
 		u.ubNameGl = GL_INVALID_VALUE;
+		u.size = size;
+		u.numParams = numParams;
+		u.lastUpdateId = -1;
+		u.arrayCount = 1;
+		u.type = ParamDataType::PDT_STRUCT;
+		u.parameter = nullptr;
+
 		GlGenBuffers(1, &u.ubNameGl);
 		GL_CHECK();
 		if (u.ubNameGl == GL_INVALID_VALUE) {
@@ -279,8 +272,29 @@ namespace RenderOpenGL {
 			NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 		}
 
-		UpdateFrequency mask = (UpdateFrequency)0;
-		UniformGL* uniforms = NEX_ALLOC_ARRAY_T(UniformGL, MEMCAT_GENERAL, numParams);
+		bool storeIndividualParams = table != nullptr;
+		bool parseIndividualParams = true;
+		// look for AutoParams
+		const AutoParam* autoParam = pass->MapParam(name);
+		if (autoParam->type == ParamDataType::PDT_STRUCT) {
+			u.autoName = autoParam->autoName;
+			u.context = autoParam->context;
+			u.processor = autoParam->processor;
+			// parameter parsing is not important if the
+			// the auto param is well defined and understood
+			// by the engine
+			if (u.processor)
+				parseIndividualParams = false;
+			if (u.context == ParameterContext::CTX_FRAME ||
+				u.context == ParameterContext::CTX_VIEW)
+				storeIndividualParams = false;
+		} else {
+			u.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
+		}
+
+		if (!storeIndividualParams && !parseIndividualParams)
+			return &u;
+
 		void* tempBuffer = NEX_ALLOC(sizeof(GLint)*numParams*7 + 128, MEMCAT_GENERAL);
 		GLint *indices = static_cast<GLint*>(tempBuffer) + numParams*0;
 		GLint *type = static_cast<GLint*>(tempBuffer) + numParams*1;
@@ -308,71 +322,104 @@ namespace RenderOpenGL {
 		GlGetActiveUniformsiv(prog, numParams, uindices, GL_UNIFORM_ARRAY_STRIDE, arrayStride);
 		GL_CHECK();
 
-
-		uint32 numCustomParams = 0;
+		// First we determine the context of the auto-param.
+		// 1. If there are no auto-params we guess the param context from hints in the buffer name.
+		// 2. If auto-params are retrieved we take the first auto-param context. We check the
+		//    consistency of context for other auto-param found. If any discrepency is observed
+		//    the buffer is rejected.
+		// We can safely say that a struct processor is applicable for the buffer under these conditions:
+		// 1. If the context is other than VIEW and FRAME
+		// 2. If no auto-params are found.
+		// We can ignore storing the individual param data in a buffer if a struct processor is applicable.
+		// We should parse the params anyway, if the params are required for paramTable for lookup.
+		uint32 autoParamCount = 0;
+		ParameterContext chosen = ParameterContext::CTX_UNKNOWN;
+		UniformGL* uniforms = NEX_NEW(UniformGL[numParams]);
+		uint32 startParamIndex = -1;
+		if (storeIndividualParams) {
+			startParamIndex = table->size();
+			table->reserve(startParamIndex + numParams);
+		}
 		for (GLint i = 0; i < (GLint)numParams; ++i) {
 			UniformGL& uform = uniforms[i];
 			GlGetActiveUniformName(prog, indices[i], 128, 0, uniName);
-			String name = uniName;
+			String paramName = uniName;
+			const AutoParam* paramDef = pass->MapParam(paramName);
+			if (paramDef) {
+				if (chosen == ParameterContext::CTX_UNKNOWN)
+					chosen = paramDef->context;
+				else if (chosen != paramDef->context &&
+						paramDef->context != ParameterContext::CTX_UNKNOWN) {
+					Warn("Parameters from different contexts cannot be mixed for buffer: " + name + "with parameter: "
+							+ paramName);
+					// discard??
+				}
+				uform.autoName = paramDef->autoName;
+				uform.processor = paramDef->processor;
+				autoParamCount++;
+			} else {
+				uform.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
+				uform.processor = Pass::GetConstantProcessor();
+			}
 			GL_CHECK();
 			uform.isRowMajMatrix = rowMaj[i] ? true : false;
 			uform.typeGl = uint8(type[i]);
 			uform.matrixStride = matStride[i];
 			uform.arrayStride = arrayStride[i];
-			uform.constBufferDesc.cbOffset = offset[i];
-			uform.constBufferDesc.paramDesc.arrayCount = uint16(arraynum[i]);
-			uform.constBufferDesc.paramDesc.size =
-					GetShaderParamSize(uform.typeGl) * uform.constBufferDesc.paramDesc.arrayCount;
-			uform.constBufferDesc.paramDesc.type = GetShaderParamType(uform.typeGl);
+			uform.bufferOffset = offset[i];
+			uform.arrayCount = uint16(arraynum[i]);
+			uform.size = GetShaderParamSize(uform.typeGl) * uform.arrayCount;
+			uform.type = GetShaderParamType(uform.typeGl);
 
-			// todo Make all possible shader paramter auto param/custom param
-			// and register them to this table, thus a valid pointer is always
-			// retrieved. For custom param, the processor will be set to custom
-			// processor which knows how to retrieve from the parameter buffer.
-			// Later on when the shader script is properly made, the script will
-			// read the parameters from the script and automatically add them
-			// to the mapped list for retrieval here.
-			const AutoParam* paramDef = pass->MapParam(name);
-			// if this is not an auto param, we
-			// use a custom processor
-			if (paramDef == nullptr) {
-				numCustomParams++;
-				// todo There are a lot of assumptions here. We assume, all parameters
-				// are material parameters. They could well be any other type custom
-				// parameter (read Object).
-				uform.constBufferDesc.paramDesc.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
-				uform.constBufferDesc.paramDesc.name = std::move(name);
-				uform.constBufferDesc.paramDesc.frequency = UpdateFrequency::PER_MATERIAL;
-				uform.constBufferDesc.paramDesc.processor = Pass::customConstantProcessorMaterial;
-			} else {
-				uform.constBufferDesc.paramDesc.autoName = paramDef->autoName;
-				uform.constBufferDesc.paramDesc.frequency = paramDef->frequency;
-				uform.constBufferDesc.paramDesc.processor = paramDef->processor;
-				NEX_ASSERT(uform.constBufferDesc.paramDesc.type == paramDef->type);
+			if (storeIndividualParams && !paramDef) {
+				ParamEntry pe;
+				pe.arrayCount = uform.arrayCount;
+				pe.autoName = uform.autoName;
+				pe.maxSize = uform.size;
+				pe.name = std::move(paramName);
+				pe.type = uform.type;
+				pe.passIndex = passIndex;
+				table->push_back(pe);
 			}
-
-			mask |= uform.constBufferDesc.paramDesc.frequency;
 		}
 
-		// sort the resulting uniforms such that auto params come first
-		// followed by unmapped params. Unmapped params are sorted by name.
-		std::sort(uniforms, uniforms + numParams,
-				[] (const UniformGL& first, const UniformGL& second) {
-					if (first.constBufferDesc.paramDesc.autoName == second.constBufferDesc.paramDesc.autoName) {
-						NEX_ASSERT(first.constBufferDesc.paramDesc.autoName == AutoParamName::AUTO_CUSTOM_CONSTANT);
-						return first.constBufferDesc.cbOffset < first.constBufferDesc.cbOffset;
-					}
-					return (first.constBufferDesc.paramDesc.autoName <
-							second.constBufferDesc.paramDesc.autoName) != 0;
-			}
-		);
-		if (numCustomParams == numParams) {
-			u.SetFlags(ConstantBuffer::CUSTOM_STRUCT);
-			u.processor = Pass::customStructProcessorMaterial;
+		if (chosen == ParameterContext::CTX_UNKNOWN)
+			chosen = GuessContextByName(name);
+		if (chosen == ParameterContext::CTX_UNKNOWN) {
+			Warn("Buffer context could not be determined, assigning material context: " + name);
+			chosen = ParameterContext::CTX_MATERIAL;
 		}
-		u.paramCount = numParams;
-		u.paramDesc = &uniforms->constBufferDesc;
-		u.frequency = mask;
+		u.context = chosen;
+		// the context was just determined
+		if (storeIndividualParams) {
+			for(; startParamIndex < table->size(); ++startParamIndex) {
+				table->at(startParamIndex).context = chosen;
+			}
+		}
+
+		if ( (!autoParamCount && chosen != ParameterContext::CTX_VIEW &&
+				chosen != ParameterContext::CTX_FRAME) ||
+				!parseIndividualParams ) {
+			// lets look for the struct processor
+			if (!u.processor)
+				u.processor = Pass::GetStructProcessor();
+			NEX_DELETE_ARRAY(uniforms);
+			u.parameter = nullptr;
+		} else {
+			u.parameter = uniforms;
+			// sort the resulting uniforms such that auto params come first
+			// followed by unmapped params. Unmapped params are sorted by name.
+			std::sort(uniforms, uniforms + numParams,
+					[] (const UniformGL& first, const UniformGL& second) {
+						if (first.autoName == second.autoName) {
+							NEX_ASSERT(first.autoName == AutoParamName::AUTO_CUSTOM_CONSTANT);
+							return first.bufferOffset < first.bufferOffset;
+						}
+						return (first.autoName <
+								second.autoName) != 0;
+				});
+		}
+
 		u.size = size;
 		NEX_FREE(tempBuffer, MEMCAT_GENERAL);
 		GlBindBuffer( GL_UNIFORM_BUFFER, u.ubNameGl );
@@ -381,19 +428,27 @@ namespace RenderOpenGL {
 		GL_CHECK();
 		GlBindBuffer( GL_UNIFORM_BUFFER, 0 );
 		GL_CHECK();
-
-		return pUb;
+		return &u;
 	}
 
-	void RenderContextGL::ReadSamplers(PassGL* pass, GLuint program) {
+	void RenderContextGL::ReadSamplers(
+			PassViewGL* pass,
+			uint32 passIndex,
+			GLuint program,
+			ParamEntryTable* paramTable, const Pass::TextureDescMap& texMap) {
 		/** todo Massive work left for sampler arrays */
 		GLint numUni = 0;
 		char name[128];
 		size_t extra = 0;
 		GlGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numUni);
 		// assume all are samplers, otherwise we got a problem
-		SamplerState* samplers = NEX_ALLOC_ARRAY_T(SamplerState, MEMCAT_GRAPHICS, numUni);
+		SamplerState* samplers = NEX_NEW(SamplerState[numUni]);
 		uint32 mapped = 0;
+		uint32 startParamIndex = -1;
+		if (paramTable) {
+			startParamIndex = paramTable->size();
+			paramTable->reserve(numUni + startParamIndex);
+		}
 		for (GLuint i = 0; i < (GLuint) numUni; ++i) {
 
 			GlGetActiveUniformName(program, i, 128, 0, name);
@@ -405,32 +460,45 @@ namespace RenderOpenGL {
 
 			GL_CHECK();
 			if (IsSamplerType(type)) {
-
 				SamplerState& ss = samplers[mapped];
 				ss.index = mapped++;
-				ss.desc.paramDesc.arrayCount = 1;
-				const Pass::SamplerDesc& tu = *pass->MapSamplerParams(unitName);
-				if (&tu == nullptr) {
+				ss.arrayCount = 1;
+				const Pass::SamplerDesc* tu = Pass::MapSamplerParams(unitName, texMap);
+				if (tu == nullptr) {
 					Error(String("Overflowing/Unspecified texture unit index for ") + name);
 					continue;
 				}
-				const AutoParam* paramDef = pass->MapParam(unitName);
+				const AutoParam* paramDef = Pass::MapParam(unitName);
 				ss.location = loc;
-
 				if (paramDef == nullptr) {
-					ss.desc.paramDesc.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
-					ss.desc.paramDesc.name = std::move(unitName);
-					ss.desc.paramDesc.frequency = UpdateFrequency::PER_MATERIAL;
-					ss.desc.paramDesc.processor = Pass::customTextureProcessorMaterial;
+					ss.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
+					ss.context = GuessContextByName(unitName, ParameterContext::CTX_MATERIAL);
+					ss.processor = Pass::GetTextureProcessor();
 				} else {
-					ss.desc.paramDesc.autoName = paramDef->autoName;
-					ss.desc.paramDesc.frequency = paramDef->frequency;
-					ss.desc.paramDesc.processor = paramDef->processor;
+					ss.autoName = paramDef->autoName;
+					ss.context = paramDef->context;
+					ss.processor = paramDef->processor;
 				}
-				ss.desc.paramDesc.size = sizeof(SamplerState);
-				ss.desc.defaultTexture.texture = tu.defaultTexture;
-				const TextureUnitParams& params = tu.texUnitParams;
+				ss.size = sizeof(TextureUnit);
+				// todo Should be a view
+				ss.defaultTexture.texture = tu->defaultTexture;
+				if (paramTable) {
+					ParamEntry pe;
+					pe.arrayCount = 1;
+					pe.autoName = ss.autoName;
+					pe.context = ss.context;
+					pe.maxSize = ss.size;
+					pe.name = std::move(unitName);
+					pe.passIndex = passIndex;
+					pe.type = ParamDataType::PDT_TEXTURE;
+					paramTable->push_back(pe);
+				}
 
+				const TextureUnitParams& params = tu->texUnitParams;
+
+				// @optimize Reuse samplers. Samplers are currently bound to unit names
+				// It is possible to bind multiple units to sampler sampler in GLSL.
+				// This support is necessary in here.
 				GlGenSamplers(1, &ss.sampler);
 				GL_CHECK();
 				if (ss.sampler) {
@@ -464,12 +532,16 @@ namespace RenderOpenGL {
 				GL_CHECK();
 				GlSamplerParameterfv(ss.sampler, GL_TEXTURE_BORDER_COLOR, params.borderColor.AsFloatArray());
 				GL_CHECK();
+				// Bind the sampler variable to sampler index
+				GlUniform1i(ss.location, ss.index);
 			}
-			std::sort(samplers, samplers + mapped, [](const SamplerState& s1, const SamplerState& s2) {
-				return s1.desc.paramDesc.autoName == s2.desc.paramDesc.autoName ? s1.desc.paramDesc.name < s2.desc.paramDesc.name :
-						((s1.desc.paramDesc.autoName < s2.desc.paramDesc.autoName) != 0);
-			});
 		}
+		pass->samplers = samplers;
+		pass->numSamplerCount = mapped;
+		std::sort(samplers, samplers + mapped, [](const SamplerState& s1, const SamplerState& s2) {
+			return s1.autoName == s2.autoName ? s1.index < s2.index :
+					(s1.autoName < s2.autoName);
+		});
 	}
 
 	void RenderContextGL::Capture(PixelBox& image,
@@ -566,7 +638,7 @@ namespace RenderOpenGL {
 		VertexLayoutGL* layout = static_cast<VertexLayoutGL*> (
 			vd.layout);
 		VertexBufferBinding& binding = (*vd.binding);
-		layout->Enable(binding, static_cast<PassGL*>(ctx.pass), this);
+		layout->Enable(binding, static_cast<PassViewGL*>(ctx.pass), this);
 
 		GLint primtype;
 		switch (streamData->type) {
@@ -640,22 +712,29 @@ namespace RenderOpenGL {
 			SetCurrentWindow(nullptr);
 		else {
 			switch (canvas->GetRenderTargetType()) {
-			case RenderTargetType::RENDER_TEXTURE:
+			case RenderTargetType::RENDER_TEXTURE: {
 				RenderTextureViewGL* textureView =
 						static_cast<RenderTextureViewGL*>(
 								GetView(static_cast<RenderTexture*>(canvas)));
 				FrameBufferObjectGL& fbo = textureView->GetFBO();
 				if (!fbo.IsValid())
-					textureView->CreateFBO();
+					textureView->CreateFBO(this);
 				fbo.Bind(false, this);
-
+			}
 				break;
 			case RenderTargetType::RENDER_BUFFER:
 				break;
 			case RenderTargetType::RENDER_WINDOW:
 				SetCurrentWindow(canvas);
 				break;
-			case RenderTargetType::MULTI_RENDER_TARGET:
+			case RenderTargetType::MULTI_RENDER_TARGET: {
+				MultiRenderTargetViewGL* textureView =
+						static_cast<MultiRenderTargetViewGL*>(
+								GetView(static_cast<MultiRenderTarget*>(canvas)));
+				FrameBufferObjectGL& fbo = textureView->GetFBO();
+				NEX_ASSERT (fbo.IsValid());
+				fbo.Bind(false, this);
+			}
 				break;
 			}
 		}
@@ -997,13 +1076,15 @@ namespace RenderOpenGL {
 		return 0;
 	}
 
-	RenderContextGL::PixelFormatGl RenderContextGL::GetGlPixelFormat(PixelFormat imageFormat, PixelFormat textureFormat) {
+	PixelFormatGl RenderContextGL::GetGlPixelFormat(PixelFormat imageFormat, PixelFormat textureFormat) {
 		NEX_ASSERT(PixelUtils::IsValidTextureFormat(textureFormat));
 		PixelFormatGl pft;
 		// todo Check for floating point components
 		pft.isCompressed = false;
+		pft.isDepthSencil = false;
 		pft.internalFormat = GL_NONE;
 		pft.sourceFormat = GL_NONE;
+		pft.attachmentType = GL_COLOR_ATTACHMENT0;
 		switch(textureFormat) {
 		case PixelFormat::R8:
 			NEX_ASSERT(imageFormat == PixelFormat::R8);
@@ -1035,24 +1116,32 @@ namespace RenderOpenGL {
 			pft.internalFormat = GL_DEPTH_COMPONENT16;
 			pft.sourceFormat = GL_DEPTH_COMPONENT;
 			pft.dataType = GL_FLOAT;
+			pft.attachmentType = GL_DEPTH_ATTACHMENT;
+			pft.isDepthSencil = true;
 			break;
 		case PixelFormat::D24:
 			NEX_ASSERT(imageFormat == PixelFormat::D24);
 			pft.internalFormat = GL_DEPTH_COMPONENT24;
 			pft.sourceFormat = GL_DEPTH_COMPONENT;
 			pft.dataType = GL_FLOAT;
+			pft.attachmentType = GL_DEPTH_ATTACHMENT;
+			pft.isDepthSencil = true;
 			break;
 		case PixelFormat::D24S8:
 			NEX_ASSERT(imageFormat == PixelFormat::D24S8);
 			pft.internalFormat = GL_DEPTH24_STENCIL8;
 			pft.sourceFormat = GL_DEPTH_STENCIL;
 			pft.dataType = GL_FLOAT; // irrelevant
+			pft.attachmentType = GL_DEPTH_STENCIL_ATTACHMENT;
+			pft.isDepthSencil = true;
 			break;
 		case PixelFormat::D32:
 			NEX_ASSERT(imageFormat == PixelFormat::D32);
 			pft.internalFormat = GL_DEPTH_COMPONENT32;
 			pft.sourceFormat = GL_DEPTH_COMPONENT;
 			pft.dataType = GL_FLOAT;
+			pft.attachmentType = GL_DEPTH_ATTACHMENT;
+			pft.isDepthSencil = true;
 			break;
 		case PixelFormat::RGBA16F:
 			NEX_ASSERT(imageFormat == PixelFormat::RGBA16F);
@@ -1061,6 +1150,23 @@ namespace RenderOpenGL {
 			pft.dataType = GL_FLOAT;
 		}
 		return pft;
+	}
+
+	ParameterContext RenderContextGL::GuessContextByName(const String& name,
+			ParameterContext defaultContex) {
+		String lowerName = name;
+		StringUtils::ToUpper(lowerName);
+		if (lowerName.find("perframe") || lowerName.find("per_frame"))
+			return ParameterContext::CTX_FRAME;
+		else if (lowerName.find("perview") || lowerName.find("per_view"))
+			return ParameterContext::CTX_VIEW;
+		else if (lowerName.find("perpass") || lowerName.find("per_pass"))
+			return ParameterContext::CTX_PASS;
+		else if (lowerName.find("permaterial") || lowerName.find("per_material"))
+			return ParameterContext::CTX_MATERIAL;
+		else if (lowerName.find("perobject") || lowerName.find("per_object"))
+			return ParameterContext::CTX_OBJECT;
+		return defaultContex;
 	}
 }
 

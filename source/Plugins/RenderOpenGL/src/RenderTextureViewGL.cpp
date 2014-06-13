@@ -25,5 +25,9 @@ namespace RenderOpenGL {
 			TextureViewGL::Update(rc, msg, cb);
 	}
 
-
+	void RenderTextureViewGL::Destroy(RenderContext* rc) {
+		RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
+		fbo.Destroy(gl);
+		TextureViewGL::Destroy(rc);
+	}
 } /* namespace nextar */

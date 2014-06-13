@@ -84,6 +84,7 @@ namespace nextar {
 	};
 
 	enum class ParameterContext : uint8 {
+		CTX_UNKNOWN = -1,
 		// changes per frame: time
 		// Type: shared
 		CTX_FRAME = 0,
@@ -136,7 +137,6 @@ namespace nextar {
 		}
 
 		static uint32 stride;
-		ShaderParameter paramDesc;
 		uint32 bufferOffset;
 	};
 
@@ -152,6 +152,7 @@ namespace nextar {
 				reinterpret_cast<uint8*>(start) + index*SamplerParameter::stride);
 		}
 
+		ParameterContext context;
 		static uint32 stride;
 		TextureUnit defaultTexture;
 	};
@@ -173,6 +174,9 @@ namespace nextar {
 		ParameterContext context;
 		ConstantParameter* parameter;
 		uint32 numParams;
+
+	protected:
+		~ParameterGroup() {}
 	};
 
 	typedef vector<ParameterGroup*>::type ParameterGroupList;
@@ -184,6 +188,7 @@ namespace nextar {
 		SamplerParameter* endSamplerIt;
 
 		uint32 offsetInParamBuffer;
+
 	};
 
 	typedef array<ParameterGroupItem, (size_t)ParameterContext::CTX_COUNT>::type ParameterGroupEntries;
@@ -196,7 +201,7 @@ namespace nextar {
 	};
 
 	struct AutoParam : public AllocGeneral {
-		uint32 type;
+		ParamDataType type;
 		AutoParamName autoName;
 		ParameterContext context;
 		AutoParamProcessor* processor;
@@ -206,16 +211,21 @@ namespace nextar {
 	};
 
 	struct ParamEntry {
+		ParameterContext context;
+		uint8 passIndex;
 		AutoParamName autoName;
-		uint16 type;
+		ParamDataType type;
 		uint16 arrayCount;
 		uint32 maxSize;
 		String name;
 	};
 
 	typedef vector<ParamEntry>::type ParamEntryTable;
-	typedef std::pair<ParamEntryTable::iterator, ParamEntryTable::iterator> ParamEntryTableItem;
-	typedef std::pair<ParamEntryTable::const_iterator, ParamEntryTable::const_iterator> ConstParamEntryTableItem;
+	struct ParamEntryTableItem {
+		ParamEntryTable::const_iterator beginIt;
+		ParamEntryTable::const_iterator endIt;
+		uint32 totalParamBufferSize;
+	};
 
 } // namespace nextar
 #endif // SHADERPARAM_H_

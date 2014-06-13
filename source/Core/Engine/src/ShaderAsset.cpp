@@ -7,7 +7,6 @@
 #include <NexEngine.h>
 #include <Pass.h>
 #include <ShaderAsset.h>
-#include <ConstantBuffer.h>
 #include <ParameterIterator.h>
 #include <RenderManager.h>
 
@@ -18,8 +17,7 @@ namespace nextar {
 	/* Shader											 */
 	/*****************************************************/
 	ShaderAsset::ShaderAsset(const StringID name) : nextar::Asset(name)
-	,translucency(0)
-	,singlePassShader(nullptr) {
+	,translucency(0) {
 	}
 
 	ShaderAsset::~ShaderAsset() {
@@ -27,10 +25,6 @@ namespace nextar {
 	}
 
 	void ShaderAsset::_DestroyPasses() {
-		if (singlePassShader)
-			NEX_DELETE(singlePassShader);
-		for(auto &p : passes)
-			NEX_DELETE(p);
 		passes.clear();
 	}
 
@@ -45,16 +39,13 @@ namespace nextar {
 		_DestroyPasses();
 		
 		StreamPassList &spl = creationParams->passes;
-		if (spl.size() > 1) {
-			passes.reserve(spl.size());
-			for(auto i = spl.begin(); i != spl.end(); ++i) {
-				PassPtr p(_CreatePass((*i), creationParams->compilationOpt));
-				passes.push_back(std::move(p));
-			}
-		} else {
-			singlePassShader = _CreatePass(spl[0], creationParams->compilationOpt);
+		passes.resize(spl.size());
+
+		for(uint32 passIndex = 0; passIndex < spl.size(); ++passIndex) {
+			spl[passIndex].compileParams.passIndex = passIndex;
+			_CompilePass(passes[passIndex],
+					spl[passIndex], creationParams->compilationOpt);
 		}
-		
 		/* update */
 		_BuildParameterTable(spl);
 		/* mark request as complete */
@@ -64,11 +55,11 @@ namespace nextar {
 		SetReady(true);
 	}
 
-	Pass* ShaderAsset::_CreatePass(ShaderAsset::StreamPass& p, const String& co) {
-		Pass* r = NEX_NEW( Pass(p.name) );
-		p.compileParams = &co;
-		r->RequestUpdate(Pass::MSG_PASS_COMPILE, reinterpret_cast<ContextObject::ContextParamPtr>(&p.compileParams));
-		return r;
+	void ShaderAsset::_CompilePass(Pass& r, ShaderAsset::StreamPass& p, const String& co) {
+		p.compileParams.compileOptions = &co;
+		p.compileParams.parameters = &paramLookup;
+		r.SetID(p.name);
+		r.RequestUpdate(Pass::MSG_PASS_COMPILE, reinterpret_cast<ContextObject::ContextParamPtr>(&p.compileParams));
 	}
 
 	void ShaderAsset::NotifyAssetUnloaded() {
@@ -96,99 +87,37 @@ namespace nextar {
 		request = nullptr;
 	}
 
-	void ShaderAsset::_BeginPass(Pass::OffsetParams& p, ParamTableBuilder& ptb) {
-		p.passParamByteOffset = ptb.passParamOffset;
-		p.materialParamByteOffset = ptb.materialParamOffset;
-		p.objectParamByteOffset = ptb.objectParamOffset;
-	}
-
-	void ShaderAsset::_Process(ShaderParamIterator& it, ParamTableBuilder& ptb) {
-		auto desc = (*it);
-		if (desc.autoName != AutoParamName::AUTO_CUSTOM_CONSTANT)
-			return;
-		uint32 offset;
-		switch(desc.frequency) {
-		case UpdateFrequency::PER_FRAME:
-			ptb.frameParamCount++;break;
-		case UpdateFrequency::PER_VIEW:
-			ptb.viewParamCount++;break;
-		case UpdateFrequency::PER_MATERIAL:
-			offset = ptb.materialParamOffset;
-			ptb.materialParamOffset += desc.size;
-			ptb.materialParamCount++;break;
-		case UpdateFrequency::PER_OBJECT_INSTANCE:
-			offset = ptb.objectParamOffset;
-			ptb.objectParamOffset += desc.size;
-			ptb.objectParamCount++;break;
-		case UpdateFrequency::PER_PASS:
-			offset = ptb.passParamOffset;
-			ptb.passParamOffset += desc.size;
-			ptb.passParamCount++;break;
-		}
-
-		ParamEntry pe;
-		pe.descriptor = &desc;
-		pe.offset = offset;
-		ptb.passTable.push_back(pe);
-	}
-
-	void ShaderAsset::_EndPass(PassPtr& p, Pass::OffsetParams& offsets, ParamTableBuilder& ptb) {
-		p->RequestUpdate(Pass::MSG_PASS_UPDATE_OFFSET, static_cast<const Pass::OffsetParams*>(&offsets));
-	}
-
-	void ShaderAsset::_Finalize(ParamTableBuilder& ptb) {
-		std::sort(ptb.passTable.begin(),ptb.passTable.end(), [] (const ParamEntry& first, const ParamEntry& second) -> bool {
-			return first.descriptor->frequency < second.descriptor->frequency;
+	void ShaderAsset::_BuildParameterTable(StreamPassList& spl) {
+		paramLookup.shrink_to_fit();
+		// sort by context type
+		std::sort(std::begin(paramLookup), std::end(paramLookup), [] (const ParamEntry& e1, const ParamEntry& e2) -> bool {
+			/* for ordered compilation no need to check passIndex order
+			return e1.context == e2.context ? e1.passIndex < e2.passIndex :
+					e1.context < e2.context;
+			*/
+			return e1.context <= e2.context;
 		});
 
-		paramLookup.reserve(ptb.passTable.size());
-		paramLookup.assign(ptb.passTable.begin(), ptb.passTable.end());
-
-		uint32 offset = ptb.frameParamCount + ptb.viewParamCount;
-		// todo Only automatic frame and view parameters are supported currently
-		NEX_ASSERT(offset);
-		passProperties.first = paramLookup.begin() + offset;
-		offset += ptb.passParamCount;
-		materialProperties.first = passProperties.second = paramLookup.begin() + offset;
-		offset += ptb.materialParamCount;
-		objectProperties.first = materialProperties.second = paramLookup.begin() + offset;
-		offset += ptb.objectParamCount;
-		objectProperties.second = paramLookup.begin() + offset;
-
-	}
-
-	void ShaderAsset::_BuildParameterTable(StreamPassList& spl) {
-		paramLookup.clear();
-
-		ParamTableBuilder paramTableBuilder;
-		Pass **it, **en;
-		if(singlePassShader) {
-			it = &singlePassShader;
-			en = it + 1;
-		} else {
-			it = passes.data();
-			en = it + passes.size();
-		}
-		uint32 index = 0;
-		for(; it != en; ++it, ++index) {
-			PassPtr p = (*it);
-			_BeginPass(spl[index].offsets, paramTableBuilder);
-			ConstantBufferList& cbl = p->GetConstantBuffers();
-			for(auto &c : cbl) {
-				ShaderParamIterator it = c->GetParamIterator();
-				while(it) {
-					_Process(it, paramTableBuilder);
-					++it;
-				}
+		ParameterContext lastContext = ParameterContext::CTX_UNKNOWN;
+		uint32 index = -1;
+		size_t offset = 0;
+		for(auto& e : paramLookup) {
+			if(e.context != lastContext) {
+				lastContext = e.context;
+				offset = 0;
 			}
-			_EndPass(p, spl[index].offsets, paramTableBuilder);
-			ShaderParamIterator it = p->GetSamplerIterator();
-			while(it) {
-				_Process(it, paramTableBuilder);
-				++it;
+			if (index != e.passIndex) {
+				index = e.passIndex;
+				spl[index].offsets.offset[lastContext] = offset;
 			}
+			offset += e.maxSize;
 		}
-		_Finalize(paramTableBuilder);
+
+		for(auto i = std::pair(spl.begin(), passes.begin());
+				i.first != spl.end(); ++i.first, ++i.second) {
+			(*i.second).RequestUpdate(Pass::MSG_PASS_UPDATE_PARAMBUFFER_OFFSET,
+					reinterpret_cast<ContextObject::ContextParamPtr>(&(*i.first).compileParams));
+		}
 	}
 
 	/*****************************************************/
@@ -225,10 +154,6 @@ namespace nextar {
 		sd.defaultTexture = texture;
 		if (texture->IsTextureAsset())
 			metaInfo.AddDependency(static_cast<TextureAsset*>(texture));
-	}
-
-	ParameterIterator ShaderAsset::GetParameterIterator(UpdateFrequency type) {
-		return ParameterIterator(passes, type);
 	}
 
 	void ShaderAsset::StreamRequest::SetBlendState(BlendState& state) {

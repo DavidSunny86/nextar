@@ -8,7 +8,7 @@
 #include <VertexElementGL.h>
 #include <RenderContextGL.h>
 #include <BufferManager.h>
-#include <PassGL.h>
+#include <PassViewGL.h>
 
 namespace RenderOpenGL {
 
@@ -67,9 +67,11 @@ namespace RenderOpenGL {
 		}
 	}
 
-	void VertexLayoutGL::Update(nextar::RenderContext* rc, ContextParamPtr param) {
-		if(param) {
-			VertexLayout::ContextParam* up = reinterpret_cast<ContextParam*>(param);
+	void VertexLayoutGL::Update(nextar::RenderContext* rc,
+			uint32 msg,
+			ContextObject::ContextParamPtr param) {
+		if(param && msg == VertexLayout::MSG_CREATE) {
+			VertexLayout::CreateParam* up = reinterpret_cast<VertexLayout::CreateParam*>(param);
 			attributes.resize(up->numElements);
 			const VertexElement* el = up->elements;
 			for(auto& a : attributes) {
@@ -96,22 +98,29 @@ namespace RenderOpenGL {
 		passVertexArrayPairs.clear();
 	}
 
-	void VertexLayoutStaticGL::Update(nextar::RenderContext* rc, ContextParamPtr param) {
-		VertexLayoutGL::Update(rc, param);
-		RenderContextGL* rcGL = static_cast<RenderContextGL*>(rc);
+	void VertexLayoutStaticGL::ClearAllVAO(RenderContextGL* rcGL) {
 		for (auto &p : passVertexArrayPairs) {
 			rcGL->DestroyVAO(p.second);
 		}
 		passVertexArrayPairs.clear();
-		
-		cachedIndex = -1;
-		bindingNumber = -1;
+	}
+	void VertexLayoutStaticGL::Update(nextar::RenderContext* rc,
+			uint32 msg,
+			ContextObject::ContextParamPtr param) {
+		if (msg == VertexLayout::MSG_CREATE) {
+			VertexLayoutGL::Update(rc, msg, param);
+			RenderContextGL* rcGL = static_cast<RenderContextGL*>(rc);
+			ClearAllVAO(rcGL);
+			cachedIndex = -1;
+			bindingNumber = -1;
+		}
 	}
 
-	void VertexLayoutStaticGL::Enable(VertexBufferBinding& binding, PassGL* pass, RenderContextGL* rc) {
+	void VertexLayoutStaticGL::Enable(VertexBufferBinding& binding, PassViewGL* pass, RenderContextGL* rc) {
 		uint32 id = pass->GetInputLayoutID();
 		if (binding.GetBindingNumber() != bindingNumber) {
 			bindingNumber =  binding.GetBindingNumber();
+			ClearAllVAO(rc);
 			passVertexArrayPairs.clear();
 			cachedIndex = -1;
 		}
@@ -145,7 +154,7 @@ namespace RenderOpenGL {
 	VertexLayoutDynamicGL::~VertexLayoutDynamicGL() {
 	}
 
-	void VertexLayoutDynamicGL::Enable(VertexBufferBinding& binding, PassGL* pass, RenderContextGL* rc) {
+	void VertexLayoutDynamicGL::Enable(VertexBufferBinding& binding, PassViewGL* pass, RenderContextGL* rc) {
 
 		uint16 id = pass->GetInputLayoutID();
 

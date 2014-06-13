@@ -14,7 +14,7 @@
 
 namespace RenderOpenGL {
 
-	class PassGL;
+	class PassViewGL;
 	struct VertexAttribGL {
 		/* assumed true?? */
 		GLboolean normalize;
@@ -41,23 +41,14 @@ namespace RenderOpenGL {
 
 	/** todo We can have more efficient structures here, but if this works out,
 	 then no worry */
-	class VertexLayoutGL : public VertexLayout {
+	class VertexLayoutGL : public VertexLayout::View {
 	public:
 		VertexLayoutGL();
 		~VertexLayoutGL() {}
 
-		virtual void Update(nextar::RenderContext*, ContextParamPtr);
-		virtual void Enable(VertexBufferBinding& binding, PassGL* pass, RenderContextGL* rc) = 0;
+		virtual void Update(nextar::RenderContext*, uint32 msg, ContextObject::ContextParamPtr);
+		virtual void Enable(VertexBufferBinding& binding, PassViewGL* pass, RenderContextGL* rc) = 0;
 		virtual void Disable(RenderContextGL* rc) = 0;
-		/* Get ith element */
-		virtual VertexElement GetVertexElement(uint32 i) {
-			return attributes[i].element;
-		}
-
-		/* Element count */
-		virtual uint32 GetNumElements() const {
-			return (uint32)attributes.size();
-		}
 
 		static uint16 GetFromGlType(GLenum);
 		static void Populate(VertexAttribGL& a);
@@ -77,11 +68,13 @@ namespace RenderOpenGL {
 		VertexLayoutStaticGL();
 		~VertexLayoutStaticGL();
 
-		virtual void Update(nextar::RenderContext*, ContextParamPtr);
+		virtual void Update(nextar::RenderContext*, uint32 msg, ContextObject::ContextParamPtr);
 		virtual void Destroy(nextar::RenderContext*);
 
-		virtual void Enable(VertexBufferBinding& binding, PassGL* pass, RenderContextGL* rc);
+		virtual void Enable(VertexBufferBinding& binding, PassViewGL* pass, RenderContextGL* rc);
 		virtual void Disable(RenderContextGL* rc);
+
+		void ClearAllVAO(RenderContextGL*);
 	};
 
 	class VertexLayoutDynamicGL : public VertexLayoutGL {
@@ -95,8 +88,8 @@ namespace RenderOpenGL {
 		VertexLayoutDynamicGL();
 		~VertexLayoutDynamicGL();
 
-		virtual void Update(nextar::RenderContext*, ContextParamPtr);
-		virtual void Enable(VertexBufferBinding& binding, PassGL* pass, RenderContextGL* rc);
+		virtual void Update(nextar::RenderContext*, uint32 msg, ContextObject::ContextParamPtr);
+		virtual void Enable(VertexBufferBinding& binding, PassViewGL* pass, RenderContextGL* rc);
 		virtual void Disable(RenderContextGL* rc);
 
 		const PassLayoutVertexArrayPair& GetVertexLayoutForPass(nextar::Pass* pass, RenderContextGL* rc);

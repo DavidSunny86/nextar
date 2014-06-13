@@ -20,10 +20,8 @@ namespace nextar {
 	class GpuBuffer;
 	class VertexBuffer;
 	class IndexBuffer;
-	class ConstantBuffer;
 	class Viewport;
 	class BufferManager;
-	class GpuProgram;
 	class ShaderAsset;
 	class TextureBase;
 	class RenderTarget;
@@ -66,7 +64,6 @@ namespace nextar {
 
 	typedef RefPtr<VertexBuffer> VertexBufferPtr;
 	typedef RefPtr<IndexBuffer> IndexBufferPtr;
-	typedef RefPtr<ConstantBuffer> ConstantBufferPtr;
 	typedef RefPtr<RenderContext> RenderContextPtr;
 	typedef RefPtr<RenderDriver> RenderDriverPtr;
 	typedef RefPtr<GpuBuffer> GpuBufferPtr;

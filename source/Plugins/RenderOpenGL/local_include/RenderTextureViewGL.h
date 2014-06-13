@@ -20,8 +20,21 @@ namespace RenderOpenGL {
 		virtual ~RenderTextureViewGL();
 
 		virtual void Update(RenderContext*, uint32 , ContextObject::ContextParamPtr);
-		void CreateFBO();
-		void DestroyFBO();
+		virtual void Destroy(RenderContext*);
+
+		inline void CreateFBO(RenderContextGL* gl) {
+			fbo.CreateAndBind(gl);
+			if (pixelFormat.isDepthSencil)
+				fbo.AttachDepth(gl, pixelFormat.attachmentType, this);
+			else
+				fbo.AttachColor(gl, 0, this);
+			fbo.Validate(gl);
+		}
+
+		inline void DestroyFBO(RenderContextGL* gl) {
+			fbo.Destroy(gl);
+		}
+
 		FrameBufferObjectGL& GetFBO() {
 			return fbo;
 		}

@@ -15,58 +15,16 @@ namespace nextar {
 	Pass::AutoParamMap Pass::autoParams;
 	
 
-	Pass::Pass(StringID name) :
+	Pass::Pass() :
 	ContextObject(TYPE_PASS)
-	,NamedObject(name)
-	,inputLayoutUniqueID(-1)
+	,NamedObject(StringUtils::NullID)
+	//,inputLayoutUniqueID(-1)
 	,flags(0)
-	,programs() // todo is this enough?? or do null out
 	{
-		// null all programs
-		for(uint32 i = 0; i < Pass::NUM_STAGES; ++i) {
-			programs[i] = nullptr;
-		}
 	}
 
 	Pass::~Pass() {
-		for(uint32 i = 0; i < Pass::NUM_STAGES; ++i) {
-			if (programs[i]) {
-				NEX_DELETE(programs[i]);
-				programs[i] = nullptr;
-			}
-		}
 	}
-
-	void Pass::RequestUpdate(uint32 msg, ContextObject::ContextParamPtr param) {
-		if (msg == Pass::MSG_PASS_COMPILE) {
-			const CompileParams& p = *reinterpret_cast<const CompileParams*>(param);
-			//blendState = p.blendState;
-			//depthStencilState = p.depthStencilState;
-			//rasterState = p.rasterState;
-			//textureDescMap.swap(p.textureStates);
-
-			for(uint32 i = 0; i < Pass::NUM_STAGES; ++i) {
-				GpuProgram::ProgramType t = (GpuProgram::ProgramType)(GpuProgram::TYPE_VERTEX + i);
-				const String& source = p.programSources[i];
-				if (programs[i])
-					NEX_DELETE(programs[i]);
-				programs[i] = nullptr;
-				if (source.length()) {
-					programs[i] = GpuProgram::Instance(t);
-					GpuProgram::CompileParam update = {
-							source.c_str(),
-							p.compileOptions
-					};
-					programs[i]->RequestUpdate(GpuProgram::MSG_COMPILE,
-							reinterpret_cast<ContextObject::ContextParamPtr>(&update));
-				}
-			}
-		} else if (msg == Pass::MSG_PASS_UPDATE_PARAMS) {
-
-		}
-		ContextObject::RequestUpdate(msg, reinterpret_cast<ContextObject::ContextParamPtr>(param));
-	}
-
 
 	const AutoParam* Pass::MapParam(const String& name) {
 		auto ap = autoParams.find(name);
@@ -94,7 +52,15 @@ namespace nextar {
 	void Pass::View::Update(RenderContext* rc, uint32 msg, ContextParamPtr param) {
 		if (msg == Pass::MSG_PASS_COMPILE) {
 			const CompileParams& p = *reinterpret_cast<const CompileParams*>(param);
+			//p.inputLayoutId = &inputLayoutUniqueID;
+			p.inited.store(0, std::memory_order_relaxed);
 			Compile(rc, p);
+		} else if (msg == Pass::MSG_PASS_UPDATE_PARAMBUFFER_OFFSET) {
+			const ParamBufferOffsetParams& p = *reinterpret_cast<const ParamBufferOffsetParams*>(param);
+			uint32 offsetAt = 0;
+			for(auto& e : paramGroupEntries) {
+				e.offsetInParamBuffer = p.offset[offsetAt++];
+			}
 		}
 	}
 	
@@ -130,7 +96,8 @@ namespace nextar {
 		for(auto it = item.beginSamplerIt; it != item.endSamplerIt; 
 			it = SamplerParameter::Next(it)) {
 			NEX_ASSERT(it->processor);
-			it->processor->Apply(ctx, it);
+			if (it->context == type)
+				it->processor->Apply(ctx, it);
 		}
 	}
 

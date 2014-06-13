@@ -4,11 +4,12 @@
 
 #include <Pass.h>
 #include <UniformBufferGL.h>
+#include <GpuProgramGL.h>
 
 namespace RenderOpenGL {
 
-	struct SamplerState {
-		TextureSamplerParamDesc desc;
+	class SamplerState : public SamplerParameter {
+	public:
 		uint32 index;
 		GLint location;
 		GLuint sampler;
@@ -30,13 +31,13 @@ namespace RenderOpenGL {
 	 */
 	typedef vector<VertexSemanticGL>::type VertexSemanticListGL;
 
-	class PassGL : public Pass {
-		NEX_LOG_HELPER(PassGL);
+	class PassViewGL : public Pass::View {
+		NEX_LOG_HELPER(PassViewGL);
 
 	public:
 
-		PassGL();
-		virtual ~PassGL();
+		PassViewGL();
+		virtual ~PassViewGL();
 		/* Could be async accessed when using multi gpu setup, so have to make sure its thread safe */
 		static std::pair<uint16, VertexSemanticListGL*> MapLayout(const VertexSemanticGL* semantics, uint32 numSemantics);
 
@@ -47,24 +48,29 @@ namespace RenderOpenGL {
 		inline GLuint GetProgram() {
 			return iGlProgram;
 		}
-				
-		virtual void SetTexture(RenderContext* rc, const SamplerParameter& desc, const TextureUnit* tu) = 0;
+
+		inline uint16 GetInputLayoutID() const {
+			return inputLayoutId;
+		}
+
+		virtual void Compile(nextar::RenderContext*, const Pass::CompileParams&);
+		virtual void SetTexture(RenderContext* rc, const SamplerParameter& desc, const TextureUnit* tu);
+		virtual void Destroy(nextar::RenderContext*);
 
 	protected:
-		virtual bool Compile(nextar::RenderContext*);
-		virtual void Decompile(nextar::RenderContext*);
-
-		virtual bool UpdateTextureStates(nextar::RenderContext*) = 0;
-		virtual bool UpdateBlendStates(nextar::RenderContext*) = 0;
-		virtual bool UpdateRasterStates(nextar::RenderContext*) = 0;
-		virtual bool UpdateDepthStencilStates(nextar::RenderContext*) = 0;
 
 		GLuint iGlProgram;
+
+		uint16 inputLayoutId;
 		VertexSemanticListGL* inputSemantics;
 		
 		typedef vector<VertexSemanticListGL>::type VertexSemanticListList;
+
+		// todo make thread safe
 		static VertexSemanticListList registeredSignatures;
 
+		GpuProgramGL programs[Pass::STAGE_COUNT];
+		static GLenum stagesMap[Pass::STAGE_COUNT];
 		friend class RenderContextGL;
 	};
 

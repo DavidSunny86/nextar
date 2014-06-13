@@ -20,7 +20,6 @@ namespace nextar {
 			MAX_TEXTURE_DIM = 16384,
 			MAX_TEXTURE_LAYER = 2048,
 			MAX_MIP_LEVELS = 14,
-			MAX_PROGRAM_STAGES = 5,
 			MAX_VERTEX_ELEMENT = 32,
 			MAX_VERTEX_STREAMS = 4,
 			// for async capture, this will pre capture the n-3rd frame from before-hand

@@ -31,12 +31,9 @@ namespace nextar {
 			uint32 numElements;
 			const VertexElement* elements;
 		};
+
 		/* Dtor */
 		virtual ~VertexLayout() {}
-		/* Get ith element */
-		virtual VertexElement GetVertexElement(uint32 i) = 0;
-		/* Element count */
-		virtual uint32 GetNumElements() const = 0;
 	};
 
 	class _NexEngineAPI VertexBufferBinding: public AllocGraphics {
