@@ -13,126 +13,130 @@
 
 namespace nextar {
 
-	class StreamLexer;
-	class _NexBaseAPI ScriptParser {
-		NEX_LOG_HELPER(ScriptParser);
+class StreamLexer;
+class _NexBaseAPI ScriptParser {
+	NEX_LOG_HELPER(ScriptParser)
+	;
+public:
+
+	class ScriptContext;
+	class BlockListener;
+	class BlockContext;
+	class StatementListener;
+	class StatementContext;
+	class RegionContext;
+
+	class StatementListener {
 	public:
-
-		class ScriptContext;
-		class BlockListener;
-		class BlockContext;
-		class StatementListener;
-		class StatementContext;
-		class RegionContext;
-
-		class StatementListener {
-		public:
-			virtual void EnterStatement(ScriptParser::StatementContext& statement) {}
-		protected:
-			~StatementListener();
-		};
-
-		class RegionListener {
-		public:
-			virtual void EnterRegion(ScriptParser::RegionContext& regionCtx) {}
-		protected:
-			~RegionListener();
-		};
-
-		class BlockListener {
-		public:
-			virtual void EnterBlock(ScriptParser::BlockContext& block) {}
-		protected:
-			~BlockListener();
-		};
-
-		class ScriptListener {
-		public:
-			virtual void EnterScript(ScriptParser::ScriptContext& block) {}
-		protected:
-			~ScriptListener();
-		};
-
-		class _NexBaseAPI ContextBase {
-		public:
-			ContextBase(ScriptContext& scriptContext);
-
-			void Error(const String& error);
-			bool IsErrorBitSet() const;
-		protected:
-			ScriptContext& scriptContext;
-		};
-
-		class _NexBaseAPI RegionContext: public ContextBase {
-			friend class ScriptContext;
-		public:
-			RegionContext(ScriptContext& context);
-
-			inline const String& GetName() const {
-				return name;
-			}
-
-			/* Returns the complete text under this region */
-			void ParseText(String&);
-			void ParseStatements(StatementListener*);
-			void Discard();
-
-		protected:
-			String name;
-		};
-
-		class _NexBaseAPI StatementContext : public ContextBase {
-			friend class BlockContext;
-			friend class ScriptContext;
-		public:
-			StatementContext(BlockContext& block, ScriptContext& context);
-			const String& GetCommand() const;
-			const StringUtils::WordList& GetParamList() const;
-
-			void ParseBlock(BlockListener*);
-		protected:
-			void _Clear();
-
-			BlockContext& parentBlockContext;
-
-			String command;
-			StringUtils::WordList paramContext;
-		};
-
-		class _NexBaseAPI BlockContext : public ContextBase {
-			friend class ScriptContext;
-			friend class StatementContext;
-		public:
-			BlockContext(ScriptContext& scriptContex);
-
-			void ParseStatements(StatementListener*);
-		protected:
-
-		};
-
-		class _NexBaseAPI ScriptContext {
-			friend class BlockContext;
-			friend class StatementContext;
-			friend class RegionContext;
-		public:
-			ScriptContext(const String& scriptName, StreamLexer& lexer);
-
-			void ParseRegions(RegionListener*);
-			void Error(const String& error);
-			bool IsErrorBitSet() const;
-			const String& GetErrors() const;
-
-		protected:
-			StreamLexer& lexer;
-			const String& scriptName;
-			String errorLog;
-		};
-
-		ScriptParser();
-		virtual ~ScriptParser();
-
-		void ParseScript(ScriptListener* listener, const String& scriptName, InputStreamPtr& input);
+		virtual void EnterStatement(ScriptParser::StatementContext& statement) {
+		}
+	protected:
+		~StatementListener();
 	};
+
+	class RegionListener {
+	public:
+		virtual void EnterRegion(ScriptParser::RegionContext& regionCtx) {
+		}
+	protected:
+		~RegionListener();
+	};
+
+	class BlockListener {
+	public:
+		virtual void EnterBlock(ScriptParser::BlockContext& block) {
+		}
+	protected:
+		~BlockListener();
+	};
+
+	class ScriptListener {
+	public:
+		virtual void EnterScript(ScriptParser::ScriptContext& block) {
+		}
+	protected:
+		~ScriptListener();
+	};
+
+	class _NexBaseAPI ContextBase {
+	public:
+		ContextBase(ScriptContext& scriptContext);
+
+		void Error(const String& error);bool IsErrorBitSet() const;
+	protected:
+		ScriptContext& scriptContext;
+	};
+
+	class _NexBaseAPI RegionContext: public ContextBase {
+		friend class ScriptContext;
+	public:
+		RegionContext(ScriptContext& context);
+
+		inline const String& GetName() const {
+			return name;
+		}
+
+		/* Returns the complete text under this region */
+		void ParseText(String&);
+		void ParseStatements(StatementListener*);
+		void Discard();
+
+	protected:
+		String name;
+	};
+
+	class _NexBaseAPI StatementContext: public ContextBase {
+		friend class BlockContext;
+		friend class ScriptContext;
+	public:
+		StatementContext(BlockContext& block, ScriptContext& context);
+		const String& GetCommand() const;
+		const StringUtils::WordList& GetParamList() const;
+
+		void ParseBlock(BlockListener*);
+	protected:
+		void _Clear();
+
+		BlockContext& parentBlockContext;
+
+		String command;
+		StringUtils::WordList paramContext;
+	};
+
+	class _NexBaseAPI BlockContext: public ContextBase {
+		friend class ScriptContext;
+		friend class StatementContext;
+	public:
+		BlockContext(ScriptContext& scriptContex);
+
+		void ParseStatements(StatementListener*);
+	protected:
+
+	};
+
+	class _NexBaseAPI ScriptContext {
+		friend class BlockContext;
+		friend class StatementContext;
+		friend class RegionContext;
+	public:
+		ScriptContext(const String& scriptName, StreamLexer& lexer);
+
+		void ParseRegions(RegionListener*);
+		void Error(const String& error);bool IsErrorBitSet() const;
+		const String& GetErrors() const;
+
+	protected:
+		StreamLexer& lexer;
+		const String& scriptName;
+		String errorLog;
+	};
+
+	ScriptParser();
+	virtual ~ScriptParser();
+
+	void ParseScript(ScriptListener* listener, const String& scriptName,
+			InputStreamPtr& input);
+};
 
 } /* namespace nextar */
 #endif /* SCRIPTPARSER_H_ */

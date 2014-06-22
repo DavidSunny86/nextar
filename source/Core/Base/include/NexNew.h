@@ -24,8 +24,8 @@
  *
  * @return null if it fails, else the ptr address.
  **/
-template <typename T>
- T* ConstructObject(T* ptr) {
+template<typename T>
+T* ConstructObject(T* ptr) {
 	return new (ptr) T;
 }
 
@@ -40,11 +40,11 @@ template <typename T>
  *
  * @return null if it fails, else returns ptr.
  **/
-template <typename T>
- T* ConstructObjects(T* ptr, long n) {
+template<typename T>
+T* ConstructObjects(T* ptr, long n) {
 	T* ptrr = ptr;
 	while (n--)
-	ConstructObject<T > (ptrr++);
+		ConstructObject<T>(ptrr++);
 	return ptr;
 }
 
@@ -59,8 +59,8 @@ template <typename T>
  *
  * @return null if it fails, else the ptr address.
  **/
-template <typename T, typename Tc>
- T* ConstructObject(T* objptr, const Tc& obj) {
+template<typename T, typename Tc>
+T* ConstructObject(T* objptr, const Tc& obj) {
 	return new (objptr) T(obj);
 }
 
@@ -72,14 +72,14 @@ template <typename T, typename Tc>
  *
  * @param [in,out] ptr If non-null, the pointer.
  **/
-template <typename T>
- void DestroyObject(T* ptr) {
+template<typename T>
+void DestroyObject(T* ptr) {
 	if (ptr)
-	ptr->~T();
+		ptr->~T();
 }
 
-template <typename T>
- void DestroyObjects(T* ptr, size_t n) {
+template<typename T>
+void DestroyObjects(T* ptr, size_t n) {
 	while (n--) {
 		ptr->~T();
 		ptr++;
@@ -120,31 +120,26 @@ public:
 		Allocator_Class::Free(ptr);
 	}
 #endif
-	
+
 	void* operator new(size_t, void* ptr) {
 		return ptr;
 	}
-
 
 	void* operator new(size_t s) {
 		return Allocator_Class::Alloc(s);
 	}
 
-
 	void* operator new[](size_t s) {
 		return Allocator_Class::Alloc(s);
 	}
-
 
 	void operator delete(void* ptr) throw () {
 		Allocator_Class::Free(ptr);
 	}
 
-
 	void operator delete[](void* ptr) throw () {
 		Allocator_Class::Free(ptr);
 	}
-
 
 	void operator delete(void*, void*) {
 	}
@@ -177,25 +172,23 @@ public:
 		Allocator_Class::FreeMultiple(ptr);
 	}
 #endif
-	
+
 	void* operator new(size_t, void* ptr) {
 		return ptr;
 	}
-
 
 	void* operator new(size_t s) {
 		return Allocator_Class::AllocSingle(s);
 	}
 
-
 	void* operator new[](size_t s) {
 		return Allocator_Class::AllocMultiple(s);
 	}
-	
+
 	void operator delete(void* ptr) throw () {
 		Allocator_Class::FreeSingle(ptr);
 	}
-	
+
 	void operator delete[](void* ptr) throw () {
 		Allocator_Class::FreeMultiple(ptr);
 	}
@@ -204,4 +197,4 @@ public:
 	}
 };
 
-#endif //NEXTAR_NEXNEW_H__
+#endif //NEXTAR_NEXNEW_H__

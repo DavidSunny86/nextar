@@ -13,15 +13,15 @@
 
 namespace nextar {
 
-	class _NexEngineAPI RenderSystem : public AllocGraphics {
-	public:
+class _NexEngineAPI RenderSystem: public AllocGraphics {
+public:
 
-		RenderSystem();
-		virtual ~RenderSystem();
+	RenderSystem();
+	virtual ~RenderSystem();
 
-		virtual void Commit(CommitContext& context, RenderContext& renderCtx) = 0;
-	};
+	virtual void Commit(CommitContext& context) = 0;
+};
 
-	typedef vector<RenderSystem*>::type RenderSystemList;
+typedef vector<RenderSystem*>::type RenderSystemList;
 } /* namespace nextar */
 #endif /* RENDERSYSTEM_H_ */

@@ -13,12 +13,12 @@
 
 namespace RenderOpenGL {
 
-	class ExtensionsGL {
-		NEX_LOG_HELPER(ExtensionsGL);
-	public:
+class ExtensionsGL {
+	NEX_LOG_HELPER(ExtensionsGL)
+	;
+public:
 
-		ExtensionsGL();
-
+	ExtensionsGL();
 
 #define DECL_FUNC_TYPE(W) PFNGL##W##PROC
 #define DECL_FUNC_NAME(W) Gl##W
@@ -41,14 +41,14 @@ namespace RenderOpenGL {
 #undef DECL_COND_END_EXT
 #undef DECL_EXTENSION
 
-	protected:
+protected:
 
-		void _ReadyExtensions(uint16 major, uint16 minior);
-		static bool IsSupported(const char* ext_name, const char* p);
-		static void RequiredExtensionNotFound(const char* what);
+	void _ReadyExtensions(uint16 major, uint16 minior);
+	static bool IsSupported(const char* ext_name, const char* p);
+	static void RequiredExtensionNotFound(const char* what);
 
-		VersionGL GLE_version;
+	VersionGL GLE_version;
 
-	};
+};
 } /* namespace RenderOpenGL */
 #endif /* EXTENSIONSGL_H_ */

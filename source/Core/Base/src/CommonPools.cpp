@@ -1,4 +1,3 @@
-
 #include <BaseHeaders.h>
 #include <MathBase.h>
 #include <TransformData.h>

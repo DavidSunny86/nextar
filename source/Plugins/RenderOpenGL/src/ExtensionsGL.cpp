@@ -15,14 +15,13 @@ namespace RenderOpenGL {
 #define DECL_FUNC_GL_STRING(W) NEX_MAKE_TEXT(gl##W)
 #define DECL_EXT_NAME(Pref,W)  NEX_MAKE_TEXT(Pref##W)
 
-    ExtensionsGL::ExtensionsGL() {
-    	GLE_ARB_multisample = false;
-    	GLE_ARB_depth_clamp = false;
-    	GLE_version = GLV_INVALID;
+ExtensionsGL::ExtensionsGL() {
+	GLE_ARB_multisample = false;
+	GLE_ARB_depth_clamp = false;
+	GLE_version = GLV_INVALID;
 
-    	GlBlendEquationSeparate = 0;
-    	GlBlendFuncSeparate = 0;
-
+	GlBlendEquationSeparate = 0;
+	GlBlendFuncSeparate = 0;
 
 #define DECL_COND_START_VERSION(what)
 #define DECL_COND_END_VERSION(what)
@@ -40,41 +39,40 @@ namespace RenderOpenGL {
 #undef DECL_COND_END_EXT
 #undef DECL_EXTENSION
 
-    }
+}
 
-    bool ExtensionsGL::IsSupported(const char* ext_name, const char* p) {
-        int ext_name_len;
-        ext_name_len = std::strlen(ext_name);
+bool ExtensionsGL::IsSupported(const char* ext_name, const char* p) {
+	int ext_name_len;
+	ext_name_len = std::strlen(ext_name);
 
-        while (*p) {
-            int n = std::strcspn(p, " ");
-            if ((ext_name_len == n) && (std::strncmp(ext_name, p, n) == 0)) {
-                return true;
-            }
-            p += (n + 1);
-        }
-        return false;
-    }
+	while (*p) {
+		int n = std::strcspn(p, " ");
+		if ((ext_name_len == n) && (std::strncmp(ext_name, p, n) == 0)) {
+			return true;
+		}
+		p += (n + 1);
+	}
+	return false;
+}
 
+void ExtensionsGL::RequiredExtensionNotFound(const char* what) {
+	Error(String("Required extensions not found: ") + what);
+	NEX_THROW_FatalError(EXCEPT_APPINIT_FAILED);
+}
 
-    void ExtensionsGL::RequiredExtensionNotFound(const char* what) {
-        Error(String("Required extensions not found: ") + what);
-        NEX_THROW_FatalError(EXCEPT_APPINIT_FAILED);
-    }
+void ExtensionsGL::_ReadyExtensions(uint16 major, uint16 minor) {
 
-    void ExtensionsGL::_ReadyExtensions(uint16 major, uint16 minor) {
+	VersionGL minimum = RenderDriverGL::ExtractVersion(major, minor);
+	const char* version = (const char*) glGetString(GL_VERSION);
+	// extract version info
+	GLE_version = RenderDriverGL::ExtractVersion(version);
+	if (GLE_version == GLV_INVALID || GLE_version < minimum) {
+		Error("OpenGL version too old!");
+		NEX_THROW_FatalError(EXCEPT_APPINIT_FAILED);
+	}
 
-        VersionGL minimum = RenderDriverGL::ExtractVersion(major, minor);
-        const char* version = (const char*) glGetString(GL_VERSION);
-        // extract version info
-        GLE_version = RenderDriverGL::ExtractVersion(version);
-        if(GLE_version == GLV_INVALID || GLE_version < minimum) {
-            Error("OpenGL version too old!");
-            NEX_THROW_FatalError(EXCEPT_APPINIT_FAILED);
-        }
-
-        // get extensions
-        const char* extensions = (const char*) glGetString(GL_EXTENSIONS);
+	// get extensions
+	const char* extensions = (const char*) glGetString(GL_EXTENSIONS);
 
 #define DECL_COND_START_VERSION(what) if(GLE_version >= what) { \
 		bool failed = false;
@@ -98,7 +96,6 @@ namespace RenderOpenGL {
 			Trace("OpenGL extension: " NEX_MAKE_TEXT(what) " not supported!");\
 		}
 
-
 #define DECL_EXTENSION(a, b) \
 		DECL_FUNC_NAME(b) = (DECL_FUNC_TYPE(a)) \
 		RenderDriverGL::GetExtension(DECL_FUNC_GL_STRING(b)); \
@@ -114,8 +111,6 @@ namespace RenderOpenGL {
 #undef DECL_COND_END_EXT
 #undef DECL_EXTENSION
 
-    }
 }
-
-
+}
 

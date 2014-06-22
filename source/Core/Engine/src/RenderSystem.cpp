@@ -9,13 +9,13 @@
 
 namespace nextar {
 
-	RenderSystem::RenderSystem() {
-		// TODO Auto-generated constructor stub
+RenderSystem::RenderSystem() {
+	// TODO Auto-generated constructor stub
 
-	}
+}
 
-	RenderSystem::~RenderSystem() {
-		// TODO Auto-generated destructor stub
-	}
+RenderSystem::~RenderSystem() {
+	// TODO Auto-generated destructor stub
+}
 
 } /* namespace nextar */

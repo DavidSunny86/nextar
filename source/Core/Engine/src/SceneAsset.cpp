@@ -9,39 +9,39 @@
 
 namespace nextar {
 
-	/** SceneParameters *******************/
-	SceneParameters::SceneParameters() {
-		// TODO Auto-generated constructor stub
+/** SceneParameters *******************/
+SceneParameters::SceneParameters() {
+	// TODO Auto-generated constructor stub
 
-	}
+}
 
-	SceneParameters::~SceneParameters() {
-		// TODO Auto-generated destructor stub
-	}
+SceneParameters::~SceneParameters() {
+	// TODO Auto-generated destructor stub
+}
 
-	/** Scene ******************************/
-	SceneAsset::SceneAsset(const StringID name) : Asset(name),
-	cullingSystem(nullptr) {
-	}
+/** Scene ******************************/
+SceneAsset::SceneAsset(const StringID name) :
+		Asset(name), cullingSystem(nullptr) {
+}
 
-	SceneAsset::~SceneAsset() {
-	}
+SceneAsset::~SceneAsset() {
+}
 
-	void SceneAsset::_AddEntity(Entity* entity) {
-		sceneEntities.push_back(Bind(entity));
-		if (cullingSystem) {
-			cullingSystem->AddBody(entity->GetSpatial());
-		}
+void SceneAsset::_AddEntity(Entity* entity) {
+	sceneEntities.push_back(Bind(entity));
+	if (cullingSystem) {
+		cullingSystem->AddBody(entity->GetSpatial());
 	}
+}
 
-	void SceneAsset::_RemoveEntity(Entity* entity) {
-		NEX_ASSERT(entity->GetScene() == this);
-		sceneEntities.remove(Bind(entity));
-	}
+void SceneAsset::_RemoveEntity(Entity* entity) {
+	NEX_ASSERT(entity->GetScene() == this);
+	sceneEntities.remove(Bind(entity));
+}
 
-	void SceneAsset::UnloadImpl(StreamRequest* req, bool isAsync) {
-		EntityList emptyList;
-		std::swap(sceneEntities, emptyList);
-	}
+void SceneAsset::UnloadImpl(StreamRequest* req, bool isAsync) {
+	EntityList emptyList;
+	std::swap(sceneEntities, emptyList);
+}
 
 } /* namespace nextar */

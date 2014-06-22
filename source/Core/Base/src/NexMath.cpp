@@ -1,4 +1,3 @@
-
 #include <BaseHeaders.h>
 #include <MathBase.h>
 #include <MathTypes.h>
@@ -6,42 +5,42 @@
 #include "mathtypes/EularAngles.cpp"
 
 #ifdef NEX_MATH_RANDOMIZER_DEFINED
-	NEX_MATH_RANDOM_SEED;
+NEX_MATH_RANDOM_SEED
+;
 #endif
 
 namespace nextar {
-	const Vector3 Vector3::XAxis(1, 0, 0);
-	const Vector3 Vector3::YAxis(0, 1, 0);
-	const Vector3 Vector3::ZAxis(0, 0, 1);
-	const Vector3 Vector3::Origin(0, 0, 0);
-	const Vector2 Vector2::Origin(0, 0);
-	_NexBaseAPI const Matrix4x4 Matrix4x4::IdentityMatrix(1, 0, 0, 0, 0, 1, 0, 0,
-			0, 0, 1, 0, 0, 0, 0, 1);
+const Vector3 Vector3::XAxis(1, 0, 0);
+const Vector3 Vector3::YAxis(0, 1, 0);
+const Vector3 Vector3::ZAxis(0, 0, 1);
+const Vector3 Vector3::Origin(0, 0, 0);
+const Vector2 Vector2::Origin(0, 0);
+_NexBaseAPI const Matrix4x4 Matrix4x4::IdentityMatrix(1, 0, 0, 0, 0, 1, 0, 0, 0,
+		0, 1, 0, 0, 0, 0, 1);
 
-	namespace Math {
+namespace Math {
 
-		_NexBaseAPI int32 GetNearestPow2(int32 from) {
-			int32 r = 1;
-			while (r < from)
-				r <<= 1;
-			if (r > from && r > 64)
-				r >>= 1;
-			return r;
-		}
+_NexBaseAPI int32 GetNearestPow2(int32 from) {
+	int32 r = 1;
+	while (r < from)
+		r <<= 1;
+	if (r > from && r > 64)
+		r >>= 1;
+	return r;
+}
 
-		_NexBaseAPI bool IsPow2(uint32 from) {
-			uint32 r = 1;
-			if (!from)
-				return 0;
+_NexBaseAPI bool IsPow2(uint32 from) {
+	uint32 r = 1;
+	if (!from)
+		return 0;
 
-			while (r < from)
-				r <<= 1;
-			if (r != from)
-				return 0;
-			return 1;
-		}
-	}
-
+	while (r < from)
+		r <<= 1;
+	if (r != from)
+		return 0;
+	return 1;
+}
+}
 
 #if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE
 
@@ -49,7 +48,7 @@ namespace nextar {
 #define NEXCORE_DEFINE_F32C(_f32const_) const _ConstF32  _f32const_
 
 NEXCORE_DEFINE_MASK(N3D_ClearSign) = { 0x7fffffff, 0x7fffffff, 0x7fffffff,
-			0x7fffffff };
+		0x7fffffff };
 NEXCORE_DEFINE_MASK(N3D_XXXX) =
 		{ 0x80000000, 0x80000000, 0x80000000, 0x80000000 };
 NEXCORE_DEFINE_MASK(N3D_OXOX) =
@@ -81,7 +80,8 @@ NEXCORE_DEFINE_F32C(N3D_1110) = { 1.f, 1.f, 1.f, 0.f };
 NEXCORE_DEFINE_F32C(N3D_HALF) = { 0.5f, 0.5f, 0.5f, 0.5f };
 NEXCORE_DEFINE_F32C(N3D_THREE) = { 3.f, 3.f, 3.f, 3.f };
 NEXCORE_DEFINE_F32C(N3D_VMinusOne) = { -1.f, -1.f, -1.f, -1.f };
-NEXCORE_DEFINE_F32C(N3D_Infinite) = {0x7F800000, 0x7F800000, 0x7F800000, 0x7F800000};
+NEXCORE_DEFINE_F32C(N3D_Infinite) = { 0x7F800000, 0x7F800000, 0x7F800000,
+		0x7F800000 };
 
 #undef NEXCORE_DEFINE_MASK
 #undef NEXCORE_DEFINE_F32C

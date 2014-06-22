@@ -20,4 +20,4 @@
 #	include <windowsx.h>
 #endif
 
-#endif //NEXTAR_INCLUDE_WINDOWS_H
+#endif //NEXTAR_INCLUDE_WINDOWS_H

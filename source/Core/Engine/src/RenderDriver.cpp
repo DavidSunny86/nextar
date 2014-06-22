@@ -3,10 +3,10 @@
 
 namespace nextar {
 
-	RenderDriver::RenderDriver(void) {
-	}
+RenderDriver::RenderDriver(void) {
+}
 
-	RenderDriver::~RenderDriver(void) {
-	}
+RenderDriver::~RenderDriver(void) {
+}
 
 }

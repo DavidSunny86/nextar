@@ -1,22 +1,21 @@
-
 #include <EngineHeaders.h>
 #include <UTApplication.h>
 
-
-UTApplication::UTApplication() : ApplicationContext("UTApplication") {
+UTApplication::UTApplication() :
+		ApplicationContext("UTApplication") {
 }
 
 SceneAssetPtr UTApplication::_CreateDefaultScene() {
 	SceneAsset* sceneAs = SceneAsset::Instance()
-			static_cast<SceneManager*>(ComponentFactoryArchive::Instance().AsyncFindManager(
+	static_cast<SceneManager*>(ComponentFactoryArchive::Instance().AsyncFindManager(
 			SceneAsset::CLASS_ID));
 	return sceneManager->AsyncCreateEmptyScene("UTScene");
 }
 
 void UTApplication::_SetupScene(SceneAssetPtr& scene) {
 	EntityManager* entityManager =
-			static_cast<EntityManager*>(
-			ComponentFactoryArchive::Instance().AsyncFindManager(Entity::CLASS_ID));
+			static_cast<EntityManager*>(ComponentFactoryArchive::Instance().AsyncFindManager(
+					Entity::CLASS_ID));
 
 	EntityPtr camera = entityManager->AsyncCreateCameraEntity("Main");
 	camera->AddToScene(scene);

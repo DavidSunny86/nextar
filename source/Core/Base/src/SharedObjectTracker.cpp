@@ -25,8 +25,8 @@ static NEX_THREAD_MUTEX(safety_mutex);
 
 void DebugUnkownTracker::OnCtor(void* obj, const char* name) {
 	// if rtti is on we can get good info.
-	AllocBlockNode* nnd =
-	(AllocBlockNode*) NEX_ALLOC(sizeof (AllocBlockNode), MEMCAT_GENERAL);
+	AllocBlockNode* nnd = (AllocBlockNode*) NEX_ALLOC(sizeof(AllocBlockNode),
+			MEMCAT_GENERAL);
 	nnd->obj = obj;
 	nnd->name = name;
 	NEX_THREAD_LOCK_GUARD_MUTEX(safety_mutex);

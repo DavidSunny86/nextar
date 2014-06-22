@@ -1,6 +1,4 @@
-
 #include <BaseHeaders.h>
-
 
 #if defined(NEX_WINDOWS)
 

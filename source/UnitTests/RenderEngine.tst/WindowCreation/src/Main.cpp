@@ -1,7 +1,7 @@
-
 #include <EngineHeaders.h>
 
-NEX_IMPLEMENT_APP();
+NEX_IMPLEMENT_APP()
+;
 
 using namespace nextar;
 

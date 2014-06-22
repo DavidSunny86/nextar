@@ -9,23 +9,24 @@
 
 namespace nextar {
 
-    ClockImpl::ClockImpl(bool reset) {
-        if (reset)
-            Reset();
-    }
+ClockImpl::ClockImpl(bool reset) {
+	if (reset)
+		Reset();
+}
 
-    ClockImpl::~ClockImpl() {
-    }
+ClockImpl::~ClockImpl() {
+}
 
-    uint32 ClockImpl::GetMilliSecs() {
-        timeval now;
-        gettimeofday(&now, NULL);
-        return (now.tv_sec-start.tv_sec)*1000+(now.tv_usec-start.tv_usec)/1000;
-    }
+uint32 ClockImpl::GetMilliSecs() {
+	timeval now;
+	gettimeofday(&now, NULL);
+	return (now.tv_sec - start.tv_sec) * 1000
+			+ (now.tv_usec - start.tv_usec) / 1000;
+}
 
-    void ClockImpl::Reset() {
-        gettimeofday(&start, NULL);
-    }
+void ClockImpl::Reset() {
+	gettimeofday(&start, NULL);
+}
 }
 
 #endif

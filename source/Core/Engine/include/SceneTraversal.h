@@ -12,25 +12,25 @@
 
 namespace nextar {
 
-	class SceneTraversal {
-	public:
-		SceneTraversal(Camera* camera = nullptr, VisibilitySet* visList = nullptr, BoundingVolume* vol = nullptr);
-		virtual ~SceneTraversal();
+class SceneTraversal {
+public:
+	SceneTraversal(Camera* camera = nullptr, VisibilitySet* visList = nullptr,
+			BoundingVolume* vol = nullptr);
+	virtual ~SceneTraversal();
 
-
-		Moveable* moveable;
-		Camera* camera;
-		Frustum* frustum;
-		VisibilitySet* visibilitySet;
-		BoundingVolume* visibleBoundsInfo;
-		LightSystem* lightSystem;
-		SceneAsset* scene;
-		/* Layer mask */
-		uint32 visibilityMask;
-		uint32 frameNumber;
-		/** scene parameter */
-		float distanceInView;
-		float recipDistanceInView;
-	};
+	Moveable* moveable;
+	Camera* camera;
+	Frustum* frustum;
+	VisibilitySet* visibilitySet;
+	BoundingVolume* visibleBoundsInfo;
+	LightSystem* lightSystem;
+	SceneAsset* scene;
+	/* Layer mask */
+	uint32 visibilityMask;
+	uint32 frameNumber;
+	/** scene parameter */
+	float distanceInView;
+	float recipDistanceInView;
+};
 } /* namespace nextar */
 #endif /* SCENETRAVERSAL_H_ */

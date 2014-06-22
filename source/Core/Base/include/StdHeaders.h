@@ -29,4 +29,4 @@
 #undef max
 #undef min
 
-#endif //NEXTAR_STDHEADERS_H
+#endif //NEXTAR_STDHEADERS_H

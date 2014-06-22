@@ -13,32 +13,32 @@
 
 namespace nextar {
 
-	class _NexEngineAPI RegionNode: public ContainerNode {
-	public:
-		enum {
-			TYPE = COMPONENT_REGION_NODE,
-		};
-
-		RegionNode(ComponentManager *creator,
-				const String& name = StringUtils::Null, bool allocMatrixBuff =
-						true);
-		virtual ~RegionNode();
-
-		virtual int GetType() const {
-			return TYPE;
-		}
-
-		/** Add child component */
-		virtual void AddChild(Movable*);
-		/** Remove child component */
-		virtual void RemoveChild(Movable*);
-
-		virtual void NotifyNodeAdded(Movable*);
-		virtual void NotifyNodeRemoved(Movable*);
-
-	protected:
-		CullingSystem* cullingSystem;
+class _NexEngineAPI RegionNode: public ContainerNode {
+public:
+	enum {
+		TYPE = COMPONENT_REGION_NODE,
 	};
+
+	RegionNode(ComponentManager *creator,
+			const String& name = StringUtils::Null, bool allocMatrixBuff =
+			true);
+	virtual ~RegionNode();
+
+	virtual int GetType() const {
+		return TYPE;
+	}
+
+	/** Add child component */
+	virtual void AddChild(Movable*);
+	/** Remove child component */
+	virtual void RemoveChild(Movable*);
+
+	virtual void NotifyNodeAdded(Movable*);
+	virtual void NotifyNodeRemoved(Movable*);
+
+protected:
+	CullingSystem* cullingSystem;
+};
 
 }
 

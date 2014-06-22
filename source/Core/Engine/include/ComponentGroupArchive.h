@@ -12,43 +12,43 @@
 
 namespace nextar {
 
-	/*
-	 *
-	 */
-	class ComponentGroupArchive : public Singleton<ComponentGroupArchive>,
+/*
+ *
+ */
+class ComponentGroupArchive: public Singleton<ComponentGroupArchive>,
 		public AllocGeneral {
-	public:
-		ComponentGroupArchive();
-		virtual ~ComponentGroupArchive();
+public:
+	ComponentGroupArchive();
+	virtual ~ComponentGroupArchive();
 
-		void Configure(const Config&);
+	void Configure(const Config&);
 
-		void AsyncAddGroup(SharedComponent::Group*);
-		void AsyncRemoveGroup(StringID name, bool del = true);
-		void AsyncDeleteAll();
+	void AsyncAddGroup(SharedComponent::Group*);
+	void AsyncRemoveGroup(StringID name, bool del = true);
+	void AsyncDeleteAll();
 
-		inline SharedComponent::Group* AsyncFindOrCreate(StringID name) {
-			if (name == StringUtils::DefaultID && defaultGroup)
-				return defaultGroup;
-			return _AsyncFindOrCreate(name);
-		}
+	inline SharedComponent::Group* AsyncFindOrCreate(StringID name) {
+		if (name == StringUtils::DefaultID && defaultGroup)
+			return defaultGroup;
+		return _AsyncFindOrCreate(name);
+	}
 
-		inline SharedComponent::Group* AsyncFindGroup(StringID name) {
-			if (name == StringUtils::DefaultID)
-				return defaultGroup;
-			return _AsyncFindGroup(name);
-		}
+	inline SharedComponent::Group* AsyncFindGroup(StringID name) {
+		if (name == StringUtils::DefaultID)
+			return defaultGroup;
+		return _AsyncFindGroup(name);
+	}
 
-	protected:
-		SharedComponent::Group* _AsyncFindGroup(StringID name);
-		SharedComponent::Group* _AsyncFindOrCreate(StringID name);
+protected:
+	SharedComponent::Group* _AsyncFindGroup(StringID name);
+	SharedComponent::Group* _AsyncFindOrCreate(StringID name);
 
-		typedef map<StringID, SharedComponent::Group*>::type ComponentGroupMap;
-		NEX_THREAD_MUTEX(containerLock);
-		SharedComponent::Group* defaultGroup;
-		ComponentGroupMap componentGroups;
-	};
+	typedef map<StringID, SharedComponent::Group*>::type ComponentGroupMap;NEX_THREAD_MUTEX(containerLock);
+	SharedComponent::Group* defaultGroup;
+	ComponentGroupMap componentGroups;
+};
 
-} /* namespace nextar */
+}
+/* namespace nextar */
 
 #endif /* COMPONENTGROUPARCHIVE_H_ */

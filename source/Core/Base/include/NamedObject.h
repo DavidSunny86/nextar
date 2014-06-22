@@ -1,4 +1,3 @@
-
 #ifndef NAMEDOBJECT_H_
 #define NAMEDOBJECT_H_
 
@@ -6,41 +5,44 @@
 
 namespace nextar {
 
-	class _NexBaseAPI NamedObject {
-	public:
+class _NexBaseAPI NamedObject {
+public:
 
-		NamedObject(const StringID _name) : name(_name) {}
-		inline NamedObject() : name(StringUtils::NullID) {
-		}
-		NamedObject(const String& name);
+	NamedObject(const StringID _name) :
+			name(_name) {
+	}
+	inline NamedObject() :
+			name(StringUtils::NullID) {
+	}
+	NamedObject(const String& name);
 
-		inline void SetName(const String& name) {
-			this->name = nameTable.AsyncStringID(name);
-		}
+	inline void SetName(const String& name) {
+		this->name = nameTable.AsyncStringID(name);
+	}
 
-		inline const String& GetName() const {
-			return nameTable.AsyncString(name);
-		}
+	inline const String& GetName() const {
+		return nameTable.AsyncString(name);
+	}
 
-		inline void SetID(StringID name) {
-			this->name = name;
-		}
+	inline void SetID(StringID name) {
+		this->name = name;
+	}
 
-		inline StringID GetID() const {
-			return name;
-		}
+	inline StringID GetID() const {
+		return name;
+	}
 
-		inline String GetNameID() const {
-			return Convert::ToString((uint32)name);
-		}
+	inline String GetNameID() const {
+		return Convert::ToString((uint32) name);
+	}
 
-		static StringID AsyncStringID(const String&);
+	static StringID AsyncStringID(const String&);
 
-	protected:
-		static StringInternTable nameTable;
-		/** todo Must be a string ID */
-		StringID name;
-	};
+protected:
+	static StringInternTable nameTable;
+	/** todo Must be a string ID */
+	StringID name;
+};
 }
 
-#endif // !NAMEDOBJECT_H_
+#endif // !NAMEDOBJECT_H_

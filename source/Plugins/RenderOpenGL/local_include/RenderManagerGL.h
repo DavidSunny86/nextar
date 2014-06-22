@@ -9,24 +9,25 @@
 #define RENDERMANAGERGL_H_
 
 #include <RenderOpenGL.h>
-#include <RenderManager.h>
+#include <BaseRenderManager.h>
 
 namespace RenderOpenGL {
 
-	class RenderManagerGL: public nextar::RenderManager {
-	public:
-		RenderManagerGL();
-		virtual ~RenderManagerGL();
+class RenderManagerGL: public nextar::BaseRenderManager {
+public:
+	RenderManagerGL();
+	virtual ~RenderManagerGL();
 
-		virtual RenderManager::ShaderProgramLanguage GetProgramLanguage();
-		virtual nextar::String GetInfo();
+	virtual RenderManager::ShaderProgramLanguage GetProgramLanguage();
+	virtual nextar::String GetInfo();
 
-	protected:
+protected:
 
-		virtual RenderDriverPtr CreateDriverImpl(RenderManager::DriverCreationParams&) = 0;
-		virtual void ConfigureImpl(const NameValueMap&) = 0;
-		virtual void CloseImpl() = 0;
-	};
+	virtual RenderDriverPtr CreateDriverImpl(
+			RenderManager::DriverCreationParams&) = 0;
+	virtual void ConfigureImpl(const NameValueMap&) = 0;
+	virtual void CloseImpl();
+};
 
 } /* namespace RenderOpenGL */
 #endif /* RENDERMANAGERGL_H_ */

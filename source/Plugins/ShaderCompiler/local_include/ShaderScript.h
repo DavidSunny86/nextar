@@ -10,32 +10,34 @@
 
 namespace ShaderCompiler {
 
-	class ShaderScript :
-			public ScriptParser::RegionListener,
-			public ScriptParser::ScriptListener,
-			public ScriptParser::StatementListener {
+class ShaderScript: public ScriptParser::RegionListener,
+		public ScriptParser::ScriptListener,
+		public ScriptParser::StatementListener {
 
-		NEX_LOG_HELPER(ShaderScript);
+	NEX_LOG_HELPER (ShaderScript);
 
-		StringRef languageContext;
-		ShaderAsset::StreamRequest* shader;
-		NameValueMap regions;
-	public:
+	StringRef languageContext;
+	ShaderAsset::StreamRequest* shader;
+	NameValueMap regions;
+public:
 
-		ShaderScript(const StringRef _languageContext, ShaderAsset::StreamRequest* s) :
-			languageContext(_languageContext), shader(s) {}
+	ShaderScript(const StringRef _languageContext,
+			ShaderAsset::StreamRequest* s) :
+			languageContext(_languageContext), shader(s) {
+	}
 
-		void SetRegionAsSource(GpuProgram::Type, const String& name);
-		inline ShaderAsset::StreamRequest* GetRequest() {
-			return shader;
-		}
+	void SetRegionAsSource(GpuProgram::Type, const String& name);
+	inline ShaderAsset::StreamRequest* GetRequest() {
+		return shader;
+	}
 
-		virtual void EnterRegion(ScriptParser::RegionContext& regionCtx);
-		virtual void EnterScript(ScriptParser::ScriptContext& block);
-		virtual void EnterStatement(ScriptParser::StatementContext& ctx);
-	protected:
-		~ShaderScript() {}
-	};
+	virtual void EnterRegion(ScriptParser::RegionContext& regionCtx);
+	virtual void EnterScript(ScriptParser::ScriptContext& block);
+	virtual void EnterStatement(ScriptParser::StatementContext& ctx);
+protected:
+	~ShaderScript() {
+	}
+};
 
 } /* namespace nextar */
 

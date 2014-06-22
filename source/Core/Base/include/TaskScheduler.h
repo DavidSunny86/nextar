@@ -1,4 +1,3 @@
-
 #ifndef TASKSCHEDULER_H_
 #define TASKSCHEDULER_H_
 
@@ -7,15 +6,14 @@
 
 namespace nextar {
 
-	class TaskScheduler : public Singleton<TaskScheduler>,
-		public AllocGeneral {
-	public:
+class TaskScheduler: public Singleton<TaskScheduler>, public AllocGeneral {
+public:
 
-		TaskScheduler();
-		virtual ~TaskScheduler();
+	TaskScheduler();
+	virtual ~TaskScheduler();
 
-	protected:
-	};
+protected:
+};
 }
 
 #endif //TASKSCHEDULER_H_

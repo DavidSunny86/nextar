@@ -1,11 +1,7 @@
 #ifndef NEXTAR_MATH_CONFIG_H
 #define NEXTAR_MATH_CONFIG_H
 
-#define NEX_VECTOR_MATH_TYPE_SSE		0	// intel
-#define NEX_VECTOR_MATH_TYPE_3DNOW		1	// amd
-#define NEX_VECTOR_MATH_TYPE_VMX128		2	// xbox
-#define NEX_VECTOR_MATH_TYPE_FALLBACK           3	// c emulation
-// @remarks Set the vector math type architecture to use here
+#define NEX_VECTOR_MATH_TYPE_SSE		0	// intel#define NEX_VECTOR_MATH_TYPE_3DNOW		1	// amd#define NEX_VECTOR_MATH_TYPE_VMX128		2	// xbox#define NEX_VECTOR_MATH_TYPE_FALLBACK           3	// c emulation// @remarks Set the vector math type architecture to use here
 #define NEX_VECTOR_MATH_TYPE   NEX_VECTOR_MATH_TYPE_SSE
 
 #if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE
@@ -24,4 +20,4 @@
 #	define NEX_CORE_USE_ASM
 #endif
 
-#endif //NEXTAR_MATH_CONFIG_H
+#endif //NEXTAR_MATH_CONFIG_H

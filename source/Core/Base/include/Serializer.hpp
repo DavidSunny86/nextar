@@ -34,16 +34,18 @@ namespace nextar {
 /**********************************************************
  * Output Serializer
  ***********************************************************/
-inline OutputSerializer::OutputSerializer(OutputStreamPtr& _outStream)	: outStream(_outStream), full(0) {
+inline OutputSerializer::OutputSerializer(OutputStreamPtr& _outStream) :
+		outStream(_outStream), full(0) {
 }
 
 inline OutputSerializer::~OutputSerializer() {
 	Flush();
 }
 
-inline OutputSerializer& OutputSerializer::operator <<(const SerializableObject& object) {
-	(*this) << (uint8)(MARKER_OBJECT);
-	(*this) << (uint32)object.GetSerializableVersion();
+inline OutputSerializer& OutputSerializer::operator <<(
+		const SerializableObject& object) {
+	(*this) << (uint8) (MARKER_OBJECT);
+	(*this) << (uint32) object.GetSerializableVersion();
 	object.WriteObject(*this);
 	return *this;
 }
@@ -87,7 +89,7 @@ inline OutputSerializer& OutputSerializer::operator <<(uint16 object) {
 	if ((LOCAL_BUFFER_SIZE - full) < 2)
 		Flush();
 	*reinterpret_cast<uint16*>(localBuffer + full) = SWAP16(object);
-	full+=2;
+	full += 2;
 	return *this;
 }
 
@@ -95,7 +97,7 @@ inline OutputSerializer& OutputSerializer::operator <<(uint32 object) {
 	if ((LOCAL_BUFFER_SIZE - full) < 4)
 		Flush();
 	*reinterpret_cast<uint32*>(localBuffer + full) = SWAP32(object);
-	full+=4;
+	full += 4;
 	return *this;
 }
 
@@ -103,28 +105,32 @@ inline OutputSerializer& OutputSerializer::operator <<(uint64 object) {
 	if ((LOCAL_BUFFER_SIZE - full) < 8)
 		Flush();
 	*reinterpret_cast<uint64*>(localBuffer + full) = SWAP64(object);
-	full+=8;
+	full += 8;
 	return *this;
 }
 
-inline OutputSerializer& OutputSerializer::operator <<(const ByteArray& object) {
+inline OutputSerializer& OutputSerializer::operator <<(
+		const ByteArray& object) {
 	Flush();
 	outStream->Write(object.first, object.second);
 	return *this;
 }
 
-inline OutputSerializer& OutputSerializer::operator <<(const UByteArray& object) {
+inline OutputSerializer& OutputSerializer::operator <<(
+		const UByteArray& object) {
 	Flush();
 	outStream->Write(object.first, object.second);
 	return *this;
 }
 
-inline OutputSerializer& OutputSerializer::operator <<(const ShortArray& object) {
+inline OutputSerializer& OutputSerializer::operator <<(
+		const ShortArray& object) {
 	WRITE_ARRAY(object, uint16);
 	return *this;
 }
 
-inline OutputSerializer& OutputSerializer::operator <<(const UShortArray& object) {
+inline OutputSerializer& OutputSerializer::operator <<(
+		const UShortArray& object) {
 	WRITE_ARRAY(object, uint16);
 	return *this;
 }
@@ -134,45 +140,54 @@ inline OutputSerializer& OutputSerializer::operator <<(const IntArray& object) {
 	return *this;
 }
 
-inline OutputSerializer& OutputSerializer::operator <<(const UIntArray& object) {
+inline OutputSerializer& OutputSerializer::operator <<(
+		const UIntArray& object) {
 	WRITE_ARRAY(object, uint32);
 	return *this;
 }
 
-inline OutputSerializer& OutputSerializer::operator <<(const Int64Array& object) {
+inline OutputSerializer& OutputSerializer::operator <<(
+		const Int64Array& object) {
 	WRITE_ARRAY(object, uint64);
 	return *this;
 }
 
-inline OutputSerializer& OutputSerializer::operator <<(const UInt64Array& object) {
+inline OutputSerializer& OutputSerializer::operator <<(
+		const UInt64Array& object) {
 	WRITE_ARRAY(object, uint64);
 	return *this;
 }
 
-inline OutputSerializer& OutputSerializer::operator <<(const FloatArray& object) {
+inline OutputSerializer& OutputSerializer::operator <<(
+		const FloatArray& object) {
 	WRITE_ARRAY(object, float);
 	return *this;
 }
 
-inline OutputSerializer& OutputSerializer::operator <<(const DoubleArray& object) {
+inline OutputSerializer& OutputSerializer::operator <<(
+		const DoubleArray& object) {
 	WRITE_ARRAY(object, double);
 	return *this;
 }
 
-inline OutputSerializer& OutputSerializer::operator <<(const ChunkHeader& object) {
-	(*this) << (uint16)MARKER_GLOBAL_CHUNK_ID << object.first << object.second;
+inline OutputSerializer& OutputSerializer::operator <<(
+		const ChunkHeader& object) {
+	(*this) << (uint16) MARKER_GLOBAL_CHUNK_ID << object.first << object.second;
 	return *this;
 }
 
-inline OutputSerializer& OutputSerializer::operator << (const String& object) {
-	ByteArray arr(reinterpret_cast<const int8*>(object.c_str()), object.length());
-	(*this) << (uint8)MARKER_STRING_UTF8 << arr.second << arr;
+inline OutputSerializer& OutputSerializer::operator <<(const String& object) {
+	ByteArray arr(reinterpret_cast<const int8*>(object.c_str()),
+			object.length());
+	(*this) << (uint8) MARKER_STRING_UTF8 << arr.second << arr;
 	return *this;
 }
 
-inline OutputSerializer& OutputSerializer::operator << (const UniString& object) {
-	ShortArray arr(reinterpret_cast<const int16*>(object.c_str()), object.length());
-	(*this) << (uint8)MARKER_STRING_UTF16 << arr.second << arr;
+inline OutputSerializer& OutputSerializer::operator <<(
+		const UniString& object) {
+	ShortArray arr(reinterpret_cast<const int16*>(object.c_str()),
+			object.length());
+	(*this) << (uint8) MARKER_STRING_UTF16 << arr.second << arr;
 	return *this;
 }
 
@@ -186,14 +201,16 @@ inline void OutputSerializer::Flush() {
 /**********************************************************
  * Input Serializer
  ***********************************************************/
-inline InputSerializer::InputSerializer(InputStreamPtr& _inStream) : inStream(_inStream), left(0), moving(localBuffer) {
+inline InputSerializer::InputSerializer(InputStreamPtr& _inStream) :
+		inStream(_inStream), left(0), moving(localBuffer) {
 	streamSize = inStream->GetSize();
 }
 
 inline InputSerializer::~InputSerializer() {
 }
 
-inline InputSerializer& InputSerializer::operator >>(SerializableObject& object) {
+inline InputSerializer& InputSerializer::operator >>(
+		SerializableObject& object) {
 	uint8 marker;
 	(*this) >> marker;
 	if (marker == MARKER_OBJECT) {
@@ -274,14 +291,14 @@ inline InputSerializer& InputSerializer::operator >>(uint64& object) {
 }
 
 inline InputSerializer& InputSerializer::operator >>(ByteArray& object) {
-	uint8* b = (uint8*)object.first;
-	int32 r = (int32)object.second;
+	uint8* b = (uint8*) object.first;
+	int32 r = (int32) object.second;
 	if (left) {
 		size_t c = std::min(r, left);
 		std::memcpy(b, moving, c);
 		moving += c;
-		left -= (int32)c;
-		r -= (int32)c;
+		left -= (int32) c;
+		r -= (int32) c;
 		b += c;
 	}
 
@@ -339,8 +356,8 @@ inline void InputSerializer::Fill() {
 	if (left)
 		inStream->Seek(-left, std::ios_base::cur);
 	streamSize += left;
-	size_t readAmt = std::min((size_t)LOCAL_BUFFER_SIZE, (size_t)streamSize);
-	left = (int32)readAmt;
+	size_t readAmt = std::min((size_t) LOCAL_BUFFER_SIZE, (size_t) streamSize);
+	left = (int32) readAmt;
 	inStream->Read(localBuffer, readAmt);
 	moving = localBuffer;
 }
@@ -356,18 +373,19 @@ inline bool InputSerializer::IsValid(const InputSerializer::Chunk& c) {
 inline void InputSerializer::Skip(Chunk& object) {
 	// rewind and tell
 	left = 0;
-	if(inStream->Seek(object.second + object.first.second, std::ios_base::beg))
-		streamSize = inStream->GetSize() - (object.second + object.first.second);
+	if (inStream->Seek(object.second + object.first.second, std::ios_base::beg))
+		streamSize = inStream->GetSize()
+				- (object.second + object.first.second);
 	else
 		Error("Seeking stream!");
 }
 
-inline void InputSerializer::Seek(std::streamoff offset, std::ios_base::seekdir dir) {
-	if (dir == std::ios_base::cur || dir == std::ios_base::end ) {
+inline void InputSerializer::Seek(std::streamoff offset,
+		std::ios_base::seekdir dir) {
+	if (dir == std::ios_base::cur || dir == std::ios_base::end) {
 		inStream->Seek(offset, dir);
-	}
-	else {
-		inStream->Seek(offset-left, dir);
+	} else {
+		inStream->Seek(offset - left, dir);
 	}
 	left = 0;
 	streamSize = inStream->GetSize() - inStream->Tell();
@@ -382,7 +400,6 @@ inline bool InputSerializer::IsEndianCorrected() {
 }
 
 }
-
 
 #endif /* SERIALIZER_HPP_ */
 

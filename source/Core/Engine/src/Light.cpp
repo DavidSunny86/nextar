@@ -11,18 +11,19 @@
 
 namespace nextar {
 
-	Light::Light(const StringID name) : Renderable(name), sortKey(0) {
-	}
+Light::Light(const StringID name) :
+		Renderable(name), sortKey(0) {
+}
 
-	Light::~Light() {
-	}
+Light::~Light() {
+}
 
-	uint32 Light::GetClassID() const {
-		return CLASS_ID;
-	}
+uint32 Light::GetClassID() const {
+	return CLASS_ID;
+}
 
-	void Light::Visit(SceneTraversal& traversal) {
-		traversal.lightSystem->PushLight(sortKey, this);
-	}
+void Light::Visit(SceneTraversal& traversal) {
+	traversal.lightSystem->PushLight(sortKey, this);
+}
 
 } /* namespace nextar */

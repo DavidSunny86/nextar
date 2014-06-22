@@ -12,32 +12,33 @@
 
 namespace RenderOpenGL {
 
-	RenderManagerGL::RenderManagerGL() {
-		ConstantParameter::stride = sizeof(UniformGL);
-		SamplerParameter::stride = sizeof(SamplerState);
-	}
+RenderManagerGL::RenderManagerGL() {
+	ConstantParameter::stride = sizeof(UniformGL);
+	SamplerParameter::stride = sizeof(SamplerState);
+}
 
-	RenderManagerGL::~RenderManagerGL() {
-		// TODO Auto-generated destructor stub
-	}
+RenderManagerGL::~RenderManagerGL() {
+	// TODO Auto-generated destructor stub
+}
 
-	String RenderManagerGL::GetInfo() {
-		// more info is required but pff
-		return "OpenGL Render Manager";
-	}
+String RenderManagerGL::GetInfo() {
+	// more info is required but pff
+	return "OpenGL Render Manager";
+}
 
-	RenderManager::ShaderProgramLanguage RenderManagerGL::GetProgramLanguage() {
-		return RenderManager::SPP_GLSL;
-	}
+RenderManager::ShaderProgramLanguage RenderManagerGL::GetProgramLanguage() {
+	return RenderManager::SPP_GLSL;
+}
 
-	RenderDriverPtr RenderManagerGL::CreateDriverImpl(DriverCreationParams& params) {
-		return Assign(RenderDriverGL::CreateDriverGL(params.gpuIndex));
-	}
+RenderDriverPtr RenderManagerGL::CreateDriverImpl(
+		DriverCreationParams& params) {
+	return Assign(RenderDriverGL::CreateDriverGL(params.gpuIndex));
+}
 
-	void RenderManagerGL::ConfigureImpl(const nextar::NameValueMap& nameValues) {
-	}
+void RenderManagerGL::ConfigureImpl(const nextar::NameValueMap& nameValues) {
+}
 
-	void RenderManagerGL::CloseImpl() {
-		// discard pending jobs?
-	}
+void RenderManagerGL::CloseImpl() {
+	// discard pending jobs?
+}
 } /* namespace RenderOpenGL */

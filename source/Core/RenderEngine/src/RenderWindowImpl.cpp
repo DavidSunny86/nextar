@@ -10,15 +10,15 @@
 
 namespace nextar {
 
-	RenderWindowImpl::RenderWindowImpl() :
+RenderWindowImpl::RenderWindowImpl() :
 		RenderTarget(RenderTargetType::RENDER_WINDOW) {
-	}
+}
 
-	RenderWindowImpl::~RenderWindowImpl() {
-	}
+RenderWindowImpl::~RenderWindowImpl() {
+}
 
-	Size RenderWindowImpl::GetDimensions() const {
-		return dimensions;
-	}
+Size RenderWindowImpl::GetDimensions() const {
+	return dimensions;
+}
 
 } /* namespace nextar */

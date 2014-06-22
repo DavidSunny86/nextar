@@ -14,9 +14,9 @@ inline Matrix3x3::Matrix3x3(const float* _m) {
 // constructor
 //=========================================
 
-inline Matrix3x3::Matrix3x3(const float __11, const float __12, const float __13,
-		const float __21, const float __22, const float __23, const float __31,
-		const float __32, const float __33) {
+inline Matrix3x3::Matrix3x3(const float __11, const float __12,
+		const float __13, const float __21, const float __22, const float __23,
+		const float __31, const float __32, const float __33) {
 	_11 = __11;
 	_12 = __12;
 	_13 = __13;

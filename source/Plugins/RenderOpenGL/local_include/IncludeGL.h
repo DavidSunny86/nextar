@@ -29,7 +29,6 @@
 #   error NOT Supported
 #endif
 
-
 #if defined (NEX_DEBUG)
 
 #define GL_CHECK() RenderOpenGL::DebugGL::CheckGL()
@@ -39,6 +38,5 @@
 #define GL_CHECK();
 
 #endif
-
 
 #endif /* INCLUDEGL_H_ */

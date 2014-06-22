@@ -12,55 +12,56 @@
 
 namespace MeshLoader {
 
-	enum MeshFileMagic {
-		FILE_MAGIC_MESH = 0xff811901
-	};
+enum MeshFileMagic {
+	FILE_MAGIC_MESH = 0xff811901
+};
 
-	MeshLoaderImpl MeshLoaderImpl::impl;
-	/*****************************************************/
-	/* MeshLoaderImpl      								 */
-	/*****************************************************/
-	MeshLoaderImpl::MeshLoaderImpl() {
-	}
+MeshLoaderImpl MeshLoaderImpl::impl;
+/*****************************************************/
+/* MeshLoaderImpl      								 */
+/*****************************************************/
+MeshLoaderImpl::MeshLoaderImpl() {
+}
 
-	MeshLoaderImpl::~MeshLoaderImpl() {
-	}
+MeshLoaderImpl::~MeshLoaderImpl() {
+}
 
-	void MeshLoaderImpl::Load(InputStreamPtr& input, AssetLoader& loader) {
+void MeshLoaderImpl::Load(InputStreamPtr& input, AssetLoader& loader) {
 
-		static MeshLoaderImplv1_0 loaderImplv1_0;
-		StreamRequest* request = loader.GetRequestPtr();
-		MeshAsset* mesh = static_cast<MeshAsset*>(request->GetStreamedObject());
+	static MeshLoaderImplv1_0 loaderImplv1_0;
+	StreamRequest* request = loader.GetRequestPtr();
+	MeshAsset* mesh = static_cast<MeshAsset*>(request->GetStreamedObject());
 
-		if (input) {
+	if (input) {
 
-			InputSerializer ser(input);
-			uint32 meshMagic;
-			String versionInfo;
-			MeshLoaderIntf* impl = 0;
-			ser >> (meshMagic);
-			if (meshMagic == FILE_MAGIC_MESH) {
-				ser >> versionInfo;
-				VersionID ver = Convert::ToVersion(versionInfo);
-				switch (ver) {
-				case NEX_MAKE_VERSION(1,0,0):
-					impl = &loaderImplv1_0;
-					break;
-				default:
-					Error( String("Unsupported mesh version in file: ")
-									+ mesh->GetAssetLocator().ToString());
-					NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
-					break;
-				}
-
-				NEX_ASSERT(impl);
-				impl->Load(ser, loader);
+		InputSerializer ser(input);
+		uint32 meshMagic;
+		String versionInfo;
+		MeshLoaderIntf* impl = 0;
+		ser >> (meshMagic);
+		if (meshMagic == FILE_MAGIC_MESH) {
+			ser >> versionInfo;
+			VersionID ver = Convert::ToVersion(versionInfo);
+			switch (ver) {
+			case NEX_MAKE_VERSION(1, 0, 0):
+				impl = &loaderImplv1_0;
+				break;
+			default:
+				Error(
+						String("Unsupported mesh version in file: ")
+								+ mesh->GetAssetLocator().ToString());
+				NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
+				break;
 			}
-		} else {
-			Error(
-					String("Could not open mesh file: ")
-							+ mesh->GetAssetLocator().ToString());
-			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOCATE_ASSET);
+
+			NEX_ASSERT(impl);
+			impl->Load(ser, loader);
 		}
+	} else {
+		Error(
+				String("Could not open mesh file: ")
+						+ mesh->GetAssetLocator().ToString());
+		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOCATE_ASSET);
 	}
+}
 }

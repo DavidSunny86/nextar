@@ -14,6 +14,8 @@
 #include <VertexElement.h>
 #include <StreamData.h>
 
+#if 0
+
 namespace nextar {
 
 	/**
@@ -23,7 +25,7 @@ namespace nextar {
 	 * 2. The buffer is bound to the context for rendering. <br/>
 	 **/
 	class _NexEngineAPI BufferManager: public Singleton<BufferManager>,
-		public AllocGraphics {
+public AllocGraphics {
 
 	public:
 		BufferManager(size_t memoryBudget, uint32 releaseFrameThreshold);
@@ -54,7 +56,7 @@ namespace nextar {
 		 **/
 		virtual IndexBufferPtr CreateIndexBuffer(size_t bufferSize,
 				uint32 accessFlags, IndexBuffer::Type type =
-						IndexBuffer::TYPE_16BIT) = 0;
+				IndexBuffer::TYPE_16BIT) = 0;
 
 		/* Set threshold at which buffers are released */
 		void SetReleaseFrameThreshold(uint16 releaseFrameThreshold) {
@@ -65,8 +67,7 @@ namespace nextar {
 		uint16 GetReleaseFrameThreshold() const {
 			return releaseFrameThreshold;
 		}
-			
-		
+
 		/**
 		 * Called internally to verify if this signature
 		 * can accept the vertex elements. Outputs the mapped vertex
@@ -75,7 +76,7 @@ namespace nextar {
 		 * @returns 0 if the verification fails, else the mapped count
 		 */
 		static size_t MapSignatureToSemantics(const VertexSemantic* signature,
-				size_t semanticStride, uint32 numSemantics, 
+				size_t semanticStride, uint32 numSemantics,
 				const VertexElement* elements, size_t elementsStride,
 				size_t numElements, uint16* outElements);
 
@@ -90,5 +91,7 @@ namespace nextar {
 	};
 
 }
+
+#endif
 #endif	/* BUFFERMANAGER_H */
 

@@ -13,26 +13,24 @@
 
 namespace nextar {
 
-	class RenderTexture:
-			public TextureBase,
-			public RenderTarget {
+class RenderTexture: public TextureBase, public RenderTarget {
 
-	public:
+public:
 
-		RenderTexture();
-		virtual ~RenderTexture();
+	RenderTexture();
+	virtual ~RenderTexture();
 
+	virtual Size GetDimensions() const;
+	virtual PixelFormat GetPixelFormat() const;
 
-		virtual Size GetDimensions() const;
-		virtual PixelFormat GetPixelFormat() const;
+	virtual void Create(TextureType type, PixelFormat format, uint32 width,
+			uint32 height, uint32 depth);
+	virtual void Capture(RenderContext* rc, PixelBox& image, FrameBuffer);
+	virtual void Present(RenderContext* rc);
 
-		virtual void Create(TextureType type, PixelFormat format, uint32 width, uint32 height, uint32 depth);
-		virtual void Capture(RenderContext* rc, PixelBox& image, FrameBuffer);
-		virtual void Present(RenderContext* rc);
+protected:
 
-	protected:
-
-	};
+};
 
 } /* namespace nextar */
 #endif /* RENDERTEXTURE_H_ */

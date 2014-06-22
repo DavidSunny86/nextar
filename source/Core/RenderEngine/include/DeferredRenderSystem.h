@@ -14,35 +14,35 @@
 
 namespace nextar {
 
-	class _NexRenderAPI GBuffer : public AllocGeneral {
-	public:
+class _NexRenderAPI GBuffer: public AllocGeneral {
+public:
 
-		GBuffer();
-		~GBuffer();
+	GBuffer();
+	~GBuffer();
 
-		void Setup(Size dimensions);
+	void Setup(Size dimensions);
 
-		RenderTexturePtr depth;
-		RenderTexturePtr albedoSpecular;
-		RenderTexturePtr normalGloss;
-		MultiRenderTargetPtr renderTarget;
-	};
+	RenderTexturePtr depth;
+	RenderTexturePtr albedoSpecular;
+	RenderTexturePtr normalGloss;
+	MultiRenderTargetPtr renderTarget;
+};
 
-	class _NexRenderAPI DeferredRenderSystem: public nextar::RenderSystem {
-	public:
-		DeferredRenderSystem();
-		virtual ~DeferredRenderSystem();
+class _NexRenderAPI DeferredRenderSystem: public nextar::RenderSystem {
+public:
+	DeferredRenderSystem();
+	virtual ~DeferredRenderSystem();
 
-		virtual void Commit(CommitContext& context, RenderContextPtr& renderCtx);
+	virtual void Commit(CommitContext& context);
 
-	protected:
+protected:
 
-		void PrepareGeometryBuffer();
+	void PrepareGeometryBuffer();
 
-		RenderInfo gbufferRI;
-		Size gbufferDimension;
-		GBuffer gbuffer;
-	};
+	RenderInfo gbufferRI;
+	Size gbufferDimension;
+	GBuffer gbuffer;
+};
 
 } /* namespace nextar */
 #endif /* DEFERREDRENDERSYSTEM_H_ */

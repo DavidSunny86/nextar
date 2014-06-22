@@ -1,30 +1,35 @@
-
 #include <EngineHeaders.h>
 #include <UTApplication.h>
 
-NEX_IMPLEMENT_APP();
+NEX_IMPLEMENT_APP()
+;
 
 using namespace nextar;
 
-class UTApplicationMesh : public UTApplication {
+class UTApplicationMesh: public UTApplication {
 public:
 	virtual void _SetupScene(SceneAssetPtr& scene) {
 		UTApplication::_SetupScene(scene);
 
-		MeshAsset::Factory* factory = static_cast<MeshAsset::Factory*>(
-				ComponentFactoryArchive::Instance().AsyncFindFactory(MeshAsset::CLASS_ID));
-		MeshAsset::Group* group = ComponentGroupArchive::Instance().AsyncFindOrCreate(StringUtils::DefaultID);
+		MeshAsset::Factory* factory =
+				static_cast<MeshAsset::Factory*>(ComponentFactoryArchive::Instance().AsyncFindFactory(
+						MeshAsset::CLASS_ID));
+		MeshAsset::Group* group =
+				ComponentGroupArchive::Instance().AsyncFindOrCreate(
+						StringUtils::DefaultID);
 		URL url("{EngineData}/mesh/box.mesh");
-		MeshAssetPtr mesh = MeshAsset::Instance(factory, NamedObject::AsyncStringID("Box"), url, group);
+		MeshAssetPtr mesh = MeshAsset::Instance(factory,
+				NamedObject::AsyncStringID("Box"), url, group);
 		if (mesh) {
 			mesh->Load(false);
 		}
 
 		Entity::Factory* entityFactory =
-				static_cast<Entity::Factory*>(
-						ComponentFactoryArchive::Instance().AsyncFindFactory(Entity::CLASS_ID));
+				static_cast<Entity::Factory*>(ComponentFactoryArchive::Instance().AsyncFindFactory(
+						Entity::CLASS_ID));
 
-		EntityPtr meshEnt = entityFactory->AsyncCreateMeshEntity(NamedObject::AsyncStringID("BoxEntity"), mesh);
+		EntityPtr meshEnt = entityFactory->AsyncCreateMeshEntity(
+				NamedObject::AsyncStringID("BoxEntity"), mesh);
 		meshEnt->AddToScene(scene);
 	}
 };

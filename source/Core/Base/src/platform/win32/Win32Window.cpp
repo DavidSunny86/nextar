@@ -1,4 +1,3 @@
-
 #include <BaseHeaders.h>
 #include <RenderWindow.h>
 
@@ -8,11 +7,11 @@
 #include <WmInputListener.h>
 
 namespace nextar {
-		
-    void Win32Window::WindowConfigChanged() {
-        // todo get the resized window
-        RenderWindow::WindowConfigChanged();
-    }
+
+	void Win32Window::WindowConfigChanged() {
+		// todo get the resized window
+		RenderWindow::WindowConfigChanged();
+	}
 
 	LRESULT CALLBACK Win32Window::WndProc(HWND wnd, UINT message, WPARAM wparam,
 			LPARAM lparam) {
@@ -21,16 +20,16 @@ namespace nextar {
 				GWLP_USERDATA);
 
 		switch (message) {
-		case WM_CLOSE:
+			case WM_CLOSE:
 			if (!wind->IsClosed()) {
 				wind->Destroy();
 			}
 			break;
-		case WM_EXITSIZEMOVE:
+			case WM_EXITSIZEMOVE:
 			// todo should have size change started, size change ended
 			wind->WindowConfigChanged();
 			break;
-		case WM_SIZE:
+			case WM_SIZE:
 			// For full screen window, this can
 			// be a toggle, else a resize
 			if (wparam == SIZE_MINIMIZED) {
@@ -43,7 +42,7 @@ namespace nextar {
 			wind->WindowConfigChanged();
 			wind->WindowFocusChanged();
 			break;
-		case WM_ACTIVATE:
+			case WM_ACTIVATE:
 			// Add pause code here.
 			if (WA_INACTIVE == LOWORD(wparam)) {
 				wind->SetActive(false);
@@ -54,9 +53,9 @@ namespace nextar {
 			}
 			wind->WindowFocusChanged();
 			break;
-		case WM_INPUT:
+			case WM_INPUT:
 			if (WmInputListener::InstancePtr() && wparam == RIM_INPUT)
-				WmInputListener::Instance().OnWmInput(wind, (HRAWINPUT) lparam);
+			WmInputListener::Instance().OnWmInput(wind, (HRAWINPUT) lparam);
 			break;
 		}
 
@@ -64,6 +63,5 @@ namespace nextar {
 	}
 
 }
-
 
 #endif

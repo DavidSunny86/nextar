@@ -275,4 +275,4 @@ public:
 
 };
 
-#endif //NEXTAR_VECTOR3_H
+#endif //NEXTAR_VECTOR3_H

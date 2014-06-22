@@ -9,35 +9,35 @@
 #include <Plugin.h>
 #include <MeshLoaderImpl.h>
 
-NEX_IMPLEMENT_PLUGIN(MeshLoader) {
-	return &MeshLoader::Plugin::plugin;
+NEX_IMPLEMENT_PLUGIN(MeshLoader){
+return &MeshLoader::Plugin::plugin;
 }
 
 namespace MeshLoader {
 
-	Plugin Plugin::plugin;
+Plugin Plugin::plugin;
 
-	Plugin::Plugin() {
-	}
+Plugin::Plugin() {
+}
 
-	Plugin::~Plugin() {
-	}
+Plugin::~Plugin() {
+}
 
-	void Plugin::Open() {
-	}
+void Plugin::Open() {
+}
 
-	void Plugin::LicenseRenewed() {
-		MeshAsset::Loader::RegisterFactory("MESH", &MeshLoaderImpl::impl);
-	}
+void Plugin::LicenseRenewed() {
+	MeshAsset::Loader::RegisterFactory("MESH", &MeshLoaderImpl::impl);
+}
 
-	bool Plugin::LicenseExpired() {
-		MeshAsset::Loader::UnregisterFactory("MESH");
-	    return true;
-	}
+bool Plugin::LicenseExpired() {
+	MeshAsset::Loader::UnregisterFactory("MESH");
+	return true;
+}
 
-	void Plugin::Close() {
-	}
+void Plugin::Close() {
+}
 
-	void Plugin::Dispose() {
-	}
+void Plugin::Dispose() {
+}
 }

@@ -8,7 +8,6 @@
 #ifndef ENUMMACROS_H_
 #define ENUMMACROS_H_
 
-
 #define NEX_ENUM_UINT(EnumName, IntType)									\
 	inline constexpr bool													\
 		operator<(EnumName __x, EnumName __y) {								\
@@ -110,8 +109,5 @@
 	inline bool Test(EnumName __x) {										\
 		return static_cast<uint32>(__x) != 0;								\
 	}
-
-
-
 
 #endif /* ENUMMACROS_H_ */

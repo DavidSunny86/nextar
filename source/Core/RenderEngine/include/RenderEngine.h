@@ -13,12 +13,11 @@
 
 namespace nextar {
 
-	class BaseRenderManager;
-	class BaseRenderDriver;
-	class BaseRenderContext;
-	class DefaultLightSystem;
-	class DeferredRenderSystem;
+class BaseRenderManager;
+class BaseRenderDriver;
+class BaseRenderContext;
+class DefaultLightSystem;
+class DeferredRenderSystem;
 }
-
 
 #endif /* RENDERENGINE_H_ */

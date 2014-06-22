@@ -16,6 +16,4 @@
 /** GL Link settings, determines how gl extensions are linked */
 #define NEX_GLE_LINKING NEX_GLE_LINKING_DYNAMIC
 
-
-
 #endif /* CONFIGGL_H_ */

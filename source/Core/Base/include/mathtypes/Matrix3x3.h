@@ -87,4 +87,4 @@ public:
 
 };
 
-#endif //NEXTAR_MATRIX3X3_H
+#endif //NEXTAR_MATRIX3X3_H

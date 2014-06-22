@@ -9,39 +9,39 @@
 #include <Plugin.h>
 #include <Image.h>
 
-NEX_IMPLEMENT_PLUGIN(ImageLoader) {
-	return &ImageLoader::Plugin::plugin;
+NEX_IMPLEMENT_PLUGIN(ImageLoader){
+return &ImageLoader::Plugin::plugin;
 }
 
 namespace ImageLoader {
 
-	Plugin Plugin::plugin;
+Plugin Plugin::plugin;
 
-	Plugin::Plugin() {
-	}
+Plugin::Plugin() {
+}
 
-	Plugin::~Plugin() {
-	}
+Plugin::~Plugin() {
+}
 
-	void Plugin::Open() {
-	}
+void Plugin::Open() {
+}
 
-	void Plugin::LicenseRenewed() {
-		Image::Serializer::RegisterFactory("PNG", &PNGImageCodec::codec);
-	    Image::Serializer::RegisterFactory("JPG", &JPEGImageCodec::codec);
-	    Image::Serializer::RegisterFactory("DDS", &DDSImageCodec::codec);
-	}
+void Plugin::LicenseRenewed() {
+	Image::Serializer::RegisterFactory("PNG", &PNGImageCodec::codec);
+	Image::Serializer::RegisterFactory("JPG", &JPEGImageCodec::codec);
+	Image::Serializer::RegisterFactory("DDS", &DDSImageCodec::codec);
+}
 
-	bool Plugin::LicenseExpired() {
-		Image::Serializer::UnregisterFactory("PNG");
-	    Image::Serializer::UnregisterFactory("JPG");
-	    Image::Serializer::UnregisterFactory("DDS");
-	    return true;
-	}
+bool Plugin::LicenseExpired() {
+	Image::Serializer::UnregisterFactory("PNG");
+	Image::Serializer::UnregisterFactory("JPG");
+	Image::Serializer::UnregisterFactory("DDS");
+	return true;
+}
 
-	void Plugin::Close() {
-	}
+void Plugin::Close() {
+}
 
-	void Plugin::Dispose() {
-	}
+void Plugin::Dispose() {
+}
 }

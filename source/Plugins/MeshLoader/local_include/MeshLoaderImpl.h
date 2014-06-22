@@ -14,24 +14,26 @@
 using namespace nextar;
 namespace MeshLoader {
 
-	class Plugin;
-	class MeshLoaderIntf {
-	public:
-		virtual void Load(InputSerializer&, MeshAsset::Loader& loader) = 0;
-	protected:
-		~MeshLoaderIntf() {}
-	};
+class Plugin;
+class MeshLoaderIntf {
+public:
+	virtual void Load(InputSerializer&, MeshAsset::Loader& loader) = 0;
+protected:
+	~MeshLoaderIntf() {
+	}
+};
 
-	class MeshLoaderImpl: public AssetLoaderImpl, public AllocGeneral {
-		NEX_LOG_HELPER(MeshLoaderImpl);
-		static MeshLoaderImpl impl;
-		friend class Plugin;
-	public:
-		MeshLoaderImpl();
-		virtual ~MeshLoaderImpl();
+class MeshLoaderImpl: public AssetLoaderImpl, public AllocGeneral {
+	NEX_LOG_HELPER(MeshLoaderImpl)
+	;
+	static MeshLoaderImpl impl;
+	friend class Plugin;
+public:
+	MeshLoaderImpl();
+	virtual ~MeshLoaderImpl();
 
-		virtual void Load(InputStreamPtr&, AssetLoader& loader);
-	};
+	virtual void Load(InputStreamPtr&, AssetLoader& loader);
+};
 }
 #endif	/* MESHLOADERIMPLV1_0_H */
 

@@ -6,14 +6,14 @@
  */
 #include <BaseHeaders.h>
 
-NEX_IMPLEMENT_PLATFORM_APP();
+NEX_IMPLEMENT_PLATFORM_APP()
+;
 
 enum MeshChunkID {
 
 	MCID_VERTEX_DATA = 0x9111,
 	MCID_BOUNDS_INFO,
 	MCID_SHARED_VERTEX_DATA,
-
 
 	MCID_VERTEX_BUFFER_DATA,
 	MCID_VERTEX_ELEMENT_DATA,
@@ -35,7 +35,6 @@ using namespace nextar;
 
 void TestDumpCubeMesh(nextar::ApplicationContext& application) {
 	nextar::FileSystem& fileSys = nextar::FileSystem::Instance();
-
 
 	String version("1.0.0");
 	URL url("{EngineData}/mesh/box.mesh");
@@ -65,8 +64,4 @@ int NextarMain(int argc, char* argv[]) {
 	std::cin.get();
 	return 0;
 }
-
-
-
-
 

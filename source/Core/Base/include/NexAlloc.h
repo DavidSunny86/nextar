@@ -23,72 +23,71 @@ namespace nextar {
 #define NEX_ALIGN2048( len ) (( (len) + 2047 ) & ~2047 )
 #define NEX_ALIGN2336( len ) (( (len) + 2335 ) % 2336 )
 
-	/**
-	 * @enum MemoryCatagory
-	 *
-	 * @brief Memory catagories. Basic allocator and deallocator design
-	 **/
-	enum MemoryCatagory {
-		//! Indicates basic memory catagory.
-		MEMCAT_GENERAL,
-		//! Indicates memory for scene objects
-		MEMCAT_SCENE,
-		//! Indicates memory for graphics objects
-		MEMCAT_GRAPHICS,
-		//! Indicates memory for loggers.
-		MEMCAT_LOGGERS,
-		//! Memory for strings used in strsets.
-		MEMCAT_STRINGPOOL,
-		//! Memory catagory cache aligned
-		MEMCAT_CACHEALIGNED,
-		//! Memory catagory general SIMD
-		MEMCAT_SIMDALIGNED,
-		//! Memory catagory general MMX
-		MEMCAT_MMXALIGNED,
-		//! Memory catagory math core
-		MEMCAT_MATH_CORE,
-		//! Memory catagory for components
-		MEMCAT_COMPONENT,
-		//! Cpu loaded vertex/index/texture data
-		MEMCAT_BUFFER_DATA,
-	};
+/**
+ * @enum MemoryCatagory
+ *
+ * @brief Memory catagories. Basic allocator and deallocator design
+ **/
+enum MemoryCatagory {
+	//! Indicates basic memory catagory.
+	MEMCAT_GENERAL,
+	//! Indicates memory for scene objects
+	MEMCAT_SCENE,
+	//! Indicates memory for graphics objects
+	MEMCAT_GRAPHICS,
+	//! Indicates memory for loggers.
+	MEMCAT_LOGGERS,
+	//! Memory for strings used in strsets.
+	MEMCAT_STRINGPOOL,
+	//! Memory catagory cache aligned
+	MEMCAT_CACHEALIGNED,
+	//! Memory catagory general SIMD
+	MEMCAT_SIMDALIGNED,
+	//! Memory catagory general MMX
+	MEMCAT_MMXALIGNED,
+	//! Memory catagory math core
+	MEMCAT_MATH_CORE,
+	//! Memory catagory for components
+	MEMCAT_COMPONENT,
+	//! Cpu loaded vertex/index/texture data
+	MEMCAT_BUFFER_DATA,
+};
 
-	/**! @brief This class is the simple memory catagory based allocator
-	 *
-	 *   This should be specialized for pooled allocations, etc.
-	 */
-	template<enum MemoryCatagory cat>
-	class AllocatorBase: public allocator::Default {
-	};
+/**! @brief This class is the simple memory catagory based allocator
+ *
+ *   This should be specialized for pooled allocations, etc.
+ */
+template<enum MemoryCatagory cat>
+class AllocatorBase: public allocator::Default {
+};
 
-	template<> class AllocatorBase<MEMCAT_CACHEALIGNED> : public allocator::Aligned<
-			16> {
-	};
+template<> class AllocatorBase<MEMCAT_CACHEALIGNED> : public allocator::Aligned<
+		16> {
+};
 
-	template<> class AllocatorBase<MEMCAT_SIMDALIGNED> : public allocator::Aligned<
-			16> {
-	};
+template<> class AllocatorBase<MEMCAT_SIMDALIGNED> : public allocator::Aligned<
+		16> {
+};
 
-	template<> class AllocatorBase<MEMCAT_MMXALIGNED> : public allocator::Aligned<
-			8> {
-	};
+template<> class AllocatorBase<MEMCAT_MMXALIGNED> : public allocator::Aligned<8> {
+};
 
-	typedef AllocatorBase<MEMCAT_GENERAL> AllocatorGeneral;
-	typedef AllocatorBase<MEMCAT_SCENE> AllocatorScene;
-	typedef AllocatorBase<MEMCAT_GRAPHICS> AllocatorGraphics;
-	typedef AllocatorBase<MEMCAT_LOGGERS> AllocatorLogger;
-	typedef AllocatorBase<MEMCAT_GENERAL> AllocatorString;
-	typedef AllocatorBase<MEMCAT_CACHEALIGNED> AllocatorCacheAligned;
-	typedef AllocatorBase<MEMCAT_SIMDALIGNED> AllocatorSimdAligned;
-	typedef AllocatorBase<MEMCAT_MMXALIGNED> AllocatorMmxAligned;
-	typedef AllocatorBase<MEMCAT_MATH_CORE> AllocatorMathCore;
-	typedef AllocatorBase<MEMCAT_COMPONENT> AllocatorComponent;
-	typedef AllocatorBase<MEMCAT_BUFFER_DATA> AllocatorBufferData;
+typedef AllocatorBase<MEMCAT_GENERAL> AllocatorGeneral;
+typedef AllocatorBase<MEMCAT_SCENE> AllocatorScene;
+typedef AllocatorBase<MEMCAT_GRAPHICS> AllocatorGraphics;
+typedef AllocatorBase<MEMCAT_LOGGERS> AllocatorLogger;
+typedef AllocatorBase<MEMCAT_GENERAL> AllocatorString;
+typedef AllocatorBase<MEMCAT_CACHEALIGNED> AllocatorCacheAligned;
+typedef AllocatorBase<MEMCAT_SIMDALIGNED> AllocatorSimdAligned;
+typedef AllocatorBase<MEMCAT_MMXALIGNED> AllocatorMmxAligned;
+typedef AllocatorBase<MEMCAT_MATH_CORE> AllocatorMathCore;
+typedef AllocatorBase<MEMCAT_COMPONENT> AllocatorComponent;
+typedef AllocatorBase<MEMCAT_BUFFER_DATA> AllocatorBufferData;
 
-	/**! \include Include inside namespace nextar. */
+/**! \include Include inside namespace nextar. */
 #include <NexNew.h>
 
-	/**! Macros for allocation and deallocations */
+/**! Macros for allocation and deallocations */
 
 #if NEX_MEMTRACKERLEVEL > 1
 //! basic allocator functions
@@ -129,37 +128,36 @@ namespace nextar {
 #	define NEX_DELETE( statement )	delete statement
 #	define NEX_DELETE_ARRAY( statement )	delete [] statement
 #endif
-	//! AllocObjectBase classes
-	typedef AllocObjectBase<AllocatorGeneral> AllocGeneral;
-	typedef AllocObjectBase<AllocatorScene> AllocScene;
-	typedef AllocObjectBase<AllocatorGraphics> AllocGraphics;
-	typedef AllocObjectBase<AllocatorLogger> AllocLogger;
-	typedef AllocObjectBase<AllocatorString> AllocString;
-	typedef AllocObjectBase<AllocatorSimdAligned> AllocSimdAligned;
-	typedef AllocObjectBase<AllocatorMmxAligned> AllocMmxAligned;
-	typedef AllocObjectBase<AllocatorMathCore> AllocMathCore;
-	typedef AllocObjectBase<AllocatorCacheAligned> AllocCacheAligned;
-	typedef AllocObjectBase<AllocatorComponent> AllocComponent;
-	typedef AllocObjectBase<AllocatorBufferData> AllocBufferData;
+//! AllocObjectBase classes
+typedef AllocObjectBase<AllocatorGeneral> AllocGeneral;
+typedef AllocObjectBase<AllocatorScene> AllocScene;
+typedef AllocObjectBase<AllocatorGraphics> AllocGraphics;
+typedef AllocObjectBase<AllocatorLogger> AllocLogger;
+typedef AllocObjectBase<AllocatorString> AllocString;
+typedef AllocObjectBase<AllocatorSimdAligned> AllocSimdAligned;
+typedef AllocObjectBase<AllocatorMmxAligned> AllocMmxAligned;
+typedef AllocObjectBase<AllocatorMathCore> AllocMathCore;
+typedef AllocObjectBase<AllocatorCacheAligned> AllocCacheAligned;
+typedef AllocObjectBase<AllocatorComponent> AllocComponent;
+typedef AllocObjectBase<AllocatorBufferData> AllocBufferData;
 
+template<typename T>
+class GenericFree {
+public:
+	inline void operator ()(T* ptr) const {
+		NEX_FREE(ptr, MEMCAT_GENERAL);
+	}
+};
 
-	template <typename T>
-	class GenericFree {
-	public:
-		inline void operator () (T* ptr) const {
-			NEX_FREE(ptr, MEMCAT_GENERAL);
-		}
-	};
-
-	template <typename T>
-	class GenericDelete {
-	public:
-		inline void operator () (T* ptr) const {
-			NEX_DELETE(ptr);
-		}
-	};
+template<typename T>
+class GenericDelete {
+public:
+	inline void operator ()(T* ptr) const {
+		NEX_DELETE(ptr);
+	}
+};
 }
 
 #include <StdAllocator.h>
 
-#endif //NEXTAR_NEXALLOC_H
+#endif //NEXTAR_NEXALLOC_H

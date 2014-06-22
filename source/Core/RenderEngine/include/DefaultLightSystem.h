@@ -13,21 +13,21 @@
 
 namespace nextar {
 
-	class _NexRenderAPI DefaultLightSystem: public nextar::LightSystem {
-	public:
-		DefaultLightSystem();
-		virtual ~DefaultLightSystem();
+class _NexRenderAPI DefaultLightSystem: public nextar::LightSystem {
+public:
+	DefaultLightSystem();
+	virtual ~DefaultLightSystem();
 
-		virtual void Prepare();
-		virtual void PushLight(uint32 sortKey, Light*);
-		virtual void Sort();
-		virtual void NearbyLights(LightSet& ls, BoundingVolume*);
-		virtual LightList& GetLights();
+	virtual void Prepare();
+	virtual void PushLight(uint32 sortKey, Light*);
+	virtual void Sort();
+	virtual void NearbyLights(LightSet& ls, BoundingVolume*);
+	virtual LightList& GetLights();
 
-	protected:
+protected:
 
-		LightList sceneLights;
-	};
+	LightList sceneLights;
+};
 
 } /* namespace nextar */
 #endif /* DEFAULTLIGHTSYSTEM_H_ */

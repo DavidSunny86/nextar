@@ -13,19 +13,20 @@
 
 namespace nextar {
 
-	/** 
-	 * Culling systems derive from spatial to support hybrid culler hierarchies.
-	 */
-	class CullingSystem : public Spatial {
-	public:
-		CullingSystem(const StringID name = StringUtils::NullID, Component* parent = nullptr);
-		virtual ~CullingSystem();
-				
-		virtual void AddBody(Spatial*) = 0;
-		virtual void RemoveBody(Spatial*) = 0;
+/** 
+ * Culling systems derive from spatial to support hybrid culler hierarchies.
+ */
+class CullingSystem: public Spatial {
+public:
+	CullingSystem(const StringID name = StringUtils::NullID, Component* parent =
+			nullptr);
+	virtual ~CullingSystem();
 
-		virtual void Visit(SceneTraversal& trav) override = 0;
-	};
+	virtual void AddBody(Spatial*) = 0;
+	virtual void RemoveBody(Spatial*) = 0;
+
+	virtual void Visit(SceneTraversal& trav) override = 0;
+};
 
 } /* namespace nextar */
 #endif /* CULLINGSYSTEM_H_ */

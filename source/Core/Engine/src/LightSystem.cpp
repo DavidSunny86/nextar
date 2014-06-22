@@ -9,13 +9,13 @@
 
 namespace nextar {
 
-	LightSystem::LightSystem() {
-		// TODO Auto-generated constructor stub
+LightSystem::LightSystem() {
+	// TODO Auto-generated constructor stub
 
-	}
+}
 
-	LightSystem::~LightSystem() {
-		// TODO Auto-generated destructor stub
-	}
+LightSystem::~LightSystem() {
+	// TODO Auto-generated destructor stub
+}
 
 } /* namespace nextar */

@@ -30,4 +30,4 @@ public:
 	}
 };
 
-#endif //NEXTAR_VECTOR4_H
+#endif //NEXTAR_VECTOR4_H

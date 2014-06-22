@@ -10,13 +10,13 @@
 
 namespace nextar {
 
-	DebugDisplay::DebugDisplay() {
-		// TODO Auto-generated constructor stub
+DebugDisplay::DebugDisplay() {
+	// TODO Auto-generated constructor stub
 
-	}
+}
 
-	DebugDisplay::~DebugDisplay() {
-		// TODO Auto-generated destructor stub
-	}
+DebugDisplay::~DebugDisplay() {
+	// TODO Auto-generated destructor stub
+}
 
 } /* namespace nextar */

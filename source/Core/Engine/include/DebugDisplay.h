@@ -15,18 +15,24 @@
 
 namespace nextar {
 
-	class DebugDisplay : public AllocGraphics {
-	public:
+class DebugDisplay: public AllocGraphics {
+public:
 
-		virtual void Register(const AABox3& box, const Color& color, float expiryTimeInSec = 0.0f) = 0;
-		virtual void Register(Mat3x4R tform, const Color& color, float expiryTimeInSec = 0.0f) = 0;
-		virtual void Register(PlaneF plane, const Color& color, float expiryTimeInSec = 0.0f) = 0;
-		virtual void Register(const Frustum& frustum, const Color& color, float expiryTimeInSec = 0.0f) = 0;
-		virtual void Register(const Box2D& rect, const Color& color, TextureBase* textured = 0, bool border = true, float expiryTimeInSec = 0.0f) = 0;
+	virtual void Register(const AABox3& box, const Color& color,
+			float expiryTimeInSec = 0.0f) = 0;
+	virtual void Register(Mat3x4R tform, const Color& color,
+			float expiryTimeInSec = 0.0f) = 0;
+	virtual void Register(PlaneF plane, const Color& color,
+			float expiryTimeInSec = 0.0f) = 0;
+	virtual void Register(const Frustum& frustum, const Color& color,
+			float expiryTimeInSec = 0.0f) = 0;
+	virtual void Register(const Box2D& rect, const Color& color,
+			TextureBase* textured = 0, bool border = true,
+			float expiryTimeInSec = 0.0f) = 0;
 
-		DebugDisplay();
-		virtual ~DebugDisplay();
-	};
+	DebugDisplay();
+	virtual ~DebugDisplay();
+};
 
 } /* namespace nextar */
 #endif /* DEBUGINFO_H_ */

@@ -7,65 +7,63 @@
 
 namespace nextar {
 
-	/* macro = relative_path
-	 * {archive}/${macro}/to.file
-	 * ArchiveEntry = #type:path;
-	 * Common macros:
-	 * ${Bin} refers to the location where the binary exists.
-	 * Common archives:
-	 * {FileSystem::ArchiveEngineData}
-	 */
-	class _NexBaseAPI URL {
+/* macro = relative_path
+ * {archive}/${macro}/to.file
+ * ArchiveEntry = #type:path;
+ * Common macros:
+ * ${Bin} refers to the location where the binary exists.
+ * Common archives:
+ * {FileSystem::ArchiveEngineData}
+ */
+class _NexBaseAPI URL {
 
-		NEX_LOG_HELPER(URL)
-		;
-	public:
-		static const URL Invalid;
+	NEX_LOG_HELPER (URL);
+public:
+	static const URL Invalid;
 
-		URL();
-		URL(const UniString& _path);
-		URL(const String&);
-		URL(const URL&);
-		URL(uint32 type, const String& archive, const String& relativePath);
+	URL();
+	URL(const UniString& _path);
+	URL(const String&);
+	URL(const URL&);
+	URL(uint32 type, const String& archive, const String& relativePath);
 
-		inline const String& GetArchiveName() const {
-			return archiveName;
-		}
+	inline const String& GetArchiveName() const {
+		return archiveName;
+	}
 
-		inline const String& GetRelativePath() const {
-			return relativePath;
-		}
+	inline const String& GetRelativePath() const {
+		return relativePath;
+	}
 
-		/* operator == */
-		bool operator ==(const URL& other) const;
+	/* operator == */
+	bool operator ==(const URL& other) const;
 
-		String ToString() const;
+	String ToString() const;
 
-		static String GetAppendedPath(const String& base,
-				const String& subPath);
-		/* Reserved path */
-		static bool IsReservedPath(const char* path);
+	static String GetAppendedPath(const String& base, const String& subPath);
+	/* Reserved path */
+	static bool IsReservedPath(const char* path);
 
-		/* extension */
-		String GetExtension() const;
-	protected:
+	/* extension */
+	String GetExtension() const;
+protected:
 
-		/* this is only called by file system */
-		static void AddMacroEntry(const String& name, const String& value) {
-			_macroTable[name] = value;
-		}
+	/* this is only called by file system */
+	static void AddMacroEntry(const String& name, const String& value) {
+		_macroTable[name] = value;
+	}
 
-		String _Resolve(const String& path, size_t offset);
-		void _Parse(const String& path);
+	String _Resolve(const String& path, size_t offset);
+	void _Parse(const String& path);
 
-		String archiveName;
-		String relativePath;
+	String archiveName;
+	String relativePath;
 
-		friend class FileSystem;
+	friend class FileSystem;
 
-		static NameValueMap _macroTable;
-	};
+	static NameValueMap _macroTable;
+};
 
 }
 
-#endif //NEXTAR_PATHUTILS_H
+#endif //NEXTAR_PATHUTILS_H

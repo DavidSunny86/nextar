@@ -14,35 +14,32 @@
 
 namespace RenderOpenGL {
 
-	class RenderTextureViewGL: public TextureViewGL {
-	public:
-		RenderTextureViewGL();
-		virtual ~RenderTextureViewGL();
+class RenderTextureViewGL: public TextureViewGL {
+public:
+	RenderTextureViewGL();
+	virtual ~RenderTextureViewGL();
 
-		virtual void Update(RenderContext*, uint32 , ContextObject::ContextParamPtr);
-		virtual void Destroy(RenderContext*);
+	virtual void Update(RenderContext*, uint32, ContextObject::ContextParamPtr);
+	virtual void Destroy(RenderContext*);
 
-		inline void CreateFBO(RenderContextGL* gl) {
-			fbo.CreateAndBind(gl);
-			if (pixelFormat.isDepthSencil)
-				fbo.AttachDepth(gl, pixelFormat.attachmentType, this);
-			else
-				fbo.AttachColor(gl, 0, this);
-			fbo.Validate(gl);
-		}
+	inline void CreateFBO(RenderContextGL* gl) {
+		fbo.CreateAndBind(gl);
+		fbo.Attach(gl, pixelFormat.attachmentType + 0, this);
+		FrameBufferObjectGL::Validate(gl);
+	}
 
-		inline void DestroyFBO(RenderContextGL* gl) {
-			fbo.Destroy(gl);
-		}
+	inline void DestroyFBO(RenderContextGL* gl) {
+		fbo.Destroy(gl);
+	}
 
-		FrameBufferObjectGL& GetFBO() {
-			return fbo;
-		}
+	FrameBufferObjectGL& GetFBO() {
+		return fbo;
+	}
 
-	protected:
+protected:
 
-		FrameBufferObjectGL fbo;
-	};
+	FrameBufferObjectGL fbo;
+};
 
 } /* namespace nextar */
 

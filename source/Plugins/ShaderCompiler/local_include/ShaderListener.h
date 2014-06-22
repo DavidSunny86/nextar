@@ -12,25 +12,24 @@
 
 namespace ShaderCompiler {
 
-	/** Shader <name> {}*/
-	class ShaderListener :
-			public ScriptParser::StatementListener,
-			public ScriptParser::BlockListener {
-	public:
-		static CommandNamePair commands[];
-		static const size_t commandCount;
+/** Shader <name> {}*/
+class ShaderListener: public ScriptParser::StatementListener,
+		public ScriptParser::BlockListener {
+public:
+	static CommandNamePair commands[];
+	static const size_t commandCount;
 
-		String name;
-		ShaderScript* shaderScript;
+	String name;
+	ShaderScript* shaderScript;
 
-		ShaderListener(ShaderScript*, const String& name);
+	ShaderListener(ShaderScript*, const String& name);
 
-		virtual void EnterBlock(ScriptParser::BlockContext& block);
-		virtual void EnterStatement(ScriptParser::StatementContext& statement);
-	protected:
-		~ShaderListener() {}
-	};
+	virtual void EnterBlock(ScriptParser::BlockContext& block);
+	virtual void EnterStatement(ScriptParser::StatementContext& statement);
+protected:
+	~ShaderListener() {
+	}
+};
 }
-
 
 #endif /* SHADERLISTENER_H_ */

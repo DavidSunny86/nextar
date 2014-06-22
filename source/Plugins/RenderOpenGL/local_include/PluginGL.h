@@ -12,22 +12,22 @@
 
 namespace RenderOpenGL {
 
-	class PluginGL : public nextar::FactoryPlugin, public nextar::AllocGraphics {
-	public:
-		static PluginGL pluginObject;
+class PluginGL: public nextar::FactoryPlugin, public nextar::AllocGraphics {
+public:
+	static PluginGL pluginObject;
 
-		PluginGL();
-		virtual ~PluginGL();
+	PluginGL();
+	virtual ~PluginGL();
 
-		virtual void Open();
-		virtual void LicenseRenewed();
-		virtual bool LicenseExpired();
-		virtual void Close();
-		virtual void Dispose();
+	virtual void Open();
+	virtual void LicenseRenewed();
+	virtual bool LicenseExpired();
+	virtual void Close();
+	virtual void Dispose();
 
-	protected:
-		RenderManagerGL renderManagerGl;
-	};
+protected:
+	RenderManagerGL renderManagerGl;
+};
 
 } /* namespace RenderOpenGL */
 #endif /* PLUGINGL_H_ */

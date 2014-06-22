@@ -12,21 +12,22 @@
 
 namespace nextar {
 
-	class FrameListener {
-	public:
-		/* Called to mark the start of a frame, return false to skip frame */
-		virtual void BeginFrame(uint32 frameNumber) {
-			(void) frameNumber;
-		}
+class FrameListener {
+public:
+	/* Called to mark the start of a frame, return false to skip frame */
+	virtual void BeginFrame(uint32 frameNumber) {
+		(void) frameNumber;
+	}
 
-		/* Called to mark the end of a frame, timeElapsed in milliseconds */
-		virtual void EndFrame(uint32 timeElapsed) {
-			(void) timeElapsed;
-		}
+	/* Called to mark the end of a frame, timeElapsed in milliseconds */
+	virtual void EndFrame(uint32 timeElapsed) {
+		(void) timeElapsed;
+	}
 
-	protected:
-		~FrameListener() {}
-	};
+protected:
+	~FrameListener() {
+	}
+};
 }
 #endif	/* FRAMELISTENER_H */
 

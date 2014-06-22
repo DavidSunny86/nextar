@@ -64,4 +64,4 @@ DllMain (HINSTANCE , DWORD , LPVOID )                                           
 static_assert(sizeof(wchar_t)==sizeof(char16_t), "wchar_t does not match char16_t size!, need to change code");
 
 #endif
-#endif //NEXTAR_WIN32_OSDEFS_H
+#endif //NEXTAR_WIN32_OSDEFS_H

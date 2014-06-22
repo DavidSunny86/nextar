@@ -9,31 +9,33 @@
 #include <RenderManager.h>
 
 namespace nextar {
-	/******************************
-	 * RenderQueue
-	 */
-	RenderQueue::RenderQueue() : descriptor(0), flags(RenderQueueFlags::DEFAULT_FLAGS) {
+/******************************
+ * RenderQueue
+ */
+RenderQueue::RenderQueue() :
+		descriptor(0), flags(RenderQueueFlags::DEFAULT_FLAGS) {
+}
+
+/******************************
+ * VisibilitySet
+ */
+VisibilitySet::VisibilitySet() :
+		visibleCount(0) {
+	/* Create basic queues */
+	const RenderQueueDescList& rqdl =
+			RenderManager::Instance().GetRenderQueueInfo();
+	queues.resize(rqdl.size());
+	RenderQueueList::iterator it = queues.begin();
+	RenderQueueList::iterator end = queues.end();
+
+	RenderQueueDescList::const_iterator descIt = rqdl.begin();
+	RenderQueueDescList::const_iterator descEnd = rqdl.end();
+	for (; it != end; ++it, ++descIt) {
+		(*it).SetDesc((*descIt));
 	}
+}
 
-
-	/******************************
-	 * VisibilitySet
-	 */
-	VisibilitySet::VisibilitySet() : visibleCount(0) {
-		/* Create basic queues */
-		const RenderQueueDescList& rqdl = RenderManager::Instance().GetRenderQueueInfo();
-		queues.resize(rqdl.size());
-		RenderQueueList::iterator it = queues.begin();
-		RenderQueueList::iterator end = queues.end();
-
-		RenderQueueDescList::const_iterator descIt = rqdl.begin();
-		RenderQueueDescList::const_iterator descEnd = rqdl.end();
-		for (; it != end; ++it, ++descIt) {
-			(*it).SetDesc((*descIt));
-		}
-	}
-
-	VisibilitySet::~VisibilitySet() {
-	}
+VisibilitySet::~VisibilitySet() {
+}
 
 } /* namespace nextar */

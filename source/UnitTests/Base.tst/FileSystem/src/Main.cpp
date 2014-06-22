@@ -1,7 +1,7 @@
-﻿
-#include <BaseHeaders.h>
+﻿#include <BaseHeaders.h>
 
-NEX_IMPLEMENT_PLATFORM_APP();
+NEX_IMPLEMENT_PLATFORM_APP()
+;
 
 void TestArchiveOpenClose(nextar::ApplicationContext& application) {
 	nextar::FileSystem& fileSys = nextar::FileSystem::Instance();

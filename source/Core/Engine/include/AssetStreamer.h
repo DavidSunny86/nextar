@@ -13,30 +13,31 @@
 
 namespace nextar {
 
-	class _NexEngineAPI AssetStreamer:
-			public nextar::Singleton<AssetStreamer>,
-			public nextar::StreamHandler,
-			public AllocGeneral {
+class _NexEngineAPI AssetStreamer:
+public nextar::Singleton<AssetStreamer>,
+public nextar::StreamHandler,
+public AllocGeneral {
 
-		NEX_LOG_HELPER(AssetStreamer);
+	NEX_LOG_HELPER(AssetStreamer);
 
-	public:
+public:
 
-		AssetStreamer();
-		virtual ~AssetStreamer();
-		
-		void RequestLoad(Asset* asset);
-		void RequestUnload(Asset* asset);
-		
-		virtual void NotifyLoaded(StreamRequest*);
-		virtual void NotifyUnloaded(StreamRequest*);
+	AssetStreamer();
+	virtual ~AssetStreamer();
 
-	protected:
+	void RequestLoad(Asset* asset);
+	void RequestUnload(Asset* asset);
 
-		void _NotifyAssetLoaded(Asset* asset, AssetStreamRequest* req);
-		void _NotifyAssetUnloaded(Asset* asset, AssetStreamRequest* req);
-		void _NotifyDependents(Asset*, AssetStreamRequestSet&);
-	};
+	virtual void NotifyLoaded(StreamRequest*);
+	virtual void NotifyUnloaded(StreamRequest*);
 
-} /* namespace nextar */
+protected:
+
+	void _NotifyAssetLoaded(Asset* asset, AssetStreamRequest* req);
+	void _NotifyAssetUnloaded(Asset* asset, AssetStreamRequest* req);
+	void _NotifyDependents(Asset*, AssetStreamRequestSet&);
+};
+
+}
+/* namespace nextar */
 #endif /* ASSETSTREAMER_H_ */

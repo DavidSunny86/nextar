@@ -11,9 +11,8 @@
 
 namespace RenderOpenGL {
 
-	CanvasGLX::CanvasGLX(const String& canvName, bool isWind) : CanvasGL(canvName, isWind), drawable(0) {
-	}
+CanvasGLX::CanvasGLX(const String& canvName, bool isWind) :
+		CanvasGL(canvName, isWind), drawable(0) {
 }
-
-
+}
 

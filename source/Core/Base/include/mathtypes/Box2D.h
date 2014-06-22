@@ -12,11 +12,11 @@ public:
 	}
 
 	inline Box2D(float minX, float minY, float maxX, float maxY) :
-			min(minX, minY), max(maxX, maxY) {
+	min(minX, minY), max(maxX, maxY) {
 	}
 
 	inline Box2D(const Box2D & b) : min(b.min), max(b.max) {
 	}
 };
 
-#endif //NEXTAR_AABB2_H
+#endif //NEXTAR_AABB2_H

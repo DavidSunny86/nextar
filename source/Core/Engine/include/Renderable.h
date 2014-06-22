@@ -13,20 +13,20 @@
 
 namespace nextar {
 
-	class Renderable: public nextar::Spatial {
-	public:
-		enum {
-			CATAGORY = Component::CAT_RENDERABLE
-		};
-		
-		Renderable(const StringID name, Component* parent = nullptr);
-		virtual ~Renderable();
-
-		virtual uint32 GetClassID() const override = 0;
-		virtual void Visit(SceneTraversal& traversal) override = 0;
-
-	protected:
+class Renderable: public nextar::Spatial {
+public:
+	enum {
+		CATAGORY = Component::CAT_RENDERABLE
 	};
+
+	Renderable(const StringID name, Component* parent = nullptr);
+	virtual ~Renderable();
+
+	virtual uint32 GetClassID() const override = 0;
+	virtual void Visit(SceneTraversal& traversal) override = 0;
+
+protected:
+};
 
 } /* namespace nextar */
 #endif /* RENDERABLE_H_ */

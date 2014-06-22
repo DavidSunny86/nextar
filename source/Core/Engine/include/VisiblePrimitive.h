@@ -16,52 +16,58 @@
 
 namespace nextar {
 
-	class VisiblePrimitive {
-	public:
+class VisiblePrimitive {
+public:
 
-		StreamData* GetStreamData() {
-			return &streamData;
-		}
+	StreamData* GetStreamData() {
+		return &streamData;
+	}
 
-		MaterialAsset* GetMaterial() {
-			return material;
-		}
+	MaterialAsset* GetMaterial() {
+		return material;
+	}
 
-		int16 GetNumWorldMatrices() const {
-			return numWorldMatrices;
-		}
+	int16 GetNumWorldMatrices() const {
+		return numWorldMatrices;
+	}
 
-		const Matrix4x4* GetWorldMatrices() const {
-			return worldMatrices;
-		}
+	const Matrix4x4* GetWorldMatrices() const {
+		return worldMatrices;
+	}
 
-		void SetWorldMatrices(const Matrix4x4* matrices, int16 numMatrices) {
-			worldMatrices = matrices;
-			numWorldMatrices = numMatrices;
-		}
+	void SetWorldMatrices(const Matrix4x4* matrices, int16 numMatrices) {
+		worldMatrices = matrices;
+		numWorldMatrices = numMatrices;
+	}
 
-		void SetBoundsInfo(const BoundingVolume* bounds) {
-			this->bounds = bounds;
-		}
+	void SetBoundsInfo(const BoundingVolume* bounds) {
+		this->bounds = bounds;
+	}
 
-		void SetMaterial(MaterialAssetPtr& m) {
-			material = m;
-		}
+	void SetMaterial(MaterialAssetPtr& m) {
+		material = m;
+	}
 
-	protected:
-		/* Shader rendering flags */
-		uint16 renderFlags;
-		/* Number of world matrices */
-		int16 numWorldMatrices;
-		/* bounding volume */
-		const BoundingVolume* bounds;
-		/* The current world matrices */
-		const Matrix4x4* worldMatrices;
-		/* Material */
-		MaterialAssetPtr material;
-		/** stream data to render */
-		StreamData streamData;
-	};
+	const ParameterBuffer* GetParameters() const {
+		return parameters;
+	}
+
+protected:
+	/* Shader rendering flags */
+	uint16 renderFlags;
+	/* Number of world matrices */
+	int16 numWorldMatrices;
+	/* bounding volume */
+	const BoundingVolume* bounds;
+	/* The current world matrices */
+	const Matrix4x4* worldMatrices;
+	/* Material */
+	MaterialAssetPtr material;
+	/** stream data to render */
+	StreamData streamData;
+	/* object parameters */
+	ParameterBuffer* parameters;
+};
 
 } /* namespace nextar */
 #endif /* VISIBLEPRIMITIVE_H_ */

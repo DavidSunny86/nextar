@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <RenderOpenGL.h>
@@ -7,44 +6,43 @@
 
 namespace RenderOpenGL {
 
-	class RenderDriverGLX;
+class RenderDriverGLX;
 
-	class RenderContextGLX : public RenderContextGL {
+class RenderContextGLX: public RenderContextGL {
 
-		NEX_LOG_HELPER(RenderContextGLX);
+	NEX_LOG_HELPER(RenderContextGLX)
+	;
 
-	public:
-		RenderContextGLX(RenderDriverGLX* driver);
-		virtual ~RenderContextGLX();
+public:
+	RenderContextGLX(RenderDriverGLX* driver);
+	virtual ~RenderContextGLX();
 
-		inline Display* GetDisplay() {
-			return display;
-		}
+	inline Display* GetDisplay() {
+		return display;
+	}
 
-		inline int GetScreenIndex() {
-			return screenIndex;
-		}
+	inline int GetScreenIndex() {
+		return screenIndex;
+	}
 
-		inline GLXFBConfig GetFrameBufferConfig() {
-			return frameBufferConfig;
-		}
+	inline GLXFBConfig GetFrameBufferConfig() {
+		return frameBufferConfig;
+	}
 
-		inline bool IsCurrentDrawable(GLXDrawable currentDrawable) {
-			return currentDrawable == this->currentDrawable;
-		}
+	inline bool IsCurrentDrawable(GLXDrawable currentDrawable) {
+		return currentDrawable == this->currentDrawable;
+	}
 
-		/* Implementations */
-		virtual void SetVideoModeImpl(const VideoMode& videoMode);
-		virtual void SetCurrentWindow(RenderTarget* rt);
+	/* Implementations */
+	virtual void SetVideoModeImpl(const VideoMode& videoMode);
+	virtual void SetCurrentWindow(RenderTarget* rt);
 
-		/* Helpers */
-		void SwitchToFullScreen(Window drawable, bool value);
+	/* Helpers */
+	void SwitchToFullScreen(Window drawable, bool value);
 
-
-		inline void Present(WindowGLX::Impl* window) {
-			glXSwapBuffers(display, window->GetDrawable());
-			GL_CHECK();
-		}
+	inline void Present(WindowGLX::Impl* window) {
+		glXSwapBuffers(display, window->GetDrawable());
+		GL_CHECK();}
 
 	protected:
 
@@ -61,7 +59,6 @@ namespace RenderOpenGL {
 		Display* OpenDisplay(int gpuIndex);
 		void CloseDisplay();
 		void ReadyGlxExtensions();
-
 
 	protected:
 
@@ -80,7 +77,7 @@ namespace RenderOpenGL {
 		Display* display;
 
 		GLXDrawable currentDrawable;
-		GLXContext  context;
+		GLXContext context;
 		GLXFBConfig frameBufferConfig;
 	};
 }

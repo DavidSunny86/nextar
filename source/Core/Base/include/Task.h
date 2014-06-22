@@ -10,13 +10,13 @@
 
 namespace nextar {
 
-	class Task {
-	public:
-		Task();
-		virtual ~Task();
+class Task {
+public:
+	Task();
+	virtual ~Task();
 
-		virtual Task* Execute() = 0;
-	};
+	virtual Task* Execute() = 0;
+};
 
 } /* namespace nextar */
 #endif /* TASK_H_ */

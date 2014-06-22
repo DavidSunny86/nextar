@@ -19,4 +19,4 @@ extern char** _argv;
 namespace nextar {
 }
 
-#endif // NEXTAR_IMPLEMENT_APPLICATION
+#endif // NEXTAR_IMPLEMENT_APPLICATION

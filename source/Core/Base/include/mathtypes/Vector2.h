@@ -234,4 +234,4 @@ public:
 	}
 };
 
-#endif //NEXTAR_VECTOR2_H
+#endif //NEXTAR_VECTOR2_H

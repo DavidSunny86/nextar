@@ -9,36 +9,34 @@
 
 namespace RenderOpenGL {
 
-	GpuProgramGL::GpuProgramGL() :
+GpuProgramGL::GpuProgramGL() :
 		iGlShader(0) {
-	}
+}
 
-	GpuProgramGL::~GpuProgramGL() {
-	}
+GpuProgramGL::~GpuProgramGL() {
+}
 
-	bool GpuProgramGL::Compile(
-			GLenum shaderType,
-			RenderContext* ctx, const char* src,
-			const nextar::StringUtils::WordList& macroList) {
-		/* get program source */
-		String macroStr, macro;
-		StringUtils::TokenIterator it = 0;
+bool GpuProgramGL::Compile(GLenum shaderType, RenderContext* ctx,
+		const char* src, const nextar::StringUtils::WordList& macroList) {
+	/* get program source */
+	String macroStr, macro;
+	StringUtils::TokenIterator it = 0;
 
-		while ((it=StringUtils::NextWord(macroList, macro, it)) != String::npos) {
-			macroStr += "#define ";
-			macroStr += macro;
-			macroStr += "\n";
-		}
-
+	while ((it = StringUtils::NextWord(macroList, macro, it)) != String::npos) {
+		macroStr += "#define ";
+		macroStr += macro;
 		macroStr += "\n";
-		/* todo append global options */
-		iGlShader = static_cast<RenderContextGL*>(ctx)->CreateShader(shaderType, macroStr.c_str(),
-				src);
-		return (iGlShader != 0);
 	}
 
-	void GpuProgramGL::Destroy(RenderContext* ctx) {
-		static_cast<RenderContextGL*>(ctx)->DestroyShader(iGlShader);
-	}
+	macroStr += "\n";
+	/* todo append global options */
+	iGlShader = static_cast<RenderContextGL*>(ctx)->CreateShader(shaderType,
+			macroStr.c_str(), src);
+	return (iGlShader != 0);
+}
+
+void GpuProgramGL::Destroy(RenderContext* ctx) {
+	static_cast<RenderContextGL*>(ctx)->DestroyShader(iGlShader);
+}
 
 } /* namespace RenderOpenGL */

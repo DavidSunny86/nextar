@@ -13,79 +13,82 @@
 
 namespace nextar {
 
-	class RenderManager;
-	class RenderDriver;
-	class RenderContext;
-	class RenderWindow;
-	class GpuBuffer;
-	class VertexBuffer;
-	class IndexBuffer;
-	class Viewport;
-	class BufferManager;
-	class ShaderAsset;
-	class TextureBase;
-	class RenderTarget;
-	class RenderTexture;
-	class MultiRenderTarget;
-	class CommitContext;
-	class DebugDisplay;
-	class Pass;
-	class ContextObject;
+class RenderManager;
+class RenderDriver;
+class RenderContext;
+class RenderWindow;
+class GpuBuffer;
+class VertexBuffer;
+class IndexBuffer;
+class Viewport;
+class BufferManager;
+class ShaderAsset;
+class TextureBase;
+class RenderTarget;
+class RenderTexture;
+class MultiRenderTarget;
+class CommitContext;
+class DebugDisplay;
+class Pass;
+class ContextObject;
+class VertexLayout;
 
-	class Component;
-	class SharedComponent;
-	class ComponentFactoryArchive;
-	class LightSystem;
-	class BoundingVolume;
-	class VisibilitySet;
-	class VisiblePrimitive;
+class Component;
+class SharedComponent;
+class ComponentFactoryArchive;
+class LightSystem;
+class BoundingVolume;
+class VisibilitySet;
+class VisiblePrimitive;
 
-	class Entity;
-	class Light;
-	class Renderable;
-	class Moveable;
-	class Camera;
-	class Spatial;
-	class CullingSystem;
 
-	class SceneAsset;
+class Entity;
+class Light;
+class Renderable;
+class Moveable;
+class Camera;
+class Spatial;
+class CullingSystem;
 
-	class Asset;
-	class AssetStreamRequest;
-	class TextureAsset;
-	class ShaderAsset;
-	class MaterialAsset;
-	class MeshAsset;
+class SceneAsset;
 
-	class AssetStreamRequest;
-	class AssetCallback;
+class Asset;
+class AssetStreamRequest;
+class TextureAsset;
+class ShaderAsset;
+class MaterialAsset;
+class MeshAsset;
 
-	typedef RefPtr<LightSystem> LightSystemPtr;
+class AssetStreamRequest;
+class AssetCallback;
 
-	typedef RefPtr<VertexBuffer> VertexBufferPtr;
-	typedef RefPtr<IndexBuffer> IndexBufferPtr;
-	typedef RefPtr<RenderContext> RenderContextPtr;
-	typedef RefPtr<RenderDriver> RenderDriverPtr;
-	typedef RefPtr<GpuBuffer> GpuBufferPtr;
-	typedef RefPtr<RenderTexture> RenderTexturePtr;
-	typedef RefPtr<RenderTarget> RenderTargetPtr;
-	typedef RefPtr<MultiRenderTarget> MultiRenderTargetPtr;
+typedef RefPtr<LightSystem> LightSystemPtr;
 
-	typedef RefPtr<SharedComponent> SharedComponentPtr;
-	typedef RefPtr<Asset> AssetPtr;
-	typedef RefPtr<TextureAsset> TextureAssetPtr;
-	typedef RefPtr<ShaderAsset> ShaderAssetPtr;
-	typedef RefPtr<MaterialAsset> MaterialAssetPtr;
-	typedef RefPtr<MeshAsset> MeshAssetPtr;
+typedef RefPtr<VertexBuffer> VertexBufferPtr;
+typedef RefPtr<IndexBuffer> IndexBufferPtr;
+typedef RefPtr<RenderContext> RenderContextPtr;
+typedef RefPtr<RenderDriver> RenderDriverPtr;
+typedef RefPtr<GpuBuffer> GpuBufferPtr;
+typedef RefPtr<RenderTexture> RenderTexturePtr;
+typedef RefPtr<RenderTarget> RenderTargetPtr;
+typedef RefPtr<MultiRenderTarget> MultiRenderTargetPtr;
+typedef RefPtr<VertexLayout> VertexLayoutPtr;
 
-	typedef RefPtr<Entity> EntityPtr;
-	typedef RefPtr<SceneAsset> SceneAssetPtr;
+typedef RefPtr<SharedComponent> SharedComponentPtr;
+typedef RefPtr<Asset> AssetPtr;
+typedef RefPtr<TextureAsset> TextureAssetPtr;
+typedef RefPtr<ShaderAsset> ShaderAssetPtr;
+typedef RefPtr<MaterialAsset> MaterialAssetPtr;
+typedef RefPtr<MeshAsset> MeshAssetPtr;
 
-	enum class EngineConstants : uint32 {
+typedef RefPtr<Entity> EntityPtr;
+typedef RefPtr<SceneAsset> SceneAssetPtr;
+
+enum class EngineConstants
+	: uint32 {
 		NUM_ASSET_POINTER_PER_POOL_BLOCK = 128,
-		NUM_STREAM_REQ_POINTER_PER_POOL_BLOCK = 32,
-	};
+	NUM_STREAM_REQ_POINTER_PER_POOL_BLOCK = 32,
+};
 }
-
 
 #endif /* NEXENGINE_H_ */

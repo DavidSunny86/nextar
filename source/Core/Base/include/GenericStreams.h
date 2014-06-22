@@ -5,179 +5,181 @@
 
 namespace nextar {
 
-	class MemoryInputStream;
-	class MemoryOutputStream;
-	class GenericInputStream;
-	class GenericOutputStream;
-	class FileInputStream;
-	class FileOutputStream;
+class MemoryInputStream;
+class MemoryOutputStream;
+class GenericInputStream;
+class GenericOutputStream;
+class FileInputStream;
+class FileOutputStream;
 
-	typedef RefPtr<MemoryInputStream> MemoryInputStreamPtr;
-	typedef RefPtr<MemoryOutputStream> MemoryOutputStreamPtr;
-	typedef RefPtr<GenericInputStream> GenericInputStreamPtr;
-	typedef RefPtr<GenericOutputStream> GenericOutputStreamPtr;
-	typedef RefPtr<FileInputStream> FileInputStreamPtr;
-	typedef RefPtr<FileOutputStream> FileOutputStreamPtr;
+typedef RefPtr<MemoryInputStream> MemoryInputStreamPtr;
+typedef RefPtr<MemoryOutputStream> MemoryOutputStreamPtr;
+typedef RefPtr<GenericInputStream> GenericInputStreamPtr;
+typedef RefPtr<GenericOutputStream> GenericOutputStreamPtr;
+typedef RefPtr<FileInputStream> FileInputStreamPtr;
+typedef RefPtr<FileOutputStream> FileOutputStreamPtr;
+
+/**
+ * @class	MemoryInputStream
+ *
+ * @brief	Memory input stream.
+ *
+ * @author	Abhishek Dey
+ * @date	11/29/2009
+ **/
+class _NexBaseAPI MemoryInputStream: public InputStream {
+	uint8* data;
+	size_t readLeft;bool freedata;
+public:
+
+	//! Construct blank stream
+	MemoryInputStream();
+	//! Construct stream from memory
+	MemoryInputStream(void* data, size_t size, bool freedataptr = false);
+	//! Construct from another stream
+	MemoryInputStream(InputStream* cpy);
+	//! Destroy
+	~MemoryInputStream();
 
 	/**
-	 * @class	MemoryInputStream
-	 *
-	 * @brief	Memory input stream.
+	 * @brief	Clears this object to its blank/initial state.
 	 *
 	 * @author	Abhishek Dey
 	 * @date	11/29/2009
 	 **/
-	class _NexBaseAPI MemoryInputStream: public InputStream {
-		uint8* data;
-		size_t readLeft;bool freedata;
-	public:
-
-		//! Construct blank stream
-		MemoryInputStream();
-		//! Construct stream from memory
-		MemoryInputStream(void* data, size_t size, bool freedataptr = false);
-		//! Construct from another stream
-		MemoryInputStream(InputStream* cpy);
-		//! Destroy
-		~MemoryInputStream();
-
-		/**
-		 * @brief	Clears this object to its blank/initial state.
-		 *
-		 * @author	Abhishek Dey
-		 * @date	11/29/2009
-		 **/
-		void Clear();
-		/**
-		 *
-		 * @brief	Loads data from memory, only applicable for blank streams.
-		 *
-		 * @author	Abhishek Dey
-		 * @date	11/29/2009
-		 *
-		 * @param [in,out]	data	If non-null, the data.
-		 * @param	size			The size.
-		 **/
-		void LoadMemory(void* data, size_t size, bool freedataptr = false);
-
-		//! @copydoc InputStream::Read(void*,size_t)
-		virtual size_t Read(void* buffer, size_t size);
-		//! @copydoc InputStream::Seek(int32,std::ios_base::seekdir)
-		virtual bool Seek(std::streamoff offset, std::ios_base::seekdir dir =
-				std::ios_base::cur);
-		//! @copydoc InputStream::Tell()
-		virtual std::streamoff Tell();
-		//! @copydoc InputStream::IsEndOfStream()
-		virtual bool IsEndOfStream() const;
-		//! @copydoc InputStream::AcquireBuffer()
-		virtual size_t AcquireBuffer(const void*& readOnlyData);
-		//! @copydoc InputStream::ReleaseBuffer()
-		virtual void ReleaseBuffer(const void* readOnlyData);
-	};
-
+	void Clear();
 	/**
-	 * @class	MemoryOutputStream
 	 *
-	 * @brief	Memory output stream.
+	 * @brief	Loads data from memory, only applicable for blank streams.
 	 *
 	 * @author	Abhishek Dey
 	 * @date	11/29/2009
+	 *
+	 * @param [in,out]	data	If non-null, the data.
+	 * @param	size			The size.
 	 **/
-	class _NexBaseAPI MemoryOutputStream: public OutputStream {
+	void LoadMemory(void* data, size_t size, bool freedataptr = false);
 
-		ByteStream buffer;
-		size_t pos;
-	public:
-		MemoryOutputStream();
-		~MemoryOutputStream();
-		/**
-		 * @brief	Gets the raw data stored.
-		 *
-		 * @author	Abhishek Dey
-		 * @date	11/29/2009
-		 *
-		 * @return	null if it fails, else the data.
-		 **/
-		const uint8* GetData() const;
+	//! @copydoc InputStream::Read(void*,size_t)
+	virtual size_t Read(void* buffer, size_t size);
+	//! @copydoc InputStream::Seek(int32,std::ios_base::seekdir)
+	virtual bool Seek(std::streamoff offset, std::ios_base::seekdir dir =
+			std::ios_base::cur);
+	//! @copydoc InputStream::Tell()
+	virtual std::streamoff Tell();
+	//! @copydoc InputStream::IsEndOfStream()
+	virtual bool IsEndOfStream() const;
+	//! @copydoc InputStream::AcquireBuffer()
+	virtual size_t AcquireBuffer(const void*& readOnlyData);
+	//! @copydoc InputStream::ReleaseBuffer()
+	virtual void ReleaseBuffer(const void* readOnlyData);
+};
 
-		//! @copydoc OutputStream::Write(void*,size_t)
-		virtual void Write(const void* buffer, size_t size);
-		//! @copydoc OutputStream::Seek(int32,std::ios_base::seekdir)
-		virtual bool Seek(std::streamoff offset, std::ios_base::seekdir dir =
-				std::ios_base::cur);
-		//! @copydoc OutputStream::Tell()
-		virtual std::streamoff Tell();
-	};
+/**
+ * @class	MemoryOutputStream
+ *
+ * @brief	Memory output stream.
+ *
+ * @author	Abhishek Dey
+ * @date	11/29/2009
+ **/
+class _NexBaseAPI MemoryOutputStream: public OutputStream {
 
-	class _NexBaseAPI GenericInputStream: public InputStream {
-		std::istream* streamptr;bool freedata;
-	public:
+	ByteStream buffer;
+	size_t pos;
+public:
+	MemoryOutputStream();
+	~MemoryOutputStream();
+	/**
+	 * @brief	Gets the raw data stored.
+	 *
+	 * @author	Abhishek Dey
+	 * @date	11/29/2009
+	 *
+	 * @return	null if it fails, else the data.
+	 **/
+	const uint8* GetData() const;
 
-		GenericInputStream(std::istream* strm, size_t size = (size_t)Constants::INVALID_SIZE,
-				bool bfreeStream = false);
-		~GenericInputStream();
+	//! @copydoc OutputStream::Write(void*,size_t)
+	virtual void Write(const void* buffer, size_t size);
+	//! @copydoc OutputStream::Seek(int32,std::ios_base::seekdir)
+	virtual bool Seek(std::streamoff offset, std::ios_base::seekdir dir =
+			std::ios_base::cur);
+	//! @copydoc OutputStream::Tell()
+	virtual std::streamoff Tell();
+};
 
-		//! @copydoc InputStream::Read(void*,size_t)
-		virtual size_t Read(void* buffer, size_t size);
-		//! @copydoc InputStream::Seek(int32,std::ios_base::seekdir)
-		virtual bool Seek(std::streamoff offset, std::ios_base::seekdir dir =
-				std::ios_base::cur);
-		//! @copydoc InputStream::Tell()
-		virtual std::streamoff Tell();
-		//! @copydoc InputStream::IsEndOfStream()
-		virtual bool IsEndOfStream() const;
-	};
+class _NexBaseAPI GenericInputStream: public InputStream {
+	std::istream* streamptr;bool freedata;
+public:
 
-	class _NexBaseAPI GenericOutputStream: public OutputStream {
-		std::ostream* streamptr;bool freedata;
-	public:
-		GenericOutputStream(std::ostream* strm,
-				size_t size = (size_t)Constants::INVALID_SIZE, bool bfreeStream = false);
-		~GenericOutputStream();
+	GenericInputStream(std::istream* strm, size_t size =
+			(size_t) Constants::INVALID_SIZE,
+	bool bfreeStream = false);
+	~GenericInputStream();
 
-		//! @copydoc OutputStream::Write(void*,size_t)
-		virtual void Write(const void* buffer, size_t size);
-		//! @copydoc OutputStream::Seek(int32,std::ios_base::seekdir)
-		virtual bool Seek(std::streamoff offset, std::ios_base::seekdir dir =
-				std::ios_base::cur);
-		//! @copydoc OutputStream::Tell()
-		virtual std::streamoff Tell();
-	};
+	//! @copydoc InputStream::Read(void*,size_t)
+	virtual size_t Read(void* buffer, size_t size);
+	//! @copydoc InputStream::Seek(int32,std::ios_base::seekdir)
+	virtual bool Seek(std::streamoff offset, std::ios_base::seekdir dir =
+			std::ios_base::cur);
+	//! @copydoc InputStream::Tell()
+	virtual std::streamoff Tell();
+	//! @copydoc InputStream::IsEndOfStream()
+	virtual bool IsEndOfStream() const;
+};
 
-	class _NexBaseAPI FileInputStream: public InputStream {
-		std::FILE* streamptr;
-	public:
+class _NexBaseAPI GenericOutputStream: public OutputStream {
+	std::ostream* streamptr;bool freedata;
+public:
+	GenericOutputStream(std::ostream* strm, size_t size =
+			(size_t) Constants::INVALID_SIZE, bool bfreeStream = false);
+	~GenericOutputStream();
 
-		FileInputStream(std::FILE* strm, size_t size = (size_t)Constants::INVALID_SIZE);
-		~FileInputStream();
+	//! @copydoc OutputStream::Write(void*,size_t)
+	virtual void Write(const void* buffer, size_t size);
+	//! @copydoc OutputStream::Seek(int32,std::ios_base::seekdir)
+	virtual bool Seek(std::streamoff offset, std::ios_base::seekdir dir =
+			std::ios_base::cur);
+	//! @copydoc OutputStream::Tell()
+	virtual std::streamoff Tell();
+};
 
-		//! @copydoc InputStream::Read(void*,size_t)
-		virtual size_t Read(void* buffer, size_t size);
-		//! @copydoc InputStream::Seek(int32,std::ios_base::seekdir)
-		virtual bool Seek(std::streamoff offset, std::ios_base::seekdir dir =
-				std::ios_base::cur);
-		//! @copydoc InputStream::Tell()
-		virtual std::streamoff Tell();
-		//! @copydoc InputStream::IsEndOfStream()
-		virtual bool IsEndOfStream() const;
-	};
+class _NexBaseAPI FileInputStream: public InputStream {
+	std::FILE* streamptr;
+public:
 
-	class _NexBaseAPI FileOutputStream: public OutputStream {
-		std::FILE* streamptr;
-	public:
-		FileOutputStream(std::FILE* streamptr,
-				size_t size = (size_t)Constants::INVALID_SIZE);
-		~FileOutputStream();
+	FileInputStream(std::FILE* strm, size_t size =
+			(size_t) Constants::INVALID_SIZE);
+	~FileInputStream();
 
-		//! @copydoc OutputStream::Write(void*,size_t)
-		virtual void Write(const void* buffer, size_t size);
-		//! @copydoc OutputStream::Seek(int32,std::ios_base::seekdir)
-		virtual bool Seek(std::streamoff offset, std::ios_base::seekdir dir =
-				std::ios_base::cur);
-		//! @copydoc OutputStream::Tell()
-		virtual std::streamoff Tell();
-	};
+	//! @copydoc InputStream::Read(void*,size_t)
+	virtual size_t Read(void* buffer, size_t size);
+	//! @copydoc InputStream::Seek(int32,std::ios_base::seekdir)
+	virtual bool Seek(std::streamoff offset, std::ios_base::seekdir dir =
+			std::ios_base::cur);
+	//! @copydoc InputStream::Tell()
+	virtual std::streamoff Tell();
+	//! @copydoc InputStream::IsEndOfStream()
+	virtual bool IsEndOfStream() const;
+};
+
+class _NexBaseAPI FileOutputStream: public OutputStream {
+	std::FILE* streamptr;
+public:
+	FileOutputStream(std::FILE* streamptr, size_t size =
+			(size_t) Constants::INVALID_SIZE);
+	~FileOutputStream();
+
+	//! @copydoc OutputStream::Write(void*,size_t)
+	virtual void Write(const void* buffer, size_t size);
+	//! @copydoc OutputStream::Seek(int32,std::ios_base::seekdir)
+	virtual bool Seek(std::streamoff offset, std::ios_base::seekdir dir =
+			std::ios_base::cur);
+	//! @copydoc OutputStream::Tell()
+	virtual std::streamoff Tell();
+};
 
 }
 
-#endif //NEXTAR_GENERALSTREAMS_H
+#endif //NEXTAR_GENERALSTREAMS_H

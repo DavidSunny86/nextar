@@ -13,22 +13,23 @@
 using namespace nextar;
 
 namespace ImageLoader {
-	class JPEGImageCodec : public ImageCodec {
-	    NEX_LOG_HELPER(JPEGImageCodec);
+class JPEGImageCodec: public ImageCodec {
+	NEX_LOG_HELPER (JPEGImageCodec);
 
-	public:
+public:
 
-	    static JPEGImageCodec codec;
+	static JPEGImageCodec codec;
 
-	    JPEGImageCodec();
-	    virtual ~JPEGImageCodec();
+	JPEGImageCodec();
+	virtual ~JPEGImageCodec();
 
-	    virtual bool TryLoad(InputStreamPtr& file, const ImageParams& params);
-	    virtual ImageData Load(InputStreamPtr& file, const ImageParams& params);
-	    virtual void Save(OutputStreamPtr& file, const ImageParams& params, const ImageData& data);
+	virtual bool TryLoad(InputStreamPtr& file, const ImageParams& params);
+	virtual ImageData Load(InputStreamPtr& file, const ImageParams& params);
+	virtual void Save(OutputStreamPtr& file, const ImageParams& params,
+			const ImageData& data);
 
-	private:
-	};
+private:
+};
 }
 
 #endif	/* JPEGIMAGELOADER_H */

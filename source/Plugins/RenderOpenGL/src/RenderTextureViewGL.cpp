@@ -10,24 +10,24 @@
 
 namespace RenderOpenGL {
 
-	RenderTextureViewGL::RenderTextureViewGL() : fbo(0) {
-	}
+RenderTextureViewGL::RenderTextureViewGL() :
+		fbo(0) {
+}
 
-	RenderTextureViewGL::~RenderTextureViewGL() {
-	}
+RenderTextureViewGL::~RenderTextureViewGL() {
+}
 
-	void RenderTextureViewGL::Update(
-			RenderContext* rc, uint32 msg,
-			ContextObject::ContextParamPtr cb) {
-		if (msg & TextureBase::MSG_TEX_READ)
-			NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
-		else
-			TextureViewGL::Update(rc, msg, cb);
-	}
+void RenderTextureViewGL::Update(RenderContext* rc, uint32 msg,
+		ContextObject::ContextParamPtr cb) {
+	if (msg & TextureBase::MSG_TEX_READ)
+		NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
+	else
+		TextureViewGL::Update(rc, msg, cb);
+}
 
-	void RenderTextureViewGL::Destroy(RenderContext* rc) {
-		RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
-		fbo.Destroy(gl);
-		TextureViewGL::Destroy(rc);
-	}
+void RenderTextureViewGL::Destroy(RenderContext* rc) {
+	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
+	fbo.Destroy(gl);
+	TextureViewGL::Destroy(rc);
+}
 } /* namespace nextar */

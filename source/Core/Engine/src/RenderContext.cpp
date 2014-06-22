@@ -3,10 +3,10 @@
 
 namespace nextar {
 
-	RenderContext::RenderContext(void) {
-	}
+RenderContext::RenderContext(void) {
+}
 
-	RenderContext::~RenderContext(void) {
-	}
+RenderContext::~RenderContext(void) {
+}
 
 }

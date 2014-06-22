@@ -17,7 +17,6 @@
 	NEXTAR_UNK_TRACKED_OBJS(std::cerr); \
 	NEXTAR_LEAK_CHECKS(std::cerr);
 
-
 #if defined(NEX_WINDOWS)
 # include "platform/win32/Win32Defs.h"
 #elif defined(NEX_LINUX)
@@ -26,17 +25,16 @@
 #error OS/Dynamic Lib not defined
 #endif
 
-
 #define NEX_IMPLEMENT_PLATFORM_APP()	\
 	NEX_PLATFORM_APP();
 
 namespace nextar {
 
-	class _NexBaseAPI Platform {
-	public:
-		/* returns the location where the current exe resides */
-		static String GetModuleLocation();
-	};
+class _NexBaseAPI Platform {
+public:
+	/* returns the location where the current exe resides */
+	static String GetModuleLocation();
+};
 }
 
 #endif	/* NEXTAR_OSDEFS_H */

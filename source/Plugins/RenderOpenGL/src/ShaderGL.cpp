@@ -11,11 +11,11 @@
 
 namespace RenderOpenGL {
 
-	GpuShaderGL::GpuShaderGL(nextar::AssetManager* m, const String& n) : Shader(m, n),
-			iGlProgram(0) {
-	}
+GpuShaderGL::GpuShaderGL(nextar::AssetManager* m, const String& n) :
+		Shader(m, n), iGlProgram(0) {
+}
 
-	GpuShaderGL::~GpuShaderGL() {
-	}
+GpuShaderGL::~GpuShaderGL() {
+}
 
 } /* namespace RenderOpenGL */

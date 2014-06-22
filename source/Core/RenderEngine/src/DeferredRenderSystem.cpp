@@ -13,20 +13,18 @@
 
 namespace nextar {
 
-	/************************************************************************/
-	/* GBuffer                                                              */
-	/************************************************************************/
-	GBuffer::GBuffer() {
-		renderTarget = Assign(NEX_NEW(MultiRenderTarget()));
-	}
+/************************************************************************/
+/* GBuffer                                                              */
+/************************************************************************/
+GBuffer::GBuffer() {
+	renderTarget = Assign(NEX_NEW(MultiRenderTarget()));
+}
 
-	GBuffer::~GBuffer() {
-	}
+GBuffer::~GBuffer() {
+}
 
-	void GBuffer::Setup(Size dimensions) {
-		if (!renderTarget)
-
-		/* Clean setup */
+void GBuffer::Setup(Size dimensions) {
+	if (!renderTarget) {
 		MultiRenderTarget::CreateParam params;
 		params.dimensions = dimensions;
 		params.useDepth = true;
@@ -44,77 +42,80 @@ namespace nextar {
 
 		depth = static_cast<RenderTexture*>(renderTarget->GetDepthAttachment());
 		normalGloss = static_cast<RenderTexture*>(renderTarget->GetAttachment(0));
-		albedoSpecular = static_cast<RenderTexture*>(renderTarget->GetAttachment(1));
-
+		albedoSpecular =
+				static_cast<RenderTexture*>(renderTarget->GetAttachment(1));
 	}
+}
 
+/************************************************************************/
+/* DeferredRenderSystem                                                 */
+/************************************************************************/
+DeferredRenderSystem::DeferredRenderSystem() {
+}
 
-	/************************************************************************/
-	/* DeferredRenderSystem                                                 */
-	/************************************************************************/
-	DeferredRenderSystem::DeferredRenderSystem() {
-		// TODO Auto-generated constructor stub
+DeferredRenderSystem::~DeferredRenderSystem() {
+}
 
+void DeferredRenderSystem::PrepareGeometryBuffer() {
+	gbufferRI.rt = gbuffer.renderTarget;
+	gbufferRI.clearColor = Color::Black;
+	gbufferRI.clearStencil = 0;
+	gbufferRI.clearDepth = 1.0f;
+	gbufferRI.clearFlags = ClearFlags::CLEAR_ALL;
+}
+
+void DeferredRenderSystem::Commit(CommitContext& context) {
+	if (gbufferDimension.combined != context.targetDimension.combined) {
+		gbuffer.Setup(context.targetDimension);
+		gbufferDimension = context.targetDimension;
 	}
+	/* geometry pass */
+	VisibilitySet& visibles = *context.visibiles;
+	context.renderContext->BeginRender(&gbufferRI);
+	RenderQueueList& layerList = visibles.GetRenderQueues();
 
-	DeferredRenderSystem::~DeferredRenderSystem() {
-		// TODO Auto-generated destructor stub
-	}
-
-	void DeferredRenderSystem::PrepareGeometryBuffer() {
-		gbufferRI.rt = gbuffer.renderTarget;
-		gbufferRI.clearColor = Color::Black;
-		gbufferRI.clearStencil = 0;
-		gbufferRI.clearDepth = 1.0f;
-		gbufferRI.clearFlags = ClearFlags::CLEAR_ALL;
-	}
-
-	void DeferredRenderSystem::Commit(CommitContext& context, RenderContextPtr& renderCtx) {
-		if (gbufferDimension.combined != context.targetDimension.combined) {
-			gbuffer.Setup(context.targetDimension);
-			gbufferDimension = context.targetDimension;
-		}
-		/* geometry pass */
-		VisibilitySet& visibles = *context.visibiles;
-		renderCtx->BeginRender(&gbufferRI);
-		RenderQueueList& layerList = visibles.GetRenderQueues();
-
-
-		for(auto &layer : layerList) {
-			if (Test(layer.flags & RenderQueueFlags::DEFERRED)) {
-				for(auto &prim : layer.visibles) {
-					MaterialAsset* material = prim.second->GetMaterial();
-					ShaderAsset* shader = material->GetShader();
-					UpdateFrequency updateParamFlag = UpdateFrequency::PER_OBJECT_INSTANCE;
-					context.primitive = prim.second;
-					if (context.material != material) {
-						context.material = material;
-						updateParamFlag |= UpdateFrequency::PER_MATERIAL;
-					}
-					if (context.shader != shader) {
-						renderCtx->SwitchShader(0, context, shader);
-						updateParamFlag |= UpdateFrequency::PER_FRAME|UpdateFrequency::PER_PASS|
-								UpdateFrequency::PER_VIEW;
-					}
-
-					context.pass->UpdateParams(renderCtx, context, updateParamFlag);
-					renderCtx->Draw(prim.second->GetStreamData(), context);
+	for (auto &layer : layerList) {
+		if (Test(layer.flags & RenderQueueFlags::DEFERRED)) {
+			for (auto &prim : layer.visibles) {
+				MaterialAsset* material = prim.second->GetMaterial();
+				ShaderAsset* shader = material->GetShader();
+				if (context.shader != shader) {
+					context.shader = shader;
+					// deferred pass at 0
+					Pass* pass = context.shader->GetPass(0);
+					context.passNumber = pass->GetID();
+					context.pass = context.renderContext->GetView(pass);
+					context.paramBuffers[ParameterContext::CTX_PASS] = shader->Get
+					context.pass->SwitchAndUpdateParams(context);
 				}
+				context.primitive = prim.second;
+				if (context.material != material) {
+					context.material = material;
+					context.materialNumber++;
+					context.paramBuffers[ParameterContext::CTX_MATERIAL] = context.material->GetParameters();
+					context.pass->UpdateParams(context, ParameterContext::CTX_MATERIAL, context.materialNumber);
+				}
+
+				context.primitive = prim.second;
+				context.paramBuffers[ParameterContext::CTX_OBJECT] = prim.second->GetParameters();
+				context.pass->UpdateParams(context, ParameterContext::CTX_OBJECT, prim.first);
+				context.renderContext->Draw(prim.second->GetStreamData(), context);
 			}
 		}
-		renderCtx->EndRender();
-		/* light pass */
-		LightSystem* lightSys = context.lightSystem;
-		LightList& ls = lightSys->GetLights();
-		/* etc */
-		PixelBox image;
-		gbuffer.normalGloss->Capture(renderCtx, image, FrameBuffer::FRONT);
-		Image imageObj(std::move(image));
-		/* Display Image */
-		if (context.debugDisplay) {
-			Box2D box(0, 0, 0.25f, 0.25f);
-			context.debugDisplay->Register(box, Color::Red, gbuffer.normalGloss);
-		}
 	}
+	context.renderContext->EndRender();
+	/* light pass */
+	LightSystem* lightSys = context.lightSystem;
+	LightList& ls = lightSys->GetLights();
+	/* etc */
+	PixelBox image;
+	gbuffer.normalGloss->Capture(context.renderContext, image, FrameBuffer::FRONT);
+	Image imageObj(std::move(image));
+	/* Display Image */
+	if (context.debugDisplay) {
+		Box2D box(0, 0, 0.25f, 0.25f);
+		context.debugDisplay->Register(box, Color::Red, gbuffer.normalGloss);
+	}
+}
 
 } /* namespace nextar */

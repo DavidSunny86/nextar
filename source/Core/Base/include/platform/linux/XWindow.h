@@ -12,40 +12,36 @@
 
 namespace nextar {
 
-    /** Glx Graphics windows are derived from here
-     */
-    class XWindow : public RenderWindow {
-    public:
+/** Glx Graphics windows are derived from here
+ */
+class XWindow: public RenderWindow {
+public:
 
-        XWindow(Impl* imp) :
-        	RenderWindow(imp)
-    		,display(0)
-    		,window(0)
-    		,msgDestroy(0) {
-        }
-        
-        inline Atom GetXDestroyMsg() const {
-        	return msgDestroy;
-        }
+	XWindow(Impl* imp) :
+			RenderWindow(imp), display(0), window(0), msgDestroy(0) {
+	}
 
-        Display* GetDisplay() {
-            return display;
-        };
+	inline Atom GetXDestroyMsg() const {
+		return msgDestroy;
+	}
 
-        Window GetWindow() {
-            return window;
-        }
+	Display* GetDisplay() {
+		return display;
+	}
+	;
 
-        static void ProcessEvent(XWindow* wind, XEvent& event);
-    protected:
-        Display*    display;
-        Window      window;
-        Atom		msgDestroy;
-    };
-    
+	Window GetWindow() {
+		return window;
+	}
+
+	static void ProcessEvent(XWindow* wind, XEvent& event);
+protected:
+	Display* display;
+	Window window;
+	Atom msgDestroy;
+};
+
 }
 
-
 #endif	/* GRAPHICSWINDOWX_H */
-
 

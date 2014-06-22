@@ -9,11 +9,11 @@
 
 namespace nextar {
 
-	Renderable::Renderable(const StringID name, Component* parent) :
+Renderable::Renderable(const StringID name, Component* parent) :
 		Spatial(name, parent) {
-	}
+}
 
-	Renderable::~Renderable() {
-	}
+Renderable::~Renderable() {
+}
 
 } /* namespace nextar */

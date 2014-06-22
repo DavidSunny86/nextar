@@ -8,18 +8,22 @@
 #include <atomic>
 
 namespace nextar {
-	namespace mt {
+namespace mt {
 
-		struct NullMutex {
-			void lock() {}
-			void unlock() noexcept {}
-			bool try_lock() { return true; }
-		};
-
-		typedef std::mutex Mutex;
-		typedef std::recursive_mutex RecursiveMutex;
-		typedef std::thread::id ThreadID;
+struct NullMutex {
+	void lock() {
 	}
+	void unlock() noexcept {
+	}
+	bool try_lock() {
+		return true;
+	}
+};
+
+typedef std::mutex Mutex;
+typedef std::recursive_mutex RecursiveMutex;
+typedef std::thread::id ThreadID;
+}
 }
 
 #define NEX_LOCK_VARIABLE(name) lock_##__LINE__##name
@@ -45,4 +49,4 @@ namespace nextar {
 #	define NEX_THREAD_LOCK_GUARD_MUTEX_T(T, mutexName)
 #endif
 
-#endif //NEXTAR_NEXTHREAD_H
+#endif //NEXTAR_NEXTHREAD_H

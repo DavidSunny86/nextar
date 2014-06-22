@@ -19,15 +19,15 @@
 
 namespace nextar {
 
-	/*! \enum ErrorSeverity
-	 *
-	 *   @brief The error depth.
-	 *
-	 *   The 3 error classes.
-	 */
-	enum ErrorSeverity {
-		ES_FATAL, ES_GRACEFUL, ES_WARNING,
-	};
+/*! \enum ErrorSeverity
+ *
+ *   @brief The error depth.
+ *
+ *   The 3 error classes.
+ */
+enum ErrorSeverity {
+	ES_FATAL, ES_GRACEFUL, ES_WARNING,
+};
 
 /*! @class Exception
  *
@@ -165,4 +165,4 @@ public:
 
 }
 
-#endif //NEX_NEXEXCEPT_H
+#endif //NEX_NEXEXCEPT_H

@@ -5,50 +5,50 @@
 
 namespace nextar {
 
-	enum PluginLicenseType {
-		/* Opens after app begin, closes before app exits. */
-		PLUG_TYPE_LIFETIME,
-		/* Opens after render manager is ready, and closes before the context is deleted. */
-		PLUG_TYPE_GRAPHICS,
-		/* Custom load */
-		PLUG_TYPE_CUSTOM,
-	};
+enum PluginLicenseType {
+	/* Opens after app begin, closes before app exits. */
+	PLUG_TYPE_LIFETIME,
+	/* Opens after render manager is ready, and closes before the context is deleted. */
+	PLUG_TYPE_GRAPHICS,
+	/* Custom load */
+	PLUG_TYPE_CUSTOM,
+};
 
-	struct PluginLicense {
-		PluginLicenseType type;
-		String customType;
-	};
+struct PluginLicense {
+	PluginLicenseType type;
+	String customType;
+};
 
-	/**
-	 * @remarks Classes derived from this one will be
-	 *          the main plugin interfaces
-	 **/
-	class FactoryPlugin {
-	public:
+/**
+ * @remarks Classes derived from this one will be
+ *          the main plugin interfaces
+ **/
+class FactoryPlugin {
+public:
 
-		virtual ~FactoryPlugin() {
-		}
+	virtual ~FactoryPlugin() {
+	}
 
-		/** @remarks Called after the plugin is loaded */
-		virtual void Open() = 0;
+	/** @remarks Called after the plugin is loaded */
+	virtual void Open() = 0;
 
-		/** @remarks Called when license is renewed. Service registration
-		 *           can be done in this call.
-		 */
-		virtual void LicenseRenewed() = 0;
+	/** @remarks Called when license is renewed. Service registration
+	 *           can be done in this call.
+	 */
+	virtual void LicenseRenewed() = 0;
 
-		/** @remarks Called when license expires. Returning true
-		 *           means every instance of objects in this plugin
-		 *           are dead, and the plugin can be safely unloaded.
-		 */
-		virtual bool LicenseExpired() = 0;
+	/** @remarks Called when license expires. Returning true
+	 *           means every instance of objects in this plugin
+	 *           are dead, and the plugin can be safely unloaded.
+	 */
+	virtual bool LicenseExpired() = 0;
 
-		/** @remarks Called before the plugin is unloaded */
-		virtual void Close() = 0;
+	/** @remarks Called before the plugin is unloaded */
+	virtual void Close() = 0;
 
-		/** @remarks Dispose should free up the pointer, implements delete this as appropriate */
-		virtual void Dispose() = 0;
-	};
+	/** @remarks Dispose should free up the pointer, implements delete this as appropriate */
+	virtual void Dispose() = 0;
+};
 
 #define NEX_IMPLEMENT_PLUGIN(pluginName)              \
     NEX_EXTERNC_SYM _NexExportSym nextar::FactoryPlugin*      \
@@ -78,7 +78,6 @@ namespace nextar {
 #define NEX_IMPLEMENT_COMPONENT_FACTORY(Class)	\
 		Class::FactoryMap Class::sImplMap;
 
-
 #define NEX_DECLARE_FACTORY(Impl)					\
 	typedef map<String, Impl*>::type FactoryMap;	\
 	private:										\
@@ -102,4 +101,4 @@ namespace nextar {
 
 }
 
-#endif //NEXTAR_PLUGIN_H__
+#endif //NEXTAR_PLUGIN_H__

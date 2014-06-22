@@ -7,30 +7,28 @@
 
 namespace nextar {
 
-	namespace debug {
-	}
+namespace debug {
+}
 
+class FactoryPlugin;
+class PluginRegistry;
+class Config;
+class URL;
+class InputStream;
+class OutputStream;
+class Archive;
+class FileSystem;
+class FrameListener;
+class RenderWindow;
+class WindowManager;
+class LogManager;
 
-	class FactoryPlugin;
-	class PluginRegistry;
-	class Config;
-	class URL;
-	class InputStream;
-	class OutputStream;
-	class Archive;
-	class FileSystem;
-	class FrameListener;
-	class RenderWindow;
-	class WindowManager;
-	class LogManager;
+class Frustum;
 
-	class Frustum;
-
-	typedef RefPtr<Archive> ArchivePtr;
-	typedef RefPtr<InputStream> InputStreamPtr;
-	typedef RefPtr<OutputStream> OutputStreamPtr;
+typedef RefPtr<Archive> ArchivePtr;
+typedef RefPtr<InputStream> InputStreamPtr;
+typedef RefPtr<OutputStream> OutputStreamPtr;
 
 }
 
-#endif //NEXBASE_H__
-
+#endif //NEXBASE_H__

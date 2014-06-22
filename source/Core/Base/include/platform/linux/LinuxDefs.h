@@ -31,4 +31,4 @@ int main(int argc,char* argv[]) {										\
 
 #define NEX_PLUGIN_OS_DEFINITION				
 
-#endif //NEXTAR_LINUX_OSDEFS_H
+#endif //NEXTAR_LINUX_OSDEFS_H

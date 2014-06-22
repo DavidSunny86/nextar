@@ -11,4 +11,4 @@ public:
 	float angle;
 };
 
-#endif //NEXTAR_AXISANGLE_H
+#endif //NEXTAR_AXISANGLE_H

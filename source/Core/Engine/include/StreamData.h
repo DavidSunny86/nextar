@@ -10,149 +10,144 @@
 
 #include <RenderConstants.h>
 #include <VertexBuffer.h>
-#include <VertexElement.h>
 #include <IndexBuffer.h>
+#include <VertexLayout.h>
 
 namespace nextar {
 
-	/** @remarks
-	 * This class represents an input or output layout for vertices. This specifically
-	 * is meant for the shader mapping, so is dependent on the shader chosen for rendering.
-	 * This makes sure the layout is modified if the shader is changed.
-	 */
-	class VertexLayout: public ContextObject,
-		public AllocGraphics {
-	public:
-		enum Message {
-			MSG_CREATE,
-		};
+// @optimize Most pointers are of few bytes size. Can be taken as object.
+// Need better data structures to account for small object pointers here.
+class _NexEngineAPI VertexBufferBinding: public AllocGraphics {
+public:
 
-		struct CreateParam {
-			uint32 numElements;
-			const VertexElement* elements;
-		};
+	VertexBufferBinding();
+	~VertexBufferBinding() {
+	}
 
-		/* Dtor */
-		virtual ~VertexLayout() {}
-	};
+	inline uint16 GetBindingNumber() const {
+		return bindingNumber;
+	}
 
-	class _NexEngineAPI VertexBufferBinding: public AllocGraphics {
-	public:
-		VertexBufferBinding();
-		~VertexBufferBinding() {}
+	/** @remarks Returns the count of vertex buffers */
+	inline size_t GetBufferCount() const {
+		return bufferList.size();
+	}
 
-		inline uint16 GetBindingNumber() const {
-			return bindingNumber;
-		}
+	/** @remarks Returns the buffer stored at a specified index */
+	VertexBuffer& GetBuffer(size_t i) {
+		return bufferList[i];
+	}
 
-		/** @remarks Returns the count of vertex buffers */
-		inline size_t GetBufferCount() {
-			return bufferCount;
-		}
-		/** @remarks Returns the buffer stored at a specified index */
-		VertexBufferPtr& GetBuffer(size_t i) {
-			NEX_ASSERT(bufferCount > i);
-			return bufferList[i];
-		}
-		/** @remarks Set buffer count, this must be called before binding
-		 * Use VertexLayout::GetBufferCount to find the number of seperate
-		 * buffers.
-		 **/
-		void SetBufferCount(size_t num) {
-			bufferCount = (uint16)num;
-		}
+	const VertexBuffer* GetBufferPtr(size_t i) const {
+		return &bufferList.at(i);
+	}
 
-		/** @remarks Binds the buffer to the specified index */
-		void BindBuffer(size_t index, VertexBufferPtr vb) {
-			bufferList[index] = vb;
-			bindingNumber++;
-		}
+	VertexBuffer* GetBufferPtr(size_t i) {
+		return &bufferList.at(i);
+	}
 
-		bool HasOnlyStaticBuffers();
+	/** @remarks Set buffer count, this must be called before binding
+	 * Use VertexLayout::GetBufferCount to find the number of seperate
+	 * buffers.
+	 **/
+	void SetBufferCount(size_t num) {
+		bufferList.resize(num);
+	}
 
-		static VertexBufferBinding* CreateInstance();
+	/** @remarks Binds the buffer to the specified index */
+	void BindBuffer(size_t index, VertexBuffer& vb) {
+		if (bufferList[index].IsTransientBuffer())
+			--transientBufferCount;
+		bufferList[index] = std::move(vb);
+		if (bufferList[index].IsTransientBuffer())
+			transientBufferCount++;
+		bindingNumber++;
+	}
 
-	protected:
-		typedef array<VertexBufferPtr, (const size_t)RenderConstants::MAX_VERTEX_STREAMS>::type VertexBufferArray;
-		uint16 bufferCount;
-		uint16 bindingNumber;
-		VertexBufferArray bufferList;
-	};
+	inline bool HasTransientBuffers() {
+		return transientBufferCount != 0;
+	}
 
-	enum PrimitiveTypeTag {
-		/* Point list primitive type.  */
-		PT_POINT_LIST,
-		/* Line list primitive type.  */
-		PT_LINE_LIST,
-		/* Triangle list primitive type.  */
-		PT_TRI_LIST,
-		/* Triangle strip primitive type.  */
-		PT_TRI_STRIP
-	};
+protected:
+	typedef vector<VertexBuffer>::type VertexBufferList;
+	uint8 transientBufferCount;
+	VertexBufferList bufferList;
+	uint16 bindingNumber;
+};
 
-	typedef uint8 PrimitiveType;
+enum PrimitiveTypeTag {
+	/* Point list primitive type.  */
+	PT_POINT_LIST,
+	/* Line list primitive type.  */
+	PT_LINE_LIST,
+	/* Triangle list primitive type.  */
+	PT_TRI_LIST,
+	/* Triangle strip primitive type.  */
+	PT_TRI_STRIP
+};
 
-	class VertexData: public AllocGraphics {
-	public:
-		size_t start;
-		size_t count;
+typedef uint8 PrimitiveType;
 
-		VertexLayout* layout;
-		VertexBufferBinding* binding;
+class VertexData: public AllocGraphics {
+public:
+	size_t start;
+	size_t count;
 
-		VertexData() :
+	VertexLayout* layout;
+	VertexBufferBinding* binding;
+
+	VertexData() :
 			layout(0), binding(0), start(0), count(0) {
 
-		}
-	};
+	}
+};
 
-	class IndexData {
-	public:
-		size_t start;
-		size_t count;
+class IndexData {
+public:
+	size_t start;
+	size_t count;
 
-		IndexBufferPtr indices;
+	IndexBufferPtr indices;
 
-		IndexData() :
-				start(0), count(0) {
+	IndexData() :
+			start(0), count(0) {
 
-		}
+	}
 
-		IndexData(size_t indexStart, size_t indexCount,
-				IndexBufferPtr indexBuffer) :
-				start(indexStart), count(indexCount), indices(indexBuffer) {
-		}
-	};
+	IndexData(size_t indexStart, size_t indexCount, IndexBufferPtr indexBuffer) :
+			start(indexStart), count(indexCount), indices(indexBuffer) {
+	}
+};
 
-	/**
-	 * This class represents stream data for a single pass.
-	 * A lot of class expecting single pass rendering can
-	 * simply use an instance of this class rather than
-	 * the stream pass map (StreamData)
-	 */
-	class _NexEngineAPI StreamData: public AllocGeneral {
-	public:
-			/* This is a hint to the renderer for optimization saying
-		 * it doesn't use any dynamic vertex buffer */
-		bool usesOnlyStaticVb;
-		/* Use indices */
-		bool useIndices;
-		/* Indicates if GraphicsStreamData was created */
-		bool isGsdataValid;
-		/**/
-		PrimitiveType type;
-		/* instance count is usually 1 */
-		uint16 instanceCount;
-		/* Vertex data */
-		VertexData vertices;
-		/* Indices are not used if invalid */
-		IndexData indices;
-		/* Graphics data index created by graphics system */
-		uint32 gsDataIndex;
+/**
+ * This class represents stream data for a single pass.
+ * A lot of class expecting single pass rendering can
+ * simply use an instance of this class rather than
+ * the stream pass map (StreamData)
+ */
+class _NexEngineAPI StreamData: public AllocGeneral {
+public:
+	/* This is a hint to the renderer for optimization saying
+	 * it doesn't use any dynamic vertex buffer */
+	bool usesOnlyStaticVb;
+	/* Use indices */
+	bool useIndices;
+	/* Indicates if GraphicsStreamData was created */
+	bool isGsdataValid;
+	/**/
+	PrimitiveType type;
+	/* instance count is usually 1 */
+	uint16 instanceCount;
+	/* Vertex data */
+	VertexData vertices;
+	/* Indices are not used if invalid */
+	IndexData indices;
+	/* Graphics data index created by graphics system */
+	uint32 gsDataIndex;
 
-		StreamData();
-		~StreamData();
-	};
+	StreamData();
+	~StreamData();
+};
 
 }
 #endif	/* StreamData_H */

@@ -24,53 +24,53 @@ extern "C" {
 #define ZIP_DEFLATE	8		/* 'DEFLATE' method id */
 
 namespace nextar {
-	namespace zip {
-		typedef uint8 uch;
-		typedef uint16 ush;
+namespace zip {
+typedef uint8 uch;
+typedef uint16 ush;
 
 #define CRCVAL_INITIAL  0L
 
-		typedef struct {
-			uch versionNeededToExtract[2];
-			ush generalPurposeBitFlag;
-			ush compressionMethod;
-			ush lastModFileTime;
-			ush lastModFileDate;
-			uint32 crc32;
-			uint32 csize;
-			uint32 ucsize;
-			ush filenameLength;
-			ush extraFieldLength;
-		} zLocalFileHdr;
+typedef struct {
+	uch versionNeededToExtract[2];
+	ush generalPurposeBitFlag;
+	ush compressionMethod;
+	ush lastModFileTime;
+	ush lastModFileDate;
+	uint32 crc32;
+	uint32 csize;
+	uint32 ucsize;
+	ush filenameLength;
+	ush extraFieldLength;
+} zLocalFileHdr;
 
-		typedef struct {
-			uch versionMadeBy[2];
-			uch versionNeededToExtract[2];
-			ush generalPurposeBitFlag;
-			ush compressionMethod;
-			ush lastModFileTime;
-			ush lastModFileDate;
-			uint32 crc32;
-			uint32 csize;
-			uint32 ucsize;
-			ush filenameLength;
-			ush extraFieldLength;
-			ush fileCommentLength;
-			ush diskNumberStart;
-			ush internalFileAttributes;
-			uint32 externalFileAttributes;
-			uint32 relativeOffsetLocalHeader;
-		} zCentralDirFileHdr;
+typedef struct {
+	uch versionMadeBy[2];
+	uch versionNeededToExtract[2];
+	ush generalPurposeBitFlag;
+	ush compressionMethod;
+	ush lastModFileTime;
+	ush lastModFileDate;
+	uint32 crc32;
+	uint32 csize;
+	uint32 ucsize;
+	ush filenameLength;
+	ush extraFieldLength;
+	ush fileCommentLength;
+	ush diskNumberStart;
+	ush internalFileAttributes;
+	uint32 externalFileAttributes;
+	uint32 relativeOffsetLocalHeader;
+} zCentralDirFileHdr;
 
-		typedef struct {
-			ush numberThisDisk;
-			ush numDiskStartCdir;
-			ush numEntriesCentrlDirThsDisk;
-			ush totalEntriesCentralDir;
-			uint32 sizeCentralDirectory;
-			uint32 offsetStartCentralDirectory;
-			ush zipfileCommentLength;
-		} zEndCentralDirRecord;
+typedef struct {
+	ush numberThisDisk;
+	ush numDiskStartCdir;
+	ush numEntriesCentrlDirThsDisk;
+	ush totalEntriesCentralDir;
+	uint32 sizeCentralDirectory;
+	uint32 offsetStartCentralDirectory;
+	ush zipfileCommentLength;
+} zEndCentralDirRecord;
 
 //--- ZIP_local_file_header layout ---------------------------------------------
 #define ZIP_LOCAL_FILE_HEADER_SIZE              26
@@ -117,7 +117,7 @@ namespace nextar {
 #define E_OFFSET_START_CENTRAL_DIRECTORY  12
 #define E_ZIPFILE_COMMENT_LENGTH          16
 
-	}
+}
 }
 
-#endif //NEXTAR_DOTZIP_H
+#endif //NEXTAR_DOTZIP_H

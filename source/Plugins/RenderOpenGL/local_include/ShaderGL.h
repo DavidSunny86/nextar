@@ -12,19 +12,18 @@
 
 namespace RenderOpenGL {
 
-	class ShaderGL: public Shader {
-		NEX_LOG_HELPER(GpuShaderGL);
+class ShaderGL: public Shader {
+	NEX_LOG_HELPER (GpuShaderGL);
 
-	public:
-		ShaderGL(nextar::AssetManager* m, const String&);
-		virtual ~ShaderGL();
+public:
+	ShaderGL(nextar::AssetManager* m, const String&);
+	virtual ~ShaderGL();
 
+protected:
+	virtual bool Compile(RenderContext*);
+	virtual void Decompile(nextar::RenderContext*);
 
-	protected:
-		virtual bool Compile(RenderContext*);
-		virtual void Decompile(nextar::RenderContext*);
-
-	};
+};
 
 } /* namespace RenderOpenGL */
 #endif /* CTXGLPROGRAM_H_ */

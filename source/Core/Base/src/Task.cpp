@@ -9,13 +9,13 @@
 
 namespace nextar {
 
-	Task::Task() {
-		// TODO Auto-generated constructor stub
+Task::Task() {
+	// TODO Auto-generated constructor stub
 
-	}
+}
 
-	Task::~Task() {
-		// TODO Auto-generated destructor stub
-	}
+Task::~Task() {
+	// TODO Auto-generated destructor stub
+}
 
 } /* namespace nextar */

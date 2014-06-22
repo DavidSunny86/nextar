@@ -15,36 +15,37 @@
 
 namespace nextar {
 
-	class CommitContext : public AllocGeneral {
-	public:
+class CommitContext: public AllocGeneral {
+public:
 
-		typedef std::pair<uint32, ParameterBuffer*> ParamContext;
+	typedef std::pair<uint32, ParameterBuffer*> ParamContext;
 
-		CommitContext();
-		virtual ~CommitContext();
-			
-		void _Reset();
+	CommitContext();
+	virtual ~CommitContext();
 
+	void _Reset();
 
-		uint32 			frameNumber;
-		uint32			viewNumber;
-		Size			targetDimension;
+	uint32 frameNumber;
+	uint32 viewNumber;
+	uint32 passNumber;
+	uint32 materialNumber;
+	Size targetDimension;
 
-		ParameterBuffer*	paramBuffers[(uint32)ParameterContext::CTX_COUNT];
-		
-		ParamContext		currentParamContext;
-		ParameterGroup*		currentGroup;
+	const ParameterBuffer* paramBuffers[(uint32) ParameterContext::CTX_COUNT];
 
-		Pass::View*			pass;
-		ShaderAsset*		shader;
-		DebugDisplay*		debugDisplay;
-		VisibilitySet*		visibiles;
-		LightSystem*		lightSystem;
-		RenderTarget*		renderTarget;
-		Viewport* 			viewport;
-		VisiblePrimitive*	primitive;
-		MaterialAsset*		material;
-		RenderContext*		context;
-	};
+	ParamContext currentParamContext;
+	ParameterGroup* currentGroup;
+
+	Pass::View* pass;
+	ShaderAsset* shader;
+	DebugDisplay* debugDisplay;
+	VisibilitySet* visibiles;
+	LightSystem* lightSystem;
+	RenderTarget* renderTarget;
+	Viewport* viewport;
+	VisiblePrimitive* primitive;
+	MaterialAsset* material;
+	RenderContext* renderContext;
+};
 } /* namespace nextar */
 #endif /* COMMITCONTEXT_H_ */

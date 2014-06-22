@@ -13,58 +13,59 @@
 namespace nextar {
 
 #if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE
-	template<> class AllocatorBase<MEMCAT_MATH_CORE> : public AllocatorSimdAligned {
-	};
+template<> class AllocatorBase<MEMCAT_MATH_CORE> : public AllocatorSimdAligned {
+};
 #elif NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_3DNOW
 #error Define allocator
 #elif NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_VMX128
-	template <> class AllocatorBase<MEMCAT_MATH_CORE> : public AllocatorSimdAligned {
-	};
+template <> class AllocatorBase<MEMCAT_MATH_CORE> : public AllocatorSimdAligned {
+};
 #elif NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_FALLBACK
-	template <> class AllocatorBase<MEMCAT_MATH_CORE> : public AllocatorGeneral {
-	};
+template <> class AllocatorBase<MEMCAT_MATH_CORE> : public AllocatorGeneral {
+};
 #else
 #error Define allocator
 #endif
 
-	template <typename T, const size_t NumPerBlock>
-	class AllocMathPool : public AllocPooledObjectBase< PooledAllocator<T, NumPerBlock, MEMCAT_MATH_CORE> > {
-	public:
-		typedef PooledAllocator<T, NumPerBlock, MEMCAT_MATH_CORE> Allocator;
-	};
+template<typename T, const size_t NumPerBlock>
+class AllocMathPool: public AllocPooledObjectBase<
+		PooledAllocator<T, NumPerBlock, MEMCAT_MATH_CORE> > {
+public:
+	typedef PooledAllocator<T, NumPerBlock, MEMCAT_MATH_CORE> Allocator;
+};
 
-	/**
-	 * @remarks Non vectorized members. These can be used as members to classes
-	 *          without explicit allocation as opposed to the case of Core types.
-	 **/
-	class Vector2;
-	class Vector3;
-	class Vector4;
-	class Matrix3x3;
-	class PolarSys;
-	class AABox3;
-	class AxisAngle;
-	class EularAngles;
-	class Box2D;
+/**
+ * @remarks Non vectorized members. These can be used as members to classes
+ *          without explicit allocation as opposed to the case of Core types.
+ **/
+class Vector2;
+class Vector3;
+class Vector4;
+class Matrix3x3;
+class PolarSys;
+class AABox3;
+class AxisAngle;
+class EularAngles;
+class Box2D;
 }
 
 /* depends on platform and implementation */
 #include <mathtypes/VectorTypes.h>
 /**
-	* Simple types, definitions separated to avoid inter-dependecy
-	*/
+ * Simple types, definitions separated to avoid inter-dependecy
+ */
 namespace nextar {
-	#include <mathtypes/Vector3.h>
-	#include <mathtypes/Vector2.h>
-	#include <mathtypes/Vector4.h>
-	#include <mathtypes/Matrix3x3.h>
-	#include <mathtypes/Box2D.h>
-	#include <mathtypes/AABox3.h>
-	#include <mathtypes/AxisAngle.h>
-	#include <mathtypes/EularAngles.h>
-	#include <mathtypes/PolarSys.h>
-	#include <mathtypes/Vector3-inl.h>
-	#include <mathtypes/Matrix3x3-inl.h>
+#include <mathtypes/Vector3.h>
+#include <mathtypes/Vector2.h>
+#include <mathtypes/Vector4.h>
+#include <mathtypes/Matrix3x3.h>
+#include <mathtypes/Box2D.h>
+#include <mathtypes/AABox3.h>
+#include <mathtypes/AxisAngle.h>
+#include <mathtypes/EularAngles.h>
+#include <mathtypes/PolarSys.h>
+#include <mathtypes/Vector3-inl.h>
+#include <mathtypes/Matrix3x3-inl.h>
 }
 
 #include <mathtypes/VectorTypes-inl.h>
@@ -72,24 +73,24 @@ namespace nextar {
 namespace nextar {
 #ifdef NEX_MATH_RANDOMIZER_DEFINED
 
-	/** Specialize sse randomizer **/
-	template<> class RandomizerBase<RANDCLASS_CORE> {
-	public:
+/** Specialize sse randomizer **/
+template<> class RandomizerBase<RANDCLASS_CORE> {
+public:
 
-		enum {
-			MAX_VAL = 0xffffffff
-		};
-
-		static inline void Seed(uint32 s) {
-			MathRandomizer::Seed(s);
-		}
-
-		static inline uint32 Rand() {
-			unsigned int ret;
-			MathRandomizer::RandSSE(&ret);
-			return ret;
-		}
+	enum {
+		MAX_VAL = 0xffffffff
 	};
+
+	static inline void Seed(uint32 s) {
+		MathRandomizer::Seed(s);
+	}
+
+	static inline uint32 Rand() {
+		unsigned int ret;
+		MathRandomizer::RandSSE(&ret);
+		return ret;
+	}
+};
 
 #endif
 }
@@ -149,9 +150,8 @@ namespace nextar {
 //    mention the left hand operand eg. for Vector3&Vector3 the C function
 //    would be name Vec3Mul not Vec3MulVec3
 
-	/** @remarks Core elements as member variables can be easily set up using this macro and
-	 *           CoreVars template
-	 **/
-
+/** @remarks Core elements as member variables can be easily set up using this macro and
+ *           CoreVars template
+ **/
 
 #endif //_MATHTYPES_H_

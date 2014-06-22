@@ -14,26 +14,27 @@
 
 namespace RenderOpenGL {
 
-	/*
-	 *
-	 */
-	class MultiRenderTargetViewGL : public MultiRenderTarget::View {
-	public:
+/*
+ *
+ */
+class MultiRenderTargetViewGL: public MultiRenderTarget::View {
+public:
 
-		MultiRenderTargetViewGL();
-		virtual ~MultiRenderTargetViewGL();
+	MultiRenderTargetViewGL();
+	virtual ~MultiRenderTargetViewGL();
 
-		virtual void Update(nextar::RenderContext*, uint32 msg, ContextObject::ContextParamPtr);
-		virtual void Destroy(nextar::RenderContext*);
+	virtual void Update(nextar::RenderContext*, uint32 msg,
+			ContextObject::ContextParamPtr);
+	virtual void Destroy(nextar::RenderContext*);
 
-		FrameBufferObjectGL& GetFBO() {
-			return fbo;
-		}
+	FrameBufferObjectGL& GetFBO() {
+		return fbo;
+	}
 
-	protected:
+protected:
 
-		FrameBufferObjectGL fbo;
-	};
+	FrameBufferObjectGL fbo;
+};
 
 } /* namespace RenderOpenGL */
 

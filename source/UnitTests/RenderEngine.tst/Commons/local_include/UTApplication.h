@@ -1,4 +1,3 @@
-
 #ifndef UTAPPLICATION_H_
 #define UTAPPLICATION_H_
 
@@ -7,8 +6,7 @@
 
 using namespace nextar;
 
-class UTApplication : public FrameListener,
-	public ApplicationContext {
+class UTApplication: public FrameListener, public ApplicationContext {
 public:
 
 	UTApplication();
@@ -18,7 +16,7 @@ public:
 	virtual void EndFrame(uint32 timeElapsed);
 
 protected:
-	
+
 	virtual void _SetupScene(SceneAssetPtr&);
 	virtual void _SetupRenderDriver();
 	virtual SceneAssetPtr _CreateDefaultScene();

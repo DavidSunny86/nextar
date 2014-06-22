@@ -36,4 +36,4 @@ public:
 
 };
 
-#endif //NEXTAR_EULARANGLES_H
+#endif //NEXTAR_EULARANGLES_H

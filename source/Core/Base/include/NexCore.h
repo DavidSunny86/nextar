@@ -153,4 +153,4 @@
 
 /* constants */
 
-#endif //NEXTAR_NEXCORE_H
+#endif //NEXTAR_NEXCORE_H

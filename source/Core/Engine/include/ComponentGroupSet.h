@@ -14,31 +14,35 @@
 
 namespace nextar {
 
-	class Component;
-	class ComponentFactoryArchive;
-	class ComponentStreamer;
+class Component;
+class ComponentFactoryArchive;
+class ComponentStreamer;
 
-	class _NexEngineAPI ComponentGroupSet: public SharedComponent::Group {
-		NEX_LOG_HELPER(ComponentGroupSet);
+class _NexEngineAPI ComponentGroupSet: public SharedComponent::Group {
+	NEX_LOG_HELPER(ComponentGroupSet)
+	;
 
-	public:
-		
-		ComponentGroupSet(const StringID name);
-		virtual ~ComponentGroupSet();
+public:
 
-		virtual void AsyncAdd(SharedComponentPtr&) override;
-		virtual SharedComponentPtr& AsyncFind(const StringID name) override;
-		virtual void AsyncRemove(StringID name) override;
-		virtual void AsyncRemoveAll(uint32 ofType = Component::CLASS_UNKNOWN) override;
-		virtual void AsyncCollect(SharedComponent::Group* container, uint32 ofType) override;
+	ComponentGroupSet(const StringID name);
+	virtual ~ComponentGroupSet();
 
-	protected:
-		
-		NEX_THREAD_MUTEX(containerLock);
-		// todo Might choose to support same named objects but of different types
-		typedef unordered_map<StringID, SharedComponentPtr>::type ComponentMap;
-		ComponentMap componentMap;
-	};
+	virtual void AsyncAdd(SharedComponentPtr&) override;
+	virtual SharedComponentPtr& AsyncFind(const StringID name) override;
+	virtual void AsyncRemove(StringID name) override;
+	virtual void AsyncRemoveAll(uint32 ofType = Component::CLASS_UNKNOWN)
+			override;
+	virtual void AsyncCollect(SharedComponent::Group* container, uint32 ofType)
+			override;
 
-} /* namespace nextar */
+protected:
+
+	NEX_THREAD_MUTEX(containerLock);
+	// todo Might choose to support same named objects but of different types
+	typedef unordered_map<StringID, SharedComponentPtr>::type ComponentMap;
+	ComponentMap componentMap;
+};
+
+}
+/* namespace nextar */
 #endif /* COMPONENTMANAGER_H_ */

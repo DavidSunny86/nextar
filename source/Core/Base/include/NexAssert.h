@@ -9,16 +9,16 @@
 
 namespace nextar {
 
-	template<bool> struct AssertFaliure;
+template<bool> struct AssertFaliure;
 
-	template<> struct AssertFaliure<true> {
-		enum {
-			value = 1
-		};
+template<> struct AssertFaliure<true> {
+	enum {
+		value = 1
 	};
+};
 
-	template<int x> struct AssertTest {
-	};
+template<int x> struct AssertTest {
+};
 }
 
 #define NEX_STATIC_ASSERT(x)                                   \
@@ -50,4 +50,4 @@ namespace nextar {
 #define NEX_ASSERT_ZERO( arg1 )
 #endif
 #define NEX_ASSERT_NOT( arg1 ) NEX_ASSERT( !(arg1) )
-#endif //NEXTAR_NEXASSERT_H__
+#endif //NEXTAR_NEXASSERT_H__

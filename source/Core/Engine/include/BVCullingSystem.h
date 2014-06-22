@@ -13,24 +13,25 @@
 
 namespace nextar {
 
-	/** 
-	 * Culling systems derive from spatial to support hybrid culler hierarchies.
-	 */
-	class BVCullingSystem : public CullingSystem {
-	public:
-		typedef vector<Spatial*>::type SpatialList;
+/** 
+ * Culling systems derive from spatial to support hybrid culler hierarchies.
+ */
+class BVCullingSystem: public CullingSystem {
+public:
+	typedef vector<Spatial*>::type SpatialList;
 
-		BVCullingSystem(const StringID name = StringUtils::NullID, Component* parent = nullptr);
-		virtual ~BVCullingSystem();
-				
-		virtual void AddBody(Spatial*) override;
-		virtual void RemoveBody(Spatial*) override;
-		virtual void Visit(SceneTraversal& trav) override;
+	BVCullingSystem(const StringID name = StringUtils::NullID,
+			Component* parent = nullptr);
+	virtual ~BVCullingSystem();
 
-	protected:
-		Camera* coherentCam;
-		SpatialList bodies;
-	};
+	virtual void AddBody(Spatial*) override;
+	virtual void RemoveBody(Spatial*) override;
+	virtual void Visit(SceneTraversal& trav) override;
+
+protected:
+	Camera* coherentCam;
+	SpatialList bodies;
+};
 
 } /* namespace nextar */
 

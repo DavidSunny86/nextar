@@ -15,8 +15,7 @@
 #define	dbg_Dtor()		debug::DebugUnkownTracker::OnDtor(this)
 #define	dbg_IncRef()	if(dbg_Break_Ctrl) NEX_DEBUG_BREAK()
 #define	dbg_DecRef()	if(dbg_Break_Ctrl) NEX_DEBUG_BREAK()
-#define	dbg_Dispose()	//debug::DebugUnkownTracker::Dispose(this)
-#define	dbg_Track_RefChanges() dbg_Break_Ctrl = true
+#define	dbg_Dispose()	//debug::DebugUnkownTracker::Dispose(this)#define	dbg_Track_RefChanges() dbg_Break_Ctrl = true
 #define  NEXTAR_UNK_TRACKED_OBJS(outstream) nextar::debug::DebugUnkownTracker::LeakCheck(outstream)
 
 namespace nextar {

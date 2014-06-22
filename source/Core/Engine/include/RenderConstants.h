@@ -12,22 +12,24 @@
 
 namespace nextar {
 
-	enum class RenderConstants : uint32 {
-			FORWARD_MAX_LIGHT_COUNT = 255,
-			FORWARD_MAX_LIGHT_PER_PRIMITIVE = 8,
+enum class RenderConstants
+	: uint32 {
+		FORWARD_MAX_LIGHT_COUNT = 255,
+	FORWARD_MAX_LIGHT_PER_PRIMITIVE = 8,
 
-			MAX_RENDER_TARGETS = 8,
-			MAX_TEXTURE_DIM = 16384,
-			MAX_TEXTURE_LAYER = 2048,
-			MAX_MIP_LEVELS = 14,
-			MAX_VERTEX_ELEMENT = 32,
-			MAX_VERTEX_STREAMS = 4,
-			// for async capture, this will pre capture the n-3rd frame from before-hand
-			MAX_FRAME_PRE_CAPTURE = 3,
-	};
+	MAX_RENDER_TARGETS = 8,
+	MAX_TEXTURE_DIM = 16384,
+	MAX_TEXTURE_LAYER = 2048,
+	MAX_MIP_LEVELS = 14,
+	MAX_VERTEX_ELEMENT = 32,
+	MAX_VERTEX_STREAMS = 4,
+	// maximum number of transient buffers supported
+	MAX_TRANSIENT_BUFFER = 3,
+	// for async capture, this will pre capture the n-3rd frame from before-hand
+	MAX_FRAME_PRE_CAPTURE = 3,
+};
 
-	NEX_ENUM_UINT(RenderConstants, uint32);
+NEX_ENUM_UINT(RenderConstants, uint32);
 }
-
 
 #endif /* RENDERCONSTANTS_H_ */

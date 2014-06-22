@@ -12,26 +12,27 @@
 
 namespace nextar {
 
-	class ComponentArchive: public Singleton<ComponentArchive>,
-	public AllocComponent {
-	public:
-		typedef nextar::SharedComponent::Group Group;
-		typedef map<StringID, Group*>::type GroupMap;
-		typedef std::pair<StringID, Group*> GroupPair;
+class ComponentArchive: public Singleton<ComponentArchive>,
+		public AllocComponent {
+public:
+	typedef nextar::SharedComponent::Group Group;
+	typedef map<StringID, Group*>::type GroupMap;
+	typedef std::pair<StringID, Group*> GroupPair;
 
-		ComponentArchive();
-		virtual ~ComponentArchive();
+	ComponentArchive();
+	virtual ~ComponentArchive();
 
-		void AsyncAdd(Group*);
-		Group* AsyncFind(const StringID name);
-		void AsyncRemove(StringID name, bool deleteGroup = true);
-		void AsyncRemoveAll();
+	void AsyncAdd(Group*);
+	Group* AsyncFind(const StringID name);
+	void AsyncRemove(StringID name, bool deleteGroup = true);
+	void AsyncRemoveAll();
 
-	protected:
-		NEX_THREAD_MUTEX(archiveLock);
-		GroupMap groups;
-	};
+protected:
+	NEX_THREAD_MUTEX(archiveLock);
+	GroupMap groups;
+};
 
-} /* namespace nextar */
+}
+/* namespace nextar */
 
 #endif /* COMPONENTARCHIVE_H_ */

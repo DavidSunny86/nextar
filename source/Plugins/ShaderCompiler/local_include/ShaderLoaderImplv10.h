@@ -14,20 +14,19 @@
 using namespace nextar;
 namespace ShaderCompiler {
 
-	class ShaderLoaderImplv1_0 : public AllocGeneral,
-	public AssetLoaderImpl {
-	public:
+class ShaderLoaderImplv1_0: public AllocGeneral, public AssetLoaderImpl {
+public:
 
-		ShaderLoaderImplv1_0();
-		virtual ~ShaderLoaderImplv1_0();
+	ShaderLoaderImplv1_0();
+	virtual ~ShaderLoaderImplv1_0();
 
-		virtual void Configure(const Config&);
-		virtual void Load(InputStreamPtr& input, AssetLoader& shader);
+	virtual void Configure(const Config&);
+	virtual void Load(InputStreamPtr& input, AssetLoader& shader);
 
-	protected:
+protected:
 
-		String languageContext;
-	};
+	String languageContext;
+};
 
 } /* namespace nextar */
 #endif /* SHADERLOADERIMPLV10_H_ */

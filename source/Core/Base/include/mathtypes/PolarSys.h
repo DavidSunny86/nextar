@@ -22,4 +22,4 @@ public:
 	};
 };
 
-#endif //NEXTAR_POLARSYS_H
+#endif //NEXTAR_POLARSYS_H

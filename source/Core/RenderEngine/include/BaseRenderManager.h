@@ -13,35 +13,46 @@
 
 namespace nextar {
 
-	// Blank implementation for now.
-	class _NexRenderAPI BaseRenderManager : public RenderManager {
-		NEX_LOG_HELPER(BaseRenderManager);
-	public:
+// Blank implementation for now.
+class _NexRenderAPI BaseRenderManager: public RenderManager {
+	NEX_LOG_HELPER(BaseRenderManager)
+	;
+public:
 
-		BaseRenderManager();
-		virtual ~BaseRenderManager();
+	BaseRenderManager();
+	virtual ~BaseRenderManager();
 
-		/* */
-		virtual void Configure(const Config&);
-		
-		virtual void RequestObjectCreate(ContextObject*);
-		virtual void RequestObjectDestroy(ContextObject*);
-		virtual void RequestObjectUpdate(ContextObject*, uint32 updateMsg, ContextObject::ContextParamPtr);
+	/* */
+	virtual void Configure(const Config&);
+	virtual RenderDriverPtr AsyncCreateDriver(DriverCreationParams&);
+	virtual void Close();
 
-		virtual void RegisterRenderContext(RenderContextPtr&);
+	virtual ContextID RequestObjectCreate(ContextObject::Type, uint32 hint);
+	virtual void RequestObjectDestroy(ContextID);
+	virtual void RequestObjectUpdate(ContextObject*, uint32 updateMsg,
+			ContextObject::ContextParamPtr);
 
-		virtual void RenderFrame(uint32 frameNumber);
+	virtual void RegisterRenderContext(RenderContextPtr&);
 
-	protected:
+	virtual void RenderFrame(uint32 frameNumber);
 
-		void RenderAllTargets(RenderContext* rc, uint32 frame, bool callPresent);
-		void PresentSwapChains(RenderContext* rc);
+protected:
 
-		/* The first registered context is always the primary context, other
-		 * contexts are present if usingMultiGpuSetup is true */
-		RenderContextPtr primaryContext;
-		RenderContextList activeContexts;
+	virtual void CloseImpl() = 0;
 
-	};
+	void RenderAllTargets(RenderContext* rc, uint32 frame, bool callPresent);
+	void PresentSwapChains(RenderContext* rc);
+
+	/* The first registered context is always the primary context, other
+	 * contexts are present if usingMultiGpuSetup is true */
+	RenderDriverPtr primaryDriver;
+	RenderContextPtr primaryContext;
+#if NEX_MULTIGPU_BUILD
+	ContextID emptySlot;
+	RenderContextList activeContexts;
+	RenderDriverList renderDrivers;
+#endif
+};
+
 } /* namespace nextar */
 #endif /* BASERENDERMANAGER_H_ */

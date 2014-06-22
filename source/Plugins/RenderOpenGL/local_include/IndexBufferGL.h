@@ -12,37 +12,38 @@
 
 namespace RenderOpenGL {
 
-	class IndexBufferGL : public IndexBuffer {
-		NEX_LOG_HELPER(GlIndexBuffer);
-	public:
+class IndexBufferGL: public IndexBuffer {
+	NEX_LOG_HELPER(GlIndexBuffer)
+	;
+public:
 
-		IndexBufferGL(size_t sz, uint32 flags, IndexBuffer::Type type);
-		virtual ~IndexBufferGL();
-	
-		virtual void Read(RenderContext* rc, void *dest, size_t offset = 0, size_t size = 0);
-		virtual void Write(RenderContext* rc, const void *src, size_t offset = 0, size_t size = 0);
-		virtual void CopyFrom(RenderContext* rc, BufferPtr&);
+	IndexBufferGL(size_t sz, uint32 flags, IndexBuffer::Type type);
+	virtual ~IndexBufferGL();
 
-		void _Create(RenderContext* rc);
-		void _Destroy(RenderContext* rc);
+	virtual void Read(RenderContext* rc, void *dest, size_t offset = 0,
+			size_t size = 0);
+	virtual void Write(RenderContext* rc, const void *src, size_t offset = 0,
+			size_t size = 0);
+	virtual void CopyFrom(RenderContext* rc, BufferPtr&);
 
-		GLuint GetBufferId() const {
-			NEX_ASSERT(bufferId);
-			return bufferId;
-		}
+	void _Create(RenderContext* rc);
+	void _Destroy(RenderContext* rc);
 
-		GLenum GetUsage() const {
-			return usage;
-		}
+	GLuint GetBufferId() const {
+		NEX_ASSERT(bufferId);
+		return bufferId;
+	}
 
-	private:
+	GLenum GetUsage() const {
+		return usage;
+	}
 
-		GLenum usage; // either GL_DYNAMIC_DRAW or GL_STATIC_DRAW
-		GLuint bufferId;
-	};
+private:
+
+	GLenum usage; // either GL_DYNAMIC_DRAW or GL_STATIC_DRAW
+	GLuint bufferId;
+};
 
 }
 #endif	/* GLINDEXBUFFER_H */
-
-
 

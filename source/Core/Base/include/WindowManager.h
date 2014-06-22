@@ -12,30 +12,29 @@
 
 namespace nextar {
 
-	class _NexBaseAPI WindowManager: public Singleton<WindowManager>,
-	public AllocGeneral {
+class _NexBaseAPI WindowManager: public Singleton<WindowManager>,
+		public AllocGeneral {
 
+public:
 
-	public:
+	WindowManager();
+	~WindowManager();
 
-		WindowManager();
-		~WindowManager();
+	void RegisterWindow(RenderWindow*);
+	void UnregisterWindow(RenderWindow*);
 
-		void RegisterWindow(RenderWindow*);
-		void UnregisterWindow(RenderWindow*);
+	/* Returns false to quit */
+	void ProcessMessages();
+protected:
 
-		/* Returns false to quit */
-		void ProcessMessages();
-	protected:
+	void _Unregister(RenderWindow*);
 
-		void _Unregister(RenderWindow*);
+	bool processing;
+	typedef list<RenderWindow*>::type WindowList;
 
-		bool processing;
-		typedef list<RenderWindow*>::type WindowList;
-
-		WindowList removedWindows;
-		WindowList registeredWindows;
-	};
+	WindowList removedWindows;
+	WindowList registeredWindows;
+};
 }
 #endif	/* WINMANAGER_H */
 

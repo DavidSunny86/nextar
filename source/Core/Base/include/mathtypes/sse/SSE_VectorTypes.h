@@ -11,85 +11,85 @@
 #include <MathBase.h>
 
 namespace nextar {
-	typedef __m128 Quad;
-	typedef const Quad QuadPF; // fast param
-	typedef const Quad& QuadPR; // ref param
-	typedef Quad Vector3A;
-	typedef Quad Vector4A;
-	typedef Quad Quaternion;
-	typedef Quad Plane;
+typedef __m128 Quad;
+typedef const Quad QuadPF; // fast param
+typedef const Quad& QuadPR; // ref param
+typedef Quad Vector3A;
+typedef Quad Vector4A;
+typedef Quad Quaternion;
+typedef Quad Plane;
 
-	typedef QuadPF Vec3AF;
-	typedef QuadPR Vec3AR;
+typedef QuadPF Vec3AF;
+typedef QuadPR Vec3AR;
 
-	typedef QuadPF Vec4AF;
-	typedef QuadPR Vec4AR;
+typedef QuadPF Vec4AF;
+typedef QuadPR Vec4AR;
 
-	typedef QuadPF QuatF;
-	typedef QuadPR QuatR;
+typedef QuadPF QuatF;
+typedef QuadPR QuatR;
 
-	typedef QuadPF PlaneF;
-	typedef QuadPR PlaneR;
+typedef QuadPF PlaneF;
+typedef QuadPR PlaneR;
 
-	/**
-	 @remarks Quad related functions
-	 **/
+/**
+ @remarks Quad related functions
+ **/
 
-	/** @remarks Load unaligned floats **/
-	inline Quad QuadLoad3UF(const float* vals);
-	inline Quad QuadLoad4UF(const float* vals);
+/** @remarks Load unaligned floats **/
+inline Quad QuadLoad3UF(const float* vals);
+inline Quad QuadLoad4UF(const float* vals);
 
-	/** @remarks Load aligned floats **/
-	inline Quad QuadLoad3AF(const float* vals);
-	inline Quad QuadLoad4AF(const float* vals);
+/** @remarks Load aligned floats **/
+inline Quad QuadLoad3AF(const float* vals);
+inline Quad QuadLoad4AF(const float* vals);
 
-	/** @remarks Set elements **/
-	inline Quad QuadSet(float x, float y, float z, float w);
-	inline Quad QuadZero();
-	inline Quad QuadSetX(QuadPF q, float val);
-	inline Quad QuadSetY(QuadPF q, float val);
-	inline Quad QuadSetZ(QuadPF q, float val);
+/** @remarks Set elements **/
+inline Quad QuadSet(float x, float y, float z, float w);
+inline Quad QuadZero();
+inline Quad QuadSetX(QuadPF q, float val);
+inline Quad QuadSetY(QuadPF q, float val);
+inline Quad QuadSetZ(QuadPF q, float val);
 
-	/** @remarks Get elements **/
-	inline float QuadGetByIdx(QuadPF q, size_t idx);
-	inline float QuadGetX(QuadPF q);
-	inline float QuadGetY(QuadPF q);
-	inline float QuadGetZ(QuadPF q);
-	inline float QuadGetW(QuadPF q);
+/** @remarks Get elements **/
+inline float QuadGetByIdx(QuadPF q, size_t idx);
+inline float QuadGetX(QuadPF q);
+inline float QuadGetY(QuadPF q);
+inline float QuadGetZ(QuadPF q);
+inline float QuadGetW(QuadPF q);
 
-	/** @remarks Replicat X component all over **/
-	inline Quad QuadSplatX(QuadPF q);
-	/** @remarks Replicat Y component all over **/
-	inline Quad QuadSplatY(QuadPF q);
-	/** @remarks Replicat Z component all over **/
-	inline Quad QuadSplatZ(QuadPF q);
-	/** @remarks Replicat W component all over **/
-	inline Quad QuadSplatW(QuadPF q);
-	/** @remarks Replicat val all over **/
-	inline Quad QuadReplicate(float val);
+/** @remarks Replicat X component all over **/
+inline Quad QuadSplatX(QuadPF q);
+/** @remarks Replicat Y component all over **/
+inline Quad QuadSplatY(QuadPF q);
+/** @remarks Replicat Z component all over **/
+inline Quad QuadSplatZ(QuadPF q);
+/** @remarks Replicat W component all over **/
+inline Quad QuadSplatW(QuadPF q);
+/** @remarks Replicat val all over **/
+inline Quad QuadReplicate(float val);
 
-	/** @remarks Abs elements **/
-	inline Quad QuadAbs(QuadPF q);
-	/** @remarks Negate elements **/
-	inline Quad QuadNegate(QuadPF q);
-	/** @remarks Negate elements **/
-	inline Quad QuadAdd(QuadPF a, QuadPF b);
-	/** @remarks Negate elements **/
-	inline Quad QuadSub(QuadPF a, QuadPF b);
-	/** @remarks Negate elements **/
-	inline Quad QuadMul(QuadPF a, QuadPF b);
-	/** @remarks Negate elements **/
-	inline Quad QuadDiv(QuadPF a, QuadPF b);
-	/** @remarks Scalar multiply **/
-	inline Quad QuadMulScalar(QuadPF q, float val);
-	/** @remarks Multiply and Add: a*b+c **/
-	inline Quad QuadMulAdd(QuadPF a, QuadPF b, QuadPF c);
-	/** @remarks Splat Sin and Cos value of 'val' **/
-	inline void QuadSinCos(Quad& vsinval, Quad& vcosval, const float val);
-	/** @reamarks Calculates reciprocal square root */
-	inline Quad QuadInvSqrt(QuadPF);
-	/* Quad select */
-	inline Quad QuadSelect(QuadPF q1, QuadPF q2);
+/** @remarks Abs elements **/
+inline Quad QuadAbs(QuadPF q);
+/** @remarks Negate elements **/
+inline Quad QuadNegate(QuadPF q);
+/** @remarks Negate elements **/
+inline Quad QuadAdd(QuadPF a, QuadPF b);
+/** @remarks Negate elements **/
+inline Quad QuadSub(QuadPF a, QuadPF b);
+/** @remarks Negate elements **/
+inline Quad QuadMul(QuadPF a, QuadPF b);
+/** @remarks Negate elements **/
+inline Quad QuadDiv(QuadPF a, QuadPF b);
+/** @remarks Scalar multiply **/
+inline Quad QuadMulScalar(QuadPF q, float val);
+/** @remarks Multiply and Add: a*b+c **/
+inline Quad QuadMulAdd(QuadPF a, QuadPF b, QuadPF c);
+/** @remarks Splat Sin and Cos value of 'val' **/
+inline void QuadSinCos(Quad& vsinval, Quad& vcosval, const float val);
+/** @reamarks Calculates reciprocal square root */
+inline Quad QuadInvSqrt(QuadPF);
+/* Quad select */
+inline Quad QuadSelect(QuadPF q1, QuadPF q2);
 }
 
 /**

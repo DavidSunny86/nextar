@@ -17,4 +17,4 @@ namespace nextar {
 }
 #endif
 
-#endif //NEX__MEMTRACKER_H
+#endif //NEX__MEMTRACKER_H

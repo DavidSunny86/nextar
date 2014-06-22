@@ -9,12 +9,11 @@
 
 namespace nextar {
 
-	FrameTimer::FrameTimer() :
-			frameNumber(0), timeFactor(1.0f), elapsedTime(0),
-			frameTime(0) {
-	}
+FrameTimer::FrameTimer() :
+		frameNumber(0), timeFactor(1.0f), elapsedTime(0), frameTime(0) {
+}
 
-	FrameTimer::~FrameTimer() {
-	}
+FrameTimer::~FrameTimer() {
+}
 
 }

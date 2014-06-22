@@ -5,26 +5,33 @@
 
 namespace nextar {
 
-	
-	class _NexEngineAPI VertexBuffer: public GpuBuffer {
+class _NexEngineAPI VertexBuffer: public GpuBuffer {
 
-	public:
+public:
 
-		VertexBuffer(size_t bufferSize, uint32 accessFlags, RelocationPolicy);
+	VertexBuffer(const VertexBuffer& ) : policy(GpuBuffer::INVALID_POLICY) {}
+	VertexBuffer() : policy(GpuBuffer::INVALID_POLICY) {}
+	VertexBuffer(VertexBuffer&& other);
+	VertexBuffer(RelocationPolicy _policy);
 
-		void SetFrameThreshold(uint32 frameThreshold) {
-			this->frameThreshold = frameThreshold;
-		}
+	inline bool IsTransientBuffer() const {
+		return (policy == GpuBuffer::RelocationPolicy::REGULARLY_RELEASED ||
+				policy == GpuBuffer::RelocationPolicy::IMMEDIATELY_RELEASED);
+	}
 
-		uint32 GetFrameThreshold() const {
-			return frameThreshold;
-		}
+	virtual void CreateBuffer(size_t bufferSize, uint32 stride, uint8* dataPtr);
 
-	protected:
-		/* Vertex buffer relocation policy */
-		uint32 frameThreshold;
-	};
+	inline VertexBuffer& operator = (VertexBuffer&& other) {
+		GpuBuffer::operator =(std::move(other));
+		policy = other.policy;
+		return *this;
+	}
+
+protected:
+
+	RelocationPolicy policy;
+};
 
 }
 
-#endif //NEXTAR_VERTEXBUFFER_H
+#endif //NEXTAR_VERTEXBUFFER_H

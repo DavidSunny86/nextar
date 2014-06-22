@@ -10,13 +10,13 @@
 
 namespace nextar {
 
-	CullingSystem::CullingSystem(const StringID name, Component* parent) :
+CullingSystem::CullingSystem(const StringID name, Component* parent) :
 		Spatial(name, parent) {
-		// TODO Auto-generated constructor stub
-	}
+	// TODO Auto-generated constructor stub
+}
 
-	CullingSystem::~CullingSystem() {
-		// TODO Auto-generated destructor stub
-	}
+CullingSystem::~CullingSystem() {
+	// TODO Auto-generated destructor stub
+}
 
 } /* namespace nextar */

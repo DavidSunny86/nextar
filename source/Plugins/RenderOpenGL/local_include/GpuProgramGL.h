@@ -12,28 +12,27 @@
 
 namespace RenderOpenGL {
 
-	/**
-	 * @shared Shared across contexts from same driver object.
-	 * */
-	class GpuProgramGL {
-		NEX_LOG_HELPER(GpuProgramGL);
-	public:
-		GpuProgramGL();
-		virtual ~GpuProgramGL();
+/**
+ * @shared Shared across contexts from same driver object.
+ * */
+class GpuProgramGL {
+	NEX_LOG_HELPER(GpuProgramGL)
+	;
+public:
+	GpuProgramGL();
+	virtual ~GpuProgramGL();
 
-		inline GLuint GetShaderObject() {
-			return iGlShader;
-		}
+	inline GLuint GetShaderObject() {
+		return iGlShader;
+	}
 
-		bool Compile(
-				GLenum shaderType,
-				nextar::RenderContext*, const char* src,
-				const nextar::StringUtils::WordList& macroList);
-		void Destroy(RenderContext* rc);
+	bool Compile(GLenum shaderType, nextar::RenderContext*, const char* src,
+			const nextar::StringUtils::WordList& macroList);
+	void Destroy(RenderContext* rc);
 
-	protected:
-		GLuint iGlShader;
-	};
+protected:
+	GLuint iGlShader;
+};
 
 } /* namespace RenderOpenGL */
 #endif /* GLSHADER_H_ */
