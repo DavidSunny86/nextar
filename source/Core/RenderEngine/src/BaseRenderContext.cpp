@@ -8,8 +8,7 @@
 namespace nextar {
 
 BaseRenderContext::BaseRenderContext(RenderDriver* _driver) :
-		driver(_driver), originalVideoMode(-1), currentVideoMode(-1), activePass(
-				nullptr) {
+		driver(_driver), originalVideoMode(-1), currentVideoMode(-1) {
 }
 
 BaseRenderContext::~BaseRenderContext(void) {

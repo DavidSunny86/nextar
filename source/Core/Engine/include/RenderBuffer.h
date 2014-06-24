@@ -38,7 +38,7 @@ public:
 	virtual void Capture(RenderContext* rc, PixelBox& image, FrameBuffer);
 
 protected:
-	uint16 width, height;
+	Size dimensions;
 	PixelFormat format;
 };
 

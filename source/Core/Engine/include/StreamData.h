@@ -29,8 +29,8 @@ public:
 	}
 
 	/** @remarks Returns the count of vertex buffers */
-	inline size_t GetBufferCount() const {
-		return bufferList.size();
+	inline uint32 GetBufferCount() const {
+		return (uint32)bufferList.size();
 	}
 
 	/** @remarks Returns the buffer stored at a specified index */

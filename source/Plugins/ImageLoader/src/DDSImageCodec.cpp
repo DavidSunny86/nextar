@@ -20,7 +20,7 @@ DDSImageCodec::DDSImageCodec() {
 DDSImageCodec::~DDSImageCodec() {
 }
 
-bool DDSImageCodec::TryLoad(InputStreamPtr& file, const ImageParams& params) {
+bool DDSImageCodec::TryLoad(InputStreamPtr& file, const ImageParams& params, ImageCodecMetaInfo& metaInfo) {
 	uint32 mn;
 	file->Read(&mn, 4);
 #if NEX_NEED_ENDIAN_SWAPPING
@@ -29,7 +29,7 @@ bool DDSImageCodec::TryLoad(InputStreamPtr& file, const ImageParams& params) {
 	return (mn == DDS_MAGIC);
 }
 
-ImageData DDSImageCodec::Load(InputStreamPtr& file, const ImageParams& params) {
+ImageData DDSImageCodec::Load(InputStreamPtr& file, const ImageParams& params, ImageCodecMetaInfo& metaInfo) {
 	// read uint32 + sizeof(DDS_HEADER) bytes of data
 	uint32 magic;
 	InputSerializer ser(file);
@@ -59,7 +59,7 @@ ImageData DDSImageCodec::Load(InputStreamPtr& file, const ImageParams& params) {
 
 	ptrdiff_t offset = sizeof(uint32) + sizeof(DDS_HEADER)
 			+ (bDXT10Header ? sizeof(DDS_HEADER_DXT10) : 0);
-	return CreateImageData(ser, &header, offset, params);
+	return CreateImageData(ser, &header, offset, params, metaInfo);
 }
 
 PixelFormat DDSImageCodec::GetPixelFormat(uint32 format) {
@@ -70,7 +70,7 @@ PixelFormat DDSImageCodec::GetPixelFormat(uint32 format) {
 	case DXGI_FORMAT_B8G8R8A8_UNORM:
 		return PixelFormat::BGRA8;
 	case DXGI_FORMAT_A8_UNORM:
-		return PixelFormat::A8;
+		return PixelFormat::R8;
 	case DXGI_FORMAT_R16G16B16A16_UNORM:
 		return PixelFormat::RGBA16F;
 	}
@@ -83,18 +83,23 @@ PixelFormat DDSImageCodec::GetPixelFormat(DDS_PIXELFORMAT& fmt) {
 }
 
 ImageData DDSImageCodec::CreateImageData(InputSerializer& ser,
-		DDS_HEADER* header, size_t offset, const ImageParams& params) {
+		DDS_HEADER* header, size_t offset, const ImageParams& params, ImageCodecMetaInfo& metaInfo) {
 	ImageData image;
-	image.width = (uint16) header->width;
-	image.height = (uint16) header->height;
-	image.depth = (uint16) header->depth;
-	image.totalMipMapCount = (uint8) header->mipMapCount;
+	if (!metaInfo.metaInfoInited) {
+		metaInfo.metaInfo.maxWidth = (uint16) header->width;
+		metaInfo.metaInfo.maxHeight = (uint16) header->height;
+		metaInfo.metaInfo.maxDepth = (uint16) header->depth;
+		metaInfo.metaInfo.maxMipMapCount = (uint16) header->mipMapCount;
+		metaInfo.mipLevelsToRead = (uint16) header->mipMapCount;
+		metaInfo.metaInfoInited = true;
+	}
+
 	uint32 resDim = -1;
 	size_t arraySize = 1;
 	PixelFormat format = PixelFormat::UNKNOWN;
 	bool isCubeMap = false;
 
-	if (0 == image.totalMipMapCount) {
+	if (0 == metaInfo.metaInfo.maxMipMapCount) {
 		image.totalMipMapCount = 1;
 	}
 
@@ -182,8 +187,8 @@ ImageData DDSImageCodec::CreateImageData(InputSerializer& ser,
 
 	switch (resDim) {
 	case DDS_DIMENSION_TEXTURE1D:
-		if ((arraySize > RenderConstants::MAX_TEXTURE_LAYER)
-				|| (image.width > RenderConstants::MAX_TEXTURE_DIM)) {
+		if (((uint32)arraySize > RenderConstants::MAX_TEXTURE_LAYER)
+				|| ((uint32)image.width > RenderConstants::MAX_TEXTURE_DIM)) {
 			NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 		}
 		break;
@@ -191,22 +196,22 @@ ImageData DDSImageCodec::CreateImageData(InputSerializer& ser,
 	case DDS_DIMENSION_TEXTURE2D:
 		if (isCubeMap) {
 			// This is the right bound because we set arraySize to (NumCubes*6) above
-			if ((arraySize > RenderConstants::MAX_TEXTURE_LAYER)
-					|| (image.width > RenderConstants::MAX_TEXTURE_DIM)
-					|| (image.height > RenderConstants::MAX_TEXTURE_DIM)) {
+			if (((uint32)arraySize > RenderConstants::MAX_TEXTURE_LAYER)
+					|| ((uint32)image.width > RenderConstants::MAX_TEXTURE_DIM)
+					|| ((uint32)image.height > RenderConstants::MAX_TEXTURE_DIM)) {
 				NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 			}
-		} else if ((arraySize > RenderConstants::MAX_TEXTURE_LAYER)
-				|| (image.width > RenderConstants::MAX_TEXTURE_DIM)
-				|| (image.height > RenderConstants::MAX_TEXTURE_DIM)) {
+		} else if (((uint32)arraySize > RenderConstants::MAX_TEXTURE_LAYER)
+				|| ((uint32)image.width > RenderConstants::MAX_TEXTURE_DIM)
+				|| ((uint32)image.height > RenderConstants::MAX_TEXTURE_DIM)) {
 			NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 		}
 		break;
 
 	case DDS_DIMENSION_TEXTURE3D:
-		if ((arraySize > 1) || (image.width > RenderConstants::MAX_TEXTURE_DIM)
-				|| (image.height > RenderConstants::MAX_TEXTURE_DIM)
-				|| (image.depth > RenderConstants::MAX_TEXTURE_DIM)) {
+		if ((arraySize > 1) || ((uint32)image.width > RenderConstants::MAX_TEXTURE_DIM)
+				|| ((uint32)image.height > RenderConstants::MAX_TEXTURE_DIM)
+				|| ((uint32)image.depth > RenderConstants::MAX_TEXTURE_DIM)) {
 			NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 		}
 		break;

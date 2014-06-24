@@ -37,7 +37,6 @@ Viewport::Iterator RenderTarget::GetViewports() {
 }
 
 void RenderTarget::Present(RenderContext* rc) {
-	NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
 }
 
 void RenderTarget::Capture(RenderContext* rc, PixelBox& image, FrameBuffer fb) {

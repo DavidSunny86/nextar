@@ -104,7 +104,7 @@ void TextureAsset::NotifyAssetLoaded() {
 		textureParams->createParams.textureFormat =
 				PixelUtils::GetNearestTextureFormat(
 						textureParams->image.GetFormat());
-		textureParams->createParams.textureFlags = GetTextureFlags();
+		textureParams->createParams.textureFlags = (uint8)GetTextureFlags();
 		// todo Texture array support
 		type = TEXTURE_2D;
 		if (height == 1)
@@ -118,7 +118,7 @@ void TextureAsset::NotifyAssetLoaded() {
 	}
 
 	textureParams->createParams.baseMipLevel =
-			textureParams->codecInfo.mipLevelsToRead;
+			(uint8)textureParams->codecInfo.mipLevelsToRead;
 	textureParams->createParams.desc = textureParams->codecInfo.metaInfo;
 
 	ContextObject::RequestUpdate(MSG_TEX_CREATE | MSG_TEX_UPLOAD,

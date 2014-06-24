@@ -40,10 +40,9 @@ void GBuffer::Setup(Size dimensions) {
 		params.depth.format = PixelFormat::D24S8;
 		renderTarget->Create(params);
 
-		depth = static_cast<RenderTexture*>(renderTarget->GetDepthAttachment());
-		normalGloss = static_cast<RenderTexture*>(renderTarget->GetAttachment(0));
-		albedoSpecular =
-				static_cast<RenderTexture*>(renderTarget->GetAttachment(1));
+		depth = renderTarget->GetDepthAttachment();
+		normalGloss = renderTarget->GetAttachment(0);
+		albedoSpecular = renderTarget->GetAttachment(1);
 	}
 }
 
@@ -82,22 +81,22 @@ void DeferredRenderSystem::Commit(CommitContext& context) {
 				if (context.shader != shader) {
 					context.shader = shader;
 					// deferred pass at 0
-					Pass* pass = context.shader->GetPass(0);
-					context.passNumber = pass->GetID();
-					context.pass = context.renderContext->GetView(pass);
-					context.paramBuffers[ParameterContext::CTX_PASS] = shader->Get
+					Pass& pass = context.shader->GetPass(0);
+					context.passNumber = pass.GetID();
+					context.pass = static_cast<Pass::View*>(context.renderContext->GetView(&pass));
+					context.paramBuffers[(uint32)ParameterContext::CTX_PASS] = &shader->GetParameters();
 					context.pass->SwitchAndUpdateParams(context);
 				}
 				context.primitive = prim.second;
 				if (context.material != material) {
 					context.material = material;
 					context.materialNumber++;
-					context.paramBuffers[ParameterContext::CTX_MATERIAL] = context.material->GetParameters();
+					context.paramBuffers[(uint32)ParameterContext::CTX_MATERIAL] = context.material->GetParameters();
 					context.pass->UpdateParams(context, ParameterContext::CTX_MATERIAL, context.materialNumber);
 				}
 
 				context.primitive = prim.second;
-				context.paramBuffers[ParameterContext::CTX_OBJECT] = prim.second->GetParameters();
+				context.paramBuffers[(uint32)ParameterContext::CTX_OBJECT] = prim.second->GetParameters();
 				context.pass->UpdateParams(context, ParameterContext::CTX_OBJECT, prim.first);
 				context.renderContext->Draw(prim.second->GetStreamData(), context);
 			}

@@ -1,6 +1,7 @@
 #include <RenderOpenGL.h>
 #include <PassViewGL.h>
 #include <RenderContextGL.h>
+#include <TextureViewGL.h>
 
 namespace RenderOpenGL {
 
@@ -10,7 +11,7 @@ GL_TESS_CONTROL_SHADER,
 GL_TESS_EVALUATION_SHADER,
 GL_GEOMETRY_SHADER,
 GL_FRAGMENT_SHADER,
-GL_COMPUTE_SHADER };
+};
 
 PassViewGL::PassViewGL() :
 		inputSemantics(nullptr), iGlProgram(0), inputLayoutId(-1) {
@@ -51,10 +52,7 @@ void PassViewGL::Compile(nextar::RenderContext* rc,
 			numSemantics);
 
 	long int preCompileStatus = 0;
-	bool produceReflectionData = params.inited.compare_exchange_strong(
-			preCompileStatus, 1, std::memory_order_release,
-			std::memory_order_relaxed);
-
+	bool produceReflectionData = !params.inited.test_and_set(std::memory_order_relaxed);
 	// read uniform data and register to uniform buffer manager
 	ctx->ReadUniforms(this, params.passIndex, iGlProgram,
 			produceReflectionData ? params.parameters : nullptr);
@@ -71,7 +69,7 @@ void PassViewGL::Compile(nextar::RenderContext* rc,
 void PassViewGL::SetTexture(RenderContext* rc, const SamplerParameter& desc,
 		const TextureUnit* tu) {
 	RenderContextGL* ctx = static_cast<RenderContextGL*>(rc);
-	const SamplerState* samplerState = static_cast<const SamplerState*>(desc);
+	const SamplerState* samplerState = static_cast<const SamplerState*>(&desc);
 	TextureViewGL* texture = static_cast<TextureViewGL*>(ctx->GetView(
 			tu->texture));
 	ctx->SetTexture(samplerState->index, samplerState->sampler, texture);

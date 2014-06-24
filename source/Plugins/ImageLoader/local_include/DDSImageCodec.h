@@ -15,7 +15,7 @@ using namespace nextar;
 namespace ImageLoader {
 
 struct DDS_HEADER;
-class DDS_PIXELFORMAT;
+struct DDS_PIXELFORMAT;
 class DDSImageCodec: public nextar::ImageCodec {
 	NEX_LOG_HELPER (DDSImageCodec);
 
@@ -26,10 +26,10 @@ public:
 	DDSImageCodec();
 	virtual ~DDSImageCodec();
 
-	virtual bool TryLoad(InputStreamPtr& file, const ImageParams& params);
-	virtual ImageData Load(InputStreamPtr& file, const ImageParams&);
+	virtual bool TryLoad(InputStreamPtr& file, const ImageParams& params, ImageCodecMetaInfo& metaInfo) override;
+	virtual ImageData Load(InputStreamPtr& file, const ImageParams&, ImageCodecMetaInfo& metaInfo) override;
 	virtual void Save(OutputStreamPtr& file, const ImageParams& params,
-			const ImageData& data);
+			const ImageData& data) override;
 
 protected:
 
@@ -41,7 +41,7 @@ protected:
 	ImageData FillInitData(InputSerializer& file, ImageData& initialData,
 			size_t arraySize, PixelFormat, const ImageParams& params);
 	ImageData CreateImageData(InputSerializer& file, DDS_HEADER* header,
-			size_t offset, const ImageParams& params);
+			size_t offset, const ImageParams& params, ImageCodecMetaInfo& metaInfo);
 };
 
 } /* namespace nextar */

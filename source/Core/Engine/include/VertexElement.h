@@ -226,4 +226,5 @@ typedef vector<VertexElement>::type VertexElementList;
 
 }
 
-#endif //NEXTAR_VERTEX_ELEMENT_H
+#endif //NEXTAR_VERTEX_ELEMENT_H
+

@@ -11,7 +11,9 @@
 
 namespace nextar {
 
-GpuBuffer::GpuBuffer(GpuBuffer&& other) : ContextObject(other),
+GpuBuffer::GpuBuffer(GpuBuffer&& other) : 
+		ReferencedType(),
+		ContextObject(other),
 		size(other.size) {
 	other.size = 0;
 }

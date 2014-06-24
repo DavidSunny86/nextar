@@ -300,4 +300,4 @@ inline void RenderContextGL::ActivateTexture(GLenum target, GLuint texture) {
 
 }
 
-#endif //RENDERCONTEXTGL_H_
+#endif //RENDERCONTEXTGL_H_

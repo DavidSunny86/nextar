@@ -106,10 +106,22 @@ public:
 		return passes[i];
 	}
 
+	inline Pass& GetPass(uint32 i) {
+		return passes[i];
+	}
+
 	virtual uint32 GetClassID() const override;
 
 	// todo
 	static ParamDataType MapParamType(const String& typeName);
+
+	const ParamEntryTableItem& GetParamTableItem(ParameterContext context) {
+		return paramsPerContext[(uint32)context];
+	}
+
+	const ParameterBuffer& GetParameters() const {
+		return passParamData;
+	}
 
 protected:
 

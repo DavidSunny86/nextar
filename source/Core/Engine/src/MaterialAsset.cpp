@@ -46,7 +46,7 @@ void MaterialAsset::NotifyAssetUpdated() {
 }
 
 void MaterialAsset::_PrepareMaterial(MaterialAsset::StreamRequest* req) {
-	ConstParamEntryTableItem item = shader->GetParamEntryForMaterial();
+	const ParamEntryTableItem& item = shader->GetParamTableItem(ParameterContext::CTX_MATERIAL);
 	materialParamData.SetParamEntryTable(item);
 }
 

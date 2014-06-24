@@ -67,6 +67,7 @@ public:
 protected:
 
 	static Type& Instance() {
+		// @urgent The static initialization is potentially dangerous and unsafe.
 		static Type _singletonPool;
 		return _singletonPool;
 	}

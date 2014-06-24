@@ -21,7 +21,6 @@ class GpuBuffer;
 class VertexBuffer;
 class IndexBuffer;
 class Viewport;
-class BufferManager;
 class ShaderAsset;
 class TextureBase;
 class RenderTarget;

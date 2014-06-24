@@ -28,11 +28,27 @@ class Referenced: public BaseClass {
 dbg_BreakFeature();
 private:
 	std::atomic_int_fast32_t refCount;
+
+protected:
+
+	typedef Referenced<T,BaseClass> ReferencedType;
+
 public:
 
 	inline Referenced() {
 		dbg_Ctor(refCount);
 		refCount.store(1, std::memory_order_relaxed);
+	}
+
+	Referenced(const Referenced<T,BaseClass>&  other) {
+		dbg_Ctor(refCount);
+		refCount.store(other.GetRefCount(), std::memory_order_relaxed);
+	}
+
+	inline Referenced(Referenced<T,BaseClass>&&  other) {
+		dbg_Ctor(refCount);
+		refCount.store(other.GetRefCount(), std::memory_order_relaxed);
+		//other.refCount.store(0, std::memory_order_relaxed);
 	}
 
 	virtual ~Referenced() {
@@ -53,6 +69,18 @@ public:
 		dbg_DecRef();
 		if (refCount.fetch_sub(1, std::memory_order_relaxed) <= 0)
 		NEX_DELETE((static_cast<T*>(this)));
+	}
+
+	inline Referenced<T,BaseClass>& operator = (const Referenced<T,BaseClass>&  other) {
+		refCount.store(other.GetRefCount(), std::memory_order_relaxed);
+		return *this;
+	}
+
+	inline Referenced<T,BaseClass>&  operator = (Referenced<T,BaseClass>&&  other) {
+		dbg_Ctor(refCount);
+		refCount.store(other.GetRefCount(), std::memory_order_relaxed);
+		//other.refCount.store(0, std::memory_order_relaxed);
+		return *this;
 	}
 };
 
@@ -301,4 +329,4 @@ inline RefPtr<T> Assign(U* what) {
 }
 }
 
-#endif //NEXTAR_SHARED_PTR_H
+#endif //NEXTAR_SHARED_PTR_H

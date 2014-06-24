@@ -2,42 +2,9 @@
 #include <MeshAsset.h>
 #include <BufferManager.h>
 #include <VertexElement.h>
+#include <CommonMeshLayouts.h>
 
 namespace nextar {
-
-MeshVertexData::CommonVertexElement
-MeshVertexData::commonElementLayout[VertexLayoutType::VERTEX_LAYOUT_COUNT] = {
-	{
-		2,
-		{
-			VertexElement(VertexDesc( VertexSemantic(COMP_POSITION, 0, COMP_TYPE_FLOAT3), 0 ), 0, 0),
-			VertexElement(VertexDesc( VertexSemantic(COMP_NORMAL, 0, COMP_TYPE_FLOAT3), 12 ), 0, 0)
-		}
-	},
-	{
-		3,
-		{
-			VertexElement(VertexDesc( VertexSemantic(COMP_POSITION, 0, COMP_TYPE_FLOAT3), 0 ), 0, 0),
-			VertexElement(VertexDesc( VertexSemantic(COMP_NORMAL, 0, COMP_TYPE_FLOAT3), 12 ), 0, 0),
-			VertexElement(VertexDesc( VertexSemantic(COMP_TEXTURE_COORDINATE, 0, COMP_TYPE_FLOAT2), 12 ), 0, 0)
-		}
-	},
-	{
-		2,
-		{
-			VertexElement(VertexDesc( VertexSemantic(COMP_POSITION, 0, COMP_TYPE_FLOAT3), 0 ), 0, 0),
-			VertexElement(VertexDesc( VertexSemantic(COMP_NORMAL, 0, COMP_TYPE_FLOAT3), 12 ), 1, 0)
-		}
-	},
-	{
-		3,
-		{
-			VertexElement(VertexDesc( VertexSemantic(COMP_POSITION, 0, COMP_TYPE_FLOAT3), 0 ), 0, 0),
-			VertexElement(VertexDesc( VertexSemantic(COMP_NORMAL, 0, COMP_TYPE_FLOAT3), 12 ), 1, 0),
-			VertexElement(VertexDesc( VertexSemantic(COMP_TEXTURE_COORDINATE, 0, COMP_TYPE_FLOAT2), 12 ), 1, 0)
-		}
-	}
-};
 
 MeshVertexData::~MeshVertexData() {
 	if (vertexElements)

@@ -52,7 +52,7 @@ public:
 	inline MeshVertexData() :
 			layoutType(VertexLayoutType::CUSTOM_LAYOUT),
 			numVertexElements(0), vertexElements(0),
-			vertexCount(0), binding(nullptr), layout() {
+			vertexCount(0), binding(), layout() {
 	}
 
 	~MeshVertexData();
@@ -269,4 +269,4 @@ protected:
 
 }
 
-#endif //MESHASSET_H_
+#endif //MESHASSET_H_

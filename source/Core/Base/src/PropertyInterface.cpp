@@ -21,7 +21,8 @@ public:
 			const String& name) {
 #if !defined(NEX_HAS_CONCURRENT_CONTAINERS)
 		NEX_THREAD_LOCK_GUARD_MUTEX(dictionaryMtx);
-#endif // !defined(NEX_HAS_CONCURRENT_CONTAINERS)
+#endif // !defined(NEX_HAS_CONCURRENT_CONTAINERS)
+
 		PropertyDictionaryMap::iterator it = dictionaryMap.find(name);
 		if (it != dictionaryMap.end()) {
 			return (*it).second;
@@ -36,7 +37,8 @@ public:
 	void RemoveDictionary(const String& name) {
 #if !defined(NEX_HAS_CONCURRENT_CONTAINERS)
 		NEX_THREAD_LOCK_GUARD_MUTEX(dictionaryMtx);
-#endif // !defined(NEX_HAS_CONCURRENT_CONTAINERS)
+#endif // !defined(NEX_HAS_CONCURRENT_CONTAINERS)
+
 		// none should be left by now
 		PropertyDictionaryMap::iterator it = dictionaryMap.find(name);
 		PropertyDictionaryMap::iterator end = dictionaryMap.end();
@@ -54,7 +56,8 @@ public:
 	void DestroyDictionaries() {
 #if !defined(NEX_HAS_CONCURRENT_CONTAINERS)
 		NEX_THREAD_LOCK_GUARD_MUTEX(dictionaryMtx);
-#endif // !defined(NEX_HAS_CONCURRENT_CONTAINERS)
+#endif // !defined(NEX_HAS_CONCURRENT_CONTAINERS)
+
 		PropertyDictionaryMap::iterator it = dictionaryMap.begin();
 		PropertyDictionaryMap::iterator end = dictionaryMap.end();
 		while (it != end) {
@@ -69,10 +72,12 @@ protected:
 	/* Dictionary map */
 	typedef concurrent_unordered_map<String, PropertyDictionary*>::type PropertyDictionaryMap;
 	PropertyDictionaryMap dictionaryMap;
-#else // defined(NEX_HAS_CONCURRENT_CONTAINERS)	/* Dictionary map */
+#else // defined(NEX_HAS_CONCURRENT_CONTAINERS)
+	/* Dictionary map */
 	typedef unordered_map<String, PropertyDictionary*>::type PropertyDictionaryMap;
 	PropertyDictionaryMap dictionaryMap;NEX_THREAD_MUTEX(dictionaryMtx);
-#endif // defined(NEX_HAS_CONCURRENT_CONTAINERS)};
+#endif // defined(NEX_HAS_CONCURRENT_CONTAINERS)
+};
 
 PropertyDictionaryManager PropertyDictionaryManager::propertyDictionaryManager;
 

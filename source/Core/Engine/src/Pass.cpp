@@ -15,7 +15,7 @@ namespace nextar {
 Pass::AutoParamMap Pass::autoParams;
 
 Pass::Pass() :
-		ContextObject(TYPE_PASS), NamedObject(StringUtils::NullID)
+		ContextObject(TYPE_PASS, 0), NamedObject(StringUtils::NullID)
 		//,inputLayoutUniqueID(-1)
 				, flags(0) {
 }
@@ -51,7 +51,7 @@ void Pass::View::Update(RenderContext* rc, uint32 msg, ContextParamPtr param) {
 	if (msg == Pass::MSG_PASS_COMPILE) {
 		const CompileParams& p = *reinterpret_cast<const CompileParams*>(param);
 		//p.inputLayoutId = &inputLayoutUniqueID;
-		p.inited.store(0, std::memory_order_relaxed);
+		p.inited.clear(std::memory_order_relaxed);
 		Compile(rc, p);
 	} else if (msg == Pass::MSG_PASS_UPDATE_PARAMBUFFER_OFFSET) {
 		const ParamBufferOffsetParams& p =
@@ -176,7 +176,6 @@ public:
 protected:
 	~CustomStructProcessor() {
 	}
-	const uint32 paramContext;
 };
 
 void CustomStructProcessor::Apply(CommitContext& context,
@@ -184,11 +183,15 @@ void CustomStructProcessor::Apply(CommitContext& context,
 	NEX_ASSERT(param->type == ParamDataType::PDT_STRUCT);
 
 	CommitContext::ParamContext& pc = context.currentParamContext;
-	size_t size = pc.second->GetSize();
+	uint32 size = (uint32)pc.second->GetSize();
 	context.currentGroup->WriteRawData(context.renderContext,
 			pc.second->AsRawData(pc.first), 0, size);
 	pc.first += size;
 }
+
+CustomParameterProcessor CustomParameterProcessor::instance;
+CustomTextureProcessor CustomTextureProcessor::instance;
+CustomStructProcessor CustomStructProcessor::instance;
 
 AutoParamProcessor* Pass::customConstantProcessor =
 		&CustomParameterProcessor::instance;

@@ -57,7 +57,7 @@ public:
 	};
 
 	struct CompileParams {
-		std::atomic_int_fast32_t inited;
+		mutable std::atomic_flag inited;
 		const StringUtils::WordList* compileOptions;
 		RasterState rasterState;
 		BlendState blendState;
@@ -69,7 +69,7 @@ public:
 		String programSources[Pass::STAGE_COUNT];
 	};
 
-	class View: public ContextObject::View {
+	class _NexEngineAPI View: public ContextObject::View {
 	public:
 
 		View();

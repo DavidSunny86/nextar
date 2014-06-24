@@ -10,8 +10,10 @@
 namespace nextar {
 
 RenderBuffer::RenderBuffer() :
-		ContextObject(ContextObject::TYPE_RENDER_BUFFER), format(
-				PixelFormat::UNKNOWN), width(0), height(0) {
+		ContextObject(ContextObject::TYPE_RENDER_BUFFER, 0)
+		,RenderTarget(RenderTargetType::RENDER_BUFFER)
+		,format(PixelFormat::UNKNOWN)
+		,dimensions(0, 0) {
 }
 
 RenderBuffer::~RenderBuffer() {
@@ -20,8 +22,8 @@ RenderBuffer::~RenderBuffer() {
 void RenderBuffer::Create(PixelFormat format, uint32 width, uint32 height,
 		uint32 samples) {
 	this->format = format;
-	this->width = width;
-	this->height = height;
+	this->dimensions.dx = width;
+	this->dimensions.dy = height;
 
 	CreateParams params;
 	params.width = width;
@@ -36,6 +38,14 @@ void RenderBuffer::Capture(RenderContext* rc, PixelBox& image,
 		FrameBuffer frameBuffer) {
 	View* v = static_cast<View*>(rc->GetView(this));
 	v->Update(rc, MSG_RB_READ, &image);
+}
+
+Size RenderBuffer::GetDimensions() const {
+	return dimensions;
+}
+
+PixelFormat RenderBuffer::GetPixelFormat() const {
+	return format;
 }
 
 } /* namespace nextar */

@@ -22,10 +22,10 @@ public:
 	PNGImageCodec();
 	virtual ~PNGImageCodec();
 
-	virtual bool TryLoad(InputStreamPtr& file, const ImageParams& params);
-	virtual ImageData Load(InputStreamPtr& file, const ImageParams&);
+	virtual bool TryLoad(InputStreamPtr& file, const ImageParams& params, ImageCodecMetaInfo& metaInfo) override;
+	virtual ImageData Load(InputStreamPtr& file, const ImageParams&, ImageCodecMetaInfo& metaInfo) override;
 	virtual void Save(OutputStreamPtr& file, const ImageParams& params,
-			const ImageData& data);
+			const ImageData& data) override;
 
 private:
 

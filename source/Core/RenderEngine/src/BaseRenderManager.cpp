@@ -1,5 +1,7 @@
 #include <RenderEngine.h>
 #include <BaseRenderManager.h>
+#include <Viewport.h>
+#include <RenderTarget.h>
 
 namespace nextar {
 

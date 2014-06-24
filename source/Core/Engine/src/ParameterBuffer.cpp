@@ -42,9 +42,9 @@ void ParameterBuffer::Prepare(DataPtr&& data, size_t size) {
 }
 
 const ParamEntry* ParameterBuffer::_GetParameter(const String& name) const {
-	auto it = paramTable.first;
-	while (it != paramTable.second) {
-		if ((*it).descriptor->name == name)
+	auto it = paramTable.beginIt;
+	while (it != paramTable.endIt) {
+		if ((*it).name == name)
 			return &(*it);
 	}
 	return nullptr;

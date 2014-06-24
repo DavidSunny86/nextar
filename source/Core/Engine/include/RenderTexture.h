@@ -26,8 +26,7 @@ public:
 	virtual void Create(TextureType type, PixelFormat format, uint32 width,
 			uint32 height, uint32 depth);
 	virtual void Capture(RenderContext* rc, PixelBox& image, FrameBuffer);
-	virtual void Present(RenderContext* rc);
-
+	
 protected:
 
 };

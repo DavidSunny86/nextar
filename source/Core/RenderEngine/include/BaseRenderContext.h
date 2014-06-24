@@ -60,14 +60,11 @@ protected:
 
 	NEX_THREAD_MUTEX(accessLock);
 
-	typedef unordered_map<StringRef, ConstantBuffer*>::type ConstantBufferMap;
-
 	uint32 originalVideoMode;
 	uint32 currentVideoMode;
 	/* thread this context is bound to, 0 if none */
 	std::thread::id threadId;
 
-	PassView* activePass;
 	RenderTarget* currentTarget;
 	FrameStats frameStats;
 	RenderDriver* driver;

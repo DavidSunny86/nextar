@@ -18,8 +18,8 @@ namespace nextar {
 class CommitContext: public AllocGeneral {
 public:
 
-	typedef std::pair<uint32, ParameterBuffer*> ParamContext;
-
+	typedef std::pair<uint32, const ParameterBuffer*> ParamContext;
+	
 	CommitContext();
 	virtual ~CommitContext();
 

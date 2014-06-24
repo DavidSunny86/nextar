@@ -14,9 +14,11 @@
 namespace nextar {
 
 MultiRenderTarget::MultiRenderTarget() :
-		RenderTarget(RenderTargetType::MULTI_RENDER_TARGET), ContextObject(
-				ContextObject::TYPE_MULTI_RENDER_TARGET), flags(0), dimensions(
-				0, 0), numColorTargets(0) {
+		RenderTarget(RenderTargetType::MULTI_RENDER_TARGET)
+		,ContextObject(ContextObject::TYPE_MULTI_RENDER_TARGET, 0)
+		,flags(0)
+		,dimensions(0, 0)
+		,numColorTargets(0) {
 }
 
 MultiRenderTarget::~MultiRenderTarget() {
@@ -70,6 +72,11 @@ RenderTargetPtr MultiRenderTarget::CreateTexture(const TargetParam& tp) {
 		rt->Create(tp.format, dimensions.width, dimensions.height);
 		return Assign(rt);
 	}
+}
+
+void MultiRenderTarget::Capture(RenderContext* rc, 
+								PixelBox& image, FrameBuffer) {
+	NEX_THROW_FatalError(EXCEPT_INVALID_CALL);
 }
 
 } /* namespace nextar */

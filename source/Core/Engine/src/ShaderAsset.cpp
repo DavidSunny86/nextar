@@ -7,7 +7,6 @@
 #include <NexEngine.h>
 #include <Pass.h>
 #include <ShaderAsset.h>
-#include <ParameterIterator.h>
 #include <RenderManager.h>
 
 namespace nextar {
@@ -104,7 +103,7 @@ void ShaderAsset::_BuildParameterTable(StreamPassList& spl) {
 
 	ParameterContext lastContext = ParameterContext::CTX_UNKNOWN;
 	uint32 index = -1;
-	size_t offset = 0;
+	uint32 offset = 0;
 	for (auto& e : paramLookup) {
 		if (e.context != lastContext) {
 			lastContext = e.context;
@@ -112,12 +111,12 @@ void ShaderAsset::_BuildParameterTable(StreamPassList& spl) {
 		}
 		if (index != e.passIndex) {
 			index = e.passIndex;
-			spl[index].offsets.offset[lastContext] = offset;
+			spl[index].offsets.offset[(uint32)lastContext] = offset;
 		}
 		offset += e.maxSize;
 	}
 
-	for (auto i = std::pair(spl.begin(), passes.begin()); i.first != spl.end();
+	for (auto i = std::pair<StreamPassList::iterator,PassList::iterator>(spl.begin(), passes.begin()); i.first != spl.end();
 			++i.first, ++i.second) {
 		(*i.second).RequestUpdate(Pass::MSG_PASS_UPDATE_PARAMBUFFER_OFFSET,
 				reinterpret_cast<ContextObject::ContextParamPtr>(&(*i.first).compileParams));
