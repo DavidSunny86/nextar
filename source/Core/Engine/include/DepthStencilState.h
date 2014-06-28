@@ -33,14 +33,14 @@ typedef uint8 StencilOpType;
 typedef uint8 DepthStencilCompareType;
 
 struct StencilFaceOp {
-	uint8 stencilMask;
+	ColorMask stencilMask;
 	DepthStencilCompareType stencilFunc;
 	StencilOpType stencilFail;
 	StencilOpType stencilPass;
 	StencilOpType depthPass;
 
 	StencilFaceOp() :
-			stencilMask(0xff), stencilFunc(DSCOMP_NEVER), stencilFail(
+			stencilMask(ColorMask::MASK_ALL), stencilFunc(DSCOMP_NEVER), stencilFail(
 					STENCILOP_ZERO), stencilPass(STENCILOP_ZERO), depthPass(
 					STENCILOP_ZERO) {
 	}

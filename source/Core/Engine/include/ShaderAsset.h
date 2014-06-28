@@ -40,11 +40,15 @@ public:
 	typedef AssetTraits<ShaderAsset> Traits;
 	typedef FactoryTraits<ShaderAsset> FactoryTraits;
 
-	struct StreamPass {
+	class StreamPass {
+	public:
 		StringID name;
 		Pass::ParamBufferOffsetParams offsets;
 		Pass::CompileParams compileParams;
 		//Pass::DefaultTextureUnitMap defaultTextureUnits;
+		StreamPass(StringID _name) : name(_name) {}
+		// not implemented
+		StreamPass(const StreamPass& p);
 	};
 
 	// todo Make this a list not a vector
@@ -85,7 +89,7 @@ public:
 	protected:
 
 		friend class ShaderAsset;
-		uint32 currentPass;
+		StreamPassList::reverse_iterator currentPass;
 		StreamPassList passes;
 		String compilationOpt;
 	};

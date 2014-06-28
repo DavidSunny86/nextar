@@ -12,6 +12,9 @@
 #include <ShaderLoaderImplv10.h>
 #include <ScriptParser.h>
 #include <ScriptStrings.h>
+#include <ShaderAsset.h>
+#include <RenderManager.h>
+#include <ShaderScript.h>
 
 namespace ShaderCompiler {
 
@@ -37,36 +40,12 @@ void ShaderLoaderImplv1_0::Configure(const Config&) {
 
 void ShaderLoaderImplv1_0::Load(InputStreamPtr& input, AssetLoader& shader) {
 	ScriptParser scriptParser;
-	ShaderLoaderImplv1_0::Script s(shader.GetRequestPtr());
+	ShaderScript s(std::cref(languageContext),
+			static_cast<ShaderAsset::StreamRequest*>(shader.GetRequestPtr()));
 	ShaderAsset* shaderPtr =
 			static_cast<ShaderAsset*>(shader.GetRequestPtr()->streamedObject);
-	scriptParser.ParseScript(&s, shaderPtr->GetName(), input);
-}
-
-void ShaderLoaderImplv1_0::Script::EnterScript(
-		ScriptParser::ScriptContext& block) {
-	block.ParseRegions(this);
-}
-
-void ShaderLoaderImplv1_0::Script::EnterRegion(
-		ScriptParser::RegionContext& ctx) {
-	const String& name = ctx.GetName();
-	String::size_type pos;
-	if (name == _SS(SHADER_REGION)) {
-		ctx.ParseStatements(this);
-	} else if ((pos = name.find(languageContext)) != String::npos) {
-
-	}
-}
-
-void ShaderLoaderImplv1_0::Script::EnterStatement(
-		ScriptParser::StatementContext& ctx) {
-	if (ctx.GetCommand() == "Shader") {
-		String name;
-		StringUtils::NextWord(ctx.GetParamList(), name);
-		ShaderCompiler::ShaderListener sl(shader, name);
-		ctx.ParseBlock(&sl);
-	}
+	String scriptName = shaderPtr->GetAssetLocator().ToString();
+	scriptParser.ParseScript(&s, scriptName, input);
 }
 
 } /* namespace nextar */

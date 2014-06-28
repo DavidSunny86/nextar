@@ -21,8 +21,8 @@ void RenderBufferViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 		ContextObject::ContextParamPtr param) {
 	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
 	if (msg == RenderBuffer::MSG_RB_CREATE) {
-		RenderBuffer::CreateParams* createParams =
-				static_cast<RenderBuffer::CreateParams*>(param);
+		const RenderBuffer::CreateParams* createParams =
+				static_cast<const RenderBuffer::CreateParams*>(param);
 		gl->GlGenRenderbuffers(1, &renderBuffer);
 		gl->GlBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
 		PixelFormatGl format = RenderContextGL::GetGlPixelFormat(

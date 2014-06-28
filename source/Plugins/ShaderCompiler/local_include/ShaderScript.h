@@ -8,6 +8,8 @@
 #ifndef SHADERSCRIPT_H_
 #define SHADERSCRIPT_H_
 
+#include <CommonTypes.h>
+
 namespace ShaderCompiler {
 
 class ShaderScript: public ScriptParser::RegionListener,
@@ -26,7 +28,7 @@ public:
 			languageContext(_languageContext), shader(s) {
 	}
 
-	void SetRegionAsSource(GpuProgram::Type, const String& name);
+	void SetRegionAsSource(Pass::ProgramStage, const String& name);
 	inline ShaderAsset::StreamRequest* GetRequest() {
 		return shader;
 	}
@@ -34,7 +36,7 @@ public:
 	virtual void EnterRegion(ScriptParser::RegionContext& regionCtx);
 	virtual void EnterScript(ScriptParser::ScriptContext& block);
 	virtual void EnterStatement(ScriptParser::StatementContext& ctx);
-protected:
+
 	~ShaderScript() {
 	}
 };

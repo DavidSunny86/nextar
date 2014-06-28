@@ -61,7 +61,7 @@ JPEGImageCodec::JPEGImageCodec() {
 JPEGImageCodec::~JPEGImageCodec() {
 }
 
-bool JPEGImageCodec::TryLoad(InputStreamPtr& file, const ImageParams& params) {
+bool JPEGImageCodec::TryLoad(InputStreamPtr& file, const ImageParams& params, ImageCodecMetaInfo& metaInfo) {
 	char header[8];
 	file->Read(header, 8);
 	// this will need a minor decompression
@@ -103,7 +103,7 @@ bool JPEGImageCodec::TryLoad(InputStreamPtr& file, const ImageParams& params) {
 }
 
 ImageData JPEGImageCodec::Load(InputStreamPtr& stream,
-		const ImageParams& params) {
+		const ImageParams& params, ImageCodecMetaInfo& metaInfo) {
 
 	struct jpeg_decompress_struct cinfo;
 
@@ -183,7 +183,12 @@ ImageData JPEGImageCodec::Load(InputStreamPtr& stream,
 	img.width = (uint16) width;
 	img.numFaces = 1;
 	img.numMipMaps = 1;
-	img.totalMipMapCount = 1;
+	metaInfo.metaInfoInited = true;
+	metaInfo.mipLevelsToRead = 0;
+	metaInfo.metaInfo.maxWidth = width;
+	metaInfo.metaInfo.maxWidth = height;
+	metaInfo.metaInfo.maxDepth = 1;
+	metaInfo.metaInfo.maxMipMapCount = 1;
 
 	while (cinfo.output_scanline < cinfo.output_height) {
 		if (jpeg_read_scanlines(&cinfo, rowPtr, 1) != 1) {

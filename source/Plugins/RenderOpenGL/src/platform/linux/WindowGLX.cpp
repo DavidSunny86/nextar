@@ -6,13 +6,12 @@
  */
 
 #include <RenderOpenGL.h>
-#include <glx/WindowGLX.h>
-#include <glx/RenderContextGLX.h>
+#include <RenderContextGLX.h>
 
 namespace RenderOpenGL {
 
 WindowGLX::WindowGLX(RenderContextGLX* ctx) :
-context(ctx), nextar::XWindow(NEX_NEW WindowGLX::Impl(this)) {
+context(ctx), nextar::XWindow(NEX_NEW( WindowGLX::Impl(this))) {
 }
 
 WindowGLX::~WindowGLX() {
@@ -21,17 +20,21 @@ WindowGLX::~WindowGLX() {
 }
 
 WindowGLX::Impl::Impl(WindowGLX* _parent) :
-		parent(_parent), drawable(0), cmap(0), pbo( { 0 }) {
+		parent(_parent), drawable(0), cmap(0), pbo{ 0 } {
 }
 
 void WindowGLX::Impl::Create(uint32 width, uint32 height,
 bool fullscreen, const NameValueMap* params) {
 
+	RenderContextGLX* context = parent->GetContext();
 	position.x = 0;
 	position.y = 0;
 
-	parent->SetDisplay(context->GetDisplay());
-	Window parentWindow = RootWindow(display, context->GetScreenIndex());
+	Display* display = context->GetDisplay();
+	parent->SetDisplay(display);
+
+	Window parentWindow = RootWindow(display,
+			context->GetScreenIndex());
 	parent->SetWindowTitle("NexTech: Render Window");
 	uint32 setVideoMode = -1;
 
@@ -101,23 +104,26 @@ bool fullscreen, const NameValueMap* params) {
 	Atom destroyMsg = XInternAtom(display, "WM_DELETE_WINDOW", False);
 	parent->SetDestroyMsg(destroyMsg);
 	// trap delete
-	XSetWMProtocols(display, window, &msgDestroy, 1);
+	XSetWMProtocols(display, window, &destroyMsg, 1);
 
 	// SetToFullScreen now
 	if (fullscreen) {
 		SetToFullScreen(true);
 	}
 
-	XStoreName(display, window, windowTitle.c_str());
+	XStoreName(display, window, parent->GetTitle().c_str());
 	XMapWindow(display, window);
 
-	flags &= ~WINDOW_CLOSED;
+	parent->SetFlag(WINDOW_CLOSED, false);
 
 	XFlush (display);
 	drawable = window;
 }
 
 void WindowGLX::Impl::SetToFullScreen(bool fullScreen) {
+	RenderContextGLX* context = parent->GetContext();
+	Display* display = parent->GetDisplay();
+	Window window = parent->GetWindow();
 	if (fullScreen) {
 
 		if (!parent->IsMainWindow()) {
@@ -143,6 +149,9 @@ void WindowGLX::Impl::SetToFullScreen(bool fullScreen) {
 }
 
 void WindowGLX::Impl::Destroy() {
+	RenderContextGLX* context = parent->GetContext();
+	Display* display = parent->GetDisplay();
+	Window window = parent->GetWindow();
 	if (context->IsCurrentDrawable(drawable))
 		context->SetCurrentTarget(nullptr);
 	XDestroyWindow(display, window);
@@ -165,7 +174,8 @@ PixelFormat WindowGLX::Impl::GetPixelFormat() const {
 
 void WindowGLX::Impl::Capture(RenderContext* rc, PixelBox& image,
 		FrameBuffer frameBuffer) {
-	if (rc != context) {
+	RenderContextGLX* context = parent->GetContext();
+	if (rc != (RenderContext*)context) {
 		Error("Window created using a different context");
 		return;
 	}
@@ -176,6 +186,9 @@ void WindowGLX::Impl::Capture(RenderContext* rc, PixelBox& image,
 }
 
 void WindowGLX::Impl::Reset(RenderContext* rc, Size size, PixelFormat format) {
+	RenderContextGLX* context = parent->GetContext();
+	Display* display = parent->GetDisplay();
+	Window window = parent->GetWindow();
 	if (parent->IsFullScreen())
 		SetToFullScreen(false);
 	XWindowAttributes attribs;
@@ -185,6 +198,7 @@ void WindowGLX::Impl::Reset(RenderContext* rc, Size size, PixelFormat format) {
 }
 
 void WindowGLX::Impl::Present(RenderContext* rc) {
+	RenderContextGLX* context = parent->GetContext();
 	if (rc != context) {
 		Error("Window created using a different context");
 		return;

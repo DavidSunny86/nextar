@@ -128,6 +128,7 @@ public:
 		nextar::DestroyObject(p);
 	}
 };
+
 }
 
 #endif// MATRIXPOOL_H_

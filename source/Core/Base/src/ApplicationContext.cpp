@@ -5,6 +5,7 @@
 #include <WindowManager.h>
 #include <BackgroundStreamer.h>
 #include <BackgroundStreamerImpl.h>
+#include <NamedObject.h>
 
 namespace nextar {
 
@@ -104,6 +105,8 @@ void ApplicationContext::DestroyServices() {
 	NEX_DELETE(BackgroundStreamer::InstancePtr());
 	NEX_DELETE(WindowManager::InstancePtr());
 	NEX_DELETE(PluginRegistry::InstancePtr());
+	// just save the strings
+	NamedObject::OnExit();
 	NEX_DELETE(FileSystem::InstancePtr());
 }
 

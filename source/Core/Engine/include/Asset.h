@@ -93,14 +93,14 @@ public:
 		}
 
 		inline static AssetTypePtr Instance(const StringID name,
-				Component::Factory* factory = nullptr,
-				SharedComponent::Group* group = nullptr) {
+				Component::Factory* factory,
+				SharedComponent::Group* group) {
 			return InstanceImplementor::Instance(CLASS_ID, name, factory, group);
 		}
 
 		inline static AssetTypePtr Instance(const StringID name,
-				const URL& locator, Component::Factory* factory = nullptr,
-				SharedComponent::Group* group = nullptr) {
+				const URL& locator, Component::Factory* factory,
+				SharedComponent::Group* group) {
 			AssetTypePtr asset = InstanceImplementor::Instance(CLASS_ID, name,
 					factory, group);
 			if (asset)
@@ -111,7 +111,7 @@ public:
 		inline static AssetTypePtr Instance(const StringID name,
 				const URL& locator, const StringID factory = StringUtils::DefaultID,
 				const StringID group = StringUtils::DefaultID) {
-			AssetTypePtr asset = Instance(CLASS_ID, name,
+			AssetTypePtr asset = Instance(name,
 					factory, group);
 			if (asset)
 				asset->SetAssetLocator(locator);

@@ -35,6 +35,7 @@ public:
 
 	ParamContext currentParamContext;
 	ParameterGroup* currentGroup;
+	void* currentGroupDataPtr;
 
 	Pass::View* pass;
 	ShaderAsset* shader;

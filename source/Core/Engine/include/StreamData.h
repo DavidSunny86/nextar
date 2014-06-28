@@ -70,9 +70,9 @@ public:
 
 protected:
 	typedef vector<VertexBuffer>::type VertexBufferList;
-	uint8 transientBufferCount;
-	VertexBufferList bufferList;
+	uint16 transientBufferCount;
 	uint16 bindingNumber;
+	VertexBufferList bufferList;
 };
 
 enum PrimitiveTypeTag {

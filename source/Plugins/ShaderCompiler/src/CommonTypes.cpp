@@ -7,6 +7,7 @@
 
 #include <BaseHeaders.h>
 #include <CommonTypes.h>
+#define NEX_SHADER_STRINGS_DEFINE
 #include <ScriptStrings.h>
 
 namespace ShaderCompiler {

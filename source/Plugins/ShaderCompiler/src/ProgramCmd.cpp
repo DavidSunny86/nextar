@@ -16,14 +16,22 @@ namespace ShaderCompiler {
 ProgramCmd ProgramCmd::command;
 ParamCmd ParamCmd::command;
 //AutoParamCmd AutoParamCmd::command;
-ShaderCmd ShaderCmd::command;
+ShaderCmd ShaderCmd::commandDomain(Pass::ProgramStage::STAGE_DOMAIN);
+ShaderCmd ShaderCmd::commandVertex(Pass::ProgramStage::STAGE_VERTEX);
+ShaderCmd ShaderCmd::commandFragment(Pass::ProgramStage::STAGE_FRAGMENT);
+ShaderCmd ShaderCmd::commandHull(Pass::ProgramStage::STAGE_HULL);
+ShaderCmd ShaderCmd::commandGeometry(Pass::ProgramStage::STAGE_GEOMETRY);
 
 CommandNamePair ProgramListener::commands[] = {
 //{ "AutoParam", &AutoParamCmd::command },
-		{ _SS(CMD_FRAGMENT_PROG), &ShaderCmd::command }, { _SS(
-				CMD_GEOMETRY_PROG), &ShaderCmd::command }, { _SS(CMD_OPTION),
-				&ParamCmd::command }, { _SS(CMD_PARAM), &ParamCmd::command }, {
-				_SS(CMD_VERTEX_PROG), &ShaderCmd::command }, };
+		{ _SS(CMD_DOMAIN_PROG), &ShaderCmd::commandDomain },
+		{ _SS(CMD_FRAGMENT_PROG), &ShaderCmd::commandFragment },
+		{ _SS(CMD_GEOMETRY_PROG), &ShaderCmd::commandGeometry },
+		{ _SS(CMD_HULL_PROG), &ShaderCmd::commandHull },
+		{ _SS(CMD_OPTION), &ParamCmd::command },
+		{ _SS(CMD_PARAM), &ParamCmd::command },
+		{ _SS(CMD_VERTEX_PROG), &ShaderCmd::commandVertex },
+};
 
 const size_t ProgramListener::commandCount = sizeof(ProgramListener::commands)
 		/ sizeof(ProgramListener::commands[0]);
@@ -34,9 +42,7 @@ const size_t ProgramListener::commandCount = sizeof(ProgramListener::commands)
 void ProgramCmd::Execute(int parentType, void* parentParam,
 		ScriptParser::StatementContext& ctx) {
 	if (parentType == CommandDelegate::SHADER_BLOCK) {
-		ShaderAsset::StreamRequest* shader =
-				static_cast<ShaderAsset::StreamRequest*>(parentParam);
-		ProgramListener programListener(shader);
+		ProgramListener programListener(static_cast<ShaderScript*>(parentParam));
 		ctx.ParseBlock(&programListener);
 	} else {
 		ctx.Error("Program block needs to be inside Shader declaration.");
@@ -105,16 +111,9 @@ void ShaderCmd::Execute(int parentType, void* parentParam,
 	NEX_ASSERT(parentType == CommandDelegate::SHADER_BLOCK);
 	ShaderScript* script = (static_cast<ShaderScript*>(parentParam));
 	String programRegion;
-	StringUtils::TokenIterator it = 0;
-	it = StringUtils::NextWord(statement.paramContext, programRegion, it);
-	if (it != String::npos) {
-		GpuProgram::Type type = GpuProgram::TYPE_VERTEX;
-		if (statement.command == _SS(CMD_FRAGMENT_PROG))
-			type = GpuProgram::TYPE_FRAGMENT;
-		else if (statement.command == _SS(CMD_GEOMETRY_PROG))
-			type = GpuProgram::TYPE_GEOMETRY;
-		script->SetRegionAsSource(type, programRegion);
-	}
+	StringUtils::TokenIterator it = StringUtils::NextWord(statement.GetParamList(),
+			programRegion, it);
+	script->SetRegionAsSource(stage, programRegion);
 }
 
 } /* namespace ShaderCompiler */

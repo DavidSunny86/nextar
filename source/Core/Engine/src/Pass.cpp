@@ -14,10 +14,19 @@ namespace nextar {
 
 Pass::AutoParamMap Pass::autoParams;
 
-Pass::Pass() :
-		ContextObject(TYPE_PASS, 0), NamedObject(StringUtils::NullID)
+Pass::Pass(StringID name) :
+		NamedObject(name),
+		ContextObject(TYPE_PASS, 0)
 		//,inputLayoutUniqueID(-1)
 				, flags(0) {
+}
+
+Pass::Pass(Pass&& p) {
+	NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
+}
+
+Pass::Pass(const Pass& p) {
+	NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
 }
 
 Pass::~Pass() {
@@ -95,9 +104,10 @@ void Pass::View::UpdateParams(CommitContext& ctx, ParameterContext type,
 			continue;
 		ctx.currentGroup = group;
 		if (group->processor) {
+			ctx.currentGroupDataPtr = nullptr;
 			group->processor->Apply(ctx, group);
 		} else {
-			group->Map(ctx.renderContext);
+			ctx.currentGroupDataPtr = group->Map(ctx.renderContext);
 			for (uint32 i = 0; i < group->numParams; ++i) {
 				ConstantParameter* parameter = group->GetParamByIndex(i);
 				NEX_ASSERT(parameter->processor);

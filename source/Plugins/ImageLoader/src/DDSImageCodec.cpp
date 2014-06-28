@@ -84,7 +84,6 @@ PixelFormat DDSImageCodec::GetPixelFormat(DDS_PIXELFORMAT& fmt) {
 
 ImageData DDSImageCodec::CreateImageData(InputSerializer& ser,
 		DDS_HEADER* header, size_t offset, const ImageParams& params, ImageCodecMetaInfo& metaInfo) {
-	ImageData image;
 	if (!metaInfo.metaInfoInited) {
 		metaInfo.metaInfo.maxWidth = (uint16) header->width;
 		metaInfo.metaInfo.maxHeight = (uint16) header->height;
@@ -92,16 +91,19 @@ ImageData DDSImageCodec::CreateImageData(InputSerializer& ser,
 		metaInfo.metaInfo.maxMipMapCount = (uint16) header->mipMapCount;
 		metaInfo.mipLevelsToRead = (uint16) header->mipMapCount;
 		metaInfo.metaInfoInited = true;
+		if (0 == metaInfo.metaInfo.maxMipMapCount) {
+			metaInfo.metaInfo.maxMipMapCount = 1;
+		}
+		// Bound sizes (for security purposes we don't trust DDS file metadata larger than the D3D 11.x hardware requirements)
+		if (metaInfo.metaInfo.maxMipMapCount > (uint16)RenderConstants::MAX_MIP_LEVELS) {
+			NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
+		}
 	}
 
 	uint32 resDim = -1;
 	size_t arraySize = 1;
 	PixelFormat format = PixelFormat::UNKNOWN;
 	bool isCubeMap = false;
-
-	if (0 == metaInfo.metaInfo.maxMipMapCount) {
-		image.totalMipMapCount = 1;
-	}
 
 	if ((header->ddspf.flags & DDS_FOURCC)
 			&& (MAKEFOURCC('D', 'X', '1', '0') == header->ddspf.fourCC)) {
@@ -124,10 +126,10 @@ ImageData DDSImageCodec::CreateImageData(InputSerializer& ser,
 		switch (d3d10ext.resourceDimension) {
 		case DDS_DIMENSION_TEXTURE1D:
 			// D3DX writes 1D textures with a fixed Height of 1
-			if ((header->flags & DDS_HEIGHT) && image.height != 1) {
+			if ((header->flags & DDS_HEIGHT) && metaInfo.metaInfo.maxHeight != 1) {
 				NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 			}
-			image.height = image.depth = 1;
+			metaInfo.metaInfo.maxHeight = metaInfo.metaInfo.maxDepth = 1;
 			break;
 
 		case DDS_DIMENSION_TEXTURE2D:
@@ -135,7 +137,7 @@ ImageData DDSImageCodec::CreateImageData(InputSerializer& ser,
 				arraySize *= 6;
 				isCubeMap = true;
 			}
-			image.depth = 1;
+			metaInfo.metaInfo.maxDepth = 1;
 			break;
 
 		case DDS_DIMENSION_TEXTURE3D:
@@ -172,7 +174,7 @@ ImageData DDSImageCodec::CreateImageData(InputSerializer& ser,
 				isCubeMap = true;
 			}
 
-			image.depth = 1;
+			metaInfo.metaInfo.maxDepth = 1;
 			resDim = DDS_DIMENSION_TEXTURE2D;
 			// Note there's no way for a legacy Direct3D 9 DDS to express a '1D' texture
 		}
@@ -180,15 +182,10 @@ ImageData DDSImageCodec::CreateImageData(InputSerializer& ser,
 		//assert(BitsPerPixel(format) != 0);
 	}
 
-	// Bound sizes (for security purposes we don't trust DDS file metadata larger than the D3D 11.x hardware requirements)
-	if (image.totalMipMapCount > RenderConstants::MAX_MIP_LEVELS) {
-		NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
-	}
-
 	switch (resDim) {
 	case DDS_DIMENSION_TEXTURE1D:
 		if (((uint32)arraySize > RenderConstants::MAX_TEXTURE_LAYER)
-				|| ((uint32)image.width > RenderConstants::MAX_TEXTURE_DIM)) {
+				|| ((uint32)metaInfo.metaInfo.maxWidth > RenderConstants::MAX_TEXTURE_DIM)) {
 			NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 		}
 		break;
@@ -197,27 +194,28 @@ ImageData DDSImageCodec::CreateImageData(InputSerializer& ser,
 		if (isCubeMap) {
 			// This is the right bound because we set arraySize to (NumCubes*6) above
 			if (((uint32)arraySize > RenderConstants::MAX_TEXTURE_LAYER)
-					|| ((uint32)image.width > RenderConstants::MAX_TEXTURE_DIM)
-					|| ((uint32)image.height > RenderConstants::MAX_TEXTURE_DIM)) {
+					|| ((uint32)metaInfo.metaInfo.maxWidth > RenderConstants::MAX_TEXTURE_DIM)
+					|| ((uint32)metaInfo.metaInfo.maxHeight > RenderConstants::MAX_TEXTURE_DIM)) {
 				NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 			}
 		} else if (((uint32)arraySize > RenderConstants::MAX_TEXTURE_LAYER)
-				|| ((uint32)image.width > RenderConstants::MAX_TEXTURE_DIM)
-				|| ((uint32)image.height > RenderConstants::MAX_TEXTURE_DIM)) {
+				|| ((uint32)metaInfo.metaInfo.maxWidth > RenderConstants::MAX_TEXTURE_DIM)
+				|| ((uint32)metaInfo.metaInfo.maxHeight > RenderConstants::MAX_TEXTURE_DIM)) {
 			NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 		}
 		break;
 
 	case DDS_DIMENSION_TEXTURE3D:
-		if ((arraySize > 1) || ((uint32)image.width > RenderConstants::MAX_TEXTURE_DIM)
-				|| ((uint32)image.height > RenderConstants::MAX_TEXTURE_DIM)
-				|| ((uint32)image.depth > RenderConstants::MAX_TEXTURE_DIM)) {
+		if ((arraySize > 1)
+				|| ((uint32)metaInfo.metaInfo.maxWidth > RenderConstants::MAX_TEXTURE_DIM)
+				|| ((uint32)metaInfo.metaInfo.maxWidth > RenderConstants::MAX_TEXTURE_DIM)
+				|| ((uint32)metaInfo.metaInfo.maxDepth > RenderConstants::MAX_TEXTURE_DIM)) {
 			NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 		}
 		break;
 	}
 
-	return FillInitData(ser, image, arraySize, format, params);
+	return FillInitData(ser, arraySize, format, params, metaInfo);
 }
 
 void DDSImageCodec::GetSurfaceInfo(size_t width, size_t height, PixelFormat fmt,
@@ -298,8 +296,8 @@ void DDSImageCodec::GetSurfaceInfo(size_t width, size_t height, PixelFormat fmt,
 	}
 }
 
-ImageData DDSImageCodec::FillInitData(InputSerializer& ser, ImageData& image, /* clear this parameter with only dimensions */
-size_t arraySize, PixelFormat format, const ImageParams& params) {
+ImageData DDSImageCodec::FillInitData(InputSerializer& ser, size_t arraySize,
+		PixelFormat format, const ImageParams& params, ImageCodecMetaInfo& metaInfo) {
 
 	ImageData ret = { 0 };
 
@@ -307,36 +305,37 @@ size_t arraySize, PixelFormat format, const ImageParams& params) {
 	size_t rowBytes = 0;
 	size_t numRows = 0;
 
-	size_t baseMipLevel = params.baseMipLevel;
-	size_t numMipLevelToLoad = params.numMipLevelToLoad;
+	uint32 baseMipLevel = params.baseMipLevel;
+	uint32 numMipLevelToLoad = params.numMipLevelToLoad;
 
 	if (params.numMipLevelToLoad == Image::IMAGE_ALL_MIP_LEVELS) {
-		numMipLevelToLoad = image.totalMipMapCount;
+		numMipLevelToLoad = metaInfo.metaInfo.maxMipMapCount;
 	}
 
 	if (baseMipLevel == Image::IMAGE_HIGHEST_MIP_LEVEL) {
 		baseMipLevel = 0;
 	} else if (baseMipLevel == Image::IMAGE_LOWEST_MIP_LEVEL) {
-		baseMipLevel = image.totalMipMapCount - numMipLevelToLoad;
+		baseMipLevel = metaInfo.metaInfo.maxMipMapCount - numMipLevelToLoad;
 	}
 
-	if (baseMipLevel + numMipLevelToLoad > image.totalMipMapCount)
-		numMipLevelToLoad = image.totalMipMapCount - baseMipLevel;
+	if (baseMipLevel + numMipLevelToLoad > metaInfo.metaInfo.maxMipMapCount)
+		numMipLevelToLoad = metaInfo.metaInfo.maxMipMapCount - baseMipLevel;
 
-	ret.totalMipMapCount = image.totalMipMapCount;
 	ret.format = format;
 	ret.numFaces = arraySize;
 	ret.numMipMaps = numMipLevelToLoad;
 
 	size_t highestMipLevel = baseMipLevel + numMipLevelToLoad;
 	size_t totalBufferSize = 0;
+	// misleading but the math works out like this
+	metaInfo.mipLevelsToRead = baseMipLevel;
 	// calculate total buffer size
 	for (size_t j = 0; j < arraySize; j++) {
-		size_t w = image.width;
-		size_t h = image.height;
-		size_t d = image.depth;
+		size_t w = metaInfo.metaInfo.maxWidth;
+		size_t h = metaInfo.metaInfo.maxHeight;
+		size_t d = metaInfo.metaInfo.maxDepth;
 
-		for (size_t i = 0; i < image.totalMipMapCount; i++) {
+		for (size_t i = 0; i < metaInfo.metaInfo.maxMipMapCount; i++) {
 			GetSurfaceInfo(w, h, format, &numBytes, &rowBytes, &numRows);
 			// mip levels loaded are
 			// baseMipLevel <= i < baseMipLevel + numMipLevelsToLoad
@@ -369,11 +368,11 @@ size_t arraySize, PixelFormat format, const ImageParams& params) {
 
 	uint8* byteArr = (uint8*) ret.data;
 	for (size_t j = 0; j < arraySize; j++) {
-		size_t w = image.width;
-		size_t h = image.height;
-		size_t d = image.depth;
+		size_t w = metaInfo.metaInfo.maxWidth;
+		size_t h = metaInfo.metaInfo.maxHeight;
+		size_t d = metaInfo.metaInfo.maxDepth;
 
-		for (size_t i = 0; i < image.totalMipMapCount; i++) {
+		for (size_t i = 0; i < metaInfo.metaInfo.maxMipMapCount; i++) {
 			GetSurfaceInfo(w, h, format, &numBytes, &rowBytes, &numRows);
 			// mip levels loaded are
 			// baseMipLevel <= i < baseMipLevel + numMipLevelsToLoad
@@ -449,4 +448,5 @@ void DDSImageCodec::Save(OutputStreamPtr& file, const ImageParams& params,
 		const ImageData& data) {
 	NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
 }
+
 } /* namespace nextar */

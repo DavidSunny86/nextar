@@ -14,14 +14,16 @@
 namespace ShaderCompiler {
 
 class TextureUnitStateCmd: public CommandDelegate {
+public:
 	static TextureUnitStateCmd command;
 	virtual void Execute(int parentType, void* parentParam,
 			ScriptParser::StatementContext& statement);
 
 };
 
-struct TextureUnitStateListener: public ScriptParser::BlockListener,
+class TextureUnitStateListener: public ScriptParser::BlockListener,
 		public ScriptParser::StatementListener {
+public:
 	//static CommandNamePair commands[];
 	//static const size_t commandCount;
 	ShaderAsset::StreamRequest* shader;
@@ -32,7 +34,8 @@ struct TextureUnitStateListener: public ScriptParser::BlockListener,
 	virtual void EnterStatement(ScriptParser::StatementContext& statement);
 };
 
-struct UnitCmd: public CommandDelegate {
+class UnitCmd: public CommandDelegate {
+public:
 	static UnitCmd command;
 	virtual void Execute(int parentType, void* parentParam,
 			ScriptParser::StatementContext& statement);

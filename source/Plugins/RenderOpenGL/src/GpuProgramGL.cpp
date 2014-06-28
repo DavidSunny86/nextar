@@ -6,6 +6,7 @@
  */
 #include <RenderOpenGL.h>
 #include <GpuProgramGL.h>
+#include <RenderContextGL.h>
 
 namespace RenderOpenGL {
 

@@ -37,6 +37,7 @@ public:
 	}
 
 	static StringID AsyncStringID(const String&);
+	static void OnExit();
 
 protected:
 	static StringInternTable nameTable;

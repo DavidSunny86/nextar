@@ -37,11 +37,12 @@ void ShaderAsset::NotifyAssetLoaded() {
 	_DestroyPasses();
 
 	StreamPassList &spl = creationParams->passes;
-	passes.resize(spl.size());
+	passes.reserve(spl.size());
 
 	for (uint32 passIndex = 0; passIndex < spl.size(); ++passIndex) {
 		spl[passIndex].compileParams.passIndex = passIndex;
-		_CompilePass(passes[passIndex], spl[passIndex],
+		passes.emplace_back(spl[passIndex].name);
+		_CompilePass(passes.back(), spl[passIndex],
 				creationParams->compilationOpt);
 	}
 	/* update */
@@ -123,11 +124,19 @@ void ShaderAsset::_BuildParameterTable(StreamPassList& spl) {
 	}
 }
 
+
+/*****************************************************/
+/* Shader::StreamPass                                */
+/*****************************************************/
+ShaderAsset::StreamPass::StreamPass(const ShaderAsset::StreamPass& p) {
+	NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
+}
+
 /*****************************************************/
 /* Shader::StreamRequest							 */
 /*****************************************************/
 ShaderAsset::StreamRequest::StreamRequest(ShaderAsset* shader) :
-		AssetStreamRequest(shader), currentPass(-1) {
+		AssetStreamRequest(shader) {
 }
 
 ShaderAsset::StreamRequest::~StreamRequest() {
@@ -139,7 +148,7 @@ void ShaderAsset::StreamRequest::SetOptions(const String& options) {
 
 void ShaderAsset::StreamRequest::SetProgramSource(Pass::ProgramStage stage,
 		String&& src) {
-	passes[currentPass].compileParams.programSources[stage] = std::move(src);
+	(*currentPass).compileParams.programSources[stage] = std::move(src);
 }
 
 void ShaderAsset::StreamRequest::AddParam(const String& name,
@@ -155,7 +164,7 @@ void ShaderAsset::StreamRequest::AddTextureUnit(const String& unitName,
 		TextureUnitParams& tu, TextureBase* texture) {
 	ShaderAsset* shader = static_cast<ShaderAsset*>(streamedObject);
 	Pass::TextureDescMap& defaultTextureUnits =
-			passes[currentPass].compileParams.textureStates;
+			(*currentPass).compileParams.textureStates;
 	Pass::SamplerDesc& sd = defaultTextureUnits[unitName];
 	sd.texUnitParams = tu;
 	sd.defaultTexture = texture;
@@ -164,26 +173,26 @@ void ShaderAsset::StreamRequest::AddTextureUnit(const String& unitName,
 }
 
 void ShaderAsset::StreamRequest::SetBlendState(BlendState& state) {
-	passes[currentPass].compileParams.blendState = state;
+	(*currentPass).compileParams.blendState = state;
 }
 
 void ShaderAsset::StreamRequest::SetRasterState(RasterState& state) {
-	passes[currentPass].compileParams.rasterState = state;
+	(*currentPass).compileParams.rasterState = state;
 }
 
 void ShaderAsset::StreamRequest::SetDepthStencilState(
 		DepthStencilState& state) {
-	passes[currentPass].compileParams.depthStencilState = state;
+	(*currentPass).compileParams.depthStencilState = state;
 }
 
 void ShaderAsset::StreamRequest::AddPass(StringID name) {
-	currentPass = (uint32) passes.size();
-	passes.resize(currentPass + 1);
-	passes[currentPass].name = name;
+	passes.emplace_back(name);
+	currentPass = passes.rbegin();
 }
 
 void ShaderAsset::StreamRequest::SetParamterBuffer(ParameterBuffer&& data) {
 	ShaderAsset* shader = static_cast<ShaderAsset*>(streamedObject);
 	shader->passParamData = std::move(data);
 }
+
 } /* namespace nextar */

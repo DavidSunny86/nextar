@@ -8,10 +8,15 @@
 #ifndef SCRIPTSTRINGS_H_
 #define SCRIPTSTRINGS_H_
 
+#if defined(NEX_SHADER_STRINGS_DEFINE)
 #define SCRIPT_STRING(str, what)	const char* SCRIPT_##str=what
+#else
+#define SCRIPT_STRING(str, what)	extern const char* SCRIPT_##str
+#endif
 #define _SS(str) SCRIPT_##str
 
 namespace ShaderCompiler {
+
 SCRIPT_STRING(LANG_GLSL, "glsl");
 SCRIPT_STRING(LANG_HLSL, "hlsl");
 SCRIPT_STRING(REGION_SHADER, "shader");
@@ -33,9 +38,11 @@ SCRIPT_STRING(CMD_RASTER, "raster");
 SCRIPT_STRING(CMD_SCISSOR, "scissor");
 SCRIPT_STRING(CMD_FRAGMENT_PROG, "fragment_program");
 SCRIPT_STRING(CMD_GEOMETRY_PROG, "geometry_program");
+SCRIPT_STRING(CMD_VERTEX_PROG, "vertex_program");
+SCRIPT_STRING(CMD_HULL_PROG, "hull_program");
+SCRIPT_STRING(CMD_DOMAIN_PROG, "domain_program");
 SCRIPT_STRING(CMD_OPTION, "option");
 SCRIPT_STRING(CMD_PARAM, "param");
-SCRIPT_STRING(CMD_VERTEX_PROG, "vertex_program");
 SCRIPT_STRING(ARG_ALWAYS, "always");
 SCRIPT_STRING(ARG_EQUAL, "equal");
 SCRIPT_STRING(ARG_GREATER, "greater");

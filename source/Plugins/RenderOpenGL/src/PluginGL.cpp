@@ -27,12 +27,11 @@ void PluginGL::Open() {
 }
 
 void PluginGL::LicenseRenewed() {
-	ApplicationContext::GetSingleton().RegisterRenderManager(&renderManagerGl);
+	renderManagerGl = NEX_NEW(RenderManagerGL());
 }
 
 bool PluginGL::LicenseExpired() {
-	ApplicationContext::GetSingleton().UnregisterRenderManager(
-			&renderManagerGl);
+	NEX_DELETE(renderManagerGl);
 	return true;
 }
 

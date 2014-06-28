@@ -26,7 +26,7 @@ public:
 
 	MeshVertexData* ReadVertexData(MeshAsset::StreamRequest*,
 			InputSerializer& ser, VertexElement* vertexElement,
-			uint16 vertexElementCount);
+			uint16 vertexElementCount, VertexLayoutType type);
 	void ReadMeshHeader(MeshAsset::StreamRequest*, InputSerializer& ser);
 	BoundsInfo ReadBoundsInfo(MeshAsset::StreamRequest*, InputSerializer& ser);
 	MeshIndexData* ReadIndexData(MeshAsset::StreamRequest*,
@@ -38,7 +38,7 @@ public:
 
 	void ReadMeshChunk(MeshAsset::StreamRequest*, InputSerializer& ser);
 	void ReadVertexElementData(MeshAsset::StreamRequest*, InputSerializer& ser,
-			VertexElement*& vertexElement, uint16& vertexDataCount);
+			uint16& layoutType, uint8& vertexElementCount, VertexElement*& vertexElement);
 	void ReadVertexBufferData(MeshAsset::StreamRequest*, InputSerializer& ser,
 			MeshVertexData*& vertexData);
 

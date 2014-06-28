@@ -51,7 +51,7 @@ public:
 	 * VideoMode:class VideoMode, ExitOnClose:bool
 	 * */
 	virtual RenderWindow* CreateRenderWindow(uint32 width, uint32 height,
-	bool fullscreen, NameValueMap* params) = 0;
+			bool fullscreen, const NameValueMap* params) = 0;
 
 	/* Called by the window to indicate it was destroyed */
 	virtual void DestroyedRenderWindow(RenderWindow*) = 0;
@@ -70,7 +70,13 @@ public:
 	virtual void UnregisterObject(ContextID) = 0;
 	virtual void UpdateObject(ContextObject*, uint32 updateMsg,
 			ContextObject::ContextParamPtr) = 0;
+#if NEX_MULTIGPU_BUILD
 	virtual ContextObject::View* GetView(const ContextObject*) = 0;
+#else
+	inline ContextObject::View* GetView(const ContextObject* object) {
+		return reinterpret_cast<ContextObject::View*>(object->GetContextID());
+	}
+#endif
 };
 
 }

@@ -11,6 +11,9 @@
 namespace RenderOpenGL {
 
 /************************ VertexLayoutGL ************************/
+VertexLayoutGL::VertexLayoutGL() {
+}
+
 uint16 VertexLayoutGL::GetFromGlType(GLenum e) {
 	switch (e) {
 	case GL_FLOAT:
@@ -67,8 +70,8 @@ void VertexLayoutGL::Populate(VertexAttribGL& attrib) {
 void VertexLayoutGL::Update(nextar::RenderContext* rc, uint32 msg,
 		ContextObject::ContextParamPtr param) {
 	if (param && msg == VertexLayout::MSG_CREATE) {
-		VertexLayout::CreateParam* up =
-				reinterpret_cast<VertexLayout::CreateParam*>(param);
+		const VertexLayout::CreateParam* up =
+				reinterpret_cast<const VertexLayout::CreateParam*>(param);
 		attributes.resize(up->numElements);
 		const VertexElement* el = up->elements;
 		for (auto& a : attributes) {
@@ -180,6 +183,9 @@ GLuint VertexLayoutStaticGL::CreateLayout(RenderContextGL* gl,
 /************************ VertexLayoutFlexibleGL ************************/
 VertexLayoutFlexibleGL::VertexLayoutFlexibleGL() :
 		cachedIndex(0), numSyncRequired(0) {
+}
+
+VertexLayoutFlexibleGL::~VertexLayoutFlexibleGL() {
 }
 
 void VertexLayoutFlexibleGL::Destroy(nextar::RenderContext* rc) {

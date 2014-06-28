@@ -17,7 +17,7 @@ namespace MeshLoader {
 class Plugin;
 class MeshLoaderIntf {
 public:
-	virtual void Load(InputSerializer&, MeshAsset::Loader& loader) = 0;
+	virtual void Load(InputSerializer&, AssetLoader& loader) = 0;
 protected:
 	~MeshLoaderIntf() {
 	}

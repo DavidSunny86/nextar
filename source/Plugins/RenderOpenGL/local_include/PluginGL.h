@@ -26,7 +26,7 @@ public:
 	virtual void Dispose();
 
 protected:
-	RenderManagerGL renderManagerGl;
+	RenderManagerGL* renderManagerGl;
 };
 
 } /* namespace RenderOpenGL */

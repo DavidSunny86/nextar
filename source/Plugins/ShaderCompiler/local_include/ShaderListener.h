@@ -12,6 +12,7 @@
 
 namespace ShaderCompiler {
 
+class ShaderScript;
 /** Shader <name> {}*/
 class ShaderListener: public ScriptParser::StatementListener,
 		public ScriptParser::BlockListener {
@@ -27,6 +28,7 @@ public:
 	virtual void EnterBlock(ScriptParser::BlockContext& block);
 	virtual void EnterStatement(ScriptParser::StatementContext& statement);
 protected:
+	friend class ShaderScript;
 	~ShaderListener() {
 	}
 };

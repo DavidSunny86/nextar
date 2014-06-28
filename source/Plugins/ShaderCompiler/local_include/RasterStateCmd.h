@@ -32,6 +32,7 @@ public:
 	virtual void EnterBlock(ScriptParser::BlockContext& block);
 	virtual void EnterStatement(ScriptParser::StatementContext& statement);
 protected:
+	friend class RasterStateCmd;
 	~RasterStateListener() {
 	}
 };

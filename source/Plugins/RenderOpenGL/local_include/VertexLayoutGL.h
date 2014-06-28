@@ -10,9 +10,11 @@
 
 #include <RenderConstants.h>
 #include <RenderOpenGL.h>
+#include <VertexElementGL.h>
 
 namespace RenderOpenGL {
 
+class PassViewGL;
 class GpuBufferViewGL;
 /** todo We can have more efficient structures here, but if this works out,
  then no worry */
@@ -65,6 +67,9 @@ class VertexLayoutFlexibleGL : public VertexLayoutGL {
 	PassLayoutVertexArrayPairList passVertexArrayPairs;
 	GpuBufferViewGL* transients[(size_t)RenderConstants::MAX_VERTEX_STREAMS];
 public:
+	VertexLayoutFlexibleGL();
+	~VertexLayoutFlexibleGL();
+
 	virtual void Update(nextar::RenderContext*, uint32 msg,
 			ContextObject::ContextParamPtr);
 	virtual void Destroy(nextar::RenderContext*);

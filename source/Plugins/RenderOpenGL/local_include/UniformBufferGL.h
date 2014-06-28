@@ -35,7 +35,7 @@ public:
 		return ubBindingGl;
 	}
 
-	virtual void Map(RenderContext* rc);
+	virtual void* Map(RenderContext* rc);
 	virtual void SetRawBuffer(RenderContext* rc, const ConstantParameter& desc,
 			const void* data);
 	virtual void Unmap(RenderContext* rc);

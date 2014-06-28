@@ -12,4 +12,9 @@ NamedObject::NamedObject(const String& _name) :
 StringID NamedObject::AsyncStringID(const String& name) {
 	return nameTable.AsyncStringID(name);
 }
+
+void NamedObject::OnExit() {
+	nameTable.SaveToCache();
+}
+
 }

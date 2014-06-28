@@ -37,7 +37,6 @@ struct ImageParams {
 struct ImageData {
 	uint8 numFaces;
 	uint8 numMipMaps;
-	uint8 totalMipMapCount;
 	uint16 depth;
 	uint16 height;
 	uint16 width;

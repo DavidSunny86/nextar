@@ -33,7 +33,7 @@ public:
 		TYPE_PASS,
 	};
 
-	class View {
+	class View : public AllocGraphics {
 	public:
 		//View(ContextObject* _parent) : parentObject(_parent) {}
 		/*
@@ -81,6 +81,8 @@ public:
 	 * the call and register a callback to be called when the update is done. */
 	virtual void RequestUpdate(uint32 updateMsg,
 			ContextObject::ContextParamPtr);
+private:
+	ContextObject(const ContextObject&) = delete;
 
 protected:
 	ContextID contextId;

@@ -44,32 +44,37 @@ struct array {
 	typedef typename std::array<T, _Nm> type;
 };
 
-template<typename T, typename Allocator = AllocatorGeneral>
+template<typename T, typename Allocator = AllocatorGeneral,
+		typename STDAllocatorType = STDAllocator<T, Allocator> >
 struct vector {
-	typedef typename std::vector<T, STDAllocator<T, Allocator> > type;
+	typedef typename std::vector<T, STDAllocatorType > type;
 };
 
-template<typename T, typename Allocator = AllocatorGeneral>
+template<typename T, typename Allocator = AllocatorGeneral,
+		typename STDAllocatorType = STDAllocator<T, Allocator> >
 struct list {
-	typedef typename std::list<T, STDAllocator<T, Allocator> > type;
+	typedef typename std::list<T, STDAllocatorType > type;
 };
 
-template<typename T, typename Allocator = AllocatorGeneral>
+template<typename T, typename Allocator = AllocatorGeneral,
+		typename STDAllocatorType = STDAllocator<T, Allocator> >
 struct forward_list {
-	typedef typename std::forward_list<T, STDAllocator<T, Allocator> > type;
+	typedef typename std::forward_list<T, STDAllocatorType > type;
 };
 
 template<typename T, typename Pr = std::less<T>,
-		typename Allocator = AllocatorGeneral>
+		typename Allocator = AllocatorGeneral,
+		typename STDAllocatorType = STDAllocator<T, Allocator> >
 struct set {
-	typedef typename std::set<T, Pr, STDAllocator<T, Allocator> > type;
+	typedef typename std::set<T, Pr, STDAllocatorType > type;
 };
 
 template<typename Kty, typename T, typename Pr = std::less<Kty>,
-		typename Allocator = AllocatorGeneral>
+		typename Allocator = AllocatorGeneral,
+		typename STDAllocatorType = STDAllocator<std::pair<Kty, T>, Allocator> >
 struct map {
 	typedef typename std::map<Kty, T, Pr,
-			STDAllocator<std::pair<Kty, T>, Allocator> > type;
+			STDAllocatorType > type;
 };
 
 template<typename T, typename Hsh = std::hash<T>,

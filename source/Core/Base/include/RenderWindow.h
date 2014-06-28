@@ -6,7 +6,7 @@
 
 namespace nextar {
 
-class _NexBaseAPI RenderWindow {
+class _NexBaseAPI RenderWindow : public AllocGraphics {
 
 	NEX_LOG_HELPER (RenderWindow);
 
@@ -73,6 +73,10 @@ public:
 
 	inline Impl* GetImpl() const {
 		return impl;
+	}
+
+	inline const String& GetTitle() const {
+		return windowTitle;
 	}
 
 	/** @remarks Add winodw event listener */

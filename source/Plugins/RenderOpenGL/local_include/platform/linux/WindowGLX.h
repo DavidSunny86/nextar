@@ -18,9 +18,8 @@ class RenderContextGLX;
 
 class WindowGLX: public nextar::XWindow {
 
-	NEX_LOG_HELPER(WindowGLX)
-	;
-
+	NEX_LOG_HELPER(WindowGLX);
+public:
 	class Impl: public RenderWindowImpl {
 		NEX_LOG_HELPER(WindowGLX::Impl)
 		;

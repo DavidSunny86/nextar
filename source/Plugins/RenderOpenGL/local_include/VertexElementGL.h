@@ -34,6 +34,21 @@ struct MappedVertexAttribList {
 	MappedVertexAttrib attribs[1];
 };
 
+struct VertexSemanticGL {
+	VertexSemantic semantic;
+	GLuint index;
+
+	friend bool operator ==(const VertexSemanticGL& v1,
+			const VertexSemanticGL& v2) {
+		// types may vary depending upon normalization is used
+		return (v1 == v2 && v1.index == v2.index);
+	}
+};
+
+/** Stored in passes, streams can only be bound
+ * to matching vertex signatures.
+ */
+typedef vector<VertexSemanticGL>::type VertexSemanticListGL;
 typedef std::vector<VertexAttribGL> VertexAttribListGL;
 typedef std::pair<uint32, GLuint> PassLayoutVertexArrayPair;
 typedef std::vector<PassLayoutVertexArrayPair> PassLayoutVertexArrayPairList;

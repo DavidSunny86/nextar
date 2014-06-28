@@ -27,11 +27,11 @@ void Plugin::Open() {
 }
 
 void Plugin::LicenseRenewed() {
-	MeshAsset::Loader::RegisterFactory("MESH", &MeshLoaderImpl::impl);
+	AssetLoader::RegisterFactory("MESH", MeshAsset::CLASS_ID, &MeshLoaderImpl::impl);
 }
 
 bool Plugin::LicenseExpired() {
-	MeshAsset::Loader::UnregisterFactory("MESH");
+	AssetLoader::UnregisterFactory("MESH", MeshAsset::CLASS_ID);
 	return true;
 }
 

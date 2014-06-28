@@ -13,7 +13,7 @@ namespace nextar {
 
 GpuBuffer::GpuBuffer(GpuBuffer&& other) : 
 		ReferencedType(),
-		ContextObject(other),
+		ContextObject(std::move(other)),
 		size(other.size) {
 	other.size = 0;
 }

@@ -40,7 +40,9 @@ public:
 	// layout type
 	VertexLayoutType layoutType;
 	/* Num vertex element */
-	uint16 numVertexElements;
+	uint8 numVertexElements;
+	/* vertex buffer count */
+	uint8 numVertexBuffers;
 	// vertex elements
 	VertexElement* vertexElements;
 	/* Layout created for vertex data */
@@ -59,6 +61,12 @@ public:
 
 	void ApplyCustomLayout();
 	void SetLayoutFromType();
+
+	static void GetCustomLayoutElements(VertexLayoutType type,
+			const VertexElement*& elements, uint32& numElements) {
+		elements = commonElementLayout[type].elements;
+		numElements = commonElementLayout[type].numElements;
+	}
 
 protected:
 	struct CommonVertexElement {

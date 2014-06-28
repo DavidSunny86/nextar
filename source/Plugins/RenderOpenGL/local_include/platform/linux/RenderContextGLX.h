@@ -2,7 +2,7 @@
 
 #include <RenderOpenGL.h>
 #include <RenderContextGL.h>
-#include <glx/WindowGLX.h>
+#include <WindowGLX.h>
 
 namespace RenderOpenGL {
 
@@ -42,7 +42,8 @@ public:
 
 	inline void Present(WindowGLX::Impl* window) {
 		glXSwapBuffers(display, window->GetDrawable());
-		GL_CHECK();}
+		GL_CHECK();
+	}
 
 	protected:
 

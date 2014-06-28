@@ -4,7 +4,7 @@
 namespace nextar {
 
 VertexBuffer::VertexBuffer(VertexBuffer&& other) :
-	GpuBuffer(other), policy(other.policy) {
+	GpuBuffer(std::move(other)), policy(other.policy) {
 }
 
 VertexBuffer::VertexBuffer(RelocationPolicy _policy) :

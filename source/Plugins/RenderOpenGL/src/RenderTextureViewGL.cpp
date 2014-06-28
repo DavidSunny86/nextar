@@ -11,7 +11,7 @@
 namespace RenderOpenGL {
 
 RenderTextureViewGL::RenderTextureViewGL() :
-		fbo(0) {
+		fbo() {
 }
 
 RenderTextureViewGL::~RenderTextureViewGL() {

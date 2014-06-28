@@ -38,8 +38,7 @@ protected:
 
 	static void GetSurfaceInfo(size_t width, size_t height, PixelFormat fmt,
 			size_t* outNumBytes, size_t* outRowBytes, size_t* outNumRows);
-	ImageData FillInitData(InputSerializer& file, ImageData& initialData,
-			size_t arraySize, PixelFormat, const ImageParams& params);
+	ImageData FillInitData(InputSerializer& file, size_t arraySize, PixelFormat, const ImageParams& params, ImageCodecMetaInfo& metaInfo);
 	ImageData CreateImageData(InputSerializer& file, DDS_HEADER* header,
 			size_t offset, const ImageParams& params, ImageCodecMetaInfo& metaInfo);
 };

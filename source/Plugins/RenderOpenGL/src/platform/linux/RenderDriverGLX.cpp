@@ -1,7 +1,7 @@
 #include <RenderOpenGL.h>
 #include <RenderDriverGL.h>
-#include <glx/RenderDriverGLX.h>
-#include <glx/RenderContextGLX.h>
+#include <RenderDriverGLX.h>
+#include <RenderContextGLX.h>
 
 namespace RenderOpenGL {
 

@@ -6,6 +6,11 @@
  */
 
 #include <MultiRenderTargetViewGL.h>
+#include <RenderBuffer.h>
+#include <RenderTarget.h>
+#include <RenderTexture.h>
+#include <RenderBufferViewGL.h>
+#include <RenderTextureViewGL.h>
 
 namespace RenderOpenGL {
 
@@ -27,34 +32,34 @@ void MultiRenderTargetViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 		uint32 numColorTargets = rt->GetColorTargetsCount();
 		fbo.CreateAndBind(gl);
 		for (uint32 i = 0; i < numColorTargets; ++i) {
-			RenderTargetPtr colorTarget = rt->GetAttachment(i);
+			RenderTarget* colorTarget = rt->GetAttachment(i).GetPtr();
 			switch (colorTarget->GetRenderTargetType()) {
 			case RenderTargetType::RENDER_BUFFER:
 				fbo.Attach(gl, GL_COLOR_ATTACHMENT0 + i,
 						static_cast<RenderBufferViewGL*>(gl->GetView(
-								static_cast<RenderBuffer*>(rt))));
+								static_cast<RenderBuffer*>(colorTarget))));
 				break;
 			case RenderTargetType::RENDER_TEXTURE:
 				fbo.Attach(gl, i,
 						static_cast<RenderTextureViewGL*>(gl->GetView(
-								static_cast<RenderTexture*>(rt))));
+								static_cast<RenderTexture*>(colorTarget))));
 				break;
 			}
 		}
 
-		RenderTargetPtr depthTarget = rt->GetDepthAttachment();
+		RenderTarget* depthTarget = rt->GetDepthAttachment().GetPtr();
 		switch (depthTarget->GetRenderTargetType()) {
 		case RenderTargetType::RENDER_BUFFER: {
 			RenderBufferViewGL* textureView =
 					static_cast<RenderBufferViewGL*>(gl->GetView(
-							static_cast<RenderBuffer*>(rt)));
+							static_cast<RenderBuffer*>(depthTarget)));
 			fbo.Attach(gl, textureView->GetAttachment(), textureView);
 			break;
 		}
 		case RenderTargetType::RENDER_TEXTURE: {
 			RenderTextureViewGL* textureView =
 					static_cast<RenderTextureViewGL*>(gl->GetView(
-							static_cast<RenderTexture*>(rt)));
+							static_cast<RenderTexture*>(depthTarget)));
 			fbo.Attach(gl, textureView->GetAttachment(), textureView);
 		}
 			break;

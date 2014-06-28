@@ -8,11 +8,12 @@
 #include <RenderOpenGL.h>
 #include <FrameBufferObjectGL.h>
 #include <RenderContextGL.h>
+#include <RenderBufferViewGL.h>
+#include <RenderTextureViewGL.h>
 
 namespace RenderOpenGL {
 
-FrameBufferObjectGL::~FrameBufferObjectGL() :
-		frameBufferObject(0) {
+FrameBufferObjectGL::~FrameBufferObjectGL() {
 }
 
 void FrameBufferObjectGL::Attach(RenderContextGL* gl, GLenum attachmentType,

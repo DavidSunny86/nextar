@@ -25,7 +25,7 @@ public:
 
 	enum ProgramStage
 		: uint16 {
-			STAGE_VERTEX,
+		STAGE_VERTEX,
 		STAGE_HULL,
 		STAGE_DOMAIN,
 		STAGE_GEOMETRY,
@@ -103,7 +103,13 @@ public:
 		uint32 passNumber;
 	};
 
-	Pass();
+	// not implemented
+	Pass(Pass&& p);
+	// not implemented
+	Pass(const Pass& p);
+	// not implemented
+
+	Pass(StringID name);
 	virtual ~Pass();
 
 	inline bool IsProgramDataInited() const {

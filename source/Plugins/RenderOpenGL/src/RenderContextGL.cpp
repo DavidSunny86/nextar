@@ -12,6 +12,12 @@
 #include <PassViewGL.h>
 #include <FrameBufferObjectGL.h>
 #include <MultiRenderTargetViewGL.h>
+#include <VertexLayoutGL.h>
+#include <RenderTexture.h>
+#include <RenderTextureViewGL.h>
+#include <RenderBuffer.h>
+#include <RenderBufferViewGL.h>
+
 namespace RenderOpenGL {
 
 RenderContextGL::RenderContextGL(RenderDriverGL* _driver) :
@@ -581,14 +587,14 @@ void RenderContextGL::Capture(PixelBox& image, RenderTarget* rt, GLuint *pbo,
 	size_t dataSize = size.dx * size.dy * 4;
 
 	if (!image.Data()) {
-		image.Data() = (NEX_ALLOC(dataSize, MEMCAT_GENERAL));
+		image.Data() = static_cast<uint8*>((NEX_ALLOC(dataSize, MEMCAT_GENERAL)));
 		image.deleteData = true;
 	}
 
 	bool asyncCapture =
 			RenderManager::Instance().GetRenderSettings().asyncCapture;
 
-	glReadBuffer(readTargets[frameBuffer]);
+	glReadBuffer(readTargets[(uint32)frameBuffer]);
 	if (asyncCapture) {
 		uint32 next = RenderConstants::MAX_FRAME_PRE_CAPTURE - 1;
 		if (!pbo[0]) {
@@ -663,7 +669,7 @@ void RenderContextGL::Draw(StreamData* streamData, CommitContext& ctx) {
 	 */
 	VertexData& vd = streamData->vertices;
 	// bind input layout
-	VertexLayoutGL* layout = static_cast<VertexLayoutGL*>(vd.layout);
+	VertexLayoutGL* layout = static_cast<VertexLayoutGL*>(GetView(vd.layout));
 	VertexBufferBinding& binding = (*vd.binding);
 	layout->Enable(binding, static_cast<PassViewGL*>(ctx.pass), this);
 
@@ -684,20 +690,15 @@ void RenderContextGL::Draw(StreamData* streamData, CommitContext& ctx) {
 	}
 
 	if (streamData->useIndices) {
-		IndexBufferGL* buff =
-				static_cast<IndexBufferGL*>(streamData->indices.indices.GetPtr());
+		GpuBufferViewGL* buffer = static_cast<GpuBufferViewGL*>(
+				GetView(streamData->indices.indices.GetPtr()));
 
-		GLenum indextype;
-		GLint indexsize;
-		if (buff->GetIndexType() == IndexBuffer::TYPE_16BIT) {
-			indexsize = 2;
-			indextype = GL_UNSIGNED_SHORT;
-		} else {
-			indexsize = 4;
-			indextype = GL_UNSIGNED_INT;
-		}
 
-		GlBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buff->GetBufferId());
+		GLint indexsize = buffer->GetStride();
+		// hack
+		NEX_STATIC_ASSERT(GL_UNSIGNED_INT == GL_UNSIGNED_SHORT + 2);
+		GLenum indextype = GL_UNSIGNED_SHORT + (indexsize - 2);
+		GlBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer->GetBufferId());
 		GL_CHECK();
 		if (vd.start == 0) {
 			if (streamData->instanceCount == 1)
@@ -748,8 +749,8 @@ void RenderContextGL::SetCurrentTarget(RenderTarget* canvas) {
 			break;
 		case RenderTargetType::RENDER_BUFFER: {
 			RenderBufferViewGL* textureView =
-					static_cast<RenderBufferViewGL*>(GetView(
-							static_cast<RenderBuffer*>(canvas)));
+					static_cast<RenderBufferViewGL*>(
+							GetView(static_cast<RenderBuffer*>(canvas)));
 			FrameBufferObjectGL& fbo = textureView->GetFBO();
 			if (!fbo.IsValid())
 				textureView->CreateFBO(this);
@@ -1052,34 +1053,34 @@ uint16 RenderContextGL::GetShaderParamSize(GLuint type) {
 	return (uint16) 0;
 }
 
-uint16 RenderContextGL::GetShaderParamType(GLuint type) {
+ParamDataType RenderContextGL::GetShaderParamType(GLuint type) {
 	switch (type) {
 	case GL_BOOL:
-		return (uint16) ParamDataType::PDT_BOOL;
+		return  ParamDataType::PDT_BOOL;
 	case GL_UNSIGNED_INT:
-		return (uint16) ParamDataType::PDT_UINT;
+		return  ParamDataType::PDT_UINT;
 	case GL_INT:
-		return (uint16) ParamDataType::PDT_INT;
+		return  ParamDataType::PDT_INT;
 	case GL_FLOAT:
-		return (uint16) ParamDataType::PDT_FLOAT;
+		return  ParamDataType::PDT_FLOAT;
 	case GL_FLOAT_VEC2:
-		return (uint16) ParamDataType::PDT_VEC2;
+		return  ParamDataType::PDT_VEC2;
 	case GL_FLOAT_VEC3:
-		return (uint16) ParamDataType::PDT_VEC3;
+		return  ParamDataType::PDT_VEC3;
 	case GL_FLOAT_VEC4:
-		return (uint16) ParamDataType::PDT_VEC4;
+		return  ParamDataType::PDT_VEC4;
 	case GL_INT_VEC2:
-		return (uint16) ParamDataType::PDT_IVEC2;
+		return  ParamDataType::PDT_IVEC2;
 	case GL_INT_VEC3:
-		return (uint16) ParamDataType::PDT_IVEC3;
+		return  ParamDataType::PDT_IVEC3;
 	case GL_INT_VEC4:
-		return (uint16) ParamDataType::PDT_IVEC4;
+		return  ParamDataType::PDT_IVEC4;
 	case GL_FLOAT_MAT3x4:
-		return (uint16) ParamDataType::PDT_MAT3x4;
+		return  ParamDataType::PDT_MAT3x4;
 	case GL_FLOAT_MAT4:
-		return (uint16) ParamDataType::PDT_MAT4x4;
+		return  ParamDataType::PDT_MAT4x4;
 	}
-	return (uint16) ParamDataType::PDT_UNKNOWN;
+	return  ParamDataType::PDT_UNKNOWN;
 }
 
 GLenum RenderContextGL::GetGlTextureType(TextureBase::TextureType type) {
@@ -1241,6 +1242,11 @@ ContextID RenderContextGL::RegisterObject(ContextObject::Type type, uint32 hint)
 	}
 
 	return reinterpret_cast<ContextID>(view);
+}
+
+void RenderContextGL::UnregisterObject(ContextID id) {
+	ContextObject::View* view = reinterpret_cast<ContextObject::View*>(id);
+	NEX_DELETE(view);
 }
 
 }

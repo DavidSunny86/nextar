@@ -75,13 +75,15 @@ protected:
 	struct Buffer {
 		GLsync fence;
 		GLuint buffer;
+
+		inline Buffer(GLsync _fence, GLuint _buffer) : fence(_fence), buffer(_buffer) {}
 	};
 
 	typedef STDPoolAllocator<Buffer,
 			16,
 			MEMCAT_GENERAL> BufferAllocator;
 
-	typedef list<Buffer, BufferAllocator>::type BufferList;
+	typedef list<Buffer, AllocatorGeneral, BufferAllocator>::type BufferList;
 	BufferList allocatedList;
 };
 

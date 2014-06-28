@@ -4,7 +4,7 @@
 namespace nextar {
 
 IndexBuffer::IndexBuffer(IndexBuffer&& other) :
-	GpuBuffer(other), indexType(other.indexType), policy(other.policy) {
+	GpuBuffer(std::move(other)), indexType(other.indexType), policy(other.policy) {
 }
 
 void IndexBuffer::CreateBuffer(size_t bufferSize,

@@ -6,18 +6,20 @@ UTApplication::UTApplication() :
 }
 
 SceneAssetPtr UTApplication::_CreateDefaultScene() {
-	SceneAsset* sceneAs = SceneAsset::Instance()
-	static_cast<SceneManager*>(ComponentFactoryArchive::Instance().AsyncFindManager(
-			SceneAsset::CLASS_ID));
-	return sceneManager->AsyncCreateEmptyScene("UTScene");
+	return SceneAsset::Traits::Instance(
+			NamedObject::AsyncStringID("UTScene"),
+			StringUtils::DefaultID,
+			StringUtils::DefaultID
+			);
 }
 
 void UTApplication::_SetupScene(SceneAssetPtr& scene) {
-	EntityManager* entityManager =
-			static_cast<EntityManager*>(ComponentFactoryArchive::Instance().AsyncFindManager(
+	Entity::Factory* entityManager =
+			static_cast<Entity::Factory*>(ComponentFactoryArchive::Instance().AsyncFindFactory(
 					Entity::CLASS_ID));
 
-	EntityPtr camera = entityManager->AsyncCreateCameraEntity("Main");
+	EntityPtr camera = entityManager->AsyncCreateCameraEntity(
+			NamedObject::AsyncStringID("Main"));
 	camera->AddToScene(scene);
 	window->CreateViewport(static_cast<Camera*>(camera->GetSpatial()));
 }

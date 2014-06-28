@@ -19,11 +19,12 @@ DepthStateCmd DepthStateCmd::command;
 StencilTestCmd StencilTestCmd::command;
 StencilOpCmd StencilOpCmd::command;
 
-CommandNamePair DepthStencilStateListener::commands[] = { { _SS(
-		CMD_DEPTH_STATE), &DepthStateCmd::command }, { _SS(CMD_STENCIL_BACK_OP),
-		&StencilOpCmd::command }, { _SS(CMD_STENCIL_FRONT_OP),
-		&StencilOpCmd::command }, { _SS(CMD_STENCIL_TEST),
-		&StencilTestCmd::command }, };
+CommandNamePair DepthStencilStateListener::commands[] = {
+		{ _SS(CMD_DEPTH_STATE), &DepthStateCmd::command },
+		{ _SS(CMD_STENCIL_BACK_OP), &StencilOpCmd::command },
+		{ _SS(CMD_STENCIL_FRONT_OP), &StencilOpCmd::command },
+		{ _SS(CMD_STENCIL_TEST), &StencilTestCmd::command },
+};
 
 const size_t DepthStencilStateListener::commandCount =
 		sizeof(DepthStencilStateListener::commands)

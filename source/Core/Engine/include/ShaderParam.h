@@ -168,7 +168,7 @@ public:
 		return ConstantParameter::At(parameter, index);
 	}
 
-	virtual void Map(RenderContext* rc) = 0;
+	virtual void* Map(RenderContext* rc) = 0;
 	virtual void SetRawBuffer(RenderContext* rc, const ConstantParameter& desc,
 			const void* data) = 0;
 	virtual void Unmap(RenderContext* rc) = 0;

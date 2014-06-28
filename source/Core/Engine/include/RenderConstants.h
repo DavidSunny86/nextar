@@ -12,7 +12,7 @@
 
 namespace nextar {
 
-enum class RenderConstants
+enum RenderConstants
 	: uint32 {
 		FORWARD_MAX_LIGHT_COUNT = 255,
 	FORWARD_MAX_LIGHT_PER_PRIMITIVE = 8,

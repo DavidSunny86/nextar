@@ -17,8 +17,7 @@ public:
 	virtual ~BaseRenderContext();
 
 	virtual void Create(const RenderDriver::ContextCreationParams& ctxParams);
-	virtual RenderWindow* CreateRenderWindow(uint32 width, uint32 height,
-	bool fullscreen, const NameValueMap* params);
+	virtual RenderWindow* CreateRenderWindow(uint32 width, uint32 height,	bool fullscreen, const NameValueMap* params);
 	virtual void DestroyedRenderWindow(RenderWindow*);
 	virtual RenderTargetList& GetRenderTargetList();
 	virtual void SetVideoMode(uint32 videoModeIndex);
@@ -40,7 +39,6 @@ public:
 	virtual void SetCurrentTarget(RenderTarget*) = 0;
 	virtual void Clear(Color& c, float depth, uint16 stencil,
 			ClearFlags flags) = 0;
-	virtual void SetActivePass(Pass* pass) = 0;
 
 	/* helpers */
 	uint32 GetVideoModeIndex(const VideoMode& vm) const;

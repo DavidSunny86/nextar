@@ -125,7 +125,7 @@ GLuint GpuTransientBufferViewGL::GetWritable(RenderContextGL* rc) {
 	}
 	// we either need to allocate or wait till the last one is
 	// finished.
-	if (allocatedList.size() < RenderConstants::MAX_TRANSIENT_BUFFER) {
+	if (allocatedList.size() < (size_t)RenderConstants::MAX_TRANSIENT_BUFFER) {
 		GLuint bufferId = rc->CreateBuffer(totalSize, usage, type);
 		rc->Bind(type, bufferId);
 		rc->WriteBuffer(type, totalSize, usage, nullptr, 0, 0);
@@ -146,7 +146,7 @@ GLuint GpuTransientBufferViewGL::GetWritable(RenderContextGL* rc) {
 void GpuTransientBufferViewGL::Sync(RenderContextGL* rc) {
 	GLsync sync = rc->GlFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 	GL_CHECK();
-	allocatedList.emplace_back(sync, bufferId);
+	allocatedList.push_back(Buffer(sync, bufferId));
 }
 
 } /* namespace RenderOpenGL */

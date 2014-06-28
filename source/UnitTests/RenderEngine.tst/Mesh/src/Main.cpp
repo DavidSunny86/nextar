@@ -18,8 +18,8 @@ public:
 				ComponentGroupArchive::Instance().AsyncFindOrCreate(
 						StringUtils::DefaultID);
 		URL url("{EngineData}/mesh/box.mesh");
-		MeshAssetPtr mesh = MeshAsset::Instance(factory,
-				NamedObject::AsyncStringID("Box"), url, group);
+		MeshAssetPtr mesh = MeshAsset::Traits::Instance(NamedObject::AsyncStringID("Box"),
+				url, factory, group);
 		if (mesh) {
 			mesh->Load(false);
 		}

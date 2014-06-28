@@ -24,8 +24,8 @@ public:
 protected:
 
 	virtual RenderDriverPtr CreateDriverImpl(
-			RenderManager::DriverCreationParams&) = 0;
-	virtual void ConfigureImpl(const NameValueMap&) = 0;
+			RenderManager::DriverCreationParams&);
+	virtual void ConfigureImpl(const NameValueMap&);
 	virtual void CloseImpl();
 };
 

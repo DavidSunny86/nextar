@@ -18,11 +18,12 @@ namespace ShaderCompiler {
 /**************************************************************
  * Command Map
  **************************************************************/
-CommandNamePair ShaderListener::commands[] = { { _SS(CMD_BLEND_STATE),
-		&BlendStateCmd::command }, { _SS(CMD_DEPTH_STENCIL_STATE),
-		&DepthStencilStateCmd::command }, { _SS(CMD_RASTER_STATE),
-		&RasterStateCmd::command }, { _SS(CMD_TEXTURE_STATE),
-		&TextureUnitStateCmd::command }, };
+CommandNamePair ShaderListener::commands[] = {
+		{ _SS(CMD_BLEND_STATE), &BlendStateCmd::command },
+		{ _SS(CMD_DEPTH_STENCIL_STATE), &DepthStencilStateCmd::command },
+		{ _SS(CMD_RASTER_STATE), &RasterStateCmd::command },
+		{ _SS(CMD_TEXTURE_STATE), &TextureUnitStateCmd::command },
+};
 
 const size_t ShaderListener::commandCount = sizeof(ShaderListener::commands)
 		/ sizeof(ShaderListener::commands[0]);
@@ -40,7 +41,7 @@ void ShaderListener::EnterBlock(ScriptParser::BlockContext& ctx) {
 
 void ShaderListener::EnterStatement(ScriptParser::StatementContext& ctx) {
 	CommandDelegate* cmd = Helper::FindCommand(ShaderListener::commands,
-			ShaderListener::commandCount, ctx.command);
+			ShaderListener::commandCount, ctx.GetCommand());
 	if (cmd)
 		cmd->Execute(CommandDelegate::SHADER_BLOCK, shaderScript, ctx);
 	// todo else throw error command not supported

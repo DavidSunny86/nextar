@@ -11,7 +11,7 @@
 #include <CommonTypes.h>
 
 namespace ShaderCompiler {
-
+class ShaderScript;
 class ProgramCmd: public CommandDelegate {
 public:
 	static ProgramCmd command;
@@ -34,6 +34,7 @@ public:
 	virtual void EnterBlock(ScriptParser::BlockContext& block);
 	virtual void EnterStatement(ScriptParser::StatementContext& statement);
 protected:
+	friend class ProgramCmd;
 	~ProgramListener() {
 	}
 };
@@ -50,12 +51,18 @@ protected:
 
 class ShaderCmd: public CommandDelegate {
 public:
-	static ShaderCmd command;
+	ShaderCmd(Pass::ProgramStage _stage) : stage(_stage) {};
+	static ShaderCmd commandVertex;
+	static ShaderCmd commandFragment;
+	static ShaderCmd commandGeometry;
+	static ShaderCmd commandHull;
+	static ShaderCmd commandDomain;
 	virtual void Execute(int parentType, void* parentParam,
 			ScriptParser::StatementContext& statement);
 protected:
 	~ShaderCmd() {
 	}
+	Pass::ProgramStage stage;
 };
 
 } /* namespace ShaderCompiler */

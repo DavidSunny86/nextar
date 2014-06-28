@@ -18,8 +18,10 @@ BlendStateCmd BlendStateCmd::command;
 BlendCmd BlendCmd::command;
 BlendTargetCmd BlendTargetCmd::command;
 
-CommandNamePair BlendStateListener::commands[] = { { _SS(CMD_BLEND),
-		&BlendCmd::command }, { _SS(CMD_TARGET), &BlendTargetCmd::command }, };
+CommandNamePair BlendStateListener::commands[] = {
+		{ _SS(CMD_BLEND), &BlendCmd::command },
+		{ _SS(CMD_TARGET), &BlendTargetCmd::command },
+};
 
 const size_t BlendStateListener::commandCount =
 		sizeof(BlendStateListener::commands)

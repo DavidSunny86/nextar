@@ -14,12 +14,13 @@
 
 namespace ShaderCompiler {
 
-CommandNamePair RasterStateListener::commands[] = { { _SS(CMD_ANTI_ALIASING),
-		&AntiAliasingCmd::command }, { _SS(CMD_DEPTH_BIAS),
-		&DepthBiasCmd::command },
-		{ _SS(CMD_DEPTH_CLIP), &DepthClipCmd::command }, { _SS(CMD_RASTER),
-				&RasterCmd::command },
-		{ _SS(CMD_SCISSOR), &ScissorCmd::command }, };
+CommandNamePair RasterStateListener::commands[] = {
+		{ _SS(CMD_ANTI_ALIASING), &AntiAliasingCmd::command },
+		{ _SS(CMD_DEPTH_BIAS), &DepthBiasCmd::command },
+		{ _SS(CMD_DEPTH_CLIP), &DepthClipCmd::command },
+		{ _SS(CMD_RASTER), &RasterCmd::command },
+		{ _SS(CMD_SCISSOR), &ScissorCmd::command },
+};
 
 const size_t RasterStateListener::commandCount =
 		sizeof(RasterStateListener::commands)

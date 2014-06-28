@@ -9,10 +9,11 @@
 #include <CommonTypes.h>
 #include <ShaderScript.h>
 #include <ScriptStrings.h>
+#include <ShaderListener.h>
 
 namespace ShaderCompiler {
 
-void ShaderScript::SetRegionAsSource(GpuProgram::Type type,
+void ShaderScript::SetRegionAsSource(Pass::ProgramStage type,
 		const String& name) {
 	auto it = regions.find(name);
 	if (it == regions.end()) {
@@ -47,7 +48,7 @@ void ShaderScript::EnterStatement(ScriptParser::StatementContext& ctx) {
 	if (ctx.GetCommand() == _SS(CMD_SHADER)) {
 		String name;
 		StringUtils::NextWord(ctx.GetParamList(), name);
-		ShaderCompiler::ShaderListener sl(this, name);
+		ShaderListener sl(this, name);
 		ctx.ParseBlock(&sl);
 	}
 }

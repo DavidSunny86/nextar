@@ -6,11 +6,10 @@
 #include <GpuProgramGL.h>
 #include <UniformBufferGL.h>
 #include <VertexElementGL.h>
-#include <IndexBufferGL.h>
 #include <RenderTarget.h>
 #include <PassViewGL.h>
-#include <BufferManagerGL.h>
 #include <GpuBufferViewGL.h>
+#include <TextureViewGL.h>
 
 namespace RenderOpenGL {
 
@@ -73,7 +72,7 @@ public:
 	void ActivateTexture(GLenum target, GLuint texture);
 	void AllocateTexture(GLenum target, GLint levels, GLenum format,
 			GLsizei width, GLsizei height, GLsizei depth);
-	void AllocateTextureLevel(GLenum target, GLint level,);
+	void AllocateTextureLevel(GLenum target, GLint level);
 	void AllocateTextureLevel(GLenum target, GLint level,
 			const PixelFormatGl& format, GLsizei width, GLsizei height,
 			GLsizei depth, const uint8* data, size_t size);
@@ -113,7 +112,7 @@ public:
 	void Capture(PixelBox& image, RenderTarget* rt, GLuint *pbo,
 			FrameBuffer frameBuffer);
 
-	static uint16 GetShaderParamType(GLuint type);
+	static ParamDataType GetShaderParamType(GLuint type);
 	static uint16 GetShaderParamSize(GLuint type);
 	static uint16 GetSemanticType(GLenum);
 	static bool IsSamplerType(GLint type);
@@ -187,7 +186,7 @@ inline void RenderContextGL::EnableVertexAttribute(const GLuint sem,
 		GlVertexAttribIFormat(sem, vegl.elementCount, vegl.dttype,
 				(std::size_t) (vegl.element.desc.offset));
 	else
-		GlVertexAttribPointer(sem, vegl.elementCount, vegl.dttype,
+		GlVertexAttribFormat(sem, vegl.elementCount, vegl.dttype,
 				vegl.normalize,
 				(std::size_t) (vegl.element.desc.offset));
 	GL_CHECK();

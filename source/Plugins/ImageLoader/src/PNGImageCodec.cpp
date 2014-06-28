@@ -49,7 +49,8 @@ bool CheckIfPng(InputStream *readr) {
 	return png_sig_cmp((png_bytep) buf, (png_size_t) 0, PNG_BYTES_TO_CHECK) == 0;
 }
 
-bool PNGImageCodec::TryLoad(InputStreamPtr& file, const ImageParams& params) {
+bool PNGImageCodec::TryLoad(InputStreamPtr& file, const ImageParams& params,
+		ImageCodecMetaInfo& metaInfo) {
 	char data[PNG_BYTES_TO_CHECK];
 	file->Read(data, PNG_BYTES_TO_CHECK);
 	return png_sig_cmp((png_bytep) data, (png_size_t) 0, PNG_BYTES_TO_CHECK)
@@ -60,7 +61,8 @@ typedef enum {
 	GrayAlpha, Palleted, RGBImage
 } ImageType;
 
-ImageData PNGImageCodec::Load(InputStreamPtr& file, const ImageParams& params) {
+ImageData PNGImageCodec::Load(InputStreamPtr& file, const ImageParams& params,
+		ImageCodecMetaInfo& metaInfo) {
 	InputStream* readr = file.GetPtr();
 	// check if png_ptr
 	if (!CheckIfPng(readr)) {
@@ -230,12 +232,13 @@ ImageData PNGImageCodec::Load(InputStreamPtr& file, const ImageParams& params) {
 	uint8* imgDest = (uint8*) NEX_ALLOC(bpp * height * width, MEMCAT_GENERAL);
 	img.data = imgDest;
 	img.format = fmt;
-	img.depth = 1;
-	img.height = (uint16) height;
-	img.width = (uint16) width;
-	img.numMipMaps = 1;
+	metaInfo.metaInfoInited = true;
+	metaInfo.mipLevelsToRead = 0;
+	metaInfo.metaInfo.maxDepth = img.depth = 1;
+	metaInfo.metaInfo.maxHeight = img.height = (uint16) height;
+	metaInfo.metaInfo.maxWidth = img.width = (uint16) width;
+	metaInfo.metaInfo.maxMipMapCount = img.numMipMaps = 1;
 	img.numFaces = 1;
-	img.totalMipMapCount = 1;
 
 	uint8* imgRows = 0;
 	if (numPass > 1) {

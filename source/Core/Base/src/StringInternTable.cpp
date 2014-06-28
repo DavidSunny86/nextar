@@ -81,6 +81,8 @@ void StringInternTable::_LoadFromCache() {
 }
 
 void StringInternTable::_SaveToCache() {
+	if (!FileSystem::InstancePtr())
+		return;
 	OutputStreamPtr output = FileSystem::Instance().OpenWrite(_GetURL());
 	if (output) {
 		OutputSerializer ser(output);
@@ -94,7 +96,8 @@ void StringInternTable::_SaveToCache() {
 
 void StringInternTable::SaveToCache() {
 	NEX_THREAD_MUTEX(accessLock);
-	_SaveToCache();
+	if (saveToCache)
+		_SaveToCache();
 }
 
 void StringInternTable::LoadFromCache() {
