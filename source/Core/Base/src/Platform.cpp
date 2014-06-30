@@ -1,5 +1,6 @@
 #include <BaseHeaders.h>
 #include <OsDefs.h>
+#include <iostream>
 
 namespace nextar {
 
@@ -21,6 +22,16 @@ String Platform::GetModuleLocation() {
 #else
 #error Dont know how to set a path here.
 	return StringUtils::Null;
+#endif
+}
+
+void Platform::OutputDebug(const char* _Str) {
+#if NEX_WINDOWS == 1
+	OutputDebugString(_Str);
+#elif NEX_LINUX == 1
+	std::cout << _Str << std::endl;
+#else
+#error Dont know how to output string.
 #endif
 }
 

@@ -1,7 +1,8 @@
+
 #include <BaseHeaders.h>
 
 #if defined( NEX_EXTENSIVE_MEM_TRACKER  )
-#	include "MemTracker.h"
+#	include "MemoryTracker.h"
 #endif
 
 #if defined( NEX_USE_PTMALLOC ) || !defined(NEX_MSVC)
@@ -24,16 +25,12 @@ namespace nextar {
 #endif
 
 #ifdef NEX_EXTENSIVE_MEM_TRACKER
-// start tracking by default because of statics
-bool G_TrackLeaks = true;
 void* Allocator::Alloc(size_t size, const char* func, const char* file,
 		long line) {
-	void* ptr = (void*) _nalloc(size);
+	void* ptr = (void*) _nalloc(size + MemoryTracker::GetBlockSize());
 	if (!ptr)
-	NEX_THROW_FatalError(EXCEPT_OUT_OF_MEMORY);
-	if (G_TrackLeaks)
-	memtracker::OnNewDbg(ptr, size, func, file, line);
-	return ptr;
+		NEX_THROW_FatalError(EXCEPT_OUT_OF_MEMORY);
+	return MemoryTracker::OnNewDbg(ptr, size, func, file, line);
 }
 
 void* Allocator::AllocAligned(size_t size, size_t al, const char* func,
@@ -41,9 +38,7 @@ void* Allocator::AllocAligned(size_t size, size_t al, const char* func,
 	void* ptr = (void*) _nalalloc(size, al);
 	if (!ptr)
 		NEX_THROW_FatalError(EXCEPT_OUT_OF_MEMORY);
-	if (G_TrackLeaks)
-		memtracker::OnNewDbg(ptr, size, func, file, line);
-	return ptr;
+	return MemoryTracker::OnNewDbg(ptr, size, func, file, line, al);
 }
 
 #endif
@@ -53,7 +48,6 @@ void* Allocator::Alloc(size_t size) {
 }
 
 void* Allocator::AllocAligned(size_t size, size_t al) {
-
 	return (void*) _nalalloc(size, al);
 }
 
@@ -62,8 +56,7 @@ void Allocator::Free(void* ptr) {
 
 	NEX_ASSERT(ptr);
 #ifdef NEX_EXTENSIVE_MEM_TRACKER
-	if (G_TrackLeaks)
-		memtracker::OnReleaseDbg(ptr);
+	ptr = MemoryTracker::OnReleaseDbg(ptr);
 #endif
 	_nfree(ptr);
 
@@ -72,24 +65,10 @@ void Allocator::Free(void* ptr) {
 void Allocator::FreeAligned(void* ptr) {
 	NEX_ASSERT(ptr);
 #ifdef NEX_EXTENSIVE_MEM_TRACKER
-	if (G_TrackLeaks)
-		memtracker::OnReleaseDbg(ptr);
+	ptr = MemoryTracker::OnReleaseDbg(ptr);
 #endif
 	_nalfree(ptr);
 }
-
-#ifdef NEX_EXTENSIVE_MEM_TRACKER
-_NexBaseAPI void Allocator_CheckLeaks(std::ostream& s) {
-	memtracker::CheckLeaks(s);
-}
-_NexBaseAPI void Allocator_DumpMemStats(std::ostream& s) {
-	memtracker::OnDumpMemStats();
-}
-
-_NexBaseAPI void Allocator_DoTracking(bool track) {
-	G_TrackLeaks = track;
-}
-#endif
 
 }
 

@@ -34,6 +34,7 @@ class _NexBaseAPI Platform {
 public:
 	/* returns the location where the current exe resides */
 	static String GetModuleLocation();
+	static void OutputDebug(const char*);
 };
 }
 

@@ -25,6 +25,10 @@
 #include <iterator>
 #include <ostream>
 #include <cstdint>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <atomic>
 
 #undef max
 #undef min

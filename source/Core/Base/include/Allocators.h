@@ -81,21 +81,5 @@ public:
 };
 }
 
-#ifdef NEX_EXTENSIVE_MEM_TRACKER
-_NexBaseAPI void Allocator_DoTracking(bool);
-_NexBaseAPI void Allocator_CheckLeaks(std::ostream& s);
-_NexBaseAPI void Allocator_DumpMemStats();
-#define NEXTAR_START_LEAK_TRACKING()		nextar::Allocator_DoTracking(true)
-#define NEXTAR_STOP_LEAK_TRACKING()		nextar::Allocator_DoTracking(false)
-#define NEXTAR_LEAK_CHECKS(outstream)	nextar::Allocator_CheckLeaks(outstream)
-#else 
-#define Allocator_DoTracking()
-#define Allocator_CheckLeaks(o)
-#define Allocator_DumpMemStats()
-#define NEXTAR_LEAK_CHECKS(o)
-#define NEXTAR_START_LEAK_TRACKING()
-#define NEXTAR_STOP_LEAK_TRACKING()
-#endif
-
 }
 
