@@ -284,7 +284,7 @@ String FormatUnderscoreString(const String& str) {
 	return ret;
 }
 
-_NexBaseAPI String FormatCamelCaseString(String& str) {
+String FormatCamelCaseString(const String& str) {
 	String ret;
 	ret.reserve(str.length() + 4);
 	size_t i = 1;
@@ -299,7 +299,7 @@ _NexBaseAPI String FormatCamelCaseString(String& str) {
 	return ret;
 }
 
-_NexBaseAPI String FormatName(String& str) {
+_NexBaseAPI String FormatName(const String& str) {
 	if (!str.length())
 		return StringUtils::Null;
 	if (str.find('_') != String::npos)
@@ -307,6 +307,7 @@ _NexBaseAPI String FormatName(String& str) {
 	else
 		return FormatCamelCaseString(str);
 }
+
 }
 
 }

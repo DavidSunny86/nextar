@@ -13,6 +13,8 @@ GL_GEOMETRY_SHADER,
 GL_FRAGMENT_SHADER,
 };
 
+PassViewGL::VertexSemanticListList PassViewGL::registeredSignatures;
+
 PassViewGL::PassViewGL() :
 		inputSemantics(nullptr), iGlProgram(0), inputLayoutId(-1) {
 }

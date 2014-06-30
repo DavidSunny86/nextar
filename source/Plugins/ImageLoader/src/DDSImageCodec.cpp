@@ -322,7 +322,7 @@ ImageData DDSImageCodec::FillInitData(InputSerializer& ser, size_t arraySize,
 		numMipLevelToLoad = metaInfo.metaInfo.maxMipMapCount - baseMipLevel;
 
 	ret.format = format;
-	ret.numFaces = arraySize;
+	ret.numFaces = (uint8)arraySize;
 	ret.numMipMaps = numMipLevelToLoad;
 
 	size_t highestMipLevel = baseMipLevel + numMipLevelToLoad;
@@ -330,12 +330,12 @@ ImageData DDSImageCodec::FillInitData(InputSerializer& ser, size_t arraySize,
 	// misleading but the math works out like this
 	metaInfo.mipLevelsToRead = baseMipLevel;
 	// calculate total buffer size
-	for (size_t j = 0; j < arraySize; j++) {
-		size_t w = metaInfo.metaInfo.maxWidth;
-		size_t h = metaInfo.metaInfo.maxHeight;
-		size_t d = metaInfo.metaInfo.maxDepth;
+	for (uint16 j = 0; j < (uint16)arraySize; j++) {
+		uint16 w = metaInfo.metaInfo.maxWidth;
+		uint16 h = metaInfo.metaInfo.maxHeight;
+		uint16 d = metaInfo.metaInfo.maxDepth;
 
-		for (size_t i = 0; i < metaInfo.metaInfo.maxMipMapCount; i++) {
+		for (uint16 i = 0; i < metaInfo.metaInfo.maxMipMapCount; i++) {
 			GetSurfaceInfo(w, h, format, &numBytes, &rowBytes, &numRows);
 			// mip levels loaded are
 			// baseMipLevel <= i < baseMipLevel + numMipLevelsToLoad
@@ -367,12 +367,12 @@ ImageData DDSImageCodec::FillInitData(InputSerializer& ser, size_t arraySize,
 	uint32 bpp = PixelUtils::BytesPerPixel(format);
 
 	uint8* byteArr = (uint8*) ret.data;
-	for (size_t j = 0; j < arraySize; j++) {
-		size_t w = metaInfo.metaInfo.maxWidth;
-		size_t h = metaInfo.metaInfo.maxHeight;
-		size_t d = metaInfo.metaInfo.maxDepth;
+	for (uint16 j = 0; j < (uint16)arraySize; j++) {
+		uint16 w = metaInfo.metaInfo.maxWidth;
+		uint16 h = metaInfo.metaInfo.maxHeight;
+		uint16 d = metaInfo.metaInfo.maxDepth;
 
-		for (size_t i = 0; i < metaInfo.metaInfo.maxMipMapCount; i++) {
+		for (uint16 i = 0; i < metaInfo.metaInfo.maxMipMapCount; i++) {
 			GetSurfaceInfo(w, h, format, &numBytes, &rowBytes, &numRows);
 			// mip levels loaded are
 			// baseMipLevel <= i < baseMipLevel + numMipLevelsToLoad

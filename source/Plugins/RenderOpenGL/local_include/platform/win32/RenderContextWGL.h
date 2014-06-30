@@ -2,7 +2,7 @@
 
 #include <RenderOpenGL.h>
 #include <RenderContextGL.h>
-#include <WindowGLX.h>
+#include <WindowWGL.h>
 
 namespace RenderOpenGL {
 
@@ -14,23 +14,25 @@ class RenderContextWGL: public RenderContextGL {
 	;
 
 public:
-	RenderContextWGL(RenderDriverGLX* driver);
+	RenderContextWGL(RenderDriverWGL* driver);
 	virtual ~RenderContextWGL();
 
-	inline Display* GetDisplay() {
-		return display;
+	int GetPixelFormat() const {
+		return pixelFormat;
 	}
 
-	inline int GetScreenIndex() {
-		return screenIndex;
+	const PIXELFORMATDESCRIPTOR* GetPixelDescriptor() const {
+		return &pixelDescriptor;
 	}
 
-	inline GLXFBConfig GetFrameBufferConfig() {
-		return frameBufferConfig;
+	inline bool IsCurrentDC(HDC hDC) {
+		return (currentDC == hDC) != 0;
 	}
 
-	inline bool IsCurrentDrawable(GLXDrawable currentDrawable) {
-		return currentDrawable == this->currentDrawable;
+	inline void Present(HDC hDC) {
+		wglSwapLayerBuffers(hDC,
+			WGL_SWAP_MAIN_PLANE);
+		GL_CHECK();
 	}
 
 	/* Implementations */
@@ -38,47 +40,39 @@ public:
 	virtual void SetCurrentWindow(RenderTarget* rt);
 
 	/* Helpers */
-	void SwitchToFullScreen(Window drawable, bool value);
 
-	inline void Present(WindowGLX::Impl* window) {
-		glXSwapBuffers(display, window->GetDrawable());
-		GL_CHECK();
-	}
+protected:
 
-	protected:
+	virtual void SetCreationParams(const RenderDriver::ContextCreationParams& ctxParams);
+	virtual nextar::RenderWindow* CreateWindowImpl();
+	virtual void ReadyContext(RenderWindow*);
 
-		virtual void SetCreationParams(const RenderDriver::ContextCreationParams& ctxParams);
-		virtual nextar::RenderWindow* CreateWindowImpl();
-		virtual void ReadyContext(RenderWindow*);
+private:
 
-	private:
-
-		GLXFBConfig GetConfig(int baseAttribs[], int maxAttribs[]);
-		void UnreadyContext();
-		void EnumVideoModes();
-		bool IsXRandrSupported();
-		Display* OpenDisplay(int gpuIndex);
-		void CloseDisplay();
-		void ReadyGlxExtensions();
-
-	protected:
-
-		typedef void (*GLfunction)();
-		typedef GLXContext (*PFNGLXCREATECONTEXTATTRIBSARB)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
-		/* GLX Extensions */
-		PFNGLXCREATECONTEXTATTRIBSARB GlXCreateContextAttribsARB;
-
-		bool xrandrSupported;
-		int screenIndex;
-
-		Atom motif;
-		Atom fullScreen;
-		Atom wmState;
-
-		Display* display;
-
-		GLXDrawable currentDrawable;
-		GLXContext context;
-		GLXFBConfig frameBufferConfig;
+	struct DummyContext {
+		HWND hWnd;
+		HDC hDC;
+		HGLRC hRC;
 	};
+
+	int GetFormat(const DummyContext&, float fAttribs[], int iAttribs[]);
+	void UnreadyContext();
+	void EnumVideoModes();
+	void ReadyWglExtensions();
+	DummyContext CreateDummyContext();
+	void DestroyDummyContext(const DummyContext&);
+
+protected:
+
+	typedef void (*GLfunction)();
+	/* GLX Extensions */
+	PFNWGLCHOOSEPIXELFORMATARBPROC WglChoosePixelFormatARB;
+	PFNWGLCREATECONTEXTATTRIBSARBPROC WglCreateContextAttribsARB;
+	HDC currentDC;
+	HGLRC context;
+	int pixelFormat;
+	PIXELFORMATDESCRIPTOR pixelDescriptor;
+};
+
+
 }

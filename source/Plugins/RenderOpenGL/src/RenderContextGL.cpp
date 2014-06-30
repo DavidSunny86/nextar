@@ -842,7 +842,7 @@ void RenderContextGL::AllocateTextureLevel(GLenum target, GLint level,
 	switch (target) {
 	case GL_TEXTURE_1D:
 		if (format.isCompressed)
-			glCompressedTexImage1D(target, level, format.internalFormat, width,
+			GlCompressedTexImage1D(target, level, format.internalFormat, width,
 					0, size, data);
 		else
 			glTexImage1D(target, level, format.internalFormat, width, 0,
@@ -853,7 +853,7 @@ void RenderContextGL::AllocateTextureLevel(GLenum target, GLint level,
 	case GL_TEXTURE_CUBE_MAP:
 	case GL_TEXTURE_1D_ARRAY:
 		if (format.isCompressed)
-			glCompressedTexImage2D(target, level, format.internalFormat, width,
+			GlCompressedTexImage2D(target, level, format.internalFormat, width,
 					height, 0, size, data);
 		else
 			glTexImage2D(target, level, format.internalFormat, width, height, 0,
@@ -863,10 +863,10 @@ void RenderContextGL::AllocateTextureLevel(GLenum target, GLint level,
 	case GL_TEXTURE_2D_ARRAY:
 	case GL_TEXTURE_CUBE_MAP_ARRAY:
 		if (format.isCompressed)
-			glCompressedTexImage3D(target, level, format.internalFormat, width,
+			GlCompressedTexImage3D(target, level, format.internalFormat, width,
 					height, depth, 0, size, data);
 		else
-			glTexImage3D(target, level, format.internalFormat, width, height,
+			GlTexImage3D(target, level, format.internalFormat, width, height,
 					depth, 0, format.sourceFormat, format.dataType, data);
 		break;
 	}
@@ -892,7 +892,7 @@ void RenderContextGL::WriteTextureLevel(GLenum target, GLint level,
 	case GL_TEXTURE_3D:
 	case GL_TEXTURE_2D_ARRAY:
 	case GL_TEXTURE_CUBE_MAP_ARRAY:
-		glTexSubImage3D(target, level, 0, 0, 0, width, height, depth,
+		GlTexSubImage3D(target, level, 0, 0, 0, width, height, depth,
 				format.sourceFormat, format.dataType, data);
 		break;
 	}

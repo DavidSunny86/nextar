@@ -22,6 +22,7 @@ class _NexBaseAPI FileSystem: public Singleton<FileSystem>, public AllocGeneral 
 public:
 	//! Engine data mount point
 	static const String ArchiveEngineData;
+	static const String ArchiveEngineData_Name;
 
 	FileSystem();
 	~FileSystem();

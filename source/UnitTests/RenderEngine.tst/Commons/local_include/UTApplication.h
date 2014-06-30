@@ -2,11 +2,11 @@
 #define UTAPPLICATION_H_
 
 #include <RenderEngineHeaders.h>
-#include <ApplicationContext.h>
+#include <EngineApplicationContext.h>
 
 using namespace nextar;
 
-class UTApplication: public FrameListener, public ApplicationContext {
+class UTApplication: public FrameListener, public EngineApplicationContext {
 public:
 
 	UTApplication();

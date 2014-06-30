@@ -64,8 +64,18 @@ public:
 	}
 
 	inline bool operator<(const VideoMode & other) const {
-		return width < other.width || height < other.height
-		|| refreshRate < other.refreshRate;
+		return width < other.width || (width==other.width && height < other.height)
+		|| (width==other.width && height == other.height && refreshRate < other.refreshRate);
+	}
+
+	inline bool IsValid() const {
+		switch(refreshRate) {
+		case 75:
+		case 60:
+		case 120:
+			return true;
+		}
+		return false;
 	}
 
 	uint16 width;

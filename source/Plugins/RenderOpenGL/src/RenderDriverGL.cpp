@@ -23,6 +23,8 @@ VersionGL RenderDriverGL::ExtractVersion(uint16 maj, uint16 min) {
 	switch (maj) {
 	case 1:
 		switch (min) {
+		case 3:
+			return RenderOpenGL::GLV_1_3;
 		case 4:
 			return RenderOpenGL::GLV_1_4;
 		case 5:

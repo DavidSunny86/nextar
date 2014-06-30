@@ -40,7 +40,7 @@ public:
 	typedef AssetTraits<ShaderAsset> Traits;
 	typedef FactoryTraits<ShaderAsset> FactoryTraits;
 
-	class StreamPass {
+	class _NexEngineAPI StreamPass {
 	public:
 		StringID name;
 		Pass::ParamBufferOffsetParams offsets;
@@ -54,7 +54,7 @@ public:
 	// todo Make this a list not a vector
 	typedef vector<StreamPass>::type StreamPassList;
 
-	class StreamRequest: public AllocGeneral, public AssetStreamRequest {
+	class _NexEngineAPI StreamRequest: public AllocGeneral, public AssetStreamRequest {
 		NEX_LOG_HELPER(ShaderAsset::StreamRequest)
 		;
 	public:

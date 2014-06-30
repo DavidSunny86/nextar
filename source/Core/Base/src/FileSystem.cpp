@@ -8,7 +8,9 @@
 namespace nextar {
 
 NEX_DEFINE_SINGLETON_PTR(FileSystem);
-const String FileSystem::ArchiveEngineData = "EngineData";
+
+const String FileSystem::ArchiveEngineData = "{EngineData}";
+const String FileSystem::ArchiveEngineData_Name = "EngineData";
 
 FileSystem::FileSystem() {
 
@@ -19,8 +21,8 @@ FileSystem::FileSystem() {
 	String moduleLocation = Platform::GetModuleLocation();
 	URL::AddMacroEntry("Bin", moduleLocation);
 	AddArchive("", Archive::TYPE_DIR, "");
-	AddArchive(ArchiveEngineData, Archive::TYPE_DIR,
-			moduleLocation + "/../../data");
+	AddArchive(ArchiveEngineData_Name, Archive::TYPE_DIR,
+			moduleLocation + "/../Data");
 }
 
 FileSystem::~FileSystem() {

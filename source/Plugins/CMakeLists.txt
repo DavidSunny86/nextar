@@ -7,10 +7,6 @@
 
 ## Configure paths
 #============================================================
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${NEX_LIB}/plugins)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${NEX_BIN}/plugins)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${NEX_BIN}/plugins)
-
 file(WRITE ${NEX_PLUGIN_CONFIG_FILE} "<plugins basePath='\${Bin}/plugins'>\n")
 
 ## Configure paths

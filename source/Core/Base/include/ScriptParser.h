@@ -26,36 +26,36 @@ public:
 	class StatementContext;
 	class RegionContext;
 
-	class StatementListener {
+	class _NexBaseAPI StatementListener {
 	public:
 		virtual void EnterStatement(ScriptParser::StatementContext& statement) {
 		}
 	protected:
-		~StatementListener();
+		~StatementListener() {}
 	};
 
-	class RegionListener {
+	class _NexBaseAPI RegionListener {
 	public:
 		virtual void EnterRegion(ScriptParser::RegionContext& regionCtx) {
 		}
 	protected:
-		~RegionListener();
+		~RegionListener() {}
 	};
 
-	class BlockListener {
+	class _NexBaseAPI BlockListener {
 	public:
 		virtual void EnterBlock(ScriptParser::BlockContext& block) {
 		}
 	protected:
-		~BlockListener();
+		~BlockListener() {}
 	};
 
-	class ScriptListener {
+	class _NexBaseAPI ScriptListener {
 	public:
 		virtual void EnterScript(ScriptParser::ScriptContext& block) {
 		}
 	protected:
-		~ScriptListener();
+		~ScriptListener() {}
 	};
 
 	class _NexBaseAPI ContextBase {

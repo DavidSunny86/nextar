@@ -96,7 +96,7 @@ void DestroyObjects(T* ptr, size_t n) {
 template<typename Allocator_Class>
 class AllocObjectBase {
 public:
-#ifdef NEX_DEBUG
+#ifdef NEX_EXTENSIVE_MEM_TRACKER
 
 	void* operator new(size_t s,
 			const char* func,
@@ -148,7 +148,7 @@ public:
 template<typename Allocator_Class>
 class AllocPooledObjectBase {
 public:
-#ifdef NEX_DEBUG
+#ifdef NEX_EXTENSIVE_MEM_TRACKER
 
 	void* operator new(size_t s,
 			const char* func,

@@ -12,10 +12,9 @@
 
 namespace RenderOpenGL {
 
-RenderContextWGL::RenderContextWGL(RenderDriverGLX* _driver) :
-		RenderContextGL(_driver), display(0), context(0), screenIndex(0), motif(
-				0), wmState(0), fullScreen(0), frameBufferConfig(0), GlXCreateContextAttribsARB(
-				0), currentDrawable(0), xrandrSupported(false) {
+RenderContextWGL::RenderContextWGL(RenderDriverWGL* _driver) :
+		RenderContextGL(_driver), context(0)
+		,WglCreateContextAttribsARB(0) {
 }
 
 RenderContextWGL::~RenderContextWGL() {
@@ -26,97 +25,172 @@ void RenderContextWGL::UnreadyContext() {
 	if (context) {
 		SetCurrentTarget(0);
 		Trace("Destroying render context.");
-		glXDestroyContext(display, context);
+		wglDeleteContext(context);
 		context = 0;
 	}
-	CloseDisplay();
-}
-
-void RenderContextWGL::CloseDisplay() {
-	XCloseDisplay(display);
-	display = 0;
 }
 
 void RenderContextWGL::SetCreationParams(
 		const RenderDriver::ContextCreationParams& ctxParams) {
-	bool failed = true;
-	contextCreationParams = ctxParams;
-	display = OpenDisplay(((RenderDriverGLX*) driver)->GetGpuIndex());
-	if (display) {
-
-		int error_base, event_base;
-		if (glXQueryExtension(display, &error_base, &event_base) == True) {
-			/* query version */
-			int major = 0, minor = 0;
-			glXQueryVersion(display, &major, &minor);
-			if ((major >= 1 || (major == 1 && minor > 3))) {
-				// get screen from screen index
-
-				if (!contextCreationParams.monitorIndex) {
-					screenIndex = DefaultScreen(display);
-				} else {
-					int screenCount = ScreenCount(display);
-					if (contextCreationParams.monitorIndex < screenCount) {
-						screenIndex = (int) contextCreationParams.monitorIndex;
-					} else
-						screenIndex = DefaultScreen(display);
-				}
-
-				EnumVideoModes();
-				// check atoms
-
-				fullScreen = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN",
-						True);
-				if (fullScreen != None) {
-					wmState = XInternAtom(display, "_NET_WM_STATE", True);
-				} else {
-					wmState = None;
-					// motif based?
-					motif = XInternAtom(display, "_MOTIF_WM_HINTS", True);
-				}
-
-				failed = false;
-			} else
-				Error("Requires atleast GLX 1.3");
-		} else
-			Error("Requires atleast GLX extensions");
-
-	}
-
-	// choose fbconfig
-	int preferredAttribs[] = { GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
-	GLX_RENDER_TYPE, GLX_RGBA_BIT, GLX_DOUBLEBUFFER, True, /* Request a double-buffered color buffer */
-	GLX_SAMPLES, contextCreationParams.multiSamples,
-	GLX_STENCIL_SIZE, contextCreationParams.stencilBits,
-	GLX_DEPTH_SIZE, contextCreationParams.depthBits, GLX_RED_SIZE, 8, /* the maximum number of bits per component    */
-	GLX_GREEN_SIZE, 8, GLX_BLUE_SIZE, 8, None };
-
-	int baseAttribs[] = { GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
-	GLX_RENDER_TYPE, GLX_RGBA_BIT, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1,
-			GLX_BLUE_SIZE, 1, None };
-
-	frameBufferConfig = GetConfig(baseAttribs, preferredAttribs);
-
 	// lets check for glx extensions
-	ReadyGlxExtensions();
+	bool failed = false;
+	contextCreationParams = ctxParams;
+	int gpuIndex = ((RenderDriverWGL*) driver)->GetGpuIndex();
+	std::memset(&pixelDescriptor, 0, sizeof(pixelDescriptor));
+	/** We will use this pixel descriptor across all the created windows.
+	 *  This will enable us using this context for all the HDC's
+	 */
+	pixelDescriptor.nSize = sizeof (pixelDescriptor);
+	pixelDescriptor.nVersion = 1;
+	pixelDescriptor.dwFlags = PFD_DRAW_TO_WINDOW |
+			PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+	pixelDescriptor.cDepthBits = (BYTE) contextCreationParams.depthBits;
+	pixelDescriptor.cStencilBits = (BYTE) contextCreationParams.stencilBits;
+	pixelDescriptor.cColorBits = 24;
+	pixelDescriptor.iLayerType = PFD_MAIN_PLANE;
+
+	float fAttribs[] = { 0, 0 };
+
+	DummyContext dc = CreateDummyContext();
+	ReadyWglExtensions();
+	EnumVideoModes();
+	
+	// choose fbconfig
+	int iAttribs[] = { 
+		WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
+		WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
+		WGL_ACCELERATION_ARB, WGL_FULL_ACCELERATION_ARB,
+		WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
+		WGL_STENCIL_BITS_ARB, contextCreationParams.stencilBits,
+		WGL_DEPTH_BITS_ARB, contextCreationParams.depthBits, 
+		WGL_RED_BITS_ARB, 8, 
+		WGL_GREEN_BITS_ARB, 8, 
+		WGL_BLUE_BITS_ARB, 8, 
+		0, 0,
+		0, 0,
+		0, 0,
+		0, 0 
+	};
+
+	int attrib = 18;
+	if(contextCreationParams.multiSamples) {
+		iAttribs[attrib++] = WGL_SAMPLE_BUFFERS_ARB;
+		iAttribs[attrib++] = GL_TRUE;
+		iAttribs[attrib++] = WGL_SAMPLES_ARB;
+		iAttribs[attrib++] = (int)contextCreationParams.multiSamples;
+	}
+	if(contextCreationParams.stereo) {
+		iAttribs[attrib++] = WGL_STEREO_ARB;
+		iAttribs[attrib++] = GL_TRUE;
+	}
+	
+	pixelFormat = GetFormat(dc, fAttribs, iAttribs);
+	DescribePixelFormat(dc.hDC, pixelFormat, 
+		sizeof(PIXELFORMATDESCRIPTOR), &pixelDescriptor);
+	DestroyDummyContext(dc);
+	// create context
 
 	if (failed)
 		NEX_THROW_FatalError(EXCEPT_DEVICE_CREATION_FAILED);
 }
 
-void RenderContextWGL::ReadyGlxExtensions() {
-	const char *glxExts = glXQueryExtensionsString(display, screenIndex);
+RenderContextWGL::DummyContext RenderContextWGL::CreateDummyContext() {
+	WindowWGL::InitializeWindowClass();
+	DWORD windowStyle = WS_OVERLAPPEDWINDOW;
+	DWORD windowExtendedStyle = WS_EX_APPWINDOW;
+	HINSTANCE hInstance = GetModuleHandle(NULL);
 
-	if (IsSupported("GLX_ARB_create_context", glxExts))
-		GlXCreateContextAttribsARB =
-				(PFNGLXCREATECONTEXTATTRIBSARB) RenderDriverGL::GetExtension(
-						"glXCreateContextAttribsARB");
+	HWND hWnd = CreateWindowEx (
+		windowExtendedStyle,					// Extended Style
+		(LPCSTR)WindowWGL::GetWindowClass(),	// Class Name
+		"DummyWindow",					// Window Title
+		windowStyle,							// Window Style
+		0, 0,								// Window X,Y Position
+		32,	// Window Width
+		32,	// Window Height
+		HWND_DESKTOP,						// Desktop Is Window's Parent
+		0,									// No Menu
+		hInstance, // Pass The Window Instance
+		0);
+	HDC hDC;
+	HGLRC hRC;
+	if (!hWnd || !(hDC = GetDC(hWnd))) {
+		if (hWnd) {
+			DestroyWindow (hWnd);
+			hWnd = 0;
+		}
+		Error("Failed to create basic window!");
+		NEX_THROW_FatalError(EXCEPT_FAILED_TO_CREATE_OBJECT);
+	}
+
+	SetWindowLongPtr(hWnd, GWLP_USERDATA, 0);
+	int pixelFormat = ChoosePixelFormat (hDC, &pixelDescriptor);
+
+	if (pixelFormat == 0 ||
+		(SetPixelFormat (hDC, pixelFormat, 
+		&pixelDescriptor) == FALSE) ||
+		!(hRC = wglCreateContext (hDC))) {
+		// Failed
+		ReleaseDC (hWnd, hDC);
+		DestroyWindow (hWnd);
+		hWnd = 0;
+		Error("Failed to get proper pixel format or create dummy context!");
+		NEX_THROW_FatalError(EXCEPT_FAILED_TO_CREATE_OBJECT);
+	}
+	
+	if (wglMakeCurrent (hDC, hRC) == FALSE) {
+		// Failed
+		wglDeleteContext (hRC);
+		hRC = 0;
+		ReleaseDC (hWnd, hDC);
+		hDC = 0;
+		DestroyWindow (hWnd);
+		hWnd = 0;
+		Error("Failed to set context!");
+		NEX_THROW_FatalError(EXCEPT_FAILED_TO_CREATE_OBJECT);
+	}
+
+	DummyContext r = { hWnd, hDC, hRC };
+	return r;
+}
+
+void RenderContextWGL::DestroyDummyContext(const RenderContextWGL::DummyContext& dc) {
+	wglMakeCurrent (NULL, NULL);
+	// Failed
+	wglDeleteContext (dc.hRC);
+	ReleaseDC (dc.hWnd, dc.hDC);
+	DestroyWindow (dc.hWnd);
+}
+
+void RenderContextWGL::ReadyWglExtensions() {
+	const char *supported = NULL;
+ 
+	// Try To Use wglGetExtensionStringARB On Current DC, If Possible
+	PROC wglGetExtString = wglGetProcAddress("wglGetExtensionsStringARB");
+ 
+	if (wglGetExtString)
+		supported = ((char*(__stdcall*)(HDC))wglGetExtString)(wglGetCurrentDC());
+ 
+	// If That Failed, Try Standard Opengl Extensions String
+	if (supported == NULL)
+		supported = (char*)glGetString(GL_EXTENSIONS);
+
+	if (IsSupported("WGL_ARB_create_context", supported))
+		WglCreateContextAttribsARB =
+				(PFNWGLCREATECONTEXTATTRIBSARBPROC) 
+				RenderDriverGL::GetExtension("wglCreateContextAttribsARB");
+
+	if (IsSupported("WGL_ARB_pixel_format", supported))
+		WglChoosePixelFormatARB =
+		(PFNWGLCHOOSEPIXELFORMATARBPROC)
+		RenderDriverGL::GetExtension("wglChoosePixelFormatARB");
 }
 
 void RenderContextWGL::ReadyContext(RenderWindow* gw) {
 	// create context based of fbConfig and set as current
 	// do we have a shared context?
-	GLXContext shared = 0;
+	WindowWGL* wglWnd = static_cast<WindowWGL*>(gw);
+	HGLRC shared = 0;
 	if (contextCreationParams.sharedContextIndex >= 0) {
 		RenderContextPtr ptr = driver->AsyncGetContext(
 				contextCreationParams.sharedContextIndex);
@@ -127,22 +201,25 @@ void RenderContextWGL::ReadyContext(RenderWindow* gw) {
 
 	bool result = true;
 	// int (*oldHandler)(Display*, XErrorEvent*) = XSetErrorHandler([&result](Display*, XErrorEvent*) { result = false; return 0; } );
-	if (!GlXCreateContextAttribsARB) {
+	if (!WglCreateContextAttribsARB) {
 		Trace("Creating old style context");
-		context = glXCreateNewContext(display, frameBufferConfig,
-		GLX_RGBA_TYPE, shared, True);
+		context = wglCreateContext(wglWnd->GetWindowDC());
 	} else {
-		int contextAttribs[] = { GLX_CONTEXT_MAJOR_VERSION_ARB,
-				contextCreationParams.reqOpenGLVersionMajor,
-				GLX_CONTEXT_MINOR_VERSION_ARB,
-				contextCreationParams.reqOpenGLVersionMinor,
-				//GLX_CONTEXT_FLAGS_ARB        , GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
-				None };
+		int contextAttribs[] = { 
+			WGL_CONTEXT_MAJOR_VERSION_ARB,
+			contextCreationParams.reqOpenGLVersionMajor,
+			WGL_CONTEXT_MINOR_VERSION_ARB,
+			contextCreationParams.reqOpenGLVersionMinor,
+#ifdef NEX_DEBUG
+			WGL_CONTEXT_FLAGS_ARB,
+			WGL_CONTEXT_DEBUG_BIT_ARB,
+#endif
+			0, 0
+		};
 
 		Trace("Creating context");
-
-		context = GlXCreateContextAttribsARB(display, frameBufferConfig, shared,
-		True, contextAttribs);
+		context = WglCreateContextAttribsARB(
+			wglWnd->GetWindowDC(), shared, contextAttribs);
 	}
 	// Sync to ensure any errors generated are processed.
 	// XSync( display, False );
@@ -151,207 +228,107 @@ void RenderContextWGL::ReadyContext(RenderWindow* gw) {
 		Error("Context creation failed!.");
 		NEX_THROW_FatalError(EXCEPT_DEVICE_CREATION_FAILED);
 	}
-	if (glXIsDirect(display, context))
-		Trace("Direct GLX rendering context created!");
-	else
-		Trace("Indirect GLX rendering context created!");
 
 	SetCurrentTarget(static_cast<RenderWindowImpl*>(gw->GetImpl()));
 }
 
 nextar::RenderWindow* RenderContextWGL::CreateWindowImpl() {
-	return NEX_NEW(WindowGLX(this));
+	return NEX_NEW(WindowWGL(this));
 }
 
-Display* RenderContextWGL::OpenDisplay(int gpuIndex) {
-	// assume that x-server index is same as gpu index
-	if (gpuIndex < 0)
-		gpuIndex = 0;
-	String openId = ":0." + Convert::ToString((uint32) gpuIndex);
-	display = XOpenDisplay(openId.c_str());
-	if (!display) {
-		Trace("Failed to open proper display!");
-		display = XOpenDisplay(NULL);
-	}
-	return display;
-}
-
-bool RenderContextWGL::IsXRandrSupported() {
-	int dummy;
-	if (XQueryExtension(display, "RANDR", &dummy, &dummy, &dummy)
-			&& XRRQueryVersion(display, &dummy, &dummy))
-		return true;
-	return false;
-}
 
 void RenderContextWGL::EnumVideoModes() {
-	// check for xrandr support
 	videoModes.clear();
-	bool fallback = false;
-	if ((xrandrSupported = IsXRandrSupported())) {
-		XRRScreenSize* screenSize;
-		int nsizes = 0;
+	DEVMODE dmi;
 
-		Trace("XRANDR is enabled");
-		screenSize = XRRSizes(display, screenIndex, &nsizes);
-		if (!nsizes)
-			fallback = true;
-		videoModes.reserve((size_t) nsizes);
-		for (int i = 0; i < nsizes; ++i) {
-			VideoMode vmode;
-			vmode.width = uint16(screenSize[i].width);
-			vmode.height = uint16(screenSize[i].height);
+	DWORD devNum = 0;
+	DWORD modeNum = 0;
+	DISPLAY_DEVICE ddi;
 
-			int nrates;
-			short* rates = XRRRates(display, screenIndex, i, &nrates);
-			for (int j = 0; j < nrates; ++j) {
-				vmode.refreshRate = uint16(rates[j]);
-				videoModes.push_back(vmode);
-			}
+
+	ZeroMemory(&ddi, sizeof(ddi));
+	ddi.cb = sizeof (ddi);
+	ZeroMemory(&dmi, sizeof(dmi));
+	dmi.dmSize = sizeof (dmi);
+
+	while (EnumDisplayDevices(NULL, devNum++, &ddi, 0)) {
+		while (EnumDisplaySettings(ddi.DeviceName, modeNum++, &dmi)) {
+			VideoMode vm((uint16) dmi.dmPelsWidth,
+				(uint16) dmi.dmPelsHeight,
+				(uint16) dmi.dmDisplayFrequency);
+			if (vm.IsValid() && 
+				std::find(videoModes.begin(), videoModes.end(), vm) == videoModes.end())
+				videoModes.push_back(vm);
+			ZeroMemory(&dmi, sizeof(dmi));
+			dmi.dmSize = sizeof (dmi);
 		}
-		Window root = RootWindow(display, screenIndex);
-		Rotation rotation;
-		XRRScreenConfiguration *conf = XRRGetScreenInfo(display, root);
-		int currsize = XRRConfigCurrentConfiguration(conf, &rotation);
-		VideoMode current = VideoMode(screenSize[currsize].width,
-				screenSize[currsize].height, XRRConfigCurrentRate(conf));
-		std::sort(videoModes.begin(), videoModes.end());
-		currentVideoMode = originalVideoMode = GetVideoModeIndex(current);
-		XRRFreeScreenConfigInfo(conf);
-	} /* check vid modes*/
-	if (fallback || !videoModes.size()) {
-		VideoMode vmode;
-		vmode.width = DisplayWidth(display, screenIndex);
-		vmode.height = DisplayHeight(display, screenIndex);
-		vmode.refreshRate = 0;
+		ZeroMemory(&ddi, sizeof(ddi));
+		ddi.cb = sizeof (ddi);
+		modeNum = 0;
+	}
+
+	std::sort(videoModes.begin(), videoModes.end());
+	// get the current mode
+	if (EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &dmi)) {
+		VideoMode vm((uint16) dmi.dmPelsWidth,
+			(uint16) dmi.dmPelsHeight,
+			(uint16) dmi.dmDisplayFrequency);
+		auto it = std::find(videoModes.begin(), videoModes.end(), vm);
+		if (it != videoModes.end())
+			currentVideoMode = originalVideoMode = it-videoModes.begin();
+		else {
+			videoModes.push_back(vm);
+			currentVideoMode = originalVideoMode = videoModes.size()-1;
+		}
+	} else {
+		Error("Failed to enumerate current mode");
 		currentVideoMode = originalVideoMode = 0;
-		videoModes.push_back(vmode);
 	}
 }
 
-GLXFBConfig RenderContextWGL::GetConfig(int baseAttribs[], int maxAttribs[]) {
+int RenderContextWGL::GetFormat(const DummyContext& dc, float fAttribs[], int iAttribs[]) {
+	
+	int pixelFormat = 0;
+	UINT numFormats = 0;
+	
+	if ( !WglChoosePixelFormatARB ||
+		!WglChoosePixelFormatARB( dc.hDC, 
+		iAttribs, fAttribs, 1, &pixelFormat, &numFormats) ||
+		numFormats == 0) {
+		return ChoosePixelFormat (dc.hDC, &pixelDescriptor);
+	} 
 
-	int fbcount = 0;
-	GLXFBConfig *fbconfigs = glXChooseFBConfig(display, screenIndex,
-			baseAttribs, &fbcount);
-	// sort configs
-	int samples = 0;
-	int chosen = -1;
-
-	for (int i = 0; i < fbcount; ++i) {
-		// check cavet
-		int attrib_val;
-		glXGetFBConfigAttrib(display, fbconfigs[i], GLX_CONFIG_CAVEAT,
-				&attrib_val);
-
-		if (attrib_val == GLX_NONE) {
-			// check multisampling
-			glXGetFBConfigAttrib(display, fbconfigs[i], GLX_SAMPLES,
-					&attrib_val);
-			if (samples < attrib_val || chosen < 0) {
-				// check if we exceed expectations
-				if (chosen >= 0) {
-					bool exceeds = false;
-					for (int k = 0; maxAttribs[k * 2] != None; ++k) {
-						glXGetFBConfigAttrib(display, fbconfigs[i],
-								maxAttribs[k * 2], &attrib_val);
-						if (maxAttribs[k * 2 + 1] < attrib_val) {
-							exceeds = true;
-							break;
-						}
-					}
-					if (!exceeds)
-						chosen = i;
-				} else
-					chosen = i;
-			}
-
-		}
-	}
-	// simply we didnt enter the loop if fbcount <= 0
-	if (chosen < 0) {
-		Error("No suitable frame buffer config found!");
-		NEX_THROW_GracefulError(EXCEPT_INVALID_ARGS);
-	}
-
-	GLXFBConfig chosenFb = fbconfigs[chosen];
-
-	XFree(fbconfigs);
-
-	return chosenFb;
+	return pixelFormat;
 }
 
 void RenderContextWGL::SetCurrentWindow(RenderTarget* canvas) {
 	if (canvas) {
-		currentDrawable = static_cast<WindowGLX::Impl*>(canvas)->GetDrawable();
-		glXMakeCurrent(display, currentDrawable, context);
+		WindowWGL::Impl* impl = static_cast<WindowWGL::Impl*>(canvas);
+		if (impl->GetWindowDC() != currentDC) {
+			wglMakeCurrent(currentDC = impl->GetWindowDC(), context);
+		}
 	} else
-		glXMakeCurrent(display, 0, 0);
+		wglMakeCurrent(0, 0);
+	GL_CHECK();
 }
 
 void RenderContextWGL::SetVideoModeImpl(const VideoMode& mode) {
-	if (xrandrSupported) {
-		Window rootWnd = RootWindow(display, screenIndex);
-		XRRScreenConfiguration *screenConfig = XRRGetScreenInfo(display,
-				rootWnd);
-
-		if (screenConfig) {
-
-			int size = -1;
-			int nsizes = 0;
-			XRRScreenSize* screenSize = XRRConfigSizes(screenConfig, &nsizes);
-			for (int i = 0; i < nsizes; ++i) {
-				if (mode.width == uint16(screenSize[i].width)
-						&& mode.height == uint16(screenSize[i].height)) {
-					size = i;
-					break;
-				}
-			}
-			if (size < 0)
-				// invalid mode
-				return;
-			Rotation current_rotation;
-			XRRConfigCurrentConfiguration(screenConfig, &current_rotation);
-			XRRSetScreenConfigAndRate(display, screenConfig, rootWnd, size,
-					current_rotation, mode.refreshRate, CurrentTime);
-			XRRFreeScreenConfigInfo(screenConfig);
-			Trace(String("Video mode changed to:") + VideoMode::ToString(mode));
-		}
+	DEVMODE dm = {0};
+	dm.dmPelsWidth = mode.width;
+	dm.dmPelsHeight = mode.height;
+	dm.dmDisplayFrequency = mode.refreshRate;
+	dm.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
+	if(mode.refreshRate)
+		dm.dmFields |= DM_DISPLAYFREQUENCY;
+	
+	dm.dmSize = sizeof (DEVMODE);
+	if (DISP_CHANGE_SUCCESSFUL == ChangeDisplaySettings(&dm, CDS_TEST)) {
+		ChangeDisplaySettings(&dm, CDS_FULLSCREEN);
+	} else {
+		Error("Error setting video mode.");
+		NEX_THROW_GracefulError(EXCEPT_INVALID_ARGS);
 	}
 }
 
-void RenderContextWGL::SwitchToFullScreen(Window win, bool toggle) {
-	if (wmState != None) {
-		// send the _NET_WM_STATE_FULLSCREEN msg
-		XClientMessageEvent msg;
-		msg.type = ClientMessage;
-		msg.serial = 0;
-		msg.send_event = True;
-		msg.window = win;
-		msg.message_type = wmState;
-		msg.format = 32;
-		msg.data.l[0] = toggle ? 1 : 0;
-		msg.data.l[1] = toggle;
-		msg.data.l[2] = 0;
-
-		XSendEvent(display, RootWindow(display, screenIndex), False,
-				SubstructureRedirectMask | SubstructureNotifyMask,
-				(XEvent*) &msg);
-	} else if (motif != None) {
-		struct Hints {
-			unsigned long flags;
-			unsigned long functions;
-			unsigned long decorations;
-			long inputMode;
-			unsigned long status;
-		};
-		Hints hints = { 0 };
-		hints.flags = 2;
-		hints.decorations = 0;
-		XChangeProperty(display, win, motif, motif, 32,
-		PropModeReplace, (unsigned char *) &hints, 5);
-	} else
-		Warn("Window manager is outdated, cannot switch to fullscreen");
-}
 }
 

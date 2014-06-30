@@ -95,6 +95,8 @@ void GpuTransientBufferViewGL::Create(RenderContext* rc, size_t size,
 		gl->Bind(type, bufferId);
 		gl->WriteBuffer(type, size, usage, dataPtr, 0, size);
 		syncRequired = true;
+	} else {
+		bufferId = 0;
 	}
 }
 
@@ -119,8 +121,9 @@ GLuint GpuTransientBufferViewGL::GetWritable(RenderContextGL* rc) {
 		if (result == GL_ALREADY_SIGNALED || result == GL_CONDITION_SATISFIED) {
 			rc->GlDeleteSync(i.fence);
 			GL_CHECK();
+			GLuint bufferRet = i.buffer;
 			allocatedList.pop_front();
-			return i.buffer;
+			return bufferRet;
 		}
 	}
 	// we either need to allocate or wait till the last one is
@@ -138,8 +141,11 @@ GLuint GpuTransientBufferViewGL::GetWritable(RenderContextGL* rc) {
 			result = rc->GlClientWaitSync(i.fence, 0, 100);
 			GL_CHECK();
 		} while (result == GL_TIMEOUT_EXPIRED || result == GL_WAIT_FAILED);
+		rc->GlDeleteSync(i.fence);
+		GL_CHECK();
+		GLuint bufferRet = i.buffer;
 		allocatedList.pop_front();
-		return i.buffer;
+		return bufferRet;
 	}
 }
 
@@ -147,6 +153,28 @@ void GpuTransientBufferViewGL::Sync(RenderContextGL* rc) {
 	GLsync sync = rc->GlFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 	GL_CHECK();
 	allocatedList.push_back(Buffer(sync, bufferId));
+	bufferId = 0;
+}
+
+void GpuTransientBufferViewGL::Destroy(RenderContext* rc) {
+	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
+	if (syncRequired) {
+		Sync(gl);
+	}
+	if (bufferId) {
+		gl->DestroyBuffer(bufferId);
+		bufferId = 0;
+	}
+	for(auto &i : allocatedList) {
+		GLenum result;
+		do {
+			result = gl->GlClientWaitSync(i.fence, 0, 100);
+			GL_CHECK();
+		} while (result == GL_TIMEOUT_EXPIRED || result == GL_WAIT_FAILED);		
+		gl->GlDeleteSync(i.fence);
+		gl->DestroyBuffer(i.buffer);
+	}
+	allocatedList.clear();
 }
 
 } /* namespace RenderOpenGL */

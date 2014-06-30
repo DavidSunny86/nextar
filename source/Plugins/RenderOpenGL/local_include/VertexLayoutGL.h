@@ -99,8 +99,6 @@ public:
 	VertexLayoutDynamicGL();
 	~VertexLayoutDynamicGL();
 
-	virtual void Update(nextar::RenderContext*, uint32 msg,
-			ContextObject::ContextParamPtr);
 	virtual void Enable(VertexBufferBinding& binding, PassViewGL* pass,
 			RenderContextGL* rc);
 	virtual void Disable(RenderContextGL* rc);

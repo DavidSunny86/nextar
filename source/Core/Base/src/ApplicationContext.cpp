@@ -14,7 +14,7 @@ NEX_DEFINE_SINGLETON_PTR(ApplicationContext);
 String ApplicationContext::_configPathName = "${Bin}/Config.cfg";
 
 ApplicationContext::ApplicationContext(const String& name) :
-		appName(name), quitting(false), runningLoop(false) {
+		appName(name), quitting(false), runningLoop(false), errorHandler(nullptr) {
 	NEX_NEW(LogManager());
 #ifdef NEX_DEBUG
 	// add a default logger
@@ -32,10 +32,9 @@ void ApplicationContext::InitializeContext() {
 	CreateServices();
 	LoadConfiguration();
 	// load sub-plugins
+	ConfigureServices();
 	PluginRegistry::Instance().RequestPlugins(PLUG_TYPE_LIFETIME,
 			StringUtils::Null, true);
-
-	ConfigureServices();
 	ConfigureExtendedInterfacesImpl();
 }
 
@@ -55,30 +54,19 @@ void ApplicationContext::ConfigureServices() {
 	FileSystem::Instance().Configure(config);
 	// load plugins
 	PluginRegistry::Instance().Configure(config);
-	// todo Moved: RenderManager
-	// if render manager is present, configure it
-	// if (RenderManager::InstancePtr())
-	//	RenderManager::Instance().Configure(config);
 }
 
 void ApplicationContext::CloseServices() {
-	// todo Moved: RenderManager
-	// if render manager is present, close it
-	// if (RenderManager::InstancePtr())
-	// 	RenderManager::Instance().Close();
 }
 
 void ApplicationContext::DestroyContext() {
 	Trace("Destroying application context: " + appName);
 	SaveConfiguration();
-	// destroy managers
-	// destroy dictionaries
-	PropertyInterface::DestroyDictionaries();
-	// close services
-	CloseServices();
 	// unload plugins
 	PluginRegistry::Instance().RequestPlugins(PLUG_TYPE_LIFETIME,
 			StringUtils::Null, false);
+	// destroy dictionaries
+	PropertyInterface::DestroyDictionaries();
 	// services
 	DestroyServices();
 }
@@ -90,13 +78,11 @@ void ApplicationContext::CreateServices() {
 	NEX_NEW(BackgroundStreamerImpl());
 	// todo Moved to Engine
 	//NEX_NEW(ComponentFactoryArchive());
-
 	CreateExtendedInterfacesImpl();
-
 }
 
 void ApplicationContext::DestroyServices() {
-
+	// close services
 	DestroyExtendedInterfacesImpl();
 	// todo Moved: RenderSystem
 	// NEX_ASSERT (!RenderManager::InstancePtr());
@@ -170,6 +156,12 @@ void ApplicationContext::UnregisterListener(const Listener& l) {
 		frameListenersToRemove.insert(l);
 	else
 		frameListeners.erase(l);
+}
+
+void ApplicationContext::ShowErrorDialog(int errorCode, const String& errorText) {
+	if (errorHandler) {
+		errorHandler->ShowErrorDialog(errorCode, errorText);
+	}
 }
 
 }

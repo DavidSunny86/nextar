@@ -5,7 +5,7 @@
 
 namespace nextar {
 
-class Win32Window: public RenderWindow {
+class _NexBaseAPI Win32Window: public RenderWindow {
 protected:
 	HWND window;
 	HDC window_dc;

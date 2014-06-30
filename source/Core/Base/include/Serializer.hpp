@@ -20,7 +20,7 @@
 	if (left) { \
 		inStream->Seek(-left, std::ios_base::cur); left = 0; \
 	} \
-	inStream->Read(object.first, readAmt); }
+	inStream->Read(object.first, (size_t)readAmt); }
 #else
 #define SWAP16(object) Endian::Swap16(object)
 #define SWAP32(object) Endian::Swap32(object)

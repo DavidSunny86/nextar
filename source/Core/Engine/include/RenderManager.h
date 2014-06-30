@@ -54,6 +54,7 @@ public:
 	/* */
 	virtual void Configure(const Config&);
 	virtual RenderDriverPtr AsyncCreateDriver(DriverCreationParams&) = 0;
+	virtual RenderDriverPtr AsyncGetDriver(uint32 index) = 0;
 	virtual void Close() = 0;
 
 	virtual void RegisterRenderContext(RenderContextPtr&) = 0;
@@ -81,9 +82,6 @@ public:
 
 protected:
 
-	typedef vector<RenderDriverPtr>::type RenderDriverList;
-	typedef vector<RenderContextPtr>::type RenderContextList;
-	typedef vector<ContextObject*>::type GpuObjectTraitsList;
 	typedef map<String, uint16>::type RenderLayerNameMap;
 
 	virtual RenderDriverPtr CreateDriverImpl(DriverCreationParams&) = 0;
@@ -95,9 +93,7 @@ protected:
 	/* Registered render systems */
 	RenderSystemList renderSystems;
 	/* Render layers */
-	RenderQueueDescList renderQueues;
-	/* List of objects needs readying */
-	GpuObjectTraitsList objectsToReady;
+	RenderQueueDescList renderQueues;	
 };
 }
 /* namespace nextar */

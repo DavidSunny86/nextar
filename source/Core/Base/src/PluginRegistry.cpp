@@ -11,9 +11,9 @@ NEX_DEFINE_SINGLETON_PTR(PluginRegistry);
 
 PluginRegistry ::DynLib::DynLib(const String& path, const String& plug,
 		const PluginLicense& license, uint32 build, bool plgOptional) :
+		fullName(path),
 		optional(plgOptional), name(plug), libptr(0), plugin(0), buildVersion(
 				build) {
-	fullName = URL::GetAppendedPath(path, NEX_MODULE_NAME(name));
 	this->license = license;
 }
 
@@ -134,10 +134,13 @@ void PluginRegistry::_ParsePluginConfiguration(const URL& path) {
 					PluginLicense license;
 					license.customType = it->GetText("type", "Custom");
 					license.type = _ParsePluginLicenseType(license.customType);
-					AddPlugin(it->GetText("path"), it->GetText("name"), license,
-							Convert::ToVersion(
-									it->GetText("build", NEX_VERSION_STRING())),
-							Convert::ToBool(it->GetText("optional", "true")));
+					
+					AddPlugin(NEX_MODULE_NAME(it->GetText("target")), 
+						static_cast<xml::Element*>(*it)->GetAttributeValue("name"), 
+						license,
+						Convert::ToVersion(
+								it->GetText("build", NEX_VERSION_STRING())),
+						Convert::ToBool(it->GetText("optional", "true")));
 					it = it.Next();
 				}
 			}

@@ -79,7 +79,7 @@ void BackgroundStreamerImpl::ExecutePoolRequests() {
 StreamRequest* BackgroundStreamerImpl::WaitAndPopRequest() {
 	std::unique_lock<std::mutex> g(requestQueueLock);
 	requestQueueVar.wait(g, [this] {
-		return !requestQueue.empty();
+		return !requestQueue.empty() || quitThreads;
 	});
 	if (quitThreads)
 		return nullptr;

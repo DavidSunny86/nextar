@@ -12,8 +12,8 @@ namespace nextar {
  * ArchiveEntry = #type:path;
  * Common macros:
  * ${Bin} refers to the location where the binary exists.
- * Common archives:
- * {FileSystem::ArchiveEngineData}
+ * Common archives: (all should be used without the braces)
+ * {FileSystem::ArchiveEngineData} 
  */
 class _NexBaseAPI URL {
 

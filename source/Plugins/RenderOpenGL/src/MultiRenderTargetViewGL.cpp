@@ -21,6 +21,11 @@ MultiRenderTargetViewGL::MultiRenderTargetViewGL() :
 MultiRenderTargetViewGL::~MultiRenderTargetViewGL() {
 }
 
+void MultiRenderTargetViewGL::Destroy(nextar::RenderContext* rc) {
+	auto gl = static_cast<RenderContextGL*>(rc);
+	fbo.Destroy(gl);
+}
+
 void MultiRenderTargetViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 		ContextObject::ContextParamPtr params) {
 

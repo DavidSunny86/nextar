@@ -7,7 +7,6 @@
 #if defined(__cplusplus)
 extern "C" {
 #endif
-
 #include <zlib.h>
 
 #if defined(__cplusplus)

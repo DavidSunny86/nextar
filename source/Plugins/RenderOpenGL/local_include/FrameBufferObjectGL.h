@@ -21,7 +21,7 @@ class FrameBufferObjectGL {
 	NEX_LOG_HELPER(FrameBufferObjectGL)
 	;
 public:
-	FrameBufferObjectGL();
+	FrameBufferObjectGL() : frameBufferObject(0) {};
 	virtual ~FrameBufferObjectGL();
 
 	bool IsValid() const {

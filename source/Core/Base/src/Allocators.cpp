@@ -17,12 +17,15 @@
 #	define _nalalloc     _aligned_malloc
 #	define _nalfree		 _aligned_free
 #endif
-
 namespace nextar {
-void* G_CheckPtr = 0;
-bool G_TrackLeaks = false;
+
+#ifdef NEX_DEBUG
+	void* G_CheckPtr = 0;
+#endif
 
 #ifdef NEX_EXTENSIVE_MEM_TRACKER
+// start tracking by default because of statics
+bool G_TrackLeaks = true;
 void* Allocator::Alloc(size_t size, const char* func, const char* file,
 		long line) {
 	void* ptr = (void*) _nalloc(size);

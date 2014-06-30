@@ -41,7 +41,7 @@ struct VertexSemanticGL {
 	friend bool operator ==(const VertexSemanticGL& v1,
 			const VertexSemanticGL& v2) {
 		// types may vary depending upon normalization is used
-		return (v1 == v2 && v1.index == v2.index);
+		return (v1.semantic == v2.semantic && v1.index == v2.index);
 	}
 };
 

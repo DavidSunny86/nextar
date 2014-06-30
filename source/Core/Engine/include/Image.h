@@ -74,7 +74,7 @@ public:
 		CLASS_ID = 0xffba, // arbitrary number?
 	};
 
-	class Serializer : public AllocGeneral {
+	class _NexEngineAPI Serializer : public AllocGeneral {
 		NEX_DECLARE_FACTORY(ImageCodec);
 
 		const ImageParams& params;

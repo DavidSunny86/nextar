@@ -67,6 +67,8 @@ uint32 BaseRenderContext::GetVideoModeIndex(const VideoMode& current) const {
 
 void BaseRenderContext::SetVideoMode(uint32 vidMod) {
 	if (currentVideoMode != vidMod) {
+		if (vidMod == (uint32)-1)
+			vidMod = originalVideoMode;
 		SetVideoModeImpl(videoModes[vidMod]);
 		currentVideoMode = vidMod;
 	}

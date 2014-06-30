@@ -85,12 +85,25 @@ void RenderContextGLX::SetCreationParams(
 	}
 
 	// choose fbconfig
-	int preferredAttribs[] = { GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
-	GLX_RENDER_TYPE, GLX_RGBA_BIT, GLX_DOUBLEBUFFER, True, /* Request a double-buffered color buffer */
-	GLX_SAMPLES, contextCreationParams.multiSamples,
-	GLX_STENCIL_SIZE, contextCreationParams.stencilBits,
-	GLX_DEPTH_SIZE, contextCreationParams.depthBits, GLX_RED_SIZE, 8, /* the maximum number of bits per component    */
-	GLX_GREEN_SIZE, 8, GLX_BLUE_SIZE, 8, None };
+	int preferredAttribs[] = { 
+		GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
+		GLX_RENDER_TYPE, GLX_RGBA_BIT, 
+		GLX_DOUBLEBUFFER, True, /* Request a double-buffered color buffer */
+		GLX_SAMPLES, contextCreationParams.multiSamples,
+		GLX_STENCIL_SIZE, contextCreationParams.stencilBits,
+		GLX_DEPTH_SIZE, contextCreationParams.depthBits, 
+		GLX_RED_SIZE, 8, /* the maximum number of bits per component    */
+		GLX_GREEN_SIZE, 8, 
+		GLX_BLUE_SIZE, 8, 
+		None, None,
+		None 
+	};
+
+	int attrib = 18;
+	if (contextCreationParams.stereo) {
+		preferredAttribs[attrib++] = GLX_STEREO;
+		preferredAttribs[attrib++] = GL_TRUE;
+	}
 
 	int baseAttribs[] = { GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
 	GLX_RENDER_TYPE, GLX_RGBA_BIT, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1,
@@ -137,7 +150,9 @@ void RenderContextGLX::ReadyContext(RenderWindow* gw) {
 				contextCreationParams.reqOpenGLVersionMajor,
 				GLX_CONTEXT_MINOR_VERSION_ARB,
 				contextCreationParams.reqOpenGLVersionMinor,
-				//GLX_CONTEXT_FLAGS_ARB        , GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
+#ifdef NEX_DEBUG
+				GLX_CONTEXT_FLAGS_ARB        , GLX_CONTEXT_DEBUG_BIT_ARB,
+#endif
 				None };
 
 		Trace("Creating context");

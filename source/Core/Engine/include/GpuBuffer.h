@@ -6,7 +6,7 @@
 
 namespace nextar {
 
-class GpuBuffer: public ContextObject,
+class _NexEngineAPI GpuBuffer: public ContextObject,
 		public Referenced<GpuBuffer, AllocGeneral> {
 public:
 	enum RelocationPolicy
@@ -49,7 +49,7 @@ public:
 		uint8* data;
 	};
 
-	class View: public ContextObject::View {
+	class _NexEngineAPI View: public ContextObject::View {
 	protected:
 		virtual void Update(nextar::RenderContext*, uint32 msg,
 				ContextParamPtr);

@@ -163,7 +163,9 @@
 #		define NEX_SIMPLE_FAST_MEM_TRACKER
 #		define NEX_TRACK_OBJECTS
 #	elif	NEX_MEMTRACKERLEVEL >= 3
-#		define NEX_EXTENSIVE_MEM_TRACKER
+// @urgent Memory tracking can only be switched on when the memory tracker static object and the class
+// has been implemented
+// #		define NEX_EXTENSIVE_MEM_TRACKER
 #		define NEX_TRACK_OBJECTS
 #	endif
 #endif

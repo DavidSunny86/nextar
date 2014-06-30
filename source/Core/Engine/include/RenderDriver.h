@@ -36,6 +36,7 @@ public:
 	struct ContextCreationParams {
 		bool createDefaultWindow;
 		bool fullScreen;
+		bool stereo;
 
 		uint16 monitorIndex;
 		uint16 multiSamples;

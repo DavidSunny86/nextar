@@ -11,7 +11,7 @@ namespace nextar {
 class _NexBaseAPI Allocator {
 public:
 
-#if NEX_MEMTRACKERLEVEL > 1
+#ifdef NEX_EXTENSIVE_MEM_TRACKER
 	static void* Alloc(size_t size, const char* func, const char* file, long line);
 	static void* AllocAligned(size_t size, size_t alignment, const char* func, const char* file, long line);
 #endif
@@ -31,7 +31,7 @@ namespace allocator {
 
 class Default {
 public:
-#if NEX_MEMTRACKERLEVEL > 1
+#ifdef NEX_EXTENSIVE_MEM_TRACKER
 
 	static inline void* Alloc(size_t size,
 			const char* func,
@@ -57,7 +57,7 @@ public:
 template<const size_t alignment = 16>
 class Aligned {
 public:
-#if NEX_MEMTRACKERLEVEL > 1
+#ifdef NEX_EXTENSIVE_MEM_TRACKER
 
 	static inline void* Alloc(size_t size,
 			const char* func,
@@ -81,7 +81,7 @@ public:
 };
 }
 
-#if NEX_MEMTRACKERLEVEL > 1
+#ifdef NEX_EXTENSIVE_MEM_TRACKER
 _NexBaseAPI void Allocator_DoTracking(bool);
 _NexBaseAPI void Allocator_CheckLeaks(std::ostream& s);
 _NexBaseAPI void Allocator_DumpMemStats();

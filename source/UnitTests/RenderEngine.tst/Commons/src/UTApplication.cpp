@@ -2,7 +2,7 @@
 #include <UTApplication.h>
 
 UTApplication::UTApplication() :
-		ApplicationContext("UTApplication") {
+		EngineApplicationContext("UTApplication") {
 }
 
 SceneAssetPtr UTApplication::_CreateDefaultScene() {
@@ -50,6 +50,7 @@ void UTApplication::_SetupRenderDriver() {
 	dcp.defaultContextParams.fullScreen = false;
 	dcp.defaultContextParams.monitorIndex = 0;
 	dcp.defaultContextParams.multiSamples = 0;
+	dcp.defaultContextParams.stereo = false;
 	dcp.defaultContextParams.reqOpenGLVersionMajor = 3;
 	dcp.defaultContextParams.reqOpenGLVersionMinor = 2;
 	dcp.defaultContextParams.sharedContextIndex = -1;

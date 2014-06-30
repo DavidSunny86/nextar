@@ -112,7 +112,7 @@ void ShaderCmd::Execute(int parentType, void* parentParam,
 	ShaderScript* script = (static_cast<ShaderScript*>(parentParam));
 	String programRegion;
 	StringUtils::TokenIterator it = StringUtils::NextWord(statement.GetParamList(),
-			programRegion, it);
+			programRegion);
 	script->SetRegionAsSource(stage, programRegion);
 }
 

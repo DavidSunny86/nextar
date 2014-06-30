@@ -195,4 +195,38 @@ void ShaderAsset::StreamRequest::SetParamterBuffer(ParameterBuffer&& data) {
 	shader->passParamData = std::move(data);
 }
 
+ParamDataType ShaderAsset::MapParamType(const String& typeName) {
+	typedef std::pair<const char*, ParamDataType> ParamTypeNamePair;
+	static ParamTypeNamePair paramTypeNameTable[] = {
+		ParamTypeNamePair("bool", ParamDataType::PDT_BOOL),
+		ParamTypeNamePair("count", ParamDataType::PDT_COUNT),
+		ParamTypeNamePair("float", ParamDataType::PDT_FLOAT),
+		ParamTypeNamePair("int", ParamDataType::PDT_INT),
+		ParamTypeNamePair("ivec2", ParamDataType::PDT_IVEC2),
+		ParamTypeNamePair("ivec3", ParamDataType::PDT_IVEC3),
+		ParamTypeNamePair("ivec4", ParamDataType::PDT_IVEC4),
+		ParamTypeNamePair("mat3x4", ParamDataType::PDT_MAT3x4),
+		ParamTypeNamePair("mat4x4", ParamDataType::PDT_MAT4x4),
+		ParamTypeNamePair("struct", ParamDataType::PDT_STRUCT),
+		ParamTypeNamePair("texture", ParamDataType::PDT_TEXTURE),
+		ParamTypeNamePair("uint", ParamDataType::PDT_UINT),
+		ParamTypeNamePair("unknown", ParamDataType::PDT_UNKNOWN),
+		ParamTypeNamePair("vec2", ParamDataType::PDT_VEC2),
+		ParamTypeNamePair("vec3", ParamDataType::PDT_VEC3),
+		ParamTypeNamePair("vec4", ParamDataType::PDT_VEC4),
+	};
+	static const uint32 arraySize = sizeof(paramTypeNameTable) / sizeof(paramTypeNameTable[0]);
+	ParamTypeNamePair* last = paramTypeNameTable + arraySize;
+	ParamTypeNamePair* ptr = std::lower_bound(paramTypeNameTable, last, typeName,
+			[] (const ParamTypeNamePair& p1, const String& searchText) -> int {
+				return searchText.compare(p1.first);
+	});
+
+	if (ptr && ptr != last) {
+		return ptr->second;
+	}
+
+	return ParamDataType::PDT_UNKNOWN;
+}
+
 } /* namespace nextar */

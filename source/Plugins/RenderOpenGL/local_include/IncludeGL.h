@@ -17,11 +17,11 @@
 #   include <GL/glx.h>    /* this includes the necessary X headers */
 #   include <GL/gl.h>
 #   include <GL/glext.h>
-
 #elif defined (NEX_WINDOWS)
 #   include <windows.h>
 #   include <GL/gl.h>
 #   include <GL/glext.h>
+#	include <GL/wglext.h>
 #elif defined (NEX_MACOSX)
 #   include <OpenGL/glx.h>    /* this includes the necessary X headers */
 #   include <OpenGL/gl.h>

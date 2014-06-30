@@ -14,6 +14,13 @@
 
 namespace ShaderCompiler {
 
+RasterStateCmd RasterStateCmd::command;
+AntiAliasingCmd AntiAliasingCmd::command;
+DepthBiasCmd DepthBiasCmd::command;
+DepthClipCmd DepthClipCmd::command;
+RasterCmd RasterCmd::command;
+ScissorCmd ScissorCmd::command;
+
 CommandNamePair RasterStateListener::commands[] = {
 		{ _SS(CMD_ANTI_ALIASING), &AntiAliasingCmd::command },
 		{ _SS(CMD_DEPTH_BIAS), &DepthBiasCmd::command },

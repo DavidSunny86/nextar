@@ -51,8 +51,8 @@ public:
 };
 
 #define NEX_IMPLEMENT_PLUGIN(pluginName)              \
-    NEX_EXTERNC_SYM _NexExportSym nextar::FactoryPlugin*      \
-    NEX_TOKEN_PASTE(pluginName,CreateFactory)()
+	NEX_EXTERNC_SYM _NexExportSym nextar::FactoryPlugin*      \
+	NEX_TOKEN_PASTE(pluginName,CreateFactory)()
 
 #define NEX_DECLARE_COMPONENT_FACTORY(Impl)					\
 	typedef map<String, Impl*>::type FactoryMap;	\

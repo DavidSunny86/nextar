@@ -13,7 +13,7 @@ namespace nextar {
  * @author	Abhishek Dey
  * @date	11/28/2009
  **/
-class InputStream: public Referenced<InputStream, AllocGeneral> {
+class _NexBaseAPI InputStream: public Referenced<InputStream, AllocGeneral> {
 protected:
 	size_t size;
 public:
@@ -45,7 +45,7 @@ public:
 	virtual void ReleaseBuffer(const void* readOnlyData);
 };
 
-class OutputStream: public Referenced<OutputStream, AllocGeneral> {
+class _NexBaseAPI OutputStream: public Referenced<OutputStream, AllocGeneral> {
 protected:
 	size_t size;
 public:

@@ -89,7 +89,7 @@ typedef AllocatorBase<MEMCAT_BUFFER_DATA> AllocatorBufferData;
 
 /**! Macros for allocation and deallocations */
 
-#if NEX_MEMTRACKERLEVEL > 1
+#ifdef NEX_EXTENSIVE_MEM_TRACKER
 //! basic allocator functions
 #define NEX_ALLOCATOR_ALLOC(size,alloct) (alloct::Alloc(size,NEX_FUNCTION_NAME,NEX_SOURCEFILE_NAME,NEX_SOURCEFILE_LINE))
 //! basic allocator functions

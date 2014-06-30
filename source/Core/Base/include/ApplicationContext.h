@@ -21,6 +21,13 @@ public:
 		PRIORITY_LOW = 999999, PRIORITY_NORMAL = 500000, PRIORITY_HIGH = 100000,
 	};
 
+	class ErrorHandler {
+	public:
+		virtual void ShowErrorDialog(int errorCode, const String& desc) = 0;
+	protected:
+		~ErrorHandler() {}
+	};
+
 	struct Listener {
 		FrameListener* frameListener;
 		uint32 priority;
@@ -45,6 +52,14 @@ public:
 		appName = name;
 	}
 
+	inline Config& GetConfig() {
+		return config;
+	}
+
+	inline const Config& GetConfig() const {
+		return config;
+	}
+
 	void SetQuitting(bool value);
 
 	virtual void InitializeContext();
@@ -55,6 +70,8 @@ public:
 	virtual void RegisterListener(const Listener&);
 	virtual void UnregisterListener(const Listener&);
 
+	virtual void ShowErrorDialog(int errorCode, const String& errorText);
+
 protected:
 	void CreateServices();
 	void DestroyServices();
@@ -64,7 +81,7 @@ protected:
 	}
 	virtual void ConfigureServices();
 	virtual void CloseServices();
-
+		
 	virtual void ConfigureExtendedInterfacesImpl() {
 	}
 	virtual void CreateExtendedInterfacesImpl() {
@@ -93,7 +110,8 @@ private:
 	FrameListenerSet frameListenersToRemove;
 	FrameListenerSet frameListenersToAdd;
 	FrameListenerSet frameListeners;
-
+	// @todo Add error handler
+	ErrorHandler* errorHandler;
 	static String _configPathName;
 };
 

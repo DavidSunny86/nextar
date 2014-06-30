@@ -25,6 +25,7 @@ public:
 	/* */
 	virtual void Configure(const Config&);
 	virtual RenderDriverPtr AsyncCreateDriver(DriverCreationParams&);
+	virtual RenderDriverPtr AsyncGetDriver(uint32 index);
 	virtual void Close();
 
 	virtual ContextID RequestObjectCreate(ContextObject::Type, uint32 hint);
@@ -48,9 +49,15 @@ protected:
 	RenderDriverPtr primaryDriver;
 	RenderContextPtr primaryContext;
 #if NEX_MULTIGPU_BUILD
+	typedef vector<RenderDriverPtr>::type RenderDriverList;
+	typedef vector<RenderContextPtr>::type RenderContextList;
+	typedef vector<ContextObject*>::type GpuObjectTraitsList;
+	
 	ContextID emptySlot;
 	RenderContextList activeContexts;
 	RenderDriverList renderDrivers;
+	/* List of objects needs readying */
+	GpuObjectTraitsList objectsToReady;
 #endif
 };
 

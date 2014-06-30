@@ -17,8 +17,8 @@ project(NextarEngine)
 ## Root variables
 #============================================================
 set(NEX_ROOT ${PROJECT_SOURCE_DIR})
-set(NEX_BIN_BASE  ${NEX_ROOT}/../bin)
-set(NEX_BUILD ${NEX_ROOT}/../build)
+set(NEX_BIN_BASE  ${NEX_ROOT}/../build/bin)
+set(NEX_INSTALL ${NEX_ROOT}/../install)
 set(NEX_LIB ${NEX_ROOT}/../lib)
 set(NEX_DEPENDENCIES ${NEX_ROOT}/../dependencies)
 set(NEX_DATA ${NEX_ROOT}/Data)
@@ -82,8 +82,6 @@ endif()
 ## Configure paths
 #============================================================
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${NEX_LIB})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${NEX_BIN})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${NEX_BIN})
 
 ## Configurable Options
 #============================================================
@@ -153,10 +151,18 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 ## Create plugin configuration file
 #============================================================
-set(NEX_PLUGIN_CONFIG_FILE ${NEX_BIN}/Plugins.xml)
-
+set(NEX_PLUGIN_CONFIG_FILE ${NEX_INSTALL}/Bin/Plugins.xml)
+set(NEX_INSTALL_PLUGIN OFF)
 ## Create nextar configuration file
-
+#============================================================
+# copy_binary_to_output
+#============================================================
+macro(copy_binary_to_out binFolder)
+	add_custom_command(TARGET "${NEXTAR_TARGET}" POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory
+			"${ARGV0}"
+			${NEX_INSTALL}/Bin)
+endmacro(copy_binary_to_out)
 #============================================================
 # get_chained_include
 #============================================================
@@ -343,7 +349,24 @@ macro(add_unit_test test)
 	set(NEXTAR_UT ${ARGV0})
 	add_subdirectory(${ARGV0})
 endmacro(add_unit_test)
-
+#============================================================
+# Place_bin
+#============================================================
+macro(place_bin)
+	
+	if (NEX_INSTALL_PLUGIN)
+		set(NEX_INSTALL_DIR ${NEX_INSTALL}/Bin/plugins)
+	else (NEX_INSTALL_PLUGIN)
+		set(NEX_INSTALL_DIR ${NEX_INSTALL}/Bin)
+	endif()
+	#add_custom_command(TARGET ${NEXTAR_TARGET} POST_BUILD
+	#	COMMAND ${CMAKE_COMMAND} -E copy_directory
+	#		$<TARGET_FILE_DIR:${NEXTAR_TARGET}>
+	#		"${NEX_INSTALL_DIR}")
+	set_target_properties(${NEXTAR_TARGET} PROPERTIES
+                      RUNTIME_OUTPUT_DIRECTORY_DEBUG ${NEX_INSTALL_DIR}
+                      RUNTIME_OUTPUT_DIRECTORY_RELEASE ${NEX_INSTALL_DIR})
+endmacro(place_bin)
 #============================================================
 # Create_Module
 #============================================================
@@ -358,6 +381,7 @@ macro(create_library)
 	message("--------------------------------------")
 	message("-->> Create Module..: ${NEXTAR_TARGET}")
 	add_library(${NEXTAR_TARGET} SHARED ${NEXTAR_SRC_FILES})
+	place_bin()
 endmacro(create_library)
 
 #============================================================
@@ -372,6 +396,8 @@ macro(create_exec)
 	message("--------------------------------------")
 	message("-->> Create Exec..: ${NEXTAR_TARGET}")	
 	add_executable(${NEXTAR_TARGET} ${NEXTAR_SRC_FILES})
+	set(NEX_INSTALL_DIR ${NEX_INSTALL})
+	place_bin()
 endmacro(create_exec)
 
 #============================================================
@@ -389,6 +415,7 @@ macro(create_ut consoleApp)
 	message("--------------------------------------")
 	message("-->> Create Test..: ${NEXTAR_TARGET}")
 	add_executable(${NEXTAR_TARGET} ${NEXTAR_SRC_FILES})
+	place_bin()
 endmacro(create_ut)
 
 ## Macros
@@ -396,18 +423,24 @@ endmacro(create_ut)
 # Create_Plugin
 #============================================================
 macro(create_plugin pluginName pluginPath type build optional)
-	file(APPEND ${NEX_PLUGIN_CONFIG_FILE} 
-		"${NEX_PLUGIN_CONFIG}"
-		 " <plugin>\n"
-		 "  <name>${ARGV0}</name>\n"
-		 "  <path>${ARGV1}</path>\n"
-		 "  <type>${ARGV2}</type>\n"
-		 "  <build>${ARGV3}</build>\n"
-		 "  <optional>${ARGV4}</optional>\n"
-		 " </plugin>\n")
+	set(NEX_INSTALL_PLUGIN ON)
 	create_library()
-endmacro(create_plugin)
+	if (ARGV1 MATCHES "")
+		set(PLUG_SUBPATH "${NEXTAR_TARGET}")
+	else()
+		set(PLUG_SUBPATH "${ARGV1}/${NEXTAR_TARGET}")
+	endif()
+	file(APPEND ${NEX_PLUGIN_CONFIG_FILE} 
+	"${NEX_PLUGIN_CONFIG}"
+	 " <plugin name='${ARGV0}'>\n"
+	 "  <target>${PLUG_SUBPATH}</target>\n"
+	 "  <type>${ARGV2}</type>\n"
+	 "  <build>${ARGV3}</build>\n"
+	 "  <optional>${ARGV4}</optional>\n"
+	 " </plugin>\n")
 
+	set(NEX_INSTALL_PLUGIN OFF)
+endmacro(create_plugin)
 
 ## Build targets
 #============================================================

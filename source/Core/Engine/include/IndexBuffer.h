@@ -12,7 +12,7 @@
 
 namespace nextar {
 
-class IndexBuffer: public GpuBuffer {
+class _NexEngineAPI IndexBuffer: public GpuBuffer {
 public:
 
 	enum Type

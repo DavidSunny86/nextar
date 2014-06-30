@@ -23,7 +23,7 @@ enum {
 	MAX_STREAM_COUNT = 8,
 };
 
-class MeshBufferData: public AllocGeneral {
+class _NexEngineAPI MeshBufferData: public AllocGeneral {
 public:
 	// first 4 bytes is stride for vertex buffers
 	typedef list<ByteStream>::type BufferList;
@@ -33,7 +33,7 @@ public:
 
 };
 
-class MeshVertexData: public AllocGeneral {
+class _NexEngineAPI MeshVertexData: public AllocGeneral {
 public:
 	/* vertex count */
 	uint32 vertexCount;
@@ -78,7 +78,7 @@ protected:
 	static VertexLayoutPtr commonLayouts[VertexLayoutType::VERTEX_LAYOUT_COUNT];
 };
 
-class MeshIndexData: public AllocGeneral {
+class _NexEngineAPI MeshIndexData: public AllocGeneral {
 public:
 	/* type */
 	bool twoBytePerElement;
@@ -88,7 +88,7 @@ public:
 	IndexBuffer ibdata;
 };
 
-class PrimitiveGroup: public AllocGeneral {
+class _NexEngineAPI PrimitiveGroup: public AllocGeneral {
 public:
 
 	BoundsInfo boundsInfo;
@@ -130,7 +130,7 @@ public:
 	typedef AssetTraits<MeshAsset> Traits;
 	typedef FactoryTraits<MeshAsset> FactoryTraits;
 
-	class StreamRequest: public AllocGeneral, public AssetStreamRequest {
+	class _NexEngineAPI StreamRequest: public AllocGeneral, public AssetStreamRequest {
 	public:
 		StreamRequest(MeshAsset* a);
 

@@ -206,7 +206,7 @@ ImageData PNGImageCodec::Load(InputStreamPtr& file, const ImageParams& params,
 
 	// update
 	png_read_update_info(png_ptr, info_ptr);
-	png_uint_32 bytes_per_row = png_get_rowbytes(png_ptr, info_ptr);
+	png_uint_32 bytes_per_row = (png_uint_32)png_get_rowbytes(png_ptr, info_ptr);
 
 	//png_read_image
 	PixelFormat fmt;

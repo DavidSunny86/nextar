@@ -18,6 +18,7 @@ class RenderDriverGL;
  */
 enum VersionGL {
 	GLV_INVALID,
+	GLV_1_3,
 	GLV_1_4,
 	GLV_1_5,
 	GLV_2_0,

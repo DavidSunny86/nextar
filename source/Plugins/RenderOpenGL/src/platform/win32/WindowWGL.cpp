@@ -6,12 +6,45 @@
  */
 
 #include <RenderOpenGL.h>
-#include <RenderContextGLX.h>
+#include <RenderContextWGL.h>
+#include <WindowWGL.h>
 
 namespace RenderOpenGL {
 
-WindowWGL::WindowWGL(RenderContextGLX* ctx) :
-context(ctx), nextar::XWindow(NEX_NEW( WindowWGL::Impl(this))) {
+ATOM WindowWGL::wndClass = 0;
+void WindowWGL::InitializeWindowClass() {
+	if (WindowWGL::wndClass)
+		return;
+
+	WNDCLASSEX wcx;
+	HINSTANCE hinstance = GetModuleHandle(NULL);
+	// Fill in the window class structure with parameters 
+	// that describe the main window. 
+	wcx.cbSize = sizeof (wcx); // size of structure 
+	wcx.style = CS_HREDRAW |
+			CS_VREDRAW; // redraw if size changes 
+	wcx.lpfnWndProc = Win32Window::WndProc; // points to window procedure 
+	wcx.cbClsExtra = 0; // no extra class memory 
+	wcx.cbWndExtra = 0; // no extra window memory 
+	wcx.hInstance = hinstance; // handle to instance 
+	wcx.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+	wcx.hCursor = LoadCursor(NULL, IDC_ARROW); // predefined arrow 
+	wcx.hbrBackground = (HBRUSH) GetStockObject(BLACK_BRUSH);
+	wcx.lpszMenuName = NULL;
+	wcx.lpszClassName = "NextarWindowWGL"; // name of window class 
+	wcx.hIconSm = (HICON) LoadImage(hinstance, // small class icon
+			MAKEINTRESOURCE(5),
+			IMAGE_ICON,
+			GetSystemMetrics(SM_CXSMICON),
+			GetSystemMetrics(SM_CYSMICON),
+			LR_DEFAULTCOLOR);
+
+	// Register the window class. 
+	wndClass = RegisterClassEx(&wcx);
+}
+
+WindowWGL::WindowWGL(RenderContextWGL* ctx) :
+context(ctx), nextar::Win32Window(NEX_NEW( WindowWGL::Impl(this))) {
 }
 
 WindowWGL::~WindowWGL() {
@@ -20,21 +53,20 @@ WindowWGL::~WindowWGL() {
 }
 
 WindowWGL::Impl::Impl(WindowWGL* _parent) :
-		parent(_parent), drawable(0), cmap(0), pbo{ 0 } {
+		parent(_parent) {
+	ZeroMemory(pbo, sizeof(pbo));
 }
 
 void WindowWGL::Impl::Create(uint32 width, uint32 height,
 bool fullscreen, const NameValueMap* params) {
 
-	RenderContextGLX* context = parent->GetContext();
+	RenderContextWGL* context = parent->GetContext();
 	position.x = 0;
 	position.y = 0;
+		
+	HWND parentWindow = GetDesktopWindow();
+	uint32 refreshRate = 0;
 
-	Display* display = context->GetDisplay();
-	parent->SetDisplay(display);
-
-	Window parentWindow = RootWindow(display,
-			context->GetScreenIndex());
 	parent->SetWindowTitle("NexTech: Render Window");
 	uint32 setVideoMode = -1;
 
@@ -66,66 +98,79 @@ bool fullscreen, const NameValueMap* params) {
 	if (!parent->IsMainWindow())
 		fullscreen = false;
 
-	this->dimensions.dx = width;
-	this->dimensions.dy = height;
-
+	
 	if (fullscreen && setVideoMode != -1) {
 		context->SetVideoMode(setVideoMode);
 	}
 
-	GLXFBConfig fbconfig = context->GetFrameBufferConfig();
-	XVisualInfo* vi = glXGetVisualFromFBConfig(display, fbconfig);
+	DWORD style = WS_OVERLAPPEDWINDOW;
+	DWORD  exStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
+	
+	WindowWGL::InitializeWindowClass();
 
-	// X Win Attributes
-	XSetWindowAttributes swa;
-	uint32 mask;
-	swa.colormap = cmap = XCreateColormap(display,
-			RootWindow(display, vi->screen), vi->visual, AllocNone);
-	swa.background_pixel = 0;
-	swa.border_pixel = 0;
-	swa.event_mask = StructureNotifyMask | VisibilityChangeMask
-			| FocusChangeMask;
-	mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
+	RECT windowRect;
+	windowRect.left = (LONG) position.x;
+	windowRect.right = (LONG) (position.x + width);
+	windowRect.top = (LONG) position.y;
+	windowRect.bottom = (LONG) (position.y + height);
 
-	Window window = XCreateWindow(display, parentWindow, position.x, position.y,
-			width, height, 0, vi->depth,
-			InputOutput, vi->visual, mask, &swa);
+	if (!AdjustWindowRectEx(&windowRect, style, FALSE, exStyle))
+		NEX_THROW_FatalError(EXCEPT_INVALID_ARGS);
 
-	XFree(vi);
+	this->dimensions.dx = (uint16)(windowRect.right - windowRect.left);
+	this->dimensions.dy = (uint16)(windowRect.bottom - windowRect.top);
+	
+	// create basic window
+	HWND wnd = CreateWindowEx(exStyle, (LPCSTR) wndClass,
+		parent->GetTitle().c_str(),
+		style | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
+		windowRect.left, windowRect.top,
+		width,
+		height,
+		parentWindow,
+		NULL, NULL, NULL);
 
-	if (!window) {
-		// error
-		Error("Failed to create window.");
-		NEX_THROW_FatalError(EXCEPT_INVALID_CALL);
+	if (wnd == NULL) {
+		Error("Failed to create window");
+		NEX_THROW_FatalError(EXCEPT_INVALID_ARGS);
 	}
 
-	parent->SetWindow(window);
-
-	Atom destroyMsg = XInternAtom(display, "WM_DELETE_WINDOW", False);
-	parent->SetDestroyMsg(destroyMsg);
-	// trap delete
-	XSetWMProtocols(display, window, &destroyMsg, 1);
+	parent->SetWindowHandle(wnd);
+	hDC = GetDC(wnd);
+	parent->SetWindowDC(hDC);
+	
+	if (!SetPixelFormat(hDC, context->GetPixelFormat(),
+		context->GetPixelDescriptor())) {
+		Error("Could not set pixel format!");
+		NEX_THROW_FatalError(EXCEPT_INVALID_ARGS);
+	}
 
 	// SetToFullScreen now
 	if (fullscreen) {
 		SetToFullScreen(true);
 	}
 
-	XStoreName(display, window, parent->GetTitle().c_str());
-	XMapWindow(display, window);
-
+	ShowWindow(wnd, SW_SHOW);
+    SetForegroundWindow(wnd);
+    SetFocus(wnd);
+    UpdateWindow(wnd);
+    
 	parent->SetFlag(WINDOW_CLOSED, false);
-
-	XFlush (display);
-	drawable = window;
+	parent->SetWindowProc(WindowWGL::WndProc);	
 }
 
 void WindowWGL::Impl::SetToFullScreen(bool fullScreen) {
-	RenderContextGLX* context = parent->GetContext();
-	Display* display = parent->GetDisplay();
-	Window window = parent->GetWindow();
-	if (fullScreen) {
+	if (fullScreen == parent->IsFullScreen())
+		return;
 
+	RenderContextWGL* context = parent->GetContext();
+	
+	RECT windowRect;
+
+	DWORD style;
+	DWORD exStyle;
+
+	if (fullScreen) {
 		if (!parent->IsMainWindow()) {
 			Warn("Window needs to be main window to set to fullscreen.");
 			return;
@@ -134,30 +179,80 @@ void WindowWGL::Impl::SetToFullScreen(bool fullScreen) {
 		// keep the current mode and switch
 		// update the client area
 		VideoMode mode = context->GetCurrentMode();
-		dimensions.height = mode.height;
-		dimensions.width = mode.width;
-		context->SwitchToFullScreen(window, true);
+		fsSwitchSize = Size(mode.width, mode.height);
+		this->dimensions.height = mode.height;
+		this->dimensions.width = mode.width;
+
+		windowRect.left = (LONG) 0;
+		windowRect.right = (LONG) (0 + mode.width);
+		windowRect.top = (LONG) 0;
+		windowRect.bottom = (LONG) (0 + mode.height);
+
+		style = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+		exStyle = WS_EX_APPWINDOW;
+
 	} else {
-		XWindowAttributes attribs;
-		parent->SetFlag(WINDOW_FULLSCREEN, false);
-		Display* display = context->GetDisplay();
-		context->SwitchToFullScreen(window, false);
-		XGetWindowAttributes(display, window, &attribs);
-		dimensions.width = attribs.width;
-		dimensions.height = attribs.height;
+		context->SetVideoMode((uint32)-1);
+		fullScreen = false;
+
+		this->dimensions = fsSwitchSize;
+		
+		windowRect.left = (LONG) position.x;
+		windowRect.right = (LONG) (position.x + dimensions.dx);
+		windowRect.top = (LONG) position.y;
+		windowRect.bottom = (LONG) (position.y + dimensions.dy);
+
+		style = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+		exStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 	}
+
+	if (!AdjustWindowRectEx(&windowRect,
+			style,
+			FALSE,
+			exStyle))
+		NEX_THROW_FatalError(EXCEPT_INVALID_ARGS);
+
+
+	SetWindowLong(parent->GetWindowHandle(), GWL_STYLE, style);
+	SetWindowLong(parent->GetWindowHandle(), GWL_EXSTYLE, exStyle);
+	SetWindowPos(parent->GetWindowHandle(), HWND_NOTOPMOST,
+			windowRect.left,
+			windowRect.top,
+			windowRect.right - windowRect.left,
+			windowRect.bottom - windowRect.top,
+			SWP_SHOWWINDOW
+			);
+
+	UpdateWindow(parent->GetWindowHandle());
+	SetForegroundWindow(parent->GetWindowHandle());
+	SetFocus(parent->GetWindowHandle());
 }
 
 void WindowWGL::Impl::Destroy() {
-	RenderContextGLX* context = parent->GetContext();
-	Display* display = parent->GetDisplay();
-	Window window = parent->GetWindow();
-	if (context->IsCurrentDrawable(drawable))
+	RenderContextWGL* context = parent->GetContext();
+	if (parent->IsFullScreen())
+		SetToFullScreen(false);
+		
+	if (context->IsCurrentDC(GetWindowDC()))
 		context->SetCurrentTarget(nullptr);
-	XDestroyWindow(display, window);
-	window = 0;
-	XFreeColormap(display, cmap);
-	cmap = 0;
+	
+    if (!ReleaseDC(parent->GetWindowHandle(), parent->GetWindowDC())) {
+        Error("Failed to destroy device context");
+        NEX_THROW_FatalError(EXCEPT_INVALID_CALL);
+    }
+
+    if (!DestroyWindow(parent->GetWindowHandle())) {
+        Error("Failed to destroy window");
+        NEX_THROW_FatalError(EXCEPT_INVALID_CALL);
+    }
+
+    parent->SetWindowHandle(0);
+    parent->SetWindowDC(0);
+	hDC = 0;
+    if (parent->IsMainWindow()) {
+        // post quit message
+        PostQuitMessage(0);
+    }
 }
 
 void WindowWGL::Impl::ApplyChangedAttributes() {
@@ -174,36 +269,52 @@ PixelFormat WindowWGL::Impl::GetPixelFormat() const {
 
 void WindowWGL::Impl::Capture(RenderContext* rc, PixelBox& image,
 		FrameBuffer frameBuffer) {
-	RenderContextGLX* context = parent->GetContext();
+	RenderContextWGL* context = parent->GetContext();
 	if (rc != (RenderContext*)context) {
 		Error("Window created using a different context");
 		return;
 	}
-	if (!context->IsCurrentDrawable(drawable))
+	if (!context->IsCurrentDC(hDC))
 		context->SetCurrentTarget(this);
 
 	context->Capture(image, this, pbo, frameBuffer);
 }
 
 void WindowWGL::Impl::Reset(RenderContext* rc, Size size, PixelFormat format) {
-	RenderContextGLX* context = parent->GetContext();
-	Display* display = parent->GetDisplay();
-	Window window = parent->GetWindow();
+	RenderContextWGL* context = parent->GetContext();
 	if (parent->IsFullScreen())
 		SetToFullScreen(false);
-	XWindowAttributes attribs;
-	XResizeWindow(display, window, size.dx, size.dy);
+	RECT windowRect;
+	windowRect.left = (LONG) position.x;
+	windowRect.right = (LONG) (position.x + dimensions.dx);
+	windowRect.top = (LONG) position.y;
+	windowRect.bottom = (LONG) (position.y + dimensions.dy);
+	DWORD style = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+	DWORD exStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
+	if (!AdjustWindowRectEx(&windowRect,
+			style,
+			FALSE,
+			exStyle))
+		NEX_THROW_FatalError(EXCEPT_INVALID_ARGS);
+	SetWindowPos(parent->GetWindowHandle(), HWND_NOTOPMOST,
+			windowRect.left,
+			windowRect.top,
+			windowRect.right - windowRect.left,
+			windowRect.bottom - windowRect.top,
+			SWP_SHOWWINDOW
+			);
 	dimensions.width = size.dx;
 	dimensions.height = size.dy;
+	UpdateWindow(parent->GetWindowHandle());
 }
 
 void WindowWGL::Impl::Present(RenderContext* rc) {
-	RenderContextGLX* context = parent->GetContext();
+	RenderContextWGL* context = parent->GetContext();
 	if (rc != context) {
 		Error("Window created using a different context");
 		return;
 	}
-	context->Present(this);
+	context->Present(GetWindowDC());
 }
 
 }

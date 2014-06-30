@@ -105,6 +105,15 @@ RenderDriverPtr BaseRenderManager::AsyncCreateDriver(DriverCreationParams& param
 	return renderDrvPtr;
 }
 
+RenderDriverPtr BaseRenderManager::AsyncGetDriver(uint32 params) {
+	NEX_THREAD_LOCK_GUARD_MUTEX(accessLock);
+#if NEX_MULTIGPU_BUILD
+	return renderDrivers[params];
+#else
+	return primaryDriver;
+#endif
+}
+
 void BaseRenderManager::RenderFrame(uint32 frameNumber) {
 	/**
 	 * Handle culling step followed by rendering step.

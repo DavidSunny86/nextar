@@ -44,15 +44,15 @@ public:
 		virtual void Reset(RenderContext* rc, Size size, PixelFormat format);
 		virtual void Present(RenderContext* rc);
 
-		// Helpers
-		inline GLXDrawable GetDrawable() const {
-			return drawable;
+		inline HDC GetWindowDC() {
+			return hDC;
 		}
-
+		// Helpers
 	private:
-		GLXDrawable drawable;
+		
+		HDC hDC;
+		Size fsSwitchSize;
 		Point position;
-		Colormap cmap;
 		// for async capture
 		GLuint pbo[PRE_FRAME_CAPTURE];
 		WindowWGL* parent;
@@ -67,25 +67,21 @@ public:
 		return context;
 	}
 
-	inline void SetWindow(Window window) {
-		this->window = window;
-	}
-
-	inline void SetDestroyMsg(Atom& m) {
-		msgDestroy = m;
-	}
-
-	inline void SetDisplay(Display* dpy) {
-		display = dpy;
-	}
-
 	inline void SetWindowTitle(const String& title) {
 		windowTitle = std::move(title);
 	}
 
-protected:
+	static inline ATOM GetWindowClass() {
+		return wndClass;
+	}
 
+	static void InitializeWindowClass();
+protected:
+	
+	HGLRC hGL;
 	RenderContextWGL* context;
+
+	static ATOM wndClass;
 };
 
 }

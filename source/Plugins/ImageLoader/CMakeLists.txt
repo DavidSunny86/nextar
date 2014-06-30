@@ -18,11 +18,14 @@ if(NEX_OS MATCHES "Windows")
  # JPEG
  if(NOT LIBJPEG_ROOT)
   set(LIBJPEG_ROOT ${NEX_DEPENDENCIES}/libjpeg)
+  # copy the binary to bin folder
+  copy_binary_to_out(${LIBJPEG_ROOT}/bin)
  endif(NOT LIBJPEG_ROOT)
  # PNG
-  if(NOT PNG_ROOT)
+ if(NOT PNG_ROOT)
 	set(PNG_NAMES libpng16)
 	set(PNG_ROOT ${NEX_DEPENDENCIES}/libpng)
+	copy_binary_to_out(${PNG_ROOT}/bin)
  endif(NOT PNG_ROOT)
 endif(NEX_OS MATCHES "Windows")
 

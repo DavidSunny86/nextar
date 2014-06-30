@@ -16,8 +16,8 @@ class PluginGL: public nextar::FactoryPlugin, public nextar::AllocGraphics {
 public:
 	static PluginGL pluginObject;
 
-	PluginGL();
-	virtual ~PluginGL();
+	PluginGL() {}
+	virtual ~PluginGL() {}
 
 	virtual void Open();
 	virtual void LicenseRenewed();

@@ -33,7 +33,7 @@ public:
 		TYPE_PASS,
 	};
 
-	class View : public AllocGraphics {
+	class _NexEngineAPI View : public AllocGraphics {
 	public:
 		//View(ContextObject* _parent) : parentObject(_parent) {}
 		/*
@@ -82,7 +82,7 @@ public:
 	virtual void RequestUpdate(uint32 updateMsg,
 			ContextObject::ContextParamPtr);
 private:
-	ContextObject(const ContextObject&) = delete;
+	ContextObject(const ContextObject&);
 
 protected:
 	ContextID contextId;

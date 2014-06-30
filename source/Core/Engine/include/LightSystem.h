@@ -8,7 +8,7 @@
 #ifndef LIGHTSYSTEM_H_
 #define LIGHTSYSTEM_H_
 
-#include <NexBase.h>
+#include <NexEngine.h>
 #include <VisiblePrimitive.h>
 #include <Light.h>
 #include <RenderConstants.h>
