@@ -32,6 +32,10 @@ RenderWindow* RenderContextGL::CreateRenderWindowImpl() {
 	return CreateWindowImpl();
 }
 
+void RenderContextGL::CloseImpl() {
+	uniformBufferMap.clear();
+}
+
 void RenderContextGL::PostWindowCreation(RenderWindow* gw) {
 	/* check if extensions were initialized or initialize extensions */
 	if (!IsContextReady()) {
@@ -1229,7 +1233,7 @@ ContextID RenderContextGL::RegisterObject(ContextObject::Type type, uint32 hint)
 		break;
 	case ContextObject::TYPE_VERTEX_LAYOUT:
 		if (hint & dynamicLayoutHint) {
-			if (GLE_version >= GLV_4_3)
+			if (GLE_ARB_vertex_attrib_binding)
 				view = (NEX_NEW(VertexLayoutFlexibleGL()));
 			else
 				view = (NEX_NEW(VertexLayoutDynamicGL()));

@@ -32,7 +32,8 @@ struct SceneEventListener {
 class _NexEngineAPI SceneAsset: public Asset {
 public:
 	enum {
-		CLASS_ID = Component::CLASS_SCENE, CATAGORY = COMPONENT_CAT(CLASS_ID),
+		CLASS_ID = Component::CLASS_SCENE, 
+		CATAGORY = COMPONENT_CAT(CLASS_ID),
 	};
 
 	typedef list<EntityPtr>::type EntityList;
@@ -44,6 +45,8 @@ public:
 
 	SceneAsset(const StringID name);
 	virtual ~SceneAsset();
+
+	virtual uint32 GetClassID() const;
 
 	/* internal API */
 	virtual void _AddEntity(Entity* entity);

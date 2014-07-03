@@ -11,7 +11,6 @@ void TestArchiveOpenClose(nextar::ApplicationContext& application) {
 			nextar::URL(nextar::String("{StringData}/Config.cfg")));
 	nextar::OutputStreamPtr out = nextar::Assign(
 			NEX_NEW(nextar::GenericOutputStream(&std::cout)));
-	out->AddRef();
 	nextar::FileSystem::CopyStream(inputFile, out);
 	std::cout << std::endl;
 	inputFile.Clear();

@@ -12,8 +12,17 @@ namespace nextar {
 
 SceneTraversal::SceneTraversal(Camera* cam, VisibilitySet* visList,
 		BoundingVolume* vol) :
-		camera(cam), visibilitySet(visList), visibleBoundsInfo(vol), distanceInView(
-				65000), recipDistanceInView(1 / 65000.f), frameNumber(0) {
+		camera(cam)
+		,visibilitySet(visList)
+		,visibleBoundsInfo(vol)
+		,distanceInView(65000)
+		,recipDistanceInView(1 / 65000.f)
+		,frameNumber(0)
+		,moveable(nullptr)
+		,frustum(nullptr)
+		,lightSystem(nullptr)
+		,scene(nullptr)
+		,visibilityMask(0xffffffff) 	{
 	if (camera)
 		visibilityMask = camera->GetVisibilityMask();
 }

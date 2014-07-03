@@ -45,6 +45,7 @@ public:
 	/* Called by the render driver when a context is created */
 	virtual void Create(
 			const RenderDriver::ContextCreationParams& ctxParams) = 0;
+	virtual void Close() = 0;
 	/**
 	 * Common Properties that can be passed in params are:
 	 * WindowLeft:int, WindowTop:int, WindowTitle:string, IsMainWindow:bool,

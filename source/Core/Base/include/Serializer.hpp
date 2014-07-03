@@ -34,12 +34,29 @@ namespace nextar {
 /**********************************************************
  * Output Serializer
  ***********************************************************/
+inline OutputSerializer::OutputSerializer() : full(0), totalSizeWritten(0) {
+}
+
+inline OutputSerializer::OutputSerializer(OutputSerializer&& other) :
+outStream(other.outStream), full(other.full), totalSizeWritten(other.totalSizeWritten) {
+	std::memcpy(localBuffer, other.localBuffer, LOCAL_BUFFER_SIZE);
+	other.outStream.Clear();
+}
+
 inline OutputSerializer::OutputSerializer(OutputStreamPtr& _outStream) :
 		outStream(_outStream), full(0) {
 }
 
 inline OutputSerializer::~OutputSerializer() {
 	Flush();
+}
+
+inline OutputSerializer& OutputSerializer::operator = (OutputSerializer&& other) {
+	outStream = other.outStream;
+	full = other.full;
+	std::memcpy(localBuffer, other.localBuffer, LOCAL_BUFFER_SIZE);
+	other.outStream.Clear();
+	return *this;
 }
 
 inline OutputSerializer& OutputSerializer::operator <<(
@@ -193,9 +210,14 @@ inline OutputSerializer& OutputSerializer::operator <<(
 
 inline void OutputSerializer::Flush() {
 	if (full) {
+		totalSizeWritten += full;
 		outStream->Write(localBuffer, full);
 		full = 0;
 	}
+}
+
+inline size_t OutputSerializer::GetTotalWrittenBytes() const {
+	return full + totalSizeWritten;
 }
 
 /**********************************************************
@@ -357,13 +379,14 @@ inline void InputSerializer::Fill() {
 		inStream->Seek(-left, std::ios_base::cur);
 	streamSize += left;
 	size_t readAmt = std::min((size_t) LOCAL_BUFFER_SIZE, (size_t) streamSize);
+	readAmt = inStream->Read(localBuffer, readAmt);
 	left = (int32) readAmt;
-	inStream->Read(localBuffer, readAmt);
+	streamSize -=  readAmt;
 	moving = localBuffer;
 }
 
 inline bool InputSerializer::IsEndOfStream() const {
-	return !left && inStream->IsEndOfStream();
+	return !left && !streamSize;
 }
 
 inline bool InputSerializer::IsValid(const InputSerializer::Chunk& c) {

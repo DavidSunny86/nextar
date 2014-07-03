@@ -32,13 +32,18 @@ public:
 	inline void Present(HDC hDC) {
 		wglSwapLayerBuffers(hDC,
 			WGL_SWAP_MAIN_PLANE);
-		GL_CHECK();
+#ifdef NEX_DEBUG
+		uint32 faliure;
+		if (faliure = GetLastError()) {
+			Warn("Failed on swap: " + Convert::ToString(faliure));
+		}
+#endif
 	}
 
 	/* Implementations */
 	virtual void SetVideoModeImpl(const VideoMode& videoMode);
 	virtual void SetCurrentWindow(RenderTarget* rt);
-
+	virtual void PostCloseImpl();
 	/* Helpers */
 
 protected:

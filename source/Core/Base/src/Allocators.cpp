@@ -13,11 +13,12 @@
 #	define _nalalloc(size, al)     nedalloc::nedmemalign(al, size)
 #	define _nalfree		 nedalloc::nedfree
 #else
-#	define _nalloc       malloc
-#	define _nfree        free
+#	define _nalloc       std::malloc
+#	define _nfree        std::free
 #	define _nalalloc     _aligned_malloc
 #	define _nalfree		 _aligned_free
 #endif
+
 namespace nextar {
 
 #ifdef NEX_DEBUG
@@ -30,15 +31,18 @@ void* Allocator::Alloc(size_t size, const char* func, const char* file,
 	void* ptr = (void*) _nalloc(size + MemoryTracker::GetBlockSize());
 	if (!ptr)
 		NEX_THROW_FatalError(EXCEPT_OUT_OF_MEMORY);
-	return MemoryTracker::OnNewDbg(ptr, size, func, file, line);
+	return MemoryTracker::OnNew(ptr, size, func, file, line);
 }
 
 void* Allocator::AllocAligned(size_t size, size_t al, const char* func,
 		const char* file, long line) {
-	void* ptr = (void*) _nalalloc(size, al);
+	NEX_ASSERT(!(al & (al-1)));
+	void* ptr = (void*) _nalalloc(size + MemoryTracker::GetBlockSize(al), al);
 	if (!ptr)
 		NEX_THROW_FatalError(EXCEPT_OUT_OF_MEMORY);
-	return MemoryTracker::OnNewDbg(ptr, size, func, file, line, al);
+	void* ret = MemoryTracker::OnNew(ptr, size, func, file, line, al);
+	NEX_ASSERT( (((uint32)ret) & (al-1)) == 0);
+	return ret;
 }
 
 #endif
@@ -56,7 +60,7 @@ void Allocator::Free(void* ptr) {
 
 	NEX_ASSERT(ptr);
 #ifdef NEX_EXTENSIVE_MEM_TRACKER
-	ptr = MemoryTracker::OnReleaseDbg(ptr);
+	ptr = MemoryTracker::OnRelease(ptr);
 #endif
 	_nfree(ptr);
 
@@ -65,7 +69,7 @@ void Allocator::Free(void* ptr) {
 void Allocator::FreeAligned(void* ptr) {
 	NEX_ASSERT(ptr);
 #ifdef NEX_EXTENSIVE_MEM_TRACKER
-	ptr = MemoryTracker::OnReleaseDbg(ptr);
+	ptr = MemoryTracker::OnRelease(ptr);
 #endif
 	_nalfree(ptr);
 }

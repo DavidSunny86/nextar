@@ -62,9 +62,6 @@ void ApplicationContext::CloseServices() {
 void ApplicationContext::DestroyContext() {
 	Trace("Destroying application context: " + appName);
 	SaveConfiguration();
-	// unload plugins
-	PluginRegistry::Instance().RequestPlugins(PLUG_TYPE_LIFETIME,
-			StringUtils::Null, false);
 	// destroy dictionaries
 	PropertyInterface::DestroyDictionaries();
 	// services
@@ -90,6 +87,11 @@ void ApplicationContext::DestroyServices() {
 	// NEX_DELETE(ComponentFactoryArchive::InstancePtr());
 	NEX_DELETE(BackgroundStreamer::InstancePtr());
 	NEX_DELETE(WindowManager::InstancePtr());
+
+	// unload plugins
+	PluginRegistry::Instance().RequestPlugins(PLUG_TYPE_LIFETIME,
+			StringUtils::Null, false);
+
 	NEX_DELETE(PluginRegistry::InstancePtr());
 	// just save the strings
 	NamedObject::OnExit();

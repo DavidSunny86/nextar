@@ -8,7 +8,6 @@
  *-----------------------------------------------------------------------------------------------**/
 #include <BaseTypes.h>
 #include <Disposer.h>
-#include <SharedObjectTracker.h>
 #include <NexThread.h>
 
 namespace nextar {
@@ -25,7 +24,7 @@ namespace nextar {
  **/
 template<typename T, typename BaseClass>
 class Referenced: public BaseClass {
-dbg_BreakFeature();
+
 private:
 	std::atomic_int_fast32_t refCount;
 
@@ -36,23 +35,19 @@ protected:
 public:
 
 	inline Referenced() {
-		dbg_Ctor(refCount);
 		refCount.store(1, std::memory_order_relaxed);
 	}
 
 	Referenced(const Referenced<T,BaseClass>&  other) {
-		dbg_Ctor(refCount);
 		refCount.store(other.GetRefCount(), std::memory_order_relaxed);
 	}
 
 	inline Referenced(Referenced<T,BaseClass>&&  other) {
-		dbg_Ctor(refCount);
 		refCount.store(other.GetRefCount(), std::memory_order_relaxed);
 		//other.refCount.store(0, std::memory_order_relaxed);
 	}
 
 	virtual ~Referenced() {
-		dbg_Dtor();
 	}
 
 	inline int32 GetRefCount() const {
@@ -61,14 +56,12 @@ public:
 
 	inline void AddRef() {
 		refCount.fetch_add(1, std::memory_order_relaxed);
-		dbg_IncRef();
 	}
 
 	inline void Release() {
 		NEX_ASSERT(GetRefCount() > 0);
-		dbg_DecRef();
-		if (refCount.fetch_sub(1, std::memory_order_relaxed) <= 0)
-		NEX_DELETE((static_cast<T*>(this)));
+		if (refCount.fetch_sub(1, std::memory_order_relaxed) <= 1)
+			NEX_DELETE((static_cast<T*>(this)));
 	}
 
 	inline Referenced<T,BaseClass>& operator = (const Referenced<T,BaseClass>&  other) {
@@ -77,7 +70,6 @@ public:
 	}
 
 	inline Referenced<T,BaseClass>&  operator = (Referenced<T,BaseClass>&&  other) {
-		dbg_Ctor(refCount);
 		refCount.store(other.GetRefCount(), std::memory_order_relaxed);
 		//other.refCount.store(0, std::memory_order_relaxed);
 		return *this;

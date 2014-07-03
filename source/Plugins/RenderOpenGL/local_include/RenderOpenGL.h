@@ -39,7 +39,7 @@ class DebugGL {
 	NEX_LOG_HELPER(DebugGL)
 	;
 public:
-	static void CheckGL();
+	static void CheckGL(const char* function, long line);
 };
 }
 

@@ -437,6 +437,7 @@ _NexZipApi void CloseArchive(ZipArchive* arch) {
 				DeleteEntry(f);
 				f = n;
 			}
+			NEX_DELETE(arch);
 		}
 	}
 }

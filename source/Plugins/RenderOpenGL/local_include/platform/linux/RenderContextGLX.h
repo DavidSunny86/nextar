@@ -36,6 +36,7 @@ public:
 	/* Implementations */
 	virtual void SetVideoModeImpl(const VideoMode& videoMode);
 	virtual void SetCurrentWindow(RenderTarget* rt);
+	virtual void PostCloseImpl();
 
 	/* Helpers */
 	void SwitchToFullScreen(Window drawable, bool value);

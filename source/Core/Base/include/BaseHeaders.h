@@ -20,5 +20,6 @@
 #include <GenericStreams.h>
 #include <FileSystem.h>
 #include <Serializer.h>
+#include <NamedObject.h>
 
 #endif //NEXTAR_NEXBASE_STDHEADERS_H__

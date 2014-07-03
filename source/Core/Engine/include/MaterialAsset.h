@@ -22,8 +22,8 @@ class _NexEngineAPI MaterialAsset: public nextar::Asset {
 public:
 
 	enum Type {
-		CLASS_ID = Component::CLASS_ASSET_MATERIAL, CATAGORY = COMPONENT_CAT(
-				CLASS_ID),
+		CLASS_ID = Component::CLASS_ASSET_MATERIAL, 
+		CATAGORY = COMPONENT_CAT(CLASS_ID),
 	};
 
 	class StreamRequest;

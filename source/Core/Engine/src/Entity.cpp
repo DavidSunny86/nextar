@@ -74,6 +74,15 @@ Component* Entity::Factory::AsyncCreate(uint32 type, const StringID name) {
 	return 0;
 }
 
+void Entity::Factory::_InternalRegisterToArchive() {
+	Entity::Factory* entityFactory = NEX_NEW(Entity::Factory(StringUtils::DefaultID));
+	ComponentFactoryArchive::Instance()._InternalDefaultFactory(entityFactory, Entity::CLASS_ID);
+	ComponentFactoryArchive::Instance()._InternalDefaultFactory(entityFactory, Light::CLASS_ID);
+	ComponentFactoryArchive::Instance()._InternalDefaultFactory(entityFactory, Mesh::CLASS_ID);
+	ComponentFactoryArchive::Instance()._InternalDefaultFactory(entityFactory, Moveable::CLASS_ID);
+	ComponentFactoryArchive::Instance()._InternalDefaultFactory(entityFactory, Camera::CLASS_ID);
+}
+
 /*************************************
  * Entity
  *************************************/

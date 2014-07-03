@@ -15,11 +15,13 @@ namespace RenderOpenGL {
 
 PluginGL PluginGL::pluginObject;
 
-void DebugGL::CheckGL() {
+void DebugGL::CheckGL(const char* function, long line) {
 	GLenum error;
 	if ((error = glGetError()) == GL_NO_ERROR)
 		return;
-	Warn(String("OpenGl error code: ") + Convert::ToString((uint32) error));
+	OutStringStream errorStr;
+	errorStr << "OpenGl error code: " << Convert::ToString((uint32) error) << " In: " << function << " Line: " << line;
+	Warn(errorStr.str());
 }
 
 void PluginGL::Open() {

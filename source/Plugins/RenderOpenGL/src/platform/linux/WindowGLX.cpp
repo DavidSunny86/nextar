@@ -12,10 +12,11 @@ namespace RenderOpenGL {
 
 WindowGLX::WindowGLX(RenderContextGLX* ctx) :
 context(ctx), nextar::XWindow(NEX_NEW( WindowGLX::Impl(this))) {
+	static_cast<WindowGLX::Impl*>(impl)->AddRef();
 }
 
 WindowGLX::~WindowGLX() {
-	NEX_DELETE(impl);
+	static_cast<WindowGLX::Impl*>(impl)->Release();
 	impl = nullptr;
 }
 

@@ -18,7 +18,11 @@ RenderContextWGL::RenderContextWGL(RenderDriverWGL* _driver) :
 }
 
 RenderContextWGL::~RenderContextWGL() {
+}
+
+void RenderContextWGL::PostCloseImpl() {
 	UnreadyContext();
+	RenderContextGL::PostCloseImpl();
 }
 
 void RenderContextWGL::UnreadyContext() {

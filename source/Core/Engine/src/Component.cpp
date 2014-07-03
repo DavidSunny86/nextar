@@ -35,6 +35,16 @@ Component* Component::FindComponent(const StringID name) {
 	return 0;
 }
 
+Component* Component::Instance(uint32 classId, StringID name,
+			Component::Factory* factory) {
+	if (!factory)
+		factory = ComponentFactoryArchive::Instance().AsyncFindFactory(classId);
+	if (factory) {
+		return factory->AsyncCreate(classId, name);
+	}
+	return nullptr;
+}
+
 /*********************************
  * SharedComponent
  *********************************/
@@ -55,16 +65,13 @@ SharedComponent::~SharedComponent() {
 
 SharedComponentPtr SharedComponent::Instance(uint32 classId, StringID name,
 		Factory* factory, Group* group) {
-	if (!factory)
-		factory = ComponentFactoryArchive::Instance().AsyncFindFactory(classId);
-	if (factory) {
-		SharedComponentPtr comp = Assign<SharedComponent>(
-				factory->AsyncCreate(classId, name));
+	Component* component = Component::Instance(classId, name, factory);
+	if (component) {
+		SharedComponentPtr comp = Assign<SharedComponent>(component);
 		if (group)
 			group->AsyncAdd(comp);
 		return comp;
 	}
-
 	return SharedComponentPtr();
 }
 

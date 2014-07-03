@@ -44,4 +44,8 @@ void SceneAsset::UnloadImpl(StreamRequest* req, bool isAsync) {
 	std::swap(sceneEntities, emptyList);
 }
 
+uint32 SceneAsset::GetClassID() const {
+	return CLASS_ID;
+}
+
 } /* namespace nextar */

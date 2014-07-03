@@ -3,6 +3,9 @@
 
 namespace nextar {
 
+/*********************************************************
+ * InputSerializer
+*********************************************************/
 InputSerializer& InputSerializer::operator >>(Chunk& object) {
 	if (object.first.first != MARKER_INVALID_CHUNK)
 		Skip(object);
@@ -87,5 +90,83 @@ ChunkInputStream& ChunkInputStream::ReadChunk(uint16 header,
 
 	return (*this);
 }
+
+/*********************************************************
+ * ChunkOutputStream
+*********************************************************/
+ChunkOutputStream::ChunkOutputStream(OutputStreamPtr& mainOut) : 
+	outStream(mainOut)
+	,cursor(nullptr) {
+	pseudoOutput = Assign<OutputStream>(NEX_NEW(MemoryOutputStream()));
+}
+
+ChunkOutputStream::~ChunkOutputStream() {
+	Write(roots);
+	outStream->Write(pseudoOutput->GetData(), pseudoOutput->GetSize());
+}
+
+OutputSerializer& ChunkOutputStream::BeginChunk(uint16 header) {
+	OutChunkList* l = cursor ? &(cursor->childrens) : &(roots);
+	if (cursor)
+		cursor->serializer.Flush();
+	l->push_back(Internal());
+	auto &chunkItem = l->back();
+	chunkItem.completed = false;
+	chunkItem.calculatedSize = 0;
+	chunkItem.writeLenghtPos = pseudoOutput->Tell();
+	OutputStreamPtr pseudoOut = pseudoOutput;
+	chunkItem.serializer = std::move(OutputSerializer(pseudoOut));
+	chunkItem.parentChunk = cursor;
+	cursor = &chunkItem;
+	OutputSerializer::ChunkHeader chkheader;
+	chkheader.first = header;
+	chkheader.second = 0;
+	chunkItem.serializer << header;
+	return chunkItem.serializer;
+}
+
+void ChunkOutputStream::EndChunk() {
+	NEX_ASSERT(cursor);
+	if (cursor) {
+		cursor->serializer.Flush();
+		Process(cursor);
+		cursor->completed = true;
+		cursor = cursor->parentChunk;
+	}
+}
+
+void ChunkOutputStream::Process(ChunkOutputStream::Internal* _internal) {
+	_internal->calculatedSize = _internal->serializer.GetTotalWrittenBytes() +
+		Process(_internal->childrens);
+}
+
+size_t ChunkOutputStream::Process(ChunkOutputStream::OutChunkList& childrens) {
+	size_t totalSize = 0;
+	for(auto &c : childrens) {
+		if (!c.completed) {
+			Error("A certain chunk was not ended properly!");
+			NEX_ASSERT(0);
+		}
+		totalSize += c.calculatedSize;
+	}
+	return totalSize;
+}
+
+void ChunkOutputStream::Write(ChunkOutputStream::Internal* _internal) {
+	OutputSerializer::ChunkHeader chkHdr;
+	chkHdr.first = _internal->chunkHeader;
+	chkHdr.second = _internal->calculatedSize;
+	pseudoOutput->Seek(_internal->writeLenghtPos, std::ios_base::beg);
+	OutputStreamPtr pseudoOut = pseudoOutput;
+	OutputSerializer ser(pseudoOut);
+	ser << chkHdr;
+}
+
+void ChunkOutputStream::Write(ChunkOutputStream::OutChunkList& childrens) {
+	for(auto &c : childrens) {
+		Write(&c);
+	}
+}
+
 }
 

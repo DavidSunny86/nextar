@@ -86,9 +86,8 @@ void StringInternTable::_SaveToCache() {
 	OutputStreamPtr output = FileSystem::Instance().OpenWrite(_GetURL());
 	if (output) {
 		OutputSerializer ser(output);
-		ForwardMap::value_type value;
 		for (auto& it : forwardMap) {
-			ser << it.first << value.second;
+			ser << it.first << it.second;
 		}
 	}
 	saveToCache = false;

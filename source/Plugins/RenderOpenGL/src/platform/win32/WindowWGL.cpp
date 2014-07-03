@@ -45,10 +45,11 @@ void WindowWGL::InitializeWindowClass() {
 
 WindowWGL::WindowWGL(RenderContextWGL* ctx) :
 context(ctx), nextar::Win32Window(NEX_NEW( WindowWGL::Impl(this))) {
+	static_cast<WindowWGL::Impl*>(impl)->AddRef();
 }
 
 WindowWGL::~WindowWGL() {
-	NEX_DELETE(impl);
+	static_cast<WindowWGL::Impl*>(impl)->Release();
 	impl = nullptr;
 }
 
@@ -116,7 +117,14 @@ bool fullscreen, const NameValueMap* params) {
 
 	if (!AdjustWindowRectEx(&windowRect, style, FALSE, exStyle))
 		NEX_THROW_FatalError(EXCEPT_INVALID_ARGS);
-
+	if (windowRect.left < 0) {
+		windowRect.right += (-windowRect.left);
+		windowRect.left = 0;
+	}
+	if (windowRect.top < 0) {
+		windowRect.bottom += (-windowRect.top);
+		windowRect.top = 0;
+	}
 	this->dimensions.dx = (uint16)(windowRect.right - windowRect.left);
 	this->dimensions.dy = (uint16)(windowRect.bottom - windowRect.top);
 	

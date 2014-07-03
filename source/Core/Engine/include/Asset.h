@@ -120,12 +120,12 @@ public:
 	};
 
 	template<typename AssetType>
-	class FactoryTraits: public Factory {
+	class _NexEngineAPI FactoryTraits: public Factory {
 	public:
 		typedef typename AssetType::Traits AssetTraits;
 		typedef typename AssetTraits::AssetTypePtr AssetTypePtr;
 		typedef FactoryTraits<AssetType> Type;
-		FactoryTraits(const StringID name);
+		inline FactoryTraits(const StringID name) : Factory(name) {}
 
 		inline static Type* FindFactory(const StringID name) {
 			return ComponentFactoryArchive::Instance().AsyncFindFactory(
@@ -149,6 +149,12 @@ public:
 				return NEX_NEW(AssetType(name));
 			}
 			return nullptr;
+		}
+
+	private:
+		friend class ComponentFactoryArchive;
+		static void _InternalRegisterToArchive() {
+			ComponentFactoryArchive::Instance()._InternalDefaultFactory(NEX_NEW(Type(StringUtils::DefaultID)), AssetTraits::CLASS_ID);
 		}
 	};
 

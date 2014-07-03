@@ -23,6 +23,8 @@ EngineApplicationContext::~EngineApplicationContext() {
 void EngineApplicationContext::CreateExtendedInterfacesImpl() {
 	NEX_NEW(ComponentFactoryArchive());
 	NEX_NEW(ComponentGroupArchive());
+
+	ComponentFactoryArchive::Instance().InstallDefaultFactories();
 }
 
 void EngineApplicationContext::ConfigureExtendedInterfacesImpl() {
@@ -34,6 +36,10 @@ void EngineApplicationContext::ConfigureExtendedInterfacesImpl() {
 }
 
 void EngineApplicationContext::DestroyExtendedInterfacesImpl() {
+	ReleaseResources();
+	if (RenderManager::InstancePtr()) {
+		RenderManager::Instance().Close();
+	}
 	NEX_DELETE(ComponentFactoryArchive::InstancePtr());
 	NEX_DELETE(ComponentGroupArchive::InstancePtr());
 }

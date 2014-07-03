@@ -34,6 +34,7 @@ public:
 	};
 
 	struct ContextCreationParams {
+		bool deferredContext; // @todo deferredContexts are not registered right now
 		bool createDefaultWindow;
 		bool fullScreen;
 		bool stereo;

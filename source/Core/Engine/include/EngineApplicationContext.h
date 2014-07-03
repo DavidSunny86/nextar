@@ -17,6 +17,7 @@ public:
 
 protected:
 	
+	virtual void ReleaseResources() = 0;
 	virtual void ConfigureExtendedInterfacesImpl();
 	virtual void CreateExtendedInterfacesImpl();
 	virtual void DestroyExtendedInterfacesImpl();

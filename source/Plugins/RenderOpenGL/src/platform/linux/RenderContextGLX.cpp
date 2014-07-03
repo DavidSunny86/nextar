@@ -20,7 +20,11 @@ RenderContextGLX::RenderContextGLX(RenderDriverGLX* _driver) :
 }
 
 RenderContextGLX::~RenderContextGLX() {
+}
+
+void RenderContextGLX::PostCloseImpl() {
 	UnreadyContext();
+	RenderContextGL::PostCloseImpl();
 }
 
 void RenderContextGLX::UnreadyContext() {

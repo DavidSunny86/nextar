@@ -130,6 +130,7 @@ protected:
 
 	inline void _SetCameraMatrixDataPtr(Camera::Matrix* m) {
 		/* The frustum planes are allocated by cam buffer */
+		matrixData = m;
 		viewFrustum.SetPlanes(m->camPlanes, 6);
 	}
 

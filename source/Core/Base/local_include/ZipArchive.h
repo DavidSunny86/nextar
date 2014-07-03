@@ -43,8 +43,12 @@ struct StrNode {
 
 #define AddArchiveRef(arch) ++arch->numRefs
 #define ReleaseArchiveRef(arch) {				\
-	if(arch->numRefs > 1) --arch->numRefs;	\
-	else zip::CloseArchive(arch);		}
+	if(arch->numRefs > 1)						\
+		--arch->numRefs;						\
+	else										\
+		zip::CloseArchive(arch);				\
+	}
+
 #define GetNumArchiveRefs(arch)	(arch->numRefs)
 //! open an existing archieve
 _NexZipApi ZipArchive* OpenArchive(const String& fullname);
@@ -109,7 +113,9 @@ public:
 	}
 
 	// handy functions
-	_NexInline void AddRef();_NexInline void Release();_NexInline int32 GetRefCount();
+	_NexInline void AddRef();
+	_NexInline void Release();
+	_NexInline int32 GetRefCount();
 };
 
 void ZipArchive::AddRef() {

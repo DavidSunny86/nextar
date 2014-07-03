@@ -69,6 +69,7 @@ VersionGL RenderDriverGL::ExtractVersion(uint16 maj, uint16 min) {
 RenderContextPtr RenderDriverGL::CreateContextImpl(
 		const RenderDriver::ContextCreationParams& params) {
 	RenderContextGL* rcGL = CreateContextImpl();
+
 	return Assign(rcGL);
 }
 }

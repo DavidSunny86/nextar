@@ -172,7 +172,8 @@ MeshVertexData* MeshLoaderImplv1_0::ReadVertexData(
 	// the first chunk should be vertex elements, if not shared
 	InputSerializer::Chunk chunk;
 	ser >> chunk;
-	if (chunk.first.first != MCID_VERTEX_ELEMENT_DATA && !vertexElements) {
+	if (chunk.first.first != MCID_VERTEX_ELEMENT_DATA && !vertexElements 
+		&& type == VertexLayoutType::CUSTOM_LAYOUT) {
 		Error(String("Vertex element data missing: ") + mesh->GetNameID());
 		NEX_DELETE(vertexData);
 		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
@@ -212,7 +213,8 @@ MeshIndexData* MeshLoaderImplv1_0::ReadIndexData(
 	MeshIndexData* indexData = NEX_NEW(MeshIndexData);
 
 	uint32 size;
-	ser >> size >> indexData->indexCount >> indexData->twoBytePerElement;
+	ser >> size >> indexData->indexCount;
+	indexData->twoBytePerElement = (size / indexData->indexCount) == 2;
 	ByteStream& stream = request->AddIndexBuffer();
 	stream.resize(size);
 	uint8* indexBuffer = &stream[0];
@@ -266,6 +268,7 @@ void MeshLoaderImplv1_0::ReadSubMesh(MeshAsset::StreamRequest* request,
 			case MCID_VERTEX_DATA:
 				vertexData = request->GetSharedVertexData();
 				if (vertexData) {
+					vetype = vertexData->layoutType;
 					ve = vertexData->vertexElements;
 					vec = vertexData->numVertexElements;
 				}

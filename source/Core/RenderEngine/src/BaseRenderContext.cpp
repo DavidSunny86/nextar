@@ -14,6 +14,27 @@ BaseRenderContext::BaseRenderContext(RenderDriver* _driver) :
 BaseRenderContext::~BaseRenderContext(void) {
 }
 
+void BaseRenderContext::DestroyAllWindows() {
+	std::for_each(renderWindows.begin(), renderWindows.end(), [] (RenderWindow* value) {
+		NEX_DELETE(value);
+	});
+	renderWindows.clear();
+}
+
+void BaseRenderContext::Close() {
+	PreCloseImpl();
+	CloseImpl();
+	PostCloseImpl();
+}
+
+void BaseRenderContext::PreCloseImpl() {
+	graphicsWindowList.clear();
+	DestroyAllWindows();
+}
+
+void BaseRenderContext::PostCloseImpl() {
+}
+
 void BaseRenderContext::Create(
 		const RenderDriver::ContextCreationParams& contextCreationParams) {
 	CreateImpl(contextCreationParams);
@@ -35,9 +56,10 @@ bool fullscreen, const NameValueMap* params) {
 		graphicsWindow->Create(width, height, fullscreen, params);
 		PostWindowCreation(graphicsWindow);
 		NEX_THREAD_LOCK_GUARD_MUTEX(accessLock);
-		RenderTargetPtr rt = Bind(
+		RenderTargetPtr rt = Assign(
 				static_cast<RenderWindowImpl*>(graphicsWindow->GetImpl()));
 		graphicsWindowList.push_back(rt);
+		renderWindows.push_back(graphicsWindow);
 	}
 	return graphicsWindow;
 }

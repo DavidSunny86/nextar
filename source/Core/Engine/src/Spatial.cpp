@@ -30,7 +30,8 @@ void Spatial::SetMoveable(Moveable* moveable) {
 			NEX_DELETE((worldMatrix));
 		worldMatrix = &moveable->GetWorldMatrix();
 	} else {
-		worldMatrix = NEX_NEW(Matrix4x4);
+		if (!worldMatrix)
+			worldMatrix = NEX_NEW(Matrix4x4);
 		*worldMatrix = Matrix4x4::IdentityMatrix;
 	}
 

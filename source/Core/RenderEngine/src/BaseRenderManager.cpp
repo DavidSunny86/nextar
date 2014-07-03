@@ -125,8 +125,11 @@ void BaseRenderManager::RenderFrame(uint32 frameNumber) {
 		RenderAllTargets((*it), frameNumber, !renderSettings.syncPresent);
 	}
 #else
+	if (!primaryContext) 
+		return;
 	RenderAllTargets(primaryContext, frameNumber,
-					!renderSettings.syncPresent);
+						!renderSettings.syncPresent);
+	
 #endif
 
 	if (renderSettings.syncPresent) {

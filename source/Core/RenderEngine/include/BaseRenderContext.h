@@ -23,6 +23,7 @@ public:
 	virtual void SetVideoMode(uint32 videoModeIndex);
 	virtual void BeginRender(RenderInfo*);
 	virtual void EndRender();
+	virtual void Close();
 
 	/** todo Context objects */
 	virtual ContextID RegisterObject(ContextObject::Type type, uint32 hint) = 0;
@@ -50,14 +51,21 @@ public:
 	virtual void EndFrame();
 	virtual FrameStats GetFrameStats();
 
+	void DestroyAllWindows();
 protected:
 
+	virtual void PreCloseImpl();
+	virtual void PostCloseImpl();
+	virtual void CloseImpl() = 0;
 	/* implement */
 	virtual void PostWindowCreation(RenderWindow* window) = 0;
 	virtual void PostWindowDestruction(RenderWindow* window) = 0;
 
 	NEX_THREAD_MUTEX(accessLock);
 
+	typedef list<RenderWindow*>::type RenderWindowList;
+
+	RenderWindowList renderWindows;
 	uint32 originalVideoMode;
 	uint32 currentVideoMode;
 	/* thread this context is bound to, 0 if none */

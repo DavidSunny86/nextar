@@ -63,8 +63,12 @@ public:
 
 	typedef std::pair<uint16, size_t> ChunkHeader;
 
+	inline OutputSerializer();
+	inline OutputSerializer(OutputSerializer&& _outStream);
 	inline OutputSerializer(OutputStreamPtr& _outStream);
 	inline ~OutputSerializer();
+
+	inline OutputSerializer& operator = (OutputSerializer&& _outStream);
 
 	inline OutputSerializer& operator <<(const SerializableObject& object);
 	inline OutputSerializer& operator <<(bool object);
@@ -94,8 +98,9 @@ public:
 	inline OutputSerializer& operator <<(const String& object);
 	inline OutputSerializer& operator <<(const UniString& object);
 
+	inline size_t GetTotalWrittenBytes() const;
 protected:
-
+	friend class ChunkOutputStream;
 	inline void Flush();
 
 	enum {
@@ -103,8 +108,8 @@ protected:
 	};
 	OutputStreamPtr outStream;
 	uint8 localBuffer[LOCAL_BUFFER_SIZE];
+	size_t totalSizeWritten;
 	size_t full;
-
 };
 
 /** @remarks input serialization **/
@@ -210,6 +215,49 @@ public:
 	ChunkInputStream& ReadChunk(uint16 header, Chunk& read,
 			const Chunk& prevChunk = ChunkInputStream::First);
 };
+
+/**
+ * ChunkOutputStream 
+ * This class provide an easy way for serialization of objects of undeterminate size
+ * using the chunk header/chuck size hieararchy format. This creates a memory file first
+ * before writing the data to the disk in one go, hence could be very inefficient for very
+ * large files.
+ */
+class _NexBaseAPI ChunkOutputStream : public AllocGeneral {
+	NEX_LOG_HELPER(ChunkOutputStream);
+public:
+	ChunkOutputStream(OutputStreamPtr&);
+	~ChunkOutputStream();
+
+	OutputSerializer& BeginChunk(uint16 header);
+	void EndChunk();
+
+protected:
+
+	struct Internal;
+	typedef list<Internal>::type OutChunkList;
+
+	void Write(Internal* parent);
+	void Write(OutChunkList& chunks);
+	void Process(Internal* parent);
+	size_t Process(OutChunkList& chunks);
+
+	struct Internal {
+		bool completed;
+		uint16	chunkHeader;
+		size_t calculatedSize;
+		std::streamoff writeLenghtPos;
+		Internal* parentChunk;
+		OutputSerializer serializer;
+		OutChunkList childrens;
+	};
+
+	Internal* cursor;
+	OutChunkList roots;
+	MemoryOutputStreamPtr pseudoOutput;
+	OutputStreamPtr outStream;
+};
+
 }
 
 #include <Serializer.hpp>

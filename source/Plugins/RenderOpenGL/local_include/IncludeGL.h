@@ -31,7 +31,7 @@
 
 #if defined (NEX_DEBUG)
 
-#define GL_CHECK() RenderOpenGL::DebugGL::CheckGL()
+#define GL_CHECK() RenderOpenGL::DebugGL::CheckGL(NEX_FUNCTION_NAME, NEX_SOURCEFILE_LINE)
 
 #else
 

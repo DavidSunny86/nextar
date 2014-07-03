@@ -69,7 +69,8 @@ public:
 
 	class Factory;
 	/* */
-	class Factory: public NamedObject {
+	class _NexEngineAPI Factory: public AllocGeneral,
+		public NamedObject {
 	public:
 		Factory(const StringID);
 		virtual ~Factory();
@@ -147,7 +148,7 @@ class _NexEngineAPI SharedComponent: public Referenced<SharedComponent,
 public:
 	static SharedComponentPtr Null;
 
-	class Group: public AllocGeneral, public NamedObject {
+	class _NexEngineAPI Group: public AllocGeneral, public NamedObject {
 	public:
 
 		Group(const StringID name);

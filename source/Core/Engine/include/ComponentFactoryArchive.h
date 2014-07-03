@@ -31,7 +31,7 @@ public:
 	}
 
 	void Configure(const Config&);
-
+	void InstallDefaultFactories();
 	void AsyncAddFactory(uint32 componentType, Component::Factory*);
 	void AsyncRemoveFactory(uint32 componentType, StringID, bool deleteFactory =
 			true);
@@ -39,6 +39,10 @@ public:
 
 	Component::Factory *AsyncFindFactory(uint32 componentType,
 			const StringID name);
+
+	void _InternalDefaultFactory(Component::Factory* compFactory, uint32 type) {
+		componentFactories[FactoryID(StringUtils::DefaultID, type)] = compFactory;
+	}
 
 protected:
 

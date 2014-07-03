@@ -54,6 +54,9 @@ public:
 		/* implementation */
 		virtual Component* AsyncCreate(uint32 classId, const StringID name);
 
+	private:
+		friend class ComponentFactoryArchive;
+		static void _InternalRegisterToArchive();
 	protected:
 
 		virtual EntityPtr AsyncCreateAndAttach(const StringID name,

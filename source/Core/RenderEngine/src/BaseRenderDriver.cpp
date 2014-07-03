@@ -19,6 +19,8 @@ RenderContextPtr BaseRenderDriver::AsyncCreateContext(
 		renderCtxPtr->Create(ctxParams);
 		NEX_THREAD_LOCK_GUARD_MUTEX(accessLock);
 		renderContexts.push_back(renderCtxPtr);
+		if (!ctxParams.deferredContext)
+			RenderManager::Instance().RegisterRenderContext(renderCtxPtr);
 	}
 	return renderCtxPtr;
 }
@@ -35,6 +37,9 @@ void BaseRenderDriver::Configure(const Config& config) {
 
 void BaseRenderDriver::Close() {
 	NEX_THREAD_LOCK_GUARD_MUTEX(accessLock);
+	std::for_each(renderContexts.begin(), renderContexts.end(), [] (RenderContextPtr& rc) {
+		rc->Close();
+	});
 	renderContexts.clear();
 }
 }

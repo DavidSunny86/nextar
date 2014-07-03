@@ -33,6 +33,7 @@ public:
 	virtual void Draw(StreamData*, CommitContext&);
 	virtual void SetCurrentTarget(RenderTarget*);
 	virtual void Clear(Color& c, float depth, uint16 stencil, ClearFlags flags);
+	virtual void CloseImpl();
 
 	virtual ContextID RegisterObject(ContextObject::Type type, uint32 hint);
 	virtual void UnregisterObject(ContextID);
@@ -135,7 +136,8 @@ protected:
 			size_t size, ParamEntryTable* paramTable);
 
 	enum {
-		CONTEXT_READY = 1 << 0, EXTENSIONS_READY = 1 << 1,
+		CONTEXT_READY = 1 << 0, 
+		EXTENSIONS_READY = 1 << 1,
 	};
 
 	bool IsContextReady() {
