@@ -100,8 +100,8 @@ public:
 
 	inline void SetCullMask(uint32 cullMask);
 	inline uint32 GetCullMask() const;
-	inline void SetVisibilityMask(uint32 visibilityMask);
-	inline uint32 GetVisibilityMask() const;
+	inline void SetVisibilityMask(VisibilityMask visibilityMask);
+	inline VisibilityMask GetVisibilityMask() const;
 	inline float GetDepth(Vec3AF ofPoint);
 	inline float GetNormalizedDepth(Vec3AF ofPoint);
 
@@ -155,7 +155,7 @@ protected:
 	/* Mask used to mark objects that needs to be rendered via this
 	 * camera.
 	 */
-	uint32 visibilityMask;
+	VisibilityMask visibilityMask;
 	uint32 cullMask;
 
 	Frustum viewFrustum;
@@ -240,11 +240,11 @@ inline uint32 Camera::GetCullMask() const {
 	return cullMask;
 }
 
-inline void Camera::SetVisibilityMask(uint32 visibilityMask) {
+inline void Camera::SetVisibilityMask(VisibilityMask visibilityMask) {
 	this->visibilityMask = visibilityMask;
 }
 
-inline uint32 Camera::GetVisibilityMask() const {
+inline VisibilityMask Camera::GetVisibilityMask() const {
 	return visibilityMask;
 }
 
@@ -273,7 +273,7 @@ inline Vector3A Camera::GetViewDirection() const {
 }
 
 inline Vector3A Camera::GetEyePosition() const {
-	return GetPosition();
+	return GetTranslation();
 }
 
 inline float Camera::GetDepth(Vec3AF ofPoint) {

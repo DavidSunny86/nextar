@@ -17,9 +17,9 @@ enum class StreamResult {
 	LOAD_SUCCESS,
 	LOAD_TRY_AGAIN,
 	LOAD_FAILED,
-	UNLOAD_SUCCESS,
-	UNLOAD_TRY_AGAIN,
-	UNLOAD_FAILED,
+	SAVE_SUCCESS,
+	SAVE_TRY_AGAIN,
+	SAVE_FAILED,
 };
 
 struct Streamable;
@@ -34,13 +34,17 @@ struct Streamable {
 	/* Background loading, can own and modify @req */
 	virtual void AsyncLoad(StreamRequest* req) = 0;
 	/* Background unloading, can own and modify @req */
-	virtual void AsyncUnload(StreamRequest* req) = 0;
+	virtual void AsyncSave(StreamRequest* req) = 0;
 };
 
-struct StreamHandler {
+class StreamHandler {
+public:
 	/** Handles load completion */
 	virtual void NotifyLoaded(StreamRequest*) = 0;
-	virtual void NotifyUnloaded(StreamRequest*) = 0;
+	virtual void NotifySaved(StreamRequest*) = 0;
+
+protected:
+	~StreamHandler() {}
 };
 
 struct StreamRequest {
@@ -53,7 +57,7 @@ struct StreamRequest {
 		// Indicates this request was handled and no further processing is required. 
 		COMPLETED = 1 << 2,
 		// Indicates AsyncUnload and NotifyUnloaded are to be called
-		REQUEST_UNLOAD = 1 << 4,
+		REQUEST_SAVE = 1 << 4,
 
 		LAST_FLAG = 1 << 5,
 	};

@@ -32,6 +32,19 @@ protected:
 	~ShaderListener() {
 	}
 };
+
+class FlagsCmd: public CommandDelegate {
+public:
+
+	static FlagsCmd command;
+	virtual void Execute(int parentType, void* parentParam,
+				ScriptParser::StatementContext& statement);
+
+protected:
+	~FlagsCmd() {
+	}
+};
+
 }
 
 #endif /* SHADERLISTENER_H_ */

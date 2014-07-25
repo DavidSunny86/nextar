@@ -12,6 +12,11 @@ class _NexEngineAPI EngineApplicationContext: public ApplicationContext {
 
 public:
 
+	enum EventIDs {
+		EVENT_RENDERMANAGER_PRE_CLOSE,
+		EVENT_RENDERMANAGER_POST_CLOSE
+	};
+
 	EngineApplicationContext(const String& name);
 	virtual ~EngineApplicationContext(void);
 

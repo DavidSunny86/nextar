@@ -19,39 +19,48 @@ public:
 		CLASS_ID = Component::CLASS_LIGHT, CATAGORY = COMPONENT_CAT(CLASS_ID),
 	};
 
-	enum class Type
-		: uint16 {
-			SKY, DIRECTIONAL, OMNI, SPOT, AREA, TYPE_COUNT,
+	enum class Type	: uint16 {
+		SKY, DIRECTIONAL, OMNI, SPOT, AREA, TYPE_COUNT,
+	};
+
+	enum class PassIndex : uint16 {
+		SKY = -1, DIRECTIONAL = 1, OMNI = 0, SPOT = 2, AREA = -1,
 	};
 
 	Light(const StringID name);
 	virtual ~Light();
 
+	inline VisiblePrimitive* GetLightVolume() const {
+		return &lightVolume;
+	}
+
+	inline Type GetLightType() const {
+		return lightType;
+	}
+
+	inline void SetLightColor(const Color& c) {
+		diffuseColor = c;
+	}
+
+	virtual void SetMoveable(Moveable* ptr);
+	void SetLightRange(float range);
+
 	/** @brief Get node type */
 	virtual uint32 GetClassID() const;
 
 	virtual void Visit(SceneTraversal& traversal);
+	virtual void SetMaterial(uint32 index, MaterialAssetPtr& mtl);
 
 protected:
+	Type lightType;
 	uint32 sortKey;
 	Color diffuseColor;
 	Color specularColor;
-	Color ambientColor;
 	/* Fall off angle for spot lights */
 	float falloffAngle;
+	float lightRange;
 
-	union {
-		struct {
-			float attenRange;
-			float attenConstant;
-			float attenLinear;
-			float attenQuadratic;
-		};
-
-		float attenuation[4];
-	};
-
-	MaterialAssetPtr lightMaterial;
+	VisiblePrimitive lightVolume;
 };
 
 } /* namespace nextar */

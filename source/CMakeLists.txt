@@ -47,7 +47,7 @@ set(GCC_COMPILE_FLAGS "-std=c++11 -pthread")
 ## Configure build config paths
 #============================================================
 if(NOT CMAKE_BUILD_TYPE)
- set(NEX_BIN ${NEX_BIN_BASE})
+ set(NEX_BIN ${NEX_BIN_BASE}/release)
  set(NEX_BUILD "Release")
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
  set(NEX_BIN ${NEX_BIN_BASE}/debug)
@@ -365,7 +365,9 @@ macro(place_bin)
 	#		"${NEX_INSTALL_DIR}")
 	set_target_properties(${NEXTAR_TARGET} PROPERTIES
                       RUNTIME_OUTPUT_DIRECTORY_DEBUG ${NEX_INSTALL_DIR}
-                      RUNTIME_OUTPUT_DIRECTORY_RELEASE ${NEX_INSTALL_DIR})
+                      RUNTIME_OUTPUT_DIRECTORY_RELEASE ${NEX_INSTALL_DIR}
+		      LIBRARY_OUTPUT_DIRECTORY_DEBUG ${NEX_INSTALL_DIR}
+                      LIBRARY_OUTPUT_DIRECTORY_RELEASE ${NEX_INSTALL_DIR})
 endmacro(place_bin)
 #============================================================
 # Create_Module

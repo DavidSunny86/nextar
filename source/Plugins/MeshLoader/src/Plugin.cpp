@@ -9,13 +9,9 @@
 #include <Plugin.h>
 #include <MeshLoaderImpl.h>
 
-NEX_IMPLEMENT_PLUGIN(MeshLoader){
-return &MeshLoader::Plugin::plugin;
-}
+NEX_IMPLEMENT_PLUGIN(MeshLoader, MeshLoader::Plugin);
 
 namespace MeshLoader {
-
-Plugin Plugin::plugin;
 
 Plugin::Plugin() {
 }

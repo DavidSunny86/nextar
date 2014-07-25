@@ -26,15 +26,15 @@ public:
 	virtual ~AssetStreamer();
 
 	void RequestLoad(Asset* asset);
-	void RequestUnload(Asset* asset);
+	void RequestSave(Asset* asset);
 
 	virtual void NotifyLoaded(StreamRequest*);
-	virtual void NotifyUnloaded(StreamRequest*);
+	virtual void NotifySaved(StreamRequest*);
 
 protected:
 
 	void _NotifyAssetLoaded(Asset* asset, AssetStreamRequest* req);
-	void _NotifyAssetUnloaded(Asset* asset, AssetStreamRequest* req);
+	void _NotifyAssetSaved(Asset* asset, AssetStreamRequest* req);
 	void _NotifyDependents(Asset*, AssetStreamRequestSet&);
 };
 

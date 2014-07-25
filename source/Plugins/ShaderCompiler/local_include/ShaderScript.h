@@ -12,24 +12,38 @@
 
 namespace ShaderCompiler {
 
+/**
+ * @effect
+ * shader <name> {
+ * 	pass <pass> {
+ * 		program {
+ * 			vertex_program VS
+ * 			fragment_program PS
+ * 		}
+ * 	}
+ * }
+ *
+ * @script:glsl:VS
+ * @script:glsl:PS
+ */
+
 class ShaderScript: public ScriptParser::RegionListener,
 		public ScriptParser::ScriptListener,
 		public ScriptParser::StatementListener {
 
 	NEX_LOG_HELPER (ShaderScript);
 
-	StringRef languageContext;
-	ShaderAsset::StreamRequest* shader;
-	NameValueMap regions;
+	typedef multimap<String, std::pair<RenderManager::ShaderProgramLanguage, String> >::type SourceRegionMap;
+	ShaderTemplate::StreamRequest* shader;
+	SourceRegionMap regions;
 public:
 
-	ShaderScript(const StringRef _languageContext,
-			ShaderAsset::StreamRequest* s) :
-			languageContext(_languageContext), shader(s) {
+	ShaderScript(ShaderAsset::StreamRequest* s) :
+			shader(s) {
 	}
 
 	void SetRegionAsSource(Pass::ProgramStage, const String& name);
-	inline ShaderAsset::StreamRequest* GetRequest() {
+	inline ShaderTemplate::StreamRequest* GetRequest() {
 		return shader;
 	}
 

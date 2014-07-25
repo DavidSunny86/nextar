@@ -18,7 +18,7 @@ class Plugin: public FactoryPlugin {
 	NEX_LOG_HELPER(Plugin)
 	;
 public:
-	static Plugin plugin;
+	NEX_DECLARE_PLUGIN(Plugin);
 
 	Plugin();
 	virtual ~Plugin();

@@ -35,9 +35,9 @@ const size_t DepthStencilStateListener::commandCount =
  **************************************************************/
 void DepthStencilStateCmd::Execute(int parentType, void* parentParam,
 		ScriptParser::StatementContext& ctx) {
-	if (parentType == CommandDelegate::SHADER_BLOCK) {
+	if (parentType == CommandDelegate::PASS_BLOCK) {
 		DepthStencilStateListener depthStencil;
-		ShaderAsset::StreamRequest* shader =
+		ShaderTemplate::StreamRequest* shader =
 				static_cast<ShaderScript*>(parentParam)->GetRequest();
 		ctx.ParseBlock(&depthStencil);
 		if (!ctx.IsErrorBitSet()) {

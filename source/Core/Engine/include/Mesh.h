@@ -20,10 +20,11 @@ public:
 	};
 
 	struct Primitive {
-		uint8 flags;
-		uint8 layer;
 		uint16 renderQueue;
+		VisibilityMask visibilityType;
 		uint32 sortKey;
+		// optimize storage here??
+		StreamData stream;
 		VisiblePrimitive primitive;
 
 		~Primitive();
@@ -42,7 +43,6 @@ public:
 protected:
 	typedef vector<Primitive>::type PrimitiveList;
 
-	uint16 defaultRenderQueue;
 	PrimitiveList primitives;
 	MeshAssetPtr meshAsset;
 };

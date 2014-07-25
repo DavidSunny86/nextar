@@ -35,4 +35,10 @@ uint32 Moveable::GetClassID() const {
 	return CLASS_ID;
 }
 
+void Moveable::Update() {
+	if (transform->IsMatrixDirty())
+		transform->UpdateMatrix();
+	SetUpdateRequired(false);
+}
+
 }

@@ -44,6 +44,20 @@ static PixelFormatDesc formatDescTable[(uint32) PixelFormat::COUNT] = { {
 		4, 4, PIXFLAG_INTEGRAL | PIXFLAG_HAS_ALPHA | PIXFLAG_UNSIGNED
 				| PIXFLAG_NORMALIZED },
 
+
+{
+// name
+		"RG16",
+		// pixelSize, numChannels, flags
+		4, 2, PIXFLAG_INTEGRAL | PIXFLAG_UNSIGNED
+				| PIXFLAG_NORMALIZED },
+{
+// name
+		"RG16_SNORM",
+		// pixelSize, numChannels, flags
+		4, 2, PIXFLAG_INTEGRAL | PIXFLAG_SIGNED
+			| PIXFLAG_NORMALIZED },
+
 { "D16",
 // pixelSize, numChannels, flags
 		2, 1, PIXFLAG_FLOAT | PIXFLAG_TEXTURE_FORMAT | PIXFLAG_UNSIGNED
@@ -67,7 +81,8 @@ static PixelFormatDesc formatDescTable[(uint32) PixelFormat::COUNT] = { {
 { "RGBA16F",
 // pixelSize, numChannels, flags
 		8, 1, PIXFLAG_FLOAT | PIXFLAG_TEXTURE_FORMAT | PIXFLAG_UNSIGNED
-				| PIXFLAG_NORMALIZED | PIXFLAG_DEPTH } };
+				| PIXFLAG_NORMALIZED | PIXFLAG_DEPTH }
+};
 
 _NexEngineAPI PixelFormat GetFormatFromString(const String& name) {
 	for (uint32 i = 0; i < (uint32) PixelFormat::COUNT; ++i)
@@ -130,6 +145,7 @@ _NexEngineAPI PixelFormat GetNearestTextureFormat(PixelFormat fmt) {
 	case PixelFormat::D24S8:
 	case PixelFormat::D32:
 	case PixelFormat::RGBA16F:
+	case PixelFormat::RG16:
 		return fmt;
 	}
 	return PixelFormat::UNKNOWN;

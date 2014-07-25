@@ -37,9 +37,9 @@ const size_t RasterStateListener::commandCount =
  ***************************************************************/
 void RasterStateCmd::Execute(int parentType, void* parentParam,
 		ScriptParser::StatementContext& ctx) {
-	if (parentType == CommandDelegate::SHADER_BLOCK) {
+	if (parentType == CommandDelegate::PASS_BLOCK) {
 		RasterStateListener raster;
-		ShaderAsset::StreamRequest* shader =
+		ShaderTemplate::StreamRequest* shader =
 				static_cast<ShaderScript*>(parentParam)->GetRequest();
 		ctx.ParseBlock(&raster);
 		if (!ctx.IsErrorBitSet()) {

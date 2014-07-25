@@ -90,8 +90,8 @@ typedef uint8 PrimitiveType;
 
 class VertexData: public AllocGraphics {
 public:
-	size_t start;
-	size_t count;
+	uint32 start;
+	uint32 count;
 
 	VertexLayout* layout;
 	VertexBufferBinding* binding;
@@ -104,8 +104,8 @@ public:
 
 class IndexData {
 public:
-	size_t start;
-	size_t count;
+	uint32 start;
+	uint32 count;
 
 	IndexBufferPtr indices;
 
@@ -127,13 +127,13 @@ public:
  */
 class _NexEngineAPI StreamData: public AllocGeneral {
 public:
-	/* This is a hint to the renderer for optimization saying
-	 * it doesn't use any dynamic vertex buffer */
-	bool usesOnlyStaticVb;
-	/* Use indices */
-	bool useIndices;
+	enum Flags {
+		DELETE_BINDING = 1 << 0,
+		DELETE_LAYOUT = 1 << 1,
+	};
+
+	uint8 flags;
 	/* Indicates if GraphicsStreamData was created */
-	bool isGsdataValid;
 	/**/
 	PrimitiveType type;
 	/* instance count is usually 1 */
@@ -142,8 +142,6 @@ public:
 	VertexData vertices;
 	/* Indices are not used if invalid */
 	IndexData indices;
-	/* Graphics data index created by graphics system */
-	uint32 gsDataIndex;
 
 	StreamData();
 	~StreamData();

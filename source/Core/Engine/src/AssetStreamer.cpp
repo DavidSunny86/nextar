@@ -40,31 +40,31 @@ void AssetStreamer::RequestLoad(Asset* asset) {
 	BackgroundStreamer::Instance().AddRequest(req);
 }
 
-void AssetStreamer::RequestUnload(Asset* asset) {
+void AssetStreamer::RequestSave(Asset* asset) {
 	if (asset->IsLoading() || !asset->IsLoaded()) {
 		Warn(
-				"Incorrect state for unload: "
+				"Incorrect state for save: "
 						+ Convert::ToString(asset->GetID()));
 		return;
 	}
 	StreamRequest* req = asset->GetStreamRequest(false);
 	if (!(req->flags & StreamRequest::ASSET_STREAM_REQUEST)) {
 		Warn(
-				"Cannot register a generic load request for asset, "
+				"Cannot register a generic save request for asset, "
 						"request must be of type AssetStreamRequest: "
 						+ Convert::ToString(asset->GetID()));
 		return;
 	}
-	req->flags |= StreamRequest::REQUEST_UNLOAD;
+	req->flags |= StreamRequest::REQUEST_SAVE;
 	BackgroundStreamer::Instance().AddRequest(req);
 }
 
-void AssetStreamer::NotifyUnloaded(StreamRequest* request) {
-	NEX_ASSERT(request->flags & StreamRequest::REQUEST_UNLOAD);
+void AssetStreamer::NotifySaved(StreamRequest* request) {
+	NEX_ASSERT(request->flags & StreamRequest::REQUEST_SAVE);
 	AssetStreamRequest* assetReq = static_cast<AssetStreamRequest*>(request);
 	Asset* asset = static_cast<Asset*>(assetReq->streamedObject);
 	// no dependencies, just notify
-	_NotifyAssetUnloaded(asset, assetReq);
+	_NotifyAssetSaved(asset, assetReq);
 }
 
 void AssetStreamer::NotifyLoaded(StreamRequest* request) {
@@ -114,11 +114,11 @@ void AssetStreamer::_NotifyAssetLoaded(Asset* asset,
 	_NotifyDependents(asset, reqSet);
 }
 
-void AssetStreamer::_NotifyAssetUnloaded(Asset* asset,
+void AssetStreamer::_NotifyAssetSaved(Asset* asset,
 		AssetStreamRequest* assetReq) {
 	if (assetReq->returnCode == (uint16) StreamResult::LOAD_SUCCESS)
 		asset->SetLoaded(false);
-	asset->NotifyAssetUnloaded();
+	asset->NotifyAssetSaved();
 }
 
 void AssetStreamer::_NotifyDependents(Asset* asset,

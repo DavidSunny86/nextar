@@ -43,6 +43,17 @@ EntityPtr Entity::Factory::AsyncCreateLightEntity(const StringID name) {
 	return AsyncCreateAndAttach(name, Light::CLASS_ID, name);
 }
 
+EntityPtr Entity::Factory::AsyncCreateOmniLightEntity(const StringID name, const Color& color, float range) {
+	Component* _subComponent = nullptr;
+	EntityPtr ret = AsyncCreateAndAttach(name, Light::CLASS_ID, name, &_subComponent);
+	if (_subComponent) {
+		Light* light = static_cast<Light*>(_subComponent);
+		light->SetLightColor(color);
+		light->SetLightRange(range);
+	}
+	return ret;
+}
+
 EntityPtr Entity::Factory::AsyncCreateAndAttach(const StringID name,
 		uint32 subType, const StringID subName, Component** _subComponent) {
 	EntityPtr ent = Assign(
@@ -168,6 +179,25 @@ void Entity::RemoveFromScene(bool removeFromGroup) {
 	}
 	if (removeFromGroup)
 		RemoveFromGroup();
+}
+
+void Entity::SetTransform(Vec3AF position, QuatF rotation, float scaling) {
+
+	if (moveable) {
+		moveable->SetTransform(position, rotation, scaling);
+		if (spatial)
+			spatial->SetUpdateRequired(true);
+	} else if (spatial)
+		spatial->SetTransform(position, rotation, scaling);
+	SetUpdateRequired(true);
+}
+
+void Entity::Update() {
+	if (moveable && moveable->IsUpdateRequired())
+		moveable->Update();
+	if (spatial && spatial->IsUpdateRequired())
+		spatial->Update();
+	SetUpdateRequired(false);
 }
 
 } /* namespace nextar */

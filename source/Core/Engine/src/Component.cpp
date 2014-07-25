@@ -63,31 +63,64 @@ SharedComponent::~SharedComponent() {
 	NEX_ASSERT(group == nullptr);
 }
 
-SharedComponentPtr SharedComponent::Instance(uint32 classId, StringID name,
+SharedComponent::InstanceResult SharedComponent::Instance(SharedComponentPtr& oInst, uint32 classId, StringID name,
+		StringID factory, Group* group) {
+	Group::Lock groupLock(group);
+	if (group) {
+		oInst = group->Find(name);
+		if (oInst)
+			return SharedComponent::INSTANCE_RETRIEVED;
+	}
+
+	Factory* factoryPtr =
+						ComponentFactoryArchive::Instance().AsyncFindFactory(
+								classId, factory);
+	Component* component = Component::Instance(classId, name, factoryPtr);
+	if (component) {
+		oInst = Assign<SharedComponent>(component);
+		if (group)
+			group->Add(oInst);
+		return SharedComponent::INSTANCE_CREATED;
+	}
+	return SharedComponent::INSTANCE_FAILED;
+}
+
+SharedComponent::InstanceResult SharedComponent::Instance(SharedComponentPtr& oInst, uint32 classId, StringID name,
 		Factory* factory, Group* group) {
+	Group::Lock groupLock(group);
+	if (group) {
+		oInst = group->Find(name);
+		if (oInst)
+			return SharedComponent::INSTANCE_RETRIEVED;
+	}
 	Component* component = Component::Instance(classId, name, factory);
 	if (component) {
-		SharedComponentPtr comp = Assign<SharedComponent>(component);
+		oInst = Assign<SharedComponent>(component);
 		if (group)
-			group->AsyncAdd(comp);
-		return comp;
+			group->Add(oInst);
+		return SharedComponent::INSTANCE_CREATED;
 	}
-	return SharedComponentPtr();
+	return SharedComponent::INSTANCE_FAILED;
 }
 
 void SharedComponent::AddToGroup(Group* g) {
 	if (group) {
-		group->AsyncRemove(GetID());
+		Group::Lock groupLock(group);
+		group->Remove(GetID());
 	}
 	group = g;
 	NEX_ASSERT(group);
 	SharedComponentPtr thisPtr = Bind(this);
-	group->AsyncAdd(thisPtr);
+	if (group) {
+		Group::Lock groupLock(group);
+		group->Add(thisPtr);
+	}
 }
 
 void SharedComponent::RemoveFromGroup() {
 	if (group) {
-		group->AsyncRemove(GetID());
+		Group::Lock groupLock(group);
+		group->Remove(GetID());
 		group = nullptr;
 	}
 }

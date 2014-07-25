@@ -50,6 +50,7 @@ public:
 		virtual EntityPtr AsyncCreateMeshEntity(const StringID name,
 				MeshAssetPtr mesh);
 		virtual EntityPtr AsyncCreateLightEntity(const StringID name);
+		virtual EntityPtr AsyncCreateOmniLightEntity(const StringID name, const Color&, float range);
 
 		/* implementation */
 		virtual Component* AsyncCreate(uint32 classId, const StringID name);
@@ -71,6 +72,10 @@ public:
 		return spatial;
 	}
 
+	inline Moveable* GetMoveable() const {
+		return moveable;
+	}
+
 	inline SceneAsset* GetScene() {
 		return scene;
 	}
@@ -88,6 +93,10 @@ public:
 	 * caller, which can dereference it for proper destruction.
 	 * The actual deletion of the entity from memory is not determined. */
 	virtual void RemoveFromScene(bool removeFromGroup = true);
+
+	virtual void Update();
+
+	void SetTransform(Vec3AF position, QuatF rotation, float scaling);
 
 protected:
 

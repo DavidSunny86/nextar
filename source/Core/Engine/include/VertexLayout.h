@@ -14,6 +14,17 @@
 
 namespace nextar {
 
+// common layouts
+enum VertexLayoutType : uint16 {
+	CUSTOM_LAYOUT = 0xffff,
+	POSITION_0 = 0,
+	POSITION_NORMAL_0,
+	POSITION_NORMAL_UV_0,
+	POSITION_0_NORMAL_1,
+	POSITION_0_NORMAL_UV_1,
+	VERTEX_LAYOUT_COUNT
+};
+
 /** @remarks
  * This class represents an input or output layout for vertices.
  */
@@ -44,8 +55,25 @@ public:
 
 	void Create(uint32 numElements, const VertexElement* elements);
 
+	static void ClearCommonLayouts();
+	static const VertexLayoutPtr& GetCommonLayout(VertexLayoutType type);
+	static void GetCustomLayoutElements(VertexLayoutType type,
+			const VertexElement*& elements, uint32& numElements) {
+		elements = commonElementLayout[type].elements;
+		numElements = commonElementLayout[type].numElements;
+	}
+
 protected:
 	uint32 flags;
+
+	struct CommonVertexElement {
+		uint32 numElements;
+		const VertexElement* elements;
+	};
+
+	static CommonVertexElement commonElementLayout[VertexLayoutType::VERTEX_LAYOUT_COUNT];
+	static VertexLayoutPtr commonLayouts[VertexLayoutType::VERTEX_LAYOUT_COUNT];
+
 };
 
 } /* namespace nextar */

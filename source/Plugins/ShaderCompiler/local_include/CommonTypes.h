@@ -8,6 +8,8 @@
 #include <RasterState.h>
 #include <TextureUnitState.h>
 #include <ShaderAsset.h>
+#include <ShaderTemplate.h>
+#include <RenderManager.h>
 
 using namespace nextar;
 namespace ShaderCompiler {
@@ -56,6 +58,7 @@ struct CommandDelegate {
 	enum {
 		INVALID_TYPE = -1,
 		SHADER_BLOCK,
+		PASS_BLOCK,
 		DEPTH_STENCIL_BLOCK,
 		BLEND_STATE_BLOCK,
 		RASTER_STATE_BLOCK,
@@ -88,18 +91,19 @@ public:
 	static CommandDelegate* FindCommand(CommandNamePair cmdMap[],
 			size_t arraySize, const String& name);
 	static ComparisonFunc GetComparisonFunc(const String& val);
-	static StencilOpType GetStencilOp(const String& val);
-	static DepthStencilCompareType GetDepthStencilFunc(const String& val);
+	static StencilOp GetStencilOp(const String& val);
+	static DepthStencilCompare GetDepthStencilFunc(const String& val);
 	static ColorMask GetColorMask(const String& val);
-	static BlendDataSourceType GetBlendSource(const String& val);
-	static BlendOpType GetColorOperation(const String& val);
-	static FillModeType GetFillMode(const String& val);
-	static FillModeType GetCullMode(const String& val);
+	static BlendDataSource GetBlendSource(const String& val);
+	static BlendOp GetColorOperation(const String& val);
+	static FillMode GetFillMode(const String& val);
+	static FillMode GetCullMode(const String& val);
 	static FilterType GetFilterType(const String& val);
-	static TextureComparisonModeType GetTextureCompareFunc(const String& val);
-	static TextureMinFilterType GetMinFilter(const String& val);
-	static TextureMagFilterType GetMagFilter(const String& val);
-	static TextureAddressModeType GetTextureAddressMode(const String& val);
+	static TextureComparisonMode GetTextureCompareFunc(const String& val);
+	static TextureMinFilter GetMinFilter(const String& val);
+	static TextureMagFilter GetMagFilter(const String& val);
+	static TextureAddressMode GetTextureAddressMode(const String& val);
+	static uint32 GetShaderFlag(const String& val);
 };
 }
 

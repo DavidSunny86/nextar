@@ -17,7 +17,7 @@ namespace nextar {
  * Material
  ****************************************/
 MaterialAsset::MaterialAsset(const StringID name) :
-		Asset(name), layerMask(0), renderLayer(0) {
+		Asset(name), layerMask(0) {
 }
 
 MaterialAsset::~MaterialAsset() {
@@ -50,7 +50,7 @@ void MaterialAsset::_PrepareMaterial(MaterialAsset::StreamRequest* req) {
 	materialParamData.SetParamEntryTable(item);
 }
 
-void MaterialAsset::UnloadImpl(nextar::StreamRequest* req, bool isStreamed) {
+void MaterialAsset::UnloadImpl() {
 	// todo
 }
 
@@ -85,25 +85,14 @@ MaterialAsset::StreamRequest::StreamRequest(Asset *asset) :
 MaterialAsset::StreamRequest::~StreamRequest() {
 }
 
-void MaterialAsset::StreamRequest::SetShader(StringID name, const URL& location,
+void MaterialAsset::StreamRequest::SetShader(StringID name,
+		const URL& location,
 		StringID group, StringID factory) {
 	// construct the name, it will be of the form
 	// Factory:Group.Name
 	Asset* material = static_cast<Asset*>(GetStreamedObject());
-	SharedComponent::Group* groupPtr =
-			ComponentGroupArchive::Instance().AsyncFindOrCreate(group);
-	NEX_ASSERT(groupPtr);
-
-	AssetPtr shader = groupPtr->AsyncFind(name);
-
-	if (shader == nullptr) {
-		Component::Factory* factoryPtr =
-				ComponentFactoryArchive::Instance().AsyncFindFactory(
-						ShaderAsset::CLASS_ID, factory);
-		shader = ShaderAsset::Traits::Instance(name, location, factoryPtr,
-				groupPtr);
-	}
-
+	shader = ShaderAsset::Traits::Instance(name, location, factory,
+				group);
 	if (!shader) {
 		Warn(
 				"Failed to load shader for material: "
@@ -136,9 +125,9 @@ void MaterialAsset::StreamRequest::SetTextureValue(uint32 offset,
 	}
 }
 
-void MaterialAsset::StreamRequest::SetRenderLayer(uint8 l) {
+void MaterialAsset::StreamRequest::SetLayer(uint8 l) {
 	MaterialAsset* material = static_cast<MaterialAsset*>(GetStreamedObject());
-	material->SetRenderLayer(l);
+	material->SetLayerMask(l);
 }
 
 } /* namespace nextar */

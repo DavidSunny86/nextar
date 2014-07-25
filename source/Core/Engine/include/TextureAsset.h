@@ -97,7 +97,7 @@ protected:
 	virtual void NotifyAssetUpdated();
 
 	virtual void LoadImpl(StreamRequest* req, bool isAsync);
-	virtual void UnloadImpl(StreamRequest* req, bool isAsync);
+	virtual void UnloadImpl();
 
 	virtual StreamRequest* CreateStreamRequestImpl(bool load);
 	virtual void DestroyStreamRequestImpl(StreamRequest*&, bool load = true);

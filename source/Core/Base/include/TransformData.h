@@ -55,6 +55,10 @@ public:
 		flags &= ~MATRIX_DIRTY;
 	}
 
+	inline uint32 GetMatrixState() const {
+		return matrixState;
+	}
+
 	inline const Matrix4x4& GetMatrix() const {
 		return matrix;
 	}

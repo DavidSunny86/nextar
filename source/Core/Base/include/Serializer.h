@@ -50,20 +50,20 @@ class _NexBaseAPI OutputSerializer: public AllocGeneral {
 
 public:
 
-	typedef std::pair<const int8*, size_t> ByteArray;
-	typedef std::pair<const uint8*, size_t> UByteArray;
-	typedef std::pair<const int16*, size_t> ShortArray;
-	typedef std::pair<const uint16*, size_t> UShortArray;
-	typedef std::pair<const int32*, size_t> IntArray;
-	typedef std::pair<const uint32*, size_t> UIntArray;
-	typedef std::pair<const int64*, size_t> Int64Array;
-	typedef std::pair<const uint64*, size_t> UInt64Array;
-	typedef std::pair<const float*, size_t> FloatArray;
-	typedef std::pair<const double*, size_t> DoubleArray;
-
-	typedef std::pair<uint16, size_t> ChunkHeader;
+	typedef std::pair<const int8*, uint32> ByteArray;
+	typedef std::pair<const uint8*, uint32> UByteArray;
+	typedef std::pair<const int16*, uint32> ShortArray;
+	typedef std::pair<const uint16*, uint32> UShortArray;
+	typedef std::pair<const int32*, uint32> IntArray;
+	typedef std::pair<const uint32*, uint32> UIntArray;
+	typedef std::pair<const int64*, uint32> Int64Array;
+	typedef std::pair<const uint64*, uint32> UInt64Array;
+	typedef std::pair<const float*, uint32> FloatArray;
+	typedef std::pair<const double*, uint32> DoubleArray;
+	typedef std::pair<uint16, uint32> ChunkHeader;
 
 	inline OutputSerializer();
+	inline OutputSerializer(const OutputSerializer& _outStream);
 	inline OutputSerializer(OutputSerializer&& _outStream);
 	inline OutputSerializer(OutputStreamPtr& _outStream);
 	inline ~OutputSerializer();
@@ -120,17 +120,17 @@ class _NexBaseAPI InputSerializer: public AllocGeneral {
 
 public:
 
-	typedef std::pair<int8*, size_t> ByteArray;
-	typedef std::pair<uint8*, size_t> UByteArray;
-	typedef std::pair<int16*, size_t> ShortArray;
-	typedef std::pair<uint16*, size_t> UShortArray;
-	typedef std::pair<int32*, size_t> IntArray;
-	typedef std::pair<uint32*, size_t> UIntArray;
-	typedef std::pair<int64*, size_t> Int64Array;
-	typedef std::pair<uint64*, size_t> UInt64Array;
-	typedef std::pair<float*, size_t> FloatArray;
-	typedef std::pair<double*, size_t> DoubleArray;
-	typedef std::pair<uint16, size_t> ChunkHeader;
+	typedef std::pair<int8*, uint32> ByteArray;
+	typedef std::pair<uint8*, uint32> UByteArray;
+	typedef std::pair<int16*, uint32> ShortArray;
+	typedef std::pair<uint16*, uint32> UShortArray;
+	typedef std::pair<int32*, uint32> IntArray;
+	typedef std::pair<uint32*, uint32> UIntArray;
+	typedef std::pair<int64*, uint32> Int64Array;
+	typedef std::pair<uint64*, uint32> UInt64Array;
+	typedef std::pair<float*, uint32> FloatArray;
+	typedef std::pair<double*, uint32> DoubleArray;
+	typedef std::pair<uint16, uint32> ChunkHeader;
 	typedef std::pair<ChunkHeader, std::streamoff> Chunk;
 
 	inline InputSerializer(InputStreamPtr& _inStream);
@@ -240,12 +240,12 @@ protected:
 	void Write(Internal* parent);
 	void Write(OutChunkList& chunks);
 	void Process(Internal* parent);
-	size_t Process(OutChunkList& chunks);
+	uint32 Process(OutChunkList& chunks);
 
 	struct Internal {
 		bool completed;
 		uint16	chunkHeader;
-		size_t calculatedSize;
+		uint32 calculatedSize;
 		std::streamoff writeLenghtPos;
 		Internal* parentChunk;
 		OutputSerializer serializer;

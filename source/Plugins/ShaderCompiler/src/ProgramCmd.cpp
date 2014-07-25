@@ -41,7 +41,7 @@ const size_t ProgramListener::commandCount = sizeof(ProgramListener::commands)
  **************************************************************/
 void ProgramCmd::Execute(int parentType, void* parentParam,
 		ScriptParser::StatementContext& ctx) {
-	if (parentType == CommandDelegate::SHADER_BLOCK) {
+	if (parentType == CommandDelegate::PASS_BLOCK) {
 		ProgramListener programListener(static_cast<ShaderScript*>(parentParam));
 		ctx.ParseBlock(&programListener);
 	} else {
@@ -64,18 +64,18 @@ void ProgramListener::EnterStatement(ScriptParser::StatementContext& ctx) {
 void ParamCmd::Execute(int parentType, void* state,
 		ScriptParser::StatementContext& ctx) {
 	NEX_ASSERT(parentType == CommandDelegate::SHADER_BLOCK);
-	ShaderAsset::StreamRequest* shader =
+	ShaderTemplate::StreamRequest* shader =
 			(static_cast<ShaderScript*>(state)->GetRequest());
 	StringUtils::TokenIterator it = 0;
 	String value;
-	String name, param, defaultVal, desc;
+	String name, param, desc;
 	ParamDataType type = ParamDataType::PDT_UNKNOWN;
 	const StringUtils::WordList& paramContext = ctx.GetParamList();
 	it = StringUtils::NextWord(paramContext, value, it);
 	if (it != String::npos) {
 		StringUtils::StringPair p = StringUtils::Split(value);
 		if (p.second.length()) {
-			type = ShaderAsset::MapParamType(value);
+			type = ShaderAsset::MapParamType(p.first);
 			param = p.second;
 		} else
 			param = p.first;
@@ -88,22 +88,17 @@ void ParamCmd::Execute(int parentType, void* state,
 	}
 	it = StringUtils::NextWord(paramContext, value, it);
 	if (it != String::npos) {
-		defaultVal = value;
-	}
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
 		/** todo localization: should be a $variableName mapped to
 		 * localization.zip/strings.table */
 		desc = value;
 	}
-	it = StringUtils::NextWord(paramContext, value, it);
 
 	if (!name.length())
 		name = StringUtils::FormatName(param);
-	if (ctx.GetCommand() == "Option")
-		shader->AddMacro(name, param, desc, Convert::ToBool(defaultVal));
+	if (ctx.GetCommand() == _SS(CMD_OPTION))
+		shader->AddMacro(param, name, desc);
 	else
-		shader->AddParam(name, param, desc, defaultVal, type);
+		shader->AddParam(param, name, desc, type);
 }
 
 void ShaderCmd::Execute(int parentType, void* parentParam,

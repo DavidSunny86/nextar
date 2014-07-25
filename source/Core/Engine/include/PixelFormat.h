@@ -57,6 +57,10 @@ enum class PixelFormat
 		RGBA8,
 		/* BBGGRRAA, unsigned, normalized 32 bits per pixel. */
 		BGRA8,
+		/* R16G16, unsigned, normalized 32 bits per pixel. */
+		RG16,
+		/* R16G16, signed, normalized 32 bits per pixel. */
+		RG16_SNORM,
 		/* depth format, pixel size 16 bits per pixel */
 		D16,
 		/* depth format, pixel size 24 bits per pixel */
@@ -105,45 +109,46 @@ class _NexEngineAPI PixelBox {
 
 		~PixelBox() {
 			if (deleteData && data)
-				NEX_FREE(data, MEMCAT_GENERAL); }
+				NEX_FREE(data, MEMCAT_GENERAL);
+		}
 
-void* Data() const {
-return data;
-}
+		void* Data() const {
+			return data;
+		}
 
-uint8*& Data() {
-return data;
-}
+		uint8*& Data() {
+			return data;
+		}
 
-uint32 GetWidth() const {
-return right - left;
-}
-uint32 GetHeight() const {
-return bottom - top;
-}
-uint32 GetDepth() const {
-return back - front;
-}
+		uint32 GetWidth() const {
+			return right - left;
+		}
+		uint32 GetHeight() const {
+			return bottom - top;
+		}
+		uint32 GetDepth() const {
+			return back - front;
+		}
 
-uint32 GetNumPixel() const {
-return GetWidth() * GetHeight() * GetDepth();
-}
+		uint32 GetNumPixel() const {
+			return GetWidth() * GetHeight() * GetDepth();
+		}
 
-bool IsSimpleArray() const {
-return ((GetWidth() == rowPixelPitch)
-		&& (GetHeight() * GetWidth() == slicePixelPitch));
-}
+		bool IsSimpleArray() const {
+			return ((GetWidth() == rowPixelPitch)
+					&& (GetHeight() * GetWidth() == slicePixelPitch));
+		}
 
-void CalculatePitches() {
-rowPixelPitch = GetWidth();
-slicePixelPitch = GetHeight() * GetWidth();
-}
+		void CalculatePitches() {
+			rowPixelPitch = GetWidth();
+			slicePixelPitch = GetHeight() * GetWidth();
+		}
 
-Size GetSize() const {
-return Size(GetWidth(), GetHeight());
-}
+		Size GetSize() const {
+			return Size(GetWidth(), GetHeight());
+		}
 
-size_t GetDataSize() const;
+		size_t GetDataSize() const;
 };
 
 namespace PixelUtils {
@@ -156,7 +161,7 @@ _NexEngineAPI String GetStringFromFormat(PixelFormat);
 
 /* Get buffer size */
 _NexEngineAPI size_t GetBufferSize(uint32 width, uint32 height, uint32 depth,
-PixelFormat fmt);
+		PixelFormat fmt);
 
 /* Get bytes per pixel */
 _NexEngineAPI uint32 BytesPerPixel(PixelFormat);

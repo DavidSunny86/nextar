@@ -12,10 +12,11 @@
 #include <StringUtils.h>
 #include <Color.h>
 #include <TextureAsset.h>
+#include <ShaderParamEnums.h>
 
 namespace nextar {
 
-enum TextureMinFilter {
+enum TextureMinFilter : uint8 {
 	TF_MIN_NEAREST,
 	TF_MIN_LINEAR,
 	TF_MIN_NEAREST_MIPMAP_NEAREST,
@@ -24,21 +25,20 @@ enum TextureMinFilter {
 	TF_MIN_LINEAR_MIPMAP_LINEAR,
 };
 
-typedef uint8 TextureMinFilterType;
-
-enum TextureMagFilter {
-	TF_MAG_NEAREST, TF_MAG_LINEAR
+enum TextureMagFilter : uint8 {
+	TF_MAG_NEAREST,
+	TF_MAG_LINEAR
 };
 
-typedef uint8 TextureMagFilterType;
-
-enum TextureAddressMode {
-	TAM_WRAP, TAM_MIRROR, TAM_CLAMP, TAM_BORDER,
+enum TextureAddressMode : uint8 {
+	TAM_WRAP,
+	TAM_MIRROR,
+	TAM_CLAMP,
+	TAM_BORDER,
 };
 
-typedef uint8 TextureAddressModeType;
 
-enum TextureComparisonMode {
+enum TextureComparisonMode : uint8 {
 	TEXCOMP_NEVER,
 	TEXCOMP_LESS,
 	TEXCOMP_EQUAL,
@@ -51,8 +51,6 @@ enum TextureComparisonMode {
 	TEXCOMP_NONE,
 };
 
-typedef uint8 TextureComparisonModeType;
-
 /* todo Incorporate unit type field specifying what kind of texture this
  * is going to use like:
  * a. Mesh Texture
@@ -61,14 +59,15 @@ typedef uint8 TextureComparisonModeType;
  * e. Selective Texture
  */
 struct TextureUnitParams {
-	TextureMinFilterType minFilter;
-	TextureMagFilterType magFilter;
-	TextureAddressModeType uAddress;
-	TextureAddressModeType vAddress;
-	TextureAddressModeType wAddress;
-	TextureComparisonModeType comparisonFunc;
+	TextureMinFilter minFilter;
+	TextureMagFilter magFilter;
+	TextureAddressMode uAddress;
+	TextureAddressMode vAddress;
+	TextureAddressMode wAddress;
+	TextureComparisonMode comparisonFunc;
+	ParameterContext context;
+	uint8 unitType;
 	uint16 flags;
-	uint16 updateFrequency;
 	uint32 maxAnisotropy;
 	float lodBias;
 	float minLod;

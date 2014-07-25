@@ -136,12 +136,12 @@ void ChunkOutputStream::EndChunk() {
 }
 
 void ChunkOutputStream::Process(ChunkOutputStream::Internal* _internal) {
-	_internal->calculatedSize = _internal->serializer.GetTotalWrittenBytes() +
+	_internal->calculatedSize = (uint32)_internal->serializer.GetTotalWrittenBytes() +
 		Process(_internal->childrens);
 }
 
-size_t ChunkOutputStream::Process(ChunkOutputStream::OutChunkList& childrens) {
-	size_t totalSize = 0;
+uint32 ChunkOutputStream::Process(ChunkOutputStream::OutChunkList& childrens) {
+	uint32 totalSize = 0;
 	for(auto &c : childrens) {
 		if (!c.completed) {
 			Error("A certain chunk was not ended properly!");

@@ -82,16 +82,25 @@ public:
 		return *worldMatrix;
 	}
 
-	inline Vector3A GetPosition() const {
+	inline Vector3A GetTranslation() const {
 		return Mat4x4Row(*worldMatrix, 3);
 	}
 
+	void SetTransform(Vec3AF pos, QuatF rot, float scaling) {
+		NEX_ASSERT(!moveable);
+		*worldMatrix = Mat4x4FromScaleRotPos(scaling, rot, pos);
+		SetUpdateRequired(true);
+	}
+
 	/** @remarks Update world volume */
-	void Update();
+	virtual void Update();
 	virtual void SetMoveable(Moveable* ptr);
 	virtual void Visit(SceneTraversal& traversal) = 0;
 
 	virtual uint32 GetClassID() const override = 0;
+
+	virtual void SetMaterial(uint32 index, MaterialAssetPtr& mtl) {}
+
 protected:
 	BoundingVolume bounds;
 	/* culling system this object belongs to */

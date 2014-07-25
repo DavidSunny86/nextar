@@ -9,6 +9,8 @@
 #include <ComponentFactoryArchive.h>
 #include <ComponentGroupArchive.h>
 #include <RenderManager.h>
+#include <VertexLayout.h>
+#include <MeshServices.h>
 
 namespace nextar {
 
@@ -23,7 +25,7 @@ EngineApplicationContext::~EngineApplicationContext() {
 void EngineApplicationContext::CreateExtendedInterfacesImpl() {
 	NEX_NEW(ComponentFactoryArchive());
 	NEX_NEW(ComponentGroupArchive());
-
+	NEX_NEW(MeshServices());
 	ComponentFactoryArchive::Instance().InstallDefaultFactories();
 }
 
@@ -33,12 +35,17 @@ void EngineApplicationContext::ConfigureExtendedInterfacesImpl() {
 	if (RenderManager::InstancePtr()) {
 		RenderManager::Instance().Configure(GetConfig());
 	}
+	MeshServices::Instance().Configure(GetConfig());
 }
 
 void EngineApplicationContext::DestroyExtendedInterfacesImpl() {
 	ReleaseResources();
+	NEX_DELETE(MeshServices::InstancePtr());
+	VertexLayout::ClearCommonLayouts();
 	if (RenderManager::InstancePtr()) {
+		DispatchEvent(EVENT_RENDERMANAGER_PRE_CLOSE);
 		RenderManager::Instance().Close();
+		DispatchEvent(EVENT_RENDERMANAGER_POST_CLOSE);
 	}
 	NEX_DELETE(ComponentFactoryArchive::InstancePtr());
 	NEX_DELETE(ComponentGroupArchive::InstancePtr());

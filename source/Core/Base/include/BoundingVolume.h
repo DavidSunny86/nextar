@@ -70,6 +70,10 @@ public:
 		return radius;
 	}
 
+	inline void SetRadius(float radius) {
+		this->radius = radius;
+	}
+
 	const Vector3A& GetCenter() const {
 		return GetBox().GetCenter();
 	}

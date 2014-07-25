@@ -34,9 +34,17 @@ public:
 
 	enum {
 		USE_FALLBACK = Asset::LAST_FLAG << 5,
+		BASIC_DEFERRED = Asset::LAST_FLAG << 6,
+		TRANSLUCENT = Asset::LAST_FLAG << 7,
+		OVERLAY = Asset::LAST_FLAG << 8,
+		BACKGROUND = Asset::LAST_FLAG << 9,
+		POST_FX = Asset::LAST_FLAG << 10,
+		DEFERRED_LIGHTING = Asset::LAST_FLAG << 11,
+		DEFERRED = DEFERRED_LIGHTING|BASIC_DEFERRED,
 	};
 
 	class StreamRequest;
+
 	typedef AssetTraits<ShaderAsset> Traits;
 	typedef FactoryTraits<ShaderAsset> FactoryTraits;
 
@@ -66,17 +74,18 @@ public:
 		// Parameters are registered here for UI specific display (or when meta data has to be stored).
 		// The parameter name is of the form: Parameter Category:Parameter Name. The category, if ignored,
 		// will be set to General.
-		virtual void AddParam(const String& name, const String& param,
-				const String& description, const String& defaultValue,
-				ParamDataType type);
-		virtual void AddMacro(const String& name, const String& param,
-				const String& description, bool defualtState);
+		// virtual void AddParam(const String& name, const String& param,
+		//		const String& description, const String& defaultValue,
+		//		ParamDataType type);
+		// virtual void AddMacro(const String& name, const String& param,
+		//		const String& description, bool defualtState);
 		/* Add Pass */
-		virtual void AddPass(StringID name);
+		void AddPass(StringID name);
 		/* Set pass paramter buffer data */
-		virtual void SetParamterBuffer(ParameterBuffer&& data);
+		void SetParamterBuffer(ParameterBuffer&& data);
+
 		/* Pass related */
-		void SetOptions(const String& options);
+		void SetCompilationOptions(const String& options);
 		void SetProgramSource(Pass::ProgramStage stage, String&& src);
 		void SetRasterState(RasterState& state);
 		void SetBlendState(BlendState& state);
@@ -88,10 +97,10 @@ public:
 
 	protected:
 
+		String compilationOptions;
 		friend class ShaderAsset;
 		StreamPassList::reverse_iterator currentPass;
 		StreamPassList passes;
-		String compilationOpt;
 	};
 
 	ShaderAsset(const StringID);
@@ -127,13 +136,24 @@ public:
 		return passParamData;
 	}
 
+	inline uint16 GetRenderQueue() const {
+		return renderQueue;
+	}
+
+	inline VisibilityMask GetVisibilityMask() const {
+		return visibilityMask;
+	}
+
+	inline void SetRenderQueue(uint16 l) {
+		renderQueue = (uint8)l;
+	}
 protected:
 
 	virtual void NotifyAssetLoaded();
 	virtual void NotifyAssetUnloaded();
 	virtual void NotifyAssetUpdated();
 
-	virtual void UnloadImpl(nextar::StreamRequest* req, bool async);
+	virtual void UnloadImpl();
 
 	virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);
 	virtual void DestroyStreamRequestImpl(nextar::StreamRequest*&, bool load =
@@ -160,6 +180,8 @@ protected:
 
 	// used as sort key
 	uint8 translucency;
+	uint8 renderQueue;
+	VisibilityMask visibilityMask;
 
 	PassList passes;
 	// required when parameter is looked up by name

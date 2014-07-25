@@ -5,18 +5,18 @@
 
 namespace nextar {
 
-typedef uint8 FillModeType;
-typedef uint8 CullModeType;
-
-enum FillMode {
-	FM_SOLID, FM_WIREFRAME, FM_POINT,
-
+enum FillMode : uint8 {
+	FM_SOLID,
+	FM_WIREFRAME,
+	FM_POINT,
 	FM_DEFAULT = FM_SOLID
 };
 
-enum CullMode {
-	CULL_BACK, CULL_FRONT, CULL_ALL, CULL_NONE,
-
+enum CullMode : uint8 {
+	CULL_BACK,
+	CULL_FRONT,
+	CULL_ALL,
+	CULL_NONE,
 	CULL_DEFAULT = CULL_BACK
 };
 
@@ -38,9 +38,9 @@ struct RasterState {
 	/* true if using line anti aliasing */
 	bool usingLineAa;
 	/* The fill mode */
-	FillModeType fill;
+	FillMode fill;
 	/* The cull mode */
-	CullModeType cull;
+	CullMode cull;
 	/* padding the bools and uint8's */
 	bool _irrelevant_padding;
 	/* The constant depth bias */

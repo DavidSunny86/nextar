@@ -492,8 +492,11 @@ void RenderContextGL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 			ss.location = loc;
 			if (paramDef == nullptr) {
 				ss.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
-				ss.context = GuessContextByName(unitName,
+				if (tu->texUnitParams.context == ParameterContext::CTX_UNKNOWN)
+					ss.context = GuessContextByName(unitName,
 						ParameterContext::CTX_MATERIAL);
+				else
+					ss.context = tu->texUnitParams.context;
 				ss.processor = Pass::GetTextureProcessor();
 			} else {
 				ss.autoName = paramDef->autoName;
@@ -693,11 +696,9 @@ void RenderContextGL::Draw(StreamData* streamData, CommitContext& ctx) {
 		break;
 	}
 
-	if (streamData->useIndices) {
-		GpuBufferViewGL* buffer = static_cast<GpuBufferViewGL*>(
-				GetView(streamData->indices.indices.GetPtr()));
-
-
+	IndexBuffer* ibuffer = streamData->indices.indices.GetPtr();
+	if (ibuffer) {
+		GpuBufferViewGL* buffer = static_cast<GpuBufferViewGL*>(GetView(ibuffer));
 		GLint indexsize = buffer->GetStride();
 		// hack
 		NEX_STATIC_ASSERT(GL_UNSIGNED_INT == GL_UNSIGNED_SHORT + 2);
@@ -1183,6 +1184,19 @@ PixelFormatGl RenderContextGL::GetGlPixelFormat(PixelFormat imageFormat,
 		pft.internalFormat = GL_RGBA16F;
 		pft.sourceFormat = GL_RGBA;
 		pft.dataType = GL_FLOAT;
+		break;
+	case PixelFormat::RG16:
+		NEX_ASSERT(imageFormat == PixelFormat::RG16);
+		pft.internalFormat = GL_RG16;
+		pft.sourceFormat = GL_RG16;
+		pft.dataType = GL_UNSIGNED_SHORT;
+		break;
+	case PixelFormat::RG16_SNORM:
+		NEX_ASSERT(imageFormat == PixelFormat::RG16_SNORM);
+		pft.internalFormat = GL_RG16_SNORM;
+		pft.sourceFormat = GL_RG16_SNORM;
+		pft.dataType = GL_SHORT;
+		break;
 	}
 	return pft;
 }

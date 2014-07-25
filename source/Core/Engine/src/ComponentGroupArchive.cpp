@@ -58,6 +58,8 @@ SharedComponent::Group* ComponentGroupArchive::_AsyncFindOrCreate(
 	NEX_THREAD_LOCK_GUARD_MUTEX(containerLock);
 	f = NEX_NEW(ComponentGroupSet(name));
 	componentGroups.emplace(name, f);
+	if (name == StringUtils::DefaultID)
+		defaultGroup = f;
 	return f;
 }
 

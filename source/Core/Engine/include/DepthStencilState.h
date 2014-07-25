@@ -5,7 +5,7 @@
 
 namespace nextar {
 
-enum DepthStencilCompare {
+enum DepthStencilCompare : uint8 {
 	DSCOMP_NEVER,
 	DSCOMP_LESS,
 	DSCOMP_EQUAL,
@@ -18,7 +18,7 @@ enum DepthStencilCompare {
 	DSCOMP_DEFAULT,
 };
 
-enum StencilOp {
+enum StencilOp : uint8 {
 	STENCILOP_KEEP,
 	STENCILOP_ZERO,
 	STENCILOP_REPLACE,
@@ -29,15 +29,12 @@ enum StencilOp {
 	STENCILOP_DECR,
 };
 
-typedef uint8 StencilOpType;
-typedef uint8 DepthStencilCompareType;
-
 struct StencilFaceOp {
 	ColorMask stencilMask;
-	DepthStencilCompareType stencilFunc;
-	StencilOpType stencilFail;
-	StencilOpType stencilPass;
-	StencilOpType depthPass;
+	DepthStencilCompare stencilFunc;
+	StencilOp stencilFail;
+	StencilOp stencilPass;
+	StencilOp depthPass;
 
 	StencilFaceOp() :
 			stencilMask(ColorMask::MASK_ALL), stencilFunc(DSCOMP_NEVER), stencilFail(
@@ -52,7 +49,7 @@ struct DepthStencilState {
 	/* true to enable depth write */
 	bool depthWrite;
 	/* The depth Compare function */
-	DepthStencilCompareType depthCompareFunc;
+	DepthStencilCompare depthCompareFunc;
 	/* true to enable stencil test */
 	bool stencilTest;
 	/* stencil operations */

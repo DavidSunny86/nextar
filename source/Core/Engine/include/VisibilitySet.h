@@ -16,9 +16,12 @@ namespace nextar {
 
 enum class RenderQueueFlags
 	: uint16 {
-		TRANSLUCENCY = 1 << 0,
+	TRANSLUCENCY = 1 << 0,
 	DEFERRED = 1 << 1,
 	SORT_ENABLED = 1 << 2,
+	OVERLAY = 1 << 3,
+	BACKGROUND = 1 << 4,
+	FORWARD = 1 << 5,
 	DEFAULT_FLAGS = SORT_ENABLED | DEFERRED,
 };
 
@@ -44,14 +47,9 @@ inline bool operator <(const KeyVisiblePrimitivePair& first,
 	return first.first < second.first;
 }
 
-enum class RenderQueueName {
-	Q_BACKGROUND, Q_OPAQUE, Q_TRANSLUCENT, Q_OVERLAY,
-};
-
-struct RenderQueueDesc {
+struct RenderQueueDesc : public NamedObject {
 	RenderQueueFlags flags;
 	uint16 priority;
-	String name;
 
 	friend inline bool operator <(const RenderQueueDesc& rl1,
 			const RenderQueueDesc& rl2) {
@@ -112,17 +110,6 @@ class VisibilitySet: public AllocScene {
 
 public:
 
-	enum VisibilityMask {
-
-		VM_BACKGROUND = 1 << 0,
-		VM_OPAQUE = 1 << 1,
-		VM_LIGHT = 1 << 2,
-		VM_TRANSLUCENT = 1 << 3,
-		VM_OVERLAY = 1 << 4,
-		VM_SHADOW_CASTER = 1 << 5,
-		VM_ALL = 0xffffffff
-	};
-
 	VisibilitySet();
 	virtual ~VisibilitySet();
 
@@ -133,8 +120,8 @@ public:
 		}
 	}
 
-	inline void AddVisiblePrimitve(uint16 qu, VisiblePrimitive* primitive,
-			uint32 sortKey) {
+	inline void AddVisiblePrimitve(uint16 qu, uint32 sortKey,
+			VisiblePrimitive* primitive) {
 		queues[qu].AddPrimitive(primitive, sortKey);
 	}
 

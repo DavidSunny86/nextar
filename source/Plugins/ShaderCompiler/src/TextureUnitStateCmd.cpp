@@ -9,6 +9,8 @@
 #include <TextureUnitState.h>
 #include <TextureUnitStateCmd.h>
 #include <ShaderAsset.h>
+#include <ScriptStrings.h>
+#include <ShaderScript.h>
 
 namespace ShaderCompiler {
 
@@ -20,9 +22,9 @@ UnitCmd UnitCmd::command;
  **************************************************************/
 void TextureUnitStateCmd::Execute(int parentType, void* parentParam,
 		ScriptParser::StatementContext& ctx) {
-	if (parentType == CommandDelegate::SHADER_BLOCK) {
-		ShaderAsset::StreamRequest* shader =
-				static_cast<ShaderAsset::StreamRequest*>(parentParam);
+	if (parentType == CommandDelegate::PASS_BLOCK) {
+		ShaderTemplate::StreamRequest* shader =
+				static_cast<ShaderTemplate::StreamRequest*>(parentParam);
 		TextureUnitStateListener textureUnitState(shader);
 		ctx.ParseBlock(&textureUnitState);
 	} else {
@@ -38,7 +40,7 @@ void TextureUnitStateListener::EnterStatement(
 		ScriptParser::StatementContext& ctx) {
 	//CommandDelegate* cmd = Helper::FindCommand(DepthStencilStateListener::commands,
 	//		DepthStencilStateListener::commandCount, ctx.command);
-	if (ctx.GetCommand() == "Unit") {
+	if (ctx.GetCommand() == _SS(CMD_UNIT)) {
 		UnitCmd::command.Execute(CommandDelegate::TEXTURE_STATE_BLOCK, shader,
 				ctx);
 	}
@@ -48,11 +50,12 @@ void UnitCmd::Execute(int parentType, void* state,
 		ScriptParser::StatementContext& ctx) {
 	NEX_ASSERT(parentType == CommandDelegate::DEPTH_STENCIL_BLOCK);
 	TextureUnitParams texUnitParams;
-	ShaderAsset::StreamRequest* shader =
-			(static_cast<ShaderAsset::StreamRequest*>(state));
+	ShaderTemplate::StreamRequest* shader =
+			(static_cast<ShaderTemplate::StreamRequest*>(state));
 	StringUtils::TokenIterator it = 0;
 	String value;
 	String name;
+	URL defaultTexturePath;
 	const StringUtils::WordList& paramContext = ctx.GetParamList();
 	it = StringUtils::NextWord(paramContext, value, it);
 	if (it != String::npos) {
@@ -102,9 +105,13 @@ void UnitCmd::Execute(int parentType, void* state,
 	if (it != String::npos) {
 		texUnitParams.borderColor = Convert::ToColor(value);
 	}
+	it = StringUtils::NextWord(paramContext, value, it);
+	if (it != String::npos) {
+		defaultTexturePath = URL(value);
+	}
 	// todo else throw error command not supported
 	if (!ctx.IsErrorBitSet()) {
-		shader->AddTextureUnit(name, texUnitParams, nullptr);
+		shader->AddTextureUnit(name, texUnitParams, defaultTexturePath);
 	}
 }
 

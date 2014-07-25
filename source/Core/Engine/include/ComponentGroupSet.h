@@ -27,9 +27,12 @@ public:
 	ComponentGroupSet(const StringID name);
 	virtual ~ComponentGroupSet();
 
-	virtual void AsyncAdd(SharedComponentPtr&) override;
-	virtual SharedComponentPtr& AsyncFind(const StringID name) override;
-	virtual void AsyncRemove(StringID name) override;
+	virtual void AcquireLock();
+	virtual void ReleaseLock();
+	virtual void Add(SharedComponentPtr&) override;
+	virtual SharedComponentPtr& Find(const StringID name) override;
+	virtual void Remove(StringID name) override;
+
 	virtual void AsyncRemoveAll(uint32 ofType = Component::CLASS_UNKNOWN)
 			override;
 	virtual void AsyncCollect(SharedComponent::Group* container, uint32 ofType)

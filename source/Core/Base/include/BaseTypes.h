@@ -30,6 +30,7 @@ typedef uint8 utf8;
 typedef uint16 utf16;
 typedef uint32 utf32;
 typedef uint32 VersionID;
+typedef uint32 EventID;
 
 template<typename T> struct BasicUniquePtr {
 	typedef std::unique_ptr<T, GenericFree<T> > type;

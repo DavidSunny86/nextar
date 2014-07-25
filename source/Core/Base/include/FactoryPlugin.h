@@ -50,9 +50,14 @@ public:
 	virtual void Dispose() = 0;
 };
 
-#define NEX_IMPLEMENT_PLUGIN(pluginName)              \
-	NEX_EXTERNC_SYM _NexExportSym nextar::FactoryPlugin*      \
-	NEX_TOKEN_PASTE(pluginName,CreateFactory)()
+#define NEX_DECLARE_PLUGIN(pluginClass) static pluginClass plugin
+
+#define NEX_IMPLEMENT_PLUGIN(pluginName, pluginClass)       \
+	pluginClass pluginClass::plugin;						\
+	NEX_EXTERNC_SYM _NexExportSym nextar::FactoryPlugin*    \
+	NEX_TOKEN_PASTE(pluginName,CreateFactory)() { 	\
+		return &pluginClass::plugin;		\
+	}
 
 #define NEX_DECLARE_COMPONENT_FACTORY(Impl)					\
 	typedef map<String, Impl*>::type FactoryMap;	\

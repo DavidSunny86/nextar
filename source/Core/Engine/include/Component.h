@@ -40,6 +40,7 @@ public:
 		CAT_SCENE = 1 << 6,
 		CAT_CULLING_SYSTEM = 1 << 8,
 		CAT_SPATIAL = 1 << 9,
+		CAT_TEMPLATE = 1 << 10
 	};
 
 	/* specific components implemented in the system */
@@ -61,10 +62,16 @@ public:
 		CLASS_SCENE = COMPONENT_CLASS_ID(CAT_ASSET | CAT_SCENE, 0),
 		CLASS_BV_CULLER = COMPONENT_CLASS_ID(CAT_SPATIAL | CAT_CULLING_SYSTEM,
 				0),
+
+		// templates
+		CLASS_SHADER_TEMPLATE = COMPONENT_CLASS_ID(CAT_TEMPLATE, 0),
+		CLASS_MATERIAL_TEMPLATE = COMPONENT_CLASS_ID(CAT_TEMPLATE, 1),
 	};
 
 	enum Flags {
-		ENABLED = 1 << 0, LAST_FLAG = 1 << 1,
+		ENABLED = 1 << 0,
+		UPDATE_REQUIRED = 1 << 1,
+		LAST_FLAG = 1 << 2,
 	};
 
 	class Factory;
@@ -116,6 +123,10 @@ public:
 		return (flags & f) != 0;
 	}
 
+	inline void SetUpdateRequired(bool v) {
+		SetFlag(UPDATE_REQUIRED, v);
+	}
+
 	inline Component* GetParent() const {
 		return parent;
 	}
@@ -124,6 +135,11 @@ public:
 		return COMPONENT_CAT(GetClassID());
 	}
 
+	inline bool IsUpdateRequired() const {
+		return IsFlagSet(UPDATE_REQUIRED);
+	}
+
+	virtual void Update() {}
 	virtual uint32 GetClassID() const = 0;
 
 	virtual void SetParent(Component*);
@@ -148,14 +164,35 @@ class _NexEngineAPI SharedComponent: public Referenced<SharedComponent,
 public:
 	static SharedComponentPtr Null;
 
+	enum InstanceResult : uint8 {
+		INSTANCE_CREATED,
+		INSTANCE_RETRIEVED,
+		INSTANCE_FAILED,
+	};
+
 	class _NexEngineAPI Group: public AllocGeneral, public NamedObject {
 	public:
 
+		class Lock {
+		public:
+			Lock(Group* group) : _group(group) {
+				if(_group) _group->AcquireLock();
+			}
+			~Lock() {
+				if(_group) _group->ReleaseLock();
+			}
+		protected:
+			Group* _group;
+		};
+
 		Group(const StringID name);
 		virtual ~Group();
-		virtual void AsyncAdd(SharedComponentPtr&) = 0;
-		virtual SharedComponentPtr& AsyncFind(const StringID name) = 0;
-		virtual void AsyncRemove(StringID name) = 0;
+		virtual void AcquireLock() = 0;
+		virtual void ReleaseLock() = 0;
+		virtual void Add(SharedComponentPtr&) = 0;
+		virtual SharedComponentPtr& Find(const StringID name) = 0;
+		virtual void Remove(StringID name) = 0;
+
 		virtual void AsyncRemoveAll(
 				uint32 ofType = Component::CLASS_UNKNOWN) = 0;
 		virtual void AsyncCollect(Group* container, uint32 ofType) = 0;
@@ -165,8 +202,14 @@ public:
 			Component* parent = nullptr, Group* addToGroup = nullptr);
 	virtual ~SharedComponent();
 
-	static SharedComponentPtr Instance(uint32 classId, StringID name,
+	/** Creates or gets an instance of an existing resource of the name specified
+	 * from the group repository (when stored). Returns InstanceResult based on
+	 * the outcome */
+	static InstanceResult Instance(SharedComponentPtr& oInst, uint32 classId, StringID name,
 			Component::Factory* factory = nullptr,
+			SharedComponent::Group* group = nullptr);
+	static InstanceResult Instance(SharedComponentPtr& oInst, uint32 classId, StringID name,
+			StringID factory = StringUtils::DefaultID,
 			SharedComponent::Group* group = nullptr);
 
 	inline Group* GetGroup() const {

@@ -37,6 +37,11 @@ namespace nextar {
 inline OutputSerializer::OutputSerializer() : full(0), totalSizeWritten(0) {
 }
 
+inline OutputSerializer::OutputSerializer(const OutputSerializer& other) :
+outStream(other.outStream), full(other.full), totalSizeWritten(other.totalSizeWritten) {
+	std::memcpy(localBuffer, other.localBuffer, LOCAL_BUFFER_SIZE);
+}
+
 inline OutputSerializer::OutputSerializer(OutputSerializer&& other) :
 outStream(other.outStream), full(other.full), totalSizeWritten(other.totalSizeWritten) {
 	std::memcpy(localBuffer, other.localBuffer, LOCAL_BUFFER_SIZE);
@@ -44,7 +49,7 @@ outStream(other.outStream), full(other.full), totalSizeWritten(other.totalSizeWr
 }
 
 inline OutputSerializer::OutputSerializer(OutputStreamPtr& _outStream) :
-		outStream(_outStream), full(0) {
+		outStream(_outStream), full(0), totalSizeWritten(0) {
 }
 
 inline OutputSerializer::~OutputSerializer() {

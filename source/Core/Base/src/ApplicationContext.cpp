@@ -36,6 +36,7 @@ void ApplicationContext::InitializeContext() {
 	PluginRegistry::Instance().RequestPlugins(PLUG_TYPE_LIFETIME,
 			StringUtils::Null, true);
 	ConfigureExtendedInterfacesImpl();
+	DispatchEvent(EVENT_INIT_RESOURCES);
 }
 
 void ApplicationContext::LoadConfiguration() {
@@ -56,14 +57,10 @@ void ApplicationContext::ConfigureServices() {
 	PluginRegistry::Instance().Configure(config);
 }
 
-void ApplicationContext::CloseServices() {
-}
-
 void ApplicationContext::DestroyContext() {
 	Trace("Destroying application context: " + appName);
 	SaveConfiguration();
-	// destroy dictionaries
-	PropertyInterface::DestroyDictionaries();
+	DispatchEvent(EVENT_DESTROY_RESOURCES);
 	// services
 	DestroyServices();
 }
@@ -95,6 +92,8 @@ void ApplicationContext::DestroyServices() {
 	NEX_DELETE(PluginRegistry::InstancePtr());
 	// just save the strings
 	NamedObject::OnExit();
+	// destroy dictionaries
+	PropertyInterface::DestroyDictionaries();
 	NEX_DELETE(FileSystem::InstancePtr());
 }
 

@@ -27,7 +27,7 @@ void RenderManager::Configure(const Config& config) {
 	ConfigureImpl(nv);
 }
 
-void RenderManager::AddRenderQueue(const String& name, uint16 priority,
+void RenderManager::AddRenderQueue(const StringID name, uint16 priority,
 		RenderQueueFlags flags) {
 	if (renderQueues.size() >= 255) {
 		Error("Render queue index must be less than 255");

@@ -8,14 +8,22 @@
 #include <FrameTimer.h>
 #include <Config.h>
 #include <URL.h>
+#include <EventDispatcher.h>
 
 namespace nextar {
 
-class _NexBaseAPI ApplicationContext: public Singleton<ApplicationContext> {
+class _NexBaseAPI ApplicationContext:
+	public EventDispatcher,
+	public Singleton<ApplicationContext> {
 	NEX_LOG_HELPER(ApplicationContext)
 	;
 
 public:
+
+	enum EventID {
+		EVENT_INIT_RESOURCES,
+		EVENT_DESTROY_RESOURCES,
+	};
 
 	enum ListnerPriority {
 		PRIORITY_LOW = 999999, PRIORITY_NORMAL = 500000, PRIORITY_HIGH = 100000,
@@ -80,8 +88,7 @@ protected:
 	virtual void SaveConfiguration() {
 	}
 	virtual void ConfigureServices();
-	virtual void CloseServices();
-		
+
 	virtual void ConfigureExtendedInterfacesImpl() {
 	}
 	virtual void CreateExtendedInterfacesImpl() {

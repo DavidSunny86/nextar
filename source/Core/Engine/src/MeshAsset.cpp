@@ -2,7 +2,6 @@
 #include <MeshAsset.h>
 #include <BufferManager.h>
 #include <VertexElement.h>
-#include <CommonMeshLayouts.h>
 
 namespace nextar {
 
@@ -10,13 +9,7 @@ MeshVertexData::~MeshVertexData() {
 	if (vertexElements)
 		NEX_DELETE_ARRAY(vertexElements);
 	layout.Clear();
-	if (layoutType != VertexLayoutType::CUSTOM_LAYOUT) {
-		if(commonLayouts[layoutType]->GetRefCount() == 1) {
-			commonLayouts[layoutType].Clear();
-		}
-	}
 	vertexElements = 0;
-
 }
 
 void MeshVertexData::ApplyCustomLayout() {
@@ -32,13 +25,7 @@ void MeshVertexData::SetLayoutFromType() {
 	if (layoutType == VertexLayoutType::CUSTOM_LAYOUT) {
 		ApplyCustomLayout();
 	} else if ((uint32)layoutType < (uint32)VertexLayoutType::VERTEX_LAYOUT_COUNT ){
-		if (!commonLayouts[layoutType]) {
-			commonLayouts[layoutType] = Assign( NEX_NEW(VertexLayout()) );
-			commonLayouts[layoutType]->Create(
-					commonElementLayout[layoutType].numElements,
-					commonElementLayout[layoutType].elements);
-		}
-		layout = commonLayouts[layoutType];
+		layout = VertexLayout::GetCommonLayout(layoutType);
 	}
 }
 
@@ -57,7 +44,7 @@ uint32 MeshAsset::GetClassID() const {
 	return CLASS_ID;
 }
 
-void MeshAsset::UnloadImpl(nextar::StreamRequest* req, bool isAsync) {
+void MeshAsset::UnloadImpl() {
 	if (sharedVertexData) {
 		NEX_DELETE(sharedVertexData);
 		sharedVertexData = 0;

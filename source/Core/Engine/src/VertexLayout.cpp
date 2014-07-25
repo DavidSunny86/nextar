@@ -6,6 +6,7 @@
  */
 
 #include <VertexLayout.h>
+#include <CommonMeshLayouts.h>
 
 namespace nextar {
 
@@ -21,6 +22,21 @@ void VertexLayout::Create(uint32 numElements, const VertexElement* elements) {
 	params.elements = elements;
 	params.numElements = numElements;
 	RequestUpdate(MSG_CREATE, reinterpret_cast<ContextParamPtr>(&params));
+}
+
+const VertexLayoutPtr& VertexLayout::GetCommonLayout(VertexLayoutType layoutType) {
+	if (!commonLayouts[layoutType]) {
+		commonLayouts[layoutType] = Assign( NEX_NEW(VertexLayout()) );
+		commonLayouts[layoutType]->Create(
+				commonElementLayout[layoutType].numElements,
+				commonElementLayout[layoutType].elements);
+	}
+	return commonLayouts[layoutType];
+}
+
+void VertexLayout::ClearCommonLayouts() {
+	for(uint32 i = 0; i < VertexLayoutType::VERTEX_LAYOUT_COUNT; ++i)
+		commonLayouts[i].Clear();
 }
 
 } /* namespace nextar */

@@ -7,17 +7,10 @@
 #include <IndexBuffer.h>
 #include <StreamData.h>
 #include <MaterialAsset.h>
+#include <VertexElement.h>
+#include <VertexLayout.h>
 
 namespace nextar {
-// common layouts
-enum VertexLayoutType : uint16 {
-	CUSTOM_LAYOUT = 0xffff,
-	POSITION_NORMAL_0 = 0,
-	POSITION_NORMAL_UV_0,
-	POSITION_0_NORMAL_1,
-	POSITION_0_NORMAL_UV_1,
-	VERTEX_LAYOUT_COUNT
-};
 
 enum {
 	MAX_STREAM_COUNT = 8,
@@ -52,6 +45,7 @@ public:
 	VertexBufferBinding binding;
 
 	inline MeshVertexData() :
+			numVertexBuffers(0),
 			layoutType(VertexLayoutType::CUSTOM_LAYOUT),
 			numVertexElements(0), vertexElements(0),
 			vertexCount(0), binding(), layout() {
@@ -62,20 +56,6 @@ public:
 	void ApplyCustomLayout();
 	void SetLayoutFromType();
 
-	static void GetCustomLayoutElements(VertexLayoutType type,
-			const VertexElement*& elements, uint32& numElements) {
-		elements = commonElementLayout[type].elements;
-		numElements = commonElementLayout[type].numElements;
-	}
-
-protected:
-	struct CommonVertexElement {
-		uint32 numElements;
-		const VertexElement* elements;
-	};
-
-	static CommonVertexElement commonElementLayout[VertexLayoutType::VERTEX_LAYOUT_COUNT];
-	static VertexLayoutPtr commonLayouts[VertexLayoutType::VERTEX_LAYOUT_COUNT];
 };
 
 class _NexEngineAPI MeshIndexData: public AllocGeneral {
@@ -254,7 +234,7 @@ protected:
 	virtual void NotifyAssetUnloaded();
 	virtual void NotifyAssetUpdated();
 
-	virtual void UnloadImpl(nextar::StreamRequest* req, bool isAsync);
+	virtual void UnloadImpl();
 
 	virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);
 	virtual void DestroyStreamRequestImpl(StreamRequest*&, bool load = true);

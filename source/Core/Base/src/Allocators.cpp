@@ -41,7 +41,7 @@ void* Allocator::AllocAligned(size_t size, size_t al, const char* func,
 	if (!ptr)
 		NEX_THROW_FatalError(EXCEPT_OUT_OF_MEMORY);
 	void* ret = MemoryTracker::OnNew(ptr, size, func, file, line, al);
-	NEX_ASSERT( (((uint32)ret) & (al-1)) == 0);
+	NEX_ASSERT( (((uintptr_t)ret) & (al-1)) == 0);
 	return ret;
 }
 

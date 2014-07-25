@@ -7,14 +7,12 @@
 #include <BaseHeaders.h>
 #include <Plugin.h>
 
-NEX_IMPLEMENT_PLUGIN(ShaderCompiler){
-return &ShaderCompiler::Plugin::plugin;
-}
+NEX_IMPLEMENT_PLUGIN(ShaderCompiler, ShaderCompiler::Plugin);
 
 namespace ShaderCompiler {
 
 ShaderLoaderImplv1_0 Plugin::shaderLoaderImpl;
-Plugin Plugin::plugin;
+
 Plugin::Plugin() {
 }
 

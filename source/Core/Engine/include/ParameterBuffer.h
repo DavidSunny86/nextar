@@ -59,6 +59,20 @@ protected:
 	DataPtr data;
 };
 
+class ParameterValue {
+	union {
+		float _f;
+		int32 _i;
+		uint32 _u;
+		float _vf[4];
+		int32 _vi[4];
+		uint32 _vu[4];
+		TextureBase* _t;
+	};
+	ParamDataType type;
+public:
+};
+
 } /* namespace nextar */
 
 #endif /* PROPERTYBUFFER_H_ */

@@ -54,7 +54,7 @@ public:
 
 protected:
 
-	virtual void UnloadImpl(StreamRequest* req, bool isAsync);
+	virtual void UnloadImpl();
 
 	SceneParameters parameters;
 	CullingSystem* cullingSystem;

@@ -45,7 +45,7 @@ void Asset::Load(StreamRequest* req, bool async) {
 	} else
 		streamRequest = req;
 
-	if (async && IsBackgroundLoaded()) {
+	if (async && IsBackgroundStreamed()) {
 		AssetStreamer::Instance().RequestLoad(this);
 	} else {
 		SetLoading(true);
@@ -66,18 +66,43 @@ void Asset::Load(StreamRequest* req, bool async) {
 	}
 }
 
-void Asset::Unload(StreamRequest* req, bool async) {
-	// todo Background unload?? any advantage? saving mayb
+void Asset::Unload() {
 	if (IsLoaded() || IsLoading()) {
 		Debug("Asset being loaded: " + GetName());
 		return;
 	}
 	try {
+		UnloadImpl();
 		NotifyAssetUnloaded();
-		UnloadImpl(req, false);
 	} catch (GracefulErrorExcept& e) {
 		Debug(e.GetMsg());
 		SetLoaded(false);
+	}
+}
+
+void Asset::Save(StreamRequest* req, bool async) {
+	if (!IsLoaded() || IsLoading() || IsSaving()) {
+		Debug("Asset has to be saved first: " + GetName());
+		return;
+	}
+
+	if (!req) {
+		streamRequest = GetStreamRequest(false);
+	} else
+		streamRequest = req;
+
+	if (async && IsBackgroundStreamed()) {
+		AssetStreamer::Instance().RequestSave(this);
+	} else {
+		SetSaving(true);
+		try {
+			SaveImpl(streamRequest, false);
+			SetSaving(false);
+			NotifyAssetSaved();
+		} catch (GracefulErrorExcept& e) {
+			Debug(e.GetMsg());
+			SetSaving(false);
+		}
 	}
 }
 
@@ -99,6 +124,9 @@ void Asset::NotifyAssetUnloaded() {
 void Asset::NotifyAssetUpdated() {
 }
 
+void Asset::NotifyAssetSaved() {
+}
+
 void Asset::AsyncLoad(StreamRequest* request) {
 	try {
 		LoadImpl(request, true);
@@ -108,12 +136,12 @@ void Asset::AsyncLoad(StreamRequest* request) {
 	}
 }
 
-void Asset::AsyncUnload(StreamRequest* request) {
+void Asset::AsyncSave(StreamRequest* request) {
 	try {
-		UnloadImpl(request, true);
+		SaveImpl(request, true);
 	} catch (GracefulErrorExcept& e) {
 		Debug(e.GetMsg());
-		request->returnCode = (uint16) StreamResult::UNLOAD_FAILED;
+		request->returnCode = (uint16) StreamResult::SAVE_FAILED;
 	}
 }
 
@@ -158,7 +186,7 @@ void Asset::_LoadDependencies(AssetStreamRequest* req) {
 }
 
 /*********************************
- * Mesh::Loader
+ * Asset::Loader
  *********************************/
 NEX_IMPLEMENT_COMPONENT_FACTORY(AssetLoader);
 
@@ -171,25 +199,77 @@ AssetLoader::~AssetLoader() {
 
 void AssetLoader::Serialize() {
 	Asset* assetPtr = static_cast<Asset*>(request->GetStreamedObject());
+	AssetLoaderImpl* impl = request->GetManualLoader();
+
 	const URL& location = assetPtr->GetAssetLocator();
-	String ext = location.GetExtension();
-	StringUtils::ToUpper(ext);
-	AssetLoaderImpl* impl = GetImpl(ext, assetPtr->GetClassID());
+
 	if (!impl) {
-		Error("No mesh loader for type.");
+		String ext = location.GetExtension();
+		StringUtils::ToUpper(ext);
+		impl = GetImpl(ext, assetPtr->GetClassID());
+	}
+	if (!impl) {
+		Error("No loader for type.");
 		NEX_THROW_GracefulError(EXCEPT_MISSING_PLUGIN);
 	}
 
-	InputStreamPtr input = FileSystem::Instance().OpenRead(location);
+	InputStreamPtr input;
 
-	if (input) {
-		impl->Load(input, *this);
-	} else {
-		Error(
-				String("Could not open mesh file: ")
-						+ assetPtr->GetAssetLocator().ToString());
-		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOCATE_ASSET);
+	if (location != URL::Invalid) {
+		input = FileSystem::Instance().OpenRead(location);
+		if (!input) {
+			Error(
+					String("Could not open asset file: ")
+							+ assetPtr->GetAssetLocator().ToString());
+			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOCATE_ASSET);
+		}
 	}
+
+	impl->Load(input, *this);
+}
+
+/*********************************
+ * Asset::Saver
+ *********************************/
+NEX_IMPLEMENT_COMPONENT_FACTORY(AssetSaver);
+
+AssetSaver::AssetSaver(nextar::AssetStreamRequest* req) :
+		request(req) {
+}
+
+AssetSaver::~AssetSaver() {
+}
+
+void AssetSaver::Serialize() {
+	Asset* assetPtr = static_cast<Asset*>(request->GetStreamedObject());
+	AssetSaverImpl* impl = request->GetManualSaver();
+
+	const URL& location = assetPtr->GetAssetLocator();
+
+	if (!impl) {
+
+		String ext = location.GetExtension();
+		StringUtils::ToUpper(ext);
+		impl = GetImpl(ext, assetPtr->GetClassID());
+	}
+	if (!impl) {
+		Error("No saver for type.");
+		NEX_THROW_GracefulError(EXCEPT_MISSING_PLUGIN);
+	}
+
+	OutputStreamPtr output;
+
+	if (location != URL::Invalid) {
+		output = FileSystem::Instance().OpenWrite(location);
+		if (!output) {
+			Error(
+							String("Could not write to asset file: ")
+							+ assetPtr->GetAssetLocator().ToString());
+			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOCATE_ASSET);
+		}
+	}
+
+	impl->Save(output, *this);
 }
 
 }

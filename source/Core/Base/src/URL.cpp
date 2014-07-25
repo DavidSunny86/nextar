@@ -5,6 +5,7 @@ namespace nextar {
 
 //------------------------------------------------------------
 NameValueMap URL::_macroTable;
+const URL URL::Invalid;
 
 URL::URL() {
 }
@@ -107,5 +108,29 @@ String URL::GetExtension() const {
 	return relativePath.substr(p + 1);
 
 }
+
+String URL::GetComputedName() const {
+	String::size_type end = relativePath.find_last_of('.');
+	String::size_type start = relativePath.find_last_of('/');
+	// "/Sn.ext"
+	// becomes Sn
+	if (start == String::npos)
+		start = 0;
+	else
+		++start;
+	return relativePath.substr(start, end - start);
 }
+
+OutputSerializer& operator << (OutputSerializer& ser, const URL& url) {
+	ser << url.archiveName << url.relativePath;
+	return ser;
+}
+
+InputSerializer& operator >> (InputSerializer& ser, URL& url) {
+	ser >> url.archiveName >> url.relativePath;
+	return ser;
+}
+
+}
+
 

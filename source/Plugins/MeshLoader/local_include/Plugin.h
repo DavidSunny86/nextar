@@ -16,7 +16,7 @@ namespace MeshLoader {
 
 class Plugin: public FactoryPlugin {
 public:
-	static Plugin plugin;
+	NEX_DECLARE_PLUGIN(Plugin);
 
 	Plugin();
 	virtual ~Plugin();

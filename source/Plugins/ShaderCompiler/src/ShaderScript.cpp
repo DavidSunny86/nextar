@@ -15,13 +15,17 @@ namespace ShaderCompiler {
 
 void ShaderScript::SetRegionAsSource(Pass::ProgramStage type,
 		const String& name) {
-	auto it = regions.find(name);
-	if (it == regions.end()) {
+	auto it = regions.equal_range(name);
+	if (it.first == regions.end()) {
 		Error("Requested region does not exist: " + name);
 		return;
 	}
 
-	shader->SetProgramSource(type, std::move((*it).second));
+	for(; it.first != it.second; ++it) {
+		shader->SetProgramSource(type,
+				(*it.first).second.first,
+				std::move((*it.first).second.second) );
+	}
 }
 
 void ShaderScript::EnterScript(ScriptParser::ScriptContext& block) {
@@ -33,13 +37,25 @@ void ShaderScript::EnterRegion(ScriptParser::RegionContext& ctx) {
 	String::size_type pos;
 	if (name == _SS(REGION_SHADER)) {
 		ctx.ParseStatements(this);
-	} else if ((pos = name.find(languageContext)) != String::npos) {
-		auto pos = name.find(':');
-		if (pos != String::npos) {
-			String regionName = name.substr(pos + 1);
-			String regionValue;
-			ctx.ParseText(regionValue);
-			regions.emplace(std::move(regionName), std::move(regionValue));
+	} else {
+		String script = _SS(PROGRAM_SCRIPT);
+		if (!name.compare(0, script.length(), script)) {
+			script = name.substr(script.length());
+			auto langRegName = StringUtils::Split(script, ':');
+			RenderManager::ShaderProgramLanguage lang = RenderManager::SPP_UNKNOWN;
+			if (langRegName.first.compare(_SS(LANG_GLSL) ) == 0) {
+				lang = RenderManager::SPP_GLSL;
+			}
+			else if (langRegName.first.compare(_SS(LANG_HLSL) ) == 0) {
+				lang = RenderManager::SPP_HLSL;
+			}
+			if (lang != RenderManager::SPP_UNKNOWN) {
+				String regionValue;
+				ctx.ParseText(regionValue);
+				// todo check if move semantics are being used
+				regions.emplace(std::move(langRegName.second),
+						std::pair(std::move(lang), std::move(regionValue)));
+			}
 		}
 	}
 }

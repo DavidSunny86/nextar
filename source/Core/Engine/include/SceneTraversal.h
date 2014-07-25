@@ -12,6 +12,18 @@
 
 namespace nextar {
 
+enum VisibilityMask : uint32 {
+	VISIBILITY_BACKGROUND = 1 << 0,
+	VISIBILITY_OPAQUE = 1 << 1,
+	VISIBILITY_TRANSLUCENT = 1 << 3,
+	VISIBILITY_OVERLAY = 1 << 4,
+	VISIBILITY_SHADOW_CASTER = 1 << 5,
+	VISIBILITY_SHADOW_RECEIVER = 1 << 6,
+	VISIBILITY_ALL = 0xffffffff
+};
+
+NEX_ENUM_FLAGS(VisibilityMask, uint32);
+
 class SceneTraversal {
 public:
 	SceneTraversal(Camera* camera = nullptr, VisibilitySet* visList = nullptr,
@@ -26,7 +38,7 @@ public:
 	LightSystem* lightSystem;
 	SceneAsset* scene;
 	/* Layer mask */
-	uint32 visibilityMask;
+	VisibilityMask visibilityMask;
 	uint32 frameNumber;
 	/** scene parameter */
 	float distanceInView;

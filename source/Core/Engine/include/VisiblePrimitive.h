@@ -16,11 +16,20 @@
 
 namespace nextar {
 
-class VisiblePrimitive {
+class _NexEngineAPI VisiblePrimitive : public AllocGeneral {
 public:
 
+	VisiblePrimitive() :
+		renderFlags(0)
+		,numWorldMatrices(0)
+		,bounds(nullptr)
+		,worldMatrices(nullptr)
+		,streamData(nullptr)
+		,parameters(nullptr) {
+	}
+
 	StreamData* GetStreamData() {
-		return &streamData;
+		return streamData;
 	}
 
 	MaterialAsset* GetMaterial() {
@@ -33,6 +42,10 @@ public:
 
 	const Matrix4x4* GetWorldMatrices() const {
 		return worldMatrices;
+	}
+
+	void SetStreamData(StreamData* stream) {
+		streamData = stream;
 	}
 
 	void SetWorldMatrices(const Matrix4x4* matrices, int16 numMatrices) {
@@ -64,7 +77,7 @@ protected:
 	/* Material */
 	MaterialAssetPtr material;
 	/** stream data to render */
-	StreamData streamData;
+	StreamData* streamData;
 	/* object parameters */
 	ParameterBuffer* parameters;
 };

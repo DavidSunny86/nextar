@@ -39,7 +39,7 @@ void SceneAsset::_RemoveEntity(Entity* entity) {
 	sceneEntities.remove(Bind(entity));
 }
 
-void SceneAsset::UnloadImpl(StreamRequest* req, bool isAsync) {
+void SceneAsset::UnloadImpl() {
 	EntityList emptyList;
 	std::swap(sceneEntities, emptyList);
 }

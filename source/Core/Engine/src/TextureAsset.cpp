@@ -163,7 +163,7 @@ void TextureAsset::NotifyAssetUpdated() {
 	Asset::NotifyAssetUpdated();
 }
 
-void TextureAsset::UnloadImpl(StreamRequest* req, bool isStreamed) {
+void TextureAsset::UnloadImpl() {
 	NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
 }
 

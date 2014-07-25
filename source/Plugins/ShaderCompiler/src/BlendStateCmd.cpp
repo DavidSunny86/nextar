@@ -32,9 +32,9 @@ const size_t BlendStateListener::commandCount =
  ***************************************************************/
 void BlendStateCmd::Execute(int parentType, void* parentParam,
 		ScriptParser::StatementContext& ctx) {
-	if (parentType == CommandDelegate::SHADER_BLOCK) {
+	if (parentType == CommandDelegate::PASS_BLOCK) {
 		BlendStateListener blend;
-		ShaderAsset::StreamRequest* shader =
+		ShaderTemplate::StreamRequest* shader =
 				static_cast<ShaderScript*>(parentParam)->GetRequest();
 		ctx.ParseBlock(&blend);
 		if (!ctx.IsErrorBitSet()) {

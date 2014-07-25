@@ -23,12 +23,15 @@ class _NexEngineAPI RenderManager: public Singleton<RenderManager>,
 	;
 public:
 
-	enum ShaderProgramLanguage {
-		SPP_GLSL, SPP_HLSL
+	enum ShaderProgramLanguage : uint8 {
+		SPP_GLSL,
+		SPP_HLSL,
+		SPP_UNKNOWN,
 	};
 
 	enum Flags {
-		RM_HAS_SINGLE_CONTEXT = 1 << 0, RM_SHARED_DATA_ACROSS_COTEXTS = 1 << 1,
+		RM_HAS_SINGLE_CONTEXT = 1 << 0,
+		RM_SHARED_DATA_ACROSS_COTEXTS = 1 << 1,
 	};
 
 	struct DriverCreationParams {
@@ -67,7 +70,7 @@ public:
 	/** This function might alter the actual layer indexes which are referred to
 	 * by materials. So, this should be called at the start of engine initialization and
 	 * not modified later. */
-	virtual void AddRenderQueue(const String& name, uint16 priority,
+	virtual void AddRenderQueue(const StringID name, uint16 priority,
 			RenderQueueFlags flags);
 	virtual const RenderQueueDescList& GetRenderQueueInfo() const;
 

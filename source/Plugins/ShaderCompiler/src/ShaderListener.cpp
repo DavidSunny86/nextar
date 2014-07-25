@@ -6,23 +6,19 @@
  */
 #include <BaseHeaders.h>
 #include <ShaderListener.h>
-#include <DepthStencilStateCmd.h>
-#include <BlendStateCmd.h>
-#include <RasterStateCmd.h>
-#include <TextureUnitStateCmd.h>
+#include <PassCmd.h>
 #include <ShaderScript.h>
 #include <ScriptStrings.h>
 
 namespace ShaderCompiler {
 
+FlagsCmd FlagsCmd::command;
 /**************************************************************
  * Command Map
  **************************************************************/
 CommandNamePair ShaderListener::commands[] = {
-		{ _SS(CMD_BLEND_STATE), &BlendStateCmd::command },
-		{ _SS(CMD_DEPTH_STENCIL_STATE), &DepthStencilStateCmd::command },
-		{ _SS(CMD_RASTER_STATE), &RasterStateCmd::command },
-		{ _SS(CMD_TEXTURE_STATE), &TextureUnitStateCmd::command },
+		{ _SS(CMD_PASS), &PassCmd::command },
+		{ _SS(CMD_FLAGS), &FlagsCmd::command },
 };
 
 const size_t ShaderListener::commandCount = sizeof(ShaderListener::commands)
@@ -45,6 +41,30 @@ void ShaderListener::EnterStatement(ScriptParser::StatementContext& ctx) {
 	if (cmd)
 		cmd->Execute(CommandDelegate::SHADER_BLOCK, shaderScript, ctx);
 	// todo else throw error command not supported
+}
+
+/**************************************************************
+ * FlagsCmd
+ **************************************************************/
+void FlagsCmd::Execute(int parentType, void* parentParam,
+		ScriptParser::StatementContext& ctx) {
+	if (parentType == CommandDelegate::SHADER_BLOCK) {
+		const StringUtils::WordList& wl = ctx.GetParamList();
+		String value;
+		StringUtils::TokenIterator prev = 0;
+		uint32 flags = 0;
+		while (	(prev = StringUtils::NextWord(wl, value, prev)) != String::npos ) {
+			flags |= Helper::GetShaderFlag(value);
+		}
+
+		if (flags) {
+			ShaderTemplate* shader = static_cast<ShaderTemplate*>(
+					static_cast<ShaderScript*>(parentParam)->GetRequest()->GetStreamedObject());
+			shader->SetFlag(flags);
+		}
+	} else {
+		ctx.Error("BlendState block needs to be inside Shader declaration.");
+	}
 }
 
 }

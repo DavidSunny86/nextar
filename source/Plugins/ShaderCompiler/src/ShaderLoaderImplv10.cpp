@@ -28,19 +28,11 @@ ShaderLoaderImplv1_0::~ShaderLoaderImplv1_0() {
 }
 
 void ShaderLoaderImplv1_0::Configure(const Config&) {
-	switch (RenderManager::Instance().GetProgramLanguage()) {
-	case RenderManager::SPP_GLSL:
-		languageContext = _SS(LANG_GLSL);
-		break;
-	case RenderManager::SPP_HLSL:
-		languageContext = _SS(LANG_HLSL);
-		break;
-	}
 }
 
 void ShaderLoaderImplv1_0::Load(InputStreamPtr& input, AssetLoader& shader) {
 	ScriptParser scriptParser;
-	ShaderScript s(std::cref(languageContext),
+	ShaderScript s(
 			static_cast<ShaderAsset::StreamRequest*>(shader.GetRequestPtr()));
 	ShaderAsset* shaderPtr =
 			static_cast<ShaderAsset*>(shader.GetRequestPtr()->streamedObject);

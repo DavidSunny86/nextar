@@ -199,6 +199,22 @@ inline Matrix4x4 Mat4x4FromScaleRotPos(float scale, QuatF rot, Vec3AF pos) {
 	return ret;
 }
 
+inline Matrix4x4 Mat4x4Scale(float scale, Mat4x4F m) {
+	Matrix4x4 ret = m;
+	ret.m00 *= scale;
+	ret.m01 *= scale;
+	ret.m02 *= scale;
+
+	ret.m10 *= scale;
+	ret.m11 *= scale;
+	ret.m12 *= scale;
+
+	ret.m20 *= scale;
+	ret.m21 *= scale;
+	ret.m22 *= scale;
+	return ret;
+}
+
 inline Matrix4x4 Mat4x4Transpose(Mat4x4F m) {
 
 	Matrix4x4 ret;

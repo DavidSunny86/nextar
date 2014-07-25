@@ -32,25 +32,23 @@ public:
 	typedef FactoryTraits<MaterialAsset> FactoryTraits;
 
 	class StreamRequest: public AllocGeneral, public AssetStreamRequest {
-		NEX_LOG_HELPER(Shader::StreamRequest)
+		NEX_LOG_HELPER(MaterialAsset::StreamRequest)
 		;
 	public:
 
 		StreamRequest(Asset*);
 		~StreamRequest();
 
-		/** @options should be a string of comma separated indices */
-		void SetShader(StringID name, const URL& location, StringID group =
-				StringUtils::DefaultID, StringID factory =
-				StringUtils::DefaultID);
+		void SetShader(StringID name, const URL& location,
+				StringID group = StringUtils::DefaultID,
+				StringID factory = StringUtils::DefaultID);
 		void SetParamBufferSize(uint32 paramBufferSize);
 		void SetParamValue(uint32 offset, const void* data, size_t amount);
 		void SetTextureValue(uint32 offset, const TextureUnit* texture);
-		void SetRenderLayer(uint8 layer);
+		void SetLayer(uint8 layer);
 
 	protected:
 		friend class MaterialAsset;
-		String optionHash;
 	};
 
 	MaterialAsset(const StringID name);
@@ -68,12 +66,8 @@ public:
 		return layerMask;
 	}
 
-	inline uint8 GetRenderLayer() const {
-		return renderLayer;
-	}
-
-	inline void SetRenderLayer(uint8 l) {
-		renderLayer = l;
+	inline void SetLayerMask(uint8 layer) {
+		layerMask = layer;
 	}
 
 	virtual uint32 GetClassID() const;
@@ -88,7 +82,7 @@ protected:
 	virtual void NotifyAssetUnloaded();
 	virtual void NotifyAssetUpdated();
 
-	virtual void UnloadImpl(nextar::StreamRequest* req, bool isStreamed);
+	virtual void UnloadImpl();
 
 	virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);
 	virtual void DestroyStreamRequestImpl(nextar::StreamRequest*&, bool load =
@@ -100,7 +94,6 @@ protected:
 
 	// used as sort key
 	uint8 layerMask;
-	uint8 renderLayer;
 
 	ShaderAssetPtr shader;
 	String options;

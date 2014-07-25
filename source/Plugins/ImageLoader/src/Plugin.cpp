@@ -9,13 +9,9 @@
 #include <Plugin.h>
 #include <Image.h>
 
-NEX_IMPLEMENT_PLUGIN(ImageLoader){
-return &ImageLoader::Plugin::plugin;
-}
+NEX_IMPLEMENT_PLUGIN(ImageLoader, ImageLoader::Plugin);
 
 namespace ImageLoader {
-
-Plugin Plugin::plugin;
 
 Plugin::Plugin() {
 }

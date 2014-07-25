@@ -22,7 +22,7 @@ SceneTraversal::SceneTraversal(Camera* cam, VisibilitySet* visList,
 		,frustum(nullptr)
 		,lightSystem(nullptr)
 		,scene(nullptr)
-		,visibilityMask(0xffffffff) 	{
+		,visibilityMask(VISIBILITY_ALL) 	{
 	if (camera)
 		visibilityMask = camera->GetVisibilityMask();
 }

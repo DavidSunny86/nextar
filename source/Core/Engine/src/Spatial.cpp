@@ -35,11 +35,19 @@ void Spatial::SetMoveable(Moveable* moveable) {
 		*worldMatrix = Matrix4x4::IdentityMatrix;
 	}
 
+	matrixState = 0;
 	this->moveable = moveable;
 }
 
 void Spatial::Update() {
-	bounds.UpdateBounds(*worldMatrix);
+	uint32 oldMatrixState =  matrixState;
+	if (!moveable || matrixState != (oldMatrixState=moveable->GetMatrixState()) ) {
+		matrixState = oldMatrixState;
+		bounds.UpdateBounds(*worldMatrix);
+	}
+
 	SetBoundsDirty(false);
+	SetUpdateRequired(false);
 }
+
 }

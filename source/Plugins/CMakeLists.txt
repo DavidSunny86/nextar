@@ -15,5 +15,6 @@ add_module(RenderOpenGL)
 add_module(ShaderCompiler)
 add_module(ImageLoader)
 add_module(MeshLoader)
+add_module(MaterialLoader)
 
 file(APPEND ${NEX_PLUGIN_CONFIG_FILE} "</plugins>\n")

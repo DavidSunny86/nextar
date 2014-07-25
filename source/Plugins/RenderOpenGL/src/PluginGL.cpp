@@ -7,13 +7,9 @@
 
 #include <PluginGL.h>
 
-NEX_IMPLEMENT_PLUGIN(RenderOpenGL){
-return &(RenderOpenGL::PluginGL::pluginObject);
-}
+NEX_IMPLEMENT_PLUGIN(RenderOpenGL, RenderOpenGL::PluginGL);
 
 namespace RenderOpenGL {
-
-PluginGL PluginGL::pluginObject;
 
 void DebugGL::CheckGL(const char* function, long line) {
 	GLenum error;

@@ -60,6 +60,8 @@ public:
 	 */
 	inline void SetRotation(QuatF q) {
 		transform->SetRotation(q);
+		transform->SetMatrixDirty(true);
+		SetUpdateRequired(true);
 	}
 
 	/** @remarks Sets the position of object in world space
@@ -67,6 +69,8 @@ public:
 	 */
 	inline void SetTranslation(Vec3AF v) {
 		transform->SetTranslation(v);
+		transform->SetMatrixDirty(true);
+		SetUpdateRequired(true);
 	}
 
 	/** @remarks Sets the scaling for object
@@ -74,6 +78,8 @@ public:
 	 */
 	inline void SetScaling(float s) {
 		transform->SetScaling(s);
+		transform->SetMatrixDirty(true);
+		SetUpdateRequired(true);
 	}
 
 	/** @remarks Returns the derived matrix  */
@@ -84,6 +90,22 @@ public:
 		return transform->GetMatrix();
 	}
 
+	inline void SetTransformDirty() {
+		transform->SetMatrixDirty(true);
+	}
+
+	inline uint32 GetMatrixState() const {
+		return transform->GetMatrixState();
+	}
+
+	inline void SetTransform(Vec3AF t, QuatF q, float scale) {
+		transform->SetTranslation(t);
+		transform->SetRotation(q);
+		transform->SetScaling(scale);
+		SetUpdateRequired(true);
+	}
+
+	virtual void Update();
 	/** @brief Initialize position, rotation and scaling values to identity */
 	void SetIdentityTransforms();
 	/* child notifications, received by regions or parent regions */

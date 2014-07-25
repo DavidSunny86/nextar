@@ -11,5 +11,6 @@
 #============================================================
 add_module(Base)
 add_module(Engine)
+add_module(ProjectModel)
 add_module(RenderEngine)
 

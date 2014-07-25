@@ -15,7 +15,7 @@ namespace nextar {
 /* Shader											 */
 /*****************************************************/
 ShaderAsset::ShaderAsset(const StringID name) :
-		nextar::Asset(name), translucency(0) {
+		nextar::Asset(name), translucency(0), renderQueue((uint8)-1), visibilityMask(0) {
 }
 
 ShaderAsset::~ShaderAsset() {
@@ -43,12 +43,42 @@ void ShaderAsset::NotifyAssetLoaded() {
 		spl[passIndex].compileParams.passIndex = passIndex;
 		passes.emplace_back(spl[passIndex].name);
 		_CompilePass(passes.back(), spl[passIndex],
-				creationParams->compilationOpt);
+				creationParams->compilationOptions);
 	}
 	/* update */
 	_BuildParameterTable(spl);
 	/* mark request as complete */
 	creationParams->flags |= StreamRequest::COMPLETED;
+	if (renderQueue == (uint8)-1) {
+		auto& renderQueueInfo = RenderManager::Instance().GetRenderQueueInfo();
+		for(auto r = renderQueueInfo.begin(); r != renderQueueInfo.end(); ++r) {
+			if (
+				( (flags & (ShaderAsset::DEFERRED)) && ((*r).flags & RenderQueueFlags::DEFERRED) ) ||
+				( (flags & ShaderAsset::TRANSLUCENT) && ((*r).flags & RenderQueueFlags::TRANSLUCENCY) )  ||
+				( (flags & ShaderAsset::OVERLAY) && ((*r).flags & RenderQueueFlags::OVERLAY) ) ||
+				( (flags & ShaderAsset::BACKGROUND) && ((*r).flags & RenderQueueFlags::BACKGROUND) )
+				) {
+				renderQueue = (uint8)std::distance(renderQueueInfo.begin(), r);
+				break;
+			} else if ((*r).flags & RenderQueueFlags::FORWARD) {
+				renderQueue = (uint8)std::distance(renderQueueInfo.begin(), r);
+			}
+		}
+		if (renderQueue == (uint8)-1) {
+			renderQueue = 0; // default it out, may be very incorrect
+			Error("Could not determine render queue!");
+		}
+	}
+
+	if (flags & ShaderAsset::BACKGROUND)
+		visibilityMask = VisibilityMask::VISIBILITY_BACKGROUND;
+	else if(flags & ShaderAsset::TRANSLUCENT)
+		visibilityMask = VisibilityMask::VISIBILITY_TRANSLUCENT;
+	else if (flags & ShaderAsset::OVERLAY)
+		visibilityMask = VisibilityMask::VISIBILITY_OVERLAY;
+	else
+		visibilityMask = VisibilityMask::VISIBILITY_OPAQUE;
+
 	/* notify dependents */
 	Asset::NotifyAssetLoaded();
 	SetReady(true);
@@ -69,7 +99,7 @@ void ShaderAsset::NotifyAssetUnloaded() {
 	Asset::NotifyAssetUnloaded();
 }
 
-void ShaderAsset::UnloadImpl(nextar::StreamRequest*, bool) {
+void ShaderAsset::UnloadImpl() {
 	_DestroyPasses();
 }
 
@@ -128,7 +158,7 @@ void ShaderAsset::_BuildParameterTable(StreamPassList& spl) {
 /*****************************************************/
 /* Shader::StreamPass                                */
 /*****************************************************/
-ShaderAsset::StreamPass::StreamPass(const ShaderAsset::StreamPass& p) {
+ShaderAsset::StreamPass::StreamPass(const ShaderAsset::StreamPass& p) : name(StringUtils::NullID) {
 	NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
 }
 
@@ -142,22 +172,13 @@ ShaderAsset::StreamRequest::StreamRequest(ShaderAsset* shader) :
 ShaderAsset::StreamRequest::~StreamRequest() {
 }
 
-void ShaderAsset::StreamRequest::SetOptions(const String& options) {
-	compilationOpt = options;
-}
-
 void ShaderAsset::StreamRequest::SetProgramSource(Pass::ProgramStage stage,
 		String&& src) {
 	(*currentPass).compileParams.programSources[stage] = std::move(src);
 }
 
-void ShaderAsset::StreamRequest::AddParam(const String& name,
-		const String& param, const String& description,
-		const String& defaultValue, ParamDataType type) {
-}
-
-void ShaderAsset::StreamRequest::AddMacro(const String& name,
-		const String& param, const String& description, bool defaultValue) {
+void ShaderAsset::StreamRequest::SetCompilationOptions(const String& options) {
+	compilationOptions = options;
 }
 
 void ShaderAsset::StreamRequest::AddTextureUnit(const String& unitName,

@@ -24,7 +24,7 @@ public:
 
 	RenderTexturePtr depth;
 	RenderTexturePtr albedoSpecular;
-	RenderTexturePtr normalGloss;
+	RenderTexturePtr normalMap;
 	MultiRenderTargetPtr renderTarget;
 };
 
@@ -37,6 +37,7 @@ public:
 
 protected:
 
+	void RenderLight(Light* light, uint32 passIdx, uint32 updateId, CommitContext& context);
 	void PrepareGeometryBuffer();
 
 	RenderInfo gbufferRI;

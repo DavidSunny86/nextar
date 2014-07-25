@@ -1,6 +1,8 @@
 #ifndef NEXTAR_COLOR_H
 #define NEXTAR_COLOR_H
 
+#include <Serializer.h>
+
 namespace nextar {
 
 /**
@@ -31,6 +33,16 @@ public:
 
 	const float* AsFloatArray() const {
 		return &red;
+	}
+
+	friend inline OutputSerializer& operator << (OutputSerializer& ser, const Color& c) {
+		ser << c.red << c.green << c.blue << c.alpha;
+		return ser;
+	}
+
+	friend inline InputSerializer& operator << (InputSerializer& ser, Color& c) {
+		ser >> c.red >> c.green >> c.blue >> c.alpha;
+		return ser;
 	}
 };
 
@@ -73,6 +85,17 @@ public:
 	inline
 	uint32 ToAbgr() const {
 		return (alpha << 24) | (blue << 16) | (green << 8) | red;
+	}
+
+	// todo Not very efficient
+	friend inline OutputSerializer& operator << (OutputSerializer& ser, const Color32& c) {
+		ser << c.red << c.green << c.blue << c.alpha;
+		return ser;
+	}
+
+	friend inline InputSerializer& operator << (InputSerializer& ser, Color32& c) {
+		ser >> c.red >> c.green >> c.blue >> c.alpha;
+		return ser;
 	}
 };
 }

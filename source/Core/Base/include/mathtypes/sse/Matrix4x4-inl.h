@@ -245,6 +245,16 @@ inline Matrix4x4 Mat4x4FromScaleRotPos(float scale, QuatF rot, Vec3AF pos) {
 	return ret;
 }
 
+
+inline Matrix4x4 Mat4x4Scale(float scale, Mat4x4F m) {
+	Matrix4x4 ret;
+	Quad scaleQ = QuadReplicate(scale);
+	ret.r[0] = _mm_mul_ps(scaleQ, m.r[0]);
+	ret.r[1] = _mm_mul_ps(scaleQ, m.r[1]);
+	ret.r[2] = _mm_mul_ps(scaleQ, m.r[2]);
+	return ret;
+}
+
 inline Matrix4x4 Mat4x4Transpose(Mat4x4F m) {
 	// x.x,x.y,y.x,y.y
 	Quad temp1 = _mm_shuffle_ps(m.r[0], m.r[1], _MM_SHUFFLE(1, 0, 1, 0));

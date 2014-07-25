@@ -25,7 +25,6 @@ public:
 
 protected:
 
-	String languageContext;
 };
 
 } /* namespace nextar */

@@ -7,6 +7,8 @@
 
 namespace nextar {
 
+class OutputSerializer;
+class InputSerializer;
 /* macro = relative_path
  * {archive}/${macro}/to.file
  * ArchiveEntry = #type:path;
@@ -37,6 +39,9 @@ public:
 
 	/* operator == */
 	bool operator ==(const URL& other) const;
+	bool operator !=(const URL& other) const {
+		return !(other == *this);
+	}
 
 	String ToString() const;
 
@@ -46,6 +51,11 @@ public:
 
 	/* extension */
 	String GetExtension() const;
+	String GetComputedName() const;
+
+	friend OutputSerializer& operator << (OutputSerializer& ser, const URL& url);
+	friend InputSerializer& operator >> (InputSerializer& ser, URL& url);
+
 protected:
 
 	/* this is only called by file system */

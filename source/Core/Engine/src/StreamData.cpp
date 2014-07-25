@@ -8,11 +8,16 @@ namespace nextar {
  * 
  */
 StreamData::StreamData() :
-		usesOnlyStaticVb(false), useIndices(false), isGsdataValid(false), type(
-				PT_TRI_LIST), instanceCount(0), gsDataIndex(-1) {
+		flags(0),
+		type(PT_TRI_LIST),
+		instanceCount(0) {
 }
 
 StreamData::~StreamData() {
+	if (flags & DELETE_BINDING)
+		NEX_DELETE(vertices.binding);
+	if (flags & DELETE_LAYOUT)
+		NEX_DELETE(vertices.layout);
 }
 
 VertexBufferBinding::VertexBufferBinding() :

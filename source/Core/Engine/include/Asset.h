@@ -54,11 +54,12 @@ public:
 	typedef SharedComponent InstanceImplementor;
 
 	enum Flags {
-		BACKGROUND_LOADED = Component::LAST_FLAG << 0,
+		BACKGROUND_STREAMED = Component::LAST_FLAG << 0,
 		ASSET_LOADING = Component::LAST_FLAG << 1,
 		ASSET_LOADED = Component::LAST_FLAG << 2,
 		ASSET_READY = Component::LAST_FLAG << 3,
-		LAST_FLAG = Component::LAST_FLAG << 4,
+		ASSET_SAVING = Component::LAST_FLAG << 4,
+		LAST_FLAG = Component::LAST_FLAG << 5,
 	};
 
 	struct AssetLocatorAccessor: public PropertyAccessor {
@@ -81,40 +82,49 @@ public:
 		inline static AssetTypePtr Instance(const StringID name,
 				const StringID factory = StringUtils::DefaultID,
 				const StringID group = StringUtils::DefaultID) {
-			Factory* factoryPtr =
-					ComponentFactoryArchive::Instance().AsyncFindFactory(
-							CLASS_ID, factory);
 			Group* groupPtr = nullptr;
 			if (group != StringUtils::NullID)
-				groupPtr = ComponentGroupArchive::Instance().AsyncFindGroup(
+				groupPtr = ComponentGroupArchive::Instance().AsyncFindOrCreate(
 						group);
-			return InstanceImplementor::Instance(CLASS_ID, name, factoryPtr,
-					groupPtr);
+			SharedComponentPtr ret;
+			InstanceImplementor::Instance(ret, CLASS_ID, name, factory,
+								groupPtr);
+			return ret;
 		}
 
 		inline static AssetTypePtr Instance(const StringID name,
 				Component::Factory* factory,
 				SharedComponent::Group* group) {
-			return InstanceImplementor::Instance(CLASS_ID, name, factory, group);
+			SharedComponentPtr ret;
+			InstanceImplementor::Instance(ret, CLASS_ID, name, factory, group);
+			return ret;
 		}
 
 		inline static AssetTypePtr Instance(const StringID name,
 				const URL& locator, Component::Factory* factory,
 				SharedComponent::Group* group) {
-			AssetTypePtr asset = InstanceImplementor::Instance(CLASS_ID, name,
-					factory, group);
-			if (asset)
-				asset->SetAssetLocator(locator);
+			SharedComponentPtr asset;
+			if(InstanceImplementor::Instance(asset, CLASS_ID, name,
+					factory, group) == SharedComponent::INSTANCE_CREATED) {
+				NEX_ASSERT(asset);
+				static_cast<Asset*>(asset.GetPtr())->SetAssetLocator(locator);
+			}
 			return asset;
 		}
 
 		inline static AssetTypePtr Instance(const StringID name,
 				const URL& locator, const StringID factory = StringUtils::DefaultID,
 				const StringID group = StringUtils::DefaultID) {
-			AssetTypePtr asset = Instance(name,
-					factory, group);
-			if (asset)
-				asset->SetAssetLocator(locator);
+			SharedComponentPtr asset;
+			Group* groupPtr = nullptr;
+			if (group != StringUtils::NullID)
+				groupPtr = ComponentGroupArchive::Instance().AsyncFindOrCreate(
+						group);
+			if(InstanceImplementor::Instance(asset, CLASS_ID, name,
+					factory, groupPtr) == SharedComponent::INSTANCE_CREATED) {
+				NEX_ASSERT(asset);
+				static_cast<Asset*>(asset.GetPtr())->SetAssetLocator(locator);
+			}
 			return asset;
 		}
 	};
@@ -151,8 +161,6 @@ public:
 			return nullptr;
 		}
 
-	private:
-		friend class ComponentFactoryArchive;
 		static void _InternalRegisterToArchive() {
 			ComponentFactoryArchive::Instance()._InternalDefaultFactory(NEX_NEW(Type(StringUtils::DefaultID)), AssetTraits::CLASS_ID);
 		}
@@ -209,6 +217,16 @@ public:
 	static void Populate(PropertyDictionary* dict);
 
 	// This should not be called from any thread other than main thread
+	inline void SetSaving(bool b) {
+		SetFlag(ASSET_SAVING, b);
+	}
+
+	// This should not be called from any thread other than main thread
+	inline bool IsSaving() const {
+		return (flags & ASSET_SAVING) != 0;
+	}
+
+	// This should not be called from any thread other than main thread
 	inline void SetLoading(bool b) {
 		SetFlag(ASSET_LOADING, b);
 	}
@@ -238,8 +256,8 @@ public:
 		return (flags & ASSET_LOADED) != 0;
 	}
 
-	inline bool IsBackgroundLoaded() const {
-		return (BACKGROUND_LOADED & flags) != 0;
+	inline bool IsBackgroundStreamed() const {
+		return (BACKGROUND_STREAMED & flags) != 0;
 	}
 
 	inline size_t GetMemoryCost() const {
@@ -272,35 +290,39 @@ public:
 		Load(nullptr, useAsyncLoad);
 	}
 
-	inline void Unload(bool useAsyncUnload) {
-		Unload(nullptr, useAsyncUnload);
+	inline void Save(bool useAsyncLoad) {
+		Save(nullptr, useAsyncLoad);
 	}
 
 	virtual void Load(StreamRequest* request, bool useAsyncLoad);
-	virtual void Unload(StreamRequest* request, bool useAsyncUnload);
+	virtual void Save(StreamRequest* request, bool useAsyncLoad);
+	virtual void Unload();
 	/* Called from main thread when the asset is loaded */
 	virtual void NotifyAssetLoaded();
 	/* Called from main thread when the asset has been unloaded */
 	virtual void NotifyAssetUnloaded();
 	/* Called from main thread when the asset has been updated */
 	virtual void NotifyAssetUpdated();
+	/* Called from main thread when the asset has been saved */
+	virtual void NotifyAssetSaved();
 	/**
 	 * When load is called, stream request is either created
 	 * or retrieved from the asset implementation.
 	 * */
-	inline StreamRequest* GetStreamRequest(bool load = true) {
+	inline StreamRequest* GetStreamRequest(bool loadOrSave = true) {
 		return (streamRequest) ? streamRequest : (streamRequest =
-											CreateStreamRequestImpl(load));
+											CreateStreamRequestImpl(loadOrSave));
 	}
 
 protected:
 	/** Streamable */
 	virtual void AsyncLoad(StreamRequest* req);
-	virtual void AsyncUnload(StreamRequest* req);
+	virtual void AsyncSave(StreamRequest* req);
 
 	/** @param isStreamed is true when the call is made from @Asset::AsyncLoad rather than @Asset::Load */
 	virtual void LoadImpl(StreamRequest* req, bool isAsync);
-	virtual void UnloadImpl(StreamRequest* req, bool isAsync) = 0;
+	virtual void UnloadImpl() = 0;
+	virtual void SaveImpl(StreamRequest* req, bool isAsync);
 
 	virtual StreamRequest* CreateStreamRequestImpl(bool load);
 	virtual void DestroyStreamRequestImpl(StreamRequest*&, bool load = true);
@@ -330,7 +352,41 @@ public:
 
 	inline AssetStreamRequest(Asset* asset,
 			uint16 exFlags = AUTO_DELETE_REQUEST) :
-			StreamRequest(asset, exFlags | ASSET_STREAM_REQUEST) {
+			StreamRequest(asset, exFlags | ASSET_STREAM_REQUEST)
+			 {
+		manualLoader = nullptr;
+	}
+
+	inline AssetStreamRequest(Asset* asset,
+			AssetLoaderImpl* _manualLoader,
+			uint16 exFlags = AUTO_DELETE_REQUEST) :
+			StreamRequest(asset, exFlags | ASSET_STREAM_REQUEST)
+			 {
+		manualLoader = _manualLoader;
+	}
+
+	inline AssetStreamRequest(Asset* asset,
+			AssetSaverImpl* _manualSaver,
+			uint16 exFlags = AUTO_DELETE_REQUEST) :
+			StreamRequest(asset, exFlags | ASSET_STREAM_REQUEST)
+			 {
+		manualSaver = _manualSaver;
+	}
+
+	inline void SetManualLoader(AssetLoaderImpl* manualLoader) {
+		this->manualLoader = manualLoader;
+	}
+
+	inline void SetManualSaver(AssetSaverImpl* manualSaver) {
+		this->manualSaver = manualSaver;
+	}
+
+	inline AssetLoaderImpl* GetManualLoader() const {
+		return manualLoader;
+	}
+
+	inline AssetSaverImpl* GetManualSaver() const {
+		return manualSaver;
 	}
 
 	inline Asset::MetaInfo& GetMetaInfo() {
@@ -338,6 +394,10 @@ public:
 	}
 
 protected:
+	union {
+		AssetLoaderImpl* manualLoader;
+		AssetLoaderImpl* manualSaver;
+	};
 	Asset::MetaInfo metaInfo;
 };
 
@@ -356,8 +416,8 @@ protected:
 
 class _NexEngineAPI AssetLoader: public AllocGeneral {
 
-	NEX_LOG_HELPER(AssetLoader)
-	;NEX_DECLARE_COMPONENT_FACTORY(AssetLoaderImpl);
+	NEX_LOG_HELPER(AssetLoader);
+	NEX_DECLARE_COMPONENT_FACTORY(AssetLoaderImpl);
 
 public:
 	AssetLoader(AssetStreamRequest* req);
@@ -372,6 +432,39 @@ public:
 protected:
 	AssetStreamRequest* request;
 };
+
+class AssetSaver;
+class AssetSaverImpl {
+public:
+
+	virtual void Configure(const Config&) {
+	}
+	virtual void Save(OutputStreamPtr&, AssetSaver&) = 0;
+
+protected:
+	~AssetSaverImpl() {
+	}
+};
+
+class _NexEngineAPI AssetSaver: public AllocGeneral {
+
+	NEX_LOG_HELPER(AssetLoader);
+	NEX_DECLARE_COMPONENT_FACTORY(AssetSaverImpl);
+
+public:
+	AssetSaver(AssetStreamRequest* req);
+	~AssetSaver();
+
+	inline AssetStreamRequest* GetRequestPtr() {
+		return request;
+	}
+
+	void Serialize();
+
+protected:
+	AssetStreamRequest* request;
+};
+
 
 }
 

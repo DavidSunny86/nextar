@@ -42,25 +42,29 @@ ComparisonFunc Helper::GetComparisonFunc(const String& val) {
 	return NFX_COMP_UNKNOWN;
 }
 
-StencilOpType Helper::GetStencilOp(const String& val) {
-	static EnumNamePair names[] = { { STENCILOP_DECR, _SS(ARG_DECREMENT) }, {
-			STENCILOP_DECR_SAT, _SS(ARG_DECREMENT_SATURATE) }, { STENCILOP_INCR,
-			_SS(ARG_INCREMENT) }, { STENCILOP_INCR_SAT, _SS(
-			ARG_INCREMENT_SATURATE) }, { STENCILOP_INVERT, _SS(ARG_INVERT) }, {
-			STENCILOP_KEEP, _SS(ARG_KEEP) }, { STENCILOP_REPLACE, _SS(
-			ARG_REPLACE) }, { STENCILOP_ZERO, _SS(ARG_ZERO) }, };
+StencilOp Helper::GetStencilOp(const String& val) {
+	static EnumNamePair names[] = {
+			{ STENCILOP_DECR, _SS(ARG_DECREMENT) },
+			{ STENCILOP_DECR_SAT, _SS(ARG_DECREMENT_SATURATE) },
+			{ STENCILOP_INCR, _SS(ARG_INCREMENT) },
+			{ STENCILOP_INCR_SAT, _SS(ARG_INCREMENT_SATURATE) },
+			{ STENCILOP_INVERT, _SS(ARG_INVERT) },
+			{ STENCILOP_KEEP, _SS(ARG_KEEP) },
+			{ STENCILOP_REPLACE, _SS(ARG_REPLACE) },
+			{ STENCILOP_ZERO, _SS(ARG_ZERO) },
+	};
 
 	const size_t array_size = sizeof(names) / sizeof(names[0]);
 
 	EnumNamePair* ptr = std::lower_bound(names, names + array_size, val,
 			EnumNameCompare());
 	if (ptr != names + array_size)
-		return static_cast<StencilOpType>(ptr->val);
+		return static_cast<StencilOp>(ptr->val);
 
 	return DSCOMP_DEFAULT;
 }
 
-DepthStencilCompareType Helper::GetDepthStencilFunc(const String& val) {
+DepthStencilCompare Helper::GetDepthStencilFunc(const String& val) {
 	switch (GetComparisonFunc(val)) {
 	case NFX_COMP_ALWAYS:
 		return DSCOMP_ALWAYS;
@@ -104,40 +108,48 @@ ColorMask Helper::GetColorMask(const String& val) {
 	return mask;
 }
 
-BlendDataSourceType Helper::GetBlendSource(const String& val) {
-	static EnumNamePair names[] = { { BDS_DST_ALPHA, _SS(ARG_DEST_ALPHA) }, {
-			BDS_DST_COLOR, _SS(ARG_DEST_COLOR) }, { BDS_INV_DST_ALPHA, _SS(
-			ARG_INV_DEST_ALPHA) },
-			{ BDS_INV_DST_COLOR, _SS(ARG_INV_DEST_COLOR) }, { BDS_INV_ALPHA,
-					_SS(ARG_INV_SRC_ALPHA) }, { BDS_INV_SRC_COLOR, _SS(
-					ARG_INV_SRC_COLOR) }, { BDS_ONE, _SS(ARG_ONE) }, {
-					BDS_ALPHA, _SS(ARG_SRC_ALPHA) }, { BDS_SRC_COLOR, _SS(
-					ARG_SRC_COLOR) }, { BDS_ZERO, _SS(ARG_ZERO) }, };
+BlendDataSource Helper::GetBlendSource(const String& val) {
+	static EnumNamePair names[] = {
+			{ BDS_DST_ALPHA, _SS(ARG_DEST_ALPHA) },
+			{ BDS_DST_COLOR, _SS(ARG_DEST_COLOR) },
+			{ BDS_INV_DST_ALPHA, _SS(ARG_INV_DEST_ALPHA) },
+			{ BDS_INV_DST_COLOR, _SS(ARG_INV_DEST_COLOR) },
+			{ BDS_INV_ALPHA, _SS(ARG_INV_SRC_ALPHA) },
+			{ BDS_INV_SRC_COLOR, _SS(ARG_INV_SRC_COLOR) },
+			{ BDS_ONE, _SS(ARG_ONE) },
+			{ BDS_ALPHA, _SS(ARG_SRC_ALPHA) },
+			{ BDS_SRC_COLOR, _SS(ARG_SRC_COLOR) },
+			{ BDS_ZERO, _SS(ARG_ZERO) },
+	};
 
 	const size_t array_size = sizeof(names) / sizeof(names[0]);
 
 	EnumNamePair* ptr = std::lower_bound(names, names + array_size, val,
 			EnumNameCompare());
 	if (ptr != names + array_size)
-		return static_cast<BlendDataSourceType>(ptr->val);
+		return static_cast<BlendDataSource>(ptr->val);
 	return BDS_DEFAULT;
 }
 
-BlendOpType Helper::GetColorOperation(const String& val) {
-	static EnumNamePair names[] = { { BOP_ADD, _SS(ARG_ADD) }, { BOP_INV_SUB,
-			_SS(ARG_INV_SUB) }, { BOP_MAX, _SS(ARG_MAX) }, { BOP_MIN, _SS(
-			ARG_MIN) }, { BOP_SUB, _SS(ARG_SUB) }, };
+BlendOp Helper::GetColorOperation(const String& val) {
+	static EnumNamePair names[] = {
+			{ BOP_ADD, _SS(ARG_ADD) },
+			{ BOP_INV_SUB, _SS(ARG_INV_SUB) },
+			{ BOP_MAX, _SS(ARG_MAX) },
+			{ BOP_MIN, _SS(ARG_MIN) },
+			{ BOP_SUB, _SS(ARG_SUB) },
+	};
 
 	const size_t array_size = sizeof(names) / sizeof(names[0]);
 
 	EnumNamePair* ptr = std::lower_bound(names, names + array_size, val,
 			EnumNameCompare());
 	if (ptr != names + array_size)
-		return static_cast<BlendOpType>(ptr->val);
+		return static_cast<BlendOp>(ptr->val);
 	return BDS_DEFAULT;
 }
 
-FillModeType Helper::GetFillMode(const String& val) {
+FillMode Helper::GetFillMode(const String& val) {
 	if (val == _SS(ARG_SOLID))
 		return FM_SOLID;
 	if (val == _SS(ARG_WIRE))
@@ -147,7 +159,7 @@ FillModeType Helper::GetFillMode(const String& val) {
 	return FM_DEFAULT;
 }
 
-FillModeType Helper::GetCullMode(const String& val) {
+FillMode Helper::GetCullMode(const String& val) {
 	if (val == _SS(ARG_FRONT))
 		return CULL_FRONT;
 	if (val == _SS(ARG_BACK))
@@ -159,7 +171,7 @@ FillModeType Helper::GetCullMode(const String& val) {
 	return CULL_DEFAULT;
 }
 
-TextureComparisonModeType Helper::GetTextureCompareFunc(const String& val) {
+TextureComparisonMode Helper::GetTextureCompareFunc(const String& val) {
 	switch (GetComparisonFunc(val)) {
 	case NFX_COMP_ALWAYS:
 		return TEXCOMP_ALWAYS;
@@ -182,12 +194,14 @@ TextureComparisonModeType Helper::GetTextureCompareFunc(const String& val) {
 }
 
 FilterType Helper::GetFilterType(const String& val) {
-	static EnumNamePair names[] = { { NFX_LINEAR, _SS(ARG_LINEAR) }, {
-			NFX_LINEAR_MIPMAP_LINEAR, _SS(ARG_LINEAR_MIP_LINEAR) }, {
-			NFX_LINEAR_MIPMAP_NEAREST, _SS(ARG_LINEAR_MIP_NEAREST) }, {
-			NFX_NEAREST, _SS(ARG_NEAREST) }, { NFX_NEAREST_MIPMAP_LINEAR, _SS(
-			ARG_NEAREST_MIP_LINEAR) }, { NFX_NEAREST_MIPMAP_NEAREST, _SS(
-			ARG_NEAREST_MIP_NEAREST) }, };
+	static EnumNamePair names[] = {
+			{ NFX_LINEAR, _SS(ARG_LINEAR) },
+			{ NFX_LINEAR_MIPMAP_LINEAR, _SS(ARG_LINEAR_MIP_LINEAR) },
+			{ NFX_LINEAR_MIPMAP_NEAREST, _SS(ARG_LINEAR_MIP_NEAREST) },
+			{ NFX_NEAREST, _SS(ARG_NEAREST) },
+			{ NFX_NEAREST_MIPMAP_LINEAR, _SS(ARG_NEAREST_MIP_LINEAR) },
+			{ NFX_NEAREST_MIPMAP_NEAREST, _SS(ARG_NEAREST_MIP_NEAREST) },
+	};
 
 	const size_t array_size = sizeof(names) / sizeof(names[0]);
 
@@ -199,7 +213,7 @@ FilterType Helper::GetFilterType(const String& val) {
 	return NFX_LINEAR;
 }
 
-TextureMinFilterType Helper::GetMinFilter(const String& val) {
+TextureMinFilter Helper::GetMinFilter(const String& val) {
 	switch (GetFilterType(val)) {
 	case NFX_LINEAR:
 		return TF_MIN_LINEAR;
@@ -217,7 +231,7 @@ TextureMinFilterType Helper::GetMinFilter(const String& val) {
 	return TF_MIN_LINEAR;
 }
 
-TextureMagFilterType Helper::GetMagFilter(const String& val) {
+TextureMagFilter Helper::GetMagFilter(const String& val) {
 	switch (GetFilterType(val)) {
 	case NFX_LINEAR:
 		return TF_MAG_LINEAR;
@@ -227,19 +241,41 @@ TextureMagFilterType Helper::GetMagFilter(const String& val) {
 	return TF_MAG_LINEAR;
 }
 
-TextureAddressModeType Helper::GetTextureAddressMode(const String& val) {
-	static EnumNamePair names[] = { { TAM_BORDER, _SS(ARG_BORDER) }, {
-			TAM_CLAMP, _SS(ARG_CLAMP) }, { TAM_MIRROR, _SS(ARG_MIRROR) }, {
-			TAM_WRAP, _SS(ARG_WARP) }, };
+TextureAddressMode Helper::GetTextureAddressMode(const String& val) {
+	static EnumNamePair names[] = {
+			{ TAM_BORDER, _SS(ARG_BORDER) },
+			{ TAM_CLAMP, _SS(ARG_CLAMP) },
+			{ TAM_MIRROR, _SS(ARG_MIRROR) },
+			{ TAM_WRAP, _SS(ARG_WARP) },
+	};
 
 	const size_t array_size = sizeof(names) / sizeof(names[0]);
 
 	EnumNamePair* ptr = std::lower_bound(names, names + array_size, val,
 			EnumNameCompare());
 	if (ptr != names + array_size)
-		return static_cast<TextureAddressModeType>(ptr->val);
-
+		return static_cast<TextureAddressMode>(ptr->val);
 	return TAM_WRAP;
 }
+
+uint32 Helper::GetShaderFlag(const String& val) {
+	static EnumNamePair names[] = {
+			{ ShaderAsset::BACKGROUND, _SS(ARG_BACKGROUND) },
+			{ ShaderAsset::BASIC_DEFERRED, _SS(ARG_BASIC_DEFERRED) },
+			{ ShaderAsset::DEFERRED_LIGHTING, _SS(ARG_DEFERRED_LIGHTING) },
+			{ ShaderAsset::OVERLAY, _SS(ARG_OVERLAY) },
+			{ ShaderAsset::POST_FX, _SS(ARG_POST_FX) },
+			{ ShaderAsset::TRANSLUCENT, _SS(ARG_TRANSLUCENT) },
+	};
+
+	const size_t array_size = sizeof(names) / sizeof(names[0]);
+
+	EnumNamePair* ptr = std::lower_bound(names, names + array_size, val,
+			EnumNameCompare());
+	if (ptr != names + array_size)
+		return static_cast<TextureAddressMode>(ptr->val);
+	return 0;
+}
+
 }
 
