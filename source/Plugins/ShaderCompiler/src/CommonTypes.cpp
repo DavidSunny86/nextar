@@ -7,7 +7,6 @@
 
 #include <BaseHeaders.h>
 #include <CommonTypes.h>
-#define NEX_SHADER_STRINGS_DEFINE
 #include <ScriptStrings.h>
 
 namespace ShaderCompiler {
@@ -25,12 +24,16 @@ CommandDelegate* Helper::FindCommand(CommandNamePair cmdMap[], size_t arraySize,
 }
 
 ComparisonFunc Helper::GetComparisonFunc(const String& val) {
-	static EnumNamePair names[] = { { NFX_COMP_ALWAYS, _SS(ARG_ALWAYS) }, {
-			NFX_COMP_EQUAL, _SS(ARG_EQUAL) }, { NFX_COMP_GREATER, _SS(
-			ARG_GREATER) }, { NFX_COMP_GREATER_EQUAL, _SS(ARG_GREATER_EQUAL) },
-			{ NFX_COMP_LESS, _SS(ARG_LESS) }, { NFX_COMP_LESS_EQUAL, _SS(
-					ARG_LESS_EQUAL) }, { NFX_COMP_NEVER, _SS(ARG_NEVER) }, {
-					NFX_COMP_NOT_EQUAL, _SS(ARG_NOT_EQUAL) }, };
+	static EnumNamePair names[] = {
+			{ NFX_COMP_ALWAYS, _SS(ARG_ALWAYS) },
+			{ NFX_COMP_EQUAL, _SS(ARG_EQUAL) },
+			{ NFX_COMP_GREATER, _SS(ARG_GREATER) },
+			{ NFX_COMP_GREATER_EQUAL, _SS(ARG_GREATER_EQUAL) },
+			{ NFX_COMP_LESS, _SS(ARG_LESS) },
+			{ NFX_COMP_LESS_EQUAL, _SS(ARG_LESS_EQUAL) },
+			{ NFX_COMP_NEVER, _SS(ARG_NEVER) },
+			{ NFX_COMP_NOT_EQUAL, _SS(ARG_NOT_EQUAL) },
+	};
 
 	const size_t arraySize = sizeof(names) / sizeof(names[0]);
 

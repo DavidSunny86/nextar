@@ -193,7 +193,7 @@ protected:
 	virtual const char* ParseData(const char*);
 };
 
-template<const MemoryCatagory catag>
+template<const MemoryCategory catag>
 static uint8* TryLoad(InputStreamPtr& p) {
 	size_t s = static_cast<size_t>(p->GetSize() - p->Tell());
 	uint8* buffp = static_cast<uint8*>(NEX_ALLOC(s + 1, catag));

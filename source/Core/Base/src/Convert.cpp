@@ -105,11 +105,37 @@ _NexBaseAPI String ToString(const nextar::Vector2& v) {
 	return ret.str();
 }
 
+_NexBaseAPI String ToString(const nextar::IVector2& v) {
+	OutStringStream ret;
+	ret << v[0] << ' ' << v[1];
+	return ret.str();
+}
+
+_NexBaseAPI String ToString(const nextar::IVector3& v) {
+	OutStringStream ret;
+	ret << v[0] << ' ' << v[1] << ' ' << v[2];
+	return ret.str();
+}
+
+_NexBaseAPI String ToString(const nextar::IVector4& v) {
+	OutStringStream ret;
+	ret << v[0] << ' ' << v[1] << ' ' << v[2] << ' ' << v[3];
+	return ret.str();
+}
+
 _NexBaseAPI String ToString(nextar::Mat4x4F mat) {
 	OutStringStream ret;
 	ret << ' ';
 	for (int32 i = 0; i < 4; ++i)
 		ret << ToString(Mat4x4Row(mat, i)) << ' ';
+	return ret.str();
+}
+
+_NexBaseAPI String ToString(nextar::Mat3x4F mat) {
+	OutStringStream ret;
+	ret << ' ';
+	for (int32 i = 0; i < 3; ++i)
+		ret << ToString(Mat3x4Row(mat, i)) << ' ';
 	return ret.str();
 }
 
@@ -126,12 +152,12 @@ _NexBaseAPI String ToString(const nextar::Color32& mat) {
 	return ret.str();
 }
 
-_NexBaseAPI nextar::Vector4A ToVec4A(const String& inp) {
+_NexBaseAPI nextar::Vector4 ToVector4(const String& inp) {
 	InStringStream ret(inp);
 
 	float x, y, z, w;
 	ret >> x >> y >> z >> w;
-	return Vec4ASet(x, y, z, w);
+	return Vector4(x, y, z, w);
 }
 
 _NexBaseAPI nextar::Vector3 ToVector3(const String& inp) {
@@ -148,6 +174,27 @@ _NexBaseAPI nextar::Vector2 ToVector2(const String& inp) {
 	return v;
 }
 
+_NexBaseAPI nextar::IVector2 ToIVector2(const String& inp) {
+	InStringStream ret(inp);
+	IVector2 v;
+	ret >> v[0] >> v[1];
+	return v;
+}
+
+_NexBaseAPI nextar::IVector3 ToIVector3(const String& inp) {
+	InStringStream ret(inp);
+	IVector3 v;
+	ret >> v[0] >> v[1] >> v[2];
+	return v;
+}
+
+_NexBaseAPI nextar::IVector4 ToIVector4(const String& inp) {
+	InStringStream ret(inp);
+	IVector4 v;
+	ret >> v[0] >> v[1] >> v[2] >> v[4];
+	return v;
+}
+
 _NexBaseAPI nextar::Matrix4x4 ToMat4x4(const String& inp) {
 	nextar::Matrix4x4 ret;
 	InStringStream stream(inp);
@@ -156,6 +203,19 @@ _NexBaseAPI nextar::Matrix4x4 ToMat4x4(const String& inp) {
 		for (int32 i = 0; i < 4; ++i) {
 			stream >> x >> y >> z >> w;
 			Mat4x4Row(ret,i)= Vec4ASet(x, y, z, w);
+		}
+	}
+	return ret;
+}
+
+_NexBaseAPI nextar::Matrix3x4 ToMat3x4(const String& inp) {
+	nextar::Matrix3x4 ret;
+	InStringStream stream(inp);
+	float x, y, z, w;
+	if (inp.length() >= 25) {
+		for (int32 i = 0; i < 3; ++i) {
+			stream >> x >> y >> z >> w;
+			Mat3x4Row(ret,i)= Vec4ASet(x, y, z, w);
 		}
 	}
 	return ret;

@@ -28,7 +28,27 @@ class _NexEngineAPI Component: public NamedObject, public AllocComponent {
 	NEX_LOG_HELPER(Component)
 	;
 public:
+	// factory, object
 
+	struct ID {
+		StringID name;
+		StringID factory;
+
+		ID(StringID _name, StringID _factory) : name(_name), factory(_factory) {}
+		ID(StringID _name) : name(_name), factory(StringUtils::DefaultID) {}
+		ID() : name(StringUtils::NullID), factory(StringUtils::DefaultID) {}
+
+		inline friend OutputSerializer& operator << (OutputSerializer& ser, const Component::ID& id) {
+			ser << id.name << id.factory;
+			return ser;
+		}
+		friend InputSerializer& operator >> (InputSerializer& ser, Component::ID& id) {
+			ser >> id.name >> id.factory;
+			return ser;
+		}
+	};
+
+	static ID NullID;
 	/* catagory the component belongs to aka Generalization */
 	enum Catagory {
 		CAT_ASSET = 1 << 0,
@@ -88,12 +108,14 @@ public:
 
 public:
 
-	Component(const StringID name = StringUtils::NullID, Component* parent =
+	Component(const StringID name, const StringID factory, Component* parent =
 			nullptr);
 	virtual ~Component();
 
 	static Component* Instance(uint32 classId, StringID name,
 			Component::Factory* factory = nullptr);
+	// factory:group.name
+	static ID ParseID(const String&);
 
 	inline bool IsEnabled() const {
 		return (flags & ENABLED) != 0;
@@ -151,8 +173,14 @@ public:
 		return COMPONENT_CAT(classID);
 	}
 
+	inline void GetID(ID& id) const {
+		id.name = NamedObject::GetID();
+		id.factory = factory;
+	}
+
 protected:
 
+	StringID factory;
 	uint32 flags;
 	// parent component this component is attached to
 	Component* parent;
@@ -162,6 +190,26 @@ class _NexEngineAPI SharedComponent: public Referenced<SharedComponent,
 		Component> {
 
 public:
+	// factory, group, object
+	struct ID : public Component::ID {
+		StringID group;
+
+		ID(StringID _name, StringID _factory, StringID _group) : Component::ID(_name, _factory), group(_group) {}
+		ID(StringID _name, StringID _factory) : Component::ID(_name, _factory), group(StringUtils::DefaultID) {}
+		ID(StringID _name) : Component::ID(_name), group(StringUtils::DefaultID) {}
+		ID() : Component::ID(), group(StringUtils::DefaultID) {}
+
+		inline friend OutputSerializer& operator << (OutputSerializer& ser, const SharedComponent::ID& id) {
+			ser << (*(const Component::ID*)&id) << id.group;
+			return ser;
+		}
+		friend InputSerializer& operator >> (InputSerializer& ser, SharedComponent::ID& id) {
+			ser >> (*(Component::ID*)&id) >> id.group;
+			return ser;
+		}
+	};
+
+	static ID NullID;
 	static SharedComponentPtr Null;
 
 	enum InstanceResult : uint8 {
@@ -198,7 +246,8 @@ public:
 		virtual void AsyncCollect(Group* container, uint32 ofType) = 0;
 	};
 
-	SharedComponent(const StringID name = StringUtils::NullID,
+	SharedComponent(const StringID name,
+			const StringID factory,
 			Component* parent = nullptr, Group* addToGroup = nullptr);
 	virtual ~SharedComponent();
 
@@ -211,9 +260,16 @@ public:
 	static InstanceResult Instance(SharedComponentPtr& oInst, uint32 classId, StringID name,
 			StringID factory = StringUtils::DefaultID,
 			SharedComponent::Group* group = nullptr);
+	// factory:group.name
+	static ID ToID(const String&);
 
 	inline Group* GetGroup() const {
 		return group;
+	}
+
+	inline void GetID(ID& id) const {
+		Component::GetID(id);
+		id.group = group ? group->GetID() : StringUtils::NullID;
 	}
 
 	/** Components can only belong to a single group */

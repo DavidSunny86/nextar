@@ -22,6 +22,8 @@ ScriptParser::~ScriptParser() {
 void ScriptParser::ParseScript(ScriptListener* listener,
 		const String& scriptName, InputStreamPtr& input) {
 
+	if (!listener)
+		return;
 	const void* readOnlyBuffer = 0;
 	size_t readSize = input->AcquireBuffer(readOnlyBuffer);
 
@@ -52,11 +54,13 @@ void ScriptParser::ScriptContext::ParseRegions(RegionListener* listener) {
 		case '@':
 			lexer.Forward();
 			context.name = lexer.ReadWord(" {\t\n\r");
-			listener->EnterRegion(context);
+			if (listener)
+				listener->EnterRegion(context);
 			break;
 		default:
 			context.name = "global";
-			listener->EnterRegion(context);
+			if (listener)
+				listener->EnterRegion(context);
 			break;
 		}
 	}
@@ -155,7 +159,7 @@ void ScriptParser::BlockContext::ParseStatements(StatementListener* listener) {
 			break;
 		case '}':
 		case 0:
-			continue;
+			return;
 		case '/': // comment
 			scriptContext.lexer.Forward();
 			if (scriptContext.lexer.Current() == '/') {
@@ -163,7 +167,7 @@ void ScriptParser::BlockContext::ParseStatements(StatementListener* listener) {
 				continue;
 			} else
 				scriptContext.lexer.Backward();
-			continue;
+				/* no break */
 		default:
 			statement._Clear();
 			statement.command = scriptContext.lexer.ReadWord(" {\t\n\r");
@@ -190,8 +194,8 @@ void ScriptParser::BlockContext::ParseStatements(StatementListener* listener) {
 				scriptContext.Error(
 						"malformed statement, expected ';' or '{'.");
 			}
-			listener->EnterStatement(statement);
-
+			if (listener)
+				listener->EnterStatement(statement);
 			continue;
 		}
 		break;
@@ -217,18 +221,21 @@ const StringUtils::WordList& ScriptParser::StatementContext::GetParamList() cons
 
 void ScriptParser::StatementContext::ParseBlock(BlockListener* listener) {
 	BlockContext blockContext(scriptContext);
+	int openCount = 0;
 	while (!scriptContext.lexer.IsEndOfStream()) {
 		scriptContext.lexer.SkipWhite();
-		switch (scriptContext.lexer.Current()) {
+		switch (scriptContext.lexer.Forward()) {
 		case '{':
-			listener->EnterBlock(blockContext);
+			openCount++;
+			if (listener)
+				listener->EnterBlock(blockContext);
 			break;
 		case '}':
-			return;
-		default:
-			scriptContext.Error(
-					String("expected '{' or '}', got: ")
-							+ scriptContext.lexer.Current());
+			if (!(--openCount))
+				return;
+			if (openCount < 0)
+				scriptContext.Error(
+				"unexpected '}'");
 			break;
 		}
 	}
@@ -238,4 +245,5 @@ void ScriptParser::StatementContext::_Clear() {
 	command.clear();
 	paramContext.clear();
 }
+
 } /* namespace nextar */

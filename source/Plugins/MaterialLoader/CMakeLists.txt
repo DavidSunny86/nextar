@@ -6,5 +6,5 @@
 ##---------------------------------------------------
 # Add plugin
 create_plugin("MaterialLoader" "" "Lifetime" "${NEX_VERSION}" "false")
-add_dependency(Core RenderEngine)
+add_dependency(Core Engine)
 

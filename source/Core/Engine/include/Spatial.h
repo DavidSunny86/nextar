@@ -33,7 +33,7 @@ public:
 		LAST_FLAG = Component::LAST_FLAG << 3
 	};
 
-	Spatial(const StringID name = StringUtils::NullID, Component* parent =
+	Spatial(const StringID name, const StringID factory,  Component* parent =
 			nullptr);
 	virtual ~Spatial();
 

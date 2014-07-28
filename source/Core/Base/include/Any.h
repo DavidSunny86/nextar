@@ -39,7 +39,7 @@ private:
 		ValueType value;
 	public:
 
-		_NexInline Holder(const ValueType& val) :
+		inline Holder(const ValueType& val) :
 				value(val) {
 		}
 		;
@@ -62,46 +62,46 @@ private:
 
 public:
 
-	_NexInline Any() :
+	inline Any() :
 			contents(0) {
 	}
 
-	_NexInline ~Any() {
+	inline ~Any() {
 		if (contents)
 			contents->Dispose();
 	}
 
-	_NexInline Any(const Any& other) :
+	inline Any(const Any& other) :
 			contents(other.contents ? other.contents->Clone() : 0) {
 	}
 
 	template<typename ValueType>
-	_NexInline Any(ValueType& v) :
+	inline Any(ValueType& v) :
 			contents(NEX_NEW(Holder<ValueType>(v))) {
 	}
 
-	_NexInline Any& Swap(Any& rhs) {
+	inline Any& Swap(Any& rhs) {
 		std::swap(contents, rhs.contents);
 		return *this;
 	}
 
-	_NexInline Any & operator=(const Any& rhs) {
+	inline Any & operator=(const Any& rhs) {
 		Any t(rhs);
 		return Swap(t);
 	}
 
 	template<typename ValueType>
-	_NexInline Any & operator=(const ValueType &rhs) {
+	inline Any & operator=(const ValueType &rhs) {
 		Any rhsany(rhs);
 		return Swap(rhsany);
 	}
 
-	_NexInline debug::ConstTypeInfo GetTypeInfo() const {
+	inline debug::ConstTypeInfo GetTypeInfo() const {
 		return contents ? contents->GetTypeInfo() : NEX_TYPE_ID(void);
 	}
 
 	template<typename ValueType>
-	_NexInline bool CopyTo(ValueType &value) const {
+	inline bool CopyTo(ValueType &value) const {
 		const ValueType *copyable = ToPtr<ValueType>();
 		if (copyable)
 			value = *copyable;
@@ -111,21 +111,21 @@ public:
 #ifdef NEX_DEBUG
 
 	template<typename ValueType>
-	_NexInline const ValueType* ToPtr() const {
+	inline const ValueType* ToPtr() const {
 		return GetTypeInfo() == NEX_TYPE_ID(ValueType) ?
 				&static_cast<Holder<ValueType>*>(contents)->value : 0;
 	}
 #else
 
 	template<typename ValueType>
-	_NexInline const ValueType* ToPtr() const {
+	inline const ValueType* ToPtr() const {
 		return contents ? & static_cast<Holder<ValueType>*> (contents)->value : 0;
 	}
 #endif
 };
 
 template<typename value_type>
-_NexInline value_type any_cast(const Any &operand) {
+inline value_type any_cast(const Any &operand) {
 	const value_type *result = operand.ToPtr<value_type>();
 	if (result)
 		return *result;
@@ -134,7 +134,7 @@ _NexInline value_type any_cast(const Any &operand) {
 }
 
 template<typename value_type>
-_NexInline value_type any_cast(const Any* operand) {
+inline value_type any_cast(const Any* operand) {
 	const value_type *result = operand->ToPtr<value_type>();
 	if (result)
 		return *result;

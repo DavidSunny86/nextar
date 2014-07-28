@@ -13,8 +13,9 @@ namespace nextar {
 /*********************************
  * Component
  *********************************/
-Component::Component(const StringID compName, Component* parentObject) :
-		NamedObject(compName), flags(ENABLED), parent(parentObject) {
+Component::ID Component::NullID(StringUtils::NullID, StringUtils::NullID);
+Component::Component(const StringID compName, const StringID creator, Component* parentObject) :
+		NamedObject(compName), factory(creator), flags(ENABLED), parent(parentObject) {
 }
 
 Component::~Component() {
@@ -45,12 +46,29 @@ Component* Component::Instance(uint32 classId, StringID name,
 	return nullptr;
 }
 
+Component::ID Component::ParseID(const String& name) {
+	Component::ID ret;
+	auto factoryNamePair = StringUtils::Split(name, ':');
+	if (factoryNamePair.first.length()) {
+		ret.name = NamedObject::AsyncStringID(factoryNamePair.first);
+	}
+	if (factoryNamePair.second.length()) {
+		ret.name = NamedObject::AsyncStringID(factoryNamePair.second);
+	}
+
+	return ret;
+}
 /*********************************
  * SharedComponent
  *********************************/
+SharedComponent::ID SharedComponent::NullID(StringUtils::NullID, StringUtils::NullID, StringUtils::NullID);
 SharedComponentPtr SharedComponent::Null;
-SharedComponent::SharedComponent(const StringID name, Component* parent,
+
+SharedComponent::SharedComponent(const StringID name,
+		const StringID factory,
+		Component* parent,
 		Group* addToGroup) :
+		Component(name, factory, parent),
 		group(nullptr) {
 	SetID(name);
 	SetParent(parent);
@@ -123,6 +141,22 @@ void SharedComponent::RemoveFromGroup() {
 		group->Remove(GetID());
 		group = nullptr;
 	}
+}
+
+SharedComponent::ID SharedComponent::ToID(const String& name) {
+	SharedComponent::ID ret = SharedComponent::ID(StringUtils::DefaultID, std::pair(StringUtils::DefaultID, StringUtils::NullID));
+	auto factoryNamePair = StringUtils::Split(name, ':');
+	if (factoryNamePair.first.length()) {
+		ret.factory = NamedObject::AsyncStringID(factoryNamePair.first);
+	}
+	if (factoryNamePair.second.length()) {
+		auto groupNamePair = StringUtils::Split(factoryNamePair.second, '.');
+		if (groupNamePair.first.length())
+			ret.group = NamedObject::AsyncStringID(groupNamePair.first);
+		ret.name = NamedObject::AsyncStringID(groupNamePair.second);
+	}
+
+	return ret;
 }
 
 /*********************************

@@ -11,7 +11,7 @@ NEX_IMPLEMENT_PLUGIN(ShaderCompiler, ShaderCompiler::Plugin);
 
 namespace ShaderCompiler {
 
-ShaderLoaderImplv1_0 Plugin::shaderLoaderImpl;
+ShaderCompilerImplv1_0 Plugin::shaderLoaderImpl;
 
 Plugin::Plugin() {
 }
@@ -29,7 +29,7 @@ void Plugin::Close() {
 
 void Plugin::LicenseRenewed() {
 	AssetLoader::RegisterFactory("NFX", ShaderAsset::Traits::CLASS_ID,
-			&shaderLoaderImpl);
+			&Plugin::shaderLoaderImpl);
 }
 
 bool Plugin::LicenseExpired() {

@@ -16,6 +16,10 @@ namespace nextar {
 class MaterialTemplate;
 class ShaderTemplate;
 
+
+typedef RefPtr<MaterialTemplate> MaterialTemplatePtr;
+typedef RefPtr<ShaderTemplate> ShaderTemplatePtr;
+
 }
 
 

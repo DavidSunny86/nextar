@@ -14,8 +14,8 @@ namespace nextar {
 /*****************************************************/
 /* Shader											 */
 /*****************************************************/
-ShaderAsset::ShaderAsset(const StringID name) :
-		nextar::Asset(name), translucency(0), renderQueue((uint8)-1), visibilityMask(0) {
+ShaderAsset::ShaderAsset(const StringID name, const StringID factory) :
+		nextar::Asset(name, factory), translucency(0), renderQueue((uint8)-1), visibilityMask(0) {
 }
 
 ShaderAsset::~ShaderAsset() {

@@ -12,7 +12,7 @@
 
 namespace nextar {
 
-enum class ParamDataType
+enum ParamDataType
 	: uint16 {
 	PDT_UNKNOWN,
 	PDT_BOOL,
@@ -30,6 +30,15 @@ enum class ParamDataType
 	PDT_MAT3x4,
 	PDT_STRUCT,
 	PDT_COUNT,
+};
+
+enum ParamDataBaseType : uint8 {
+	BASE_UNKNOWN,
+	BASE_BYTE,
+	BASE_INT32,
+	BASE_INT64,
+	BASE_TEXTURE,
+	BASE_FLOAT,
 };
 
 enum class AutoParamName

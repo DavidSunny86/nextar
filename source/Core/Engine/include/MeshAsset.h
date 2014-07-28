@@ -191,7 +191,7 @@ public:
 		MeshBufferData bufferData;
 	};
 
-	MeshAsset(const StringID);
+	MeshAsset(const StringID, const StringID factory);
 	~MeshAsset();
 
 	const BoundsInfo& GetBoundsInfo() const {

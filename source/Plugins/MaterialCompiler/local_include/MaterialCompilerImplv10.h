@@ -12,15 +12,15 @@
 #include <ScriptParser.h>
 #include <Asset.h>
 
-namespace MaterialLoader {
+namespace MaterialCompiler {
 
 /*
  *
  */
-class MaterialLoaderImplv1_0: public nextar::AssetLoaderImpl {
+class MaterialCompilerImplv1_0: public nextar::AssetLoaderImpl {
 public:
-	MaterialLoaderImplv1_0();
-	virtual ~MaterialLoaderImplv1_0();
+	MaterialCompilerImplv1_0();
+	virtual ~MaterialCompilerImplv1_0();
 
 	virtual void Configure(const nextar::Config&);
 	virtual void Load(nextar::InputStreamPtr& input, nextar::AssetLoader& shader);

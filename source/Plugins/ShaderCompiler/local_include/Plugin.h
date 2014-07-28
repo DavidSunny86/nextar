@@ -9,7 +9,7 @@
 #define PLUGIN_H_
 
 #include <RenderEngineHeaders.h>
-#include <ShaderLoaderImplv10.h>
+#include <ShaderCompilerImplv10.h>
 
 using namespace nextar;
 namespace ShaderCompiler {
@@ -39,7 +39,7 @@ public:
 	/** @remarks Dispose should free up the pointer, implements delete this as appropriate */
 	virtual void Dispose();
 protected:
-	static ShaderLoaderImplv1_0 shaderLoaderImpl;
+	static ShaderCompilerImplv1_0 shaderLoaderImpl;
 };
 
 } /* namespace ShaderCompiler */

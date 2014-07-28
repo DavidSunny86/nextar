@@ -79,6 +79,14 @@ public:
 		typedef typename AssetType::InstanceImplementor InstanceImplementor;
 		typedef RefPtr<AssetType> AssetTypePtr;
 
+		inline static AssetTypePtr Instance(const ID& object) {
+			return Instance(object.name, object.factory, object.group);
+		}
+
+		inline static AssetTypePtr Instance(const ID& object, const URL& locator) {
+			return Instance(object.name, locator, object.factory, object.group);
+		}
+
 		inline static AssetTypePtr Instance(const StringID name,
 				const StringID factory = StringUtils::DefaultID,
 				const StringID group = StringUtils::DefaultID) {
@@ -156,7 +164,7 @@ public:
 		/* Implementation */
 		virtual Component* AsyncCreate(uint32 classId, const StringID name) {
 			if (classId == AssetTraits::CLASS_ID) {
-				return NEX_NEW(AssetType(name));
+				return NEX_NEW(AssetType(name, GetID()));
 			}
 			return nullptr;
 		}
@@ -210,9 +218,10 @@ public:
 		AssetSet unresolvedDependencies;
 	};
 
-	Asset(const StringID);
+	Asset(const StringID name, const StringID factory);
 	virtual ~Asset();
 
+	static ID ToID(const URL& url);
 	/* Populate dictionary */
 	static void Populate(PropertyDictionary* dict);
 

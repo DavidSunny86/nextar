@@ -103,7 +103,7 @@ public:
 		StreamPassList passes;
 	};
 
-	ShaderAsset(const StringID);
+	ShaderAsset(const StringID, const StringID factory);
 	virtual ~ShaderAsset();
 
 	inline uint16 GetShaderMask() const {

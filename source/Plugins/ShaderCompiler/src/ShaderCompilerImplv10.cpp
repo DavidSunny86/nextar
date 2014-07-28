@@ -9,7 +9,7 @@
 #include <ShaderAsset.h>
 #include <CommonTypes.h>
 #include <ShaderListener.h>
-#include <ShaderLoaderImplv10.h>
+#include <ShaderCompilerImplv10.h>
 #include <ScriptParser.h>
 #include <ScriptStrings.h>
 #include <ShaderAsset.h>
@@ -21,16 +21,16 @@ namespace ShaderCompiler {
 /**************************************************************
  * ShaderLoaderImplv1_0
  **************************************************************/
-ShaderLoaderImplv1_0::ShaderLoaderImplv1_0() {
+ShaderCompilerImplv1_0::ShaderCompilerImplv1_0() {
 }
 
-ShaderLoaderImplv1_0::~ShaderLoaderImplv1_0() {
+ShaderCompilerImplv1_0::~ShaderCompilerImplv1_0() {
 }
 
-void ShaderLoaderImplv1_0::Configure(const Config&) {
+void ShaderCompilerImplv1_0::Configure(const Config&) {
 }
 
-void ShaderLoaderImplv1_0::Load(InputStreamPtr& input, AssetLoader& shader) {
+void ShaderCompilerImplv1_0::Load(InputStreamPtr& input, AssetLoader& shader) {
 	ScriptParser scriptParser;
 	ShaderScript s(
 			static_cast<ShaderAsset::StreamRequest*>(shader.GetRequestPtr()));

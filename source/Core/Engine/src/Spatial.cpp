@@ -6,8 +6,8 @@
 
 namespace nextar {
 
-Spatial::Spatial(const StringID name, Component* parent) :
-		Component(name, parent), cullingData(0), moveable(nullptr), culler(
+Spatial::Spatial(const StringID name, const StringID factory,  Component* parent) :
+		Component(name, factory, parent), cullingData(0), moveable(nullptr), culler(
 				nullptr), matrixState(0) {
 	worldMatrix = NEX_NEW(Matrix4x4);
 	*worldMatrix = Matrix4x4::IdentityMatrix;

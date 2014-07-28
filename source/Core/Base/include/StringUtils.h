@@ -257,27 +257,27 @@ void PushFrontWord(StringType& arr, const StringType& what) {
 	NEX_FREE(strCopy, MEMCAT_GENERAL);
 }
 
-_NexInline size_t Length(const char* s) {
+inline size_t Length(const char* s) {
 	return std::strlen(s);
 }
 
-_NexInline size_t Length(const wchar_t* s) {
+inline size_t Length(const wchar_t* s) {
 	return std::wcslen(s);
 }
 
-_NexInline size_t Compare(const char* s1, const char* s2) {
+inline size_t Compare(const char* s1, const char* s2) {
 	return std::strcmp(s1, s2);
 }
 
-_NexInline size_t Compare(const wchar_t* s1, const wchar_t* s2) {
+inline size_t Compare(const wchar_t* s1, const wchar_t* s2) {
 	return std::wcscmp(s1, s2);
 }
 
-_NexInline size_t Compare(const char* s1, const char* s2, size_t n) {
+inline size_t Compare(const char* s1, const char* s2, size_t n) {
 	return std::strncmp(s1, s2, n);
 }
 
-_NexInline size_t Compare(const wchar_t* s1, const wchar_t* s2, size_t n) {
+inline size_t Compare(const wchar_t* s1, const wchar_t* s2, size_t n) {
 	return std::wcsncmp(s1, s2, n);
 }
 
@@ -485,7 +485,7 @@ _NexBaseAPI const utf32* GetNextWordEndPtrUtf32(const utf32*,
  *
  * @return	.
  **/
-_NexInline int32 NoCaseCompare(const char* s1, const char* s2) {
+inline int32 NoCaseCompare(const char* s1, const char* s2) {
 #if defined(NEX_MSVC)
 	return ::_stricmp(s1, s2);
 #elif defined(NEX_GCC)
@@ -509,14 +509,14 @@ _NexInline int32 NoCaseCompare(const char* s1, const char* s2) {
  **/_NexBaseAPI void FreeStr(char* ptr);
 _NexBaseAPI void FreeStr(wchar_t* ptr);
 
-template<typename T> _NexInline void SafeFreeString(T*& ptr) {
+template<typename T> inline void SafeFreeString(T*& ptr) {
 	if (ptr) {
 		FreeStr(ptr);
 		ptr = 0;
 	}
 }
 
-_NexInline String Indent(int32 amt) {
+inline String Indent(int32 amt) {
 	String s;
 	s.resize(amt, ' ');
 	return s;
@@ -577,7 +577,7 @@ _NexBaseAPI void ToUpper(String& str);
 _NexBaseAPI String FormatName(const String& str);
 
 /** Seperates a string pair of the format Abc:efg into 'Abc' and 'efg' */
-_NexInline StringPair Split(const String& name, char by = ':') {
+inline StringPair Split(const String& name, char by = ':') {
 	size_t seperator = name.find_first_of(by);
 	if (seperator != String::npos)
 		return StringPair(name.substr(0, seperator), name.substr(seperator + 1));
@@ -586,17 +586,22 @@ _NexInline StringPair Split(const String& name, char by = ':') {
 }
 
 /** @remarks Trim leading white space **/
-_NexInline void TrimLeading(String& str) {
+inline void TrimLeading(String& str) {
 	size_t endpos = str.find_first_not_of(" \t\n\r");
 	if (endpos != 0)
 		str.erase(0, endpos);
 }
 
 /** @remarks Trim trailing white space **/
-_NexInline void TrimTrailing(String& str) {
+inline void TrimTrailing(String& str) {
 	size_t endpos = str.find_last_not_of(" \t\n\r");
 	if (endpos != String::npos)
 		str.erase(endpos + 1);
+}
+
+inline void Trim(String& str) {
+	TrimLeading(str);
+	TrimTrailing(str);
 }
 /* Unicode conversion UTF-8 to UTF-16 */
 _NexBaseAPI UniString ToUtf16(const String& utf8String);

@@ -54,7 +54,8 @@ enum FilterType {
 	NFX_LINEAR_MIPMAP_LINEAR
 };
 
-struct CommandDelegate {
+class CommandDelegate {
+public:
 	enum {
 		INVALID_TYPE = -1,
 		SHADER_BLOCK,
@@ -66,9 +67,8 @@ struct CommandDelegate {
 	};
 
 	virtual void Execute(int parentType, void* parentParam,
-			ScriptParser::StatementContext& statement) {
-	}
-	;
+			ScriptParser::StatementContext& statement) = 0;
+
 };
 
 struct CommandNamePair {

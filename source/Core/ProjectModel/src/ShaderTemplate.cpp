@@ -13,7 +13,7 @@ namespace nextar {
 /********************************************
  * ShaderTemplate
  *********************************************/
-ShaderTemplate::ShaderTemplate(const StringID name) : AssetTemplate(name) {
+ShaderTemplate::ShaderTemplate(const StringID name, const StringID factory) : AssetTemplate(name, factory) {
 }
 
 ShaderTemplate::~ShaderTemplate() {

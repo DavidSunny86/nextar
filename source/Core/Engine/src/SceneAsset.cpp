@@ -20,8 +20,8 @@ SceneParameters::~SceneParameters() {
 }
 
 /** Scene ******************************/
-SceneAsset::SceneAsset(const StringID name) :
-		Asset(name), cullingSystem(nullptr) {
+SceneAsset::SceneAsset(const StringID name, const StringID factory) :
+		Asset(name, factory), cullingSystem(nullptr) {
 }
 
 SceneAsset::~SceneAsset() {

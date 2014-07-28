@@ -17,7 +17,7 @@ namespace nextar {
  */
 class AssetTemplate: public Asset {
 public:
-	AssetTemplate(const StringID);
+	AssetTemplate(const StringID, const StringID);
 	virtual ~AssetTemplate();
 
 	inline void DoModification() {

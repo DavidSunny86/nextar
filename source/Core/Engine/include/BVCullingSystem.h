@@ -20,7 +20,8 @@ class BVCullingSystem: public CullingSystem {
 public:
 	typedef vector<Spatial*>::type SpatialList;
 
-	BVCullingSystem(const StringID name = StringUtils::NullID,
+	BVCullingSystem(const StringID name,
+			const StringID factory,
 			Component* parent = nullptr);
 	virtual ~BVCullingSystem();
 

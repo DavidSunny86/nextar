@@ -69,7 +69,7 @@ public:
 		Plane camPlanes[6];
 	};
 
-	Camera(const StringID name, Component* parent = nullptr);
+	Camera(const StringID name, const StringID factory,  Component* parent = nullptr);
 	virtual ~Camera();
 
 	/** This is basically the inverse of the world transform */

@@ -69,7 +69,7 @@ public:
 		}
 	};
 
-	TextureAsset(const StringID);
+	TextureAsset(const StringID, const StringID factory);
 	virtual ~TextureAsset();
 
 	inline bool IsTextureInited() const {

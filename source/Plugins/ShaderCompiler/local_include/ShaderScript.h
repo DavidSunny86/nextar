@@ -38,11 +38,12 @@ class ShaderScript: public ScriptParser::RegionListener,
 	SourceRegionMap regions;
 public:
 
-	ShaderScript(ShaderAsset::StreamRequest* s) :
+	ShaderScript(ShaderTemplate::StreamRequest* s) :
 			shader(s) {
 	}
 
 	void SetRegionAsSource(Pass::ProgramStage, const String& name);
+
 	inline ShaderTemplate::StreamRequest* GetRequest() {
 		return shader;
 	}

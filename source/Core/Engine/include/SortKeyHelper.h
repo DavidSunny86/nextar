@@ -12,6 +12,12 @@
 
 namespace nextar {
 
+enum class Layer : uint8 {
+	HIGHEST = 0,
+	NORMAL = 4,
+	LOWEST = 7,
+};
+
 enum SortMask {
 	MASK_LAYER = 0xe0000000,
 	MASK_TRANSLUCENCY = 0x18000000,

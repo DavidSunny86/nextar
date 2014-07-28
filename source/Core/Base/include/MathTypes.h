@@ -93,6 +93,12 @@ public:
 };
 
 #endif
+
+
+typedef std::array<int32, 2> IVector2;
+typedef std::array<int32, 3> IVector3;
+typedef std::array<int32, 4> IVector4;
+
 }
 
 // naming convention for operations

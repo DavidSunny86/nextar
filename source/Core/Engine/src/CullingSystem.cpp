@@ -10,8 +10,8 @@
 
 namespace nextar {
 
-CullingSystem::CullingSystem(const StringID name, Component* parent) :
-		Spatial(name, parent) {
+CullingSystem::CullingSystem(const StringID name, const StringID factory, Component* parent) :
+		Spatial(name, factory, parent) {
 	// TODO Auto-generated constructor stub
 }
 

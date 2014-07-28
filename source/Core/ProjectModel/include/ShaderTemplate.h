@@ -26,8 +26,7 @@ public:
 	};
 
 	struct Parameter {
-
-		ParamDataType type
+		ParamDataType type;
 		String uiName;
 		String uiDescription;
 		String catagory;
@@ -79,7 +78,7 @@ public:
 	typedef FactoryTraits<ShaderTemplate> FactoryTraits;
 
 	class StreamRequest: public AllocGeneral, public AssetStreamRequest {
-		NEX_LOG_HELPER(ShaderTemplate::StreamRequest)
+		NEX_LOG_HELPER(ShaderTemplate::StreamRequest);
 	public:
 
 		StreamRequest(ShaderTemplate* shaderTemplate);
@@ -107,7 +106,7 @@ public:
 		PassUnit* current;
 	};
 
-	ShaderTemplate(const StringID);
+	ShaderTemplate(const StringID, const StringID);
 	virtual ~ShaderTemplate();
 
 	/* notify loaded/unloaded */

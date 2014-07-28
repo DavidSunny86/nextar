@@ -31,7 +31,7 @@ public:
 		DEFAULT_FLAGS = 0, LAST_FLAG = Component::LAST_FLAG << 0,
 	};
 
-	Moveable(const StringID name = StringUtils::NullID, Component* parent =
+	Moveable(const StringID name, const StringID factory,  Component* parent =
 			nullptr);
 	virtual ~Moveable();
 

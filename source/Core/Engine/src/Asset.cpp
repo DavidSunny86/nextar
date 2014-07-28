@@ -6,14 +6,20 @@ namespace nextar {
 
 Asset::AssetLocatorAccessor Asset::AssetLocatorAccessor::assetLocatorAccessor;
 
-Asset::Asset(const StringID id) :
-		memoryCost(sizeof(Asset)), SharedComponent(id) {
+Asset::Asset(const StringID id, const StringID factory) :
+		memoryCost(sizeof(Asset)), SharedComponent(id, factory) {
 	if (OverrideDictionary("Asset")) {
 		Populate(GetDictionary());
 	}
 }
 
 Asset::~Asset() {
+}
+
+Asset::ID Asset::ToID(const URL& url) {
+	Asset::ID id;
+	id.name = NamedObject::AsyncStringID(url.GetComputedName());
+	return id;
 }
 
 void Asset::Populate(PropertyDictionary* dict) {

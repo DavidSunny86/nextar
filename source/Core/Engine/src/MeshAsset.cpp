@@ -32,8 +32,8 @@ void MeshVertexData::SetLayoutFromType() {
 /*********************************
  * Mesh
  *********************************/
-MeshAsset::MeshAsset(const StringID name) :
-		Asset(name), vertexDeformationsEnabled(false), sharedVertexData(0), sharedIndexData(
+MeshAsset::MeshAsset(const StringID name, const StringID factory) :
+		Asset(name, factory), vertexDeformationsEnabled(false), sharedVertexData(0), sharedIndexData(
 				0) {
 }
 

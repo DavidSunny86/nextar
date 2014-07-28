@@ -30,8 +30,8 @@ protected:
 
 DefaultTextureLodStrategy DefaultTextureLodStrategy::strategy;
 
-TextureAsset::TextureAsset(const StringID name) :
-		TextureBase(TextureBase::TEXTURE_ASSET), Asset(name), lodStrategy(
+TextureAsset::TextureAsset(const StringID name, const StringID factory) :
+		TextureBase(TextureBase::TEXTURE_ASSET), Asset(name, factory), lodStrategy(
 				&DefaultTextureLodStrategy::strategy) {
 
 	flags |= (AUTOGEN_MIP_MAPS_ENABLED | AUTOSTREAM_ENABLED);

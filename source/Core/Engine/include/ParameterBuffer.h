@@ -14,6 +14,7 @@
 
 namespace nextar {
 
+class AssetStreamRequest;
 class ParamterItearator;
 /*
  *
@@ -45,32 +46,23 @@ public:
 		return size;
 	}
 
+	void Load(InputSerializer& ser, AssetStreamRequest* request = nullptr);
+	void Save(OutputSerializer& ser);
+
 	void SetData(const void* data, size_t offset, size_t size);
+	void SetData(const TextureUnit* data, size_t offset);
 
 	ParameterBuffer& operator =(const ParameterBuffer& pb);
 	ParameterBuffer& operator =(ParameterBuffer&& pb);
 protected:
 
+	typedef BasicUniquePtr<uint8, MEMCAT_CACHEALIGNED>::type BufferPtr;
 	const ParamEntry* _GetParameter(const String& name) const;
 
 	size_t size;
 	ParamEntryTableItem paramTable;
 	//uint8 smallBuffer[16];
-	DataPtr data;
-};
-
-class ParameterValue {
-	union {
-		float _f;
-		int32 _i;
-		uint32 _u;
-		float _vf[4];
-		int32 _vi[4];
-		uint32 _vu[4];
-		TextureBase* _t;
-	};
-	ParamDataType type;
-public:
+	BufferPtr data;
 };
 
 } /* namespace nextar */

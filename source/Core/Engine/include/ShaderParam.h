@@ -33,6 +33,8 @@ public:
 	uint16 arrayCount;
 	AutoParamName autoName;
 	uint32 size;
+
+	static ParamDataBaseType GetBaseType(ParamDataType type);
 };
 
 class _NexEngineAPI ConstantParameter: public ShaderParameter {

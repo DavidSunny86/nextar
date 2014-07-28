@@ -16,8 +16,8 @@ namespace nextar {
 /****************************************
  * Material
  ****************************************/
-MaterialAsset::MaterialAsset(const StringID name) :
-		Asset(name), layerMask(0) {
+MaterialAsset::MaterialAsset(const StringID name, const StringID factory) :
+		Asset(name, factory), layerMask(0) {
 }
 
 MaterialAsset::~MaterialAsset() {
@@ -31,7 +31,7 @@ void MaterialAsset::NotifyAssetLoaded() {
 	/* loaded only when dependencies are resolved */
 	MaterialAsset::StreamRequest* req =
 			static_cast<MaterialAsset::StreamRequest*>(GetStreamRequest());
-	_PrepareMaterial(req);
+	PrepareMaterial(req);
 	Asset::NotifyAssetLoaded();
 }
 
@@ -45,7 +45,7 @@ void MaterialAsset::NotifyAssetUpdated() {
 	Asset::NotifyAssetUpdated();
 }
 
-void MaterialAsset::_PrepareMaterial(MaterialAsset::StreamRequest* req) {
+void MaterialAsset::PrepareMaterial(MaterialAsset::StreamRequest* req) {
 	const ParamEntryTableItem& item = shader->GetParamTableItem(ParameterContext::CTX_MATERIAL);
 	materialParamData.SetParamEntryTable(item);
 }
@@ -66,13 +66,21 @@ void MaterialAsset::DestroyStreamRequestImpl(nextar::StreamRequest*& request,
 	request = nullptr;
 }
 
-void MaterialAsset::_SetParamBufferSize(size_t size) {
+void MaterialAsset::SetParamBufferSize(size_t size) {
 	materialParamData.Prepare(nullptr, size);
 }
 
-void MaterialAsset::_SetParamData(const void* data, size_t offset,
+void MaterialAsset::SetParamData(const void* data, size_t offset,
 		size_t size) {
 	materialParamData.SetData(data, offset, size);
+}
+
+void MaterialAsset::SetParamData(const TextureUnit* data, size_t offset) {
+	materialParamData.SetData(data, offset);
+}
+
+void MaterialAsset::SetShader(ShaderAssetPtr& shader) {
+	this->shader = shader;
 }
 
 /*****************************************************/
@@ -85,39 +93,40 @@ MaterialAsset::StreamRequest::StreamRequest(Asset *asset) :
 MaterialAsset::StreamRequest::~StreamRequest() {
 }
 
-void MaterialAsset::StreamRequest::SetShader(StringID name,
-		const URL& location,
-		StringID group, StringID factory) {
+void MaterialAsset::StreamRequest::SetShader(ShaderAssetPtr& shader) {
 	// construct the name, it will be of the form
 	// Factory:Group.Name
-	Asset* material = static_cast<Asset*>(GetStreamedObject());
-	shader = ShaderAsset::Traits::Instance(name, location, factory,
-				group);
-	if (!shader) {
-		Warn(
-				"Failed to load shader for material: "
-						+ Convert::ToString(shader->GetID()));
-		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
-	}
-
+	MaterialAsset* material = static_cast<MaterialAsset*>(GetStreamedObject());
+	material->SetShader(shader);
 	GetMetaInfo().AddDependency(shader);
+}
+
+void MaterialAsset::StreamRequest::SetShader(const ShaderAsset::ID& id,
+		const URL& location) {
+	shader = ShaderAsset::Traits::Instance(id, location);
+	if (!shader) {
+		Warn("Failed to load shader for material: "
+						+ shader->GetNameID());
+		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
+	} else
+		SetShader(shader);
 }
 
 void MaterialAsset::StreamRequest::SetParamBufferSize(uint32 paramBufferSize) {
 	MaterialAsset* material = static_cast<MaterialAsset*>(GetStreamedObject());
-	material->_SetParamBufferSize(paramBufferSize);
+	material->SetParamBufferSize(paramBufferSize);
 }
 
 void MaterialAsset::StreamRequest::SetParamValue(uint32 offset,
 		const void* data, size_t amount) {
 	MaterialAsset* material = static_cast<MaterialAsset*>(GetStreamedObject());
-	material->_SetParamData(data, offset, amount);
+	material->SetParamData(data, offset, amount);
 }
 
 void MaterialAsset::StreamRequest::SetTextureValue(uint32 offset,
 		const TextureUnit* tu) {
 	MaterialAsset* material = static_cast<MaterialAsset*>(GetStreamedObject());
-	material->_SetParamData(tu, offset, sizeof(TextureUnit));
+	material->SetParamData(tu, offset);
 	// add dependency
 	if (tu->texture && tu->texture->IsTextureAsset()) {
 		Asset* asset = static_cast<TextureAsset*>(tu->texture);

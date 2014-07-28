@@ -39,9 +39,8 @@ public:
 		StreamRequest(Asset*);
 		~StreamRequest();
 
-		void SetShader(StringID name, const URL& location,
-				StringID group = StringUtils::DefaultID,
-				StringID factory = StringUtils::DefaultID);
+		void SetShader(ShaderAssetPtr& shader);
+		void SetShader(const ShaderAsset::ID& id, const URL& location);
 		void SetParamBufferSize(uint32 paramBufferSize);
 		void SetParamValue(uint32 offset, const void* data, size_t amount);
 		void SetTextureValue(uint32 offset, const TextureUnit* texture);
@@ -51,7 +50,7 @@ public:
 		friend class MaterialAsset;
 	};
 
-	MaterialAsset(const StringID name);
+	MaterialAsset(const StringID name, const StringID factory);
 	virtual ~MaterialAsset();
 
 	inline const ShaderAssetPtr& GetShader() const {
@@ -88,9 +87,11 @@ protected:
 	virtual void DestroyStreamRequestImpl(nextar::StreamRequest*&, bool load =
 			true);
 
-	void _PrepareMaterial(MaterialAsset::StreamRequest*);
-	void _SetParamBufferSize(size_t size);
-	void _SetParamData(const void* data, size_t offset, size_t size);
+	void PrepareMaterial(MaterialAsset::StreamRequest*);
+	void SetParamBufferSize(size_t size);
+	void SetParamData(const void* data, size_t offset, size_t size);
+	void SetParamData(const TextureUnit* data, size_t offset);
+	void SetShader(ShaderAssetPtr& shader);
 
 	// used as sort key
 	uint8 layerMask;

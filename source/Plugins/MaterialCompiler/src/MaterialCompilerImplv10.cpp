@@ -6,23 +6,24 @@
  */
 #define NEX_MATERIAL_STRINGS_DEFINE
 #include <CommonTypes.h>
-#include <MaterialLoaderImplv10.h>
+#include <MaterialCompilerImplv10.h>
 #include <ScriptStrings.h>
+#include <MaterialTemplate.h>
 
-namespace MaterialLoader {
+namespace MaterialCompiler {
 
-MaterialLoaderImplv1_0::MaterialLoaderImplv1_0() {
-
-}
-
-MaterialLoaderImplv1_0::~MaterialLoaderImplv1_0() {
+MaterialCompilerImplv1_0::MaterialCompilerImplv1_0() {
 
 }
 
-void MaterialLoaderImplv1_0::Configure(const Config&) {
+MaterialCompilerImplv1_0::~MaterialCompilerImplv1_0() {
+
 }
 
-void MaterialLoaderImplv1_0::Load(InputStreamPtr& input, AssetLoader& shader) {
+void MaterialCompilerImplv1_0::Configure(const Config&) {
+}
+
+void MaterialCompilerImplv1_0::Load(InputStreamPtr& input, AssetLoader& shader) {
 	ScriptParser scriptParser;
 	MaterialScript s(static_cast<MaterialAsset::StreamRequest*>(shader.GetRequestPtr()));
 	MaterialAsset* materialPtr =

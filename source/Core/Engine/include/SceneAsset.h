@@ -43,7 +43,7 @@ public:
 	class SceneStreamRequest: public AssetStreamRequest {
 	};
 
-	SceneAsset(const StringID name);
+	SceneAsset(const StringID name, const StringID factory);
 	virtual ~SceneAsset();
 
 	virtual uint32 GetClassID() const;

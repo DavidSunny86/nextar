@@ -17,8 +17,8 @@ FlagsCmd FlagsCmd::command;
  * Command Map
  **************************************************************/
 CommandNamePair ShaderListener::commands[] = {
-		{ _SS(CMD_PASS), &PassCmd::command },
 		{ _SS(CMD_FLAGS), &FlagsCmd::command },
+		{ _SS(CMD_PASS), &PassCmd::command },
 };
 
 const size_t ShaderListener::commandCount = sizeof(ShaderListener::commands)

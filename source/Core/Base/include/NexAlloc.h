@@ -28,7 +28,7 @@ namespace nextar {
  *
  * @brief Memory catagories. Basic allocator and deallocator design
  **/
-enum MemoryCatagory {
+enum MemoryCategory {
 	//! Indicates basic memory catagory.
 	MEMCAT_GENERAL,
 	//! Indicates memory for scene objects
@@ -57,7 +57,7 @@ enum MemoryCatagory {
  *
  *   This should be specialized for pooled allocations, etc.
  */
-template<enum MemoryCatagory cat>
+template<enum MemoryCategory cat>
 class AllocatorBase: public allocator::Default {
 };
 
@@ -141,11 +141,11 @@ typedef AllocObjectBase<AllocatorCacheAligned> AllocCacheAligned;
 typedef AllocObjectBase<AllocatorComponent> AllocComponent;
 typedef AllocObjectBase<AllocatorBufferData> AllocBufferData;
 
-template<typename T>
+template<typename T, enum MemoryCategory category = MEMCAT_GENERAL>
 class GenericFree {
 public:
 	inline void operator ()(T* ptr) const {
-		NEX_FREE(ptr, MEMCAT_GENERAL);
+		NEX_FREE(ptr, category);
 	}
 };
 

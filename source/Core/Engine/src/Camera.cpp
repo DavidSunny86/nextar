@@ -10,8 +10,8 @@
 
 namespace nextar {
 
-Camera::Camera(const StringID name, Component* parent) :
-		Spatial(name, parent), projectMatrixNumber(0), visibilityMask(
+Camera::Camera(const StringID name, const StringID factory,  Component* parent) :
+		Spatial(name, factory, parent), projectMatrixNumber(0), visibilityMask(
 				VisibilitySet::VM_ALL) {
 	_SetCameraMatrixDataPtr(NEX_NEW(Camera::Matrix));
 }

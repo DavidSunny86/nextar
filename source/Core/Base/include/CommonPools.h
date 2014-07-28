@@ -7,7 +7,7 @@
 
 namespace nextar {
 
-template<typename T, const size_t NumPerBlock, enum MemoryCatagory Catagory>
+template<typename T, const size_t NumPerBlock, enum MemoryCategory Catagory>
 class PooledAllocator {
 	// todo write an usage reporting function that will automatically be invoked at the end and report
 	// the total allocations, alive pointer avg, total blocks allocated, etc to get an idea of
@@ -73,7 +73,7 @@ protected:
 	}
 };
 
-template<typename T, const size_t NumPerBlock, enum MemoryCatagory Catagory>
+template<typename T, const size_t NumPerBlock, enum MemoryCategory Catagory>
 class STDPoolAllocator: public std::allocator<T> {
 public:
 	//    typedefs

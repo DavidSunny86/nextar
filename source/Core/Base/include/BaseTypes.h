@@ -32,8 +32,9 @@ typedef uint32 utf32;
 typedef uint32 VersionID;
 typedef uint32 EventID;
 
-template<typename T> struct BasicUniquePtr {
-	typedef std::unique_ptr<T, GenericFree<T> > type;
+template<typename T, enum MemoryCategory cat = MEMCAT_GENERAL>
+struct BasicUniquePtr {
+	typedef std::unique_ptr<T, GenericFree<T, cat> > type;
 };
 
 template<typename T>

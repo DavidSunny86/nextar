@@ -11,8 +11,8 @@
 
 namespace nextar {
 
-BVCullingSystem::BVCullingSystem(const StringID name, Component* parent) :
-		CullingSystem(name, parent), coherentCam(nullptr) {
+BVCullingSystem::BVCullingSystem(const StringID name, const StringID factory,  Component* parent) :
+		CullingSystem(name, factory, parent), coherentCam(nullptr) {
 }
 
 BVCullingSystem::~BVCullingSystem() {

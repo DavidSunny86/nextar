@@ -12,9 +12,11 @@ file(WRITE ${NEX_PLUGIN_CONFIG_FILE} "<plugins basePath='\${Bin}/plugins'>\n")
 ## Configure paths
 #============================================================
 add_module(RenderOpenGL)
-add_module(ShaderCompiler)
 add_module(ImageLoader)
 add_module(MeshLoader)
 add_module(MaterialLoader)
+add_module(ShaderLoader)
+add_module(ShaderCompiler)
+add_module(MaterialCompiler)
 
 file(APPEND ${NEX_PLUGIN_CONFIG_FILE} "</plugins>\n")
