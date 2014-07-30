@@ -23,8 +23,8 @@ UnitCmd UnitCmd::command;
 void TextureUnitStateCmd::Execute(int parentType, void* parentParam,
 		ScriptParser::StatementContext& ctx) {
 	if (parentType == CommandDelegate::PASS_BLOCK) {
-		ShaderTemplate::StreamRequest* shader =
-				static_cast<ShaderTemplate::StreamRequest*>(parentParam);
+		ShaderTemplate::LoadStreamRequest* shader =
+				static_cast<ShaderTemplate::LoadStreamRequest*>(parentParam);
 		TextureUnitStateListener textureUnitState(shader);
 		ctx.ParseBlock(&textureUnitState);
 	} else {
@@ -50,8 +50,8 @@ void UnitCmd::Execute(int parentType, void* state,
 		ScriptParser::StatementContext& ctx) {
 	NEX_ASSERT(parentType == CommandDelegate::DEPTH_STENCIL_BLOCK);
 	TextureUnitParams texUnitParams;
-	ShaderTemplate::StreamRequest* shader =
-			(static_cast<ShaderTemplate::StreamRequest*>(state));
+	ShaderTemplate::LoadStreamRequest* shader =
+			(static_cast<ShaderTemplate::LoadStreamRequest*>(state));
 	StringUtils::TokenIterator it = 0;
 	String value;
 	String name;

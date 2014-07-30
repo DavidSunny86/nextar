@@ -65,7 +65,7 @@ public:
 				Component** subComponent = nullptr);
 	};
 
-	Entity(const StringID name);
+	Entity(const StringID name, const StringID factory);
 	virtual ~Entity();
 
 	inline Spatial* GetSpatial() const {

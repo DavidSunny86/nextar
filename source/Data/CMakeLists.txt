@@ -8,18 +8,26 @@
 # Source list
 #===========================================================
 set(NEX_DATA_SHADERS ${NEX_DATA}/Shaders)
-set(NEX_DATA_CONFIG ${NEX_DATA}/Config)
+set(NEX_DATA_CONFIGS ${NEX_DATA}/Configs)
 set(NEX_DATA_TEXTURES ${NEX_DATA}/Textures)
 set(NEX_DATA_MESHES ${NEX_DATA}/Meshes)
+set(NEX_DATA_MATERIALS ${NEX_DATA}/Materials)
+set(NEX_DATA_SCRIPTS ${NEX_DATA}/Scripts)
 
 file(GLOB NEX_DATA_SHADER_LIST ${NEX_DATA_SHADERS}/*)
-file(GLOB NEX_DATA_CONFIG_LIST ${NEX_DATA_CONFIG}/*)
+file(GLOB NEX_DATA_CONFIG_LIST ${NEX_DATA_CONFIGS}/*)
+file(GLOB NEX_DATA_TEXTURE_LIST ${NEX_DATA_TEXTURES}/*)
 file(GLOB NEX_DATA_MESH_LIST ${NEX_DATA_MESHES}/*)
+file(GLOB NEX_DATA_MATERIAL_LIST ${NEX_DATA_MATERIALS}/*)
+file(GLOB NEX_DATA_SCRIPTS_LIST ${NEX_DATA_SCRIPTS}/*)
 
 set(DATA_SRC_LIST 
 	${NEX_DATA_SHADER_LIST}
 	${NEX_DATA_CONFIG_LIST}
+	${NEX_DATA_TEXTURE_LIST}
 	${NEX_DATA_MESH_LIST}
+	${NEX_DATA_MATERIAL_LIST}
+	${NEX_DATA_SCRIPTS_LIST}
 )
 # Add definition
 
@@ -44,11 +52,18 @@ endmacro(copy_data)
 # Add library
 #===========================================================
 prepare_data(Shaders)
-prepare_data(Config)
+prepare_data(Configs)
+prepare_data(Textures)
 prepare_data(Meshes)
+prepare_data(Materials)
+prepare_data(Scripts)
 
 add_custom_target(NE_Data ALL SOURCES ${DATA_SRC_LIST})
 
 copy_data(Shaders)
-copy_data(Config)
+copy_data(Configs)
+copy_data(Textures)
 copy_data(Meshes)
+copy_data(Materials)
+copy_data(Scripts)
+

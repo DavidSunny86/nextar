@@ -70,6 +70,7 @@ public:
 	virtual void EnterStatement(ScriptParser::StatementContext& statement);
 
 protected:
+	friend class MaterialScript;
 	~MaterialListener() {}
 };
 

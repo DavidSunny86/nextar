@@ -40,7 +40,7 @@ public:
 		return ser;
 	}
 
-	friend inline InputSerializer& operator << (InputSerializer& ser, Color& c) {
+	friend inline InputSerializer& operator >> (InputSerializer& ser, Color& c) {
 		ser >> c.red >> c.green >> c.blue >> c.alpha;
 		return ser;
 	}

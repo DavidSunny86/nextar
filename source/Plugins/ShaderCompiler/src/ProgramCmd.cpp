@@ -64,7 +64,7 @@ void ProgramListener::EnterStatement(ScriptParser::StatementContext& ctx) {
 void ParamCmd::Execute(int parentType, void* state,
 		ScriptParser::StatementContext& ctx) {
 	NEX_ASSERT(parentType == CommandDelegate::SHADER_BLOCK);
-	ShaderTemplate::StreamRequest* shader =
+	ShaderTemplate::LoadStreamRequest* shader =
 			(static_cast<ShaderScript*>(state)->GetRequest());
 	StringUtils::TokenIterator it = 0;
 	String value;

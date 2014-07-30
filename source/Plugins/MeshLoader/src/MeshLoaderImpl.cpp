@@ -28,8 +28,8 @@ MeshLoaderImpl::~MeshLoaderImpl() {
 
 void MeshLoaderImpl::Load(InputStreamPtr& input, AssetLoader& loader) {
 
-	static MeshLoaderImplv1_0 loaderImplv1_0;
-	StreamRequest* request = loader.GetRequestPtr();
+	static MeshLoaderIntfv1_0 loaderImplv1_0;
+	AssetStreamRequest* request = loader.GetRequestPtr();
 	MeshAsset* mesh = static_cast<MeshAsset*>(request->GetStreamedObject());
 
 	if (input) {
@@ -49,7 +49,7 @@ void MeshLoaderImpl::Load(InputStreamPtr& input, AssetLoader& loader) {
 			default:
 				Error(
 						String("Unsupported mesh version in file: ")
-								+ mesh->GetAssetLocator().ToString());
+								+ request->GetName());
 				NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
 				break;
 			}
@@ -60,7 +60,7 @@ void MeshLoaderImpl::Load(InputStreamPtr& input, AssetLoader& loader) {
 	} else {
 		Error(
 				String("Could not open mesh file: ")
-						+ mesh->GetAssetLocator().ToString());
+						+ request->GetName());
 		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOCATE_ASSET);
 	}
 }

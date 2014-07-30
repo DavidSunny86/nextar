@@ -14,7 +14,7 @@
 
 namespace nextar {
 
-enum class RenderQueueFlags
+enum RenderQueueFlags
 	: uint16 {
 	TRANSLUCENCY = 1 << 0,
 	DEFERRED = 1 << 1,

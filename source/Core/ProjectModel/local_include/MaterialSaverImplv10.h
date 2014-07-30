@@ -15,11 +15,12 @@ namespace nextar {
 /*
  *
  */
-class MaterialSaverImplv10  : public AssetSaverImpl,
+class MaterialSaverImplv1_0  : public AssetSaverImpl,
 public AllocGeneral {
 public:
-	MaterialSaverImplv10();
-	virtual ~MaterialSaverImplv10();
+	static MaterialSaverImplv1_0 saver;
+	MaterialSaverImplv1_0();
+	virtual ~MaterialSaverImplv1_0();
 
 	virtual void Save(OutputStreamPtr&, AssetSaver&);
 

@@ -20,19 +20,19 @@ AssetStreamer::~AssetStreamer() {
 
 void AssetStreamer::RequestLoad(Asset* asset) {
 	NEX_ASSERT(asset);
-	StreamRequest* req = asset->GetStreamRequest();
+	AssetStreamRequest* req = static_cast<AssetStreamRequest*>(asset->GetStreamRequest(true));
 	if (!(req->flags & StreamRequest::ASSET_STREAM_REQUEST)) {
 		Warn(
 				"Cannot register a generic load request for asset, "
 						"request must be of type AssetStreamRequest: "
-						+ Convert::ToString(asset->GetID()));
+						+ req->GetName());
 		return;
 	}
 	/** */
 	if (asset->IsLoading()) {
 		Warn(
 				"Redundant load request for asset: "
-						+ Convert::ToString(asset->GetID()));
+						+ req->GetName());
 		return;
 	}
 	asset->SetLoading(true);
@@ -41,18 +41,19 @@ void AssetStreamer::RequestLoad(Asset* asset) {
 }
 
 void AssetStreamer::RequestSave(Asset* asset) {
+	AssetStreamRequest* req = static_cast<AssetStreamRequest*>(asset->GetStreamRequest(false));
 	if (asset->IsLoading() || !asset->IsLoaded()) {
 		Warn(
 				"Incorrect state for save: "
-						+ Convert::ToString(asset->GetID()));
+						+ req->GetName());
 		return;
 	}
-	StreamRequest* req = asset->GetStreamRequest(false);
+
 	if (!(req->flags & StreamRequest::ASSET_STREAM_REQUEST)) {
 		Warn(
 				"Cannot register a generic save request for asset, "
 						"request must be of type AssetStreamRequest: "
-						+ Convert::ToString(asset->GetID()));
+						+ req->GetName());
 		return;
 	}
 	req->flags |= StreamRequest::REQUEST_SAVE;

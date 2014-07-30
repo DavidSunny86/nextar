@@ -63,12 +63,12 @@ void MeshAsset::_FillVertexData(MeshVertexData* data,
 	uint32 numVertexBuffers = data->binding.GetBufferCount();
 	for (uint32 stream = 0; stream < numVertexBuffers;
 			++stream, ++vertexBufferIt) {
-		ByteStream& byteData = (*vertexBufferIt);
-		uint8* dataPtr = byteData.data();
-		uint32 stride = *reinterpret_cast<uint32*>(dataPtr);
+		MeshBufferData::Stream& byteData = (*vertexBufferIt);
+		uint8* dataPtr = byteData.buffer.data();
+		uint32 stride =  byteData.stride;
 		dataPtr += 4;
 		VertexBuffer buffer(GpuBuffer::RelocationPolicy::NEVER_RELEASED);
-		buffer.CreateBuffer(byteData.size(), stride, dataPtr);
+		buffer.CreateBuffer(byteData.buffer.size(), stride, dataPtr);
 		data->binding.BindBuffer(stream, buffer);
 	}
 
@@ -77,10 +77,10 @@ void MeshAsset::_FillVertexData(MeshVertexData* data,
 
 void MeshAsset::_FillIndexData(MeshIndexData* data,
 		MeshBufferData::BufferList::iterator& indexBufferIt) {
-	ByteStream& byteData = (*indexBufferIt);
+	MeshBufferData::Stream& byteData = (*indexBufferIt);
 	data->ibdata = IndexBuffer(GpuBuffer::RelocationPolicy::NEVER_RELEASED);
-	data->ibdata.CreateBuffer(byteData.size(), data->twoBytePerElement ?
-			IndexBuffer::TYPE_16BIT : IndexBuffer::TYPE_32BIT, byteData.data());
+	data->ibdata.CreateBuffer(byteData.buffer.size(), byteData.stride == 2 ?
+			IndexBuffer::TYPE_16BIT : IndexBuffer::TYPE_32BIT, byteData.buffer.data());
 	indexBufferIt++;
 }
 
@@ -168,12 +168,12 @@ MeshAsset::StreamRequest::StreamRequest(MeshAsset* mesh) :
 		AssetStreamRequest(mesh), sharedVertexData(0), sharedIndexData(0) {
 }
 
-ByteStream& MeshAsset::StreamRequest::AddIndexBuffer() {
+MeshBufferData::Stream& MeshAsset::StreamRequest::AddIndexBuffer() {
 	bufferData.indexBuffers.resize(bufferData.indexBuffers.size() + 1);
 	return bufferData.indexBuffers.back();
 }
 
-ByteStream& MeshAsset::StreamRequest::AddVertexBuffer() {
+MeshBufferData::Stream& MeshAsset::StreamRequest::AddVertexBuffer() {
 	bufferData.vertexBuffers.resize(bufferData.vertexBuffers.size() + 1);
 	return bufferData.vertexBuffers.back();
 }

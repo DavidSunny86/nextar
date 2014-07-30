@@ -9,6 +9,7 @@
 #define SHADERPARAMAGENT_H_
 
 #include <ShaderParam.h>
+#include <MaterialAsset.h>
 
 namespace nextar {
 

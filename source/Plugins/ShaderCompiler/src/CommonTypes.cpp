@@ -4,7 +4,7 @@
  *  Created on: 22-Sep-2013
  *      Author: obhi
  */
-
+#define NEX_SHADER_STRINGS_DEFINE
 #include <BaseHeaders.h>
 #include <CommonTypes.h>
 #include <ScriptStrings.h>
@@ -64,7 +64,7 @@ StencilOp Helper::GetStencilOp(const String& val) {
 	if (ptr != names + array_size)
 		return static_cast<StencilOp>(ptr->val);
 
-	return DSCOMP_DEFAULT;
+	return STENCILOP_ZERO;
 }
 
 DepthStencilCompare Helper::GetDepthStencilFunc(const String& val) {
@@ -149,7 +149,7 @@ BlendOp Helper::GetColorOperation(const String& val) {
 			EnumNameCompare());
 	if (ptr != names + array_size)
 		return static_cast<BlendOp>(ptr->val);
-	return BDS_DEFAULT;
+	return BOP_ADD;
 }
 
 FillMode Helper::GetFillMode(const String& val) {
@@ -162,7 +162,7 @@ FillMode Helper::GetFillMode(const String& val) {
 	return FM_DEFAULT;
 }
 
-FillMode Helper::GetCullMode(const String& val) {
+CullMode Helper::GetCullMode(const String& val) {
 	if (val == _SS(ARG_FRONT))
 		return CULL_FRONT;
 	if (val == _SS(ARG_BACK))

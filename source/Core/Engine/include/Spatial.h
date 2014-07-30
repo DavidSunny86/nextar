@@ -92,6 +92,11 @@ public:
 		SetUpdateRequired(true);
 	}
 
+	void SetRadius(float radius) {
+		bounds.SetRadius(radius);
+		SetBoundsDirty(true);
+	}
+
 	/** @remarks Update world volume */
 	virtual void Update();
 	virtual void SetMoveable(Moveable* ptr);

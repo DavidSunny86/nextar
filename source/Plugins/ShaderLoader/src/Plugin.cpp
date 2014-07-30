@@ -4,15 +4,15 @@
  *  Created on: 30-Sep-2013
  *      Author: obhi
  */
-#include <CommonTypes.h>
 #include <BaseHeaders.h>
+#include <ShaderLoaderImplv10.h>
 #include <Plugin.h>
 
-NEX_IMPLEMENT_PLUGIN(MaterialLoader, MaterialLoader::Plugin);
+NEX_IMPLEMENT_PLUGIN(ShaderLoader, ShaderLoader::Plugin);
 
-namespace MaterialLoader {
+namespace ShaderLoader {
 
-MaterialLoaderImplv1_0 Plugin::materialLoaderImpl;
+ShaderLoaderImplv1_0 Plugin::shaderLoaderImpl;
 
 Plugin::Plugin() {
 }
@@ -29,12 +29,12 @@ void Plugin::Close() {
 }
 
 void Plugin::LicenseRenewed() {
-	AssetLoader::RegisterFactory("MTL", MaterialAsset::Traits::CLASS_ID,
-			&materialLoaderImpl);
+	AssetLoader::RegisterFactory("NFX", ShaderAsset::Traits::CLASS_ID,
+			&shaderLoaderImpl);
 }
 
 bool Plugin::LicenseExpired() {
-	AssetLoader::UnregisterFactory("MTL", ShaderAsset::Traits::CLASS_ID);
+	AssetLoader::UnregisterFactory("NFX", ShaderAsset::Traits::CLASS_ID);
 	return true;
 }
 

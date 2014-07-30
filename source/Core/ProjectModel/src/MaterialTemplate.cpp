@@ -14,7 +14,7 @@ namespace nextar {
 /*********************************
  * MaterialTemplate
  ********************************/
-MaterialTemplate::MaterialTemplate(const StringID name, const StringID factory) : Asset(name, factory)
+MaterialTemplate::MaterialTemplate(const StringID name, const StringID factory) : AssetTemplate(name, factory)
 ,layer(Layer::NORMAL) {
 }
 
@@ -46,6 +46,8 @@ void MaterialTemplate::NotifyAssetUpdated() {
 
 void MaterialTemplate::NotifyAssetSaved() {
 	AssetTemplate::NotifyAssetSaved();
+	if (material)
+		material->SetAssetLocator(GetAssetLocator());
 }
 
 void MaterialTemplate::SetShader(const ShaderTemplatePtr& shader) {
@@ -77,6 +79,10 @@ void MaterialTemplate::DestroyStreamRequestImpl(nextar::StreamRequest*& streamRe
 		bool load) {
 	NEX_DELETE(streamRequest);
 	streamRequest = nullptr;
+}
+// load a shader
+uint32 MaterialTemplate::GetClassID() const {
+	return CLASS_ID;
 }
 
 /********************************************
@@ -119,7 +125,7 @@ void nextar::MaterialTemplate::StreamRequest::AddParam(const String& name,
 void nextar::MaterialTemplate::StreamRequest::SetLayer(uint8 l) {
 	MaterialTemplate* materialTemplate = static_cast<MaterialTemplate*>(
 				GetStreamedObject());
-	materialTemplate->SetLayer(l);
+	materialTemplate->SetLayer((Layer)l);
 }
 
 /********************************************

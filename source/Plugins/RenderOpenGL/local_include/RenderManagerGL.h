@@ -18,7 +18,7 @@ public:
 	RenderManagerGL();
 	virtual ~RenderManagerGL();
 
-	virtual RenderManager::ShaderProgramLanguage GetProgramLanguage();
+	virtual RenderManager::ShaderLanguage GetProgramLanguage();
 	virtual nextar::String GetInfo();
 
 protected:

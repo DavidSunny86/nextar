@@ -20,8 +20,8 @@ Mesh::Primitive::~Primitive() {
 /************************************************************************/
 /* Mesh                                                                 */
 /************************************************************************/
-Mesh::Mesh(const StringID name, Component* parent) :
-		Renderable(name, parent) {
+Mesh::Mesh(const StringID name, const StringID factory, Component* parent) :
+		Renderable(name, factory, parent) {
 }
 
 Mesh::~Mesh() {
@@ -59,7 +59,7 @@ void Mesh::SetMeshAsset(MeshAssetPtr& mesh) {
 			prim.stream.vertices.start = pg.startVertex;
 			prim.stream.vertices.count = pg.vertexCount;
 			prim.stream.vertices.layout = pg.vertexData->layout;
-			prim.stream.vertices.binding = pg.vertexData->binding;
+			prim.stream.vertices.binding = &pg.vertexData->binding;
 			prim.visibilityType = VisibilityMask::VISIBILITY_SHADOW_CASTER|
 					VisibilityMask::VISIBILITY_SHADOW_RECEIVER;
 			//prim.sortKey = SortKeyHelper::KeyOpaque(prim.layer, 0, 0);

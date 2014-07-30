@@ -53,6 +53,11 @@ class SceneAsset;
 
 class Asset;
 class AssetStreamRequest;
+class AssetLoader;
+class AssetLoaderImpl;
+class AssetSaver;
+class AssetSaverImpl;
+
 class TextureAsset;
 class ShaderAsset;
 class MaterialAsset;

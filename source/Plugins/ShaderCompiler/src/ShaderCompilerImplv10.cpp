@@ -32,11 +32,9 @@ void ShaderCompilerImplv1_0::Configure(const Config&) {
 
 void ShaderCompilerImplv1_0::Load(InputStreamPtr& input, AssetLoader& shader) {
 	ScriptParser scriptParser;
-	ShaderScript s(
-			static_cast<ShaderAsset::StreamRequest*>(shader.GetRequestPtr()));
-	ShaderAsset* shaderPtr =
-			static_cast<ShaderAsset*>(shader.GetRequestPtr()->streamedObject);
-	String scriptName = shaderPtr->GetAssetLocator().ToString();
+	auto request = static_cast<ShaderTemplate::LoadStreamRequest*>(shader.GetRequestPtr());
+	ShaderScript s(request);
+	String scriptName = request->GetName();
 	scriptParser.ParseScript(&s, scriptName, input);
 }
 

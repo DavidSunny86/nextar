@@ -37,7 +37,7 @@ void DepthStencilStateCmd::Execute(int parentType, void* parentParam,
 		ScriptParser::StatementContext& ctx) {
 	if (parentType == CommandDelegate::PASS_BLOCK) {
 		DepthStencilStateListener depthStencil;
-		ShaderTemplate::StreamRequest* shader =
+		ShaderTemplate::LoadStreamRequest* shader =
 				static_cast<ShaderScript*>(parentParam)->GetRequest();
 		ctx.ParseBlock(&depthStencil);
 		if (!ctx.IsErrorBitSet()) {
@@ -113,7 +113,7 @@ void StencilOpCmd::Execute(int parentType, void* state,
 	}
 	it = StringUtils::NextWord(paramContext, value, it);
 	if (it != String::npos) {
-		faceOp->stencilFunc = Helper::GetComparisonFunc(value);
+		faceOp->stencilFunc = Helper::GetDepthStencilFunc(value);
 	}
 	it = StringUtils::NextWord(paramContext, value, it);
 	if (it != String::npos) {

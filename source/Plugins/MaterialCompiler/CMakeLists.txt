@@ -6,5 +6,5 @@
 ##---------------------------------------------------
 # Add plugin
 create_plugin("MaterialCompiler" "" "Lifetime" "${NEX_VERSION}" "false")
-add_dependency(Core ProductModel)
+add_dependency(Core ProjectModel)
 

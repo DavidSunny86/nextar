@@ -21,16 +21,23 @@ ShaderTemplate::~ShaderTemplate() {
 }
 
 nextar::StreamRequest* ShaderTemplate::CreateStreamRequestImpl(bool load) {
-	// @urgent return for save
 	if (load)
-		return NEX_NEW(StreamRequest(this));
+		return NEX_NEW(LoadStreamRequest(this));
 	else
-		return NEX_ALLOC_T(AssetStreamRequest, MEMCAT_GENERAL);
+		return NEX_NEW(SaveStreamRequest(this));
+}
+
+uint32 ShaderTemplate::GetClassID() const {
+	return CLASS_ID;
 }
 
 void ShaderTemplate::DestroyStreamRequestImpl(
 		nextar::StreamRequest*& streamRequest, bool load) {
-	//NEX_DELETE(static_cast<StreamRequest*>(streamRequest));
+	if (load)
+		NEX_DELETE(static_cast<LoadStreamRequest*>(streamRequest));
+	else
+		NEX_DELETE(static_cast<SaveStreamRequest*>(streamRequest));
+	streamRequest = nullptr;
 }
 
 String ShaderTemplate::GetHashNameFromOptions(const StringUtils::WordList& opt) {
@@ -75,7 +82,10 @@ ShaderAssetPtr& ShaderTemplate::CreateShader(const String& hash,
 	streamRequest->SetManualLoader(&loader);
 	shaderObject->Load(false);
 
-	return shaderObject;
+	ShaderUnit &unit = shaders[hash];
+	unit.shaderObject = shaderObject;
+	unit.compilationOptions = options;
+	return unit.shaderObject;
 }
 
 void ShaderTemplate::NotifyAssetLoaded() {
@@ -92,6 +102,11 @@ void ShaderTemplate::NotifyAssetUpdated() {
 
 void ShaderTemplate::NotifyAssetSaved() {
 	AssetTemplate::NotifyAssetSaved();
+	// make sure these shaders are loaded from the current saved path
+	for (auto &s : shaders) {
+		if(s.second.shaderObject)
+			s.second.shaderObject->SetAssetLocator(GetAssetLocator());
+	}
 }
 
 void ShaderTemplate::UnloadImpl() {
@@ -104,59 +119,64 @@ void ShaderTemplate::UnloadImpl() {
 /********************************************
  * ShaderTemplate::StreamRequest
  *********************************************/
-ShaderTemplate::StreamRequest::StreamRequest(ShaderTemplate* shaderTemplate) :
+ShaderTemplate::LoadStreamRequest::LoadStreamRequest(ShaderTemplate* shaderTemplate) :
 		AssetStreamRequest(shaderTemplate),
 		current(nullptr) {
 }
 
-void ShaderTemplate::StreamRequest::AddPass(StringID name) {
+void ShaderTemplate::LoadStreamRequest::AddPass(StringID name) {
+	ShaderTemplate* shader = static_cast<ShaderTemplate*>(GetStreamedObject());
+	auto& passes = shader->passes;
 	passes.resize(passes.size()+1);
-	current = &passes.back();
+	current = &(passes.back());
 	current->name = name;
 }
-void ShaderTemplate::StreamRequest::SetProgramSource(Pass::ProgramStage stage,
-		RenderManager::ShaderProgramLanguage lang, String&& source) {
-	uint32 key = ((((uint32)stage)<<16 & 0xffff0000))|(((uint32)lang) & 0xffff);
-	current->sourceMap[key] = std::move(source);
+
+void ShaderTemplate::LoadStreamRequest::SetProgramSource(Pass::ProgramStage stage,
+		RenderManager::ShaderLanguage lang, String&& source) {
+	current->sourceMap.emplace(lang,
+			std::pair<Pass::ProgramStage, String>(stage, std::move(source)));
 }
 
-void ShaderTemplate::StreamRequest::SetRasterState(RasterState& state) {
+void ShaderTemplate::LoadStreamRequest::SetRasterState(RasterState& state) {
 	current->rasterState = state;
 }
 
-void ShaderTemplate::StreamRequest::SetBlendState(BlendState& state) {
+void ShaderTemplate::LoadStreamRequest::SetBlendState(BlendState& state) {
 	current->blendState = state;
 }
 
-void ShaderTemplate::StreamRequest::SetDepthStencilState(
+void ShaderTemplate::LoadStreamRequest::SetDepthStencilState(
 		DepthStencilState& state) {
 	current->depthStencilState = state;
 }
 
-void ShaderTemplate::StreamRequest::AddTextureUnit(const String& unitName,
+void ShaderTemplate::LoadStreamRequest::AddTextureUnit(const String& unitName,
 		TextureUnitParams& unit, URL& defaultTexturePath) {
 	auto& state = current->textureUnitStates[unitName];
 	state.defaultTexturePath = defaultTexturePath;
 	state.params = unit;
 }
 
-void ShaderTemplate::StreamRequest::AddParam(const String& param,
+void ShaderTemplate::LoadStreamRequest::AddParam(const String& param,
 		const String& name, const String& description, ParamDataType type) {
-	auto& parameter = parameters[param];
+	ShaderTemplate* shader = static_cast<ShaderTemplate*>(GetStreamedObject());
+	auto& parameter = shader->parameters[param];
 	auto namePair = StringUtils::Split(name, '.');
 
-	parameter.uiName = StringUtils::FormatCamelCaseString(namePair.second);
+	parameter.uiName = StringUtils::FormatName(namePair.second);
 	parameter.uiDescription = description;
 	parameter.type = type;
-	parameter.catagory = StringUtils::FormatCamelCaseString(namePair.first);
+	parameter.catagory = StringUtils::FormatName(namePair.first);
 }
 
-void ShaderTemplate::StreamRequest::AddMacro(const String& param,
+void ShaderTemplate::LoadStreamRequest::AddMacro(const String& param,
 		const String& name, const String& description) {
-	auto& macro = macros[name];
+	ShaderTemplate* shader = static_cast<ShaderTemplate*>(GetStreamedObject());
+	auto& macro = shader->macros[name];
 	if (macro.index == -1) {
-		macro.index = macros.size();
-		macro.uiName = StringUtils::FormatCamelCaseString(name);
+		macro.index = shader->macros.size();
+		macro.uiName = StringUtils::FormatName(name);
 		macro.uiDescription = description;
 	}
 }
@@ -175,7 +195,7 @@ void ShaderTemplate::ShaderFromTemplate::Load(InputStreamPtr& stream, AssetLoade
 			loader.GetRequestPtr());
 	request->SetCompilationOptions(compilationOptions);
 	auto passes = parent->passes;
-	uint8 language = (uint8)RenderManager::Instance().GetProgramLanguage();
+	RenderManager::ShaderLanguage language = RenderManager::Instance().GetProgramLanguage();
 	for(auto &p : passes) {
 		request->AddPass(p.name);
 		request->SetBlendState(p.blendState);
@@ -190,13 +210,10 @@ void ShaderTemplate::ShaderFromTemplate::Load(InputStreamPtr& stream, AssetLoade
 			request->AddTextureUnit(tu.first, tu.second.params, tu.second.defaultTexture.GetPtr());
 		}
 
-		for(uint32 i = 0; i < (uint32)Pass::ProgramStage::STAGE_COUNT; ++i) {
-			uint32 key = ((i<<16 & 0xffff0000))|(language & 0xffff);
-			auto srcIt = p.sourceMap.find(key);
-			if (srcIt != p.sourceMap.end() && (*srcIt).second.length()) {
-				String sourceCpy = (*srcIt).second;
-				request->SetProgramSource((Pass::ProgramStage)i, std::move(sourceCpy));
-			}
+		auto range = p.sourceMap.equal_range(language);
+		for(auto i = range.first; i != range.second; ++i) {
+			String sourceCpy = (*i).second.second;
+			request->SetProgramSource((*i).second.first, std::move(sourceCpy));
 		}
 	}
 }

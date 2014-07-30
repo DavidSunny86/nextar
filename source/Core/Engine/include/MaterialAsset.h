@@ -44,7 +44,8 @@ public:
 		void SetParamBufferSize(uint32 paramBufferSize);
 		void SetParamValue(uint32 offset, const void* data, size_t amount);
 		void SetTextureValue(uint32 offset, const TextureUnit* texture);
-		void SetLayer(uint8 layer);
+		void SetParameterBuffer(ParameterBuffer&& buff);
+		void SetLayer(Layer layer);
 
 	protected:
 		friend class MaterialAsset;
@@ -69,6 +70,7 @@ public:
 		layerMask = layer;
 	}
 
+
 	virtual uint32 GetClassID() const;
 
 	const ParameterBuffer* GetParameters() const {
@@ -91,14 +93,12 @@ protected:
 	void SetParamBufferSize(size_t size);
 	void SetParamData(const void* data, size_t offset, size_t size);
 	void SetParamData(const TextureUnit* data, size_t offset);
+	void SetParameterBuffer(ParameterBuffer&& buff);
 	void SetShader(ShaderAssetPtr& shader);
 
 	// used as sort key
 	uint8 layerMask;
-
 	ShaderAssetPtr shader;
-	String options;
-
 	//ConstantBufferPtr materialParameters;
 	// todo
 	ParameterBuffer materialParamData;

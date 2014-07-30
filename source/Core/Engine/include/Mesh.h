@@ -13,6 +13,7 @@
 namespace nextar {
 
 class Mesh: public nextar::Renderable {
+	NEX_LOG_HELPER(Mesh);
 public:
 
 	enum Type {
@@ -30,7 +31,7 @@ public:
 		~Primitive();
 	};
 
-	Mesh(const StringID name, Component* parent = nullptr);
+	Mesh(const StringID name, const StringID factory, Component* parent = nullptr);
 	virtual ~Mesh();
 
 	/* recreate the object with new mesh asset */

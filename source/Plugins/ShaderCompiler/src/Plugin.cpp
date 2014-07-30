@@ -4,14 +4,16 @@
  *  Created on: 30-Sep-2013
  *      Author: obhi
  */
+#include <CommonTypes.h>
 #include <BaseHeaders.h>
+#include <ShaderTemplate.h>
 #include <Plugin.h>
 
 NEX_IMPLEMENT_PLUGIN(ShaderCompiler, ShaderCompiler::Plugin);
 
 namespace ShaderCompiler {
 
-ShaderCompilerImplv1_0 Plugin::shaderLoaderImpl;
+ShaderCompilerImplv1_0 Plugin::shaderCompilerImpl;
 
 Plugin::Plugin() {
 }
@@ -28,15 +30,16 @@ void Plugin::Close() {
 }
 
 void Plugin::LicenseRenewed() {
-	AssetLoader::RegisterFactory("NFX", ShaderAsset::Traits::CLASS_ID,
-			&Plugin::shaderLoaderImpl);
+	AssetLoader::RegisterFactory("NFX", ShaderTemplate::Traits::CLASS_ID,
+			&Plugin::shaderCompilerImpl);
 }
 
 bool Plugin::LicenseExpired() {
-	AssetLoader::UnregisterFactory("NFX", ShaderAsset::Traits::CLASS_ID);
+	AssetLoader::UnregisterFactory("NFX", ShaderTemplate::Traits::CLASS_ID);
 	return true;
 }
 
 void Plugin::Dispose() {
 }
+
 } /* namespace ShaderCompiler */

@@ -8,15 +8,17 @@
 #ifndef MATERIALTEMPLATE_H_
 #define MATERIALTEMPLATE_H_
 
-#include <Asset.h>
+#include <NexProjectModel.h>
+#include <AssetTemplate.h>
 #include <MaterialAsset.h>
+#include <ShaderTemplate.h>
 
 namespace nextar {
 
 /*
  *
  */
-class MaterialTemplate: public Asset {
+class _NexProjectAPI MaterialTemplate: public AssetTemplate {
 	NEX_LOG_HELPER(MaterialTemplate);
 public:
 	enum Type {
@@ -57,13 +59,29 @@ public:
 	virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);
 	virtual void DestroyStreamRequestImpl(nextar::StreamRequest*&, bool load = true);
 
-	void SetLayer(uint8 layer) {
+	void SetLayer(Layer layer) {
 		this->layer = layer;
 	}
 
-	uint8 GetLayer() const {
+	Layer GetLayer() const {
 		return layer;
 	}
+
+	MaterialAssetPtr GetMaterial() const {
+		return material;
+	}
+
+	ShaderTemplatePtr GetShaderTemplate() const {
+		return shader;
+	}
+
+	const String& GetOptions() const {
+		return compilationOptions;
+	}
+
+	// load a shader
+	virtual uint32 GetClassID() const;
+
 protected:
 
 	class MaterialFromTemplate : public AssetLoaderImpl {
@@ -84,7 +102,7 @@ protected:
 
 	typedef NameValueMap ParamValueMap;
 
-	uint8 layer;
+	Layer layer;
 	StringUtils::WordList compilationOptions;
 	MaterialAsset::ID assetId;
 	ParamValueMap paramValues;

@@ -39,7 +39,7 @@ void RasterStateCmd::Execute(int parentType, void* parentParam,
 		ScriptParser::StatementContext& ctx) {
 	if (parentType == CommandDelegate::PASS_BLOCK) {
 		RasterStateListener raster;
-		ShaderTemplate::StreamRequest* shader =
+		ShaderTemplate::LoadStreamRequest* shader =
 				static_cast<ShaderScript*>(parentParam)->GetRequest();
 		ctx.ParseBlock(&raster);
 		if (!ctx.IsErrorBitSet()) {

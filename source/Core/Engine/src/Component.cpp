@@ -68,10 +68,11 @@ SharedComponent::SharedComponent(const StringID name,
 		const StringID factory,
 		Component* parent,
 		Group* addToGroup) :
-		Component(name, factory, parent),
 		group(nullptr) {
 	SetID(name);
+	SetFactory(factory);
 	SetParent(parent);
+
 	if (addToGroup) {
 		AddToGroup(addToGroup);
 	}
@@ -85,7 +86,7 @@ SharedComponent::InstanceResult SharedComponent::Instance(SharedComponentPtr& oI
 		StringID factory, Group* group) {
 	Group::Lock groupLock(group);
 	if (group) {
-		oInst = group->Find(name);
+		oInst = group->Find(classId, name);
 		if (oInst)
 			return SharedComponent::INSTANCE_RETRIEVED;
 	}
@@ -107,7 +108,7 @@ SharedComponent::InstanceResult SharedComponent::Instance(SharedComponentPtr& oI
 		Factory* factory, Group* group) {
 	Group::Lock groupLock(group);
 	if (group) {
-		oInst = group->Find(name);
+		oInst = group->Find(classId, name);
 		if (oInst)
 			return SharedComponent::INSTANCE_RETRIEVED;
 	}
@@ -144,7 +145,7 @@ void SharedComponent::RemoveFromGroup() {
 }
 
 SharedComponent::ID SharedComponent::ToID(const String& name) {
-	SharedComponent::ID ret = SharedComponent::ID(StringUtils::DefaultID, std::pair(StringUtils::DefaultID, StringUtils::NullID));
+	SharedComponent::ID ret;
 	auto factoryNamePair = StringUtils::Split(name, ':');
 	if (factoryNamePair.first.length()) {
 		ret.factory = NamedObject::AsyncStringID(factoryNamePair.first);

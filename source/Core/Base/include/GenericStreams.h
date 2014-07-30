@@ -5,20 +5,6 @@
 
 namespace nextar {
 
-class MemoryInputStream;
-class MemoryOutputStream;
-class GenericInputStream;
-class GenericOutputStream;
-class FileInputStream;
-class FileOutputStream;
-
-typedef RefPtr<MemoryInputStream> MemoryInputStreamPtr;
-typedef RefPtr<MemoryOutputStream> MemoryOutputStreamPtr;
-typedef RefPtr<GenericInputStream> GenericInputStreamPtr;
-typedef RefPtr<GenericOutputStream> GenericOutputStreamPtr;
-typedef RefPtr<FileInputStream> FileInputStreamPtr;
-typedef RefPtr<FileOutputStream> FileOutputStreamPtr;
-
 /**
  * @class	MemoryInputStream
  *

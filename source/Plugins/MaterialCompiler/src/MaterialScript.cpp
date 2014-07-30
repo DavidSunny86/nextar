@@ -14,7 +14,7 @@ namespace MaterialCompiler {
 MaterialScript::MaterialScript(MaterialTemplate::StreamRequest* request) :
 		material(request) {
 	auto mtl = static_cast<MaterialTemplate*>(GetRequest()->GetStreamedObject());
-	materialName = mtl->GetID();
+	mtl->GetID(materialId);
 }
 
 void MaterialScript::EnterRegion(ScriptParser::RegionContext& ctx) {
@@ -30,7 +30,8 @@ void MaterialScript::EnterStatement(ScriptParser::StatementContext& ctx) {
 		String name;
 		StringUtils::NextWord(ctx.GetParamList(), name);
 		SharedComponent::ID id = SharedComponent::ToID(name);
-		if (id.name == this->materialName) {
+		if (id.name == this->materialId.name &&
+			id.group == this->materialId.group) {
 			material->SetMaterialID(id);
 			MaterialListener ml(this);
 			ctx.ParseBlock(&ml);

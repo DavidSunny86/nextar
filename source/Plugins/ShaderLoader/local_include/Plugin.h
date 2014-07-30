@@ -9,10 +9,10 @@
 #define PLUGIN_H_
 
 #include <RenderEngineHeaders.h>
-#include <MaterialLoaderImplv10.h>
+#include <ShaderLoaderImplv10.h>
 
 using namespace nextar;
-namespace MaterialLoader {
+namespace ShaderLoader {
 
 class Plugin: public FactoryPlugin {
 	NEX_LOG_HELPER(Plugin)
@@ -39,7 +39,7 @@ public:
 	/** @remarks Dispose should free up the pointer, implements delete this as appropriate */
 	virtual void Dispose();
 protected:
-	static MaterialLoaderImplv1_0 materialLoaderImpl;
+	static ShaderLoaderImplv1_0 shaderLoaderImpl;
 };
 
 } /* namespace ShaderCompiler */

@@ -15,6 +15,7 @@
 #include <RenderConstants.h>
 #include <ShaderParam.h>
 #include <NamedObject.h>
+#include <TextureAsset.h>
 
 namespace nextar {
 
@@ -41,13 +42,15 @@ public:
 		MSG_PASS_COMPILE, MSG_PASS_UPDATE_PARAMBUFFER_OFFSET
 	};
 
-	// todo 7 or 8 is a good cap for this array, and
-	// can make do with a static array in that case.
-	typedef vector<TextureBase*>::type TextureList;
-
 	struct SamplerDesc {
 		TextureUnitParams texUnitParams;
 		TextureBase* defaultTexture;
+		~SamplerDesc() {
+			if (defaultTexture && defaultTexture->IsTextureAsset()) {
+				static_cast<TextureAsset*>(defaultTexture)->Release();
+				defaultTexture = nullptr;
+			}
+		}
 	};
 
 	typedef map<String, SamplerDesc>::type TextureDescMap;
@@ -123,9 +126,8 @@ public:
 	//inline uint16 GetInputLayoutID() const {
 	//	return inputLayoutUniqueID;
 	//}
-
-	TextureBase* GetDefaultTexture(const String& name, uint32 index) const;
-	const TextureUnitParams* GetTextureUnit(const String& name) const;
+	//TextureBase* GetDefaultTexture(const String& name, uint32 index) const;
+	//const TextureUnitParams* GetTextureUnit(const String& name) const;
 
 	static const AutoParam* MapParam(const String& name);
 	static const SamplerDesc* MapSamplerParams(const String& name,

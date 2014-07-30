@@ -42,9 +42,15 @@ public:
 			ser << id.name << id.factory;
 			return ser;
 		}
-		friend InputSerializer& operator >> (InputSerializer& ser, Component::ID& id) {
+		inline friend InputSerializer& operator >> (InputSerializer& ser, Component::ID& id) {
 			ser >> id.name >> id.factory;
 			return ser;
+		}
+		inline friend bool operator == (const ID& one, const ID& other) {
+			return one.name == other.name && one.factory == other.factory;
+		}
+		inline friend bool operator != (const ID& one, const ID& other) {
+			return !(one==other);
 		}
 	};
 
@@ -84,8 +90,8 @@ public:
 				0),
 
 		// templates
-		CLASS_SHADER_TEMPLATE = COMPONENT_CLASS_ID(CAT_TEMPLATE, 0),
-		CLASS_MATERIAL_TEMPLATE = COMPONENT_CLASS_ID(CAT_TEMPLATE, 1),
+		CLASS_SHADER_TEMPLATE = COMPONENT_CLASS_ID(CAT_ASSET | CAT_TEMPLATE, 0),
+		CLASS_MATERIAL_TEMPLATE = COMPONENT_CLASS_ID(CAT_ASSET | CAT_TEMPLATE, 1),
 	};
 
 	enum Flags {
@@ -108,8 +114,9 @@ public:
 
 public:
 
-	Component(const StringID name, const StringID factory, Component* parent =
-			nullptr);
+	Component(const StringID name = StringUtils::NullID,
+			const StringID factory = StringUtils::DefaultID,
+			Component* parent = nullptr);
 	virtual ~Component();
 
 	static Component* Instance(uint32 classId, StringID name,
@@ -119,6 +126,14 @@ public:
 
 	inline bool IsEnabled() const {
 		return (flags & ENABLED) != 0;
+	}
+
+	inline void SetFactory(StringID factoy) {
+		this->factory = factory;
+	}
+
+	inline StringID GetFactory() const {
+		return factory;
 	}
 
 	inline void SetFlag(uint32 flag, bool v) {
@@ -161,6 +176,15 @@ public:
 		return IsFlagSet(UPDATE_REQUIRED);
 	}
 
+	inline StringID GetID() const {
+		return NamedObject::GetID();
+	}
+
+	inline void GetID(ID& id) const {
+		id.name = NamedObject::GetID();
+		id.factory = factory;
+	}
+
 	virtual void Update() {}
 	virtual uint32 GetClassID() const = 0;
 
@@ -171,11 +195,6 @@ public:
 
 	static uint32 GetComponentCatagory(uint32 classID) {
 		return COMPONENT_CAT(classID);
-	}
-
-	inline void GetID(ID& id) const {
-		id.name = NamedObject::GetID();
-		id.factory = factory;
 	}
 
 protected:
@@ -203,9 +222,21 @@ public:
 			ser << (*(const Component::ID*)&id) << id.group;
 			return ser;
 		}
-		friend InputSerializer& operator >> (InputSerializer& ser, SharedComponent::ID& id) {
+
+		inline friend InputSerializer& operator >> (InputSerializer& ser, SharedComponent::ID& id) {
 			ser >> (*(Component::ID*)&id) >> id.group;
 			return ser;
+		}
+
+		inline friend bool operator == (const ID& one, const ID& other) {
+			if ( (*(const Component::ID*)&one) == (*(const Component::ID*)&other)
+					&& (one.group == other.group))
+				return true;
+			return false;
+		}
+
+		inline friend bool operator != (const ID& one, const ID& other) {
+			return !(one==other);
 		}
 	};
 
@@ -238,7 +269,8 @@ public:
 		virtual void AcquireLock() = 0;
 		virtual void ReleaseLock() = 0;
 		virtual void Add(SharedComponentPtr&) = 0;
-		virtual SharedComponentPtr& Find(const StringID name) = 0;
+		virtual SharedComponentPtr& Find(uint32 classId, const StringID name) = 0;
+		virtual void Remove(uint32 classId, StringID name) = 0;
 		virtual void Remove(StringID name) = 0;
 
 		virtual void AsyncRemoveAll(
@@ -265,6 +297,14 @@ public:
 
 	inline Group* GetGroup() const {
 		return group;
+	}
+
+	inline StringID GetID() const {
+		return Component::GetID();
+	}
+
+	inline void GetID(Component::ID& id) const {
+		Component::GetID(id);
 	}
 
 	inline void GetID(ID& id) const {

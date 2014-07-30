@@ -32,7 +32,7 @@ void PluginRegistry::DynLib::Request(PluginLicenseType pluginType,
 		if (load) {
 
 			if (!plugin && !_LoadLib()) {
-				Warn(String("Plugin failed to load: ") + name);
+				Warn(String("Plugin failed to load: ") + this->name);
 				if (!optional)
 					NEX_THROW_FatalError(EXCEPT_FAILED_TO_LOADLIB);
 			}

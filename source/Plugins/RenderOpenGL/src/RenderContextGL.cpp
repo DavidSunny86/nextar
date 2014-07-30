@@ -708,22 +708,22 @@ void RenderContextGL::Draw(StreamData* streamData, CommitContext& ctx) {
 		if (vd.start == 0) {
 			if (streamData->instanceCount == 1)
 				glDrawElements(primtype, streamData->indices.count, indextype,
-						(const GLvoid*) (indexsize * streamData->indices.start));
+						reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start));
 			else
 				GlDrawElementsInstanced(primtype, streamData->indices.count,
 						indextype,
-						(const GLvoid*) (indexsize * streamData->indices.start),
+						reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start),
 						streamData->instanceCount);
 		} else {
 			if (streamData->instanceCount == 1)
 				GlDrawElementsBaseVertex(primtype, streamData->indices.count,
 						indextype,
-						(const GLvoid*) (indexsize * streamData->indices.start),
+						reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start),
 						vd.start);
 			else
 				GlDrawElementsInstancedBaseVertex(primtype,
 						streamData->indices.count, indextype,
-						(const GLvoid*) (indexsize * streamData->indices.start),
+						reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start),
 						streamData->instanceCount, vd.start);
 		}
 	} else {
@@ -948,7 +948,7 @@ bool RenderContextGL::IsSamplerType(GLint type) {
 	return false;
 }
 
-GLint RenderContextGL::GetGlMinFilter(TextureMinFilterType t) {
+GLint RenderContextGL::GetGlMinFilter(TextureMinFilter t) {
 	switch (t) {
 	case TF_MIN_NEAREST:
 		return GL_NEAREST;
@@ -966,7 +966,7 @@ GLint RenderContextGL::GetGlMinFilter(TextureMinFilterType t) {
 	return GL_LINEAR;
 }
 
-GLint RenderContextGL::GetGlMagFilter(TextureMinFilterType t) {
+GLint RenderContextGL::GetGlMagFilter(TextureMagFilter t) {
 	switch (t) {
 	case TF_MAG_NEAREST:
 		return GL_NEAREST;
@@ -976,7 +976,7 @@ GLint RenderContextGL::GetGlMagFilter(TextureMinFilterType t) {
 	return GL_LINEAR;
 }
 
-GLint RenderContextGL::GetGlAddressMode(TextureAddressModeType t) {
+GLint RenderContextGL::GetGlAddressMode(TextureAddressMode t) {
 	switch (t) {
 	case TAM_BORDER:
 		return GL_CLAMP_TO_BORDER;
@@ -990,7 +990,7 @@ GLint RenderContextGL::GetGlAddressMode(TextureAddressModeType t) {
 	return GL_REPEAT;
 }
 
-GLenum RenderContextGL::GetGlCompareFunc(TextureComparisonModeType type) {
+GLenum RenderContextGL::GetGlCompareFunc(TextureComparisonMode type) {
 	switch (type) {
 	case TEXCOMP_NEVER:
 		return GL_NEVER;

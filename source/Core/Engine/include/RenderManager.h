@@ -23,10 +23,12 @@ class _NexEngineAPI RenderManager: public Singleton<RenderManager>,
 	;
 public:
 
-	enum ShaderProgramLanguage : uint8 {
+	/** indexing dependency, needs to be consequtive starting from 0 */
+	enum ShaderLanguage : uint8 {
 		SPP_GLSL,
 		SPP_HLSL,
-		SPP_UNKNOWN,
+		SPP_COUNT,
+		SPP_UNKNOWN = SPP_COUNT,
 	};
 
 	enum Flags {
@@ -76,7 +78,7 @@ public:
 
 	virtual RenderSystemList& GetRenderSystems();
 	/* Implement */
-	virtual ShaderProgramLanguage GetProgramLanguage() = 0;
+	virtual ShaderLanguage GetProgramLanguage() = 0;
 	virtual String GetInfo() = 0;
 
 	/* Render a single frame for a specific window, should be called

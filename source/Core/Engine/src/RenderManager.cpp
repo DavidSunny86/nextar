@@ -34,7 +34,7 @@ void RenderManager::AddRenderQueue(const StringID name, uint16 priority,
 		return;
 	}
 	RenderQueueDesc desc;
-	desc.name = name;
+	desc.SetID(name);
 	desc.priority = priority;
 	desc.flags = flags;
 	renderQueues.push_back(desc);

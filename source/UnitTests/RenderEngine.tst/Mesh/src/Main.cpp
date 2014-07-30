@@ -17,7 +17,7 @@ public:
 		MeshAsset::Group* group =
 				ComponentGroupArchive::Instance().AsyncFindOrCreate(
 						StringUtils::DefaultID);
-		URL url("{EngineData}/mesh/box.mesh");
+		URL url("{EngineData}/Meshes/Box.mesh");
 		MeshAssetPtr mesh = MeshAsset::Traits::Instance(NamedObject::AsyncStringID("Box"),
 				url, factory, group);
 		if (mesh) {

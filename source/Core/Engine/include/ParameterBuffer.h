@@ -21,6 +21,8 @@ class ParamterItearator;
  */
 class _NexEngineAPI ParameterBuffer: public AllocGraphics {
 public:
+	typedef BasicUniquePtr<uint8, MEMCAT_CACHEALIGNED>::type BufferPtr;
+
 	ParameterBuffer();
 	ParameterBuffer(const ParameterBuffer&);
 	ParameterBuffer(ParameterBuffer&&);
@@ -28,7 +30,7 @@ public:
 
 	void Prepare(const ParamEntryTableItem& table);
 	void Prepare(void* data, size_t size);
-	void Prepare(DataPtr&& data, size_t size);
+	void Prepare(BufferPtr&& data, size_t size);
 
 	const TextureUnit* AsTexture(uint32 offset) const {
 		return reinterpret_cast<const TextureUnit*>(data.get() + offset);
@@ -47,7 +49,7 @@ public:
 	}
 
 	void Load(InputSerializer& ser, AssetStreamRequest* request = nullptr);
-	void Save(OutputSerializer& ser);
+	void Save(OutputSerializer& ser) const;
 
 	void SetData(const void* data, size_t offset, size_t size);
 	void SetData(const TextureUnit* data, size_t offset);
@@ -56,7 +58,6 @@ public:
 	ParameterBuffer& operator =(ParameterBuffer&& pb);
 protected:
 
-	typedef BasicUniquePtr<uint8, MEMCAT_CACHEALIGNED>::type BufferPtr;
 	const ParamEntry* _GetParameter(const String& name) const;
 
 	size_t size;

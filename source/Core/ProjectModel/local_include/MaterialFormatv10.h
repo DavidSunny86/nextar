@@ -8,6 +8,23 @@
 #ifndef MATERIALFORMATV10_H_
 #define MATERIALFORMATV10_H_
 
+namespace nextar {
+
+enum MaterialFormatChunkHeaders : uint16 {
+	MATERIAL_HEADER = 0x3a7e,
+	MATERIAL_PARAMETERS = 0x3196,
+};
+
+struct MaterialHeader {
+	VersionID version;
+	ShaderAsset::ID shader;
+	URL shaderLocation;
+	String options;
+	uint8 layerMask;
+};
+
+}
+
 
 
 

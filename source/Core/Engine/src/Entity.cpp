@@ -72,15 +72,15 @@ EntityPtr Entity::Factory::AsyncCreateAndAttach(const StringID name,
 Component* Entity::Factory::AsyncCreate(uint32 type, const StringID name) {
 	switch (type) {
 	case Entity::CLASS_ID:
-		return NEX_NEW(Entity(name));
+		return NEX_NEW(Entity(name, GetID()));
 	case Light::CLASS_ID:
-		return NEX_NEW(Light(name));
+		return NEX_NEW(Light(name, GetID()));
 	case Mesh::CLASS_ID:
-		return NEX_NEW(Mesh(name));
+		return NEX_NEW(Mesh(name, GetID()));
 	case Moveable::CLASS_ID:
-		return NEX_NEW(Moveable(name));
+		return NEX_NEW(Moveable(name, GetID()));
 	case Camera::CLASS_ID:
-		return NEX_NEW(Camera(name));
+		return NEX_NEW(Camera(name, GetID()));
 	}
 	return 0;
 }
@@ -97,8 +97,8 @@ void Entity::Factory::_InternalRegisterToArchive() {
 /*************************************
  * Entity
  *************************************/
-Entity::Entity(const StringID name) :
-		SharedComponent(name), moveable(nullptr), spatial(nullptr), scene(
+Entity::Entity(const StringID name, const StringID factory) :
+		SharedComponent(name, factory), moveable(nullptr), spatial(nullptr), scene(
 				nullptr) {
 }
 

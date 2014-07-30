@@ -43,6 +43,7 @@ public:
 
 protected:
 	friend class ShaderListener;
+	friend class PassCmd;
 	~PassListener() {
 	}
 };

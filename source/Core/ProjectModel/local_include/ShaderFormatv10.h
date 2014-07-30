@@ -13,7 +13,9 @@ namespace nextar {
 enum ShaderFormatChunkHeaders : uint16 {
 	SHADER_HEADER = 0x5231,
 	SHADER_PASS_BLOCK = 0x5633,
-	SHADER_SOURCE = 0x5244,
+	/* @shader_lang */
+	SHADER_SOURCE_GLSL = 0x5244,
+	SHADER_SOURCE_HLSL = 0x5114,
 	SHADER_UNIT = 0x5134,
 };
 
@@ -25,6 +27,7 @@ enum ShaderFormatKeys : uint16 {
 };
 
 struct ShaderHeader {
+	VersionID version;
 	uint16 numUnits;
 	uint8 numPasses;
 };

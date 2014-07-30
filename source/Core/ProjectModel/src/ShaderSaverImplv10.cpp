@@ -8,16 +8,19 @@
 #include <ShaderSaverImplv10.h>
 #include <Serializer.h>
 #include <ShaderFormatv10.h>
+#include <ShaderTemplate.h>
 
 namespace nextar {
 
-ShaderSaverImplv10::ShaderSaverImplv10() {
+ShaderSaverImplv1_0 ShaderSaverImplv1_0::saver;
+
+ShaderSaverImplv1_0::ShaderSaverImplv1_0() {
 }
 
-ShaderSaverImplv10::~ShaderSaverImplv10() {
+ShaderSaverImplv1_0::~ShaderSaverImplv1_0() {
 }
 
-void ShaderSaverImplv10::SavePass(const ShaderTemplate::PassUnit& pu,
+void ShaderSaverImplv1_0::SavePass(const ShaderTemplate::PassUnit& pu,
 		ChunkOutputStream& stream) {
 	OutputSerializer& ser = stream.BeginChunk(SHADER_PASS_BLOCK);
 	ser << pu.name;
@@ -47,10 +50,10 @@ void ShaderSaverImplv10::SavePass(const ShaderTemplate::PassUnit& pu,
 	ser << (uint8)PASS_DEPTH_STATE
 		<< pu.depthStencilState.depthTest
 		<< pu.depthStencilState.depthWrite
-		<< pu.depthStencilState.depthCompareFunc
+		<< (uint8)pu.depthStencilState.depthCompareFunc
 		<< pu.depthStencilState.stencilTest;
 	if (pu.depthStencilState.stencilTest) {
-		StencilFaceOp* op[2] = { &pu.depthStencilState.front, &pu.depthStencilState.back };
+		const StencilFaceOp* op[2] = { &pu.depthStencilState.front, &pu.depthStencilState.back };
 		for(uint32 i = 0; i < 2; ++i) {
 			ser << (uint8)op[i]->stencilMask
 				<< (uint8)op[i]->stencilFunc
@@ -76,9 +79,10 @@ void ShaderSaverImplv10::SavePass(const ShaderTemplate::PassUnit& pu,
 	// todo Texture unit states and source map
 	ser << (uint8)PASS_TEXTURE_STATE;
 	auto& tuMap = pu.textureUnitStates;
+	uint32 numUnits = tuMap.size();
+	ser << numUnits;
 	for(auto& e : tuMap) {
 		ser << e.first
-			<< e.second.defaultTexturePath
 			<< (uint8)e.second.params.minFilter
 			<< (uint8)e.second.params.magFilter
 			<< (uint8)e.second.params.uAddress
@@ -93,30 +97,48 @@ void ShaderSaverImplv10::SavePass(const ShaderTemplate::PassUnit& pu,
 			<< e.second.params.minLod
 			<< e.second.params.maxLod
 			<< e.second.params.borderColor;
+		if (e.second.defaultTexture) {
+			TextureAsset::ID id;
+			e.second.defaultTexture->GetID(id);
+			ser << true << id << e.second.defaultTexturePath;
+		} else
+			ser << false;
 	}
 
 	auto& srcMap = pu.sourceMap;
-	for(auto& m : srcMap) {
-		OutputSerializer& srcChunk = stream.BeginChunk(SHADER_SOURCE);
-		srcChunk << m.first
-			<< m.second;
-		stream.EndChunk();
+	std::array<ShaderFormatChunkHeaders, (uint32)RenderManager::SPP_COUNT> 	languageDumps;
+	languageDumps[RenderManager::SPP_GLSL] = SHADER_SOURCE_GLSL;
+	languageDumps[RenderManager::SPP_HLSL] = SHADER_SOURCE_HLSL;
+
+	for(uint32 i = 0; i < languageDumps.size(); ++i) {
+		auto range = srcMap.equal_range((RenderManager::ShaderLanguage)i);
+		if (range.first != srcMap.end()) {
+			OutputSerializer& ser = stream.BeginChunk((uint16)(languageDumps[i]));
+			uint32 numStages = std::distance(range.first, range.second);
+			ser << numStages;
+			for(auto it = range.first; it != range.second; ++it) {
+				uint16 stage = (uint16)(*it).second.first;
+				ser <<  stage << (*it).second.second;
+			}
+			stream.EndChunk();
+		}
 	}
 	stream.EndChunk();
 }
 
-void ShaderSaverImplv10::Save(OutputStreamPtr& out, AssetSaver& saver) {
+void ShaderSaverImplv1_0::Save(OutputStreamPtr& out, AssetSaver& saver) {
 
 	ShaderTemplate* shader = static_cast<ShaderTemplate*>(
 			saver.GetRequestPtr()->GetStreamedObject());
 	ChunkOutputStream stream(out);
 
 	ShaderHeader header;
+	header.version = NEX_MAKE_VERSION(1, 0, 0);
 	header.numPasses = (uint8)shader->GetPassCount();
 	header.numUnits = (uint16)shader->GetShaderCount();
 
 	OutputSerializer& ser = stream.BeginChunk(SHADER_HEADER);
-	ser << header.numPasses << header.numUnits;
+	ser << header.version << header.numPasses << header.numUnits;
 	stream.EndChunk();
 
 	auto &passList = shader->GetPassList();

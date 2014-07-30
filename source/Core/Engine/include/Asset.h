@@ -402,15 +402,19 @@ public:
 		return metaInfo;
 	}
 
+	inline String GetName() const {
+		Asset* asset = static_cast<Asset*>(GetStreamedObject());
+		return asset->GetAssetLocator().ToString();
+	}
+
 protected:
 	union {
 		AssetLoaderImpl* manualLoader;
-		AssetLoaderImpl* manualSaver;
+		AssetSaverImpl* manualSaver;
 	};
 	Asset::MetaInfo metaInfo;
 };
 
-class AssetLoader;
 class AssetLoaderImpl {
 public:
 

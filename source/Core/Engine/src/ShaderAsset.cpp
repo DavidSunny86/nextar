@@ -15,7 +15,9 @@ namespace nextar {
 /* Shader											 */
 /*****************************************************/
 ShaderAsset::ShaderAsset(const StringID name, const StringID factory) :
-		nextar::Asset(name, factory), translucency(0), renderQueue((uint8)-1), visibilityMask(0) {
+		nextar::Asset(name, factory), translucency(0)
+		,renderQueue((uint8)-1)
+		,visibilityMask(VisibilityMask::VISIBILITY_ALL) {
 }
 
 ShaderAsset::~ShaderAsset() {
@@ -189,8 +191,10 @@ void ShaderAsset::StreamRequest::AddTextureUnit(const String& unitName,
 	Pass::SamplerDesc& sd = defaultTextureUnits[unitName];
 	sd.texUnitParams = tu;
 	sd.defaultTexture = texture;
-	if (texture->IsTextureAsset())
+	if (texture && texture->IsTextureAsset()) {
+		static_cast<TextureAsset*>(texture)->AddRef();
 		metaInfo.AddDependency(static_cast<TextureAsset*>(texture));
+	}
 }
 
 void ShaderAsset::StreamRequest::SetBlendState(BlendState& state) {

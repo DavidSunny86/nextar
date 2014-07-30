@@ -26,7 +26,7 @@ String RenderManagerGL::GetInfo() {
 	return "OpenGL Render Manager";
 }
 
-RenderManager::ShaderProgramLanguage RenderManagerGL::GetProgramLanguage() {
+RenderManager::ShaderLanguage RenderManagerGL::GetProgramLanguage() {
 	return RenderManager::SPP_GLSL;
 }
 

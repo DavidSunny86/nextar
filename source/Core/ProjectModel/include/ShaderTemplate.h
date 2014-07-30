@@ -8,15 +8,17 @@
 #ifndef SHADERTEMPLATE_H_
 #define SHADERTEMPLATE_H_
 
+#include <NexProjectModel.h>
 #include <AssetTemplate.h>
 #include <ShaderAsset.h>
+#include <RenderManager.h>
 
 namespace nextar {
 
 /*
  *
  */
-class ShaderTemplate :
+class _NexProjectAPI ShaderTemplate :
 		public AssetTemplate {
 public:
 
@@ -59,7 +61,7 @@ public:
 	};
 
 	typedef map<String, TextureUnit>::type TextureUnitMap;
-	typedef map<uint32, String>::type SourceMap;
+	typedef multimap<RenderManager::ShaderLanguage, std::pair<Pass::ProgramStage, String>>::type SourceMap;
 
 	struct PassUnit {
 		StringID name;
@@ -72,19 +74,24 @@ public:
 
 	typedef vector<PassUnit>::type PassList;
 
-	class StreamRequest;
+	class LoadStreamRequest;
 
 	typedef AssetTraits<ShaderTemplate> Traits;
 	typedef FactoryTraits<ShaderTemplate> FactoryTraits;
 
-	class StreamRequest: public AllocGeneral, public AssetStreamRequest {
-		NEX_LOG_HELPER(ShaderTemplate::StreamRequest);
+	class SaveStreamRequest: public AllocGeneral, public AssetStreamRequest {
+	public:
+		SaveStreamRequest(ShaderTemplate* shaderTemplate) : AssetStreamRequest(shaderTemplate) {}
+	};
+
+	class LoadStreamRequest: public AllocGeneral, public AssetStreamRequest {
+		NEX_LOG_HELPER(ShaderTemplate::LoadStreamRequest);
 	public:
 
-		StreamRequest(ShaderTemplate* shaderTemplate);
+		LoadStreamRequest(ShaderTemplate* shaderTemplate);
 		void AddPass(StringID name);
 		void SetProgramSource(Pass::ProgramStage stage,
-				RenderManager::ShaderProgramLanguage lang,
+				RenderManager::ShaderLanguage lang,
 				String&& source);
 
 		void SetRasterState(RasterState& state);
@@ -141,6 +148,7 @@ public:
 	}
 
 	// load a shader
+	virtual uint32 GetClassID() const;
 
 protected:
 
@@ -159,7 +167,8 @@ protected:
 	};
 
 	friend class nextar::ShaderTemplate::ShaderFromTemplate;
-	friend class nextar::ShaderTemplate::StreamRequest;
+	friend class nextar::ShaderTemplate::LoadStreamRequest;
+	friend class nextar::ShaderTemplate::SaveStreamRequest;
 
 	String GetHashNameFromOptions(const StringUtils::WordList& );
 

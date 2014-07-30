@@ -119,10 +119,9 @@ void WriteBoundsInfo(ChunkOutputStream& outStream) {
 
 void WriteMaterialData(ChunkOutputStream& outStream) {
 	OutputSerializer& ser = outStream.BeginChunk(MCID_MATERIAL_DATA);
-	StringID factoryAndGroup = StringUtils::DefaultID;
-	StringID name = NamedObject::AsyncStringID("BoxMtl");
-	String path = "{EngineData}/Materials/box.material";
-	ser << factoryAndGroup << name << factoryAndGroup << path;
+	StringID name(NamedObject::AsyncStringID("Box")), factory(StringUtils::DefaultID), group(StringUtils::DefaultID);
+	URL path("{EngineData}/Materials/Box.mtl");
+	ser << name << factory << group << path;
 	outStream.EndChunk();
 }
 
@@ -155,7 +154,7 @@ void TestDumpCubeMesh(nextar::ApplicationContext& application) {
 	nextar::FileSystem& fileSys = nextar::FileSystem::Instance();
 
 	String version("1.0.0");
-	URL url("{EngineData}/Meshes/box.mesh");
+	URL url("{EngineData}/Meshes/Box.mesh");
 	OutputStreamPtr output = fileSys.OpenWrite(url, false);
 	{
 	OutputSerializer ser(output);

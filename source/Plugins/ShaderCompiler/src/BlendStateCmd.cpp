@@ -34,7 +34,7 @@ void BlendStateCmd::Execute(int parentType, void* parentParam,
 		ScriptParser::StatementContext& ctx) {
 	if (parentType == CommandDelegate::PASS_BLOCK) {
 		BlendStateListener blend;
-		ShaderTemplate::StreamRequest* shader =
+		ShaderTemplate::LoadStreamRequest* shader =
 				static_cast<ShaderScript*>(parentParam)->GetRequest();
 		ctx.ParseBlock(&blend);
 		if (!ctx.IsErrorBitSet()) {

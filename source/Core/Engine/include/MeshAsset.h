@@ -18,12 +18,16 @@ enum {
 
 class _NexEngineAPI MeshBufferData: public AllocGeneral {
 public:
+	typedef vector<uint8, AllocatorCacheAligned>::type Data;
+	struct Stream {
+		Data buffer;
+		uint32 stride;
+	};
 	// first 4 bytes is stride for vertex buffers
-	typedef list<ByteStream>::type BufferList;
+	typedef list<Stream>::type BufferList;
 	/* vertex/index buffer data when loaded from file */
 	BufferList vertexBuffers;
 	BufferList indexBuffers;
-
 };
 
 class _NexEngineAPI MeshVertexData: public AllocGeneral {
@@ -60,8 +64,6 @@ public:
 
 class _NexEngineAPI MeshIndexData: public AllocGeneral {
 public:
-	/* type */
-	bool twoBytePerElement;
 	/* index count */
 	uint32 indexCount;
 	/* index buffer */
@@ -175,8 +177,8 @@ public:
 		}
 
 		/* set buffer data */
-		ByteStream& AddIndexBuffer();
-		ByteStream& AddVertexBuffer();
+		MeshBufferData::Stream& AddIndexBuffer();
+		MeshBufferData::Stream& AddVertexBuffer();
 
 	protected:
 

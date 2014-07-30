@@ -33,18 +33,18 @@ class ShaderScript: public ScriptParser::RegionListener,
 
 	NEX_LOG_HELPER (ShaderScript);
 
-	typedef multimap<String, std::pair<RenderManager::ShaderProgramLanguage, String> >::type SourceRegionMap;
-	ShaderTemplate::StreamRequest* shader;
+	typedef multimap<String, std::pair<RenderManager::ShaderLanguage, String> >::type SourceRegionMap;
+	ShaderTemplate::LoadStreamRequest* shader;
 	SourceRegionMap regions;
 public:
 
-	ShaderScript(ShaderTemplate::StreamRequest* s) :
+	ShaderScript(ShaderTemplate::LoadStreamRequest* s) :
 			shader(s) {
 	}
 
 	void SetRegionAsSource(Pass::ProgramStage, const String& name);
 
-	inline ShaderTemplate::StreamRequest* GetRequest() {
+	inline ShaderTemplate::LoadStreamRequest* GetRequest() {
 		return shader;
 	}
 

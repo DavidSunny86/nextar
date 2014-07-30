@@ -89,7 +89,7 @@ StreamData* MeshServices::CreateSphereMesh(
 	stream->flags = StreamData::DELETE_BINDING;
 	stream->vertices.count = nvec;
 	stream->vertices.start = 0;
-	stream->vertices.layout = VertexLayout::GetCommonLayout(VertexLayoutType::POSITION_0);
+	stream->vertices.layout = VertexLayout::GetCommonLayout(VertexLayoutType::POSITION_0).GetPtr();
 	stream->vertices.binding = NEX_NEW(VertexBufferBinding());
 	stream->vertices.binding->BindBuffer(0, vertexBuffer);
 	stream->indices.start = 0;

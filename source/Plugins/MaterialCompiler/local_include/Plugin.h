@@ -8,7 +8,7 @@
 #ifndef PLUGIN_H_
 #define PLUGIN_H_
 
-#include <RenderEngineHeaders.h>
+#include <EngineHeaders.h>
 #include <MaterialCompilerImplv10.h>
 
 using namespace nextar;

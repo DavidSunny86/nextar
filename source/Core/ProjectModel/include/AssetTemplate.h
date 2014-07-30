@@ -8,6 +8,7 @@
 #ifndef ASSETTEMPLATE_H_
 #define ASSETTEMPLATE_H_
 
+#include <NexProjectModel.h>
 #include <Asset.h>
 
 namespace nextar {
@@ -15,7 +16,7 @@ namespace nextar {
 /*
  *
  */
-class AssetTemplate: public Asset {
+class _NexProjectAPI AssetTemplate: public Asset {
 public:
 	AssetTemplate(const StringID, const StringID);
 	virtual ~AssetTemplate();
@@ -33,7 +34,7 @@ public:
 	}
 
 protected:
-	std::chrono::time_point lastSaveTime;
+	// std::chrono::time_point lastSaveTime;
 	uint32 lastSavedModification;
 	uint32 modification;
 };

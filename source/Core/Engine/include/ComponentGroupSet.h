@@ -30,7 +30,8 @@ public:
 	virtual void AcquireLock();
 	virtual void ReleaseLock();
 	virtual void Add(SharedComponentPtr&) override;
-	virtual SharedComponentPtr& Find(const StringID name) override;
+	virtual SharedComponentPtr& Find(uint32 classId, const StringID name) override;
+	virtual void Remove(uint32 classId, StringID name) override;
 	virtual void Remove(StringID name) override;
 
 	virtual void AsyncRemoveAll(uint32 ofType = Component::CLASS_UNKNOWN)
@@ -42,7 +43,7 @@ protected:
 
 	NEX_THREAD_MUTEX(containerLock);
 	// todo Might choose to support same named objects but of different types
-	typedef unordered_map<StringID, SharedComponentPtr>::type ComponentMap;
+	typedef multimap<StringID, SharedComponentPtr>::type ComponentMap;
 	ComponentMap componentMap;
 };
 

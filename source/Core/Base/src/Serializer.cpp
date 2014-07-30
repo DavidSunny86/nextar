@@ -3,6 +3,11 @@
 
 namespace nextar {
 
+const InputSerializer::Chunk InputSerializer::First(
+		InputSerializer::ChunkHeader(MARKER_INVALID_CHUNK, 0), 0);
+const InputSerializer::Chunk InputSerializer::Invalid(
+		InputSerializer::ChunkHeader(MARKER_INVALID_CHUNK, 0), 0);
+
 /*********************************************************
  * InputSerializer
 *********************************************************/
@@ -20,7 +25,8 @@ InputSerializer& InputSerializer::operator >>(Chunk& object) {
 			left = 0;
 		}
 		object.second = inStream->Tell();
-	}
+	} else
+		object = Invalid;
 	return *this;
 }
 
@@ -76,9 +82,6 @@ InputSerializer& InputSerializer::operator >>(UniString& object) {
 		Warn("Invalid string read!");
 	return *this;
 }
-
-const InputSerializer::Chunk ChunkInputStream::First(
-		InputSerializer::ChunkHeader(MARKER_INVALID_CHUNK, 0), 0);
 
 ChunkInputStream& ChunkInputStream::ReadChunk(uint16 header,
 		InputSerializer::Chunk& read, const InputSerializer::Chunk& prevChunk) {

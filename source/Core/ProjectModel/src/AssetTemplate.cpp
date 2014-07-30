@@ -9,7 +9,10 @@
 
 namespace nextar {
 
-AssetTemplate::AssetTemplate(const StringID name, const StringID factory) : Asset(name, factory) {
+AssetTemplate::AssetTemplate(const StringID name, const StringID factory) :
+		Asset(name, factory),
+		lastSavedModification(0),
+		modification(-1) {
 }
 
 AssetTemplate::~AssetTemplate() {

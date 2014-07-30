@@ -41,7 +41,7 @@ void PassCmd::Execute(int parentType, void* parentParam,
 	if (parentType == CommandDelegate::SHADER_BLOCK) {
 		String name;
 		StringUtils::NextWord(ctx.GetParamList(), name);
-		PassListener pass(static_cast<ShaderScript*>(parentParam), ctx);
+		PassListener pass(static_cast<ShaderScript*>(parentParam), name);
 		ctx.ParseBlock(&pass);
 	} else {
 		ctx.Error("BlendState block needs to be inside Shader declaration.");

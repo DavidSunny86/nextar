@@ -117,10 +117,10 @@ public:
 	static uint16 GetShaderParamSize(GLuint type);
 	static uint16 GetSemanticType(GLenum);
 	static bool IsSamplerType(GLint type);
-	static GLint GetGlAddressMode(TextureAddressModeType t);
-	static GLenum GetGlCompareFunc(TextureComparisonModeType type);
-	static GLint GetGlMagFilter(TextureMinFilterType t);
-	static GLint GetGlMinFilter(TextureMinFilterType t);
+	static GLint GetGlAddressMode(TextureAddressMode t);
+	static GLenum GetGlCompareFunc(TextureComparisonMode type);
+	static GLint GetGlMagFilter(TextureMagFilter t);
+	static GLint GetGlMinFilter(TextureMinFilter t);
 	static GLenum GetGlTextureType(TextureBase::TextureType type);
 	// @optimize Return from a table a const reference rather than the object
 	// and store that in texture view.

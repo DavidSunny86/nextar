@@ -28,7 +28,7 @@ ParameterBuffer::~ParameterBuffer() {
 		if( (*it).type == ParamDataType::PDT_TEXTURE ) {
 			TextureUnit* unit = reinterpret_cast<TextureUnit*>(buffer);
 			if (unit->texture && unit->texture->IsTextureAsset()) {
-				static_cast<Asset*>(unit->texture)->Release();
+				static_cast<TextureAsset*>(unit->texture)->Release();
 			}
 		}
 		buffer += (*it).maxSize;
@@ -48,7 +48,7 @@ void ParameterBuffer::Prepare(void* data, size_t size) {
 		std::memcpy(this->data.get(), data, size);
 }
 
-void ParameterBuffer::Prepare(DataPtr&& data, size_t size) {
+void ParameterBuffer::Prepare(BufferPtr&& data, size_t size) {
 	this->size = size;
 	this->data = std::move(data);
 }
@@ -72,7 +72,7 @@ void ParameterBuffer::SetData(const TextureUnit* data, size_t offset) {
 		std::memcpy(this->data.get() + offset, data, sizeof(TextureUnit));
 		if(data->texture &&
 				data->texture->IsTextureAsset()) {
-			static_cast<Asset*>(data->texture)->AddRef();
+			static_cast<TextureAsset*>(data->texture)->AddRef();
 		}
 	}
 }
@@ -155,7 +155,7 @@ void ParameterBuffer::Load(InputSerializer& ser, AssetStreamRequest* request) {
 	}
 }
 
-void ParameterBuffer::Save(OutputSerializer& ser) {
+void ParameterBuffer::Save(OutputSerializer& ser) const {
 	ser << size;
 	if (size) {
 		const uint8* buffer = data.get();
@@ -193,7 +193,7 @@ void ParameterBuffer::Save(OutputSerializer& ser) {
 			}
 				break;
 			case ParamDataBaseType::BASE_TEXTURE: {
-				TextureUnit* tu = reinterpret_cast<TextureUnit*>(buffer);
+				const TextureUnit* tu = reinterpret_cast<const TextureUnit*>(buffer);
 				bool asset = tu->texture->IsTextureAsset();
 				ser << asset;
 				if (asset && tu->texture) {

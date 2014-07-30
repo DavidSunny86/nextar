@@ -8,7 +8,8 @@
 #ifndef TEXTUREUNITSTATECMD_H_
 #define TEXTUREUNITSTATECMD_H_
 
-#include <EngineHeaders.h>
+#include <ProjectModelHeaders.h>
+#include <ShaderTemplate.h>
 #include <CommonTypes.h>
 
 namespace ShaderCompiler {
@@ -26,8 +27,8 @@ class TextureUnitStateListener: public ScriptParser::BlockListener,
 public:
 	//static CommandNamePair commands[];
 	//static const size_t commandCount;
-	ShaderAsset::StreamRequest* shader;
-	inline TextureUnitStateListener(ShaderAsset::StreamRequest* s) :
+	ShaderTemplate::LoadStreamRequest* shader;
+	inline TextureUnitStateListener(ShaderTemplate::LoadStreamRequest* s) :
 			shader(s) {
 	}
 	virtual void EnterBlock(ScriptParser::BlockContext& block);

@@ -8,6 +8,8 @@
 #ifndef MATERIALSCRIPT_H_
 #define MATERIALSCRIPT_H_
 
+#include <CommonTypes.h>
+
 namespace MaterialCompiler {
 
 /*
@@ -18,7 +20,7 @@ public ScriptParser::ScriptListener,
 public ScriptParser::StatementListener {
 	NEX_LOG_HELPER (MaterialScript);
 
-	StringID materialName;
+	MaterialAsset::ID materialId;
 	MaterialTemplate::StreamRequest* material;
 public:
 	MaterialScript(MaterialTemplate::StreamRequest* request);

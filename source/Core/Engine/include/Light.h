@@ -24,13 +24,17 @@ public:
 	};
 
 	enum class PassIndex : uint16 {
-		SKY = -1, DIRECTIONAL = 1, OMNI = 0, SPOT = 2, AREA = -1,
+		SKY = 100,
+		DIRECTIONAL = 1,
+		OMNI = 0,
+		SPOT = 2,
+		AREA = 100,
 	};
 
-	Light(const StringID name);
+	Light(const StringID name, const StringID factory, Component* parent = nullptr);
 	virtual ~Light();
 
-	inline VisiblePrimitive* GetLightVolume() const {
+	inline VisiblePrimitive* GetLightVolume() {
 		return &lightVolume;
 	}
 

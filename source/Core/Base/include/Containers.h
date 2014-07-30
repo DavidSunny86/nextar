@@ -92,10 +92,11 @@ struct unordered_map {
 };
 
 template<typename Kty, typename T, typename Pr = std::less<Kty>,
-		typename Allocator = AllocatorGeneral>
+		typename Allocator = AllocatorGeneral,
+		typename STDAllocatorType = STDAllocator< std::pair<Kty, T>, Allocator> >
 struct multimap {
 	typedef typename std::multimap<Kty, T, Pr,
-			STDAllocator<std::pair<Kty, T>, Allocator> > type;
+			STDAllocatorType > type;
 };
 
 template<typename T, typename Allocator = AllocatorGeneral>

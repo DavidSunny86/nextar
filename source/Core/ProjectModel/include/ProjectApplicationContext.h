@@ -8,6 +8,7 @@
 #ifndef PROJECTAPPLICATIONCONTEXT_H_
 #define PROJECTAPPLICATIONCONTEXT_H_
 
+#include <NexProjectModel.h>
 #include <EngineApplicationContext.h>
 
 namespace nextar {
@@ -15,7 +16,7 @@ namespace nextar {
 /*
  *
  */
-class ProjectApplicationContext: public EngineApplicationContext {
+class _NexProjectAPI ProjectApplicationContext: public EngineApplicationContext {
 public:
 	ProjectApplicationContext(const String& name);
 	virtual ~ProjectApplicationContext();

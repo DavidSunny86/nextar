@@ -15,7 +15,7 @@
 #endif
 #define _SS(str) SCRIPT_##str
 
-namespace MaterialLoader {
+namespace MaterialCompiler {
 
 SCRIPT_STRING(CMD_MATERIAL, "material");
 SCRIPT_STRING(CMD_SHADER, "shader");

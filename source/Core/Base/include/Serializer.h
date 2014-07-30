@@ -120,6 +120,7 @@ class _NexBaseAPI InputSerializer: public AllocGeneral {
 
 public:
 
+
 	typedef std::pair<int8*, uint32> ByteArray;
 	typedef std::pair<uint8*, uint32> UByteArray;
 	typedef std::pair<int16*, uint32> ShortArray;
@@ -132,6 +133,9 @@ public:
 	typedef std::pair<double*, uint32> DoubleArray;
 	typedef std::pair<uint16, uint32> ChunkHeader;
 	typedef std::pair<ChunkHeader, std::streamoff> Chunk;
+
+	static const Chunk First;
+	static const Chunk Invalid;
 
 	inline InputSerializer(InputStreamPtr& _inStream);
 	inline ~InputSerializer();
@@ -191,9 +195,9 @@ protected:
 };
 
 class _NexBaseAPI ChunkInputStream: public InputSerializer {
-	static const Chunk First;
 
 public:
+
 	/** @remarks Constructor **/
 	inline ChunkInputStream(InputStreamPtr& o) :
 			InputSerializer(o) {

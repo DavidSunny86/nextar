@@ -14,5 +14,5 @@
 ## Add modules
 #============================================================
 add_module(Base)
+add_module(ProjectModel)
 add_module(RenderEngine)
-

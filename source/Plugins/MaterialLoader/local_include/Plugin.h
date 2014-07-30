@@ -8,7 +8,7 @@
 #ifndef PLUGIN_H_
 #define PLUGIN_H_
 
-#include <RenderEngineHeaders.h>
+#include <EngineHeaders.h>
 #include <MaterialLoaderImplv10.h>
 
 using namespace nextar;
@@ -42,5 +42,5 @@ protected:
 	static MaterialLoaderImplv1_0 materialLoaderImpl;
 };
 
-} /* namespace ShaderCompiler */
+} /* namespace MaterialLoader */
 #endif /* PLUGIN_H_ */

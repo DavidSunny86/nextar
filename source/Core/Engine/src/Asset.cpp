@@ -156,6 +156,11 @@ void Asset::LoadImpl(nextar::StreamRequest* request, bool) {
 	loader.Serialize();
 }
 
+void Asset::SaveImpl(nextar::StreamRequest* request, bool) {
+	AssetSaver saver(static_cast<AssetStreamRequest*>(request));
+	saver.Serialize();
+}
+
 StreamRequest* Asset::CreateStreamRequestImpl(bool) {
 	return NEX_ALLOC_INIT_T(AssetStreamRequest, MEMCAT_GENERAL, this);
 }
@@ -226,7 +231,7 @@ void AssetLoader::Serialize() {
 		if (!input) {
 			Error(
 					String("Could not open asset file: ")
-							+ assetPtr->GetAssetLocator().ToString());
+							+ request->GetName());
 			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOCATE_ASSET);
 		}
 	}

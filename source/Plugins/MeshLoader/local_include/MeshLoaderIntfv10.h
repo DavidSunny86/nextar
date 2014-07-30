@@ -13,14 +13,14 @@
 using namespace nextar;
 namespace MeshLoader {
 
-class MeshLoaderImplv1_0: public MeshLoaderIntf, public AllocGeneral {
+class MeshLoaderIntfv1_0: public MeshLoaderIntf, public AllocGeneral {
 
-	NEX_LOG_HELPER(MeshLoaderImplv1_0)
+	NEX_LOG_HELPER(MeshLoaderIntfv1_0)
 	;
 
 public:
-	MeshLoaderImplv1_0();
-	virtual ~MeshLoaderImplv1_0();
+	MeshLoaderIntfv1_0();
+	virtual ~MeshLoaderIntfv1_0();
 
 	virtual void Load(InputSerializer&, AssetLoader& loader);
 

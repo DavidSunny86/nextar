@@ -31,20 +31,15 @@ enum MeshChunkID {
 	MCID_END
 };
 
-MaterialAssetPtr MeshLoaderImplv1_0::ReadMaterialData(
+MaterialAssetPtr MeshLoaderIntfv1_0::ReadMaterialData(
 		MeshAsset::StreamRequest* mesh, InputSerializer& ser) {
-	StringID factory, name, materialGroup;
-	String path;
-	ser >> factory >> name >> materialGroup >> path;
-	MaterialAssetPtr mtl;
-	URL location(path);
-	// create a new request for material load??
-	mtl = MaterialAsset::Traits::Instance(name, location, factory,
-			materialGroup);
-	return mtl;
+	MaterialAsset::ID id;
+	URL path;
+	ser >> id >> path;
+	return MaterialAsset::Traits::Instance(id, path);
 }
 
-void MeshLoaderImplv1_0::FindStreamVertexElements(
+void MeshLoaderIntfv1_0::FindStreamVertexElements(
 		MeshAsset::StreamRequest* mesh, const VertexElement*& start,
 		const VertexElement*& end, uint16 streamIndex,
 		const VertexElement* elem, uint16 numVertexElements) {
@@ -73,7 +68,7 @@ void MeshLoaderImplv1_0::FindStreamVertexElements(
 	end++;
 }
 
-void MeshLoaderImplv1_0::ReadVertexElementData(
+void MeshLoaderIntfv1_0::ReadVertexElementData(
 		MeshAsset::StreamRequest* request, InputSerializer& ser,
 		uint16& layoutType, uint8& vertexElementCount, VertexElement*& vertexElements) {
 
@@ -86,14 +81,14 @@ void MeshLoaderImplv1_0::ReadVertexElementData(
 		vertexElementCount = 0;
 		vertexElements = 0;
 		if(layoutType >= (uint16)VertexLayoutType::VERTEX_LAYOUT_COUNT) {
-			Error(String("Layout not supported: ") + mesh->GetNameID());
+			Error(String("Layout not supported: ") + request->GetName());
 			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
 		}
 		return;
 	}
 	ser >> (vertexElementCount);
 	if (vertexElementCount >= VertexElement::MAX_VERTEX_ELEMENT) {
-		Error(String("Too many vertex elements: ") + mesh->GetNameID());
+		Error(String("Too many vertex elements: ") + request->GetName());
 		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
 	}
 
@@ -112,7 +107,7 @@ void MeshLoaderImplv1_0::ReadVertexElementData(
 	}
 
 	if (i != vertexElementCount) {
-		Error(String("Failed to read vertex elements: ") + mesh->GetNameID());
+		Error(String("Failed to read vertex elements: ") + request->GetName());
 		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
 	}
 
@@ -120,7 +115,7 @@ void MeshLoaderImplv1_0::ReadVertexElementData(
 	std::sort(vertexElements, vertexElements + vertexElementCount);
 }
 
-void MeshLoaderImplv1_0::ReadVertexBufferData(MeshAsset::StreamRequest* request,
+void MeshLoaderIntfv1_0::ReadVertexBufferData(MeshAsset::StreamRequest* request,
 		InputSerializer& ser, MeshVertexData*& vertexData) {
 
 	Asset* mesh = static_cast<Asset*>(request->GetStreamedObject());
@@ -131,11 +126,10 @@ void MeshLoaderImplv1_0::ReadVertexBufferData(MeshAsset::StreamRequest* request,
 
 	ser >> size >> vertexCount >> streamIndex >> vertexStride;
 
-	ByteStream& stream = request->AddVertexBuffer();
-	stream.resize(size+4);
-	uint8* vertexBuffer = &stream[0];
-	*(uint32*)vertexBuffer = vertexStride;
-	vertexBuffer += 4;
+	auto& stream = request->AddVertexBuffer();
+	stream.buffer.resize(size);
+	uint8* vertexBuffer = stream.buffer.data();
+	stream.stride = vertexStride;
 
 	InputSerializer::UByteArray readBuffer(vertexBuffer, size);
 	ser >> readBuffer;
@@ -153,7 +147,7 @@ void MeshLoaderImplv1_0::ReadVertexBufferData(MeshAsset::StreamRequest* request,
 	}
 }
 
-MeshVertexData* MeshLoaderImplv1_0::ReadVertexData(
+MeshVertexData* MeshLoaderIntfv1_0::ReadVertexData(
 		MeshAsset::StreamRequest* request, InputSerializer& ser,
 		VertexElement* vertexElements, uint16 vertexElementCount, VertexLayoutType type) {
 
@@ -164,7 +158,7 @@ MeshVertexData* MeshLoaderImplv1_0::ReadVertexData(
 	ser >> numVertexBuffers >> vertexData->vertexCount;
 
 	if (numVertexBuffers >= MAX_STREAM_COUNT) {
-		Error(String("Too many vertex buffers: ") + mesh->GetNameID());
+		Error(String("Too many vertex buffers: ") + request->GetName());
 		NEX_DELETE(vertexData);
 		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
 	}
@@ -174,7 +168,7 @@ MeshVertexData* MeshLoaderImplv1_0::ReadVertexData(
 	ser >> chunk;
 	if (chunk.first.first != MCID_VERTEX_ELEMENT_DATA && !vertexElements 
 		&& type == VertexLayoutType::CUSTOM_LAYOUT) {
-		Error(String("Vertex element data missing: ") + mesh->GetNameID());
+		Error(String("Vertex element data missing: ") + request->GetName());
 		NEX_DELETE(vertexData);
 		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
 	}
@@ -207,23 +201,25 @@ MeshVertexData* MeshLoaderImplv1_0::ReadVertexData(
 	return vertexData;
 }
 
-MeshIndexData* MeshLoaderImplv1_0::ReadIndexData(
+MeshIndexData* MeshLoaderIntfv1_0::ReadIndexData(
 		MeshAsset::StreamRequest* request, InputSerializer& ser) {
 	Asset* mesh = static_cast<Asset*>(request->GetStreamedObject());
 	MeshIndexData* indexData = NEX_NEW(MeshIndexData);
 
 	uint32 size;
 	ser >> size >> indexData->indexCount;
-	indexData->twoBytePerElement = (size / indexData->indexCount) == 2;
-	ByteStream& stream = request->AddIndexBuffer();
-	stream.resize(size);
-	uint8* indexBuffer = &stream[0];
 
-	if (indexData->twoBytePerElement) {
+	auto& stream = request->AddIndexBuffer();
+	stream.stride = (size / indexData->indexCount);
+	stream.buffer.resize(size);
+	uint8* indexBuffer = stream.buffer.data();
+
+	if (stream.stride==2) {
 		InputSerializer::UShortArray dataBuff(
 				reinterpret_cast<uint16*>(indexBuffer), size / 2);
 		ser >> dataBuff;
 	} else {
+		NEX_ASSERT(stream.stride==4);
 		InputSerializer::UIntArray dataBuff(
 				reinterpret_cast<uint32*>(indexBuffer), size / 4);
 		ser >> dataBuff;
@@ -232,7 +228,7 @@ MeshIndexData* MeshLoaderImplv1_0::ReadIndexData(
 	return indexData;
 }
 
-BoundsInfo MeshLoaderImplv1_0::ReadBoundsInfo(MeshAsset::StreamRequest* mesh,
+BoundsInfo MeshLoaderIntfv1_0::ReadBoundsInfo(MeshAsset::StreamRequest* mesh,
 		InputSerializer& ser) {
 	BoundsInfo bv;
 	float radius;
@@ -245,7 +241,7 @@ BoundsInfo MeshLoaderImplv1_0::ReadBoundsInfo(MeshAsset::StreamRequest* mesh,
 	return bv;
 }
 
-void MeshLoaderImplv1_0::ReadSubMesh(MeshAsset::StreamRequest* request,
+void MeshLoaderIntfv1_0::ReadSubMesh(MeshAsset::StreamRequest* request,
 		InputSerializer& ser) {
 	Asset* mesh = static_cast<Asset*>(request->GetStreamedObject());
 	uint32 subMesh = request->AddPrimitiveGroup();
@@ -303,20 +299,20 @@ void MeshLoaderImplv1_0::ReadSubMesh(MeshAsset::StreamRequest* request,
 				return;
 			}
 		} else {
-			Error(String("File is corrupt: ") + mesh->GetNameID());
+			Error(String("File is corrupt: ") + request->GetName());
 			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
 		}
 	} while (!ser.IsEndOfStream());
 }
 
-void MeshLoaderImplv1_0::ReadMeshHeader(MeshAsset::StreamRequest* mesh,
+void MeshLoaderIntfv1_0::ReadMeshHeader(MeshAsset::StreamRequest* mesh,
 		InputSerializer& ser) {
 	uint32 numSubMesh;
 	ser >> numSubMesh;
 	mesh->SetPrimitiveGroupCount(numSubMesh);
 }
 
-void MeshLoaderImplv1_0::ReadMeshChunk(MeshAsset::StreamRequest* request,
+void MeshLoaderIntfv1_0::ReadMeshChunk(MeshAsset::StreamRequest* request,
 		InputSerializer& ser) {
 	/* check if data is shared */
 	Asset* mesh = static_cast<Asset*>(request->GetStreamedObject());
@@ -337,11 +333,11 @@ void MeshLoaderImplv1_0::ReadMeshChunk(MeshAsset::StreamRequest* request,
 					if (!headersRead)
 						Error(
 								"Vertex data should appear after mesh header: "
-										+ mesh->GetNameID());
+										+ request->GetName());
 					if (subMeshesRead)
 						Error(
 								"Vertex data should appear before primitive groups: "
-										+ mesh->GetNameID());
+										+ request->GetName());
 				}
 				break;
 			case MCID_INDEX_DATA:
@@ -351,11 +347,11 @@ void MeshLoaderImplv1_0::ReadMeshChunk(MeshAsset::StreamRequest* request,
 					if (!headersRead)
 						Error(
 								"Index data should appear after mesh header: "
-										+ mesh->GetNameID());
+										+ request->GetName());
 					if (subMeshesRead)
 						Error(
 								"Index data should appear before primitive groups: "
-										+ mesh->GetNameID());
+										+ request->GetName());
 				}
 				break;
 			case MCID_MATERIAL_DATA:
@@ -368,7 +364,7 @@ void MeshLoaderImplv1_0::ReadMeshChunk(MeshAsset::StreamRequest* request,
 				else
 					Error(
 							"Primitive groups should appear after mesh header: "
-									+ mesh->GetNameID());
+									+ request->GetName());
 				subMeshesRead = true;
 				break;
 			case MCID_BOUNDS_INFO:
@@ -382,19 +378,19 @@ void MeshLoaderImplv1_0::ReadMeshChunk(MeshAsset::StreamRequest* request,
 				return;
 			}
 		} else {
-			Error(String("File is corrupt: ") + mesh->GetNameID());
+			Error(String("File is corrupt: ") + request->GetName());
 			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
 		}
 	} while (!ser.IsEndOfStream());
 }
 
-MeshLoaderImplv1_0::MeshLoaderImplv1_0() {
+MeshLoaderIntfv1_0::MeshLoaderIntfv1_0() {
 }
 
-MeshLoaderImplv1_0::~MeshLoaderImplv1_0() {
+MeshLoaderIntfv1_0::~MeshLoaderIntfv1_0() {
 }
 
-void MeshLoaderImplv1_0::Load(InputSerializer& streamPtr, AssetLoader& loader) {
+void MeshLoaderIntfv1_0::Load(InputSerializer& streamPtr, AssetLoader& loader) {
 	MeshAsset::StreamRequest* request =
 			static_cast<MeshAsset::StreamRequest*>(loader.GetRequestPtr());
 	ReadMeshChunk(request, streamPtr);

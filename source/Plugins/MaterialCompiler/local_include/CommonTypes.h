@@ -1,7 +1,7 @@
 #ifndef COMMONTYPES_H_
 #define COMMONTYPES_H_
 
-#include <NexEngine.h>
+#include <ProjectModelHeaders.h>
 #include <ScriptParser.h>
 #include <DepthStencilState.h>
 #include <BlendState.h>
@@ -14,7 +14,7 @@ using namespace nextar;
 namespace MaterialCompiler {
 
 class CommandDelegate {
-
+public:
 	virtual void Execute(void* parentParam, ScriptParser::StatementContext& statement) = 0;
 protected:
 	~CommandDelegate() {}

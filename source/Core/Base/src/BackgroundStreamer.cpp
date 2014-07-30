@@ -59,7 +59,7 @@ void BackgroundStreamerImpl::ExecutePoolRequests() {
 		bool result = true;
 		try {
 			if (request->flags & StreamRequest::REQUEST_SAVE)
-				request->streamedObject->AsyncUnload(request);
+				request->streamedObject->AsyncSave(request);
 			else
 				request->streamedObject->AsyncLoad(request);
 		} catch (GracefulErrorExcept& ge) {
@@ -104,7 +104,7 @@ void BackgroundStreamerImpl::EndFrame(uint32 timeElapsed) {
 		std::lock_guard<std::mutex> g(responseQueueLock);
 		for (auto& r : responseQueue) {
 			if (r->flags & StreamRequest::REQUEST_SAVE)
-				r->streamHandler->NotifyUnloaded(r);
+				r->streamHandler->NotifySaved(r);
 			else
 				r->streamHandler->NotifyLoaded(r);
 		}

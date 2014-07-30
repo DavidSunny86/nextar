@@ -9,18 +9,21 @@
 #define SHADERSAVERIMPLV10_H_
 
 #include <EngineHeaders.h>
+#include <ShaderTemplate.h>
 
 namespace nextar {
 
 /*
  *
  */
-class ShaderSaverImplv10 : public AssetSaverImpl,
+class ShaderSaverImplv1_0 : public AssetSaverImpl,
 	public AllocGeneral {
-	NEX_LOG_HELPER(ShaderSaverImplv10);
+	NEX_LOG_HELPER(ShaderSaverImplv1_0);
 public:
-	ShaderSaverImplv10();
-	virtual ~ShaderSaverImplv10();
+	static ShaderSaverImplv1_0 saver;
+
+	ShaderSaverImplv1_0();
+	virtual ~ShaderSaverImplv1_0();
 
 	virtual void Save(OutputStreamPtr&, AssetSaver&);
 

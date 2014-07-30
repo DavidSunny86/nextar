@@ -15,6 +15,7 @@
 #include <ShaderParam.h>
 #include <FactoryPlugin.h>
 #include <ParameterBuffer.h>
+#include <SceneTraversal.h>
 
 namespace nextar {
 

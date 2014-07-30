@@ -9,8 +9,8 @@
 
 namespace nextar {
 
-Renderable::Renderable(const StringID name, Component* parent) :
-		Spatial(name, parent) {
+Renderable::Renderable(const StringID name, const StringID factory, Component* parent) :
+		Spatial(name, factory, parent) {
 }
 
 Renderable::~Renderable() {

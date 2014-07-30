@@ -1,7 +1,7 @@
 #ifndef COMMONTYPES_H_
 #define COMMONTYPES_H_
 
-#include <NexEngine.h>
+#include <ProjectModelHeaders.h>
 #include <ScriptParser.h>
 #include <DepthStencilState.h>
 #include <BlendState.h>
@@ -97,7 +97,7 @@ public:
 	static BlendDataSource GetBlendSource(const String& val);
 	static BlendOp GetColorOperation(const String& val);
 	static FillMode GetFillMode(const String& val);
-	static FillMode GetCullMode(const String& val);
+	static CullMode GetCullMode(const String& val);
 	static FilterType GetFilterType(const String& val);
 	static TextureComparisonMode GetTextureCompareFunc(const String& val);
 	static TextureMinFilter GetMinFilter(const String& val);

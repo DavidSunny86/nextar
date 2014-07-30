@@ -23,11 +23,24 @@ class RenderWindow;
 class WindowManager;
 class LogManager;
 
+class MemoryInputStream;
+class MemoryOutputStream;
+class GenericInputStream;
+class GenericOutputStream;
+class FileInputStream;
+class FileOutputStream;
+
 class Frustum;
 
 typedef RefPtr<Archive> ArchivePtr;
 typedef RefPtr<InputStream> InputStreamPtr;
 typedef RefPtr<OutputStream> OutputStreamPtr;
+typedef RefPtr<MemoryInputStream> MemoryInputStreamPtr;
+typedef RefPtr<MemoryOutputStream> MemoryOutputStreamPtr;
+typedef RefPtr<GenericInputStream> GenericInputStreamPtr;
+typedef RefPtr<GenericOutputStream> GenericOutputStreamPtr;
+typedef RefPtr<FileInputStream> FileInputStreamPtr;
+typedef RefPtr<FileOutputStream> FileOutputStreamPtr;
 
 }
 

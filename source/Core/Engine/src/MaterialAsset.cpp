@@ -79,6 +79,10 @@ void MaterialAsset::SetParamData(const TextureUnit* data, size_t offset) {
 	materialParamData.SetData(data, offset);
 }
 
+void MaterialAsset::SetParameterBuffer(ParameterBuffer&& buff) {
+	materialParamData = std::move(buff);
+}
+
 void MaterialAsset::SetShader(ShaderAssetPtr& shader) {
 	this->shader = shader;
 }
@@ -103,7 +107,7 @@ void MaterialAsset::StreamRequest::SetShader(ShaderAssetPtr& shader) {
 
 void MaterialAsset::StreamRequest::SetShader(const ShaderAsset::ID& id,
 		const URL& location) {
-	shader = ShaderAsset::Traits::Instance(id, location);
+	ShaderAssetPtr shader = ShaderAsset::Traits::Instance(id, location);
 	if (!shader) {
 		Warn("Failed to load shader for material: "
 						+ shader->GetNameID());
@@ -134,9 +138,14 @@ void MaterialAsset::StreamRequest::SetTextureValue(uint32 offset,
 	}
 }
 
-void MaterialAsset::StreamRequest::SetLayer(uint8 l) {
+void MaterialAsset::StreamRequest::SetParameterBuffer(ParameterBuffer&& buffer) {
 	MaterialAsset* material = static_cast<MaterialAsset*>(GetStreamedObject());
-	material->SetLayerMask(l);
+	material->SetParameterBuffer(std::move(buffer));
+}
+
+void MaterialAsset::StreamRequest::SetLayer(Layer l) {
+	MaterialAsset* material = static_cast<MaterialAsset*>(GetStreamedObject());
+	material->SetLayerMask((uint8)l);
 }
 
 } /* namespace nextar */

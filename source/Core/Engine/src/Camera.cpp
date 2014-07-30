@@ -11,8 +11,8 @@
 namespace nextar {
 
 Camera::Camera(const StringID name, const StringID factory,  Component* parent) :
-		Spatial(name, factory, parent), projectMatrixNumber(0), visibilityMask(
-				VisibilitySet::VM_ALL) {
+		Spatial(name, factory, parent), projectMatrixNumber(0),
+		visibilityMask(VisibilityMask::VISIBILITY_ALL) {
 	_SetCameraMatrixDataPtr(NEX_NEW(Camera::Matrix));
 }
 
@@ -168,7 +168,7 @@ void Camera::UpdateProjection() {
 void Camera::Visit(SceneTraversal & traversal) {
 	Camera* oldCamera = traversal.camera;
 	Frustum* oldFrustum = traversal.frustum;
-	uint32 oldMask = visibilityMask;
+	VisibilityMask oldMask = visibilityMask;
 	traversal.camera = this;
 	traversal.visibilityMask = visibilityMask;
 	traversal.frustum = &viewFrustum;

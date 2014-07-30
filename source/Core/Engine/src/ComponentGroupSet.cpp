@@ -36,16 +36,31 @@ void ComponentGroupSet::Add(SharedComponentPtr& c) {
 	Debug(
 			GetName() + ": Number of components = "
 					+ Convert::ToString((uint32) componentMap.size()));
-	componentMap.insert(ComponentMap::value_type(c->GetID(), c));
+	StringID name = c->GetID();
+	componentMap.insert(ComponentMap::value_type(name, c));
 }
 
-SharedComponentPtr& ComponentGroupSet::Find(const StringID name) {
+SharedComponentPtr& ComponentGroupSet::Find(uint32 classId, const StringID name) {
 	/* No sub component by default */
-	ComponentMap::iterator it = componentMap.find(name);
-	if (it != componentMap.end()) {
-		return (*it).second;
+	auto range = componentMap.equal_range(name);
+	if (range.first != componentMap.end()) {
+		for (auto it = range.first; it != range.second; ++it)
+			if ( (*it).second->GetClassID() == classId )
+				return (*it).second;
 	}
 	return SharedComponent::Null;
+}
+
+void ComponentGroupSet::Remove(uint32 classId, const StringID name) {
+	/* No sub component by default */
+	auto range = componentMap.equal_range(name);
+	if (range.first != componentMap.end()) {
+		for (auto it = range.first; it != range.second; ++it)
+			if ( (*it).second->GetClassID() == classId ) {
+				componentMap.erase(it);
+				return;
+			}
+	}
 }
 
 void ComponentGroupSet::Remove(const StringID name) {

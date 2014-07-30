@@ -47,7 +47,8 @@ protected:
 	~StreamHandler() {}
 };
 
-struct StreamRequest {
+class StreamRequest {
+public:
 	enum StreamRequestFlags {
 
 		// Indicates this request is of type AssetStreamRequest 
@@ -67,7 +68,7 @@ struct StreamRequest {
 	Streamable* streamedObject;
 	StreamHandler* streamHandler;
 
-	inline Streamable* GetStreamedObject() {
+	inline Streamable* GetStreamedObject() const {
 		return streamedObject;
 	}
 

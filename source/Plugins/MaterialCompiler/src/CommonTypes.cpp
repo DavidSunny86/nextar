@@ -9,7 +9,7 @@
 #include <CommonTypes.h>
 #include <ScriptStrings.h>
 
-namespace ShaderCompiler {
+namespace MaterialCompiler {
 
 CommandDelegate* Helper::FindCommand(CommandNamePair cmdMap[], size_t arraySize,
 		const String& name) {

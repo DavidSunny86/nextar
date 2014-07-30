@@ -21,7 +21,7 @@ void ShaderScript::SetRegionAsSource(Pass::ProgramStage type,
 		return;
 	}
 
-	for(; it.first != it.second; ++it) {
+	for(; it.first != it.second; ++it.first) {
 		shader->SetProgramSource(type,
 				(*it.first).second.first,
 				std::move((*it.first).second.second) );
@@ -42,7 +42,7 @@ void ShaderScript::EnterRegion(ScriptParser::RegionContext& ctx) {
 		if (!name.compare(0, script.length(), script)) {
 			script = name.substr(script.length());
 			auto langRegName = StringUtils::Split(script, ':');
-			RenderManager::ShaderProgramLanguage lang = RenderManager::SPP_UNKNOWN;
+			RenderManager::ShaderLanguage lang = RenderManager::SPP_UNKNOWN;
 			if (langRegName.first.compare(_SS(LANG_GLSL) ) == 0) {
 				lang = RenderManager::SPP_GLSL;
 			}
@@ -54,7 +54,7 @@ void ShaderScript::EnterRegion(ScriptParser::RegionContext& ctx) {
 				ctx.ParseText(regionValue);
 				// todo check if move semantics are being used
 				regions.emplace(std::move(langRegName.second),
-						std::pair(std::move(lang), std::move(regionValue)));
+						std::pair<RenderManager::ShaderLanguage, String>(std::move(lang), std::move(regionValue)));
 			}
 		}
 	}
