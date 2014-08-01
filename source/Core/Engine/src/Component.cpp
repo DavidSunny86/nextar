@@ -97,8 +97,10 @@ SharedComponent::InstanceResult SharedComponent::Instance(SharedComponentPtr& oI
 	Component* component = Component::Instance(classId, name, factoryPtr);
 	if (component) {
 		oInst = Assign<SharedComponent>(component);
-		if (group)
+		if (group) {
 			group->Add(oInst);
+			oInst->group = group;
+		}
 		return SharedComponent::INSTANCE_CREATED;
 	}
 	return SharedComponent::INSTANCE_FAILED;
@@ -115,8 +117,10 @@ SharedComponent::InstanceResult SharedComponent::Instance(SharedComponentPtr& oI
 	Component* component = Component::Instance(classId, name, factory);
 	if (component) {
 		oInst = Assign<SharedComponent>(component);
-		if (group)
+		if (group) {
 			group->Add(oInst);
+			oInst->group = group;
+		}
 		return SharedComponent::INSTANCE_CREATED;
 	}
 	return SharedComponent::INSTANCE_FAILED;

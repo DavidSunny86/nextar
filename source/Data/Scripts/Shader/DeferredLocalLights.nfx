@@ -23,8 +23,8 @@ shader DeferredLocalLights {
 		}
 	
 		program {
-			vertex_program VSOmni
-			pixel_program PSOmni
+			vertex_program VSOmni;
+			pixel_program PSOmni;
 		}
 	}
 }

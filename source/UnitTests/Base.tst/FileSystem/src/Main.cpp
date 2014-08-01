@@ -6,7 +6,7 @@ NEX_IMPLEMENT_PLATFORM_APP()
 void TestArchiveOpenClose(nextar::ApplicationContext& application) {
 	nextar::FileSystem& fileSys = nextar::FileSystem::Instance();
 	fileSys.AddArchive("StringData", nextar::Archive::TYPE_ARC,
-		nextar::FileSystem::ArchiveEngineData + "/config/localization.zip");
+		nextar::FileSystem::ArchiveEngineData + "/Configs/localization.zip");
 	nextar::InputStreamPtr inputFile = fileSys.OpenRead(
 			nextar::URL(nextar::String("{StringData}/Config.cfg")));
 	nextar::OutputStreamPtr out = nextar::Assign(

@@ -27,7 +27,7 @@ struct CommandNamePair {
 
 struct CommandNameCompare {
 	bool operator ()(const CommandNamePair& enp, const String& name) const {
-		return name.compare(enp.name) >= 0;
+		return name.compare(enp.name) > 0;
 	}
 
 	bool operator ()(const String& name, const CommandNamePair & enp) const {

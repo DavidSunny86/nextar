@@ -22,6 +22,7 @@ ProjectApplicationContext::~ProjectApplicationContext() {
 }
 
 void ProjectApplicationContext::CreateExtendedInterfacesImpl() {
+	EngineApplicationContext::CreateExtendedInterfacesImpl();
 	RegisterTemplateFactories();
 }
 
@@ -38,7 +39,6 @@ void ProjectApplicationContext::RegisterTemplateFactories() {
 }
 
 void ProjectApplicationContext::ReleaseResources() {
-
 }
 
 } /* namespace nextar */

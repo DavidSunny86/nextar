@@ -178,15 +178,21 @@ void ScriptParser::BlockContext::ParseStatements(StatementListener* listener) {
 			bool wellFormed = false;
 			while (!scriptContext.lexer.IsEndOfStream()) {
 				// ParameterContext
+				scriptContext.lexer.SkipWhite();
 				switch (scriptContext.lexer.Current()) {
 				case '{':
 				case ';':
 					wellFormed = true;
 					break;
-				default:
-					StringUtils::PushBackWord(statement.paramContext,
-							scriptContext.lexer.ReadWord());
-					continue;
+				default: {
+					const String& word = scriptContext.lexer.ReadWord();
+					if (word.length() > 0)
+						StringUtils::PushBackWord(statement.paramContext,
+							word);
+					else
+						break;
+				}
+				continue;
 				}
 				break;
 			}

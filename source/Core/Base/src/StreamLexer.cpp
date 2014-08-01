@@ -59,6 +59,7 @@ const String& StreamLexer::ReadWord() {
 		case ' ':
 		case '\v':
 		case '\t':
+		case ';':
 			// append
 			if (lookForTerminatingQuotes) {
 				temp += c;
@@ -99,7 +100,13 @@ const String& StreamLexer::ReadWord() {
 			/* no break */
 		case '"':
 			pos++;
-			lookForTerminatingQuotes = !lookForTerminatingQuotes;
+			if (lookForTerminatingQuotes)
+				break;
+			lookForTerminatingQuotes = true;
+			if(pos < size)
+				c = buffer[pos];
+			else
+				break;
 			/* no break */
 		default:
 			temp += c;

@@ -24,7 +24,7 @@ struct EnumNamePair {
 struct EnumNameCompare {
 
 	inline bool operator ()(const EnumNamePair& enp, const String& name) const {
-		return name.compare(enp.name) >= 0;
+		return name.compare(enp.name) > 0;
 	}
 
 	inline bool operator ()(const String& name,
@@ -78,7 +78,7 @@ struct CommandNamePair {
 
 struct CommandNameCompare {
 	bool operator ()(const CommandNamePair& enp, const String& name) const {
-		return name.compare(enp.name) >= 0;
+		return name.compare(enp.name) > 0;
 	}
 
 	bool operator ()(const String& name, const CommandNamePair & enp) const {
