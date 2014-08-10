@@ -7,6 +7,7 @@
 #include <SceneTraversal.h>
 #include <VisibilitySet.h>
 #include <RenderSystem.h>
+#include <LightSystem.h>
 
 namespace nextar {
 struct ViewportCallback;
@@ -108,7 +109,7 @@ public:
 		return height;
 	}
 
-	inline RenderTarget *GetCanvas() const {
+	inline RenderTarget *GetRenderTarget() const {
 		return renderTarget;
 	}
 
@@ -178,6 +179,7 @@ protected:
 		return next;
 	}
 
+	LightSystemPtr lightSystem;
 	SceneTraversal traversal;
 
 	float topleftX;

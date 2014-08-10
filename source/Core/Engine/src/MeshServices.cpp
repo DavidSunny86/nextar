@@ -16,10 +16,20 @@ MeshServices::MeshServices() :
 }
 
 MeshServices::~MeshServices() {
-	if (unitOmniLV)
-		NEX_DELETE(unitOmniLV);
-	if (unitSpotLV)
-		NEX_DELETE(unitSpotLV);
+	Close();
+}
+
+void MeshServices::SafeDelete(StreamData*& what) {
+	if (what) {
+		what->indices.indices.Clear();
+		NEX_DELETE(what);
+		what = nullptr;
+	}
+}
+
+void MeshServices::Close() {
+	SafeDelete(unitOmniLV);
+	SafeDelete(unitSpotLV);
 }
 
 void MeshServices::Configure(const Config& config) {
@@ -82,8 +92,8 @@ StreamData* MeshServices::CreateSphereMesh(
 
 	VertexBuffer vertexBuffer(GpuBuffer::NEVER_RELEASED);
 	IndexBufferPtr indexBuffer = Assign(NEX_NEW(IndexBuffer(GpuBuffer::NEVER_RELEASED)));
-	vertexBuffer.Write(dat, 0, vbsize);
-	indexBuffer->Write(idx, 0, ibsize);
+	vertexBuffer.CreateBuffer(vbsize, sizeof(float)* 3, reinterpret_cast<const uint8*>(dat));
+	indexBuffer->CreateBuffer(ibsize, IndexBuffer::Type::TYPE_16BIT, reinterpret_cast<const uint8*>(idx));
 
 	StreamData* stream = NEX_NEW(StreamData());
 	stream->flags = StreamData::DELETE_BINDING;
@@ -91,10 +101,14 @@ StreamData* MeshServices::CreateSphereMesh(
 	stream->vertices.start = 0;
 	stream->vertices.layout = VertexLayout::GetCommonLayout(VertexLayoutType::POSITION_0).GetPtr();
 	stream->vertices.binding = NEX_NEW(VertexBufferBinding());
+	stream->vertices.binding->SetBufferCount(1);
 	stream->vertices.binding->BindBuffer(0, vertexBuffer);
 	stream->indices.start = 0;
 	stream->indices.count = ntri*3;
 	stream->indices.indices = std::move(indexBuffer);
+
+	NEX_FREE(dat, MEMCAT_GENERAL);
+	NEX_FREE(idx, MEMCAT_GENERAL);
 	return stream;
 }
 

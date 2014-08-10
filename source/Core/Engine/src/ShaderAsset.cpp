@@ -21,7 +21,8 @@ ShaderAsset::ShaderAsset(const StringID name, const StringID factory) :
 }
 
 ShaderAsset::~ShaderAsset() {
-	_DestroyPasses();
+	if (IsLoaded())
+		Unload();
 }
 
 void ShaderAsset::_DestroyPasses() {
@@ -32,7 +33,7 @@ uint32 ShaderAsset::GetClassID() const {
 	return CLASS_ID;
 }
 
-void ShaderAsset::NotifyAssetLoaded() {
+bool ShaderAsset::NotifyAssetLoadedImpl() {
 	StreamRequest* creationParams = static_cast<StreamRequest*>(streamRequest);
 	/* update programs */
 	/* build with compilation options */
@@ -82,8 +83,7 @@ void ShaderAsset::NotifyAssetLoaded() {
 		visibilityMask = VisibilityMask::VISIBILITY_OPAQUE;
 
 	/* notify dependents */
-	Asset::NotifyAssetLoaded();
-	SetReady(true);
+	return true;
 }
 
 void ShaderAsset::_CompilePass(Pass& r, ShaderAsset::StreamPass& p,
@@ -131,15 +131,26 @@ void ShaderAsset::_BuildParameterTable(StreamPassList& spl) {
 				 return e1.context == e2.context ? e1.passIndex < e2.passIndex :
 				 e1.context < e2.context;
 				 */
-				return e1.context <= e2.context;
+				return e1.context < e2.context;
 			});
 
 	ParameterContext lastContext = ParameterContext::CTX_UNKNOWN;
 	uint32 index = -1;
 	uint32 offset = 0;
-	for (auto& e : paramLookup) {
+	auto en = paramLookup.end();
+	for (uint32 ctx = 0; ctx < (uint32)ParameterContext::CTX_COUNT; ++ctx) {
+		paramsPerContext[ctx].beginIt = 
+		paramsPerContext[ctx].endIt = en;
+	}
+	for (auto& it = paramLookup.begin(); it != en; ++it) {
+		auto &e = (*it);
 		if (e.context != lastContext) {
+			if (lastContext != ParameterContext::CTX_UNKNOWN) {
+				paramsPerContext[(uint32)lastContext].endIt = it;
+				paramsPerContext[(uint32)lastContext].totalParamBufferSize = offset;
+			}
 			lastContext = e.context;
+			paramsPerContext[(uint32)lastContext].beginIt = it;
 			offset = 0;
 		}
 		if (index != e.passIndex) {
@@ -158,14 +169,23 @@ void ShaderAsset::_BuildParameterTable(StreamPassList& spl) {
 
 
 /*****************************************************/
-/* Shader::StreamPass                                */
+/* ShaderAsset::StreamPass                                */
 /*****************************************************/
-ShaderAsset::StreamPass::StreamPass(const ShaderAsset::StreamPass& p) : name(StringUtils::NullID) {
-	NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
+ShaderAsset::StreamPass::StreamPass(const StreamPass& p) : name(p.name) {
+
+}
+
+ShaderAsset::StreamPass::StreamPass(StreamPass&& p) : name(p.name) {
+
+}
+
+ShaderAsset::StreamPass& ShaderAsset::StreamPass::operator = (const nextar::ShaderAsset::StreamPass &p) {
+	name = p.name;
+	return *this;
 }
 
 /*****************************************************/
-/* Shader::StreamRequest							 */
+/* ShaderAsset::StreamRequest							 */
 /*****************************************************/
 ShaderAsset::StreamRequest::StreamRequest(ShaderAsset* shader) :
 		AssetStreamRequest(shader) {

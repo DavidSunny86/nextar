@@ -26,7 +26,7 @@ void ShaderSaverImplv1_0::SavePass(const ShaderTemplate::PassUnit& pu,
 	ser << pu.name;
 
 	// blend state
-	ser << (uint8)PASS_BLEND_STATE
+	ser << (uint16)PASS_BLEND_STATE
 		<<	pu.blendState.enabled;
 	if (pu.blendState.enabled) {
 		ser << pu.blendState.alphaToCoverage
@@ -47,7 +47,7 @@ void ShaderSaverImplv1_0::SavePass(const ShaderTemplate::PassUnit& pu,
 	}
 
 	// depth stencil state
-	ser << (uint8)PASS_DEPTH_STATE
+	ser << (uint16)PASS_DEPTH_STATE
 		<< pu.depthStencilState.depthTest
 		<< pu.depthStencilState.depthWrite
 		<< (uint8)pu.depthStencilState.depthCompareFunc
@@ -64,7 +64,7 @@ void ShaderSaverImplv1_0::SavePass(const ShaderTemplate::PassUnit& pu,
 	}
 
 	// raster state
-	ser << (uint8)PASS_RASTER_STATE
+	ser << (uint16)PASS_RASTER_STATE
 		<< pu.rasterState.trianglesAreClockwise
 		<< pu.rasterState.depthClip
 		<< pu.rasterState.usingScissors
@@ -77,7 +77,7 @@ void ShaderSaverImplv1_0::SavePass(const ShaderTemplate::PassUnit& pu,
 		<< pu.rasterState.depthBiasClamp;
 
 	// todo Texture unit states and source map
-	ser << (uint8)PASS_TEXTURE_STATE;
+	ser << (uint16)PASS_TEXTURE_STATE;
 	auto& tuMap = pu.textureUnitStates;
 	uint32 numUnits = tuMap.size();
 	ser << numUnits;

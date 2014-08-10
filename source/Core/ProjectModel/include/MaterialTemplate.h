@@ -29,7 +29,7 @@ public:
 	typedef AssetTraits<MaterialTemplate> Traits;
 	typedef FactoryTraits<MaterialTemplate> FactoryTraits;
 
-	class StreamRequest: public AllocGeneral, public AssetStreamRequest {
+	class _NexProjectAPI StreamRequest: public AllocGeneral, public AssetStreamRequest {
 		NEX_LOG_HELPER(MaterialTemplate::StreamRequest);
 	public:
 		StreamRequest(MaterialTemplate* materialTemplate);
@@ -45,10 +45,10 @@ public:
 	virtual ~MaterialTemplate();
 
 	/* notify loaded/unloaded */
-	virtual void NotifyAssetLoaded();
 	virtual void NotifyAssetUnloaded();
 	virtual void NotifyAssetUpdated();
-	virtual void NotifyAssetSaved();
+	virtual bool NotifyAssetLoadedImpl();
+	virtual bool NotifyAssetSavedImpl();
 
 	void SetMaterialID(const MaterialAsset::ID& id);
 	void SetShader(const ShaderTemplatePtr& shader);

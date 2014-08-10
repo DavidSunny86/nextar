@@ -28,9 +28,13 @@ public:
 	virtual ~MeshServices();
 
 	void Configure(const Config& config);
+	void Close();
+
 	StreamData* CreateSphereMesh(uint32 density, float radius, bool normalData = false, bool uvData = false);
 
 protected:
+
+	void SafeDelete(StreamData*&);
 
 	StreamData* unitOmniLV;
 	StreamData* unitSpotLV;

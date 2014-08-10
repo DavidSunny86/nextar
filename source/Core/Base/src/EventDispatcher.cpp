@@ -31,7 +31,7 @@ void EventDispatcher::Unsubscribe(EventID event, EventCallback callback) {
 
 void EventDispatcher::DispatchEvent(EventID event) {
 	auto items = subscribers.equal_range(event);
-	for(auto it = items.first; it != items.second; ) {
+	for(auto it = items.first; it != items.second; ++it) {
 		(*(*it).second.first)((*it).second.second);
 	}
 }

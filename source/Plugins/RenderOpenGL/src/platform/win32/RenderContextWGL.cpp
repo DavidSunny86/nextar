@@ -162,6 +162,7 @@ void RenderContextWGL::DestroyDummyContext(const RenderContextWGL::DummyContext&
 	wglMakeCurrent (NULL, NULL);
 	// Failed
 	wglDeleteContext (dc.hRC);
+	GL_CHECK();
 	ReleaseDC (dc.hWnd, dc.hDC);
 	DestroyWindow (dc.hWnd);
 }
@@ -234,6 +235,7 @@ void RenderContextWGL::ReadyContext(RenderWindow* gw) {
 	}
 
 	SetCurrentTarget(static_cast<RenderWindowImpl*>(gw->GetImpl()));
+	GL_CHECK();
 }
 
 nextar::RenderWindow* RenderContextWGL::CreateWindowImpl() {

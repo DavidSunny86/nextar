@@ -21,6 +21,7 @@ BackgroundStreamer::~BackgroundStreamer() {
 /* BackgroundStreamerImpl                                               */
 /************************************************************************/
 BackgroundStreamerImpl::BackgroundStreamerImpl() {
+	responseProcessed.clear(std::memory_order_release);
 	for (auto& t : streamingThreads) {
 		t = std::thread(&BackgroundStreamerImpl::ExecutePoolRequests, this);
 	}

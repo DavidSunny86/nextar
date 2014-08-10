@@ -79,7 +79,7 @@ SharedComponent::SharedComponent(const StringID name,
 }
 
 SharedComponent::~SharedComponent() {
-	NEX_ASSERT(group == nullptr);
+	//NEX_ASSERT(group == nullptr);
 }
 
 SharedComponent::InstanceResult SharedComponent::Instance(SharedComponentPtr& oInst, uint32 classId, StringID name,

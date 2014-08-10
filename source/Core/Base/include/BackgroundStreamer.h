@@ -22,12 +22,12 @@ enum class StreamResult {
 	SAVE_FAILED,
 };
 
-struct Streamable;
-struct StreamHandler;
-struct StreamRequest;
+class Streamable;
+class StreamHandler;
+class StreamRequest;
 
-struct Streamable {
-
+class Streamable {
+public:
 	virtual ~Streamable() {
 	}
 
@@ -59,6 +59,8 @@ public:
 		COMPLETED = 1 << 2,
 		// Indicates AsyncUnload and NotifyUnloaded are to be called
 		REQUEST_SAVE = 1 << 4,
+		// Default stream request flags
+		DEFAULT_FLAGS = AUTO_DELETE_REQUEST,
 
 		LAST_FLAG = 1 << 5,
 	};
@@ -72,7 +74,7 @@ public:
 		return streamedObject;
 	}
 
-	StreamRequest(Streamable* streamed = 0, uint16 streamFlags = 0) :
+	StreamRequest(Streamable* streamed = 0, uint16 streamFlags = DEFAULT_FLAGS) :
 			streamedObject(streamed), flags(streamFlags), returnCode(0), streamHandler(
 					0) {
 	}

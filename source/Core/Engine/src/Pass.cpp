@@ -18,11 +18,13 @@ Pass::Pass(StringID name) :
 		NamedObject(name),
 		ContextObject(TYPE_PASS, 0)
 		//,inputLayoutUniqueID(-1)
-				, flags(0) {
+		,flags(0) {
 }
 
-Pass::Pass(Pass&& p) {
-	NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
+Pass::Pass(Pass&& p) :
+	NamedObject(p.GetID())
+	,ContextObject(std::move(*static_cast<ContextObject*>(&p)))
+	,flags(0) {
 }
 
 Pass::Pass(const Pass& p) {
@@ -30,6 +32,7 @@ Pass::Pass(const Pass& p) {
 }
 
 Pass::~Pass() {
+	Debug("Pass destroyed.");
 }
 
 const AutoParam* Pass::MapParam(const String& name) {

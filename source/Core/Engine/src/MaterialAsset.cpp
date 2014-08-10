@@ -21,18 +21,24 @@ MaterialAsset::MaterialAsset(const StringID name, const StringID factory) :
 }
 
 MaterialAsset::~MaterialAsset() {
+	Debug("Material destroyed: " + GetAssetLocator().ToString());
 }
 
 uint32 MaterialAsset::GetClassID() const {
 	return CLASS_ID;
 }
 
-void MaterialAsset::NotifyAssetLoaded() {
+bool MaterialAsset::NotifyAssetLoadedImpl() {
 	/* loaded only when dependencies are resolved */
 	MaterialAsset::StreamRequest* req =
 			static_cast<MaterialAsset::StreamRequest*>(GetStreamRequest());
 	PrepareMaterial(req);
-	Asset::NotifyAssetLoaded();
+	return true;
+}
+
+bool MaterialAsset::NotifyAssetSavedImpl() {
+	/* loaded only when dependencies are resolved */
+	return true;
 }
 
 void MaterialAsset::NotifyAssetUnloaded() {

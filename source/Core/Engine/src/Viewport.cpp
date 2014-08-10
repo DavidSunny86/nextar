@@ -2,6 +2,8 @@
 #include <Viewport.h>
 #include <Camera.h>
 #include <RenderManager.h>
+#include <DefaultLightSystem.h>
+#include <RenderTarget.h>
 
 namespace nextar {
 
@@ -21,6 +23,8 @@ Viewport::Viewport(Camera* cam, RenderTarget* rt, float x, float y, float width,
 	this->flags = flags;
 	this->priority = priority;
 	this->name = optName;
+	this->renderSystems = RenderManager::Instance().GetRenderSystems();
+	this->lightSystem = Assign(NEX_NEW(DefaultLightSystem()));
 }
 
 Viewport::~Viewport() {
@@ -31,7 +35,7 @@ void Viewport::AddCallback(ViewportCallback* cbk) {
 }
 
 void Viewport::RemoveCallback(ViewportCallback* cbk) {
-	BestErase(callbacks, std::find(callbacks.begin(), callbacks.end(), cbk));
+	BestErase(callbacks, cbk);
 }
 
 void Viewport::FirePreupdate() {
@@ -50,6 +54,7 @@ void Viewport::PushPrimitives(uint32 frameNumber) {
 
 	traversal.camera = camera;
 	traversal.frameNumber = frameNumber;
+	traversal.lightSystem = lightSystem;
 	//traversal.visibleBoundsInfo = &(camera->GetBoundsInfo());
 	//traversal.visibilityMask = camera->GetVisibilityMask();
 	traversal.visibilitySet = &visibleSet;
@@ -73,6 +78,9 @@ void Viewport::CommitPrimitives(RenderContext* renderCtx, uint32 frameNumber) {
 	commitContext.viewport = this;
 	commitContext.frameNumber = frameNumber;
 	commitContext.visibiles = &visibleSet;
+	commitContext.lightSystem = traversal.lightSystem;
+	commitContext.targetDimension = renderTarget->GetDimensions();
+
 
 	for (auto &r : renderSystems) {
 		r->Commit(commitContext);

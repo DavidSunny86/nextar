@@ -14,7 +14,8 @@ NEX_DEFINE_SINGLETON_PTR(ApplicationContext);
 String ApplicationContext::_configPathName = "${Bin}/Config.cfg";
 
 ApplicationContext::ApplicationContext(const String& name) :
-		appName(name), quitting(false), runningLoop(false), errorHandler(nullptr) {
+		appName(name), quitting(false), runningLoop(false), errorHandler(nullptr),
+		resourcesDestroyed(false) {
 	NEX_NEW(LogManager());
 #ifdef NEX_DEBUG
 	// add a default logger
@@ -57,10 +58,17 @@ void ApplicationContext::ConfigureServices() {
 	PluginRegistry::Instance().Configure(config);
 }
 
+void ApplicationContext::ReleaseResources() {
+	if (resourcesDestroyed)
+		return;
+	DispatchEvent(EVENT_DESTROY_RESOURCES);
+	ReleaseResourcesImpl();
+	resourcesDestroyed = true;
+}
+
 void ApplicationContext::DestroyContext() {
 	Trace("Destroying application context: " + appName);
 	SaveConfiguration();
-	DispatchEvent(EVENT_DESTROY_RESOURCES);
 	// services
 	DestroyServices();
 }

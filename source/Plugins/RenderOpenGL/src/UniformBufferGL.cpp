@@ -17,6 +17,10 @@ UniformBufferGL::UniformBufferGL() :
 UniformBufferGL::~UniformBufferGL() {
 }
 
+void UniformBufferGL::Destroy(RenderContextGL* rc) {
+	rc->DestroyBuffer(ubNameGl);
+}
+
 void* UniformBufferGL::Map(RenderContext* rc) {
 	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
 	gl->Bind(GL_UNIFORM_BUFFER, ubNameGl);

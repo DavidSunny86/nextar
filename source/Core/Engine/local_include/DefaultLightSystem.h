@@ -8,12 +8,11 @@
 #ifndef DEFAULTLIGHTSYSTEM_H_
 #define DEFAULTLIGHTSYSTEM_H_
 
-#include <RenderEngine.h>
 #include <LightSystem.h>
 
 namespace nextar {
 
-class _NexRenderAPI DefaultLightSystem: public nextar::LightSystem {
+class _NexEngineAPI DefaultLightSystem: public nextar::LightSystem {
 public:
 	DefaultLightSystem();
 	virtual ~DefaultLightSystem();

@@ -1,7 +1,8 @@
-#include <RenderEngine.h>
+#include <NexRenderEngine.h>
 #include <BaseRenderManager.h>
 #include <Viewport.h>
 #include <RenderTarget.h>
+#include <DeferredRenderSystem.h>
 
 namespace nextar {
 
@@ -16,6 +17,7 @@ BaseRenderManager::~BaseRenderManager() {
 
 void BaseRenderManager::Configure(const Config&) {
 	// @todo
+	CreateRenderQueues();
 }
 
 ContextID BaseRenderManager::RequestObjectCreate(ContextObject::Type type, uint32 hint) {
@@ -68,14 +70,22 @@ void BaseRenderManager::RegisterRenderContext(RenderContextPtr& ptr) {
 #if NEX_MULTIGPU_BUILD
 	activeContexts.push_back(ptr);
 #else
-	if (!primaryContext)
+	if (!primaryContext) {
 		primaryContext = ptr;
+	}
+	if (!renderSystems.size())
+		CreateRenderSystems();
 #endif
 }
 
-
 void BaseRenderManager::Close() {
 	CloseImpl();
+
+	for (auto r : renderSystems) {
+		if (r)
+			NEX_DELETE(r);
+	}
+		
 #if NEX_MULTIGPU_BUILD
 	RenderDriverList::iterator it = renderDrivers.begin();
 	RenderDriverList::iterator en = renderDrivers.end();
@@ -171,6 +181,19 @@ void BaseRenderManager::PresentSwapChains(RenderContext* rc) {
 	for (auto &rt : rtList) {
 		rt->Present(rc);
 	}
+}
+
+void BaseRenderManager::CreateRenderSystems() {
+	AddRenderSystem(NEX_NEW(DeferredRenderSystem));
+}
+
+void BaseRenderManager::CreateRenderQueues() {
+	// @todo We run this only when configuration is not present
+	AddRenderQueue(NamedObject::AsyncStringID("Background"), 110, RenderQueueFlags::BACKGROUND);
+	AddRenderQueue(NamedObject::AsyncStringID("Deferred"), 111, RenderQueueFlags::DEFERRED | RenderQueueFlags::SORT_ENABLED);
+	AddRenderQueue(NamedObject::AsyncStringID("Forward"), 112, RenderQueueFlags::FORWARD | RenderQueueFlags::SORT_ENABLED);
+	AddRenderQueue(NamedObject::AsyncStringID("Transparent"), 113, RenderQueueFlags::TRANSLUCENCY | RenderQueueFlags::SORT_ENABLED);
+	AddRenderQueue(NamedObject::AsyncStringID("Overlay"), 114, RenderQueueFlags::OVERLAY);
 }
 
 }

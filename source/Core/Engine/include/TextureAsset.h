@@ -91,10 +91,11 @@ public:
 	virtual uint32 GetClassID() const;
 
 protected:
-
-	virtual void NotifyAssetLoaded();
+		
 	virtual void NotifyAssetUnloaded();
 	virtual void NotifyAssetUpdated();
+
+	virtual bool NotifyAssetLoadedImpl();
 
 	virtual void LoadImpl(StreamRequest* req, bool isAsync);
 	virtual void UnloadImpl();

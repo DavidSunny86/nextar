@@ -5,6 +5,7 @@
 #include <DataStream.h>
 #include <Endian.h>
 #include <Logger.h>
+#include <GenericStreams.h>
 
 namespace nextar {
 class OutputSerializer;
@@ -206,7 +207,7 @@ public:
 	 *           file pointer right after that
 	 **/
 	inline ChunkInputStream& MoveAfter(const Chunk& v) {
-		if ((int32) v.first.second >= 0) {
+		if (IsValid(v) && (int32)v.first.second >= 0) {
 			inStream->Seek(v.second + v.first.second, std::ios_base::beg);
 			streamSize = inStream->GetSize() - inStream->Tell();
 		}
@@ -248,7 +249,7 @@ protected:
 
 	struct Internal {
 		bool completed;
-		uint16	chunkHeader;
+		uint16	header;
 		uint32 calculatedSize;
 		std::streamoff writeLenghtPos;
 		Internal* parentChunk;
@@ -256,6 +257,7 @@ protected:
 		OutChunkList childrens;
 	};
 
+	std::streamoff writeOffset;
 	Internal* cursor;
 	OutChunkList roots;
 	MemoryOutputStreamPtr pseudoOutput;

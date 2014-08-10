@@ -55,6 +55,10 @@ public:
 		nextar::ConstructObject(p, t);
 	}
 
+	inline void construct(pointer p, T&& t) const {
+		nextar::ConstructObject(p, std::move(t));
+	}
+
 	inline void destroy(pointer p) const {
 		nextar::DestroyObject(p);
 	}

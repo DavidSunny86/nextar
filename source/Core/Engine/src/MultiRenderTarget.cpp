@@ -33,7 +33,7 @@ void MultiRenderTarget::Create(const CreateParam& params) {
 	const TargetParamArray& tpa = params.targets;
 	dimensions = params.dimensions;
 	numColorTargets = params.numColorTargets;
-	for (uint32 i = numColorTargets; i < params.numColorTargets; ++i) {
+	for (uint32 i = 0; i < params.numColorTargets; ++i) {
 		color[i] = tpa[i].useTarget ? tpa[i].useTarget : CreateTexture(tpa[i]);
 
 	}

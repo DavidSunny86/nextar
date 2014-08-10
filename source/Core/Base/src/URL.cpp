@@ -121,12 +121,12 @@ String URL::GetComputedName() const {
 	return relativePath.substr(start, end - start);
 }
 
-OutputSerializer& operator << (OutputSerializer& ser, const URL& url) {
+_NexBaseAPI OutputSerializer& operator << (OutputSerializer& ser, const URL& url) {
 	ser << url.archiveName << url.relativePath;
 	return ser;
 }
 
-InputSerializer& operator >> (InputSerializer& ser, URL& url) {
+_NexBaseAPI InputSerializer& operator >> (InputSerializer& ser, URL& url) {
 	ser >> url.archiveName >> url.relativePath;
 	return ser;
 }

@@ -53,8 +53,8 @@ public:
 	String GetExtension() const;
 	String GetComputedName() const;
 
-	friend OutputSerializer& operator << (OutputSerializer& ser, const URL& url);
-	friend InputSerializer& operator >> (InputSerializer& ser, URL& url);
+	_NexBaseAPI friend OutputSerializer& operator << (OutputSerializer& ser, const URL& url);
+	_NexBaseAPI friend InputSerializer& operator >> (InputSerializer& ser, URL& url);
 
 protected:
 

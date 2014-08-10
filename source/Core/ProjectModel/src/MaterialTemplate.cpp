@@ -21,10 +21,10 @@ MaterialTemplate::MaterialTemplate(const StringID name, const StringID factory) 
 MaterialTemplate::~MaterialTemplate() {
 }
 
-void MaterialTemplate::NotifyAssetLoaded() {
+bool MaterialTemplate::NotifyAssetLoadedImpl() {
 	if(!shader) {
 		Error("Shader failed to load");
-		return;
+		return false;
 	}
 	ShaderAssetPtr shaderPtr =
 			shader->GetShaderUnit(compilationOptions);
@@ -34,6 +34,13 @@ void MaterialTemplate::NotifyAssetLoaded() {
 	MaterialFromTemplate loader(this, shaderPtr);
 	streamRequest->SetManualLoader(&loader);
 	material->Load(false);
+	return true;
+}
+
+bool MaterialTemplate::NotifyAssetSavedImpl() {
+	if (material)
+		material->SetAssetLocator(GetAssetLocator());
+	return true;
 }
 
 void MaterialTemplate::NotifyAssetUnloaded() {
@@ -42,12 +49,6 @@ void MaterialTemplate::NotifyAssetUnloaded() {
 
 void MaterialTemplate::NotifyAssetUpdated() {
 	AssetTemplate::NotifyAssetUpdated();
-}
-
-void MaterialTemplate::NotifyAssetSaved() {
-	AssetTemplate::NotifyAssetSaved();
-	if (material)
-		material->SetAssetLocator(GetAssetLocator());
 }
 
 void MaterialTemplate::SetShader(const ShaderTemplatePtr& shader) {
@@ -77,7 +78,11 @@ void MaterialTemplate::SetMaterialID(const MaterialAsset::ID& id) {
 
 void MaterialTemplate::DestroyStreamRequestImpl(nextar::StreamRequest*& streamRequest,
 		bool load) {
-	NEX_DELETE(streamRequest);
+	if (streamRequest) {
+		MaterialTemplate::StreamRequest* req = 
+			static_cast<MaterialTemplate::StreamRequest*>(streamRequest);
+		NEX_DELETE(req);
+	}
 	streamRequest = nullptr;
 }
 // load a shader
@@ -144,10 +149,9 @@ void MaterialTemplate::MaterialFromTemplate::Load(InputStreamPtr& stream, AssetL
 	request->SetShader(shader);
 	request->SetLayer(parent->GetLayer());
 	auto paramContext = shader->GetParamTableItem(ParameterContext::CTX_MATERIAL);
-	uint32 size = 0;
+	uint32 size = paramContext.totalParamBufferSize;
 	for(auto it = paramContext.beginIt; it != paramContext.endIt; ++it) {
 		NEX_ASSERT( (*it).autoName == AutoParamName::AUTO_CUSTOM_CONSTANT );
-		size += (*it).maxSize;
 	}
 	request->SetParamBufferSize(size);
 	size_t offset = 0;

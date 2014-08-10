@@ -23,6 +23,8 @@ public:
 	//! Engine data mount point
 	static const String ArchiveEngineData;
 	static const String ArchiveEngineData_Name;
+	static const String ArchiveProjectData;
+	static const String ArchiveProjectData_Name;
 
 	FileSystem();
 	~FileSystem();

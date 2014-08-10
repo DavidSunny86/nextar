@@ -105,6 +105,7 @@ void ScriptParser::RegionContext::ParseText(String& str) {
 	while (!scriptContext.lexer.IsEndOfStream()) {
 		switch (scriptContext.lexer.Forward()) {
 		case '@':
+			scriptContext.lexer.Backward();
 			break;
 		case '\\':
 			if (scriptContext.lexer.Current() == '@') {
@@ -115,6 +116,7 @@ void ScriptParser::RegionContext::ParseText(String& str) {
 				str += scriptContext.lexer.AsText(c, s - c - 1);
 				c = s;
 			}
+		default:
 			continue;
 		}
 		break;
@@ -132,11 +134,14 @@ void ScriptParser::RegionContext::Discard() {
 	while (!scriptContext.lexer.IsEndOfStream()) {
 		switch (scriptContext.lexer.Forward()) {
 		case '@':
+			scriptContext.lexer.Backward();
 			break;
 		case '\\':
 			if (scriptContext.lexer.Current() == '@') {
 				scriptContext.lexer.Forward();
 			}
+			/* no break */
+		default:
 			continue;
 		}
 		break;
@@ -155,6 +160,10 @@ void ScriptParser::BlockContext::ParseStatements(StatementListener* listener) {
 	while (!scriptContext.lexer.IsEndOfStream()) {
 		scriptContext.lexer.SkipWhite();
 		switch (scriptContext.lexer.Current()) {
+		case ';':
+			// empty statement
+			scriptContext.lexer.Forward();
+			continue;
 		case '@':
 			break;
 		case '}':
@@ -180,8 +189,10 @@ void ScriptParser::BlockContext::ParseStatements(StatementListener* listener) {
 				// ParameterContext
 				scriptContext.lexer.SkipWhite();
 				switch (scriptContext.lexer.Current()) {
-				case '{':
 				case ';':
+					scriptContext.lexer.Forward();
+					/* no break */
+				case '{':
 					wellFormed = true;
 					break;
 				default: {

@@ -5,7 +5,7 @@
  *      Author: obhi
  */
 
-#include <RenderEngine.h>
+#include <NexRenderEngine.h>
 #include <RenderWindowImpl.h>
 
 namespace nextar {

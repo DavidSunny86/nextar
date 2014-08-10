@@ -65,6 +65,7 @@ void StringInternTable::_LoadFromCache() {
 					StringUtils::Default)).first;
 	reverseMap.emplace(std::cref((*it).second), (*it).first);
 
+	// @todo Read from project folder if present 
 	InputStreamPtr input = FileSystem::Instance().OpenRead(_GetURL());
 	if (input) {
 		InputSerializer ser(input);
@@ -83,6 +84,7 @@ void StringInternTable::_LoadFromCache() {
 void StringInternTable::_SaveToCache() {
 	if (!FileSystem::InstancePtr())
 		return;
+	// @todo Write to project folder if present 
 	OutputStreamPtr output = FileSystem::Instance().OpenWrite(_GetURL());
 	if (output) {
 		OutputSerializer ser(output);

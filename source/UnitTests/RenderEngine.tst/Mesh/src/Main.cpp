@@ -11,15 +11,10 @@ public:
 	virtual void _SetupScene(SceneAssetPtr& scene) {
 		UTApplication::_SetupScene(scene);
 
-		MeshAsset::Factory* factory =
-				static_cast<MeshAsset::Factory*>(ComponentFactoryArchive::Instance().AsyncFindFactory(
-						MeshAsset::CLASS_ID));
-		MeshAsset::Group* group =
-				ComponentGroupArchive::Instance().AsyncFindOrCreate(
-						StringUtils::DefaultID);
 		URL url("{EngineData}/Meshes/Box.mesh");
-		MeshAssetPtr mesh = MeshAsset::Traits::Instance(NamedObject::AsyncStringID("Box"),
-				url, factory, group);
+		MeshAsset::ID id(NamedObject::AsyncStringID("Box"));
+		
+		MeshAssetPtr mesh = MeshAsset::Traits::Instance(id, url);
 		if (mesh) {
 			mesh->Load(false);
 		}

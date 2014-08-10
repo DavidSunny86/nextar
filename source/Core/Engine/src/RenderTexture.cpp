@@ -49,8 +49,11 @@ void RenderTexture::Create(TextureType type, PixelFormat format, uint32 width,
 
 void RenderTexture::Capture(RenderContext* rc, PixelBox& image,
 		FrameBuffer frameBuffer) {
+
+	ReadPixelUpdateParams update;
+	update.box = &image;
 	View* v = static_cast<View*>(rc->GetView(this));
-	v->Update(rc, MSG_TEX_READ, &image);
+	v->Update(rc, MSG_TEX_READ, &update);
 }
 
 } /* namespace nextar */

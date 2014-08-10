@@ -45,7 +45,8 @@ protected:
 	std::mutex requestQueueLock;
 	std::mutex responseQueueLock;
 	std::condition_variable requestQueueVar;
-	std::atomic_flag responseProcessed;bool quitThreads;
+	std::atomic_flag responseProcessed;
+	bool quitThreads;
 
 	StreamRequestList requestQueue;
 	StreamRequestList responseQueue;

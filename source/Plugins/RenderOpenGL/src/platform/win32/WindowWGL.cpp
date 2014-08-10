@@ -238,6 +238,7 @@ void WindowWGL::Impl::SetToFullScreen(bool fullScreen) {
 
 void WindowWGL::Impl::Destroy() {
 	RenderContextWGL* context = parent->GetContext();
+	
 	if (parent->IsFullScreen())
 		SetToFullScreen(false);
 		
@@ -261,6 +262,7 @@ void WindowWGL::Impl::Destroy() {
         // post quit message
         PostQuitMessage(0);
     }
+	context->DestroyedRenderWindow(parent);
 }
 
 void WindowWGL::Impl::ApplyChangedAttributes() {

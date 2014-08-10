@@ -19,7 +19,7 @@ public:
 				policy == GpuBuffer::RelocationPolicy::IMMEDIATELY_RELEASED);
 	}
 
-	virtual void CreateBuffer(size_t bufferSize, uint32 stride, uint8* dataPtr);
+	virtual void CreateBuffer(size_t bufferSize, uint32 stride, const uint8* dataPtr);
 
 	inline VertexBuffer& operator = (VertexBuffer&& other) {
 		GpuBuffer::operator =(std::move(other));

@@ -1,42 +1,5 @@
 //***************************************************************************
-@effect 
-//***************************************************************************
-
-shader Deferred {
-	
-	flags basic_deferred;
-
-	pass GBuffer {
-		
-		depth_stencil_state {
-			depth_state true true lessEq;
-			stencil_test false;
-		}
-		
-		blend_state {
-			blend false;
-		}
-		
-		raster_state {
-			raster solid back true;
-			scissor false;
-			anti_aliasing false false;
-		}
-		
-		program {
-			
-			param vec4:diffuseAndGloss DiffuseColorAndGloss 
-			param texture:diffuseMap DiffuseMap	
-			option USE_DIFFUSE_SAMPLER HasDiffuseMap
-			
-			vertex_program VSGBuffer;
-			fragment_program PSGBuffer;
-		}
-	}
-}
-
-//***************************************************************************
-@script:glsl:VSGbuffer
+@script:glsl:VSGBuffer
 //***************************************************************************
 #version 330
 
@@ -67,13 +30,15 @@ void main(void)
 }
 
 //***************************************************************************
-@script:glsl:PSGbuffer
+@script:glsl:PSGBuffer
 //***************************************************************************
-smooth in vec3 varyingNormal;
+#version 330
+
+smooth in vec4 varyingNormal;
 layout(location = 0) out vec4 albedoAndGlossMap;
 layout(location = 1) out vec4 normalMap;
 
-uniform per_object_materials {
+uniform per_material_properties {
 	vec4 diffuseAndGloss;
 };
 
@@ -101,10 +66,47 @@ vec2 getEncodedNormal(vec3 n) {
 }
 
 vec2 getNormal() {
-	return getEncodedNormal(normalize(varyingNormal));
+	return getEncodedNormal(normalize(varyingNormal.xyz));
 }
 
 void main(void) {
 	albedoAndGlossMap = vec4(getDiffuseColor(), getGloss());
 	normalMap = vec4(getNormal(), 0, 0);
+}
+
+//***************************************************************************
+@effect 
+//***************************************************************************
+
+shader Deferred {
+	
+	flags basic_deferred;
+
+	pass GBuffer {
+		
+		depth_stencil_state {
+			depth_state true true lessEq;
+			stencil_test false;
+		}
+		
+		blend_state {
+			blend false;
+		}
+		
+		raster_state {
+			raster solid back true;
+			scissor false;
+			anti_aliasing false false;
+		}
+		
+		program {
+			
+			param vec4:diffuseAndGloss DiffuseColorAndGloss;
+			param texture:diffuseMap DiffuseMap;
+			option USE_DIFFUSE_SAMPLER HasDiffuseMap;
+			
+			vertex_program VSGBuffer;
+			fragment_program PSGBuffer;
+		}
+	}
 }

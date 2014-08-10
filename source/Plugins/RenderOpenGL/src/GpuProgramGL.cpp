@@ -37,7 +37,8 @@ bool GpuProgramGL::Compile(GLenum shaderType, RenderContext* ctx,
 }
 
 void GpuProgramGL::Destroy(RenderContext* ctx) {
-	static_cast<RenderContextGL*>(ctx)->DestroyShader(iGlShader);
+	if (iGlShader)
+		static_cast<RenderContextGL*>(ctx)->DestroyShader(iGlShader);
 }
 
 } /* namespace RenderOpenGL */

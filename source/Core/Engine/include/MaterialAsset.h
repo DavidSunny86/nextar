@@ -19,6 +19,7 @@ namespace nextar {
  * and the compiled shader technique reference stored here.
  */
 class _NexEngineAPI MaterialAsset: public nextar::Asset {
+	NEX_LOG_HELPER(MaterialAsset);
 public:
 
 	enum Type {
@@ -31,7 +32,7 @@ public:
 	typedef AssetTraits<MaterialAsset> Traits;
 	typedef FactoryTraits<MaterialAsset> FactoryTraits;
 
-	class StreamRequest: public AllocGeneral, public AssetStreamRequest {
+	class _NexEngineAPI StreamRequest: public AllocGeneral, public AssetStreamRequest {
 		NEX_LOG_HELPER(MaterialAsset::StreamRequest)
 		;
 	public:
@@ -79,9 +80,10 @@ public:
 
 protected:
 	/* notify loaded/unloaded */
-	virtual void NotifyAssetLoaded();
+	virtual bool NotifyAssetLoadedImpl();
 	virtual void NotifyAssetUnloaded();
 	virtual void NotifyAssetUpdated();
+	virtual bool NotifyAssetSavedImpl();
 
 	virtual void UnloadImpl();
 

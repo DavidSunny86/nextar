@@ -42,9 +42,10 @@ void UTApplication::BeginFrame(uint32 frameNumber) {
 void UTApplication::EndFrame(uint32 elapsedTime) {
 }
 
-void UTApplication::ReleaseResources() {
+void UTApplication::ReleaseResourcesImpl() {
 	scene.Clear();
 	window.Clear();
+	EngineApplicationContext::ReleaseResourcesImpl();
 }
 
 void UTApplication::_SetupRenderDriver() {

@@ -33,10 +33,11 @@ public:
 	inline IndexBuffer& operator = (IndexBuffer&& other) {
 		GpuBuffer::operator =(std::move(other));
 		indexType = other.indexType;
+		policy = other.policy;
 		return *this;
 	}
 
-	virtual void CreateBuffer(size_t bufferSize, Type type, uint8* dataPtr);
+	virtual void CreateBuffer(size_t bufferSize, Type type, const uint8* dataPtr);
 
 private:
 

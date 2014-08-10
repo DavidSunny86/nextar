@@ -26,7 +26,7 @@ void BVCullingSystem::AddBody(Spatial* s) {
 
 void BVCullingSystem::RemoveBody(Spatial* s) {
 	NEX_ASSERT(s && s->GetCullingSystem() == this);
-	BestErase(bodies, std::find(bodies.begin(), bodies.end(), s));
+	BestErase(bodies, s);
 	s->_SetCullingSystem(nullptr);
 }
 

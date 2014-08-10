@@ -7,7 +7,7 @@ namespace nextar {
 Asset::AssetLocatorAccessor Asset::AssetLocatorAccessor::assetLocatorAccessor;
 
 Asset::Asset(const StringID id, const StringID factory) :
-		memoryCost(sizeof(Asset)), SharedComponent(id, factory) {
+		memoryCost(sizeof(Asset)), SharedComponent(id, factory), streamRequest(nullptr) {
 	if (OverrideDictionary("Asset")) {
 		Populate(GetDictionary());
 	}
@@ -73,7 +73,7 @@ void Asset::Load(StreamRequest* req, bool async) {
 }
 
 void Asset::Unload() {
-	if (IsLoaded() || IsLoading()) {
+	if (IsLoading()) {
 		Debug("Asset being loaded: " + GetName());
 		return;
 	}
@@ -113,6 +113,11 @@ void Asset::Save(StreamRequest* req, bool async) {
 }
 
 void Asset::NotifyAssetLoaded() {
+	if (NotifyAssetLoadedImpl()) {
+		streamRequest->flags |= StreamRequest::COMPLETED;
+		SetReady(true);
+	}
+
 	_FireCallbacksLoaded();
 	if (streamRequest) {
 		uint16 reqflags = streamRequest->flags;
@@ -121,6 +126,7 @@ void Asset::NotifyAssetLoaded() {
 				== (StreamRequest::AUTO_DELETE_REQUEST
 						| StreamRequest::COMPLETED))
 			DestroyStreamRequestImpl(streamRequest);
+		streamRequest = nullptr;
 	}
 }
 
@@ -131,6 +137,29 @@ void Asset::NotifyAssetUpdated() {
 }
 
 void Asset::NotifyAssetSaved() {
+	if (NotifyAssetSavedImpl()) {
+		streamRequest->flags |= StreamRequest::COMPLETED;
+		SetReady(true);
+	}
+
+	_FireCallbacksSaved();
+	if (streamRequest) {
+		uint16 reqflags = streamRequest->flags;
+		if ((reqflags
+			& (StreamRequest::AUTO_DELETE_REQUEST | StreamRequest::COMPLETED))
+			== (StreamRequest::AUTO_DELETE_REQUEST
+			| StreamRequest::COMPLETED))
+			DestroyStreamRequestImpl(streamRequest, false);
+		streamRequest = nullptr;
+	}
+}
+
+bool Asset::NotifyAssetLoadedImpl() {
+	return true;
+}
+
+bool Asset::NotifyAssetSavedImpl() {
+	return true;
 }
 
 void Asset::AsyncLoad(StreamRequest* request) {
@@ -186,6 +215,12 @@ void Asset::_FireCallbacksUnloaded() {
 void Asset::_FireCallbacksUpdated() {
 	for (auto callback : callbacks) {
 		callback->AssetUpdated(this);
+	}
+}
+
+void Asset::_FireCallbacksSaved() {
+	for (auto callback : callbacks) {
+		callback->AssetSaved(this);
 	}
 }
 

@@ -17,14 +17,22 @@ namespace nextar {
 /* GBuffer                                                              */
 /************************************************************************/
 GBuffer::GBuffer() {
-	renderTarget = Assign(NEX_NEW(MultiRenderTarget()));
 }
 
 GBuffer::~GBuffer() {
 }
 
+void GBuffer::Destroy() {
+
+	depth.Clear();
+	albedoSpecular.Clear();
+	normalMap.Clear();
+	renderTarget.Clear();
+}
+
 void GBuffer::Setup(Size dimensions) {
 	if (!renderTarget) {
+		renderTarget = Assign(NEX_NEW(MultiRenderTarget()));
 		MultiRenderTarget::CreateParam params;
 		params.dimensions = dimensions;
 		params.useDepth = true;
@@ -50,6 +58,7 @@ void GBuffer::Setup(Size dimensions) {
 /* DeferredRenderSystem                                                 */
 /************************************************************************/
 DeferredRenderSystem::DeferredRenderSystem() {
+	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyBuffers, this);
 }
 
 DeferredRenderSystem::~DeferredRenderSystem() {
@@ -153,6 +162,12 @@ void DeferredRenderSystem::RenderLight(Light* light, uint32 passIdx, uint32 upda
 	context.paramBuffers[(uint32)ParameterContext::CTX_OBJECT] = lightVol->GetParameters();
 	context.pass->UpdateParams(context, ParameterContext::CTX_OBJECT, updateId);
 	context.renderContext->Draw(lightVol->GetStreamData(), context);
+}
+
+void DeferredRenderSystem::DestroyBuffers(void* renderSystem) {
+	DeferredRenderSystem* pRenderSys = reinterpret_cast<DeferredRenderSystem*>(renderSystem);
+	if (pRenderSys)
+		pRenderSys->DestroyBuffer();
 }
 
 } /* namespace nextar */

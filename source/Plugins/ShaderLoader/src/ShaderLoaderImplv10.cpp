@@ -38,17 +38,12 @@ ShaderLoaderImplv1_0::ShaderLoaderImplv1_0() : language(RenderManager::SPP_UNKNO
 ShaderLoaderImplv1_0::~ShaderLoaderImplv1_0() {
 }
 
-void ShaderLoaderImplv1_0::Configure(const Config&) {
-	language =
-			RenderManager::Instance().GetProgramLanguage();
-}
-
 void ShaderLoaderImplv1_0::ReadPass(ShaderAsset::StreamRequest* request,
 		ChunkInputStream& ser) {
 	ShaderAsset* shader = static_cast<ShaderAsset*>(
 					request->GetStreamedObject());
 	StringID name;
-	uint8 header;
+	uint16 header;
 	ser >> name;
 	request->AddPass(name);
 
@@ -201,6 +196,10 @@ void ShaderLoaderImplv1_0::ReadPass(ShaderAsset::StreamRequest* request,
 void ShaderLoaderImplv1_0::Load(InputStreamPtr& stream,
 		AssetLoader& loader) {
 
+	if (language == RenderManager::SPP_UNKNOWN)
+		language =
+		RenderManager::Instance().GetProgramLanguage();
+
 	ShaderAsset::StreamRequest* request =
 			static_cast<ShaderAsset::StreamRequest*>(loader.GetRequestPtr());
 	ShaderAsset* shader = static_cast<ShaderAsset*>(
@@ -208,9 +207,9 @@ void ShaderLoaderImplv1_0::Load(InputStreamPtr& stream,
 	ShaderHeader header;
 
 	ChunkInputStream ser(stream);
-	InputSerializer::Chunk headerChunk = ChunkInputStream::Invalid;
-	ser.ReadChunk(SHADER_HEADER, headerChunk);
-	if (InputSerializer::IsValid(headerChunk)) {
+	InputSerializer::Chunk chunk = ChunkInputStream::Invalid;
+	ser.ReadChunk(SHADER_HEADER, chunk);
+	if (InputSerializer::IsValid(chunk)) {
 		ser >> header.version;
 		if (!TestVersion(NEX_MAKE_VERSION(1,0,0), header.version)) {
 			Error("Shader is of higher version: " + request->GetName());
@@ -226,7 +225,6 @@ void ShaderLoaderImplv1_0::Load(InputStreamPtr& stream,
 	bool foundUnit = false;
 	StringID name;
 	do {
-		InputSerializer::Chunk chunk;
 		ser >> chunk;
 		if (InputSerializer::IsValid(chunk)) {
 			switch (chunk.first.first) {

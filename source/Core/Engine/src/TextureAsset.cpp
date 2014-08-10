@@ -88,7 +88,7 @@ void TextureAsset::LoadImpl(StreamRequest* request, bool isStreamed) {
 	}
 }
 
-void TextureAsset::NotifyAssetLoaded() {
+bool TextureAsset::NotifyAssetLoadedImpl() {
 	TextureStreamRequest* textureParams =
 			static_cast<TextureStreamRequest*>(GetStreamRequest());
 
@@ -123,30 +123,28 @@ void TextureAsset::NotifyAssetLoaded() {
 
 	ContextObject::RequestUpdate(MSG_TEX_CREATE | MSG_TEX_UPLOAD,
 			reinterpret_cast<ContextObject::ContextParamPtr>(&textureParams->createParams));
+	bool completed = false;
 	/* should we stream again, in case it was not fully loaded ? */
 	if (currentMaxMipLevel < numMipMaps) {
 		if (IsAutoStreamEnabled()) {
 			AssetStreamer::Instance().RequestLoad(this);
-		} else
+		} else {
 			textureParams->flags |= StreamRequest::COMPLETED;
+			completed = true;
+		}
 	} else {
 		SetTextureComplete(true);
 		textureParams->flags |= StreamRequest::COMPLETED;
+		completed = true;
 	}
-
-	uint16 reqflags = streamRequest->flags;
-	if ((reqflags
-			& (StreamRequest::AUTO_DELETE_REQUEST | StreamRequest::COMPLETED))
-			== (StreamRequest::AUTO_DELETE_REQUEST | StreamRequest::COMPLETED))
-		DestroyStreamRequestImpl(streamRequest);
 
 	if (!IsTextureInited()) {
 		SetTextureInited(true);
-		Asset::NotifyAssetLoaded();
-		SetReady(true);
 	} else {
 		Asset::NotifyAssetUpdated();
 	}
+
+	return completed;
 }
 
 void TextureAsset::NotifyAssetUnloaded() {
@@ -164,7 +162,6 @@ void TextureAsset::NotifyAssetUpdated() {
 }
 
 void TextureAsset::UnloadImpl() {
-	NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
 }
 
 StreamRequest* TextureAsset::CreateStreamRequestImpl(bool load) {

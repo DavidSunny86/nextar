@@ -153,12 +153,15 @@ void WindowGLX::Impl::Destroy() {
 	RenderContextGLX* context = parent->GetContext();
 	Display* display = parent->GetDisplay();
 	Window window = parent->GetWindow();
+	
+
 	if (context->IsCurrentDrawable(drawable))
 		context->SetCurrentTarget(nullptr);
 	XDestroyWindow(display, window);
 	window = 0;
 	XFreeColormap(display, cmap);
 	cmap = 0;
+	context->DestroyedRenderWindow(parent);
 }
 
 void WindowGLX::Impl::ApplyChangedAttributes() {

@@ -10,7 +10,33 @@
 
 namespace nextar {
 
+ShaderParamScalar ShaderParamScalar::agent;
+ShaderParamVector ShaderParamVector::agent;
+ShaderParamTexture ShaderParamTexture::agent;
+ShaderParamAgent::ShaderParamAgentMap ShaderParamAgent::agents;
+
 ShaderParamAgent* ShaderParamAgent::GetAgent(ParamDataType type) {
+	if (!agents.size()) {
+		agents[ParamDataType::PDT_BOOL] = &ShaderParamScalar::agent;
+		agents[ParamDataType::PDT_UINT] = &ShaderParamScalar::agent;
+		agents[ParamDataType::PDT_INT] = &ShaderParamScalar::agent;
+		agents[ParamDataType::PDT_FLOAT] = &ShaderParamScalar::agent;
+		agents[ParamDataType::PDT_TEXTURE] = &ShaderParamTexture::agent;
+		agents[ParamDataType::PDT_VEC2] = &ShaderParamVector::agent;
+		agents[ParamDataType::PDT_VEC3] = &ShaderParamVector::agent;
+		agents[ParamDataType::PDT_VEC4] = &ShaderParamVector::agent;
+		agents[ParamDataType::PDT_IVEC2] = &ShaderParamVector::agent;
+		agents[ParamDataType::PDT_IVEC3] = &ShaderParamVector::agent;
+		agents[ParamDataType::PDT_IVEC4] = &ShaderParamVector::agent;
+		agents[ParamDataType::PDT_MAT4x4] = &ShaderParamVector::agent;
+		agents[ParamDataType::PDT_MAT3x4] = &ShaderParamVector::agent;
+	}
+
+	auto it = agents.find(type);
+	if (it != agents.end()) {
+		return (*it).second;
+	}
+	return nullptr;
 }
 
 void ShaderParamAgent::SetParamValue(size_t offset,

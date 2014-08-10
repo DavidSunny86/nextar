@@ -23,6 +23,7 @@ public:
 	enum EventID {
 		EVENT_INIT_RESOURCES,
 		EVENT_DESTROY_RESOURCES,
+		LAST_EVENT_ID,
 	};
 
 	enum ListnerPriority {
@@ -72,6 +73,7 @@ public:
 
 	virtual void InitializeContext();
 	virtual void DestroyContext();
+	virtual void ReleaseResources();
 
 	virtual void Run();
 
@@ -95,7 +97,8 @@ protected:
 	}
 	virtual void DestroyExtendedInterfacesImpl() {
 	}
-
+	virtual void ReleaseResourcesImpl() {
+	}
 private:
 
 	NEX_THREAD_RECURSIVE_MUTEX(appLock);
@@ -113,6 +116,7 @@ private:
 	URL defaultConfigPath;
 	String appName;
 
+	bool resourcesDestroyed;
 	bool runningLoop;
 	FrameListenerSet frameListenersToRemove;
 	FrameListenerSet frameListenersToAdd;

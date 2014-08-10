@@ -8,9 +8,11 @@
 #ifndef DEFERREDRENDERSYSTEM_H_
 #define DEFERREDRENDERSYSTEM_H_
 
-#include <RenderEngine.h>
+#include <NexRenderEngine.h>
 #include <EngineHeaders.h>
 #include <RenderSystem.h>
+#include <RenderTexture.h>
+#include <MultiRenderTarget.h>
 
 namespace nextar {
 
@@ -21,6 +23,7 @@ public:
 	~GBuffer();
 
 	void Setup(Size dimensions);
+	void Destroy();
 
 	RenderTexturePtr depth;
 	RenderTexturePtr albedoSpecular;
@@ -30,10 +33,18 @@ public:
 
 class _NexRenderAPI DeferredRenderSystem: public nextar::RenderSystem {
 public:
+
 	DeferredRenderSystem();
 	virtual ~DeferredRenderSystem();
 
 	virtual void Commit(CommitContext& context);
+
+	static void DestroyBuffers(void* renderSystem);
+
+	inline void DestroyBuffer() {
+		gbufferRI.rt = nullptr;
+		gbuffer.Destroy();
+	}
 
 protected:
 

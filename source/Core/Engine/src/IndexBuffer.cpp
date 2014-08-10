@@ -8,7 +8,7 @@ IndexBuffer::IndexBuffer(IndexBuffer&& other) :
 }
 
 void IndexBuffer::CreateBuffer(size_t bufferSize,
-		IndexBuffer::Type type, uint8* dataPtr) {
+		IndexBuffer::Type type, const uint8* dataPtr) {
 	GpuBuffer::CreateParams params;
 	this->indexType = type;
 	params.size = bufferSize;

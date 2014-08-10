@@ -22,6 +22,9 @@ namespace nextar {
 class _NexEngineAPI Pass: public ContextObject,
 		public NamedObject,
 		public AllocGraphics {
+	
+	NEX_LOG_HELPER(Pass); 
+
 public:
 
 	enum ProgramStage
@@ -59,7 +62,8 @@ public:
 		uint32 offset[(size_t) ParameterContext::CTX_COUNT];
 	};
 
-	struct CompileParams {
+	class CompileParams {
+	public:
 		mutable std::atomic_flag inited;
 		const StringUtils::WordList* compileOptions;
 		RasterState rasterState;
@@ -70,6 +74,13 @@ public:
 		//uint16* inputLayoutId;
 		uint32 passIndex;
 		String programSources[Pass::STAGE_COUNT];
+
+		CompileParams() : passIndex(-1) {
+			inited.clear(std::memory_order_release);
+		}
+
+		CompileParams(const CompileParams& other) = delete;
+		Pass::CompileParams& operator =(const nextar::Pass::CompileParams &) = delete;
 	};
 
 	class _NexEngineAPI View: public ContextObject::View {
@@ -106,12 +117,9 @@ public:
 		uint32 passNumber;
 	};
 
-	// not implemented
+	// implemented
 	Pass(Pass&& p);
 	// not implemented
-	Pass(const Pass& p);
-	// not implemented
-
 	Pass(StringID name);
 	virtual ~Pass();
 
@@ -161,6 +169,11 @@ protected:
 	typedef map<StringRef, AutoParam*>::type AutoParamMap;
 	static AutoParamMap autoParams;
 	friend class ShaderAsset;
+
+private:
+	// not implemented
+	Pass(const Pass& p);
+
 };
 
 typedef Pass* PassPtr;

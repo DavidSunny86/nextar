@@ -28,7 +28,7 @@ enum VertexLayoutType : uint16 {
 /** @remarks
  * This class represents an input or output layout for vertices.
  */
-class VertexLayout: public Referenced<VertexLayout, AllocGeneral>,
+class _NexEngineAPI VertexLayout: public Referenced<VertexLayout, AllocGeneral>,
 	public ContextObject {
 public:
 	enum Message {

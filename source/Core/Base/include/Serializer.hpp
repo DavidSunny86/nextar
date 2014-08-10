@@ -12,7 +12,7 @@
 #define SWAP16(object) object
 #define SWAP32(object) object
 #define SWAP64(object) object
-#define WRITE_ARRAY(object, T) Flush(); outStream->Write(object.first, object.second*sizeof(T))
+#define WRITE_ARRAY(object, T) Flush(); outStream->Write(object.first, object.second*sizeof(T)); totalSizeWritten += object.second*sizeof(T)
 #define READ_ARRAY(object, T) { \
 	std::streamoff readAmt = (object.second*sizeof(T)); \
 	streamSize -= (readAmt-left); \
@@ -25,7 +25,7 @@
 #define SWAP16(object) Endian::Swap16(object)
 #define SWAP32(object) Endian::Swap32(object)
 #define SWAP64(object) Endian::Swap64(object)
-#define WRITE_ARRAY(object, T) for(size_t i = 0; i < object.second; ++i) (*this) << object.first[i];
+#define WRITE_ARRAY(object, T) for(size_t i = 0; i < object.second; ++i) (*this) << object.first[i]; totalSizeWritten += object.second*sizeof(T)
 #define READ_ARRAY(object, T) for(size_t i = 0; i < object.second; ++i) (*this) >> object.first[i];
 #endif
 
@@ -135,6 +135,7 @@ inline OutputSerializer& OutputSerializer::operator <<(
 		const ByteArray& object) {
 	Flush();
 	outStream->Write(object.first, object.second);
+	totalSizeWritten += object.second;
 	return *this;
 }
 
@@ -142,6 +143,7 @@ inline OutputSerializer& OutputSerializer::operator <<(
 		const UByteArray& object) {
 	Flush();
 	outStream->Write(object.first, object.second);
+	totalSizeWritten += object.second;
 	return *this;
 }
 

@@ -11,6 +11,8 @@ NEX_DEFINE_SINGLETON_PTR(FileSystem);
 
 const String FileSystem::ArchiveEngineData = "{EngineData}";
 const String FileSystem::ArchiveEngineData_Name = "EngineData";
+const String FileSystem::ArchiveProjectData = "{ProjectData}";
+const String FileSystem::ArchiveProjectData_Name = "ProjectData";
 
 FileSystem::FileSystem() {
 
@@ -23,6 +25,8 @@ FileSystem::FileSystem() {
 	AddArchive("", Archive::TYPE_DIR, "");
 	AddArchive(ArchiveEngineData_Name, Archive::TYPE_DIR,
 			moduleLocation + "/../Data");
+	AddArchive(ArchiveProjectData_Name, Archive::TYPE_DIR,
+		moduleLocation + "/../Project");
 }
 
 FileSystem::~FileSystem() {

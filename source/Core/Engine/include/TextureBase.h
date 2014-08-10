@@ -47,6 +47,14 @@ public:
 				<< 3, MSG_TEX_READ = 1 << 4,
 	};
 
+	struct ReadPixelUpdateParams {
+		std::atomic_flag lock;
+		PixelBox* box;
+		ReadPixelUpdateParams() {
+			lock.clear(std::memory_order_relaxed);
+		}
+	};
+
 	struct UpdateParams {
 		PixelFormat textureFormat;
 		TextureType type;

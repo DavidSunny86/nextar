@@ -3,6 +3,7 @@
 
 #include <ProjectModelHeaders.h>
 #include <ProjectApplicationContext.h>
+#include <RenderTarget.h>
 
 using namespace nextar;
 
@@ -13,16 +14,18 @@ public:
 	~UTApplication();
 	virtual void ConfigureExtendedInterfacesImpl();
 
-	virtual void ReleaseResources();
+	virtual void ReleaseResourcesImpl();
 	virtual void BeginFrame(uint32 frameNumber);
 	virtual void EndFrame(uint32 timeElapsed);
 
 protected:
 
 	virtual void _SetupScene(SceneAssetPtr&);
+	virtual void _SetupRenderDriver();
 	virtual SceneAssetPtr _CreateDefaultScene();
 
 	SceneAssetPtr scene;
+	RenderTargetPtr window;
 };
 
 #endif //UTAPPLICATION_H_

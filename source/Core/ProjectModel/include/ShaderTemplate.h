@@ -79,12 +79,12 @@ public:
 	typedef AssetTraits<ShaderTemplate> Traits;
 	typedef FactoryTraits<ShaderTemplate> FactoryTraits;
 
-	class SaveStreamRequest: public AllocGeneral, public AssetStreamRequest {
+	class _NexProjectAPI SaveStreamRequest: public AllocGeneral, public AssetStreamRequest {
 	public:
 		SaveStreamRequest(ShaderTemplate* shaderTemplate) : AssetStreamRequest(shaderTemplate) {}
 	};
 
-	class LoadStreamRequest: public AllocGeneral, public AssetStreamRequest {
+	class _NexProjectAPI LoadStreamRequest: public AllocGeneral, public AssetStreamRequest {
 		NEX_LOG_HELPER(ShaderTemplate::LoadStreamRequest);
 	public:
 
@@ -117,10 +117,10 @@ public:
 	virtual ~ShaderTemplate();
 
 	/* notify loaded/unloaded */
-	virtual void NotifyAssetLoaded();
 	virtual void NotifyAssetUnloaded();
 	virtual void NotifyAssetUpdated();
-	virtual void NotifyAssetSaved();
+	virtual bool NotifyAssetLoadedImpl();
+	virtual bool NotifyAssetSavedImpl();
 
 	virtual void UnloadImpl();
 

@@ -105,10 +105,11 @@ const uint8* MemoryOutputStream::GetData() const {
 }
 
 void MemoryOutputStream::Write(const void* buff, size_t s) {
-	buffer.reserve(pos + s);
+	size = std::max(pos + s, size);
+	buffer.resize(size);
 	void* dst = buffer.data() + pos;
 	std::memcpy(dst, buff, s);
-	size = std::max(pos + s, size);
+	pos += s;
 }
 
 bool MemoryOutputStream::Seek(std::streamoff offset,

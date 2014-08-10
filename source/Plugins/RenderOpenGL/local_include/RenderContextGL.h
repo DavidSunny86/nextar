@@ -108,6 +108,8 @@ public:
 			GLbitfield access);
 	inline void SetTexture(uint32 texIdx, GLuint samplerObject,
 			TextureViewGL* tu);
+	inline Size GetTextureParams(GLenum target);
+	inline void GetTextureData(GLenum target, GLenum format, GLenum type, GLvoid* data);
 
 	// capture
 	void Capture(PixelBox& image, RenderTarget* rt, GLuint *pbo,
@@ -128,6 +130,7 @@ public:
 			PixelFormat textureFormat);
 	static ParameterContext GuessContextByName(const String& name,
 			ParameterContext defaultContext = ParameterContext::CTX_UNKNOWN);
+	static void DestroyResources(void* pThis);
 
 protected:
 
@@ -297,8 +300,26 @@ inline void RenderContextGL::DestroyTexture(GLuint tex) {
 
 inline void RenderContextGL::ActivateTexture(GLenum target, GLuint texture) {
 	glBindTexture(target, texture);
-	GL_CHECK();}
+	GL_CHECK();
+}
+
+inline Size RenderContextGL::GetTextureParams(GLenum target) {
+	GLint width = -1;
+	GLint height = -1;
+	glGetTexLevelParameteriv(target, 0, GL_TEXTURE_WIDTH, &width);
+	GL_CHECK();
+	glGetTexLevelParameteriv(target, 0, GL_TEXTURE_HEIGHT, &height);
+	GL_CHECK();
+
+	return Size((uint16)width, (uint16)height);
+}
+
+inline void RenderContextGL::GetTextureData(GLenum target, GLenum format, GLenum type, GLvoid* data) {
+	glGetTexImage(target, 0, format, type, data);
+	GL_CHECK();
+}
 
 }
+
 
 #endif //RENDERCONTEXTGL_H_

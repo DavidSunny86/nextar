@@ -25,7 +25,7 @@ namespace StringUtils {
 // const char* operator
 //! Exported constants
 enum {
-	STRING_ID_START_OFFSET = 10,
+	STRING_ID_START_OFFSET = 99999,
 };
 
 NEX_EXTERN_SYM _NexBaseAPI const String Null;

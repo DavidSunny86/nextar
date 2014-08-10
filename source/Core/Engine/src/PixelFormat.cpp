@@ -49,7 +49,7 @@ static PixelFormatDesc formatDescTable[(uint32) PixelFormat::COUNT] = { {
 // name
 		"RG16",
 		// pixelSize, numChannels, flags
-		4, 2, PIXFLAG_INTEGRAL | PIXFLAG_UNSIGNED
+		4, 2, PIXFLAG_INTEGRAL | PIXFLAG_TEXTURE_FORMAT | PIXFLAG_UNSIGNED
 				| PIXFLAG_NORMALIZED },
 {
 // name

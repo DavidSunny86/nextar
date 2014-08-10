@@ -43,7 +43,7 @@ void WriteMeshHeader(ChunkOutputStream& outStream) {
 
 void WriteElementData(ChunkOutputStream& outStream) {
 	OutputSerializer& ser = outStream.BeginChunk(MCID_VERTEX_ELEMENT_DATA);
-	uint16 layoutType = 0; // Position and Normal
+	uint16 layoutType = 1; // Position and Normal
 	ser << layoutType;
 	outStream.EndChunk();
 }
@@ -134,7 +134,7 @@ void WriteSharedVertexData(ChunkOutputStream& outStream) {
 }
 
 void WriteSharedIndexData(ChunkOutputStream& outStream) {
-	OutputSerializer& ser = outStream.BeginChunk(MCID_SHARED_VERTEX_DATA);
+	OutputSerializer& ser = outStream.BeginChunk(MCID_SHARED_INDEX_DATA);
 	uint32 start = 0;
 	uint32 count = 36;
 	ser << start << count;

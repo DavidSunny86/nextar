@@ -13,7 +13,7 @@ public:
 	~UTApplication();
 	virtual void ConfigureExtendedInterfacesImpl();
 
-	virtual void ReleaseResources();
+	virtual void ReleaseResourcesImpl();
 	virtual void BeginFrame(uint32 frameNumber);
 	virtual void EndFrame(uint32 timeElapsed);
 

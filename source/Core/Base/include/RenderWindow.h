@@ -113,6 +113,7 @@ public:
 	 * @brief	Set to full screen
 	 **/
 	virtual void SetToFullScreen(bool fullscreen);
+
 protected:
 	enum {
 		WINDOW_CREATED = 1 << 0,

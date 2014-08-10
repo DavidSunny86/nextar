@@ -207,7 +207,7 @@ typedef unsigned short wchar_t;
 #	endif
 #endif
 
-#if (defined(_MSC_VER) && (_MSC_VER <= 1700)) || defined(__MINGW32__)
+#if (defined(_MSC_VER) && (_MSC_VER <= 1800)) || defined(__MINGW32__)
 #	define noexcept
 #	define constexpr const
 	// no need to explicitly align as first member is aligned anyway

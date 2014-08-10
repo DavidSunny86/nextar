@@ -9,7 +9,6 @@
 #define RENDERMANAGER_H_
 
 #include <NexBase.h>
-#include <NexBase.h>
 #include <RenderDriver.h>
 #include <NameValueMap.h>
 #include <RenderSystem.h>
@@ -56,6 +55,17 @@ public:
 		return renderSettings;
 	}
 
+	inline const RenderSystemList& GetRenderSystems() const {
+		return renderSystems;
+	}
+
+	inline const RenderQueueDescList& GetRenderQueueInfo() const {
+		return renderQueues;
+	}
+
+	virtual void AddRenderSystem(RenderSystem* rs);
+	virtual void RemoveRenderSystem(RenderSystem* rs);
+
 	/* */
 	virtual void Configure(const Config&);
 	virtual RenderDriverPtr AsyncCreateDriver(DriverCreationParams&) = 0;
@@ -74,9 +84,7 @@ public:
 	 * not modified later. */
 	virtual void AddRenderQueue(const StringID name, uint16 priority,
 			RenderQueueFlags flags);
-	virtual const RenderQueueDescList& GetRenderQueueInfo() const;
-
-	virtual RenderSystemList& GetRenderSystems();
+	
 	/* Implement */
 	virtual ShaderLanguage GetProgramLanguage() = 0;
 	virtual String GetInfo() = 0;

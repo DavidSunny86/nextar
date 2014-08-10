@@ -1,12 +1,6 @@
 #ifndef NEXTAR_NEXASSERT_H__
 #define NEXTAR_NEXASSERT_H__
 
-#include <NexBase.h>
-
-#ifndef NEXTAR_BASE_DEF_H
-#error Do not include this file directly, include "NexBase.h" instead
-#endif
-
 namespace nextar {
 
 template<bool> struct AssertFaliure;

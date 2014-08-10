@@ -38,7 +38,8 @@ void ProjectApplicationContext::RegisterTemplateFactories() {
 			&ShaderSaverImplv1_0::saver);
 }
 
-void ProjectApplicationContext::ReleaseResources() {
+void ProjectApplicationContext::ReleaseResourcesImpl() {
+	EngineApplicationContext::ReleaseResourcesImpl();
 }
 
 } /* namespace nextar */

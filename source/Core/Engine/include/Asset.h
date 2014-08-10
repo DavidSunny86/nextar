@@ -16,6 +16,7 @@ public:
 	virtual void AssetUnloaded(Asset*) = 0;
 	virtual void AssetLoaded(Asset*) = 0;
 	virtual void AssetUpdated(Asset*) = 0;
+	virtual void AssetSaved(Asset*) = 0;
 protected:
 	~AssetCallback() {
 	}
@@ -138,7 +139,7 @@ public:
 	};
 
 	template<typename AssetType>
-	class _NexEngineAPI FactoryTraits: public Factory {
+	class FactoryTraits: public Factory {
 	public:
 		typedef typename AssetType::Traits AssetTraits;
 		typedef typename AssetTraits::AssetTypePtr AssetTypePtr;
@@ -169,7 +170,7 @@ public:
 			return nullptr;
 		}
 
-		static void _InternalRegisterToArchive() {
+		inline static void _InternalRegisterToArchive() {
 			ComponentFactoryArchive::Instance()._InternalDefaultFactory(NEX_NEW(Type(StringUtils::DefaultID)), AssetTraits::CLASS_ID);
 		}
 	};
@@ -306,14 +307,14 @@ public:
 	virtual void Load(StreamRequest* request, bool useAsyncLoad);
 	virtual void Save(StreamRequest* request, bool useAsyncLoad);
 	virtual void Unload();
-	/* Called from main thread when the asset is loaded */
-	virtual void NotifyAssetLoaded();
 	/* Called from main thread when the asset has been unloaded */
 	virtual void NotifyAssetUnloaded();
 	/* Called from main thread when the asset has been updated */
 	virtual void NotifyAssetUpdated();
+	/* Called from main thread when the asset is loaded */
+	void NotifyAssetLoaded();
 	/* Called from main thread when the asset has been saved */
-	virtual void NotifyAssetSaved();
+	void NotifyAssetSaved();
 	/**
 	 * When load is called, stream request is either created
 	 * or retrieved from the asset implementation.
@@ -324,6 +325,11 @@ public:
 	}
 
 protected:
+	/* return true if the loading was completed */
+	virtual bool NotifyAssetLoadedImpl();
+	/* return true if the saving was completed */
+	virtual bool NotifyAssetSavedImpl();
+
 	/** Streamable */
 	virtual void AsyncLoad(StreamRequest* req);
 	virtual void AsyncSave(StreamRequest* req);
@@ -339,6 +345,7 @@ protected:
 	void _FireCallbacksLoaded();
 	void _FireCallbacksUnloaded();
 	void _FireCallbacksUpdated();
+	void _FireCallbacksSaved();
 
 	static void _LoadDependencies(AssetStreamRequest* req);
 
@@ -418,8 +425,6 @@ protected:
 class AssetLoaderImpl {
 public:
 
-	virtual void Configure(const Config&) {
-	}
 	virtual void Load(InputStreamPtr&, AssetLoader&) = 0;
 
 protected:
@@ -450,8 +455,6 @@ class AssetSaver;
 class AssetSaverImpl {
 public:
 
-	virtual void Configure(const Config&) {
-	}
 	virtual void Save(OutputStreamPtr&, AssetSaver&) = 0;
 
 protected:

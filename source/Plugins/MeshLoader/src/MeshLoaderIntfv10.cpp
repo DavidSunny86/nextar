@@ -156,15 +156,16 @@ MeshVertexData* MeshLoaderIntfv1_0::ReadVertexData(
 	// read some headers
 	uint32 numVertexBuffers;
 	ser >> numVertexBuffers >> vertexData->vertexCount;
-
+	
 	if (numVertexBuffers >= MAX_STREAM_COUNT) {
 		Error(String("Too many vertex buffers: ") + request->GetName());
 		NEX_DELETE(vertexData);
 		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
 	}
 
+	vertexData->numVertexBuffers = numVertexBuffers;
 	// the first chunk should be vertex elements, if not shared
-	InputSerializer::Chunk chunk;
+	InputSerializer::Chunk chunk = InputSerializer::Invalid;
 	ser >> chunk;
 	if (chunk.first.first != MCID_VERTEX_ELEMENT_DATA && !vertexElements 
 		&& type == VertexLayoutType::CUSTOM_LAYOUT) {
@@ -189,6 +190,7 @@ MeshVertexData* MeshLoaderIntfv1_0::ReadVertexData(
 
 	size_t i = 0;
 	do {
+		ser >> chunk;
 		switch (chunk.first.first) {
 		case MCID_VERTEX_BUFFER_DATA:
 			ReadVertexBufferData(request, ser, vertexData);
@@ -246,8 +248,7 @@ void MeshLoaderIntfv1_0::ReadSubMesh(MeshAsset::StreamRequest* request,
 	Asset* mesh = static_cast<Asset*>(request->GetStreamedObject());
 	uint32 subMesh = request->AddPrimitiveGroup();
 	// right now all buffers are shared by subMesh
-	InputSerializer::Chunk chunk(
-			InputSerializer::ChunkHeader(MARKER_INVALID_CHUNK, 0), 0);
+	InputSerializer::Chunk chunk = InputSerializer::Invalid;
 
 	MaterialAssetPtr mtl;
 	MeshVertexData* vertexData = 0;
@@ -316,7 +317,7 @@ void MeshLoaderIntfv1_0::ReadMeshChunk(MeshAsset::StreamRequest* request,
 		InputSerializer& ser) {
 	/* check if data is shared */
 	Asset* mesh = static_cast<Asset*>(request->GetStreamedObject());
-	InputSerializer::Chunk chunk;
+	InputSerializer::Chunk chunk = InputSerializer::Invalid;
 	bool headersRead = false;
 	bool subMeshesRead = false;
 	MaterialAssetPtr mtl;

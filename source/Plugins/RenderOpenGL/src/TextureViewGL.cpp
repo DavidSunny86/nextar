@@ -25,10 +25,38 @@ void TextureViewGL::Destroy(nextar::RenderContext* rc) {
 	texture = 0;
 }
 
+void TextureViewGL::ReadPixels(RenderContextGL* gl, TextureBase::ReadPixelUpdateParams& params) {
+	if (params.lock.test_and_set(std::memory_order_release))
+		return;
+	PixelBox* pixels = params.box;
+	gl->ActivateTexture(target, texture);
+	Size dim = gl->GetTextureParams(target);
+
+	pixels->data = static_cast<uint8*>(
+		NEX_ALLOC(dim.dx * dim.dy * pixelFormat.pixelSize, MEMCAT_GENERAL));
+	pixels->left = 0;
+	pixels->right = dim.dx;
+	pixels->top = 0;
+	pixels->bottom = dim.dy;
+	pixels->front = 0;
+	pixels->back = 1;
+	pixels->format = pixelFormat.textureFormat;
+	pixels->deleteData = true;
+	gl->GetTextureData(target, pixelFormat.internalFormat, pixelFormat.dataType, pixels->data);
+	pixels->CalculatePitches();
+}
+
 void TextureViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 		ContextObject::ContextParamPtr params) {
-	// todo Incorrect implementation
+
 	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
+	if (msg & TextureBase::MSG_TEX_READ) {
+		ReadPixels(gl, *const_cast<TextureBase::ReadPixelUpdateParams*>(
+			reinterpret_cast<const TextureBase::ReadPixelUpdateParams*>(params)));
+		return;
+	}
+
+	// todo Incorrect implementation
 	const TextureBase::UpdateParams& textureParams =
 			*reinterpret_cast<const TextureBase::UpdateParams*>(params);
 

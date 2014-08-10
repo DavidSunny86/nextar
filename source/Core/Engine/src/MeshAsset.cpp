@@ -38,6 +38,8 @@ MeshAsset::MeshAsset(const StringID name, const StringID factory) :
 }
 
 MeshAsset::~MeshAsset() {
+	if (IsLoaded())
+		Unload();
 }
 
 uint32 MeshAsset::GetClassID() const {
@@ -45,6 +47,15 @@ uint32 MeshAsset::GetClassID() const {
 }
 
 void MeshAsset::UnloadImpl() {
+	for (auto &p : primitives) {
+		if (p.vertexData != sharedVertexData) {
+			NEX_SAFE_DELETE(p.vertexData);
+		}
+		if (p.indexData != sharedIndexData) {
+			NEX_SAFE_DELETE(p.indexData);
+		}
+	}
+
 	if (sharedVertexData) {
 		NEX_DELETE(sharedVertexData);
 		sharedVertexData = 0;
@@ -60,15 +71,13 @@ void MeshAsset::UnloadImpl() {
 void MeshAsset::_FillVertexData(MeshVertexData* data,
 		MeshBufferData::BufferList::iterator& vertexBufferIt) {
 	/* create vertex binding */
-	uint32 numVertexBuffers = data->binding.GetBufferCount();
+	uint32 numVertexBuffers = data->numVertexBuffers;
+	data->binding.SetBufferCount(numVertexBuffers);
 	for (uint32 stream = 0; stream < numVertexBuffers;
 			++stream, ++vertexBufferIt) {
 		MeshBufferData::Stream& byteData = (*vertexBufferIt);
-		uint8* dataPtr = byteData.buffer.data();
-		uint32 stride =  byteData.stride;
-		dataPtr += 4;
 		VertexBuffer buffer(GpuBuffer::RelocationPolicy::NEVER_RELEASED);
-		buffer.CreateBuffer(byteData.buffer.size(), stride, dataPtr);
+		buffer.CreateBuffer(byteData.buffer.size(), byteData.stride, byteData.buffer.data());
 		data->binding.BindBuffer(stream, buffer);
 	}
 
@@ -84,7 +93,7 @@ void MeshAsset::_FillIndexData(MeshIndexData* data,
 	indexBufferIt++;
 }
 
-void MeshAsset::NotifyAssetLoaded() {
+bool MeshAsset::NotifyAssetLoadedImpl() {
 	MeshAsset::StreamRequest* request =
 			static_cast<MeshAsset::StreamRequest*>(GetStreamRequest());
 	defaultSharedMaterial = request->sharedMaterial;
@@ -108,11 +117,17 @@ void MeshAsset::NotifyAssetLoaded() {
 	for (auto &p : primitives) {
 		if (p.vertexData) {
 			_FillVertexData(p.vertexData, vertexBufferIt);
-		}
+		} else
+			p.vertexData = sharedVertexData;
 		if (p.indexData) {
 			_FillIndexData(p.indexData, indexBufferIt);
-		}
+		} else
+			p.indexData = sharedIndexData;
+		if (!p.defaultMaterial)
+			p.defaultMaterial = defaultSharedMaterial;
 	}
+
+	return true;
 }
 
 void MeshAsset::NotifyAssetUnloaded() {
@@ -127,10 +142,11 @@ StreamRequest* MeshAsset::CreateStreamRequestImpl(bool load) {
 	return NEX_NEW(MeshAsset::StreamRequest(this));
 }
 
-void MeshAsset::DestroyStreamRequestImpl(StreamRequest*& request,
+void MeshAsset::DestroyStreamRequestImpl(nextar::StreamRequest*& _request,
 		bool load/*=true*/) {
+	MeshAsset::StreamRequest* request = static_cast<MeshAsset::StreamRequest*>(_request);
 	NEX_DELETE(request);
-	request = nullptr;
+	_request = nullptr;
 }
 
 void MeshAsset::EndianFlip(void* data, const VertexElement* veBegin,

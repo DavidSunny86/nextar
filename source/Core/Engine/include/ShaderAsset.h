@@ -58,7 +58,11 @@ public:
 		StreamPass(StringID _name) : name(_name) {}
 		// not implemented
 		StreamPass(const StreamPass& p);
+		StreamPass(StreamPass&& p);
+
+		StreamPass& operator = (const nextar::ShaderAsset::StreamPass &);
 	};
+
 
 	// todo Make this a list not a vector
 	typedef vector<StreamPass>::type StreamPassList;
@@ -150,7 +154,7 @@ public:
 	}
 protected:
 
-	virtual void NotifyAssetLoaded();
+	virtual bool NotifyAssetLoadedImpl();
 	virtual void NotifyAssetUnloaded();
 	virtual void NotifyAssetUpdated();
 

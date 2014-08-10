@@ -25,6 +25,7 @@ Mesh::Mesh(const StringID name, const StringID factory, Component* parent) :
 }
 
 Mesh::~Mesh() {
+	primitives.clear();
 }
 
 void Mesh::Visit(SceneTraversal& traversal) {
@@ -55,7 +56,8 @@ void Mesh::SetMeshAsset(MeshAssetPtr& mesh) {
 			prim.stream.instanceCount = 1;
 			prim.stream.indices.start = pg.startIndex;
 			prim.stream.indices.count = pg.indexCount;
-			prim.stream.indices.indices = Bind(&pg.indexData->ibdata);
+			if (pg.indexData)
+				prim.stream.indices.indices = Bind(&pg.indexData->ibdata);
 			prim.stream.vertices.start = pg.startVertex;
 			prim.stream.vertices.count = pg.vertexCount;
 			prim.stream.vertices.layout = pg.vertexData->layout;

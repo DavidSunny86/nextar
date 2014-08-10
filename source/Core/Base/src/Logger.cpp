@@ -57,9 +57,7 @@ void Logger::AddListener(nextar::LogListener *listener) {
 }
 
 void Logger::RemoveListener(nextar::LogListener *listener) {
-
-	BestErase(listeners,
-			std::find(listeners.begin(), listeners.end(), listener));
+	BestErase(listeners, listener); 
 }
 
 void Logger::LogMsg(nextar::LogSeverity logSeverity, const String& intf,
@@ -139,7 +137,7 @@ void LogManager::LogMsg(nextar::LogSeverity logSeverity,
 
 void LogManager::RemoveLogger(nextar::LoggerBase* logger) {
 	NEX_THREAD_LOCK_GUARD_MUTEX(accessLock);
-	BestErase(loggers, std::find(loggers.begin(), loggers.end(), logger));
+	BestErase(loggers, logger);
 }
 }
 

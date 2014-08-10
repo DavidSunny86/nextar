@@ -145,11 +145,19 @@ struct concurrent_unordered_set {
 #else
 // never define
 #endif
+
+// @remarks std::vector erase by element for unsorted lists.
+template<typename Vec>
+inline void BestErase(Vec& _cont, typename Vec::value_type& _what) {
+	BestErase(_cont, std::find(_cont.begin(), _cont.end(), _what));
+}
+
 // @remarks std::vector erase by index for unsorted lists.
-template<typename Vec, typename _It>
-inline void BestErase(Vec& _cont, _It _where) {
+template<typename Vec>
+inline void BestErase(Vec& _cont, typename Vec::iterator _where) {
 	if (_where != _cont.end()) {
-		*_where = *_cont.rbegin();
+		if (_cont.size() > 1)
+			*_where = *_cont.rbegin();
 		_cont.pop_back();
 	}
 }

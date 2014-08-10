@@ -8,7 +8,7 @@
 #ifndef BASERENDERMANAGER_H_
 #define BASERENDERMANAGER_H_
 
-#include <RenderEngine.h>
+#include <NexRenderEngine.h>
 #include <RenderManager.h>
 
 namespace nextar {
@@ -43,6 +43,8 @@ protected:
 
 	void RenderAllTargets(RenderContext* rc, uint32 frame, bool callPresent);
 	void PresentSwapChains(RenderContext* rc);
+	void CreateRenderSystems();
+	void CreateRenderQueues();
 
 	/* The first registered context is always the primary context, other
 	 * contexts are present if usingMultiGpuSetup is true */

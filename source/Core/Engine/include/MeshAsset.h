@@ -90,6 +90,7 @@ public:
 	uint32 startIndex;
 	/* index count */
 	uint32 indexCount;
+
 };
 
 typedef vector<PrimitiveGroup>::type PrimitiveGroupList;
@@ -232,14 +233,14 @@ public:
 
 protected:
 
-	virtual void NotifyAssetLoaded();
+	virtual bool NotifyAssetLoadedImpl();
 	virtual void NotifyAssetUnloaded();
 	virtual void NotifyAssetUpdated();
 
 	virtual void UnloadImpl();
 
 	virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);
-	virtual void DestroyStreamRequestImpl(StreamRequest*&, bool load = true);
+	virtual void DestroyStreamRequestImpl(nextar::StreamRequest*&, bool load = true);
 
 	static void _FillVertexData(MeshVertexData*,
 			MeshBufferData::BufferList::iterator&);

@@ -8,7 +8,7 @@
 #ifndef RENDERWINDOWIMPL_H_
 #define RENDERWINDOWIMPL_H_
 
-#include <RenderEngine.h>
+#include <NexRenderEngine.h>
 #include <RenderWindow.h>
 #include <RenderTarget.h>
 

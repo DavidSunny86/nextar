@@ -33,10 +33,16 @@ uint32 ShaderTemplate::GetClassID() const {
 
 void ShaderTemplate::DestroyStreamRequestImpl(
 		nextar::StreamRequest*& streamRequest, bool load) {
-	if (load)
-		NEX_DELETE(static_cast<LoadStreamRequest*>(streamRequest));
-	else
-		NEX_DELETE(static_cast<SaveStreamRequest*>(streamRequest));
+	
+	if (load) {
+		auto request = static_cast<LoadStreamRequest*>(streamRequest);
+		NEX_DELETE(request);
+	}
+	else {
+		auto request = static_cast<SaveStreamRequest*>(streamRequest);
+		NEX_DELETE(request);
+	}
+
 	streamRequest = nullptr;
 }
 
@@ -88,10 +94,6 @@ ShaderAssetPtr& ShaderTemplate::CreateShader(const String& hash,
 	return unit.shaderObject;
 }
 
-void ShaderTemplate::NotifyAssetLoaded() {
-	AssetTemplate::NotifyAssetLoaded();
-}
-
 void ShaderTemplate::NotifyAssetUnloaded() {
 	AssetTemplate::NotifyAssetUnloaded();
 }
@@ -100,13 +102,17 @@ void ShaderTemplate::NotifyAssetUpdated() {
 	AssetTemplate::NotifyAssetUpdated();
 }
 
-void ShaderTemplate::NotifyAssetSaved() {
-	AssetTemplate::NotifyAssetSaved();
+bool ShaderTemplate::NotifyAssetLoadedImpl() {
+	return true;
+}
+
+bool ShaderTemplate::NotifyAssetSavedImpl() {
 	// make sure these shaders are loaded from the current saved path
 	for (auto &s : shaders) {
 		if(s.second.shaderObject)
 			s.second.shaderObject->SetAssetLocator(GetAssetLocator());
 	}
+	return true;
 }
 
 void ShaderTemplate::UnloadImpl() {

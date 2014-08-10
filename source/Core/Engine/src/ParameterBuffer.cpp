@@ -24,6 +24,9 @@ ParameterBuffer::ParameterBuffer(ParameterBuffer&& pb) {
 
 ParameterBuffer::~ParameterBuffer() {
 	uint8* buffer = data.get();
+	if (!buffer || !size)
+		return;
+
 	for (auto it = paramTable.beginIt; it != paramTable.endIt; ++it) {
 		if( (*it).type == ParamDataType::PDT_TEXTURE ) {
 			TextureUnit* unit = reinterpret_cast<TextureUnit*>(buffer);

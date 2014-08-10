@@ -65,6 +65,22 @@ T* ConstructObject(T* objptr, const Tc& obj) {
 }
 
 /**
+ * @brief Construct object.
+ *
+ * @author Abhishek Dey
+ * @date 10/28/2009
+ *
+ * @param [in,out] objptr If non-null, the objptr.
+ * @param obj 			  The initializer object.
+ *
+ * @return null if it fails, else the ptr address.
+ **/
+template<typename T, typename Tc>
+T* ConstructObject(T* objptr, Tc&& obj) {
+	return new (objptr) T(std::move(obj));
+}
+
+/**
  * @brief Destroys the object described by ptr.
  *
  * @author Abhishek Dey

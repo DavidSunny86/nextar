@@ -30,12 +30,18 @@ public:
 	}
 
 	inline void Present(HDC hDC) {
-		wglSwapLayerBuffers(hDC,
-			WGL_SWAP_MAIN_PLANE);
 #ifdef NEX_DEBUG
-		uint32 faliure;
-		if (faliure = GetLastError()) {
-			Warn("Failed on swap: " + Convert::ToString(faliure));
+		BOOL ret = 
+#endif
+			wglSwapLayerBuffers(hDC,
+			WGL_SWAP_MAIN_PLANE);
+
+#ifdef NEX_DEBUG
+		if (!ret) {
+			uint32 faliure;
+			if (faliure = GetLastError()) {
+				Warn("Failed on swap: " + Convert::ToString(faliure));
+			}
 		}
 #endif
 	}

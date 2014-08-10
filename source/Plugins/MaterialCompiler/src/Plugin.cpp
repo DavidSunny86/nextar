@@ -21,11 +21,11 @@ Plugin::~Plugin() {
 }
 
 void Plugin::Open() {
-	Trace("Loaded shader compiler 1.0.");
+	Trace("Loaded material compiler 1.0.");
 }
 
 void Plugin::Close() {
-	Trace("Unloading shader compiler 1.0.");
+	Trace("Unloading material compiler 1.0.");
 }
 
 void Plugin::LicenseRenewed() {

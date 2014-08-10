@@ -40,8 +40,14 @@ void RenderWindow::Destroy() {
 		++it;
 	}
 
+	if (IsMainWindow()) {
+		// we will post quit message, so release all resources
+		ApplicationContext::Instance().ReleaseResources();
+	}
+
 	WindowManager::Instance().UnregisterWindow(this);
 	impl->Destroy();
+	
 	flags &= ~WINDOW_CREATED;
 	flags |= WINDOW_CLOSED;
 	Trace("Window Destroyed: " + windowTitle);

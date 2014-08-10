@@ -41,12 +41,12 @@ void RenderManager::AddRenderQueue(const StringID name, uint16 priority,
 	std::sort(renderQueues.begin(), renderQueues.end());
 }
 
-const RenderQueueDescList& RenderManager::GetRenderQueueInfo() const {
-	return renderQueues;
+void RenderManager::AddRenderSystem(RenderSystem* rs) {
+	renderSystems.push_back(rs);
 }
 
-RenderSystemList& RenderManager::GetRenderSystems() {
-	return renderSystems;
+void RenderManager::RemoveRenderSystem(RenderSystem* rs) {
+	BestErase<RenderSystemList>(renderSystems, rs);
 }
 
 } /* namespace nextar */

@@ -22,8 +22,7 @@ class ShaderLoaderImplv1_0: public nextar::AssetLoaderImpl {
 public:
 	ShaderLoaderImplv1_0();
 	virtual ~ShaderLoaderImplv1_0();
-
-	void Configure(const Config&);
+		
 	void ReadPass(ShaderAsset::StreamRequest* request, ChunkInputStream& ser);
 	virtual void Load(InputStreamPtr&, AssetLoader& loader);
 

@@ -13,7 +13,6 @@
 
 namespace nextar {
 
-NEX_ENUM_UINT(ParameterContext, uint8);
 
 class AutoParamProcessor;
 

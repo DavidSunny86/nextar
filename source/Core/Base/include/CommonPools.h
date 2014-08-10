@@ -14,7 +14,7 @@ class PooledAllocator {
 	// item per block count is correct or not.
 	typedef T ObjectType;
 	typedef AllocatorBase<Catagory> BaseAllocator;
-	typedef MemPool<NumPerBlock, mt::Mutex, Allocator> MPool;
+	typedef MemPool<NumPerBlock, mt::Mutex, BaseAllocator> MPool;
 
 	MPool pool;
 public:
@@ -53,11 +53,11 @@ public:
 
 	/* use base allocator */
 	inline static void* AllocMultiple(size_t amount) {
-		return BaseAllocator::Alloc(amount);
+		return NEX_ALLOCATOR_ALLOC(amount, BaseAllocator);
 	}
 
 	inline static void FreeMultiple(void* ptr) {
-		BaseAllocator::Free(ptr);
+		NEX_ALLOCATOR_FREE(ptr, BaseAllocator);
 	}
 
 	inline static void FreePool() {
@@ -106,9 +106,10 @@ public:
 	//    memory allocation
 	inline pointer allocate(size_type cnt,
 			typename std::allocator<void>::const_pointer = 0) const {
-		return cnt == 1 ?
-				reinterpret_cast<pointer>(BaseAllocator::AllocSingle(sizeof(T))) :
-				reinterpret_cast<pointer>(BaseAllocator::AllocMultiple(
+		if( cnt == 1 )
+			return reinterpret_cast<pointer>(BaseAllocator::AllocSingle(sizeof(T)));
+		else
+			return reinterpret_cast<pointer>(BaseAllocator::AllocMultiple(
 						sizeof(T) * cnt));
 	}
 

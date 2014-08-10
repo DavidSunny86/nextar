@@ -11,6 +11,7 @@
 
 #include <Allocators.h>
 #include <new>
+#include <NexAssert.h>
 
 namespace nextar {
 
@@ -122,12 +123,14 @@ typedef AllocatorBase<MEMCAT_BUFFER_DATA> AllocatorBufferData;
 #define NEX_FREE_ARRAY_T(T,catagory,num,ptr)  DestroyObjects<T>(ptr,num); NEX_FREE_ARRAY(ptr, sizeof(T)*num, catagory)
 //! delete operator override
 #ifdef NEX_DEBUG
-#	define NEX_DELETE( statement )	if ( (statement) ) delete statement
-#	define NEX_DELETE_ARRAY( statement )	if ( (statement) ) delete [] statement
+#	define NEX_DELETE( statement )	{ auto _pointer = statement; NEX_ASSERT( (_pointer) ); delete _pointer; }
+#	define NEX_DELETE_ARRAY( statement )	{ auto _pointer = statement; NEX_ASSERT( (_pointer) ); delete [] _pointer; }
 #else
 #	define NEX_DELETE( statement )	delete statement
 #	define NEX_DELETE_ARRAY( statement )	delete [] statement
 #endif
+#	define NEX_SAFE_DELETE( pointer ) if ( pointer ) { NEX_DELETE(pointer); pointer = nullptr; }
+#	define NEX_SAFE_DELETE_ARRAY( pointer ) if ( pointer ) { NEX_DELETE_ARRAY(pointer); pointer = nullptr; }
 //! AllocObjectBase classes
 typedef AllocObjectBase<AllocatorGeneral> AllocGeneral;
 typedef AllocObjectBase<AllocatorScene> AllocScene;

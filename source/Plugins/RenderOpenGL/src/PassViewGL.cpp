@@ -6,11 +6,11 @@
 namespace RenderOpenGL {
 
 GLenum PassViewGL::stagesMap[Pass::STAGE_COUNT] = {
-GL_VERTEX_SHADER,
-GL_TESS_CONTROL_SHADER,
-GL_TESS_EVALUATION_SHADER,
-GL_GEOMETRY_SHADER,
-GL_FRAGMENT_SHADER,
+	GL_VERTEX_SHADER,
+	GL_TESS_CONTROL_SHADER,
+	GL_TESS_EVALUATION_SHADER,
+	GL_GEOMETRY_SHADER,
+	GL_FRAGMENT_SHADER,
 };
 
 PassViewGL::VertexSemanticListList PassViewGL::registeredSignatures;
@@ -20,6 +20,11 @@ PassViewGL::PassViewGL() :
 }
 
 PassViewGL::~PassViewGL() {
+	if (samplers) {
+		SamplerState* samplerStates = static_cast<SamplerState*>(samplers);
+		NEX_DELETE_ARRAY(samplerStates);
+		samplers = nullptr;
+	}
 }
 
 void PassViewGL::Compile(nextar::RenderContext* rc,
@@ -42,6 +47,10 @@ void PassViewGL::Compile(nextar::RenderContext* rc,
 	}
 
 	iGlProgram = ctx->CreateProgram(programStages);
+	if (!iGlProgram) {
+		Error("Failed to compile program!");
+		return;
+	}
 	// read input/output semantics and lock before assignment
 	VertexSemanticGL inputSemantics[VertexElement::MAX_VERTEX_ELEMENT];
 	//todo We might need sorting the semantics for more coherency
@@ -78,6 +87,10 @@ void PassViewGL::SetTexture(RenderContext* rc, const SamplerParameter& desc,
 }
 
 void PassViewGL::Destroy(RenderContext* _ctx) {
+	for (nextar::uint32 i = 0; i < Pass::STAGE_COUNT; ++i) {
+		programs[i].Destroy(_ctx);
+	}
+
 	RenderContextGL* ctx = static_cast<RenderContextGL*>(_ctx);
 	ctx->DestroyProgram(iGlProgram);
 }
@@ -98,4 +111,5 @@ std::pair<uint16, VertexSemanticListGL*> PassViewGL::MapLayout(
 	return std::pair<uint16, VertexSemanticListGL*>(index,
 			&registeredSignatures.back());
 }
+
 }

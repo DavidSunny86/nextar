@@ -1,6 +1,6 @@
 #pragma once
 
-#include <RenderEngine.h>
+#include <NexRenderEngine.h>
 #include <RenderContext.h>
 #include <VideoMode.h>
 #include <ContextObject.h>

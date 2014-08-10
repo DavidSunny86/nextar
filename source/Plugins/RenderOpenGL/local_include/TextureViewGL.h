@@ -14,7 +14,10 @@
 namespace RenderOpenGL {
 
 struct PixelFormatGl {
-	bool isCompressed;bool isDepthSencil;
+	bool isCompressed : 1;
+	bool isDepthSencil : 1;
+	uint8 pixelSize;
+	PixelFormat textureFormat;
 	GLenum attachmentType;
 	GLenum internalFormat;
 	GLenum sourceFormat;
@@ -47,8 +50,10 @@ public:
 	}
 
 	bool IsCreated() const {
-		return texture == 0;
+		return texture != 0;
 	}
+
+	void ReadPixels(RenderContextGL*, TextureBase::ReadPixelUpdateParams& box);
 protected:
 
 	PixelFormatGl pixelFormat;

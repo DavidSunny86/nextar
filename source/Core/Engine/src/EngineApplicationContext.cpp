@@ -38,17 +38,22 @@ void EngineApplicationContext::ConfigureExtendedInterfacesImpl() {
 	MeshServices::Instance().Configure(GetConfig());
 }
 
-void EngineApplicationContext::DestroyExtendedInterfacesImpl() {
-	ReleaseResources();
-	NEX_DELETE(MeshServices::InstancePtr());
+void EngineApplicationContext::ReleaseResourcesImpl() {
+	MeshServices::Instance().Close();
+	ComponentGroupArchive::Instance().AsyncDeleteAll();
+	ComponentFactoryArchive::Instance().AsyncDeleteAll();
 	VertexLayout::ClearCommonLayouts();
+}
+
+void EngineApplicationContext::DestroyExtendedInterfacesImpl() {
+	NEX_DELETE(MeshServices::InstancePtr());
+	NEX_DELETE(ComponentFactoryArchive::InstancePtr());
+	NEX_DELETE(ComponentGroupArchive::InstancePtr());
 	if (RenderManager::InstancePtr()) {
 		DispatchEvent(EVENT_RENDERMANAGER_PRE_CLOSE);
 		RenderManager::Instance().Close();
 		DispatchEvent(EVENT_RENDERMANAGER_POST_CLOSE);
 	}
-	NEX_DELETE(ComponentFactoryArchive::InstancePtr());
-	NEX_DELETE(ComponentGroupArchive::InstancePtr());
 }
 
 } /* namespace nextar */

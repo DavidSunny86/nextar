@@ -15,7 +15,7 @@ namespace RenderOpenGL {
 struct UniformGL: public ConstantParameter {
 public:
 	bool isRowMajMatrix;
-	uint16 typeGl;
+	GLint typeGl;
 	uint16 matrixStride; // matrix/array
 	uint16 arrayStride;
 };
@@ -34,6 +34,8 @@ public:
 	inline GLuint GetBinding() const {
 		return ubBindingGl;
 	}
+
+	void Destroy(RenderContextGL* rc);
 
 	virtual void* Map(RenderContext* rc);
 	virtual void SetRawBuffer(RenderContext* rc, const ConstantParameter& desc,

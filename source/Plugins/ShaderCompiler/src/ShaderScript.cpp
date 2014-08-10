@@ -34,13 +34,12 @@ void ShaderScript::EnterScript(ScriptParser::ScriptContext& block) {
 
 void ShaderScript::EnterRegion(ScriptParser::RegionContext& ctx) {
 	const String& name = ctx.GetName();
-	String::size_type pos;
 	if (name == _SS(REGION_SHADER)) {
 		ctx.ParseStatements(this);
 	} else {
 		String script = _SS(PROGRAM_SCRIPT);
 		if (!name.compare(0, script.length(), script)) {
-			script = name.substr(script.length());
+			script = name.substr(script.length()+1);
 			auto langRegName = StringUtils::Split(script, ':');
 			RenderManager::ShaderLanguage lang = RenderManager::SPP_UNKNOWN;
 			if (langRegName.first.compare(_SS(LANG_GLSL) ) == 0) {
@@ -56,7 +55,8 @@ void ShaderScript::EnterRegion(ScriptParser::RegionContext& ctx) {
 				regions.emplace(std::move(langRegName.second),
 						std::pair<RenderManager::ShaderLanguage, String>(std::move(lang), std::move(regionValue)));
 			}
-		}
+		} else
+			ctx.Discard();
 	}
 }
 

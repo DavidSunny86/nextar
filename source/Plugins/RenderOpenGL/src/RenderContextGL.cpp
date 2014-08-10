@@ -22,10 +22,19 @@ namespace RenderOpenGL {
 
 RenderContextGL::RenderContextGL(RenderDriverGL* _driver) :
 		BaseRenderContext(_driver), contextFlags(0) {
+	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyResources, this);
 }
 
 RenderContextGL::~RenderContextGL() {
 
+}
+
+void RenderContextGL::DestroyResources(void* pThis) {
+	RenderContextGL* rc = reinterpret_cast<RenderContextGL*>(pThis);
+	auto& ubMap = rc->uniformBufferMap;
+	for (auto& e : ubMap) {
+		e.second.Destroy(rc);
+	}
 }
 
 RenderWindow* RenderContextGL::CreateRenderWindowImpl() {
@@ -45,6 +54,7 @@ void RenderContextGL::PostWindowCreation(RenderWindow* gw) {
 		if (!AreExtensionsReady()) {
 			_ReadyExtensions(contextCreationParams.reqOpenGLVersionMajor,
 					contextCreationParams.reqOpenGLVersionMinor);
+			GL_CHECK();
 			contextFlags |= EXTENSIONS_READY;
 		}
 	}
@@ -57,6 +67,7 @@ void RenderContextGL::PostWindowDestruction(RenderWindow* gw) {
 void RenderContextGL::CreateImpl(
 		const RenderDriver::ContextCreationParams& ctxParams) {
 	SetCreationParams(ctxParams);
+	GL_CHECK();
 }
 
 GLuint RenderContextGL::CreateShader(GLenum type, const char* preDef,
@@ -64,6 +75,7 @@ GLuint RenderContextGL::CreateShader(GLenum type, const char* preDef,
 	const GLchar* sourceBuff[2] = { 0 };
 	sourceBuff[0] = static_cast<const GLchar*>(preDef ? preDef : "");
 	sourceBuff[1] = static_cast<const GLchar*>(source);
+	GL_CHECK();
 	GLuint shaderObject = GlCreateShader(type);
 	GL_CHECK();
 	GlShaderSource(shaderObject, 2, sourceBuff, NULL);
@@ -77,7 +89,7 @@ GLuint RenderContextGL::CreateShader(GLenum type, const char* preDef,
 	if (compileStatus == GL_FALSE) {
 		/* log compilation error */
 		GLint infoLogLength = 1;
-		GlGetShaderiv(shaderObject, GL_COMPILE_STATUS, &infoLogLength);
+		GlGetShaderiv(shaderObject, GL_INFO_LOG_LENGTH, &infoLogLength);
 		GL_CHECK();
 		GLchar* infoLog = static_cast<GLchar*>(NEX_ALLOC(infoLogLength + 2,
 				MEMCAT_GENERAL));
@@ -285,7 +297,7 @@ UniformBufferGL* RenderContextGL::CreateUniformBuffer(PassViewGL* pass,
 	bool parseIndividualParams = true;
 	// look for AutoParams
 	const AutoParam* autoParam = pass->MapParam(name);
-	if (autoParam->type == ParamDataType::PDT_STRUCT) {
+	if (autoParam && autoParam->type == ParamDataType::PDT_STRUCT) {
 		u.autoName = autoParam->autoName;
 		u.context = autoParam->context;
 		u.processor = autoParam->processor;
@@ -379,7 +391,7 @@ UniformBufferGL* RenderContextGL::CreateUniformBuffer(PassViewGL* pass,
 		}
 		GL_CHECK();
 		uform.isRowMajMatrix = rowMaj[i] ? true : false;
-		uform.typeGl = uint8(type[i]);
+		uform.typeGl = type[i];
 		uform.matrixStride = matStride[i];
 		uform.arrayStride = arrayStride[i];
 		uform.bufferOffset = offset[i];
@@ -1118,12 +1130,14 @@ PixelFormatGl RenderContextGL::GetGlPixelFormat(PixelFormat imageFormat,
 	pft.internalFormat = GL_NONE;
 	pft.sourceFormat = GL_NONE;
 	pft.attachmentType = GL_COLOR_ATTACHMENT0;
+	pft.textureFormat = textureFormat;
 	switch (textureFormat) {
 	case PixelFormat::R8:
 		NEX_ASSERT(imageFormat == PixelFormat::R8);
 		pft.internalFormat = GL_R8;
 		pft.sourceFormat = GL_R8;
 		pft.dataType = GL_UNSIGNED_BYTE;
+		pft.pixelSize = 1;
 		break;
 	case PixelFormat::BGRA8:
 		pft.internalFormat = GL_RGBA8;
@@ -1133,6 +1147,7 @@ PixelFormatGl RenderContextGL::GetGlPixelFormat(PixelFormat imageFormat,
 #else
 		pft.dataType = GL_UNSIGNED_INT_8_8_8_8;
 #endif
+		pft.pixelSize = 4;
 		break;
 	case PixelFormat::RGBA8:
 		NEX_ASSERT(
@@ -1146,6 +1161,7 @@ PixelFormatGl RenderContextGL::GetGlPixelFormat(PixelFormat imageFormat,
 #else
 		pft.dataType = GL_UNSIGNED_INT_8_8_8_8;
 #endif
+		pft.pixelSize = 4;
 		break;
 	case PixelFormat::D16:
 		NEX_ASSERT(imageFormat == PixelFormat::D16);
@@ -1154,6 +1170,7 @@ PixelFormatGl RenderContextGL::GetGlPixelFormat(PixelFormat imageFormat,
 		pft.dataType = GL_FLOAT;
 		pft.attachmentType = GL_DEPTH_ATTACHMENT;
 		pft.isDepthSencil = true;
+		pft.pixelSize = 2;
 		break;
 	case PixelFormat::D24:
 		NEX_ASSERT(imageFormat == PixelFormat::D24);
@@ -1162,6 +1179,7 @@ PixelFormatGl RenderContextGL::GetGlPixelFormat(PixelFormat imageFormat,
 		pft.dataType = GL_FLOAT;
 		pft.attachmentType = GL_DEPTH_ATTACHMENT;
 		pft.isDepthSencil = true;
+		pft.pixelSize = 3;
 		break;
 	case PixelFormat::D24S8:
 		NEX_ASSERT(imageFormat == PixelFormat::D24S8);
@@ -1170,6 +1188,7 @@ PixelFormatGl RenderContextGL::GetGlPixelFormat(PixelFormat imageFormat,
 		pft.dataType = GL_FLOAT; // irrelevant
 		pft.attachmentType = GL_DEPTH_STENCIL_ATTACHMENT;
 		pft.isDepthSencil = true;
+		pft.pixelSize = 4;
 		break;
 	case PixelFormat::D32:
 		NEX_ASSERT(imageFormat == PixelFormat::D32);
@@ -1178,24 +1197,28 @@ PixelFormatGl RenderContextGL::GetGlPixelFormat(PixelFormat imageFormat,
 		pft.dataType = GL_FLOAT;
 		pft.attachmentType = GL_DEPTH_ATTACHMENT;
 		pft.isDepthSencil = true;
+		pft.pixelSize = 4;
 		break;
 	case PixelFormat::RGBA16F:
 		NEX_ASSERT(imageFormat == PixelFormat::RGBA16F);
 		pft.internalFormat = GL_RGBA16F;
 		pft.sourceFormat = GL_RGBA;
 		pft.dataType = GL_FLOAT;
+		pft.pixelSize = 8;
 		break;
 	case PixelFormat::RG16:
 		NEX_ASSERT(imageFormat == PixelFormat::RG16);
 		pft.internalFormat = GL_RG16;
 		pft.sourceFormat = GL_RG16;
 		pft.dataType = GL_UNSIGNED_SHORT;
+		pft.pixelSize = 4;
 		break;
 	case PixelFormat::RG16_SNORM:
 		NEX_ASSERT(imageFormat == PixelFormat::RG16_SNORM);
 		pft.internalFormat = GL_RG16_SNORM;
 		pft.sourceFormat = GL_RG16_SNORM;
 		pft.dataType = GL_SHORT;
+		pft.pixelSize = 4;
 		break;
 	}
 	return pft;
@@ -1205,15 +1228,15 @@ ParameterContext RenderContextGL::GuessContextByName(const String& name,
 		ParameterContext defaultContex) {
 	String lowerName = name;
 	StringUtils::ToLower(lowerName);
-	if (lowerName.find("perframe") || lowerName.find("per_frame"))
+	if (lowerName.find("perframe") != String::npos || lowerName.find("per_frame") != String::npos)
 		return ParameterContext::CTX_FRAME;
-	else if (lowerName.find("perview") || lowerName.find("per_view"))
+	else if (lowerName.find("perview") != String::npos || lowerName.find("per_view") != String::npos)
 		return ParameterContext::CTX_VIEW;
-	else if (lowerName.find("perpass") || lowerName.find("per_pass"))
+	else if (lowerName.find("perpass") != String::npos|| lowerName.find("per_pass") != String::npos)
 		return ParameterContext::CTX_PASS;
-	else if (lowerName.find("permaterial") || lowerName.find("per_material"))
+	else if (lowerName.find("permaterial") != String::npos || lowerName.find("per_material") != String::npos)
 		return ParameterContext::CTX_MATERIAL;
-	else if (lowerName.find("perobject") || lowerName.find("per_object"))
+	else if (lowerName.find("perobject") != String::npos || lowerName.find("per_object") != String::npos)
 		return ParameterContext::CTX_OBJECT;
 	return defaultContex;
 }
@@ -1258,13 +1281,16 @@ ContextID RenderContextGL::RegisterObject(ContextObject::Type type, uint32 hint)
 		view = NEX_NEW(PassViewGL());
 		break;
 	}
-
+	view->Create(this);
 	return reinterpret_cast<ContextID>(view);
 }
 
 void RenderContextGL::UnregisterObject(ContextID id) {
-	ContextObject::View* view = reinterpret_cast<ContextObject::View*>(id);
-	NEX_DELETE(view);
+	if (id) {
+		ContextObject::View* view = reinterpret_cast<ContextObject::View*>(id);
+		view->Destroy(this);
+		NEX_DELETE(view);
+	}
 }
 
 }
