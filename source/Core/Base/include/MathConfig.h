@@ -6,8 +6,8 @@
 
 #if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE
 // @remarks Comment out this line to remove sse3/sse4 instructions
-#	define NEX_VECTOR_MATH_SSE3
-//#	define NEX_VECTOR_MATH_SSE4
+//#	define NEX_VECTOR_MATH_SSE3
+#	define NEX_VECTOR_MATH_SSE4
 #endif
 
 // @remarks Set this to 1 to do debug checks

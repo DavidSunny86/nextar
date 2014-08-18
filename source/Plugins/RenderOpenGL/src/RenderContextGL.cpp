@@ -207,6 +207,7 @@ uint32 RenderContextGL::ReadProgramSemantics(GLuint program,
 		} else {
 			/** todo Add support for output semantic */
 		}
+
 	}
 
 	if (inpCount <= 0) {
@@ -220,9 +221,10 @@ uint32 RenderContextGL::ReadProgramSemantics(GLuint program,
 }
 
 void RenderContextGL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
-		GLuint program, ParamEntryTable* paramTable) {
+	GLuint program, ParamEntryTable* paramTable) {
 	GLint numBlocks = 0;
 	GlGetProgramiv(program, GL_ACTIVE_UNIFORM_BLOCKS, &numBlocks);
+	GL_CHECK();
 	char name[128];
 	ParameterGroupList& ubList = pass->sharedParameters;
 	ubList.reserve(numBlocks);
@@ -230,10 +232,13 @@ void RenderContextGL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
 		GLint size = 0;
 		GLint numParams = 0;
 		GlGetActiveUniformBlockName(program, i, 128, NULL, name);
+		GL_CHECK();
 		GlGetActiveUniformBlockiv(program, i, GL_UNIFORM_BLOCK_DATA_SIZE,
-				&size);
+			&size);
+		GL_CHECK();
 		GlGetActiveUniformBlockiv(program, i,
-		GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &numParams);
+			GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &numParams);
+		GL_CHECK();
 		//NEX_ASSERT(numParams < MAX_PARAMS);
 		if (numParams == 0) {
 			continue;
@@ -246,10 +251,10 @@ void RenderContextGL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
 			ubPtr = &(*it).second;
 			if (!(ubPtr && ubPtr->numParams == numParams && ubPtr->size == size)) {
 				Warn(
-						String(
-								"Uniform buffer cannot be registered"
-										" (name already registered with different contents): ")
-								+ uniName);
+					String(
+					"Uniform buffer cannot be registered"
+					" (name already registered with different contents): ")
+					+ uniName);
 				ubPtr = 0;
 				// we can surely register it as unshared ub
 				continue;
@@ -259,16 +264,22 @@ void RenderContextGL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
 		if (!ubPtr) {
 			// create a new uniform buffer
 			ubPtr = CreateUniformBuffer(pass, passIndex, uniName, i, program,
-					numParams, size, paramTable);
-			ubPtr->SetBinding((GLuint) uniformBufferMap.size());
+				numParams, size, paramTable);
+			GL_CHECK();
+			//ubPtr->SetBinding((GLuint) uniformBufferMap.size()-1);
 		}
 
 		ubList.push_back(ubPtr);
-		// sort ublist by name
-		GlBindBufferRange(GL_UNIFORM_BUFFER, ubPtr->GetBinding(),
-				ubPtr->ubNameGl, 0, ubPtr->size);
-		GlUniformBlockBinding(program, i, ubPtr->GetBinding());
+		//GlBindBufferBase(GL_UNIFORM_BUFFER, ubPtr->GetBinding(),
+		//		ubPtr->ubNameGl);
+		//GL_CHECK();
+		//GlUniformBlockBinding(program, i, ubPtr->GetBinding());
+		//GL_CHECK();
 	}
+	// sort ublist by context
+	std::sort(ubList.begin(), ubList.end(), [](const ParameterGroup* p1, const ParameterGroup* p2){
+		return (p1->context < p2->context) != 0;
+	});
 }
 
 UniformBufferGL* RenderContextGL::CreateUniformBuffer(PassViewGL* pass,
@@ -285,6 +296,7 @@ UniformBufferGL* RenderContextGL::CreateUniformBuffer(PassViewGL* pass,
 	u.arrayCount = 1;
 	u.type = ParamDataType::PDT_STRUCT;
 	u.parameter = nullptr;
+	u.processor = nullptr;
 
 	GlGenBuffers(1, &u.ubNameGl);
 	GL_CHECK();
@@ -296,7 +308,7 @@ UniformBufferGL* RenderContextGL::CreateUniformBuffer(PassViewGL* pass,
 	bool storeIndividualParams = table != nullptr;
 	bool parseIndividualParams = true;
 	// look for AutoParams
-	const AutoParam* autoParam = pass->MapParam(name);
+	const AutoParam* autoParam = pass->MapParam(name.c_str());
 	if (autoParam && autoParam->type == ParamDataType::PDT_STRUCT) {
 		u.autoName = autoParam->autoName;
 		u.context = autoParam->context;
@@ -304,14 +316,22 @@ UniformBufferGL* RenderContextGL::CreateUniformBuffer(PassViewGL* pass,
 		// parameter parsing is not important if the
 		// the auto param is well defined and understood
 		// by the engine
-		if (u.processor)
+		if (u.processor) {
 			parseIndividualParams = false;
-		if (u.context == ParameterContext::CTX_FRAME
-				|| u.context == ParameterContext::CTX_VIEW)
 			storeIndividualParams = false;
+		}
 	} else {
+		u.context = ParameterContext::CTX_UNKNOWN;
 		u.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
 	}
+
+	u.size = size;
+	GlBindBuffer(GL_UNIFORM_BUFFER, u.ubNameGl);
+	GL_CHECK();
+	GlBufferData(GL_UNIFORM_BUFFER, size, NULL, GL_DYNAMIC_DRAW);
+	GL_CHECK();
+	GlBindBuffer(GL_UNIFORM_BUFFER, 0);
+	GL_CHECK();
 
 	if (!storeIndividualParams && !parseIndividualParams)
 		return &u;
@@ -360,7 +380,7 @@ UniformBufferGL* RenderContextGL::CreateUniformBuffer(PassViewGL* pass,
 	// We can ignore storing the individual param data in a buffer if a struct processor is applicable.
 	// We should parse the params anyway, if the params are required for paramTable for lookup.
 	uint32 autoParamCount = 0;
-	ParameterContext chosen = ParameterContext::CTX_UNKNOWN;
+	ParameterContext chosen = u.context;
 	UniformGL* uniforms = NEX_NEW(UniformGL[numParams]);
 	uint32 startParamIndex = -1;
 	if (storeIndividualParams) {
@@ -370,8 +390,9 @@ UniformBufferGL* RenderContextGL::CreateUniformBuffer(PassViewGL* pass,
 	for (GLint i = 0; i < (GLint) numParams; ++i) {
 		UniformGL& uform = uniforms[i];
 		GlGetActiveUniformName(prog, indices[i], 128, 0, uniName);
+		GL_CHECK();
 		String paramName = uniName;
-		const AutoParam* paramDef = pass->MapParam(paramName);
+		const AutoParam* paramDef = pass->MapParam(uniName);
 		if (paramDef) {
 			if (chosen == ParameterContext::CTX_UNKNOWN)
 				chosen = paramDef->context;
@@ -389,7 +410,6 @@ UniformBufferGL* RenderContextGL::CreateUniformBuffer(PassViewGL* pass,
 			uform.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
 			uform.processor = Pass::GetConstantProcessor();
 		}
-		GL_CHECK();
 		uform.isRowMajMatrix = rowMaj[i] ? true : false;
 		uform.typeGl = type[i];
 		uform.matrixStride = matStride[i];
@@ -449,15 +469,9 @@ UniformBufferGL* RenderContextGL::CreateUniformBuffer(PassViewGL* pass,
 							second.autoName) != 0;
 				});
 	}
-
-	u.size = size;
+	
 	NEX_FREE(tempBuffer, MEMCAT_GENERAL);
-	GlBindBuffer( GL_UNIFORM_BUFFER, u.ubNameGl);
-	GL_CHECK();
-	GlBufferData( GL_UNIFORM_BUFFER, size, NULL, GL_DYNAMIC_DRAW);
-	GL_CHECK();
-	GlBindBuffer( GL_UNIFORM_BUFFER, 0);
-	GL_CHECK();
+
 	return &u;
 }
 
@@ -469,6 +483,7 @@ void RenderContextGL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 	char name[128];
 	size_t extra = 0;
 	GlGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numUni);
+	GL_CHECK();
 	// assume all are samplers, otherwise we got a problem
 	SamplerState* samplers = NEX_NEW(SamplerState[numUni]);
 	uint32 mapped = 0;
@@ -480,13 +495,17 @@ void RenderContextGL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 	for (GLuint i = 0; i < (GLuint) numUni; ++i) {
 
 		GlGetActiveUniformName(program, i, 128, 0, name);
+		GL_CHECK();
+		
 		GLint loc = GlGetUniformLocation(program, name);
+		GL_CHECK();
+
 		String unitName = name;
 		GLint type;
 
 		GlGetActiveUniformsiv(program, 1, &i, GL_UNIFORM_TYPE, &type);
-
 		GL_CHECK();
+
 		if (IsSamplerType(type)) {
 			SamplerState& ss = samplers[mapped];
 			ss.index = mapped++;
@@ -500,7 +519,7 @@ void RenderContextGL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 								+ name);
 				continue;
 			}
-			const AutoParam* paramDef = Pass::MapParam(unitName);
+			const AutoParam* paramDef = Pass::MapParam(name);
 			ss.location = loc;
 			if (paramDef == nullptr) {
 				ss.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
@@ -672,6 +691,14 @@ void RenderContextGL::SwitchPass(CommitContext& context, Pass::View* passView) {
 	GLuint program = passViewGl->GetProgram();
 	GlUseProgram(program);
 	GL_CHECK();
+	ParameterGroupList& paramList = passViewGl->sharedParameters;
+	for (uint32 i = 0; i < paramList.size(); ++i) {
+		UniformBufferGL* ubPtr = static_cast<UniformBufferGL*>(paramList[i]);
+		GlBindBufferBase(GL_UNIFORM_BUFFER, i, ubPtr->ubNameGl);
+		GL_CHECK();
+		GlUniformBlockBinding(program, i, i);
+		GL_CHECK();
+	}
 }
 
 void RenderContextGL::Draw(StreamData* streamData, CommitContext& ctx) {
@@ -1228,15 +1255,15 @@ ParameterContext RenderContextGL::GuessContextByName(const String& name,
 		ParameterContext defaultContex) {
 	String lowerName = name;
 	StringUtils::ToLower(lowerName);
-	if (lowerName.find("perframe") != String::npos || lowerName.find("per_frame") != String::npos)
+	if (lowerName.find("frame") != String::npos)
 		return ParameterContext::CTX_FRAME;
-	else if (lowerName.find("perview") != String::npos || lowerName.find("per_view") != String::npos)
+	else if (lowerName.find("view") != String::npos)
 		return ParameterContext::CTX_VIEW;
-	else if (lowerName.find("perpass") != String::npos|| lowerName.find("per_pass") != String::npos)
+	else if (lowerName.find("pass") != String::npos)
 		return ParameterContext::CTX_PASS;
-	else if (lowerName.find("permaterial") != String::npos || lowerName.find("per_material") != String::npos)
+	else if (lowerName.find("material") != String::npos)
 		return ParameterContext::CTX_MATERIAL;
-	else if (lowerName.find("perobject") != String::npos || lowerName.find("per_object") != String::npos)
+	else if (lowerName.find("object") != String::npos)
 		return ParameterContext::CTX_OBJECT;
 	return defaultContex;
 }

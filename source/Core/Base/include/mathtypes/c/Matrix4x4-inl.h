@@ -269,4 +269,131 @@ inline Matrix4x4 Mat4x4FromPerspective(float fieldOfView, float aspectRatio,
 			1, 0, 0, -q * zn, 0);
 }
 
+inline Matrix4x4 Mat4x4Inverse(Mat4x4F m) {
+	Matrix4x4 inv;
+	
+	inv.m[0] = m.m[5] * m.m[10] * m.m[15] -
+		m.m[5] * m.m[11] * m.m[14] -
+		m.m[9] * m.m[6] * m.m[15] +
+		m.m[9] * m.m[7] * m.m[14] +
+		m.m[13] * m.m[6] * m.m[11] -
+		m.m[13] * m.m[7] * m.m[10];
+
+	inv.m[4] = -m.m[4] * m.m[10] * m.m[15] +
+		m.m[4] * m.m[11] * m.m[14] +
+		m.m[8] * m.m[6] * m.m[15] -
+		m.m[8] * m.m[7] * m.m[14] -
+		m.m[12] * m.m[6] * m.m[11] +
+		m.m[12] * m.m[7] * m.m[10];
+
+	inv.m[8] = m.m[4] * m.m[9] * m.m[15] -
+		m.m[4] * m.m[11] * m.m[13] -
+		m.m[8] * m.m[5] * m.m[15] +
+		m.m[8] * m.m[7] * m.m[13] +
+		m.m[12] * m.m[5] * m.m[11] -
+		m.m[12] * m.m[7] * m.m[9];
+	
+	inv.m[12] = -m.m[4] * m.m[9] * m.m[14] +
+		m.m[4] * m.m[10] * m.m[13] +
+		m.m[8] * m.m[5] * m.m[14] -
+		m.m[8] * m.m[6] * m.m[13] -
+		m.m[12] * m.m[5] * m.m[10] +
+		m.m[12] * m.m[6] * m.m[9];
+
+	inv.m[1] = -m.m[1] * m.m[10] * m.m[15] +
+		m.m[1] * m.m[11] * m.m[14] +
+		m.m[9] * m.m[2] * m.m[15] -
+		m.m[9] * m.m[3] * m.m[14] -
+		m.m[13] * m.m[2] * m.m[11] +
+		m.m[13] * m.m[3] * m.m[10];
+
+	inv.m[5] = m.m[0] * m.m[10] * m.m[15] -
+		m.m[0] * m.m[11] * m.m[14] -
+		m.m[8] * m.m[2] * m.m[15] +
+		m.m[8] * m.m[3] * m.m[14] +
+		m.m[12] * m.m[2] * m.m[11] -
+		m.m[12] * m.m[3] * m.m[10];
+
+	inv.m[9] = -m.m[0] * m.m[9] * m.m[15] +
+		m.m[0] * m.m[11] * m.m[13] +
+		m.m[8] * m.m[1] * m.m[15] -
+		m.m[8] * m.m[3] * m.m[13] -
+		m.m[12] * m.m[1] * m.m[11] +
+		m.m[12] * m.m[3] * m.m[9];
+
+	inv.m[13] = m.m[0] * m.m[9] * m.m[14] -
+		m.m[0] * m.m[10] * m.m[13] -
+		m.m[8] * m.m[1] * m.m[14] +
+		m.m[8] * m.m[2] * m.m[13] +
+		m.m[12] * m.m[1] * m.m[10] -
+		m.m[12] * m.m[2] * m.m[9];
+
+	inv.m[2] = m.m[1] * m.m[6] * m.m[15] -
+		m.m[1] * m.m[7] * m.m[14] -
+		m.m[5] * m.m[2] * m.m[15] +
+		m.m[5] * m.m[3] * m.m[14] +
+		m.m[13] * m.m[2] * m.m[7] -
+		m.m[13] * m.m[3] * m.m[6];
+
+	inv.m[6] = -m.m[0] * m.m[6] * m.m[15] +
+		m.m[0] * m.m[7] * m.m[14] +
+		m.m[4] * m.m[2] * m.m[15] -
+		m.m[4] * m.m[3] * m.m[14] -
+		m.m[12] * m.m[2] * m.m[7] +
+		m.m[12] * m.m[3] * m.m[6];
+
+	inv.m[10] = m.m[0] * m.m[5] * m.m[15] -
+		m.m[0] * m.m[7] * m.m[13] -
+		m.m[4] * m.m[1] * m.m[15] +
+		m.m[4] * m.m[3] * m.m[13] +
+		m.m[12] * m.m[1] * m.m[7] -
+		m.m[12] * m.m[3] * m.m[5];
+
+	inv.m[14] = -m.m[0] * m.m[5] * m.m[14] +
+		m.m[0] * m.m[6] * m.m[13] +
+		m.m[4] * m.m[1] * m.m[14] -
+		m.m[4] * m.m[2] * m.m[13] -
+		m.m[12] * m.m[1] * m.m[6] +
+		m.m[12] * m.m[2] * m.m[5];
+
+	inv.m[3] = -m.m[1] * m.m[6] * m.m[11] +
+		m.m[1] * m.m[7] * m.m[10] +
+		m.m[5] * m.m[2] * m.m[11] -
+		m.m[5] * m.m[3] * m.m[10] -
+		m.m[9] * m.m[2] * m.m[7] +
+		m.m[9] * m.m[3] * m.m[6];
+
+	inv.m[7] = m.m[0] * m.m[6] * m.m[11] -
+		m.m[0] * m.m[7] * m.m[10] -
+		m.m[4] * m.m[2] * m.m[11] +
+		m.m[4] * m.m[3] * m.m[10] +
+		m.m[8] * m.m[2] * m.m[7] -
+		m.m[8] * m.m[3] * m.m[6];
+
+	inv.m[11] = -m.m[0] * m.m[5] * m.m[11] +
+		m.m[0] * m.m[7] * m.m[9] +
+		m.m[4] * m.m[1] * m.m[11] -
+		m.m[4] * m.m[3] * m.m[9] -
+		m.m[8] * m.m[1] * m.m[7] +
+		m.m[8] * m.m[3] * m.m[5];
+
+	inv.m[15] = m.m[0] * m.m[5] * m.m[10] -
+		m.m[0] * m.m[6] * m.m[9] -
+		m.m[4] * m.m[1] * m.m[10] +
+		m.m[4] * m.m[2] * m.m[9] +
+		m.m[8] * m.m[1] * m.m[6] -
+		m.m[8] * m.m[2] * m.m[5];
+
+	float det = m.m[0] * inv.m[0] + m.m[1] * inv.m[4] + m.m[2] * inv.m[8] + m.m[3] * inv.m[12];
+
+	if (det == 0)
+		return ret;
+
+	det = 1.0 / det;
+
+	for (int i = 0; i < 16; i++)
+		inv.m[i] = inv.m[i] * det;
+	return inv;
+}
+
 }  // namespace nextar

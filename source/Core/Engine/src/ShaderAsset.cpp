@@ -52,19 +52,13 @@ bool ShaderAsset::NotifyAssetLoadedImpl() {
 	_BuildParameterTable(spl);
 	/* mark request as complete */
 	creationParams->flags |= StreamRequest::COMPLETED;
+	uint32 renderFlags =  creationParams->renderQueueFlags;
 	if (renderQueue == (uint8)-1) {
 		auto& renderQueueInfo = RenderManager::Instance().GetRenderQueueInfo();
 		for(auto r = renderQueueInfo.begin(); r != renderQueueInfo.end(); ++r) {
-			if (
-				( (flags & (ShaderAsset::DEFERRED)) && ((*r).flags & RenderQueueFlags::DEFERRED) ) ||
-				( (flags & ShaderAsset::TRANSLUCENT) && ((*r).flags & RenderQueueFlags::TRANSLUCENCY) )  ||
-				( (flags & ShaderAsset::OVERLAY) && ((*r).flags & RenderQueueFlags::OVERLAY) ) ||
-				( (flags & ShaderAsset::BACKGROUND) && ((*r).flags & RenderQueueFlags::BACKGROUND) )
-				) {
+			if ((renderFlags & (*r).flags) == renderFlags) {
 				renderQueue = (uint8)std::distance(renderQueueInfo.begin(), r);
 				break;
-			} else if ((*r).flags & RenderQueueFlags::FORWARD) {
-				renderQueue = (uint8)std::distance(renderQueueInfo.begin(), r);
 			}
 		}
 		if (renderQueue == (uint8)-1) {
@@ -73,11 +67,11 @@ bool ShaderAsset::NotifyAssetLoadedImpl() {
 		}
 	}
 
-	if (flags & ShaderAsset::BACKGROUND)
+	if (renderFlags & RenderQueueFlags::BACKGROUND)
 		visibilityMask = VisibilityMask::VISIBILITY_BACKGROUND;
-	else if(flags & ShaderAsset::TRANSLUCENT)
+	else if (renderFlags & RenderQueueFlags::TRANSLUCENCY)
 		visibilityMask = VisibilityMask::VISIBILITY_TRANSLUCENT;
-	else if (flags & ShaderAsset::OVERLAY)
+	else if (renderFlags & RenderQueueFlags::OVERLAY)
 		visibilityMask = VisibilityMask::VISIBILITY_OVERLAY;
 	else
 		visibilityMask = VisibilityMask::VISIBILITY_OPAQUE;
@@ -141,8 +135,10 @@ void ShaderAsset::_BuildParameterTable(StreamPassList& spl) {
 	for (uint32 ctx = 0; ctx < (uint32)ParameterContext::CTX_COUNT; ++ctx) {
 		paramsPerContext[ctx].beginIt = 
 		paramsPerContext[ctx].endIt = en;
+		paramsPerContext[ctx].totalParamBufferSize = 0;
 	}
-	for (auto& it = paramLookup.begin(); it != en; ++it) {
+	auto& it = paramLookup.begin();
+	for (; it != en; ++it) {
 		auto &e = (*it);
 		if (e.context != lastContext) {
 			if (lastContext != ParameterContext::CTX_UNKNOWN) {
@@ -158,6 +154,10 @@ void ShaderAsset::_BuildParameterTable(StreamPassList& spl) {
 			spl[index].offsets.offset[(uint32)lastContext] = offset;
 		}
 		offset += e.maxSize;
+	}
+	if (lastContext != ParameterContext::CTX_UNKNOWN) {
+		paramsPerContext[(uint32)lastContext].endIt = it;
+		paramsPerContext[(uint32)lastContext].totalParamBufferSize = offset;
 	}
 
 	for (auto i = std::pair<StreamPassList::iterator,PassList::iterator>(spl.begin(), passes.begin()); i.first != spl.end();
@@ -272,6 +272,10 @@ ParamDataType ShaderAsset::MapParamType(const String& typeName) {
 	}
 
 	return ParamDataType::PDT_UNKNOWN;
+}
+
+void ShaderAsset::StreamRequest::SetRenderQueueFlags(uint32 flags) {
+	renderQueueFlags = flags;
 }
 
 } /* namespace nextar */

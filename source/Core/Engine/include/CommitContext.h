@@ -32,11 +32,12 @@ public:
 	Size targetDimension;
 
 	const ParameterBuffer* paramBuffers[(uint32) ParameterContext::CTX_COUNT];
-
-	ParamContext currentParamContext;
-	ParameterGroup* currentGroup;
-	void* currentGroupDataPtr;
-
+	// rename the
+	ParamContext paramContext;
+	ParameterGroup* paramGroup;
+	void* groupDataPtr;
+		
+	Light* light; // for deferred
 	Pass::View* pass;
 	ShaderAsset* shader;
 	DebugDisplay* debugDisplay;
@@ -47,6 +48,12 @@ public:
 	VisiblePrimitive* primitive;
 	MaterialAsset* material;
 	RenderContext* renderContext;
+
+	const Matrix4x4* viewMatrix;
+	const Matrix4x4* viewProjectionMatrix;
+	const Matrix4x4* projectionMatrix;
+	Matrix4x4* invProjectionMatrix;
 };
+
 } /* namespace nextar */
 #endif /* COMMITCONTEXT_H_ */

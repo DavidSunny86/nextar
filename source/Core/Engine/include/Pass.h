@@ -102,7 +102,8 @@ public:
 
 		// todo refer to the static table as well as a custom table
 		// created from parsing the shader script
-		inline const AutoParam* MapParam(const String& name) {
+		// string should be in uppercase
+		inline const AutoParam* MapParam(const char* name) {
 			return Pass::MapParam(name);
 		}
 
@@ -137,7 +138,10 @@ public:
 	//TextureBase* GetDefaultTexture(const String& name, uint32 index) const;
 	//const TextureUnitParams* GetTextureUnit(const String& name) const;
 
-	static const AutoParam* MapParam(const String& name);
+	static void AddParamDef(const char* name, ParamDataType type, AutoParamName autoName, ParameterContext context,
+		AutoParamProcessor* processor, const String& desc);
+	static const AutoParam* MapParam(const char* name);
+
 	static const SamplerDesc* MapSamplerParams(const String& name,
 			const TextureDescMap& texMap);
 
@@ -166,7 +170,7 @@ protected:
 	static AutoParamProcessor* customTextureProcessor;
 	static AutoParamProcessor* customStructProcessor;
 
-	typedef map<StringRef, AutoParam*>::type AutoParamMap;
+	typedef map<const char*, AutoParam, StringUtils::NoCaseLess>::type AutoParamMap;
 	static AutoParamMap autoParams;
 	friend class ShaderAsset;
 

@@ -18,6 +18,12 @@ namespace nextar {
  */
 class BVCullingSystem: public CullingSystem {
 public:
+
+	enum {
+		CLASS_ID = Component::CLASS_BV_CULLER,
+	};
+
+	typedef ComponentTraits<BVCullingSystem> Traits;
 	typedef vector<Spatial*>::type SpatialList;
 
 	BVCullingSystem(const StringID name,
@@ -28,6 +34,9 @@ public:
 	virtual void AddBody(Spatial*) override;
 	virtual void RemoveBody(Spatial*) override;
 	virtual void Visit(SceneTraversal& trav) override;
+
+	/** @brief Get node type */
+	virtual uint32 GetClassID() const override;
 
 protected:
 	Camera* coherentCam;

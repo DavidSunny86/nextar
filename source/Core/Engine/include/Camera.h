@@ -29,16 +29,17 @@ public:
 	};
 
 	enum {
-		FRUSTUM_OUTDATED = Moveable::LAST_FLAG << 0,
-		PROJECTION_DIRTY = Moveable::LAST_FLAG << 1,
-		BOUNDS_OUTDATED = Moveable::LAST_FLAG << 2,
-		VIEW_DIM_OUTDATED = Moveable::LAST_FLAG << 3,
+		FRUSTUM_OUTDATED = Spatial::LAST_FLAG << 0,
+		PROJECTION_DIRTY = Spatial::LAST_FLAG << 1,
+		BOUNDS_OUTDATED = Spatial::LAST_FLAG << 2,
+		VIEW_DIM_OUTDATED = Spatial::LAST_FLAG << 3,
 	};
 
 	enum {
 		PERSPECTIVE, ASYMMETRIC, ORTHOGRAPHIC,
 	};
-
+		
+	typedef ComponentTraits<Camera> Traits;
 	// Symmetric camera
 	struct PerspectiveParams {
 		float fieldOfView;
@@ -122,6 +123,8 @@ public:
 	const Vector3A* GetCorners();
 	/** @remarks Called to update the render queue with renderable data. */
 	virtual void Visit(SceneTraversal & traversal) override;
+	/** @remarks Update camera */
+	virtual void Update();
 
 	/** @brief Get node type */
 	virtual uint32 GetClassID() const override;

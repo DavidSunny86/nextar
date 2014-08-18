@@ -27,13 +27,13 @@ public:
 	UniformBufferGL();
 	virtual ~UniformBufferGL();
 
-	inline void SetBinding(GLuint binding) {
-		ubBindingGl = binding;
-	}
+//	inline void SetBinding(GLuint binding) {
+//		ubBindingGl = binding;
+//	}
 
-	inline GLuint GetBinding() const {
-		return ubBindingGl;
-	}
+//	inline GLuint GetBinding() const {
+//		return ubBindingGl;
+//	}
 
 	void Destroy(RenderContextGL* rc);
 
@@ -47,7 +47,7 @@ public:
 
 protected:
 
-	GLuint ubBindingGl;
+	//GLuint ubBindingGl;
 	GLuint ubNameGl;
 
 	uint8* mappedMem;

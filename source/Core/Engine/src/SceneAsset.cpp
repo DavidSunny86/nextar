@@ -16,7 +16,6 @@ SceneParameters::SceneParameters() {
 }
 
 SceneParameters::~SceneParameters() {
-	// TODO Auto-generated destructor stub
 }
 
 /** Scene ******************************/
@@ -25,17 +24,33 @@ SceneAsset::SceneAsset(const StringID name, const StringID factory) :
 }
 
 SceneAsset::~SceneAsset() {
+	NEX_SAFE_DELETE(cullingSystem);
 }
 
 void SceneAsset::_AddEntity(Entity* entity) {
 	sceneEntities.push_back(Bind(entity));
 	if (cullingSystem) {
-		cullingSystem->AddBody(entity->GetSpatial());
+		Spatial* s = entity->GetSpatial();
+		bool isCamera = (Component::GetComponentCatagory(s->GetClassID()) & Camera::Traits::GetCatagory()) == Camera::Traits::GetCatagory();
+		if (s) {
+			if (!isCamera)
+				cullingSystem->AddBody(s);
+			s->_SetCullingSystem(cullingSystem);
+		}
 	}
 }
 
 void SceneAsset::_RemoveEntity(Entity* entity) {
 	NEX_ASSERT(entity->GetScene() == this);
+	if (cullingSystem) {
+		Spatial* s = entity->GetSpatial();
+		bool isCamera = (Component::GetComponentCatagory(s->GetClassID()) & Camera::Traits::GetCatagory()) == Camera::Traits::GetCatagory();
+		if (s) {
+			if (!isCamera)
+				cullingSystem->RemoveBody(s);
+			s->_SetCullingSystem(nullptr);
+		}
+	}
 	sceneEntities.remove(Bind(entity));
 }
 
@@ -46,6 +61,42 @@ void SceneAsset::UnloadImpl() {
 
 uint32 SceneAsset::GetClassID() const {
 	return CLASS_ID;
+}
+
+void SceneAsset::SetCullingSystem(CullingSystem* cullSystem) {
+	if (cullingSystem)
+		ResetCullingSystem();
+	cullingSystem = cullSystem;
+	if (cullingSystem) {
+		for (auto& e : sceneEntities) {
+			Spatial* _s = e->GetSpatial();
+			if (_s) {
+				cullingSystem->AddBody(_s);
+				_s->_SetCullingSystem(cullingSystem);
+			}
+		}
+	}
+}
+
+void SceneAsset::ResetCullingSystem() {
+	if (cullingSystem) {
+		CullingSystem* doDeleteSystem = cullingSystem;
+		DisownCullingSystem();
+		NEX_DELETE(doDeleteSystem);
+	}
+}
+
+void SceneAsset::DisownCullingSystem(bool removeBodies) {
+	if (cullingSystem) {
+		for (auto& e : sceneEntities) {
+			Spatial* _s = e->GetSpatial();
+			if (_s) {
+				cullingSystem->RemoveBody(_s);
+				_s->_SetCullingSystem(nullptr);
+			}
+		}
+		cullingSystem = nullptr;
+	}
 }
 
 } /* namespace nextar */

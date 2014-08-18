@@ -4,16 +4,18 @@
  *  Created on: 19-May-2014
  *      Author: obhi
  */
-
-#ifndef SCRIPTSTRINGS_H_
-#define SCRIPTSTRINGS_H_
+#ifdef SCRIPT_STRING
+#	undef SCRIPT_STRING
+#endif
 
 #if defined(NEX_SHADER_STRINGS_DEFINE)
 #define SCRIPT_STRING(str, what)	const char* SCRIPT_##str=what
 #else
 #define SCRIPT_STRING(str, what)	extern const char* SCRIPT_##str
 #endif
-#define _SS(str) SCRIPT_##str
+#ifndef _SS
+#	define _SS(str) SCRIPT_##str
+#endif
 
 namespace ShaderCompiler {
 SCRIPT_STRING(PROGRAM_SCRIPT, "script");
@@ -103,4 +105,3 @@ SCRIPT_STRING(ARG_TRANSLUCENT, "translucent");
 
 }
 
-#endif /* SCRIPTSTRINGS_H_ */

@@ -37,7 +37,8 @@ public:
 		rotation = QuatIdentity();
 		translation = Vec3AZero();
 		scale = 1.0f;
-		UpdateMatrix();
+		matrix = Matrix4x4::IdentityMatrix;
+		matrixState++;
 		flags |= IDENTITY_TRANSFORM;
 	}
 

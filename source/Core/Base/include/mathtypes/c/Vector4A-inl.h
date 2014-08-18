@@ -87,3 +87,7 @@ inline float Vec4ADistance(Vec4AF vec1, Vec4AF vec2) {
 inline float Vec4ASqDistance(Vec4AF vec1, Vec4AF vec2) {
 	return Vec4ASqLength(Vec4ASub(vec1, vec2));
 }
+
+inline Vector4A Vec4AMul(Vec4AF a, Vec4AF b) {
+	return Quad(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
+}

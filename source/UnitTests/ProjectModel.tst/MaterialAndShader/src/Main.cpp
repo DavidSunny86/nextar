@@ -22,6 +22,18 @@ public:
 		shader->SetAssetLocator(saveShaderUrl);
 		shader->Save(false);
 		material->Save(false);
+
+		// save engine lights
+		URL dlMaterialUrl("{EngineData}/Scripts/Material/DeferredLights.mtl");
+		URL saveDlMaterialUrl("{EngineData}/Materials/DeferredLights.asset");
+		URL saveDlShaderUrl("{EngineData}/Shaders/DeferredLights.nfx");
+		material = MaterialTemplate::Traits::Instance(id, dlMaterialUrl);
+		material->Load(false);
+		shader = material->GetShaderTemplate();
+		shader->SetAssetLocator(saveShaderUrl);
+		shader->Save(false);
+		AssetPtr mtl = material;
+		Asset::AsyncSave(mtl, saveDlMaterialUrl);
 	}
 };
 

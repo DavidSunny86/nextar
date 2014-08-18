@@ -71,11 +71,8 @@ public:
 	};
 
 	template<typename AssetType>
-	class AssetTraits {
+	class AssetTraits : public ComponentTraits<AssetType> {
 	public:
-		enum {
-			CLASS_ID = AssetType::CLASS_ID
-		};
 
 		typedef typename AssetType::InstanceImplementor InstanceImplementor;
 		typedef RefPtr<AssetType> AssetTypePtr;
@@ -324,6 +321,13 @@ public:
 											CreateStreamRequestImpl(loadOrSave));
 	}
 
+	// @remarks Used by the engine to initialize resources
+	static AssetPtr AsyncLoad(const URL& input);
+	static AssetPtr AsyncLoad(InputStreamPtr& input);
+	// @remarks Used by the engine to stream out resources
+	static void AsyncSave(AssetPtr& asset, const URL& output);
+	static void AsyncSave(AssetPtr& asset, OutputStreamPtr& output);
+
 protected:
 	/* return true if the loading was completed */
 	virtual bool NotifyAssetLoadedImpl();
@@ -360,6 +364,10 @@ protected:
 	StreamRequest* streamRequest;
 
 private:
+	enum {
+		ASSET_HEADER = 0xa5e7,
+	};
+
 	friend class AssetStreamer;
 };
 
@@ -397,12 +405,28 @@ public:
 		this->manualSaver = manualSaver;
 	}
 
+	inline void SetInputStream(const InputStreamPtr& inputSteam) {
+		this->inputStream = inputStream;
+	}
+
+	inline void SetOutputStream(const OutputStreamPtr& inputSteam) {
+		this->outputStream = outputStream;
+	}
+
 	inline AssetLoaderImpl* GetManualLoader() const {
 		return manualLoader;
 	}
 
 	inline AssetSaverImpl* GetManualSaver() const {
 		return manualSaver;
+	}
+
+	inline const InputStreamPtr& GetInputStream() const {
+		return inputStream;
+	}
+
+	inline const OutputStreamPtr& GetOutputStream() const {
+		return outputStream;
 	}
 
 	inline Asset::MetaInfo& GetMetaInfo() {
@@ -416,8 +440,14 @@ public:
 
 protected:
 	union {
-		AssetLoaderImpl* manualLoader;
-		AssetSaverImpl* manualSaver;
+		struct {
+			AssetLoaderImpl* manualLoader;
+			InputStreamPtr inputStream;
+		};
+		struct {
+			AssetSaverImpl* manualSaver;
+			OutputStreamPtr outputStream;
+		};
 	};
 	Asset::MetaInfo metaInfo;
 };

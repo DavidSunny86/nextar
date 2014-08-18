@@ -30,6 +30,7 @@ struct ShaderHeader {
 	VersionID version;
 	uint16 numUnits;
 	uint8 numPasses;
+	uint32 renderFlags;
 };
 
 }

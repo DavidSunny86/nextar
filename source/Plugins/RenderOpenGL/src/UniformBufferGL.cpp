@@ -11,7 +11,8 @@
 namespace RenderOpenGL {
 
 UniformBufferGL::UniformBufferGL() :
-		mappedMem(nullptr), ubBindingGl(0), ubNameGl(0) {
+		mappedMem(nullptr), ubNameGl(0) {
+	// ubBindingGl = 0;
 }
 
 UniformBufferGL::~UniformBufferGL() {

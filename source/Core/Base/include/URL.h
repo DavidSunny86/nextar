@@ -27,7 +27,7 @@ public:
 	URL(const UniString& _path);
 	URL(const String&);
 	URL(const URL&);
-	URL(uint32 type, const String& archive, const String& relativePath);
+	URL(const String& archive, const String& relativePath);
 
 	inline const String& GetArchiveName() const {
 		return archiveName;

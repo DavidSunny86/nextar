@@ -1,35 +1,4 @@
 //***************************************************************************
-@effect 
-//***************************************************************************
-shader DeferredLocalLights {
-	
-	flags BasicDeferred;
-
-	pass Illumination {
-	
-		depth_stencil_state {
-			depth_state false;
-			stencil_test false;
-		}
-		
-		blend_state {
-			blend false;
-		}
-		
-		raster_state {
-			raster solid back true;
-			scissor false;
-			anti_aliasing false false;
-		}
-	
-		program {
-			vertex_program VSOmni;
-			pixel_program PSOmni;
-		}
-	}
-}
-
-//***************************************************************************
 @GLSL:VSOmni
 //***************************************************************************
 #version 330
@@ -53,11 +22,11 @@ sampler2D normalMap;
 sampler2D albedoAndGlossMap;
 
 uniform per_view_transform {
-	mat4 matInvProj;
+	mat4 invProjection;
 };
 
-uniform per_object_props {
-	vec3 lightColor;
+uniform OmniLightProperties {
+	vec4 lightColor;
 	vec4 lightPosAndRadius;
 };
 
@@ -77,7 +46,7 @@ vec3 getPosition(vec2 texCoord) {
     float x = texCoord.x * 2 - 1;
     float y = (1 - texCoord.y) * 2 - 1;
     vec4 vProjectedPos = vec4(x, y, z, 1.0f);
-    vec4 vPositionVS = mul(vProjectedPos, matInvProj);  
+    vec4 vPositionVS = mul(vProjectedPos, invProjection);  
     // Divide by w to get the view-space position
     return vPositionVS.xyz / vPositionVS.w;  
 }
@@ -96,16 +65,46 @@ void main(void) {
 	// Dot product gives us diffuse intensity
 	float diff = max(0.0, dot(n, lightDir));
 	// Multiply intensity by diffuse color, force alpha to 1.0
-	vFragColor.rgb = diff * albedoAndGloss.rgb * lightColor;
+	vFragColor = diff * albedoAndGloss * lightColor;
 	// Specular Light
 	vec3 vReflection = reflect(-lightDir,	n);
 	float spec = max(0.0, dot(n, vReflection));
 	// If the diffuse light is zero, don’t even bother with the pow function
 	if(diff != 0) {
 		float fSpec = pow(spec, albedoAndGloss.a);
-		vFragColor.rgb += vec3(fSpec, fSpec, fSpec);
+		vFragColor += vec4(fSpec, fSpec, fSpec, fSpec);
 	}
 	float atten = clamp(1 - distanceToLight/(lightPosAndRadius.w*lightPosAndRadius.w), 0.0, 1.0);
-	vFragColor.rgb *= (atten*atten);
-	vFragColor.a = 1;
+	vFragColor *= (atten*atten);
+}
+
+//***************************************************************************
+@effect 
+//***************************************************************************
+shader DeferredLights {
+	
+	flags basic_deferred;
+
+	pass OmniLight {
+	
+		depth_stencil_state {
+			depth_state false;
+			stencil_test false;
+		}
+		
+		blend_state {
+			blend false;
+		}
+		
+		raster_state {
+			raster solid back true;
+			scissor false;
+			anti_aliasing false false;
+		}
+	
+		program {
+			vertex_program VSOmni;
+			pixel_program PSOmni;
+		}
+	}
 }

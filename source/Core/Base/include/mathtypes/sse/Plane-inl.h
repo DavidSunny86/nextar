@@ -17,8 +17,8 @@ namespace nextar {
 inline float PlaneDotVec3A(PlaneF p, Vec3AF v) {
 	float ret;
 #if defined(NEX_VECTOR_MATH_SSE4)
-	Quad q = _mm_and_ps(v,N3D_FFFO);
-	q = _mm_or_ps(q,N3D_0001);
+	Quad q = _mm_and_ps(v,N3D_FFFO.v);
+	q = _mm_or_ps(q,N3D_0001.v);
 	_mm_dp_ps(q,p,0xFF);
 	// Get the reciprocal
 	_mm_store_ss(&ret,q);

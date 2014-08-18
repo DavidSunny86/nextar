@@ -4,7 +4,6 @@
  *  Created on: 18-Jul-2014
  *      Author: obhi
  */
-#define NEX_MATERIAL_STRINGS_DEFINE
 #include <CommonTypes.h>
 #include <MaterialCompilerImplv10.h>
 #include <ScriptStrings.h>

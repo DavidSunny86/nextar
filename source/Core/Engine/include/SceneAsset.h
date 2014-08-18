@@ -48,6 +48,9 @@ public:
 
 	virtual uint32 GetClassID() const;
 
+	virtual void DisownCullingSystem(bool removeBodies = false);
+	virtual void SetCullingSystem(CullingSystem* cullSystem);
+	virtual void ResetCullingSystem();
 	/* internal API */
 	virtual void _AddEntity(Entity* entity);
 	virtual void _RemoveEntity(Entity* entity);

@@ -30,6 +30,28 @@ class _NexEngineAPI Component: public NamedObject, public AllocComponent {
 public:
 	// factory, object
 
+	template <typename ComponentType>
+	class ComponentTraits {
+	public:
+		enum {
+			CLASS_ID = ComponentType::CLASS_ID
+		};
+
+		inline static uint32 GetClassID() {
+			return CLASS_ID;
+		}
+		
+		inline static uint32 GetCatagory() {
+			return COMPONENT_CAT(GetClassID());
+		}
+
+		template <typename CastFrom>
+		inline static ComponentType* Cast(CastFrom* anyComponent) {
+			NEX_ASSERT(COMPONENT_CAT(anyComponent->GetClassID()) == COMPONENT_CAT(GetClassID()));
+			return static_cast<ComponentType*>(anyComponent);
+		}
+	};
+
 	struct ID {
 		StringID name;
 		StringID factory;

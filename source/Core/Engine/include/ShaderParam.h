@@ -123,7 +123,7 @@ struct AutoParam: public AllocGeneral {
 	ParameterContext context;
 	AutoParamProcessor* processor;
 	// todo May not be useful except in UI
-	String name;
+	const char* name;
 	String desc;
 };
 

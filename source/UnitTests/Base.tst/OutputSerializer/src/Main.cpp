@@ -27,6 +27,7 @@ enum MeshChunkID {
 	MCID_MATERIAL_SCRIPT,
 	MCID_SUBMESH_DATA,
 	MCID_SUBMESH_END,
+	MCID_SUBMESH_INFO,
 	MCID_MESH_HEADER,
 	MCID_END
 };
@@ -141,8 +142,16 @@ void WriteSharedIndexData(ChunkOutputStream& outStream) {
 	outStream.EndChunk();
 }
 
+void WriteSubmeshInfo(ChunkOutputStream& outStream) {
+	OutputSerializer& ser = outStream.BeginChunk(MCID_SUBMESH_INFO);
+	uint8 primType = 2; // triangles
+	ser << primType;
+	outStream.EndChunk();
+}
+
 void WriteSubmeshData(ChunkOutputStream& outStream) {
 	OutputSerializer& ser = outStream.BeginChunk(MCID_SUBMESH_DATA);
+	WriteSubmeshInfo(outStream);
 	WriteSharedVertexData(outStream);
 	WriteSharedIndexData(outStream);
 	outStream.BeginChunk(MCID_SUBMESH_END);

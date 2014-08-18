@@ -177,6 +177,11 @@ public:
 			pg.boundsInfo = bv;
 		}
 
+		inline void SetPrimitiveType(uint32 i, PrimitiveType type) {
+			PrimitiveGroup& pg = primitives[i];
+			pg.primitiveType = type;
+		}
+
 		/* set buffer data */
 		MeshBufferData::Stream& AddIndexBuffer();
 		MeshBufferData::Stream& AddVertexBuffer();

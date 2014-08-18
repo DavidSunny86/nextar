@@ -13,6 +13,7 @@
 #include <Camera.h>
 #include <SceneAsset.h>
 #include <MeshAsset.h>
+#include <BVCullingSystem.h>
 
 namespace nextar {
 
@@ -81,6 +82,8 @@ Component* Entity::Factory::AsyncCreate(uint32 type, const StringID name) {
 		return NEX_NEW(Moveable(name, GetID()));
 	case Camera::CLASS_ID:
 		return NEX_NEW(Camera(name, GetID()));
+	case BVCullingSystem::CLASS_ID:
+		return NEX_NEW(BVCullingSystem(name, GetID()));
 	}
 	return 0;
 }
@@ -92,6 +95,7 @@ void Entity::Factory::_InternalRegisterToArchive() {
 	ComponentFactoryArchive::Instance()._InternalDefaultFactory(entityFactory, Mesh::CLASS_ID);
 	ComponentFactoryArchive::Instance()._InternalDefaultFactory(entityFactory, Moveable::CLASS_ID);
 	ComponentFactoryArchive::Instance()._InternalDefaultFactory(entityFactory, Camera::CLASS_ID);
+	ComponentFactoryArchive::Instance()._InternalDefaultFactory(entityFactory, BVCullingSystem::CLASS_ID);
 }
 
 /*************************************

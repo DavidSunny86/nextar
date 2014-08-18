@@ -136,9 +136,9 @@ void ShaderSaverImplv1_0::Save(OutputStreamPtr& out, AssetSaver& saver) {
 	header.version = NEX_MAKE_VERSION(1, 0, 0);
 	header.numPasses = (uint8)shader->GetPassCount();
 	header.numUnits = (uint16)shader->GetShaderCount();
-
+	header.renderFlags = shader->GetRenderFlags();
 	OutputSerializer& ser = stream.BeginChunk(SHADER_HEADER);
-	ser << header.version << header.numPasses << header.numUnits;
+	ser << header.version << header.numPasses << header.numUnits << header.renderFlags;
 	stream.EndChunk();
 
 	auto &passList = shader->GetPassList();

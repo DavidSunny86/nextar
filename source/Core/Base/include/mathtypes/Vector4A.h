@@ -61,6 +61,8 @@ inline float Vec4ASqLength(Vec4AF vec);
 inline float Vec4ADistance(Vec4AF vec1, Vec4AF vec2);
 /** @brief	Vector 4  sqlength(vec1-vec2)**/
 inline float Vec4ASqDistance(Vec4AF vec1, Vec4AF vec2);
+/** @brief	Vector 4  Multiply **/
+inline Vector4A Vec4AMul(Vec4AF vec1, Vec4AF vec2);
 
 }
 

@@ -45,10 +45,11 @@ void Mesh::SetMeshAsset(MeshAssetPtr& mesh) {
 	if (meshAsset) {
 
 		PrimitiveGroupList& groups = mesh->GetPrimitiveGroups();
-		primitives.reserve(groups.size());
+		primitives.resize(groups.size());
+		uint32 index = 0;
 		for (auto &pg : groups) {
 			MaterialAssetPtr& mtl = pg.defaultMaterial;
-			Primitive prim;
+			Primitive &prim = primitives[index];
 			prim.primitive.SetWorldMatrices(&GetWorldMatrix(), 1);
 			prim.primitive.SetBoundsInfo(&GetBoundsInfo());
 			prim.primitive.SetStreamData(&prim.stream);
@@ -65,8 +66,8 @@ void Mesh::SetMeshAsset(MeshAssetPtr& mesh) {
 			prim.visibilityType = VisibilityMask::VISIBILITY_SHADOW_CASTER|
 					VisibilityMask::VISIBILITY_SHADOW_RECEIVER;
 			//prim.sortKey = SortKeyHelper::KeyOpaque(prim.layer, 0, 0);
-			primitives.push_back(prim);
-			SetMaterial((uint32) primitives.size() - 1, mtl);
+			SetMaterial(index, mtl);
+			index++;
 		}
 	}
 }

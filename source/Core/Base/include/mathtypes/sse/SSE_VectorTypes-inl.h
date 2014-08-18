@@ -124,15 +124,57 @@ inline Quad QuadSetX(QuadPF q, float val) {
 }
 
 inline Quad QuadSetY(QuadPF q, float val) {
+#ifdef NEX_MSVC
+	Quad res;
+	res.m128_f32[0] = q.m128_f32[0];
+	res.m128_f32[1] = val;
+	res.m128_f32[2] = q.m128_f32[2];
+	res.m128_f32[3] = q.m128_f32[3];
+	return res;
+#else
 	Quad res = _mm_shuffle_ps(q, q, _MM_SHUFFLE(3, 2, 0, 1));
 	Quad v = _mm_set_ss(val);
-
-	return _mm_move_ss(q, v);
+	// Replace the x component
+	res = _mm_move_ss(res, v);
+	// Swap y and x again
+	return _mm_shuffle_ps(res, res, _MM_SHUFFLE(3, 2, 0, 1));
+#endif
 }
 
 inline Quad QuadSetZ(QuadPF q, float val) {
+#ifdef NEX_MSVC
+	Quad res;
+	res.m128_f32[0] = q.m128_f32[0];
+	res.m128_f32[1] = q.m128_f32[1];
+	res.m128_f32[2] = val;
+	res.m128_f32[3] = q.m128_f32[3];
+	return res;
+#else
+	Quad res = _mm_shuffle_ps(q, q, _MM_SHUFFLE(3, 0, 1, 2));
 	Quad v = _mm_set_ss(val);
-	return _mm_move_ss(q, v);
+	// Replace the x component
+	res = _mm_move_ss(res, v);
+	// Swap y and x again
+	return _mm_shuffle_ps(res, res, _MM_SHUFFLE(3, 0, 1, 2));
+#endif
+}
+
+inline Quad QuadSetW(QuadPF q, float val) {
+#ifdef NEX_MSVC
+	Quad res;
+	res.m128_f32[0] = q.m128_f32[0];
+	res.m128_f32[1] = q.m128_f32[1];
+	res.m128_f32[2] = q.m128_f32[2];
+	res.m128_f32[3] = val;
+	return res;
+#else
+	Quad res = _mm_shuffle_ps(q, q, _MM_SHUFFLE(0, 2, 1, 3));
+	Quad v = _mm_set_ss(val);
+	// Replace the x component
+	res = _mm_move_ss(res, v);
+	// Swap y and x again
+	return _mm_shuffle_ps(res, res, _MM_SHUFFLE(3, 2, 0, 1));
+#endif
 }
 
 inline float QuadGetByIdx(QuadPF q, size_t idx) {
@@ -218,6 +260,33 @@ inline Quad QuadEqualInt(Quad q, Quad e) {
 			reinterpret_cast<const __m128i *>(&e)[0]);
 	return reinterpret_cast<__m128 *>(&v)[0];
 }
+
+inline Quad QuadDot(QuadPF vec1, QuadPF vec2) {
+#if defined(NEX_VECTOR_MATH_SSE4)
+	Quad q = _mm_dp_ps(vec1, vec2, 0xFF);
+	// Get the reciprocal
+	return q;
+#elif defined(NEX_VECTOR_MATH_SSE3)
+	Quad q = _mm_mul_ps(vec1, vec2);
+	q = _mm_hadd_ps(q, q); // latency 7
+	q = _mm_hadd_ps(q, q);// latency 7
+	// Get the reciprocal
+	return q;
+#else
+	Quad q = _mm_mul_ps(vec1, vec2);
+	Quad temp = _mm_shuffle_ps(q, q, _MM_SHUFFLE(3, 2, 3, 2));
+	q = _mm_add_ps(q, temp);
+	// x+z,x+z,x+z,y+w
+	q = _mm_shuffle_ps(q, q, _MM_SHUFFLE(1, 0, 0, 0));
+	// y+w, ??, ??, ??
+	temp = _mm_shuffle_ps(q, temp, _MM_SHUFFLE(0, 0, 0, 3));
+	// x+z+y+w,??, ??, ??
+	q = _mm_add_ss(q, temp);
+	// Get the reciprocal
+	return q;
+#endif
+}
+
 
 }
 

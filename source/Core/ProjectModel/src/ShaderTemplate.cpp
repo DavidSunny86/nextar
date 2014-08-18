@@ -222,6 +222,8 @@ void ShaderTemplate::ShaderFromTemplate::Load(InputStreamPtr& stream, AssetLoade
 			request->SetProgramSource((*i).second.first, std::move(sourceCpy));
 		}
 	}
+
+	request->SetRenderQueueFlags(parent->renderFlags);
 }
 
 } /* namespace nextar */

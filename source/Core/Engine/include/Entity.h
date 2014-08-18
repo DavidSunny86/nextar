@@ -12,6 +12,8 @@
 #include <Component.h>
 #include <Moveable.h>
 #include <Camera.h>
+#include <Mesh.h>
+#include <BVCullingSystem.h>
 
 namespace nextar {
 
@@ -33,6 +35,7 @@ public:
 		LAST_FLAG = Component::LAST_FLAG << 0,
 	};
 
+	typedef ComponentTraits<Entity> Traits;
 	/**
 	 * This is a default manager for most/all default scene components.
 	 * Any extended component could register its own factory.
@@ -107,6 +110,40 @@ protected:
 	 * same entity as both derive from Spatial. */
 	Spatial* spatial;
 };
+
+template <> template <>
+Camera* Component::ComponentTraits<Camera>::Cast(Entity* entity) {
+	Component* anyComponent = entity->GetSpatial();
+	NEX_ASSERT(anyComponent);
+	NEX_ASSERT(COMPONENT_CAT(anyComponent->GetClassID()) == COMPONENT_CAT(GetClassID()));
+	return static_cast<Camera*>(anyComponent);
+}
+
+
+template <> template <>
+Moveable* Component::ComponentTraits<Moveable>::Cast(Entity* entity) {
+	Component* anyComponent = entity->GetMoveable();
+	NEX_ASSERT(anyComponent);
+	NEX_ASSERT(COMPONENT_CAT(anyComponent->GetClassID()) == COMPONENT_CAT(GetClassID()));
+	return static_cast<Moveable*>(anyComponent);
+}
+
+
+template <> template <>
+Mesh* Component::ComponentTraits<Mesh>::Cast(Entity* entity) {
+	Component* anyComponent = entity->GetSpatial();
+	NEX_ASSERT(anyComponent);
+	NEX_ASSERT(COMPONENT_CAT(anyComponent->GetClassID()) == COMPONENT_CAT(GetClassID()));
+	return static_cast<Mesh*>(anyComponent);
+}
+
+template <> template <>
+BVCullingSystem* Component::ComponentTraits<BVCullingSystem>::Cast(Entity* entity) {
+	Component* anyComponent = entity->GetSpatial();
+	NEX_ASSERT(anyComponent);
+	NEX_ASSERT(COMPONENT_CAT(anyComponent->GetClassID()) == COMPONENT_CAT(GetClassID()));
+	return static_cast<BVCullingSystem*>(anyComponent);
+}
 
 } /* namespace nextar */
 #endif /* ENTITY_H_ */

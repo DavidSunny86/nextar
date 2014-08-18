@@ -201,7 +201,7 @@ inline Matrix4x4 Mat4x4Mul(Mat4x4F m1, Mat4x4F m2) {
 }
 
 inline Matrix4x4 Mat4x4FromScaleRotPos(float scale, QuatF rot, Vec3AF pos) {
-	Matrix4x4 ret;
+	Quad r0, r1, r2;
 	Quad q0, q1;
 	Quad v0, v1, v2;
 
@@ -212,8 +212,8 @@ inline Matrix4x4 Mat4x4FromScaleRotPos(float scale, QuatF rot, Vec3AF pos) {
 	v0 = _mm_and_ps(v0, N3D_FFFO.v);
 	v1 = _mm_shuffle_ps(q1, q1, _MM_SHUFFLE(3, 1, 2, 2));
 	v1 = _mm_and_ps(v1, N3D_FFFO.v);
-	ret.r[0] = _mm_sub_ps(N3D_1110.v, v0);
-	ret.r[0] = _mm_sub_ps(ret.r[0], v1);
+	r0 = _mm_sub_ps(N3D_1110.v, v0);
+	r0 = _mm_sub_ps(r0, v1);
 
 	v0 = _mm_shuffle_ps(rot, rot, _MM_SHUFFLE(3, 1, 0, 0));
 	v1 = _mm_shuffle_ps(q0, q0, _MM_SHUFFLE(3, 2, 1, 2));
@@ -223,23 +223,24 @@ inline Matrix4x4 Mat4x4FromScaleRotPos(float scale, QuatF rot, Vec3AF pos) {
 	v2 = _mm_shuffle_ps(q0, q0, _MM_SHUFFLE(3, 0, 2, 1));
 	v1 = _mm_mul_ps(v1, v2);
 
-	ret.r[1] = _mm_add_ps(v0, v1);
-	ret.r[2] = _mm_sub_ps(v0, v1);
+	r1 = _mm_add_ps(v0, v1);
+	r2 = _mm_sub_ps(v0, v1);
 
-	v0 = _mm_shuffle_ps(ret.r[1], ret.r[2], _MM_SHUFFLE(1, 0, 2, 1));
+	v0 = _mm_shuffle_ps(r1, r2, _MM_SHUFFLE(1, 0, 2, 1));
 	v0 = _mm_shuffle_ps(v0, v0, _MM_SHUFFLE(1, 3, 2, 0));
-	v1 = _mm_shuffle_ps(ret.r[1], ret.r[2], _MM_SHUFFLE(2, 2, 0, 0));
+	v1 = _mm_shuffle_ps(r1, r2, _MM_SHUFFLE(2, 2, 0, 0));
 	v1 = _mm_shuffle_ps(v1, v1, _MM_SHUFFLE(2, 0, 2, 0));
 
-	q1 = _mm_shuffle_ps(ret.r[0], v0, _MM_SHUFFLE(1, 0, 3, 0));
+	q1 = _mm_shuffle_ps(r0, v0, _MM_SHUFFLE(1, 0, 3, 0));
 	q1 = _mm_shuffle_ps(q1, q1, _MM_SHUFFLE(1, 3, 2, 0));
 
 	Quad scaleQ = QuadReplicate(scale);
+	Matrix4x4 ret;
 	ret.r[0] = _mm_mul_ps(scaleQ, q1);
-	q1 = _mm_shuffle_ps(ret.r[0], v0, _MM_SHUFFLE(3, 2, 3, 1));
+	q1 = _mm_shuffle_ps(r0, v0, _MM_SHUFFLE(3, 2, 3, 1));
 	q1 = _mm_shuffle_ps(q1, q1, _MM_SHUFFLE(1, 3, 0, 2));
 	ret.r[1] = _mm_mul_ps(scaleQ, q1);
-	q1 = _mm_shuffle_ps(v1, ret.r[0], _MM_SHUFFLE(3, 2, 1, 0));
+	q1 = _mm_shuffle_ps(v1, r0, _MM_SHUFFLE(3, 2, 1, 0));
 	ret.r[2] = _mm_mul_ps(scaleQ, q1);
 	ret.r[3] = _mm_or_ps(_mm_and_ps(pos, N3D_FFFO.v), N3D_0001.v);
 	return ret;
@@ -299,7 +300,7 @@ inline Matrix4x4 Mat4x4ViewFromWorld(Mat4x4F m) {
 	ret.r[3] = _mm_add_ps(ret.r[3], vTemp);
 	ret.r[3] = _mm_xor_ps(ret.r[3], N3D_FlipSign.v);
 	// and with 0001
-	ret.r[3] = _mm_and_ps(ret.r[3], N3D_0001.v);
+	ret.r[3] = _mm_or_ps(_mm_and_ps(ret.r[3], N3D_FFFO.v), N3D_0001.v);
 
 	NEX_ASSERT(
 			ret.m03 == 0.f && ret.m13 == 0.f && ret.m23 == 0.f
@@ -335,6 +336,125 @@ inline Matrix4x4 Mat4x4FromPerspective(float fieldOfView, float aspectRatio,
 	float q = zf / (zf - zn);
 	return Matrix4x4((yscale / aspectRatio), 0, 0, 0, 0, yscale, 0, 0, 0, 0, q,
 			1, 0, 0, -q * zn, 0);
+}
+
+inline Matrix4x4 Mat4x4Inverse(Mat4x4F m) {
+	Matrix4x4 MT = Mat4x4Transpose(m);
+	Quad V00 = _mm_shuffle_ps(MT.r[2], MT.r[2], _MM_SHUFFLE(1, 1, 0, 0));
+	Quad V10 = _mm_shuffle_ps(MT.r[3], MT.r[3], _MM_SHUFFLE(3, 2, 3, 2));
+	Quad V01 = _mm_shuffle_ps(MT.r[0], MT.r[0], _MM_SHUFFLE(1, 1, 0, 0));
+	Quad V11 = _mm_shuffle_ps(MT.r[1], MT.r[1], _MM_SHUFFLE(3, 2, 3, 2));
+	Quad V02 = _mm_shuffle_ps(MT.r[2], MT.r[0], _MM_SHUFFLE(2, 0, 2, 0));
+	Quad V12 = _mm_shuffle_ps(MT.r[3], MT.r[1], _MM_SHUFFLE(3, 1, 3, 1));
+
+	Quad D0 = _mm_mul_ps(V00, V10);
+	Quad D1 = _mm_mul_ps(V01, V11);
+	Quad D2 = _mm_mul_ps(V02, V12);
+
+	V00 = _mm_shuffle_ps(MT.r[2], MT.r[2], _MM_SHUFFLE(3, 2, 3, 2));
+	V10 = _mm_shuffle_ps(MT.r[3], MT.r[3], _MM_SHUFFLE(1, 1, 0, 0));
+	V01 = _mm_shuffle_ps(MT.r[0], MT.r[0], _MM_SHUFFLE(3, 2, 3, 2));
+	V11 = _mm_shuffle_ps(MT.r[1], MT.r[1], _MM_SHUFFLE(1, 1, 0, 0));
+	V02 = _mm_shuffle_ps(MT.r[2], MT.r[0], _MM_SHUFFLE(3, 1, 3, 1));
+	V12 = _mm_shuffle_ps(MT.r[3], MT.r[1], _MM_SHUFFLE(2, 0, 2, 0));
+
+	V00 = _mm_mul_ps(V00, V10);
+	V01 = _mm_mul_ps(V01, V11);
+	V02 = _mm_mul_ps(V02, V12);
+	D0 = _mm_sub_ps(D0, V00);
+	D1 = _mm_sub_ps(D1, V01);
+	D2 = _mm_sub_ps(D2, V02);
+	// V11 = D0Y,D0W,D2Y,D2Y
+	V11 = _mm_shuffle_ps(D0, D2, _MM_SHUFFLE(1, 1, 3, 1));
+	V00 = _mm_shuffle_ps(MT.r[1], MT.r[1], _MM_SHUFFLE(1, 0, 2, 1));
+	V10 = _mm_shuffle_ps(V11, D0, _MM_SHUFFLE(0, 3, 0, 2));
+	V01 = _mm_shuffle_ps(MT.r[0], MT.r[0], _MM_SHUFFLE(0, 1, 0, 2));
+	V11 = _mm_shuffle_ps(V11, D0, _MM_SHUFFLE(2, 1, 2, 1));
+	// V13 = D1Y,D1W,D2W,D2W
+	Quad V13 = _mm_shuffle_ps(D1, D2, _MM_SHUFFLE(3, 3, 3, 1));
+	V02 = _mm_shuffle_ps(MT.r[3], MT.r[3], _MM_SHUFFLE(1, 0, 2, 1));
+	V12 = _mm_shuffle_ps(V13, D1, _MM_SHUFFLE(0, 3, 0, 2));
+	Quad V03 = _mm_shuffle_ps(MT.r[2], MT.r[2], _MM_SHUFFLE(0, 1, 0, 2));
+	V13 = _mm_shuffle_ps(V13, D1, _MM_SHUFFLE(2, 1, 2, 1));
+
+	Quad C0 = _mm_mul_ps(V00, V10);
+	Quad C2 = _mm_mul_ps(V01, V11);
+	Quad C4 = _mm_mul_ps(V02, V12);
+	Quad C6 = _mm_mul_ps(V03, V13);
+
+	// V11 = D0X,D0Y,D2X,D2X
+	V11 = _mm_shuffle_ps(D0, D2, _MM_SHUFFLE(0, 0, 1, 0));
+	V00 = _mm_shuffle_ps(MT.r[1], MT.r[1], _MM_SHUFFLE(2, 1, 3, 2));
+	V10 = _mm_shuffle_ps(D0, V11, _MM_SHUFFLE(2, 1, 0, 3));
+	V01 = _mm_shuffle_ps(MT.r[0], MT.r[0], _MM_SHUFFLE(1, 3, 2, 3));
+	V11 = _mm_shuffle_ps(D0, V11, _MM_SHUFFLE(0, 2, 1, 2));
+	// V13 = D1X,D1Y,D2Z,D2Z
+	V13 = _mm_shuffle_ps(D1, D2, _MM_SHUFFLE(2, 2, 1, 0));
+	V02 = _mm_shuffle_ps(MT.r[3], MT.r[3], _MM_SHUFFLE(2, 1, 3, 2));
+	V12 = _mm_shuffle_ps(D1, V13, _MM_SHUFFLE(2, 1, 0, 3));
+	V03 = _mm_shuffle_ps(MT.r[2], MT.r[2], _MM_SHUFFLE(1, 3, 2, 3));
+	V13 = _mm_shuffle_ps(D1, V13, _MM_SHUFFLE(0, 2, 1, 2));
+
+	V00 = _mm_mul_ps(V00, V10);
+	V01 = _mm_mul_ps(V01, V11);
+	V02 = _mm_mul_ps(V02, V12);
+	V03 = _mm_mul_ps(V03, V13);
+	C0 = _mm_sub_ps(C0, V00);
+	C2 = _mm_sub_ps(C2, V01);
+	C4 = _mm_sub_ps(C4, V02);
+	C6 = _mm_sub_ps(C6, V03);
+
+	V00 = _mm_shuffle_ps(MT.r[1], MT.r[1], _MM_SHUFFLE(0, 3, 0, 3));
+	// V10 = D0Z,D0Z,D2X,D2Y
+	V10 = _mm_shuffle_ps(D0, D2, _MM_SHUFFLE(1, 0, 2, 2));
+	V10 = _mm_shuffle_ps(V10, V10, _MM_SHUFFLE(0, 2, 3, 0));
+	V01 = _mm_shuffle_ps(MT.r[0], MT.r[0], _MM_SHUFFLE(2, 0, 3, 1));
+	// V11 = D0X,D0W,D2X,D2Y
+	V11 = _mm_shuffle_ps(D0, D2, _MM_SHUFFLE(1, 0, 3, 0));
+	V11 = _mm_shuffle_ps(V11, V11, _MM_SHUFFLE(2, 1, 0, 3));
+	V02 = _mm_shuffle_ps(MT.r[3], MT.r[3], _MM_SHUFFLE(0, 3, 0, 3));
+	// V12 = D1Z,D1Z,D2Z,D2W
+	V12 = _mm_shuffle_ps(D1, D2, _MM_SHUFFLE(3, 2, 2, 2));
+	V12 = _mm_shuffle_ps(V12, V12, _MM_SHUFFLE(0, 2, 3, 0));
+	V03 = _mm_shuffle_ps(MT.r[2], MT.r[2], _MM_SHUFFLE(2, 0, 3, 1));
+	// V13 = D1X,D1W,D2Z,D2W
+	V13 = _mm_shuffle_ps(D1, D2, _MM_SHUFFLE(3, 2, 3, 0));
+	V13 = _mm_shuffle_ps(V13, V13, _MM_SHUFFLE(2, 1, 0, 3));
+
+	V00 = _mm_mul_ps(V00, V10);
+	V01 = _mm_mul_ps(V01, V11);
+	V02 = _mm_mul_ps(V02, V12);
+	V03 = _mm_mul_ps(V03, V13);
+	Quad C1 = _mm_sub_ps(C0, V00);
+	C0 = _mm_add_ps(C0, V00);
+	Quad C3 = _mm_add_ps(C2, V01);
+	C2 = _mm_sub_ps(C2, V01);
+	Quad C5 = _mm_sub_ps(C4, V02);
+	C4 = _mm_add_ps(C4, V02);
+	Quad C7 = _mm_add_ps(C6, V03);
+	C6 = _mm_sub_ps(C6, V03);
+
+	C0 = _mm_shuffle_ps(C0, C1, _MM_SHUFFLE(3, 1, 2, 0));
+	C2 = _mm_shuffle_ps(C2, C3, _MM_SHUFFLE(3, 1, 2, 0));
+	C4 = _mm_shuffle_ps(C4, C5, _MM_SHUFFLE(3, 1, 2, 0));
+	C6 = _mm_shuffle_ps(C6, C7, _MM_SHUFFLE(3, 1, 2, 0));
+	C0 = _mm_shuffle_ps(C0, C0, _MM_SHUFFLE(3, 1, 2, 0));
+	C2 = _mm_shuffle_ps(C2, C2, _MM_SHUFFLE(3, 1, 2, 0));
+	C4 = _mm_shuffle_ps(C4, C4, _MM_SHUFFLE(3, 1, 2, 0));
+	C6 = _mm_shuffle_ps(C6, C6, _MM_SHUFFLE(3, 1, 2, 0));
+	// Get the determinate
+	QuadDot(C0, MT.r[0]);
+#if NEX_USE_FAST_DIVISION
+	Quad vTemp = QuadSplatX(_mm_rcp_ss(QuadDot(C0, MT.r[0])));
+#else
+	Quad vTemp = QuadSplatX(_mm_div_ss(N3D_1000.v, QuadDot(C0, MT.r[0])));
+#endif
+	Matrix4x4 mResult;
+	mResult.r[0] = _mm_mul_ps(C0, vTemp);
+	mResult.r[1] = _mm_mul_ps(C2, vTemp);
+	mResult.r[2] = _mm_mul_ps(C4, vTemp);
+	mResult.r[3] = _mm_mul_ps(C6, vTemp);
+	return mResult;
 }
 
 }

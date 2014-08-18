@@ -549,32 +549,37 @@ _NexBaseAPI String& Replace(String &s, const String &sub, const String &other);
  *
  * @return	true if it succeeds, false if it fails.
  **/
-_NexBaseAPI bool PatternMatch(const char* pattern, const char* str,
-bool checkcase = true);
+_NexBaseAPI bool PatternMatch(const char* pattern, const char* str, bool checkcase = true);
 
-/**
- * @brief	Convert string to lower case.
- *
- * @author	Abhishek Dey
- * @date	12/4/2009
- *
- * @param [in,out]	str	The string to convert.
- **/
-_NexBaseAPI void ToLower(String& str);
-
-/**
- * @brief	Convert string to upper case.
- *
- * @author	Abhishek Dey
- * @date	12/4/2009
- *
- * @param [in,out]	str	The string to convert.
- **/
-_NexBaseAPI void ToUpper(String& str);
 /** Convert a camel or upper case name into a formatted string.
  * For Eg: "madeInChina" to "Made In China" or
  * MADE_IN_CHINA to "Made In China" */
 _NexBaseAPI String FormatName(const String& str);
+/**
+* @brief	Convert string to lower case.
+*
+* @author	Abhishek Dey
+* @date	12/4/2009
+*
+* @param [in,out]	str	The string to convert.
+**/
+template <typename StringType>
+inline void ToLower(StringType& str) {
+	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+}
+
+/**
+* @brief	Convert string to upper case.
+*
+* @author	Abhishek Dey
+* @date	12/4/2009
+*
+* @param [in,out]	str	The string to convert.
+**/
+template <typename StringType>
+void ToUpper(StringType& str) {
+	std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+}
 
 /** Seperates a string pair of the format Abc:efg into 'Abc' and 'efg' */
 inline StringPair Split(const String& name, char by = ':') {
@@ -611,6 +616,13 @@ inline bool IsAscii(const String& utf8String) {
 	return std::find_if(utf8String.begin(), utf8String.end(), NotAsciiTest())
 			== utf8String.end();
 }
+
+struct NoCaseLess { // functor for operator <
+
+	bool operator()(const char* _Left, const char* _Right) const { // apply operator< to operands
+		return NoCaseCompare(_Left, _Right) < 0;
+	}
+};
 
 /************************************** Legacy **************************************/
 

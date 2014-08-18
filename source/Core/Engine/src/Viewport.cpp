@@ -51,8 +51,7 @@ void Viewport::FirePostupdate() {
 }
 
 void Viewport::PushPrimitives(uint32 frameNumber) {
-
-	traversal.camera = camera;
+		
 	traversal.frameNumber = frameNumber;
 	traversal.lightSystem = lightSystem;
 	//traversal.visibleBoundsInfo = &(camera->GetBoundsInfo());
@@ -74,13 +73,17 @@ void Viewport::CommitPrimitives(RenderContext* renderCtx, uint32 frameNumber) {
 
 	visibleSet.SortSet();
 
+	commitContext.viewMatrix = &camera->GetViewMatrix();
+	commitContext.viewProjectionMatrix = &camera->GetViewProjectionMatrix();
+	commitContext.projectionMatrix = &camera->GetProjectionMatrix();
+	*commitContext.invProjectionMatrix = Mat4x4Inverse(*commitContext.projectionMatrix);
 	commitContext.renderContext = renderCtx;
 	commitContext.viewport = this;
 	commitContext.frameNumber = frameNumber;
 	commitContext.visibiles = &visibleSet;
 	commitContext.lightSystem = traversal.lightSystem;
 	commitContext.targetDimension = renderTarget->GetDimensions();
-
+	
 
 	for (auto &r : renderSystems) {
 		r->Commit(commitContext);
@@ -95,4 +98,5 @@ void Viewport::Render(RenderContext* renderCtx, uint32 frameNumber) {
 	CommitPrimitives(renderCtx, frameNumber);
 	FirePostupdate();
 }
+
 }

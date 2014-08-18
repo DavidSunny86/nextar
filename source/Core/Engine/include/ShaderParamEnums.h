@@ -61,6 +61,8 @@ enum class AutoParamName
 	AUTO_VIEW,
 	// Projection matrix.
 	AUTO_PROJECTION,
+	// Inverse projection
+	AUTO_INV_PROJECTION,
 	// World*View matrix.
 	AUTO_WORLD_VIEW,
 	// View*Projection matrix.
@@ -85,6 +87,10 @@ enum class AutoParamName
 	AUTO_LIGHT_ATTENUATION,
 	// Light pov matrix used for shadow coordinates
 	AUTO_LIGHT_POV_MATRIX,
+	// Model view projection and model view matrix
+	AUTO_OBJECT_TRANSFORM,
+	// Omni Light properties
+	AUTO_OMNI_LIGHT_PROPERTIES,
 	// Custom generic parameter, could be texture or constant
 	// accessed from property buffer.
 	AUTO_CUSTOM_CONSTANT,

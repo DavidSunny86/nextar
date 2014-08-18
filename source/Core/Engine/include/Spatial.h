@@ -32,6 +32,7 @@ public:
 		UPDATE_BOUNDS = Component::LAST_FLAG << 2,
 		LAST_FLAG = Component::LAST_FLAG << 3
 	};
+		
 
 	Spatial(const StringID name, const StringID factory,  Component* parent =
 			nullptr);
@@ -95,6 +96,10 @@ public:
 	void SetRadius(float radius) {
 		bounds.SetRadius(radius);
 		SetBoundsDirty(true);
+	}
+
+	inline float GetRadius() const {
+		return bounds.GetRadius();
 	}
 
 	/** @remarks Update world volume */

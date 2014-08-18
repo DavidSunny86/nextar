@@ -55,6 +55,8 @@ inline Matrix4x4 Mat4x4FromOrtho(float width, float height, float nearPlane,
 /** @brief Orthogonal matrix */
 inline Matrix4x4 Mat4x4FromPerspective(float fieldOfView, float aspectRatio,
 		float nearPlane, float farPlane);
+/** @urgent generic matrix inverse */
+inline Matrix4x4 Mat4x4Inverse(Mat4x4F m);
 
 }
 

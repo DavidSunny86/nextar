@@ -221,7 +221,7 @@ protected:
 
 // StackString
 
-template<size_t stack_capacity, typename _NexAllocator>
+template<size_t stack_capacity, typename _NexAllocator = AllocatorGeneral>
 class StackString: public STLStackContainer<
 		std::basic_string<char, std::char_traits<char>,
 				STDStackAllocator<char, stack_capacity, _NexAllocator> >,

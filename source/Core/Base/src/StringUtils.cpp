@@ -125,7 +125,8 @@ _NexBaseAPI const utf32* GetWordEndPtrUtf32(const utf32* p) {
 	return p;
 }
 
-/* returns the pointer where no whitespace [' ','\n','\t'] is encountered */_NexBaseAPI const utf32* EatWhiteUtf32(
+/* returns the pointer where no whitespace [' ','\n','\t'] is encountered */
+_NexBaseAPI const utf32* EatWhiteUtf32(
 		const utf32* p) {
 	if (!p)
 		return 0;
@@ -134,7 +135,8 @@ _NexBaseAPI const utf32* GetWordEndPtrUtf32(const utf32* p) {
 	return p;
 }
 
-/* returns the pointer where no whitespace [' ','\n','\t'] is encountered */_NexBaseAPI const utf8* EatWhiteUtf8(
+/* returns the pointer where no whitespace [' ','\n','\t'] is encountered */
+_NexBaseAPI const utf8* EatWhiteUtf8(
 		const utf8* p) {
 	if (!p)
 		return 0;
@@ -159,7 +161,8 @@ _NexBaseAPI const utf32* GetIndexOfUtf32(const utf32* p, const utf32 c) {
 	return p;
 }
 
-/* returns the pointer where no whitespace [' ','\n','\t'] is encountered */_NexBaseAPI const char* EatWhite(
+/* returns the pointer where no whitespace [' ','\n','\t'] is encountered */
+_NexBaseAPI const char* EatWhite(
 		const char* p) {
 	if (!p)
 		return 0;
@@ -246,14 +249,6 @@ bool checkcase) {
 	while (*pat == '*')
 		++pat;
 	return (*pat) == 0;
-}
-
-_NexBaseAPI void ToLower(String& str) {
-	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-}
-
-_NexBaseAPI void ToUpper(String& str) {
-	std::transform(str.begin(), str.end(), str.begin(), ::toupper);
 }
 
 _NexBaseAPI void FreeStr(char* ptr) {

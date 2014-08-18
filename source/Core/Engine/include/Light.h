@@ -31,6 +31,8 @@ public:
 		AREA = 100,
 	};
 
+	typedef ComponentTraits<Light> Traits;
+
 	Light(const StringID name, const StringID factory, Component* parent = nullptr);
 	virtual ~Light();
 
@@ -44,6 +46,10 @@ public:
 
 	inline void SetLightColor(const Color& c) {
 		diffuseColor = c;
+	}
+
+	inline const Color& GetLightColor() const {
+		return diffuseColor;
 	}
 
 	virtual void SetMoveable(Moveable* ptr);

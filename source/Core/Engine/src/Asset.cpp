@@ -231,6 +231,72 @@ void Asset::_LoadDependencies(AssetStreamRequest* req) {
 	}
 }
 
+AssetPtr Asset::AsyncLoad(const URL& input) {
+	InputStreamPtr inputStream = FileSystem::Instance().OpenRead(input);
+	if (inputStream)
+		return AsyncLoad(inputStream);
+	return AssetPtr();
+}
+
+AssetPtr Asset::AsyncLoad(InputStreamPtr& input) {
+	ChunkInputStream ser(input);
+	InputSerializer::Chunk c = InputSerializer::Invalid;
+
+	ser.ReadChunk(ASSET_HEADER, c);
+	if (InputSerializer::IsValid(c)) {
+		uint32 classId;
+		StringID name, factory, group;
+		ser >> classId >> name >> factory >> group;
+		SharedComponentPtr oInst;
+		Group* groupPtr = nullptr;
+		if (group != StringUtils::NullID)
+			groupPtr = ComponentGroupArchive::Instance().AsyncFindOrCreate(
+			group);
+		SharedComponent::Instance(oInst, classId, name, factory, groupPtr);
+		if (oInst) {
+			ser.Skip(c);
+			AssetPtr asset = oInst;
+			AssetStreamRequest* req = static_cast<AssetStreamRequest*>(asset->GetStreamRequest());
+			if (req) {
+				req->flags |= StreamRequest::AUTO_DELETE_REQUEST;
+				req->SetInputStream(input);
+			}
+			// load synchronously
+			asset->Load(req, false);
+			return asset;
+		}			
+	}
+	
+	return AssetPtr();
+}
+
+void Asset::AsyncSave(AssetPtr& asset, const URL& output) {
+	OutputStreamPtr stream = FileSystem::Instance().OpenWrite(output);
+	if (stream)
+		AsyncSave(asset,stream);
+}
+
+void Asset::AsyncSave(AssetPtr& asset, OutputStreamPtr& output) {
+
+	{
+		ChunkOutputStream cser(output);
+		OutputSerializer& ser = cser.BeginChunk(ASSET_HEADER);
+		SharedComponent::ID id;
+		asset->GetID(id);
+		uint32 classId = asset->GetClassID();
+		ser << classId << id.name << id.factory << id.group;
+		cser.EndChunk();
+		// destroy the cser object for flushing
+	}
+
+	AssetStreamRequest* req = static_cast<AssetStreamRequest*>(asset->GetStreamRequest(false));
+	if (req) {
+		req->flags |= StreamRequest::AUTO_DELETE_REQUEST;
+		req->SetOutputStream(output);
+	}
+	asset->Save(req, false);
+}
+
 /*********************************
  * Asset::Loader
  *********************************/
@@ -259,16 +325,17 @@ void AssetLoader::Serialize() {
 		NEX_THROW_GracefulError(EXCEPT_MISSING_PLUGIN);
 	}
 
-	InputStreamPtr input;
+	InputStreamPtr input = request->GetInputStream();
 
-	if (location != URL::Invalid) {
+	if (!input && location != URL::Invalid) {
 		input = FileSystem::Instance().OpenRead(location);
-		if (!input) {
-			Error(
-					String("Could not open asset file: ")
-							+ request->GetName());
-			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOCATE_ASSET);
-		}
+	}
+
+	if (!input) {
+		Error(
+			String("Could not open asset file: ")
+			+ request->GetName());
+		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOCATE_ASSET);
 	}
 
 	impl->Load(input, *this);
@@ -303,16 +370,17 @@ void AssetSaver::Serialize() {
 		NEX_THROW_GracefulError(EXCEPT_MISSING_PLUGIN);
 	}
 
-	OutputStreamPtr output;
+	OutputStreamPtr output = request->GetOutputStream();
 
-	if (location != URL::Invalid) {
+	if (!output && location != URL::Invalid) {
 		output = FileSystem::Instance().OpenWrite(location);
-		if (!output) {
-			Error(
-							String("Could not write to asset file: ")
-							+ assetPtr->GetAssetLocator().ToString());
-			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOCATE_ASSET);
-		}
+	}
+
+	if (!output) {
+		Error(
+			String("Could not write to asset file: ")
+			+ assetPtr->GetAssetLocator().ToString());
+		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOCATE_ASSET);
 	}
 
 	impl->Save(output, *this);

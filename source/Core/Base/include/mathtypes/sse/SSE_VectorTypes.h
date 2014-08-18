@@ -49,6 +49,7 @@ inline Quad QuadZero();
 inline Quad QuadSetX(QuadPF q, float val);
 inline Quad QuadSetY(QuadPF q, float val);
 inline Quad QuadSetZ(QuadPF q, float val);
+inline Quad QuadSetW(QuadPF q, float val);
 
 /** @remarks Get elements **/
 inline float QuadGetByIdx(QuadPF q, size_t idx);
@@ -90,6 +91,9 @@ inline void QuadSinCos(Quad& vsinval, Quad& vcosval, const float val);
 inline Quad QuadInvSqrt(QuadPF);
 /* Quad select */
 inline Quad QuadSelect(QuadPF q1, QuadPF q2);
+/* Quad/Vec4 dot product */
+inline Quad QuadDot(QuadPF q1, QuadPF q2);
+
 }
 
 /**
@@ -99,9 +103,12 @@ inline Quad QuadSelect(QuadPF q1, QuadPF q2);
 #define Vec3AGetX		QuadGetX
 #define Vec3AGetY		QuadGetY
 #define Vec3AGetZ		QuadGetZ
+#define Vec3ASetX		QuadSetX
+#define Vec3ASetY		QuadSetY
+#define Vec3ASetZ		QuadSetZ
 #define Vec3AAbs		QuadAbs
 #define Vec3ANegate		QuadNegate
-#define Vec3AMulScalar          QuadMulScalar
+#define Vec3AMulScalar   QuadMulScalar
 #define Vec3AAdd		QuadAdd
 #define Vec3ASub		QuadSub
 #define Vec3AMulAdd		QuadMulAdd
@@ -117,9 +124,14 @@ inline Quad QuadSelect(QuadPF q1, QuadPF q2);
 #define Vec4AGetY		QuadGetY
 #define Vec4AGetZ		QuadGetZ
 #define Vec4AGetW		QuadGetW
+#define Vec4ASetX		QuadSetX
+#define Vec4ASetY		QuadSetY
+#define Vec4ASetZ		QuadSetZ
+#define Vec4ASetW		QuadSetW
 #define Vec4AAbs		QuadAbs
 #define Vec4ANegate     QuadNegate
 #define Vec4AAdd		QuadAdd
+#define Vec4AMul		QuadMul
 #define Vec4ASub		QuadSub
 #define Vec4AMulAdd		QuadMulAdd
 #define Vec4AReplicate          QuadReplicate

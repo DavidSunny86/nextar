@@ -60,7 +60,7 @@ void FlagsCmd::Execute(int parentType, void* parentParam,
 		if (flags) {
 			ShaderTemplate* shader = static_cast<ShaderTemplate*>(
 					static_cast<ShaderScript*>(parentParam)->GetRequest()->GetStreamedObject());
-			shader->SetFlag(flags);
+			shader->SetRenderFlags(flags);
 		}
 	} else {
 		ctx.Error("BlendState block needs to be inside Shader declaration.");

@@ -35,13 +35,6 @@ public:
 
 	enum {
 		USE_FALLBACK = Asset::LAST_FLAG << 5,
-		BASIC_DEFERRED = Asset::LAST_FLAG << 6,
-		TRANSLUCENT = Asset::LAST_FLAG << 7,
-		OVERLAY = Asset::LAST_FLAG << 8,
-		BACKGROUND = Asset::LAST_FLAG << 9,
-		POST_FX = Asset::LAST_FLAG << 10,
-		DEFERRED_LIGHTING = Asset::LAST_FLAG << 11,
-		DEFERRED = DEFERRED_LIGHTING|BASIC_DEFERRED,
 	};
 
 	class StreamRequest;
@@ -99,9 +92,11 @@ public:
 		// list and if the sampler is an array
 		void AddTextureUnit(const String& unitName, TextureUnitParams& unit,
 				TextureBase* defaultTexture);
+		void SetRenderQueueFlags(uint32 flags);
 
 	protected:
 
+		uint32 renderQueueFlags;
 		String compilationOptions;
 		friend class ShaderAsset;
 		StreamPassList::reverse_iterator currentPass;

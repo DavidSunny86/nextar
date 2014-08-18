@@ -75,7 +75,7 @@ protected:
 	VertexBufferList bufferList;
 };
 
-enum PrimitiveTypeTag {
+enum PrimitiveType : uint8 {
 	/* Point list primitive type.  */
 	PT_POINT_LIST,
 	/* Line list primitive type.  */
@@ -85,8 +85,6 @@ enum PrimitiveTypeTag {
 	/* Triangle strip primitive type.  */
 	PT_TRI_STRIP
 };
-
-typedef uint8 PrimitiveType;
 
 class VertexData: public AllocGraphics {
 public:

@@ -147,6 +147,13 @@ public:
 		return shaders;
 	}
 
+	inline void SetRenderFlags(uint32 renderFlags) {
+		this->renderFlags = renderFlags;
+	}
+
+	inline uint32 GetRenderFlags() const {
+		return renderFlags;
+	}
 	// load a shader
 	virtual uint32 GetClassID() const;
 
@@ -174,6 +181,7 @@ protected:
 
 	PassList passes;
 
+	uint32 renderFlags;
 	ShaderTable shaders;
 	ParameterTable parameters;
 	MacroTable macros;

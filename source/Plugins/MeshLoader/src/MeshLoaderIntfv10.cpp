@@ -27,6 +27,7 @@ enum MeshChunkID {
 	MCID_MATERIAL_SCRIPT,
 	MCID_SUBMESH_DATA,
 	MCID_SUBMESH_END,
+	MCID_SUBMESH_INFO,
 	MCID_MESH_HEADER,
 	MCID_END
 };
@@ -257,11 +258,16 @@ void MeshLoaderIntfv1_0::ReadSubMesh(MeshAsset::StreamRequest* request,
 	uint16 vec = 0;
 	VertexLayoutType vetype = VertexLayoutType::CUSTOM_LAYOUT;
 	uint32 start, count;
+	uint8 primType;
 
 	do {
 		ser >> chunk;
 		if (InputSerializer::IsValid(chunk)) {
 			switch (chunk.first.first) {
+			case MCID_SUBMESH_INFO:
+				ser >> primType;
+				request->SetPrimitiveType(subMesh, (PrimitiveType)primType);
+				break;
 			case MCID_VERTEX_DATA:
 				vertexData = request->GetSharedVertexData();
 				if (vertexData) {

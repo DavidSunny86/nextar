@@ -35,12 +35,12 @@ Pass::~Pass() {
 	Debug("Pass destroyed.");
 }
 
-const AutoParam* Pass::MapParam(const String& name) {
+const AutoParam* Pass::MapParam(const char* name) {
 	auto ap = autoParams.find(name);
 	if (ap == autoParams.end())
 		return nullptr;
 	// todo map parsed params
-	return (*ap).second;
+	return &(*ap).second;
 }
 
 const Pass::SamplerDesc* Pass::MapSamplerParams(const String& name,
@@ -50,6 +50,17 @@ const Pass::SamplerDesc* Pass::MapSamplerParams(const String& name,
 		return nullptr;
 	// todo map parsed params
 	return &(*sp).second;
+}
+
+void Pass::AddParamDef(const char* name, ParamDataType type, AutoParamName autoName, ParameterContext context,
+	AutoParamProcessor* processor, const String& desc) {
+	auto& param = autoParams[name];
+	param.autoName = autoName;
+	param.context = context;
+	param.desc = desc;
+	param.name = name;
+	param.processor = processor;
+	param.type = type;
 }
 
 /****************************************************/
@@ -65,11 +76,41 @@ void Pass::View::Update(RenderContext* rc, uint32 msg, ContextParamPtr param) {
 		//p.inputLayoutId = &inputLayoutUniqueID;
 		p.inited.clear(std::memory_order_relaxed);
 		Compile(rc, p);
-	} else if (msg == Pass::MSG_PASS_UPDATE_PARAMBUFFER_OFFSET) {
+	}
+	else if (msg == Pass::MSG_PASS_UPDATE_PARAMBUFFER_OFFSET) {
 		const ParamBufferOffsetParams& p =
-				*reinterpret_cast<const ParamBufferOffsetParams*>(param);
+			*reinterpret_cast<const ParamBufferOffsetParams*>(param);
 		uint32 offsetAt = 0;
-		for (auto& e : paramGroupEntries) {
+
+		auto enParamIt = sharedParameters.end();
+		auto paramIt = sharedParameters.begin();
+		auto samplerIt = samplers;
+		auto enSamplerIt = SamplerParameter::At(samplers, numSamplerCount);
+
+
+		for (uint32 context = 0; context < (uint32)ParameterContext::CTX_COUNT; ++context) {
+			auto& e = paramGroupEntries[context];
+			
+			if (paramIt != enParamIt && (*paramIt)->context == (ParameterContext)context) {
+				e.beginIt = paramIt;
+				do {
+					paramIt++;
+				} while (paramIt != enParamIt && (*paramIt)->context == (ParameterContext)context);
+				e.endIt = paramIt;
+			} else {
+				e.beginIt = e.endIt = enParamIt;
+			}
+			
+			if (samplerIt != enSamplerIt && (*samplerIt).context == (ParameterContext)context) {
+				e.beginSamplerIt = samplerIt;
+				do {
+					samplerIt = SamplerParameter::Next(samplerIt);
+				} while (samplerIt != enSamplerIt && (*samplerIt).context == (ParameterContext)context);
+				e.endSamplerIt = samplerIt;
+			} else {
+				e.beginSamplerIt = e.endSamplerIt = nullptr;
+			}
+			
 			e.offsetInParamBuffer = p.offset[offsetAt++];
 		}
 	}
@@ -97,7 +138,7 @@ void Pass::View::UpdateParams(CommitContext& ctx, ParameterContext type,
 	NEX_ASSERT(this == ctx.pass);
 
 	ParameterGroupItem& item = paramGroupEntries[(uint32) type];
-	ctx.currentParamContext = CommitContext::ParamContext(
+	ctx.paramContext = CommitContext::ParamContext(
 			item.offsetInParamBuffer, ctx.paramBuffers[(uint32) type]);
 
 	for (auto it = item.beginIt; it != item.endIt; ++it) {
@@ -105,12 +146,12 @@ void Pass::View::UpdateParams(CommitContext& ctx, ParameterContext type,
 		NEX_ASSERT(group->context == type);
 		if (group->lastUpdateId == id)
 			continue;
-		ctx.currentGroup = group;
+		ctx.paramGroup = group;
 		if (group->processor) {
-			ctx.currentGroupDataPtr = nullptr;
+			ctx.groupDataPtr = nullptr;
 			group->processor->Apply(ctx, group);
 		} else {
-			ctx.currentGroupDataPtr = group->Map(ctx.renderContext);
+			ctx.groupDataPtr = group->Map(ctx.renderContext);
 			for (uint32 i = 0; i < group->numParams; ++i) {
 				ConstantParameter* parameter = group->GetParamByIndex(i);
 				NEX_ASSERT(parameter->processor);
@@ -121,7 +162,7 @@ void Pass::View::UpdateParams(CommitContext& ctx, ParameterContext type,
 		(*it)->lastUpdateId = id;
 	}
 
-	ctx.currentGroup = nullptr;
+	ctx.paramGroup = nullptr;
 	for (auto it = item.beginSamplerIt; it != item.endSamplerIt; it =
 			SamplerParameter::Next(it)) {
 		NEX_ASSERT(it->processor);
@@ -148,7 +189,7 @@ void CustomTextureProcessor::Apply(CommitContext& context,
 	NEX_ASSERT(param->autoName == AutoParamName::AUTO_CUSTOM_CONSTANT);
 	const SamplerParameter* sampler =
 			reinterpret_cast<const SamplerParameter*>(param);
-	CommitContext::ParamContext& pc = context.currentParamContext;
+	CommitContext::ParamContext& pc = context.paramContext;
 	context.pass->SetTexture(context.renderContext, *sampler,
 			pc.second->AsTexture(pc.first));
 	pc.first += sampler->size;
@@ -172,8 +213,8 @@ void CustomParameterProcessor::Apply(CommitContext& context,
 	NEX_ASSERT(param->autoName == AutoParamName::AUTO_CUSTOM_CONSTANT);
 	const ConstantParameter* constParam =
 			reinterpret_cast<const ConstantParameter*>(param);
-	CommitContext::ParamContext& pc = context.currentParamContext;
-	context.currentGroup->SetRawBuffer(context.renderContext, *constParam,
+	CommitContext::ParamContext& pc = context.paramContext;
+	context.paramGroup->SetRawBuffer(context.renderContext, *constParam,
 			pc.second->AsRawData(pc.first));
 	pc.first += param->size;
 }
@@ -195,9 +236,9 @@ void CustomStructProcessor::Apply(CommitContext& context,
 		const ShaderParameter* param) {
 	NEX_ASSERT(param->type == ParamDataType::PDT_STRUCT);
 
-	CommitContext::ParamContext& pc = context.currentParamContext;
+	CommitContext::ParamContext& pc = context.paramContext;
 	uint32 size = (uint32)pc.second->GetSize();
-	context.currentGroup->WriteRawData(context.renderContext,
+	context.paramGroup->WriteRawData(context.renderContext,
 			pc.second->AsRawData(pc.first), 0, size);
 	pc.first += size;
 }

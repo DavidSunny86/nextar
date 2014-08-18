@@ -22,7 +22,7 @@ URL::URL(const URL& _url) :
 		archiveName(_url.archiveName), relativePath(_url.relativePath) {
 }
 
-URL::URL(uint32 _url_type, const String& _url_archiveName,
+URL::URL(const String& _url_archiveName,
 		const String& _url_relativePath) :
 		archiveName(_url_archiveName), relativePath(_url_relativePath) {
 }

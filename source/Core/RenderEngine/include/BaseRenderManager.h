@@ -45,6 +45,7 @@ protected:
 	void PresentSwapChains(RenderContext* rc);
 	void CreateRenderSystems();
 	void CreateRenderQueues();
+	void RegisterAutoParams();
 
 	/* The first registered context is always the primary context, other
 	 * contexts are present if usingMultiGpuSetup is true */

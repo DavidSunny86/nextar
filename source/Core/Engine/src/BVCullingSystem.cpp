@@ -21,7 +21,6 @@ BVCullingSystem::~BVCullingSystem() {
 void BVCullingSystem::AddBody(Spatial* s) {
 	NEX_ASSERT(s);
 	bodies.push_back(s);
-	s->_SetCullingSystem(this);
 }
 
 void BVCullingSystem::RemoveBody(Spatial* s) {
@@ -31,14 +30,23 @@ void BVCullingSystem::RemoveBody(Spatial* s) {
 }
 
 void BVCullingSystem::Visit(SceneTraversal& trav) {
-	for (auto &b : bodies) {
-		if (coherentCam == trav.camera) {
+	if (coherentCam == trav.camera) {
+		for (auto &b : bodies) {
+
 			if (trav.camera->IsVisible(b->GetBoundsInfo(), b->_CullingData()))
 				b->Visit(trav);
-		} else {
+		}
+	} else {
+		for (auto &b : bodies) {
 			if (trav.camera->IsVisible(b->GetBoundsInfo()))
 				b->Visit(trav);
 		}
 	}
 }
+
+/** @brief Get node type */
+uint32 BVCullingSystem::GetClassID() const {
+	return CLASS_ID;
+}
+
 } /* namespace nextar */

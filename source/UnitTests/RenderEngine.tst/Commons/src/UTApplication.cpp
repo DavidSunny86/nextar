@@ -20,11 +20,26 @@ void UTApplication::_SetupScene(SceneAssetPtr& scene) {
 	Entity::Factory* entityManager =
 			static_cast<Entity::Factory*>(ComponentFactoryArchive::Instance().AsyncFindFactory(
 					Entity::CLASS_ID));
-
+	CullingSystem* culler = static_cast<CullingSystem*>(
+		entityManager->AsyncCreate(Component::CLASS_BV_CULLER, NamedObject::AsyncStringID("MainCuller")));
+	scene->SetCullingSystem(culler);
 	EntityPtr camera = entityManager->AsyncCreateCameraEntity(
 			NamedObject::AsyncStringID("Main"));
+	// A camera at 50,0,50 looking at 0,0,0
+	Quaternion rotation = QuatFromAxisAng(Vector3::ZAxis, 0);
+	camera->SetTransform(Vec3ASet(50, 0, 50), rotation, 1);
+	Camera::PerspectiveParams params;
+
+	Size s = window->GetDimensions();
+	params.aspectRatio = (float)s.dx / (float)s.dy;
+	params.fieldOfView = Math::ToRadians(50);
+	Camera::Traits::Cast(camera.GetPtr())->SetPerspectiveParams(params);
+	Camera::Traits::Cast(camera.GetPtr())->SetNearDistance(0.1f);
+	Camera::Traits::Cast(camera.GetPtr())->SetFarDistance(500.1f);
+
 	camera->AddToScene(scene);
-	window->CreateViewport(static_cast<Camera*>(camera->GetSpatial()));
+
+	window->CreateViewport(Camera::Traits::Cast(camera->GetSpatial()));
 }
 
 void UTApplication::ConfigureExtendedInterfacesImpl() {

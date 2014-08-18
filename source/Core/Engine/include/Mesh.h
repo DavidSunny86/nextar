@@ -31,6 +31,8 @@ public:
 		~Primitive();
 	};
 
+	typedef ComponentTraits<Mesh> Traits;
+
 	Mesh(const StringID name, const StringID factory, Component* parent = nullptr);
 	virtual ~Mesh();
 

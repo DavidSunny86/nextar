@@ -17,7 +17,8 @@ project(NextarEngine)
 ## Root variables
 #============================================================
 set(NEX_ROOT ${PROJECT_SOURCE_DIR})
-set(NEX_BIN_BASE  ${NEX_ROOT}/../build/bin)
+#set(NEX_BIN_BASE  ${NEX_ROOT}/../build/bin)
+set(NEX_BUILD_DIR ${NEX_ROOT}/../build)
 set(NEX_INSTALL ${NEX_ROOT}/../install)
 set(NEX_LIB ${NEX_ROOT}/../lib)
 set(NEX_DEPENDENCIES ${NEX_ROOT}/../dependencies)
@@ -47,14 +48,14 @@ set(GCC_COMPILE_FLAGS "-std=c++11 -pthread")
 ## Configure build config paths
 #============================================================
 if(NOT CMAKE_BUILD_TYPE)
- set(NEX_BIN ${NEX_BIN_BASE}/release)
+ #set(NEX_BIN ${NEX_BIN_BASE}/release)
  set(NEX_BUILD "Release")
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
- set(NEX_BIN ${NEX_BIN_BASE}/debug)
+ #set(NEX_BIN ${NEX_BIN_BASE}/debug)
  set(NEX_BUILD "Debug")
 # append compiler flags here
 else()
- set(NEX_BIN ${NEX_BIN_BASE}/release)
+ #set(NEX_BIN ${NEX_BIN_BASE}/release)
  set(NEX_BUILD "Release")
 endif()
 
@@ -91,7 +92,8 @@ option(NEX_USE_PTMALLOC "Use PtMalloc instead of NedAlloc." OFF)
 option(NEX_SUPPORT_MULTITHREADING "Use multithreading." ON)
 option(NEX_USE_TBB "Use Intel Thread Building Blocks." OFF)
 option(NEX_CROSS_COMPILE "Cross compile for different architecture." ON)
-
+option(NEX_UNITY_BUILD "Unity build." ON)
+set(NEX_UNITY_FILE_LIMIT 40 CACHE STRING "Number of files per unit in unity build") 
 set(NEX_ARCHITECTURE_NAME "x86_64" CACHE STRING "Architecture chosen for cross compilation.")
 set(NEX_SUPPORTED_ARCHITECTURE_LIST "x86;x86_64;ia64;ppc;alpha")
 set_property(CACHE NEX_ARCHITECTURE_NAME PROPERTY STRINGS ${NEX_SUPPORTED_ARCHITECTURE_LIST})
@@ -147,7 +149,7 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	set(NEX_OS "Linux")
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(NEX_OS "MacOSX")
-ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 ## Create plugin configuration file
 #============================================================
@@ -255,12 +257,100 @@ macro(add_chained_external_dependency includeFiles libraryName)
 	add_external_dependency( "${ARGV0}" "${ARGV1}" )
 	append_chained_include("${ARGV0}")
 endmacro(add_chained_external_dependency)
+#============================================================
+# include_path
+#============================================================
+macro(include_path path)
+	if(EXISTS ${ARGV0})
+		include_directories(${ARGV0})
+		list(APPEND NEXTAR_HEADER_LIST "${ARGV0}/*.h")
+	endif()
+endmacro(include_path)
 
 #============================================================
-# Config_Src
-# todo: Use source_group
+# pre_configure
+#============================================================
+macro(pre_configure)
+	set(NEXTAR_HEADER_LIST "")
+	include_path(${NEX_ROOT}/${NEXTAR_FRAMEWORK}/Commons/include)
+	include_path(${NEX_ROOT}/${NEXTAR_FRAMEWORK}/Commons/local_include)
+	include_path(${NEX_ROOT}/${NEXTAR_FRAMEWORK}/${NEXTAR_MODULE_PATH}/Commons/include)
+	include_path(${NEX_ROOT}/${NEXTAR_FRAMEWORK}/${NEXTAR_MODULE_PATH}/Commons/local_include)
+	include_path(${NEXTAR_TARGET_PATH}/include)
+	include_path(${NEXTAR_TARGET_PATH}/local_include)
+	if(EXISTS "${NEXTAR_TARGET_PATH}/include/platform")
+		if(NEX_OS MATCHES "Windows")
+			include_path("${NEXTAR_TARGET_PATH}/include/platform/win32")
+		elseif(NEX_OS MATCHES "Linux")
+			include_path("${NEXTAR_TARGET_PATH}/include/platform/linux")
+		elseif(NEX_OS MATCHES "MacOSX")
+			include_path("${NEXTAR_TARGET_PATH}/include/platform/macosx")
+		endif(NEX_OS MATCHES "Windows")
+	endif()
+	if(EXISTS "${NEXTAR_TARGET_PATH}/local_include/platform")
+		if(NEX_OS MATCHES "Windows")
+			include_path("${NEXTAR_TARGET_PATH}/local_include/platform/win32")
+		elseif(NEX_OS MATCHES "Linux")
+			include_path("${NEXTAR_TARGET_PATH}/local_include/platform/linux")
+		elseif(NEX_OS MATCHES "MacOSX")
+			include_path("${NEXTAR_TARGET_PATH}/local_include/platform/macosx")
+		endif(NEX_OS MATCHES "Windows")
+	endif()
+	if(EXISTS "${NEXTAR_TARGET_PATH}/local_include/Config.h.cmake")
+		configure_file(
+			"${NEXTAR_TARGET_PATH}/local_include/Config.h.cmake"
+			"${NEXTAR_TARGET_PATH}/include/${NEXTAR_CONFIG_NAME}Config.h"
+		)
+	endif()
+	file(GLOB HEADER_GROUP_FILES
+		${NEXTAR_HEADER_LIST}
+		)
+endmacro(pre_configure)
+#============================================================
+# clean_unity_file
+#============================================================
+macro(clean_unity_file index)
+	if (EXISTS "${NEX_UNITY_SRC_PATH}/c${ARGV0}.cpp")
+		list(APPEND NEXTAR_SRC_FILES_UNITY "${NEX_UNITY_SRC_PATH}/c${ARGV0}.cpp")
+		file(WRITE "${NEX_UNITY_SRC_PATH}/c${ARGV0}.cpp" "")
+	endif()
+endmacro(clean_unity_file)
+#============================================================
+# unity_file
+#============================================================
+macro(unity_file index path)
+	file(APPEND "${NEX_UNITY_SRC_PATH}/c${ARGV0}.cpp" "#include \"${ARGV1}\"\n")
+endmacro(unity_file)
+#============================================================
+# config_unity
+#============================================================
+macro(post_configure)
+	if(${NEX_UNITY_BUILD})
+		set(NEX_UNITY_SRC_PATH ${NEX_BUILD_DIR}/${NEXTAR_TARGET_RELPATH})
+		set(NEXTAR_SRC_FILES_UNITY "")
+		set(i 0)
+		set(fc 0)
+		# create the unity file
+		clean_unity_file(${i})
+		foreach(FileName ${SOURCE_GROUP_FILES})
+			unity_file(${i} ${FileName})
+			math(EXPR fc "${fc}+1")
+			if ( fc GREATER ${NEX_UNITY_FILE_LIMIT} )
+				set(fc 0)
+				math(EXPR i "${i}+1")
+				clean_unity_file(${i})
+			endif()
+		endforeach()
+		set(NEXTAR_SRC_FILES ${NEXTAR_SRC_FILES_UNITY} ${SOURCE_GROUP_FILES} ${HEADER_GROUP_FILES})
+	else()
+		set(NEXTAR_SRC_FILES ${SOURCE_GROUP_FILES} ${HEADER_GROUP_FILES})
+	endif()
+endmacro(post_configure)
+#============================================================
+# config_src
 #============================================================
 macro(config_src)
+	pre_configure()
 	set(NEXTAR_SRC_LIST "")
 	if (EXISTS "${NEX_ROOT}/${NEXTAR_FRAMEWORK}/Commons/src")
 		list(APPEND NEXTAR_SRC_LIST "${NEX_ROOT}/${NEXTAR_FRAMEWORK}/Commons/src/*.cpp")
@@ -279,46 +369,11 @@ macro(config_src)
 		endif(NEX_OS MATCHES "Windows")
 	endif()
 	
-	file(GLOB NEXTAR_SRC_FILES 
+	file(GLOB SOURCE_GROUP_FILES 
 		${NEXTAR_SRC_LIST}
 		)
+	post_configure()
 endmacro(config_src)
-
-#============================================================
-# Configure_Module
-#============================================================
-macro(configure_target)
-	include_directories(${NEX_ROOT}/${NEXTAR_FRAMEWORK}/Commons/include)
-	include_directories(${NEX_ROOT}/${NEXTAR_FRAMEWORK}/Commons/local_include)
-	include_directories(${NEX_ROOT}/${NEXTAR_FRAMEWORK}/${NEXTAR_MODULE_PATH}/Commons/include)
-	include_directories(${NEX_ROOT}/${NEXTAR_FRAMEWORK}/${NEXTAR_MODULE_PATH}/Commons/local_include)
-	include_directories(${NEXTAR_TARGET_PATH}/include)
-	include_directories(${NEXTAR_TARGET_PATH}/local_include)
-	if(EXISTS "${NEXTAR_TARGET_PATH}/include/platform")
-		if(NEX_OS MATCHES "Windows")
-			include_directories("${NEXTAR_TARGET_PATH}/include/platform/win32")
-		elseif(NEX_OS MATCHES "Linux")
-			include_directories("${NEXTAR_TARGET_PATH}/include/platform/linux")
-		elseif(NEX_OS MATCHES "MacOSX")
-			include_directories("${NEXTAR_TARGET_PATH}/include/platform/macosx")
-		endif(NEX_OS MATCHES "Windows")
-	endif()
-	if(EXISTS "${NEXTAR_TARGET_PATH}/local_include/platform")
-		if(NEX_OS MATCHES "Windows")
-			include_directories("${NEXTAR_TARGET_PATH}/local_include/platform/win32")
-		elseif(NEX_OS MATCHES "Linux")
-			include_directories("${NEXTAR_TARGET_PATH}/local_include/platform/linux")
-		elseif(NEX_OS MATCHES "MacOSX")
-			include_directories("${NEXTAR_TARGET_PATH}/local_include/platform/macosx")
-		endif(NEX_OS MATCHES "Windows")
-	endif()
-	if(EXISTS "${NEXTAR_TARGET_PATH}/local_include/Config.h.cmake")
-		configure_file(
-			"${NEXTAR_TARGET_PATH}/local_include/Config.h.cmake"
-			"${NEXTAR_TARGET_PATH}/include/${NEXTAR_CONFIG_NAME}Config.h"
-		)
-	endif()
-endmacro(configure_target)
 
 #============================================================
 # Add_Framework
@@ -368,18 +423,25 @@ macro(place_bin)
                       RUNTIME_OUTPUT_DIRECTORY_RELEASE ${NEX_INSTALL_DIR}
 		      LIBRARY_OUTPUT_DIRECTORY_DEBUG ${NEX_INSTALL_DIR}
                       LIBRARY_OUTPUT_DIRECTORY_RELEASE ${NEX_INSTALL_DIR})
+	
+	source_group("[Sources]" FILES ${SOURCE_GROUP_FILES})
+	source_group("[Headers]" FILES ${HEADER_GROUP_FILES})
+	if (${NEX_UNITY_BUILD})
+		set_source_files_properties(${SOURCE_GROUP_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
+	endif()
+	set_source_files_properties(${HEADER_GROUP_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 endmacro(place_bin)
 #============================================================
 # Create_Module
 #============================================================
 macro(create_library)
 	set(NEXTAR_TARGET NE_${NEXTAR_FRAMEWORK}.${NEXTAR_MODULE})	
-	set(NEXTAR_TARGET_PATH ${NEX_ROOT}/${NEXTAR_FRAMEWORK}/${NEXTAR_MODULE})
+	set(NEXTAR_TARGET_RELPATH ${NEXTAR_FRAMEWORK}/${NEXTAR_MODULE})
+	set(NEXTAR_TARGET_PATH ${NEX_ROOT}/${NEXTAR_TARGET_RELPATH})
 	set(NEXTAR_CONFIG_NAME ${NEXTAR_MODULE})
 	target_to_var(${NEXTAR_TARGET})
 	set(NEXTAR_LIBRARY_DEFINE "${TARGET_TO_VAR}")
 	config_src()
-	configure_target()
 	message("--------------------------------------")
 	message("-->> Create Module..: ${NEXTAR_TARGET}")
 	add_library(${NEXTAR_TARGET} SHARED ${NEXTAR_SRC_FILES})
@@ -391,10 +453,10 @@ endmacro(create_library)
 #============================================================
 macro(create_exec)
 	set(NEXTAR_TARGET NE_${NEXTAR_FRAMEWORK}.${NEXTAR_MODULE})	
-	set(NEXTAR_TARGET_PATH ${NEX_ROOT}/${NEXTAR_FRAMEWORK}/${NEXTAR_MODULE})
+	set(NEXTAR_TARGET_RELPATH ${NEXTAR_FRAMEWORK}/${NEXTAR_MODULE})
+	set(NEXTAR_TARGET_PATH ${NEX_ROOT}/${NEXTAR_TARGET_RELPATH})
 	set(NEXTAR_CONFIG_NAME ${NEXTAR_MODULE})
 	config_src()
-	configure_target()
 	message("--------------------------------------")
 	message("-->> Create Exec..: ${NEXTAR_TARGET}")	
 	add_executable(${NEXTAR_TARGET} ${NEXTAR_SRC_FILES})
@@ -407,13 +469,13 @@ endmacro(create_exec)
 #============================================================
 macro(create_ut consoleApp)
 	set(NEXTAR_TARGET "NE_${NEXTAR_FRAMEWORK}.${NEXTAR_MODULE}_${NEXTAR_UT}.tst")
-	set(NEXTAR_TARGET_PATH ${NEX_ROOT}/${NEXTAR_FRAMEWORK}/${NEXTAR_MODULE_PATH}/${NEXTAR_UT})
+	set(NEXTAR_TARGET_RELPATH ${NEXTAR_FRAMEWORK}/${NEXTAR_MODULE_PATH}/${NEXTAR_UT})
+	set(NEXTAR_TARGET_PATH ${NEX_ROOT}/${NEXTAR_TARGET_RELPATH})
 	set(NEXTAR_CONFIG_NAME ${NEXTAR_UT})
 	if(${ARGV0})
 		add_definitions( -DNEX_CONSOLE_APP_ENTRY )
 	endif()
 	config_src()
-	configure_target()
 	message("--------------------------------------")
 	message("-->> Create Test..: ${NEXTAR_TARGET}")
 	add_executable(${NEXTAR_TARGET} ${NEXTAR_SRC_FILES})
@@ -450,4 +512,4 @@ add_framework(Core)
 add_framework(Plugins)
 add_framework(UnitTests)
 add_framework(Data)
-
+#add_framework(Utility)

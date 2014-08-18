@@ -54,6 +54,10 @@ inline float QuadGetX(QuadPF q);
 inline float QuadGetY(QuadPF q);
 inline float QuadGetZ(QuadPF q);
 inline float QuadGetW(QuadPF q);
+inline Quad QuadSetX(QuadPF q, float val);
+inline Quad QuadSetY(QuadPF q, float val);
+inline Quad QuadSetZ(QuadPF q, float val);
+inline Quad QuadSetW(QuadPF q, float val);
 
 }
 

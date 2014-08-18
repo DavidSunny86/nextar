@@ -58,6 +58,7 @@ void GBuffer::Setup(Size dimensions) {
 /* DeferredRenderSystem                                                 */
 /************************************************************************/
 DeferredRenderSystem::DeferredRenderSystem() {
+	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_INIT_RESOURCES, CreateMaterials, this);
 	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyBuffers, this);
 }
 
@@ -72,9 +73,18 @@ void DeferredRenderSystem::PrepareGeometryBuffer() {
 	gbufferRI.clearFlags = ClearFlags::CLEAR_ALL;
 }
 
+void DeferredRenderSystem::PrepareMaterials() {
+	if (!lightMaterial) {
+		URL lightMaterialPath(FileSystem::ArchiveEngineData, "Materials/DeferredLights.asset");
+		lightMaterial = Asset::AsyncLoad(lightMaterialPath);
+	}
+}
+
 void DeferredRenderSystem::Commit(CommitContext& context) {
 	if (gbufferDimension.combined != context.targetDimension.combined) {
+		PrepareMaterials();
 		gbuffer.Setup(context.targetDimension);
+		PrepareGeometryBuffer();
 		gbufferDimension = context.targetDimension;
 	}
 	/* geometry pass */
@@ -112,6 +122,7 @@ void DeferredRenderSystem::Commit(CommitContext& context) {
 		}
 	}
 	context.renderContext->EndRender();
+	context.primitive = nullptr;
 	/* light pass */
 	LightSystem* lightSys = context.lightSystem;
 	LightList& ls = lightSys->GetLights();
@@ -140,7 +151,12 @@ void DeferredRenderSystem::Commit(CommitContext& context) {
 void DeferredRenderSystem::RenderLight(Light* light, uint32 passIdx, uint32 updateId, CommitContext& context) {
 	VisiblePrimitive* lightVol = light->GetLightVolume();
 	MaterialAsset* material = lightVol->GetMaterial();
+	if (material)
+		passIdx = 0;
+	else if (!(material = lightMaterial))
+		return;
 	ShaderAsset* shader = material->GetShader();
+	context.light = light;
 	if (context.shader != shader) {
 		context.shader = shader;
 		// deferred pass at 0
@@ -162,12 +178,21 @@ void DeferredRenderSystem::RenderLight(Light* light, uint32 passIdx, uint32 upda
 	context.paramBuffers[(uint32)ParameterContext::CTX_OBJECT] = lightVol->GetParameters();
 	context.pass->UpdateParams(context, ParameterContext::CTX_OBJECT, updateId);
 	context.renderContext->Draw(lightVol->GetStreamData(), context);
+	context.light = nullptr;
+	context.primitive = nullptr;
 }
 
 void DeferredRenderSystem::DestroyBuffers(void* renderSystem) {
 	DeferredRenderSystem* pRenderSys = reinterpret_cast<DeferredRenderSystem*>(renderSystem);
 	if (pRenderSys)
 		pRenderSys->DestroyBuffer();
+}
+
+
+void DeferredRenderSystem::CreateMaterials(void* renderSystem) {
+	DeferredRenderSystem* pRenderSys = reinterpret_cast<DeferredRenderSystem*>(renderSystem);
+	if (pRenderSys)
+		pRenderSys->PrepareMaterials();
 }
 
 } /* namespace nextar */

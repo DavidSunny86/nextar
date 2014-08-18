@@ -40,6 +40,7 @@ public:
 	virtual void Commit(CommitContext& context);
 
 	static void DestroyBuffers(void* renderSystem);
+	static void CreateMaterials(void* renderSystem);
 
 	inline void DestroyBuffer() {
 		gbufferRI.rt = nullptr;
@@ -47,10 +48,13 @@ public:
 	}
 
 protected:
-
+		
 	void RenderLight(Light* light, uint32 passIdx, uint32 updateId, CommitContext& context);
 	void PrepareGeometryBuffer();
-
+	void PrepareMaterials();
+		
+	MaterialAssetPtr lightMaterial;
+	
 	RenderInfo gbufferRI;
 	Size gbufferDimension;
 	GBuffer gbuffer;

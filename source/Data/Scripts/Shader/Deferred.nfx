@@ -10,7 +10,7 @@ in vec3 vertNorm;
 	in vec2 vertDiffuseUV;
 #endif
 
-uniform per_object_transforms {
+uniform ObjectTransforms {
 	mat4 matMvp;
 	mat4 matMv; // assumed orthogonal
 };

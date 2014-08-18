@@ -18,6 +18,7 @@ BaseRenderManager::~BaseRenderManager() {
 void BaseRenderManager::Configure(const Config&) {
 	// @todo
 	CreateRenderQueues();
+	RegisterAutoParams();
 }
 
 ContextID BaseRenderManager::RequestObjectCreate(ContextObject::Type type, uint32 hint) {

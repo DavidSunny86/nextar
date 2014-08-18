@@ -80,17 +80,40 @@ inline float QuadGetW(QuadPF q) {
 	return q.w;
 }
 
+inline Quad QuadSetX(QuadPF q, float val) {
+	return Quad(val, q.y, q.z, q.w);
+}
+
+inline Quad QuadSetY(QuadPF q, float val) {
+	return Quad(q.x, val, q.z, q.w);
+}
+
+inline Quad QuadSetZ(QuadPF q, float val) {
+	return Quad(q.x, q.y, val, q.w);
+}
+
+inline Quad QuadSetW(QuadPF q, float val) {
+	return Quad(q.x, q.y, q.z, val);
+}
+
 /** definitions come here */
 #define Vec4AGetX		QuadGetX
 #define Vec4AGetY		QuadGetY
 #define Vec4AGetZ		QuadGetZ
 #define Vec4AGetW		QuadGetW
+#define Vec4ASetX		QuadSetX
+#define Vec4ASetY		QuadSetY
+#define Vec4ASetZ		QuadSetZ
+#define Vec4ASetW		QuadSetW
 /**
  * @remarks Vec3 functions
  **/
 #define Vec3AGetX		QuadGetX
 #define Vec3AGetY		QuadGetY
 #define Vec3AGetZ		QuadGetZ
+#define Vec3ASetX		QuadSetX
+#define Vec3ASetY		QuadSetY
+#define Vec3ASetZ		QuadSetZ
 #define Vec3AMulMat4x4  Mat4x4TransVec3A
 
 #define PlaneNormalize		Vec3ANormalize

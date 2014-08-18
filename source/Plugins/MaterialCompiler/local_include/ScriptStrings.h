@@ -5,15 +5,19 @@
  *      Author: obhi
  */
 
-#ifndef MATERIALSCRIPTSTRINGS_H_
-#define MATERIALSCRIPTSTRINGS_H_
+#ifdef SCRIPT_STRING
+#	undef SCRIPT_STRING
+#endif
 
 #if defined(NEX_MATERIAL_STRINGS_DEFINE)
 #define SCRIPT_STRING(str, what)	const char* SCRIPT_##str=what
 #else
 #define SCRIPT_STRING(str, what)	extern const char* SCRIPT_##str
 #endif
-#define _SS(str) SCRIPT_##str
+
+#ifndef _SS
+#	define _SS(str) SCRIPT_##str
+#endif
 
 namespace MaterialCompiler {
 
@@ -27,5 +31,3 @@ SCRIPT_STRING(ARG_HIGHEST, "highest");
 SCRIPT_STRING(ARG_LOWEST, "lowest");
 
 }
-
-#endif /* MATERIALSCRIPTSTRINGS_H_ */

@@ -71,8 +71,7 @@ bool recursive) {
 		if (pattern.length()
 				&& StringUtils::PatternMatch(filename, pattern.c_str())) {
 			//! full path not valid
-			attr.fileName = URL(CompressedArchive::TYPE, GetName(),
-					String(filename));
+			attr.fileName = URL(GetName(), String(filename));
 			attr.flags = FileAttribute::ATTRIB_COMPRESSED;
 			attr.uncompressedSize = zip::GetFileSizeUncomp(filelist[j]);
 			attr.compressedSize = zip::GetFileSizeComp(filelist[j]);
@@ -98,7 +97,7 @@ bool CompressedArchive::GetAttribute(const String& fileName,
 
 	if (!file)
 		return false;
-	attr.fileName = URL(CompressedArchive::TYPE, GetName(), fileName);
+	attr.fileName = URL(GetName(), fileName);
 	attr.flags = FileAttribute::ATTRIB_COMPRESSED;
 	attr.uncompressedSize = zip::GetFileSizeUncomp(file);
 	attr.compressedSize = zip::GetFileSizeComp(file);

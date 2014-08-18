@@ -4,10 +4,13 @@
  *  Created on: 22-Sep-2013
  *      Author: obhi
  */
-#define NEX_SHADER_STRINGS_DEFINE
+
 #include <BaseHeaders.h>
 #include <CommonTypes.h>
+
+#define NEX_SHADER_STRINGS_DEFINE
 #include <ScriptStrings.h>
+#undef NEX_SHADER_STRINGS_DEFINE
 
 namespace ShaderCompiler {
 
@@ -263,12 +266,12 @@ TextureAddressMode Helper::GetTextureAddressMode(const String& val) {
 
 uint32 Helper::GetShaderFlag(const String& val) {
 	static EnumNamePair names[] = {
-			{ ShaderAsset::BACKGROUND, _SS(ARG_BACKGROUND) },
-			{ ShaderAsset::BASIC_DEFERRED, _SS(ARG_BASIC_DEFERRED) },
-			{ ShaderAsset::DEFERRED_LIGHTING, _SS(ARG_DEFERRED_LIGHTING) },
-			{ ShaderAsset::OVERLAY, _SS(ARG_OVERLAY) },
-			{ ShaderAsset::POST_FX, _SS(ARG_POST_FX) },
-			{ ShaderAsset::TRANSLUCENT, _SS(ARG_TRANSLUCENT) },
+			{ RenderQueueFlags::BACKGROUND, _SS(ARG_BACKGROUND) },
+			{ RenderQueueFlags::DEFERRED, _SS(ARG_BASIC_DEFERRED) },
+			{ RenderQueueFlags::DEFERRED_LIGHTING, _SS(ARG_DEFERRED_LIGHTING) },
+			{ RenderQueueFlags::OVERLAY, _SS(ARG_OVERLAY) },
+			{ RenderQueueFlags::POST_FX, _SS(ARG_POST_FX) },
+			{ RenderQueueFlags::TRANSLUCENCY, _SS(ARG_TRANSLUCENT) },
 	};
 
 	const size_t array_size = sizeof(names) / sizeof(names[0]);
@@ -281,4 +284,3 @@ uint32 Helper::GetShaderFlag(const String& val) {
 }
 
 }
-

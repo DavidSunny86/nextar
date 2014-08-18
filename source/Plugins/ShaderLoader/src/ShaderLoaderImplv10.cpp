@@ -30,6 +30,7 @@ struct ShaderHeader {
 	VersionID version;
 	uint16 numUnits;
 	uint8 numPasses;
+	uint32 renderFlags;
 };
 
 ShaderLoaderImplv1_0::ShaderLoaderImplv1_0() : language(RenderManager::SPP_UNKNOWN) {
@@ -216,11 +217,12 @@ void ShaderLoaderImplv1_0::Load(InputStreamPtr& stream,
 			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
 		}
 
-		ser >> header.numPasses >> header.numUnits;
+		ser >> header.numPasses >> header.numUnits >> header.renderFlags;
 	} else {
 		Error("Shader does not have a valid header: " + request->GetName());
 		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
 	}
+	request->SetRenderQueueFlags(header.renderFlags);
 
 	bool foundUnit = false;
 	StringID name;

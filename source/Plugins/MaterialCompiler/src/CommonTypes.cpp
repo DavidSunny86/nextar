@@ -4,10 +4,13 @@
  *  Created on: 26-Jul-2014
  *      Author: obhi
  */
-#define NEX_SHADER_STRINGS_DEFINE
+
 #include <BaseHeaders.h>
 #include <CommonTypes.h>
+
+#define NEX_MATERIAL_STRINGS_DEFINE
 #include <ScriptStrings.h>
+#undef NEX_MATERIAL_STRINGS_DEFINE
 
 namespace MaterialCompiler {
 
@@ -21,4 +24,5 @@ CommandDelegate* Helper::FindCommand(CommandNamePair cmdMap[], size_t arraySize,
 }
 
 }
+
 
