@@ -1,0 +1,21 @@
+add_framework(Core 
+				Base 
+				Engine 
+				RenderEngine
+			)
+add_framework(Plugins 
+				ImageLoader
+				MaterialLoader
+				MeshLoader
+				RenderOpenGL
+				ShaderLoader
+			)
+add_framework(UnitTests 
+				Base
+				Engine
+				RenderEngine
+			)
+add_framework(Data 
+				All
+			)
+#add_framework(Utility All)

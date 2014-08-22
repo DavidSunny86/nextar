@@ -1,0 +1,5 @@
+add_framework(Core All)
+add_framework(Plugins All)
+add_framework(UnitTests All)
+add_framework(Data All)
+#add_framework(Utility All)

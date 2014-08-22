@@ -13,7 +13,7 @@ public:
 		MaterialTemplatePtr material;
 		ShaderTemplatePtr shader;
 
-		/*MaterialTemplate::ID id(NamedObject::AsyncStringID("Box"));
+		MaterialTemplate::ID id(NamedObject::AsyncStringID("Box"));
 		URL loadUrl("{EngineData}/Scripts/Material/DefaultMaterials.mtl");
 		URL saveUrl("{EngineData}/Materials/Box.mtl");
 		URL saveShaderUrl("{EngineData}/Shaders/Deferred.nfx");
@@ -23,7 +23,7 @@ public:
 		shader = material->GetShaderTemplate();
 		shader->SetAssetLocator(saveShaderUrl);
 		shader->Save(false);
-		material->Save(false);*/
+		material->Save(false);
 
 		// save engine lights
 		

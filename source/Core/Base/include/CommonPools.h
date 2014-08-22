@@ -24,6 +24,14 @@ public:
 			pool(sizeof(ObjectType)) {
 	}
 	~PooledAllocator() {
+#ifdef NEX_DEBUG
+		std::ostringstream info;
+		info << "\n*********************************************"
+			 << "\n  Pool Allocator: "
+			 << typeid(T).name()
+			 << "\n*********************************************";
+		Platform::OutputDebug(info.str().c_str());
+#endif
 	}
 
 	/* generic */

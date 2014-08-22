@@ -380,7 +380,8 @@ endmacro(config_src)
 #============================================================
 macro(add_framework frameWorkName)
     set(NEXTAR_FRAMEWORK ${ARGV0})
-    add_subdirectory(${ARGV0})
+	set(NEXTAR_PACKAGE_LIST "${ARGN}")
+    add_subdirectory("${NEX_ROOT}/${ARGV0}")
 endmacro(add_framework)
 
 #============================================================
@@ -388,12 +389,17 @@ endmacro(add_framework)
 #============================================================
 macro(add_module moduleName)
 	set(NEXTAR_MODULE ${ARGV0})
-	if(EXISTS "${NEX_ROOT}/${NEXTAR_FRAMEWORK}/${NEXTAR_MODULE}")
-		set(NEXTAR_MODULE_PATH ${NEXTAR_MODULE})
-		add_subdirectory(${NEXTAR_MODULE})
-	elseif(EXISTS "${NEX_ROOT}/${NEXTAR_FRAMEWORK}/${NEXTAR_MODULE}.tst")
-		set(NEXTAR_MODULE_PATH ${NEXTAR_MODULE}.tst)
-		add_subdirectory(${NEXTAR_MODULE_PATH})
+	list(FIND NEXTAR_PACKAGE_LIST ${NEXTAR_MODULE} NEX_MODULE_ADDED)
+	if ( (";${NEXTAR_PACKAGE_LIST};" MATCHES ";${NEXTAR_MODULE};") OR
+		 (";${NEXTAR_PACKAGE_LIST};" MATCHES ";All;") OR
+		 NOT(NEXTAR_PACKAGE_LIST) )	 
+		if(EXISTS "${NEX_ROOT}/${NEXTAR_FRAMEWORK}/${NEXTAR_MODULE}")
+			set(NEXTAR_MODULE_PATH ${NEXTAR_MODULE})
+			add_subdirectory(${NEXTAR_MODULE})
+		elseif(EXISTS "${NEX_ROOT}/${NEXTAR_FRAMEWORK}/${NEXTAR_MODULE}.tst")
+			set(NEXTAR_MODULE_PATH ${NEXTAR_MODULE}.tst)
+			add_subdirectory(${NEXTAR_MODULE_PATH})
+		endif()
 	endif()
 endmacro(add_module)
 
@@ -506,10 +512,19 @@ macro(create_plugin pluginName pluginPath type build optional)
 	set(NEX_INSTALL_PLUGIN OFF)
 endmacro(create_plugin)
 
+## Build Options:
+#============================================================
+set(NEX_PACKAGE_TYPE "All" CACHE STRING "Package configuration.")
 ## Build targets
 #============================================================
-add_framework(Core)
-add_framework(Plugins)
-add_framework(UnitTests)
-add_framework(Data)
-#add_framework(Utility)
+file(GLOB NEX_AVAILABLE_PACKAGES "${NEX_ROOT}/CMake/Scripts/BuildConfig_*.txt")
+set(NEX_PACKAGE_LIST "")
+foreach(FileName ${NEX_AVAILABLE_PACKAGES}) 
+	string(REGEX MATCH "_([^.]*)[.]+" PackageName ${FileName})
+	list(APPEND NEX_PACKAGE_LIST "${CMAKE_MATCH_1}")
+endforeach()
+set_property(CACHE NEX_PACKAGE_TYPE PROPERTY STRINGS ${NEX_PACKAGE_LIST})
+
+## Build Include
+include(${NEX_ROOT}/CMake/Scripts/BuildConfig_${NEX_PACKAGE_TYPE}.txt)
+
