@@ -81,7 +81,7 @@ public:
 
 	// load a shader
 	virtual uint32 GetClassID() const;
-
+	virtual uint32 GetProxyID() const;
 protected:
 
 	class MaterialFromTemplate : public AssetLoaderImpl {

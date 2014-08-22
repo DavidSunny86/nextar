@@ -191,8 +191,8 @@ uint32 RenderContextGL::ReadProgramSemantics(GLuint program,
 		// if no match is found, we have a problem
 		SemanticDef semantic = VertexSemantic::MapSemantic(attribName);
 		if (semantic.semantic >= COMP_RESERVED_COUNT) {
-			Warn("Unmatched input semantic.");
-			return 0;
+			Warn(String("Unmatched input semantic: ") + attribName);
+			continue;
 		}
 		attribLoc = GlGetAttribLocation(program, attribName);
 		/* We do not think about output formats now */
@@ -480,33 +480,51 @@ void RenderContextGL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 		const Pass::TextureDescMap& texMap) {
 	/** todo Massive work left for sampler arrays */
 	GLint numUni = 0;
+	uint32 numSamplers = 0;
 	char name[128];
 	size_t extra = 0;
 	GlGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numUni);
+
+	for (GLuint i = 0; i < (GLuint)numUni; ++i) {
+		GLint type;
+		GlGetActiveUniformsiv(program, 1, &i, GL_UNIFORM_TYPE, &type);
+		if (IsSamplerType(type)) {
+			numSamplers++;
+		}
+	}
+
+	if (!numSamplers) {
+		pass->samplers = nullptr;
+		pass->numSamplerCount = 0;
+		return;
+	}
+
 	GL_CHECK();
 	// assume all are samplers, otherwise we got a problem
-	SamplerState* samplers = NEX_NEW(SamplerState[numUni]);
+	SamplerState* samplers = NEX_NEW(SamplerState[numSamplers]);
 	uint32 mapped = 0;
 	uint32 startParamIndex = -1;
 	if (paramTable) {
 		startParamIndex = paramTable->size();
 		paramTable->reserve(numUni + startParamIndex);
 	}
+	GlUseProgram(program);
 	for (GLuint i = 0; i < (GLuint) numUni; ++i) {
 
-		GlGetActiveUniformName(program, i, 128, 0, name);
-		GL_CHECK();
-		
-		GLint loc = GlGetUniformLocation(program, name);
-		GL_CHECK();
-
-		String unitName = name;
 		GLint type;
-
 		GlGetActiveUniformsiv(program, 1, &i, GL_UNIFORM_TYPE, &type);
 		GL_CHECK();
 
 		if (IsSamplerType(type)) {
+
+			GlGetActiveUniformName(program, i, 128, 0, name);
+			GL_CHECK();
+
+			GLint loc = GlGetUniformLocation(program, name);
+			GL_CHECK();
+
+			String unitName = name;
+
 			SamplerState& ss = samplers[mapped];
 			ss.index = mapped++;
 			ss.arrayCount = 1;
@@ -537,7 +555,7 @@ void RenderContextGL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 			ss.size = sizeof(TextureUnit);
 			// todo Should be a view
 			ss.defaultTexture.texture = tu->defaultTexture;
-			if (paramTable) {
+			if (paramTable && !paramDef) {
 				ParamEntry pe;
 				pe.arrayCount = 1;
 				pe.autoName = ss.autoName;
@@ -573,7 +591,7 @@ void RenderContextGL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 						GetGlAddressMode(params.wAddress));
 				GL_CHECK();
 			}
-			if (params.comparisonFunc) {
+			if (params.comparisonFunc != TEXCOMP_NONE) {
 				GlSamplerParameteri(ss.sampler, GL_TEXTURE_COMPARE_FUNC,
 						GetGlCompareFunc(params.comparisonFunc));
 				GL_CHECK();
@@ -599,8 +617,11 @@ void RenderContextGL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 			GL_CHECK();
 			// Bind the sampler variable to sampler index
 			GlUniform1i(ss.location, ss.index);
+			GL_CHECK();
 		}
 	}
+	if (mapped != numSamplers)
+		Warn("Not all samplers were mapped!");
 	pass->samplers = samplers;
 	pass->numSamplerCount = mapped;
 	std::sort(samplers, samplers + mapped,
@@ -608,6 +629,7 @@ void RenderContextGL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 				return s1.autoName == s2.autoName ? s1.index < s2.index :
 				(s1.autoName < s2.autoName);
 			});
+	GlUseProgram(0);
 }
 
 void RenderContextGL::Capture(PixelBox& image, RenderTarget* rt, GLuint *pbo,
@@ -1031,6 +1053,7 @@ GLint RenderContextGL::GetGlAddressMode(TextureAddressMode t) {
 
 GLenum RenderContextGL::GetGlCompareFunc(TextureComparisonMode type) {
 	switch (type) {
+	case TEXCOMP_NONE:
 	case TEXCOMP_NEVER:
 		return GL_NEVER;
 	case TEXCOMP_LESS:

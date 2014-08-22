@@ -43,13 +43,13 @@ uniform per_material_properties {
 };
 
 #ifdef USE_DIFFUSE_SAMPLER
-	sampler2D diffuseMap;
-	smooth in vec2 varyingUV;
+	uniform sampler2D diffuseMap;
+	smooth in vec2 texCoord0;
 #endif
 
 vec3 getDiffuseColor() {
 #ifdef USE_DIFFUSE_SAMPLER
-	return (texture(diffuseMap, varyingUV).rgb * diffuseAndGloss.rgb);
+	return (texture(diffuseMap, texCoord0).rgb * diffuseAndGloss.rgb);
 #else
 	return diffuseAndGloss.rgb;
 #endif

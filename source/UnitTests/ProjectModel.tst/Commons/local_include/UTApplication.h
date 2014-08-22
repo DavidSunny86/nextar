@@ -18,8 +18,10 @@ public:
 	virtual void BeginFrame(uint32 frameNumber);
 	virtual void EndFrame(uint32 timeElapsed);
 
+	static void SetupScene(void* callback);
 protected:
 
+	virtual void SetupScene();
 	virtual void _SetupScene(SceneAssetPtr&);
 	virtual void _SetupRenderDriver();
 	virtual SceneAssetPtr _CreateDefaultScene();

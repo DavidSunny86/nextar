@@ -10,27 +10,31 @@ class UTApplicationMesh: public UTApplication {
 public:
 	virtual void _SetupScene(SceneAssetPtr& scene) {
 		UTApplication::_SetupScene(scene);
+		MaterialTemplatePtr material;
+		ShaderTemplatePtr shader;
 
-		MaterialTemplate::ID id(NamedObject::AsyncStringID("Box"));
+		/*MaterialTemplate::ID id(NamedObject::AsyncStringID("Box"));
 		URL loadUrl("{EngineData}/Scripts/Material/DefaultMaterials.mtl");
 		URL saveUrl("{EngineData}/Materials/Box.mtl");
 		URL saveShaderUrl("{EngineData}/Shaders/Deferred.nfx");
-		MaterialTemplatePtr material = MaterialTemplate::Traits::Instance(id, loadUrl);
+		material = MaterialTemplate::Traits::Instance(id, loadUrl);
 		material->Load(false);
 		material->SetAssetLocator(saveUrl);
-		ShaderTemplatePtr shader = material->GetShaderTemplate();
-		shader->SetAssetLocator(saveShaderUrl);
-		shader->Save(false);
-		material->Save(false);
-
-		// save engine lights
-		URL dlMaterialUrl("{EngineData}/Scripts/Material/DeferredLights.mtl");
-		URL saveDlMaterialUrl("{EngineData}/Materials/DeferredLights.asset");
-		URL saveDlShaderUrl("{EngineData}/Shaders/DeferredLights.nfx");
-		material = MaterialTemplate::Traits::Instance(id, dlMaterialUrl);
-		material->Load(false);
 		shader = material->GetShaderTemplate();
 		shader->SetAssetLocator(saveShaderUrl);
+		shader->Save(false);
+		material->Save(false);*/
+
+		// save engine lights
+		
+		MaterialTemplate::ID id2(NamedObject::AsyncStringID("DeferredLights"));
+		URL dlMaterialUrl("{EngineData}/Scripts/Material/DeferredLights.mtl");
+		URL saveDlMaterialUrl("{EngineData}/Materials/DeferredLights.mtl");
+		URL saveDlShaderUrl("{EngineData}/Shaders/DeferredLights.nfx");
+		material = MaterialTemplate::Traits::Instance(id2, dlMaterialUrl);
+		material->Load(false);
+		shader = material->GetShaderTemplate();
+		shader->SetAssetLocator(saveDlShaderUrl);
 		shader->Save(false);
 		AssetPtr mtl = material;
 		Asset::AsyncSave(mtl, saveDlMaterialUrl);

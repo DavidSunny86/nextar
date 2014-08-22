@@ -60,15 +60,23 @@ void Asset::Load(StreamRequest* req, bool async) {
 			if (streamRequest->flags & StreamRequest::ASSET_STREAM_REQUEST)
 				_LoadDependencies(
 						static_cast<AssetStreamRequest*>(streamRequest));
-
+			// @todo Combine the flags set/unset
 			SetLoading(false);
-			SetLoaded(true);
-			NotifyAssetLoaded();
+			if (streamRequest->returnCode != StreamResult::STREAM_FAILED && 
+				streamRequest->returnCode != StreamResult::STREAM_TRY_AGAIN) {
+				SetLoaded(true);
+				streamRequest->returnCode = StreamResult::STREAM_SUCCESS;
+			}
 		} catch (GracefulErrorExcept& e) {
 			Debug(e.GetMsg());
+			// @todo Combine the flags set/unset
 			SetLoading(false);
 			SetLoaded(false);
+			SetLoadFailed(true);
+			streamRequest->flags |= StreamRequest::COMPLETED;
+			streamRequest->returnCode = StreamResult::STREAM_FAILED;
 		}
+		NotifyAssetLoaded();
 	}
 }
 
@@ -104,20 +112,30 @@ void Asset::Save(StreamRequest* req, bool async) {
 		try {
 			SaveImpl(streamRequest, false);
 			SetSaving(false);
-			NotifyAssetSaved();
+			if (streamRequest->returnCode != StreamResult::STREAM_FAILED &&
+				streamRequest->returnCode != StreamResult::STREAM_TRY_AGAIN) {
+				streamRequest->returnCode = StreamResult::STREAM_SUCCESS;
+			}
 		} catch (GracefulErrorExcept& e) {
 			Debug(e.GetMsg());
+			// @todo Combine the flags set/unset
 			SetSaving(false);
+			SetSaveFailed(true);
+			streamRequest->returnCode = StreamResult::STREAM_FAILED;
 		}
+		NotifyAssetSaved();
 	}
 }
 
 void Asset::NotifyAssetLoaded() {
-	if (NotifyAssetLoadedImpl()) {
+	if (!streamRequest || (streamRequest->returnCode == StreamResult::STREAM_SUCCESS)) {
+		if (NotifyAssetLoadedImpl()) {
+			streamRequest->flags |= StreamRequest::COMPLETED;
+			SetReady(true);
+		}
+	} else if (streamRequest->returnCode == StreamResult::STREAM_FAILED) {
 		streamRequest->flags |= StreamRequest::COMPLETED;
-		SetReady(true);
 	}
-
 	_FireCallbacksLoaded();
 	if (streamRequest) {
 		uint16 reqflags = streamRequest->flags;
@@ -137,9 +155,13 @@ void Asset::NotifyAssetUpdated() {
 }
 
 void Asset::NotifyAssetSaved() {
-	if (NotifyAssetSavedImpl()) {
+	if (!streamRequest || (streamRequest->returnCode == StreamResult::STREAM_SUCCESS)) {
+		if (NotifyAssetSavedImpl()) {
+			streamRequest->flags |= StreamRequest::COMPLETED;
+			SetReady(true);
+		}
+	} else if (streamRequest->returnCode == StreamResult::STREAM_FAILED) {
 		streamRequest->flags |= StreamRequest::COMPLETED;
-		SetReady(true);
 	}
 
 	_FireCallbacksSaved();
@@ -167,7 +189,7 @@ void Asset::AsyncLoad(StreamRequest* request) {
 		LoadImpl(request, true);
 	} catch (GracefulErrorExcept& e) {
 		Debug(e.GetMsg());
-		request->returnCode = (uint16) StreamResult::LOAD_FAILED;
+		request->returnCode = StreamResult::STREAM_FAILED;
 	}
 }
 
@@ -176,7 +198,7 @@ void Asset::AsyncSave(StreamRequest* request) {
 		SaveImpl(request, true);
 	} catch (GracefulErrorExcept& e) {
 		Debug(e.GetMsg());
-		request->returnCode = (uint16) StreamResult::SAVE_FAILED;
+		request->returnCode = StreamResult::STREAM_FAILED;
 	}
 }
 
@@ -228,41 +250,52 @@ void Asset::_LoadDependencies(AssetStreamRequest* req) {
 	AssetSet& s = req->GetMetaInfo().GetDependencies();
 	for (auto a : s) {
 		a->Load(false);
+		if (a->HasLoadFailed()) {
+			req->returnCode = StreamResult::STREAM_FAILED;
+			return;
+		}
 	}
 }
 
-AssetPtr Asset::AsyncLoad(const URL& input) {
+AssetPtr Asset::AsyncLoad(const URL& input, const String& streamer) {
 	InputStreamPtr inputStream = FileSystem::Instance().OpenRead(input);
 	if (inputStream)
-		return AsyncLoad(inputStream);
+		return AsyncLoad(inputStream, streamer.length() ? streamer : input.GetExtension());
 	return AssetPtr();
 }
 
-AssetPtr Asset::AsyncLoad(InputStreamPtr& input) {
+AssetPtr Asset::AsyncLoad(InputStreamPtr& input, const String& streamer) {
 	ChunkInputStream ser(input);
 	InputSerializer::Chunk c = InputSerializer::Invalid;
 
 	ser.ReadChunk(ASSET_HEADER, c);
 	if (InputSerializer::IsValid(c)) {
 		uint32 classId;
-		StringID name, factory, group;
-		ser >> classId >> name >> factory >> group;
+		Asset::ID id;
+		ser >> classId >> id;
 		SharedComponentPtr oInst;
 		Group* groupPtr = nullptr;
-		if (group != StringUtils::NullID)
+		if (id.group != StringUtils::NullID)
 			groupPtr = ComponentGroupArchive::Instance().AsyncFindOrCreate(
-			group);
-		SharedComponent::Instance(oInst, classId, name, factory, groupPtr);
+			id.group);
+		SharedComponent::Instance(oInst, classId, id.name, id.factory, groupPtr);
 		if (oInst) {
 			ser.Skip(c);
 			AssetPtr asset = oInst;
-			AssetStreamRequest* req = static_cast<AssetStreamRequest*>(asset->GetStreamRequest());
-			if (req) {
-				req->flags |= StreamRequest::AUTO_DELETE_REQUEST;
-				req->SetInputStream(input);
+			if (!asset->IsLoaded() && !asset->IsLoading()) {
+				AssetStreamRequest* req = static_cast<AssetStreamRequest*>(asset->GetStreamRequest());
+				if (req) {
+					String streamerImpl = streamer;
+					StringUtils::ToUpper(streamerImpl);
+					AssetLoaderImpl* impl = AssetLoader::GetImpl(streamerImpl, classId);
+					req->flags |= StreamRequest::AUTO_DELETE_REQUEST;
+					req->SetInputStream(input);
+					req->SetManualLoader(impl);
+				}
+				// load synchronously
+				
+				asset->Load(req, false);
 			}
-			// load synchronously
-			asset->Load(req, false);
 			return asset;
 		}			
 	}
@@ -270,31 +303,36 @@ AssetPtr Asset::AsyncLoad(InputStreamPtr& input) {
 	return AssetPtr();
 }
 
-void Asset::AsyncSave(AssetPtr& asset, const URL& output) {
+void Asset::AsyncSave(AssetPtr& asset, const URL& output, const String& streamer) {
 	OutputStreamPtr stream = FileSystem::Instance().OpenWrite(output);
 	if (stream)
-		AsyncSave(asset,stream);
+		AsyncSave(asset, stream, streamer.length() ? streamer : output.GetExtension());
 }
 
-void Asset::AsyncSave(AssetPtr& asset, OutputStreamPtr& output) {
-
+void Asset::AsyncSave(AssetPtr& asset, OutputStreamPtr& output, const String& streamer) {
+	
 	{
 		ChunkOutputStream cser(output);
 		OutputSerializer& ser = cser.BeginChunk(ASSET_HEADER);
 		SharedComponent::ID id;
+		uint32 classId = asset->GetProxyID();
 		asset->GetID(id);
-		uint32 classId = asset->GetClassID();
 		ser << classId << id.name << id.factory << id.group;
 		cser.EndChunk();
 		// destroy the cser object for flushing
 	}
-
-	AssetStreamRequest* req = static_cast<AssetStreamRequest*>(asset->GetStreamRequest(false));
-	if (req) {
-		req->flags |= StreamRequest::AUTO_DELETE_REQUEST;
-		req->SetOutputStream(output);
+	if (!asset->IsSaving()) {
+		AssetStreamRequest* req = static_cast<AssetStreamRequest*>(asset->GetStreamRequest(false));
+		if (req) {
+			String streamerImpl = streamer;
+			StringUtils::ToUpper(streamerImpl);
+			AssetSaverImpl* impl = AssetSaver::GetImpl(streamerImpl, asset->GetClassID());
+			req->SetManualSaver(impl);
+			req->flags |= StreamRequest::AUTO_DELETE_REQUEST;
+			req->SetOutputStream(output);
+		}
+		asset->Save(req, false);
 	}
-	asset->Save(req, false);
 }
 
 /*********************************
@@ -329,13 +367,6 @@ void AssetLoader::Serialize() {
 
 	if (!input && location != URL::Invalid) {
 		input = FileSystem::Instance().OpenRead(location);
-	}
-
-	if (!input) {
-		Error(
-			String("Could not open asset file: ")
-			+ request->GetName());
-		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOCATE_ASSET);
 	}
 
 	impl->Load(input, *this);
@@ -374,13 +405,6 @@ void AssetSaver::Serialize() {
 
 	if (!output && location != URL::Invalid) {
 		output = FileSystem::Instance().OpenWrite(location);
-	}
-
-	if (!output) {
-		Error(
-			String("Could not write to asset file: ")
-			+ assetPtr->GetAssetLocator().ToString());
-		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOCATE_ASSET);
 	}
 
 	impl->Save(output, *this);

@@ -41,6 +41,7 @@ InputSerializer& InputSerializer::operator >>(String& object) {
 	if (stringMarker == MARKER_STRING_UTF8) {
 		uint32 length;
 		(*this) >> length;
+		object.clear();
 		object.reserve(length);
 		while (length > 0) {
 			if (!left)

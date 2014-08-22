@@ -24,16 +24,19 @@ MaterialTemplate::~MaterialTemplate() {
 bool MaterialTemplate::NotifyAssetLoadedImpl() {
 	if(!shader) {
 		Error("Shader failed to load");
-		return false;
+		// request is complete
+		return true;
 	}
 	ShaderAssetPtr shaderPtr =
 			shader->GetShaderUnit(compilationOptions);
 	material = MaterialAsset::Traits::Instance(assetId);
-	auto streamRequest = static_cast<AssetStreamRequest*>(
+	if (!material->IsLoaded()) {
+		auto streamRequest = static_cast<AssetStreamRequest*>(
 			material->GetStreamRequest(true));
-	MaterialFromTemplate loader(this, shaderPtr);
-	streamRequest->SetManualLoader(&loader);
-	material->Load(false);
+		MaterialFromTemplate loader(this, shaderPtr);
+		streamRequest->SetManualLoader(&loader);
+		material->Load(false);
+	}
 	return true;
 }
 
@@ -85,9 +88,13 @@ void MaterialTemplate::DestroyStreamRequestImpl(nextar::StreamRequest*& streamRe
 	}
 	streamRequest = nullptr;
 }
-// load a shader
+
 uint32 MaterialTemplate::GetClassID() const {
 	return CLASS_ID;
+}
+
+uint32 MaterialTemplate::GetProxyID() const {
+	return MaterialAsset::CLASS_ID;
 }
 
 /********************************************

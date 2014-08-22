@@ -141,7 +141,8 @@ void ShaderLoaderImplv1_0::ReadPass(ShaderAsset::StreamRequest* request,
 	ser >> numUnits;
 	for(uint32 i = 0; i < numUnits; ++i) {
 		TextureUnitParams params;
-		uint8 minFilter, magFilter, uAddress, vAddress, wAddress, comparisonFunc, context;
+		uint8 minFilter, magFilter, uAddress, vAddress, wAddress, comparisonFunc, context, unitType;
+		
 		bool defaultTexture;
 		ser >> unitName
 			>> minFilter
@@ -151,7 +152,7 @@ void ShaderLoaderImplv1_0::ReadPass(ShaderAsset::StreamRequest* request,
 			>> wAddress
 			>> comparisonFunc
 			>> context
-			>> params.unitType
+			>> unitType
 			>> params.flags
 			>> params.maxAnisotropy
 			>> params.lodBias
@@ -166,6 +167,7 @@ void ShaderLoaderImplv1_0::ReadPass(ShaderAsset::StreamRequest* request,
 		params.wAddress = (TextureAddressMode)wAddress;
 		params.comparisonFunc = (TextureComparisonMode)comparisonFunc;
 		params.context = (ParameterContext)context;
+		params.unitType = (TextureUnitType)unitType;
 		TextureAssetPtr texture;
 		if (defaultTexture) {
 			URL locator;

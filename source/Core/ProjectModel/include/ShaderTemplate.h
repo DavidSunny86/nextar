@@ -154,8 +154,9 @@ public:
 	inline uint32 GetRenderFlags() const {
 		return renderFlags;
 	}
-	// load a shader
+	
 	virtual uint32 GetClassID() const;
+	virtual uint32 GetProxyID() const;
 
 protected:
 

@@ -58,9 +58,11 @@ public:
 		BACKGROUND_STREAMED = Component::LAST_FLAG << 0,
 		ASSET_LOADING = Component::LAST_FLAG << 1,
 		ASSET_LOADED = Component::LAST_FLAG << 2,
-		ASSET_READY = Component::LAST_FLAG << 3,
-		ASSET_SAVING = Component::LAST_FLAG << 4,
-		LAST_FLAG = Component::LAST_FLAG << 5,
+		ASSET_LOAD_FAILED = Component::LAST_FLAG << 3,
+		ASSET_READY = Component::LAST_FLAG << 4,
+		ASSET_SAVING = Component::LAST_FLAG << 5,
+		ASSET_SAVE_FAILED = Component::LAST_FLAG << 6,
+		LAST_FLAG = Component::LAST_FLAG << 7,
 	};
 
 	struct AssetLocatorAccessor: public PropertyAccessor {
@@ -233,6 +235,22 @@ public:
 		return (flags & ASSET_SAVING) != 0;
 	}
 
+	inline bool HasLoadFailed() const {
+		return (flags & ASSET_LOAD_FAILED) != 0;
+	}
+
+	inline bool HasSaveFailed() const {
+		return (flags & ASSET_SAVE_FAILED) != 0;
+	}
+
+	inline void SetLoadFailed(bool b) {
+		SetFlag(ASSET_LOAD_FAILED, b);
+	}
+
+	inline void SetSaveFailed(bool b) {
+		SetFlag(ASSET_SAVE_FAILED, b);
+	}
+
 	// This should not be called from any thread other than main thread
 	inline void SetLoading(bool b) {
 		SetFlag(ASSET_LOADING, b);
@@ -321,12 +339,17 @@ public:
 											CreateStreamRequestImpl(loadOrSave));
 	}
 
+	/* proxy objects when saved will return the object type it is saving via this call */
+	virtual uint32 GetProxyID() const {
+		return GetClassID();
+	}
+		
 	// @remarks Used by the engine to initialize resources
-	static AssetPtr AsyncLoad(const URL& input);
-	static AssetPtr AsyncLoad(InputStreamPtr& input);
+	static AssetPtr AsyncLoad(const URL& input, const String& streamer = StringUtils::Null);
+	static AssetPtr AsyncLoad(InputStreamPtr& input, const String& streamer);
 	// @remarks Used by the engine to stream out resources
-	static void AsyncSave(AssetPtr& asset, const URL& output);
-	static void AsyncSave(AssetPtr& asset, OutputStreamPtr& output);
+	static void AsyncSave(AssetPtr& asset, const URL& output, const String& streamer = StringUtils::Null);
+	static void AsyncSave(AssetPtr& asset, OutputStreamPtr& output, const String& streamer);
 
 protected:
 	/* return true if the loading was completed */
@@ -405,11 +428,11 @@ public:
 		this->manualSaver = manualSaver;
 	}
 
-	inline void SetInputStream(const InputStreamPtr& inputSteam) {
+	inline void SetInputStream(const InputStreamPtr& inputStream) {
 		this->inputStream = inputStream;
 	}
 
-	inline void SetOutputStream(const OutputStreamPtr& inputSteam) {
+	inline void SetOutputStream(const OutputStreamPtr& outputStream) {
 		this->outputStream = outputStream;
 	}
 

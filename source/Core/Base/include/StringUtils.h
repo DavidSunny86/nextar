@@ -565,7 +565,7 @@ _NexBaseAPI String FormatName(const String& str);
 **/
 template <typename StringType>
 inline void ToLower(StringType& str) {
-	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+	std::transform(std::begin(str), std::end(str), std::begin(str), ::tolower);
 }
 
 /**
@@ -578,7 +578,7 @@ inline void ToLower(StringType& str) {
 **/
 template <typename StringType>
 void ToUpper(StringType& str) {
-	std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+	std::transform(std::begin(str), std::end(str), std::begin(str), ::toupper);
 }
 
 /** Seperates a string pair of the format Abc:efg into 'Abc' and 'efg' */

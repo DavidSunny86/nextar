@@ -23,9 +23,8 @@ UnitCmd UnitCmd::command;
 void TextureUnitStateCmd::Execute(int parentType, void* parentParam,
 		ScriptParser::StatementContext& ctx) {
 	if (parentType == CommandDelegate::PASS_BLOCK) {
-		ShaderTemplate::LoadStreamRequest* shader =
-				static_cast<ShaderTemplate::LoadStreamRequest*>(parentParam);
-		TextureUnitStateListener textureUnitState(shader);
+		ShaderScript* script = reinterpret_cast<ShaderScript*>(parentParam);
+		TextureUnitStateListener textureUnitState(script->GetRequest());
 		ctx.ParseBlock(&textureUnitState);
 	} else {
 		ctx.Error("TextureState block needs to be inside Shader declaration.");
@@ -48,7 +47,7 @@ void TextureUnitStateListener::EnterStatement(
 
 void UnitCmd::Execute(int parentType, void* state,
 		ScriptParser::StatementContext& ctx) {
-	NEX_ASSERT(parentType == CommandDelegate::DEPTH_STENCIL_BLOCK);
+	NEX_ASSERT(parentType == CommandDelegate::TEXTURE_STATE_BLOCK);
 	TextureUnitParams texUnitParams;
 	ShaderTemplate::LoadStreamRequest* shader =
 			(static_cast<ShaderTemplate::LoadStreamRequest*>(state));
@@ -76,10 +75,15 @@ void UnitCmd::Execute(int parentType, void* state,
 	it = StringUtils::NextWord(paramContext, value, it);
 	if (it != String::npos) {
 		texUnitParams.vAddress = Helper::GetTextureAddressMode(value);
+	} else {
+		texUnitParams.vAddress = texUnitParams.uAddress;
 	}
 	it = StringUtils::NextWord(paramContext, value, it);
 	if (it != String::npos) {
 		texUnitParams.wAddress = Helper::GetTextureAddressMode(value);
+	}
+	else {
+		texUnitParams.vAddress = texUnitParams.uAddress;
 	}
 	it = StringUtils::NextWord(paramContext, value, it);
 	if (it != String::npos) {

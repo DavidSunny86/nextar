@@ -45,6 +45,7 @@ public:
 	inline void DestroyBuffer() {
 		gbufferRI.rt = nullptr;
 		gbuffer.Destroy();
+		lightMaterial.Clear();
 	}
 
 protected:

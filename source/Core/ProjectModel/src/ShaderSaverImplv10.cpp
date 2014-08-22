@@ -82,6 +82,7 @@ void ShaderSaverImplv1_0::SavePass(const ShaderTemplate::PassUnit& pu,
 	uint32 numUnits = tuMap.size();
 	ser << numUnits;
 	for(auto& e : tuMap) {
+		bool defaultTexture = e.second.defaultTexture;
 		ser << e.first
 			<< (uint8)e.second.params.minFilter
 			<< (uint8)e.second.params.magFilter
@@ -90,19 +91,19 @@ void ShaderSaverImplv1_0::SavePass(const ShaderTemplate::PassUnit& pu,
 			<< (uint8)e.second.params.wAddress
 			<< (uint8)e.second.params.comparisonFunc
 			<< (uint8)e.second.params.context
-			<< e.second.params.unitType
+			<< (uint8)e.second.params.unitType
 			<< e.second.params.flags
 			<< e.second.params.maxAnisotropy
 			<< e.second.params.lodBias
 			<< e.second.params.minLod
 			<< e.second.params.maxLod
-			<< e.second.params.borderColor;
-		if (e.second.defaultTexture) {
+			<< e.second.params.borderColor
+			<< defaultTexture;
+		if (defaultTexture) {
 			TextureAsset::ID id;
 			e.second.defaultTexture->GetID(id);
-			ser << true << id << e.second.defaultTexturePath;
-		} else
-			ser << false;
+			ser << id << e.second.defaultTexturePath;
+		}
 	}
 
 	auto& srcMap = pu.sourceMap;

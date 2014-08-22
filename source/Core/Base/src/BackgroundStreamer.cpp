@@ -58,22 +58,28 @@ void BackgroundStreamerImpl::ExecutePoolRequests() {
 		if (!request)
 			return;
 		bool result = true;
-		try {
-			if (request->flags & StreamRequest::REQUEST_SAVE)
-				request->streamedObject->AsyncSave(request);
-			else
-				request->streamedObject->AsyncLoad(request);
-		} catch (GracefulErrorExcept& ge) {
-			result = false;
-			Warn(ge.GetMsg());
+		do {
+			try {
+				if (request->flags & StreamRequest::REQUEST_SAVE)
+					request->streamedObject->AsyncSave(request);
+				else
+					request->streamedObject->AsyncLoad(request);
+			}
+			catch (GracefulErrorExcept& ge) {
+				result = false;
+				Warn(ge.GetMsg());
+			}
+		} while (!result && request->returnCode == StreamResult::STREAM_TRY_AGAIN && (--request->tryCount) > 0);
+
+		if (!result) {
+			request->returnCode = StreamResult::STREAM_FAILED;
 		}
-		if (result) {
-			// add to loaded
-			AddResponse(request);
-			// this might result in a call to process responses
-			// even when there are none, but thats not an issue.
-			responseProcessed.clear(std::memory_order_relaxed);
-		}
+		// add to loaded
+		AddResponse(request);
+		// this might result in a call to process responses
+		// even when there are none, but thats not an issue.
+		responseProcessed.clear(std::memory_order_relaxed);
+		
 	}
 }
 

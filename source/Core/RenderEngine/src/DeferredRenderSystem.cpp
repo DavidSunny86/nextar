@@ -75,7 +75,7 @@ void DeferredRenderSystem::PrepareGeometryBuffer() {
 
 void DeferredRenderSystem::PrepareMaterials() {
 	if (!lightMaterial) {
-		URL lightMaterialPath(FileSystem::ArchiveEngineData, "Materials/DeferredLights.asset");
+		URL lightMaterialPath(FileSystem::ArchiveEngineData_Name, "Materials/DeferredLights.mtl");
 		lightMaterial = Asset::AsyncLoad(lightMaterialPath);
 	}
 }
@@ -137,6 +137,10 @@ void DeferredRenderSystem::Commit(CommitContext& context) {
 		Box2D box2(0.25, 0, 0.5f, 0.25f);
 		context.debugDisplay->Register(box2, Color::Red, gbuffer.albedoSpecular);
 	}
+
+	context.albedoAndGlossMap = gbuffer.albedoSpecular;
+	context.depthMap = gbuffer.depth;
+	context.normalMap = gbuffer.normalMap;
 
 	for(auto& lightPair : ls) {
 		auto light = lightPair.second;

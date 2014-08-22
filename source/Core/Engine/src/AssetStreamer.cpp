@@ -82,6 +82,12 @@ void AssetStreamer::NotifyLoaded(StreamRequest* request) {
 		// probably kill starvation, but two things need to be atomic in such a case (or may
 		// be one depending on memory ordering). The request pointer, and the atomic state.
 		for (auto it = dependencies.begin(); it != dependencies.end();) {
+			if ((*it)->HasLoadFailed()) {
+				dependencies.clear();
+				assetReq->returnCode = StreamResult::STREAM_FAILED;
+				_NotifyAssetLoaded(asset, assetReq);
+				break;
+			}
 			if ((*it)->IsLoaded())
 				dependencies.erase(it++);
 			else {
@@ -93,7 +99,7 @@ void AssetStreamer::NotifyLoaded(StreamRequest* request) {
 				NEX_ASSERT(dep->flags & StreamRequest::ASSET_STREAM_REQUEST);
 				AssetStreamRequest* asr = static_cast<AssetStreamRequest*>(dep);
 				asr->GetMetaInfo().AddDependent(assetReq);
-				if (!(*it)->IsLoading())
+				if (!(*it)->IsLoading() && !(*it)->HasLoadFailed())
 					RequestLoad((*it));
 				++it;
 			}
@@ -105,20 +111,27 @@ void AssetStreamer::_NotifyAssetLoaded(Asset* asset,
 		AssetStreamRequest* assetReq) {
 	Asset::MetaInfo& meta = assetReq->GetMetaInfo();
 	asset->SetLoading(false);
-	if (assetReq->returnCode == (uint16) StreamResult::LOAD_SUCCESS)
+	if (assetReq->returnCode == StreamResult::STREAM_SUCCESS) {
 		asset->SetLoaded(true);
+	} else {
+		asset->SetLoadFailed(true);
+		assetReq->flags |= StreamRequest::COMPLETED;
+	}
+	asset->NotifyAssetLoaded();
 	// do a quick swap for the dependent set, as the request might
 	// get deleted in notify, and request pointer is no more required.
 	AssetStreamRequestSet reqSet;
-	reqSet.swap(meta.GetDependents());
-	asset->NotifyAssetLoaded();
+	reqSet.swap(meta.GetDependents());	
 	_NotifyDependents(asset, reqSet);
 }
 
 void AssetStreamer::_NotifyAssetSaved(Asset* asset,
 		AssetStreamRequest* assetReq) {
-	if (assetReq->returnCode == (uint16) StreamResult::LOAD_SUCCESS)
-		asset->SetLoaded(false);
+	asset->SetSaving(false);
+	if (assetReq->returnCode != StreamResult::STREAM_SUCCESS) {
+		asset->SetSaveFailed(true);
+		assetReq->flags |= StreamRequest::COMPLETED;
+	}
 	asset->NotifyAssetSaved();
 }
 

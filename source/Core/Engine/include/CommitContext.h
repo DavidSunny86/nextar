@@ -37,6 +37,10 @@ public:
 	ParameterGroup* paramGroup;
 	void* groupDataPtr;
 		
+	TextureBase* albedoAndGlossMap;
+	TextureBase* depthMap;
+	TextureBase* normalMap;
+
 	Light* light; // for deferred
 	Pass::View* pass;
 	ShaderAsset* shader;

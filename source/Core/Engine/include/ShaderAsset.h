@@ -124,7 +124,7 @@ public:
 	}
 
 	virtual uint32 GetClassID() const override;
-
+	
 	// todo
 	static ParamDataType MapParamType(const String& typeName);
 

@@ -21,7 +21,10 @@ CommitContext::CommitContext() :
 	,material(nullptr)
 	,viewMatrix(nullptr)
 	,viewProjectionMatrix(nullptr)
-	,projectionMatrix(nullptr) {
+	,projectionMatrix(nullptr)
+	,albedoAndGlossMap(nullptr)
+	,depthMap(nullptr)
+	,normalMap(nullptr) {
 	invProjectionMatrix = NEX_NEW(Matrix4x4());
 }
 
@@ -41,6 +44,9 @@ void CommitContext::_Reset() {
 	primitive = nullptr;
 	material = nullptr;
 	light = nullptr;
+	albedoAndGlossMap = nullptr;
+	normalMap = nullptr;
+	depthMap = nullptr;
 }
 
 } /* namespace nextar */

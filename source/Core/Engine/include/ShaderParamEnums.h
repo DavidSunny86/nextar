@@ -91,6 +91,12 @@ enum class AutoParamName
 	AUTO_OBJECT_TRANSFORM,
 	// Omni Light properties
 	AUTO_OMNI_LIGHT_PROPERTIES,
+	// Depth map
+	AUTO_DEPTH_MAP,
+	// Normal map
+	AUTO_NORMAL_MAP,
+	// Albedo and gloss map
+	AUTO_ALBEDO_AND_GLOSS,
 	// Custom generic parameter, could be texture or constant
 	// accessed from property buffer.
 	AUTO_CUSTOM_CONSTANT,

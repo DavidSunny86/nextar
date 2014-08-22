@@ -51,6 +51,13 @@ enum TextureComparisonMode : uint8 {
 	TEXCOMP_NONE,
 };
 
+enum TextureUnitType : uint8 {
+	MESH_TEXTURE,
+	SHADOW_TEXTURE,
+	RENDER_TEXTURE,
+	SELECTIVE_TEXTURE
+};
+
 /* todo Incorporate unit type field specifying what kind of texture this
  * is going to use like:
  * a. Mesh Texture
@@ -66,13 +73,20 @@ struct TextureUnitParams {
 	TextureAddressMode wAddress;
 	TextureComparisonMode comparisonFunc;
 	ParameterContext context;
-	uint8 unitType;
+	TextureUnitType unitType;
 	uint16 flags;
 	uint32 maxAnisotropy;
 	float lodBias;
 	float minLod;
 	float maxLod;
 	Color borderColor;
+
+	TextureUnitParams() : minFilter(TextureMinFilter::TF_MIN_NEAREST),
+		magFilter(TextureMagFilter::TF_MAG_NEAREST), uAddress(TextureAddressMode::TAM_CLAMP),
+		vAddress(TextureAddressMode::TAM_CLAMP), wAddress(TextureAddressMode::TAM_CLAMP),
+		comparisonFunc(TextureComparisonMode::TEXCOMP_NONE), context(ParameterContext::CTX_UNKNOWN),
+		unitType(MESH_TEXTURE), flags(0), maxAnisotropy(0), lodBias(0), minLod(0), maxLod(1000) {
+	}
 };
 
 /* A texture unit that can be submitted to the

@@ -28,6 +28,7 @@ CommandNamePair PassListener::commands[] = {
 		{ _SS(CMD_DEPTH_STENCIL_STATE), &DepthStencilStateCmd::command },
 		{ _SS(CMD_PROGRAM), &ProgramCmd::command },
 		{ _SS(CMD_RASTER_STATE), &RasterStateCmd::command },
+		{ _SS(CMD_TEXTURE_STATE), &TextureUnitStateCmd::command },
 };
 
 const size_t PassListener::commandCount = sizeof(PassListener::commands)

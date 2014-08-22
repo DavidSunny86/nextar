@@ -8,6 +8,15 @@ UTApplication::UTApplication() :
 UTApplication::~UTApplication() {
 }
 
+void UTApplication::SetupScene(void* data) {
+	reinterpret_cast<UTApplication*>(data)->SetupScene();
+}
+
+void UTApplication::SetupScene() {
+	scene = _CreateDefaultScene();
+	_SetupScene(scene);
+}
+
 SceneAssetPtr UTApplication::_CreateDefaultScene() {
 	return SceneAsset::Traits::Instance(
 			NamedObject::AsyncStringID("UTScene"),
@@ -28,10 +37,9 @@ void UTApplication::_SetupScene(SceneAssetPtr& scene) {
 
 void UTApplication::ConfigureExtendedInterfacesImpl() {
 	EngineApplicationContext::ConfigureExtendedInterfacesImpl();
-	_SetupRenderDriver();
-	scene = _CreateDefaultScene();
-	_SetupScene(scene);
+	_SetupRenderDriver();	
 	RegisterListener(Listener(this, 0));
+	Subscribe(ApplicationContext::EVENT_INIT_RESOURCES, SetupScene, this);
 }
 
 void UTApplication::BeginFrame(uint32 frameNumber) {

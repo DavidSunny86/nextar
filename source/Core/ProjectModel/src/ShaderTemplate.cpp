@@ -31,6 +31,10 @@ uint32 ShaderTemplate::GetClassID() const {
 	return CLASS_ID;
 }
 
+uint32 ShaderTemplate::GetProxyID() const {
+	return ShaderAsset::CLASS_ID;
+}
+
 void ShaderTemplate::DestroyStreamRequestImpl(
 		nextar::StreamRequest*& streamRequest, bool load) {
 	
@@ -80,14 +84,15 @@ ShaderAssetPtr& ShaderTemplate::CreateShader(const String& hash,
 		const StringUtils::WordList& options) {
 	String uniqueName = GetName() + "#" + Convert::ToString((uint32)shaders.size(), ' ', std::ios::hex);
 	ShaderAssetPtr shaderObject = ShaderAsset::Traits::Instance(NamedObject::AsyncStringID(uniqueName), nullptr, GetGroup() );
-	// load and prepare the shader object
-	auto streamRequest = static_cast<AssetStreamRequest*>(
+	if (!shaderObject->IsLoaded()) {
+		// load and prepare the shader object
+		auto streamRequest = static_cast<AssetStreamRequest*>(
 			shaderObject->GetStreamRequest(true));
 
-	ShaderFromTemplate loader(this, options);
-	streamRequest->SetManualLoader(&loader);
-	shaderObject->Load(false);
-
+		ShaderFromTemplate loader(this, options);
+		streamRequest->SetManualLoader(&loader);
+		shaderObject->Load(false);
+	}
 	ShaderUnit &unit = shaders[hash];
 	unit.shaderObject = shaderObject;
 	unit.compilationOptions = options;

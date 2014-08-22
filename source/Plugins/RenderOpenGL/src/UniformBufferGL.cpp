@@ -16,6 +16,11 @@ UniformBufferGL::UniformBufferGL() :
 }
 
 UniformBufferGL::~UniformBufferGL() {
+	if (parameter) {
+		UniformGL* parameters = static_cast<UniformGL*>(parameter);
+		NEX_DELETE_ARRAY(parameters);
+	}
+		
 }
 
 void UniformBufferGL::Destroy(RenderContextGL* rc) {

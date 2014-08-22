@@ -13,13 +13,11 @@
 
 namespace nextar {
 
-enum class StreamResult {
-	LOAD_SUCCESS,
-	LOAD_TRY_AGAIN,
-	LOAD_FAILED,
-	SAVE_SUCCESS,
-	SAVE_TRY_AGAIN,
-	SAVE_FAILED,
+enum class StreamResult : uint8 {
+	STREAM_WAITING,
+	STREAM_SUCCESS,
+	STREAM_TRY_AGAIN,
+	STREAM_FAILED,
 };
 
 class Streamable;
@@ -66,7 +64,8 @@ public:
 	};
 
 	uint16 flags;
-	uint16 returnCode;
+	StreamResult returnCode;
+	int8 tryCount;
 	Streamable* streamedObject;
 	StreamHandler* streamHandler;
 
@@ -75,8 +74,8 @@ public:
 	}
 
 	StreamRequest(Streamable* streamed = 0, uint16 streamFlags = DEFAULT_FLAGS) :
-			streamedObject(streamed), flags(streamFlags), returnCode(0), streamHandler(
-					0) {
+		streamedObject(streamed), flags(streamFlags), returnCode(StreamResult::STREAM_WAITING), streamHandler(
+			0), tryCount(1) {
 	}
 
 };

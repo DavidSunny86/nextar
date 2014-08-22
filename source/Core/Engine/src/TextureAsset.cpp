@@ -70,7 +70,7 @@ void TextureAsset::LoadImpl(StreamRequest* request, bool isStreamed) {
 				GetAssetLocator());
 		if (!textureParams->inputStream) {
 			Warn("Texture not found: " + GetAssetLocator().ToString());
-			request->returnCode = -1; // todo Not found return code. unify return codes??
+			request->returnCode = StreamResult::STREAM_FAILED; // todo Not found return code. unify return codes??
 			return;
 		}
 	} else

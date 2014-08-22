@@ -36,7 +36,7 @@ public:
 		NEX_ASSERT(context.primitive);
 		const Matrix4x4* m = context.invProjectionMatrix;
 		const ConstantParameter* constParam =
-			reinterpret_cast<const ConstantParameter*>(param);
+			static_cast<const ConstantParameter*>(param);
 		context.paramGroup->SetRawBuffer(context.renderContext, *constParam, m);
 	}
 };
@@ -52,8 +52,44 @@ public:
 		params[1] = Vec4ASetW(context.light->GetTranslation(), 
 			context.light->GetRadius());
 		const ConstantParameter* constParam =
-			reinterpret_cast<const ConstantParameter*>(param);
+			static_cast<const ConstantParameter*>(param);
 		context.paramGroup->SetRawBuffer(context.renderContext, *constParam, params);
+	}
+};
+
+class AlbedoAndGlossMap : public AutoParamProcessor {
+public:
+	virtual void Apply(CommitContext& context, const ShaderParameter* param) {
+		TextureUnit tu;
+		tu.texture = context.albedoAndGlossMap;
+		const SamplerParameter* samplerParam =
+			static_cast<const SamplerParameter*>(param);
+		context.pass->SetTexture(context.renderContext, *samplerParam,
+			&tu);
+	}
+};
+
+class DepthMap : public AutoParamProcessor {
+public:
+	virtual void Apply(CommitContext& context, const ShaderParameter* param) {
+		TextureUnit tu;
+		tu.texture = context.depthMap;
+		const SamplerParameter* samplerParam =
+			static_cast<const SamplerParameter*>(param);
+		context.pass->SetTexture(context.renderContext, *samplerParam,
+			&tu);
+	}
+};
+
+class NormalMap : public AutoParamProcessor {
+public:
+	virtual void Apply(CommitContext& context, const ShaderParameter* param) {
+		TextureUnit tu;
+		tu.texture = context.normalMap;
+		const SamplerParameter* samplerParam =
+			static_cast<const SamplerParameter*>(param);
+		context.pass->SetTexture(context.renderContext, *samplerParam,
+			&tu);
 	}
 };
 
@@ -65,6 +101,12 @@ void BaseRenderManager::RegisterAutoParams() {
 		ParameterContext::CTX_VIEW, "Inverse projection matrix.");
 	MAKE_AUTO_PARAM(OmniLightProperties, "OMNILIGHTPROPERTIES", PDT_STRUCT, AutoParamName::AUTO_OMNI_LIGHT_PROPERTIES,
 		ParameterContext::CTX_OBJECT, "Omni light properties.");
+	MAKE_AUTO_PARAM(AlbedoAndGlossMap, "ALBEDOANDGLOSSMAP", PDT_TEXTURE, AutoParamName::AUTO_ALBEDO_AND_GLOSS,
+		ParameterContext::CTX_PASS, "GBuffer albedo and gloss.");
+	MAKE_AUTO_PARAM(NormalMap, "NORMALMAP", PDT_TEXTURE, AutoParamName::AUTO_NORMAL_MAP,
+		ParameterContext::CTX_PASS, "GBuffer normal map.");
+	MAKE_AUTO_PARAM(DepthMap, "DEPTHMAP", PDT_TEXTURE, AutoParamName::AUTO_DEPTH_MAP,
+		ParameterContext::CTX_PASS, "GBuffer depth map.");
 }
 
 }

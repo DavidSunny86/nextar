@@ -24,7 +24,10 @@ void MaterialSaverImplv1_0::Save(OutputStreamPtr& out, AssetSaver& saver) {
 			saver.GetRequestPtr()->GetStreamedObject());
 	MaterialAsset* asset = material->GetMaterial();
 	MaterialHeader header;
-
+	if (!asset->GetShader()) {
+		saver.GetRequestPtr()->returnCode = StreamResult::STREAM_FAILED;
+		return;
+	}
 	header.version = NEX_MAKE_VERSION(1, 0, 0);
 	header.layerMask = (uint8)material->GetLayer();
 	header.options = material->GetOptions();
