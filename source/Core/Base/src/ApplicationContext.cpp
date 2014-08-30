@@ -28,9 +28,31 @@ ApplicationContext::~ApplicationContext(void) {
 	NEX_DELETE(LogManager::InstancePtr());
 }
 
-void ApplicationContext::InitializeContext() {
+void ApplicationContext::ParseCommandLineParaqms(int argc, char* argv[]) {
+	NameValueMap appParams;
+	for (int i = 1; i < argc; ++i) {
+		String arg = argv[i];
+		if (arg[0] == '-') {
+			String value;
+			size_t pos = arg.find_first_of('=');
+			if (pos == String::npos) {
+				value = "true";
+				pos = arg.length();
+			} else {
+				value = arg.substr(pos+1);
+			}
+			appParams[arg.substr(1, pos - 1)] = value;
+
+		}
+	}
+
+	ParseCommandLine(appParams);
+}
+
+void ApplicationContext::InitializeContext(int argc, char* argv[]) {
 	Trace("Initializing application context: " + appName);
 	CreateServices();
+	ParseCommandLineParaqms(argc, argv);
 	LoadConfiguration();
 	// load sub-plugins
 	ConfigureServices();

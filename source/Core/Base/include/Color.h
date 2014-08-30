@@ -67,6 +67,10 @@ public:
 	red(r), green(g), blue(b), alpha(a) {
 	}
 
+	inline Color32(float a, float r, float g, float b) :
+		red((uint8)(r*255.f)), green((uint8)(g*255.f)), blue((uint8)(b*255.f)), alpha((uint8)(a*255.f)) {
+	}
+
 	inline
 	uint32 ToRgba() const {
 		return (red << 24) | (green << 16) | (blue << 8) | alpha;

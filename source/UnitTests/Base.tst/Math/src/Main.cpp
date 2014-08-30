@@ -143,7 +143,7 @@ void TestMathFunctions(nextar::ApplicationContext& application) {
 
 int NextarMain(int argc, char* argv[]) {
 	nextar::ApplicationContext application("FileSystem");
-	application.InitializeContext();
+	application.InitializeContext(argc, argv);
 	TestMathFunctions(application);
 	application.DestroyContext();
 	std::cin.get();

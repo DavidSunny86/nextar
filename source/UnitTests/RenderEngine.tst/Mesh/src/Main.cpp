@@ -38,7 +38,7 @@ public:
 
 int NextarMain(int argc, char* argv[]) {
 	UTApplicationMesh application;
-	application.InitializeContext();
+	application.InitializeContext(argc, argv);
 	application.Run();
 	application.DestroyContext();
 	return 0;

@@ -7,6 +7,7 @@
 
 class _NexBaseAPI Vector4 : public nextar::AllocGeneral {
 public:
+	static const Vector4 Origin;
 	float x, y, z, w;
 	//# construction and implicit conversions
 

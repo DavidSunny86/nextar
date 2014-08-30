@@ -15,6 +15,7 @@ const Vector3 Vector3::YAxis(0, 1, 0);
 const Vector3 Vector3::ZAxis(0, 0, 1);
 const Vector3 Vector3::Origin(0, 0, 0);
 const Vector2 Vector2::Origin(0, 0);
+const Vector4 Vector4::Origin(0, 0, 0, 0);
 _NexBaseAPI const Matrix4x4 Matrix4x4::IdentityMatrix(1, 0, 0, 0, 0, 1, 0, 0, 0,
 		0, 1, 0, 0, 0, 0, 1);
 

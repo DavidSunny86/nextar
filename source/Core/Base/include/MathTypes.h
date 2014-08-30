@@ -34,6 +34,7 @@ public:
 	typedef PooledAllocator<T, NumPerBlock, MEMCAT_MATH_CORE> Allocator;
 };
 
+
 /**
  * @remarks Non vectorized members. These can be used as members to classes
  *          without explicit allocation as opposed to the case of Core types.
@@ -94,10 +95,75 @@ public:
 
 #endif
 
+namespace Math {
+	template <typename T>
+	class Traits {
+	public:
+		static uint32 ElementCount() {
+			return 1;
+		}
+
+		static bool Equals(const T& v1, const T2& v2) {
+			return v1 - v2 == 0;
+		}
+	};
+
+	template <>
+	class Traits<float> {
+		static uint32 ElementCount() {
+			return 1;
+		}
+
+		static bool Equals(const float v1, const float v2) {
+			return (bool)(Math::Abs(v1 - v2) < Math::EPSILON_MED);
+		}
+	};
+
+	template <>
+	class Traits<Vector2> {
+		static uint32 ElementCount() {
+			return 2;
+		}
+
+		static bool Equals(const Vector2& v1, const Vector2& v2) {
+			return (bool)( (Math::Abs(v1.x - v2.x) < Math::EPSILON_MED) &&
+				(Math::Abs(v1.y - v2.y) < Math::EPSILON_MED) );
+		}
+	};
+
+	template <>
+	class Traits<Vector3> {
+		static uint32 ElementCount() {
+			return 3;
+		}
+
+		static bool Equals(const Vector3& v1, const Vector3& v2) {
+			return (bool)((Math::Abs(v1.x - v2.x) < Math::EPSILON_MED) &&
+				(Math::Abs(v1.y - v2.y) < Math::EPSILON_MED) &&
+				(Math::Abs(v1.z - v2.z) < Math::EPSILON_MED));
+		}
+	};
+
+	template <>
+	class Traits<Vector4> {
+		static uint32 ElementCount() {
+			return 4;
+		}
+
+		static bool Equals(const Vector3& v1, const Vector3& v2) {
+			return (bool)((Math::Abs(v1.x - v2.x) < Math::EPSILON_MED) &&
+				(Math::Abs(v1.y - v2.y) < Math::EPSILON_MED) &&
+				(Math::Abs(v1.z - v2.z) < Math::EPSILON_MED) &&
+				(Math::Abs(v1.w - v2.w) < Math::EPSILON_MED));
+		}
+	};
+}
 
 typedef std::array<int32, 2> IVector2;
 typedef std::array<int32, 3> IVector3;
 typedef std::array<int32, 4> IVector4;
+
+
 
 }
 

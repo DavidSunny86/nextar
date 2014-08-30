@@ -70,8 +70,9 @@ public:
 	}
 
 	void SetQuitting(bool value);
-
-	virtual void InitializeContext();
+	
+	void ParseCommandLineParaqms(int argc, char* argv[]);
+	virtual void InitializeContext(int argc, char* argv[]);
 	virtual void DestroyContext();
 	virtual void ReleaseResources();
 
@@ -99,6 +100,9 @@ protected:
 	}
 	virtual void ReleaseResourcesImpl() {
 	}
+	virtual void ParseCommandLine(const NameValueMap& params) {
+	}
+
 private:
 
 	NEX_THREAD_RECURSIVE_MUTEX(appLock);

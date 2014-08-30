@@ -15,7 +15,7 @@ namespace nextar {
 /**
  * @note Matrix Layout
  * @par OpenGl uses Coloumn Major while DirectX uses Row major,
- * but, while considering memory, OpenGL nad DirectX both use the
+ * but, while considering memory, OpenGL and DirectX both use the
  * same memory locations to store their matrices. 
  * @par Nextar uses the same thing. More specifically, it uses:
  * Row Major, Row Ordered matrices. So the 4 vectors are in 4 rows.

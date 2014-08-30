@@ -18,5 +18,6 @@ add_module(MaterialLoader)
 add_module(ShaderLoader)
 add_module(ShaderCompiler)
 add_module(MaterialCompiler)
+#add_module(FbxMeshImporter)
 
 file(APPEND ${NEX_PLUGIN_CONFIG_FILE} "</plugins>\n")

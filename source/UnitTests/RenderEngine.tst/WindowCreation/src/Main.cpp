@@ -17,7 +17,7 @@ void SetupDriver(RenderManager& renderManager) {
 
 int NextarMain(int argc, char* argv[]) {
 	UTApplication application;
-	application.InitializeContext();
+	application.InitializeContext(argc, argv);
 	RenderManager& renderManager = RenderManager::Instance();
 	SetupDriver(renderManager);
 	application.Run();
