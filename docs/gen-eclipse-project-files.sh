@@ -2,6 +2,7 @@ cur_dir=$(pwd)
 root_dir=${cur_dir}/..
 src_dir=${root_dir}/source
 build_dir=${root_dir}/build
+export FBX_DIR=~/fbx-sdk
 cd $root_dir
 rm -rf $build_dir 
 mkdir $build_dir

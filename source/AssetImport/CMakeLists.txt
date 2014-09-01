@@ -1,4 +1,4 @@
 
 #---
-add_module(FbxMeshImporter)
+add_module(FbxMeshImporterApp)
 

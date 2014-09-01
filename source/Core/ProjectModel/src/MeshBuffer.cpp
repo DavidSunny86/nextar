@@ -6,7 +6,8 @@ namespace nextar {
 
 
 MeshBuffer::MeshBuffer(PrimitiveType _type) :
-type(_type) {
+type(_type)
+,flags(0) {
 }
 
 void MeshBuffer::ReserveVertexSpace(uint32 numVertices) {
@@ -75,10 +76,36 @@ uint32 MeshBuffer::AddVertexChannel(
 		}
 		if (channel) {
 			channels.push_back(channel);
+			vertexSignature += "#";
+			vertexSignature += Convert::ToString((uint32)_semantic) + ":" + Convert::ToString((uint32)_semanticIdx);
 			return channels.size() - 1;
 		}
 	}
+
 	return -1;
+}
+
+void MeshBuffer::RemoveDuplicates() {
+	/*uint32 nCount = GetVertexCount();
+	IndexArray remapped;
+	remapped.resize(nCount, -1);
+	for(uint32 i = 0; i < nCount; ++i) {
+		if (remapped[i] == -1) {
+			for(uint32 j = i+1; j < nCount; ++j) {
+				bool equals = true;
+				for (auto &c : channels) {
+					equals &= c->Equals(i, j);
+				}
+				if (equals)
+					remapped[j] = i;
+			}
+		}
+	}
+
+	for(uint32 i = 0; i < remapped.size(); ++i) {
+		if(remapped[i] != -1)
+			std::replace(std::begin(indices), std::end(indices), i, remapped[i]);
+	}*/
 }
 
 }

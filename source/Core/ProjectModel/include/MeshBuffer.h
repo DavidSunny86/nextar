@@ -22,6 +22,9 @@ public:
 		semantic(_semantic), semanticIdx(_semanticIdx), type(_type) {
 	}
 
+	virtual ~VertexChannel() {
+	}
+
 	virtual void Reserve(uint32 count) = 0;
 	virtual bool Equals(uint32 i, uint32 j) = 0;
 	virtual void PushVertex(const void* pData) = 0;
@@ -100,6 +103,8 @@ public:
 	VertexChannel* GetVertexChannel(VertexComponentSemantic _semantic, uint32 _semanticIdx);
 	uint32 GetChannelCount(VertexComponentSemantic _semantic);
 
+	void RemoveDuplicates();
+
 	void ReserveVertexSpace(uint32 nVertex);
 	void ReserveIndexSpace(uint32 nIndex);
 	uint32 GetVertexCount() const;
@@ -111,8 +116,15 @@ public:
 		indices.push_back(index);
 	}
 
+	inline const String& GetVertexSignature() const {
+		return vertexSignature;
+	}
+
+	void MergeBuffer(const MeshBuffer& m);
+
 protected:
 
+	String vertexSignature;
 	PrimitiveType type;
 	uint32 flags;
 	IndexArray indices;
