@@ -103,8 +103,12 @@ namespace Math {
 			return 1;
 		}
 
-		static bool Equals(const T& v1, const T2& v2) {
+		static bool Equals(const T& v1, const T& v2) {
 			return v1 - v2 == 0;
+		}
+
+		static uint32 Hash(const T& v) {
+			return (uint32)v;
 		}
 	};
 
@@ -117,6 +121,10 @@ namespace Math {
 		static bool Equals(const float v1, const float v2) {
 			return (bool)(Math::Abs(v1 - v2) < Math::EPSILON_MED);
 		}
+
+		static uint32 Hash(const float v) {
+			return (uint32)(v * 100.f);
+		}
 	};
 
 	template <>
@@ -128,6 +136,10 @@ namespace Math {
 		static bool Equals(const Vector2& v1, const Vector2& v2) {
 			return (bool)( (Math::Abs(v1.x - v2.x) < Math::EPSILON_MED) &&
 				(Math::Abs(v1.y - v2.y) < Math::EPSILON_MED) );
+		}
+
+		static uint32 Hash(const Vector2& v) {
+			return (uint32)((v.x+v.y) * 100.f);
 		}
 	};
 
@@ -142,6 +154,10 @@ namespace Math {
 				(Math::Abs(v1.y - v2.y) < Math::EPSILON_MED) &&
 				(Math::Abs(v1.z - v2.z) < Math::EPSILON_MED));
 		}
+
+		static uint32 Hash(const Vector3& v) {
+			return (uint32)((v.x+v.y+v.z) * 100.f);
+		}
 	};
 
 	template <>
@@ -150,11 +166,15 @@ namespace Math {
 			return 4;
 		}
 
-		static bool Equals(const Vector3& v1, const Vector3& v2) {
+		static bool Equals(const Vector4& v1, const Vector4& v2) {
 			return (bool)((Math::Abs(v1.x - v2.x) < Math::EPSILON_MED) &&
 				(Math::Abs(v1.y - v2.y) < Math::EPSILON_MED) &&
 				(Math::Abs(v1.z - v2.z) < Math::EPSILON_MED) &&
 				(Math::Abs(v1.w - v2.w) < Math::EPSILON_MED));
+		}
+
+		static uint32 Hash(const Vector4& v) {
+			return (uint32)((v.x+v.y+v.z+v.w) * 100.f);
 		}
 	};
 }

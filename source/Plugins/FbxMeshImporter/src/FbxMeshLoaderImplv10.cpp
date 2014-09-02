@@ -321,74 +321,29 @@ void FbxMeshLoaderImplv1_0::CreatePrimitiveGroupFrom(FbxSurfaceMaterial* pMtl,
 	int tangentCount = pMesh->GetElementTangentCount();
 	int colorCount = pMesh->GetElementVertexColorCount();
 
-	bool useSharedVertexSpace = false;
-	if (!mSharedBuffer) {
-		useSharedVertexSpace = true;
-	} else if (mSharedBuffer->GetChannelCount(COMP_NORMAL)
-			== (uint32) normalCount
-			&& mSharedBuffer->GetChannelCount(COMP_BINORMAL)
-					== (uint32) biNormalCount
-			&& mSharedBuffer->GetChannelCount(COMP_TANGENT)
-					== (uint32) tangentCount
-			&& mSharedBuffer->GetChannelCount(COMP_COLOR) == (uint32) colorCount
-			&& mSharedBuffer->GetChannelCount(COMP_TEXTURE_COORDINATE)
-					== (uint32) uvChannelCount) {
-		useSharedVertexSpace = true;
+	MeshBuffer* pBuffer = NEX_NEW(MeshBuffer(PrimitiveType::PT_TRI_LIST));
+	pBuffer = NEX_NEW(MeshBuffer(PrimitiveType::PT_TRI_LIST));
+	pBuffer->AddVertexChannel(COMP_POSITION, 0, COMP_TYPE_FLOAT3);
+	if (normalCount > 0)
+		pBuffer->AddVertexChannel(COMP_NORMAL, 0, COMP_TYPE_FLOAT3);
+	if (tangentCount > 0)
+		pBuffer->AddVertexChannel(COMP_TANGENT, 0, COMP_TYPE_FLOAT3);
+	if (biNormalCount > 0)
+		pBuffer->AddVertexChannel(COMP_BINORMAL, 0, COMP_TYPE_FLOAT3);
+
+	if (colorCount > 0) {
+		for (int32 i = 0; i < colorCount; ++i)
+			pBuffer->AddVertexChannel(COMP_COLOR, (uint32) i,
+					COMP_TYPE_COLOR);
 	}
 
-	bool addToMap = true;
-	MeshBuffer* pBuffer = nullptr;
-	if (useSharedVertexSpace) {
-		pBuffer = mSharedBuffer;
-	} else {
-		auto it = mMeshMap.find(pMtl);
-		if (it != mMeshMap.end()) {
-			if ((*it).second->GetChannelCount(COMP_NORMAL)
-					== (uint32) normalCount
-					&& (*it).second->GetChannelCount(COMP_BINORMAL)
-							== (uint32) biNormalCount
-					&& (*it).second->GetChannelCount(COMP_TANGENT)
-							== (uint32) tangentCount
-					&& (*it).second->GetChannelCount(COMP_COLOR)
-							== (uint32) colorCount
-					&& (*it).second->GetChannelCount(COMP_TEXTURE_COORDINATE)
-							== (uint32) uvChannelCount) {
-				addToMap = false;
-				pBuffer = (*it).second;
-			}
+	if (uvChannelCount > 0) {
+		for (int32 i = 0; i < uvChannelCount; ++i) {
+			pBuffer->AddVertexChannel(COMP_TEXTURE_COORDINATE, (uint32) i,
+					COMP_TYPE_FLOAT2);
 		}
 	}
 
-	// determine the mesh buffer
-	if (!pBuffer) {
-		pBuffer = NEX_NEW(MeshBuffer(PrimitiveType::PT_TRI_LIST));
-		pBuffer->AddVertexChannel(COMP_POSITION, 0, COMP_TYPE_FLOAT3);
-		if (normalCount > 0)
-			pBuffer->AddVertexChannel(COMP_NORMAL, 0, COMP_TYPE_FLOAT3);
-		if (tangentCount > 0)
-			pBuffer->AddVertexChannel(COMP_TANGENT, 0, COMP_TYPE_FLOAT3);
-		if (biNormalCount > 0)
-			pBuffer->AddVertexChannel(COMP_BINORMAL, 0, COMP_TYPE_FLOAT3);
-
-		if (colorCount > 0) {
-			for (int32 i = 0; i < colorCount; ++i)
-				pBuffer->AddVertexChannel(COMP_COLOR, (uint32) i,
-						COMP_TYPE_COLOR);
-		}
-
-		if (uvChannelCount > 0) {
-			for (int32 i = 0; i < uvChannelCount; ++i) {
-				pBuffer->AddVertexChannel(COMP_TEXTURE_COORDINATE, (uint32) i,
-						COMP_TYPE_FLOAT2);
-			}
-		}
-
-		if (useSharedVertexSpace)
-			mSharedBuffer = pBuffer;
-	}
-
-	if (addToMap)
-		mMeshMap.emplace(pMtl, pBuffer);
 	pBuffer->ReserveVertexSpace(polys.size() * 3);
 	pBuffer->ReserveIndexSpace(polys.size() * 3);
 
@@ -453,6 +408,34 @@ void FbxMeshLoaderImplv1_0::CreatePrimitiveGroupFrom(FbxSurfaceMaterial* pMtl,
 		CopyVertexChannel<FbxColor, uint32>(pMesh, pFbxColorChannel,
 				pColorChannel, polys);
 	}
+
+	pBuffer->RemoveDuplicates();
+
+	bool useSharedVertexSpace = false;
+	if (!mSharedBuffer ||
+		 mSharedBuffer->GetVertexSignature() == pBuffer->GetVertexSignature()) {
+		useSharedVertexSpace = true;
+	}
+
+	MeshElement kElement;
+	kElement.mVertexCount = pBuffer->GetVertexCount();
+	kElement.mIndexCount = pBuffer->GetIndexCount();
+	kElement.mMaterial = pMtl;
+	if (useSharedVertexSpace && mSharedBuffer) {
+		kElement.mStartVertex = mSharedBuffer->GetVertexCount();
+		kElement.mStartIndex = mSharedBuffer->GetIndexCount();
+		kElement.mMesh = nullptr;
+		mSharedBuffer->MergeBuffer(*pBuffer);
+		NEX_DELETE(pBuffer);
+	} else {
+		kElement.mStartVertex = 0;
+		kElement.mStartIndex = 0;
+		kElement.mMesh = pBuffer;
+		if (useSharedVertexSpace)
+			mSharedBuffer = pBuffer;
+	}
+
+	mElements.push_back(kElement);
 
 }
 

@@ -4,6 +4,47 @@
 
 namespace nextar {
 
+template <typename Vec>
+class VertexChannelTempl : public VertexChannel {
+public:
+	typedef vector<Vec>::type VertexArray;
+
+
+	VertexChannelTempl(VertexComponentSemantic _semantic, uint32 _index, VertexComponentType _type) :
+		VertexChannel(_semantic, _index, _type) {
+	}
+
+	virtual void Reserve(uint32 count) {
+		vertices.reserve(vertices.size() + count);
+	}
+
+	virtual bool Equals(uint32 i, uint32 j) {
+		return Math::Traits<Vec>::Equals(vertices[i], vertices[j]);
+	}
+
+	virtual uint32 GetVertexCount() const {
+		return vertices.size();
+	}
+
+	virtual void PushVertex(const void* pData) {
+		const Vec& v = *reinterpret_cast<const Vec*>(pData);
+		vertices.push_back(v);
+	}
+
+	virtual void PushVertices(const void* pData, uint32 numVertices) {
+		const Vec* v = reinterpret_cast<const Vec*>(pData);
+		for (uint32 i = 0; i < numVertices; ++i)
+			vertices.push_back(v[i]);
+	}
+
+	virtual void GenerateDuplicateMap(IndexArray& indices) {
+
+	}
+protected:
+
+	VertexArray vertices;
+};
+
 
 MeshBuffer::MeshBuffer(PrimitiveType _type) :
 type(_type)

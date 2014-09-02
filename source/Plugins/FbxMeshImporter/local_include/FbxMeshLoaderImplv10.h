@@ -13,7 +13,7 @@ class FbxMeshLoaderImplv1_0 : public nextar::AssetLoaderImpl {
 	NEX_LOG_HELPER(FbxMeshLoaderImplv1_0);
 
 public:
-	class MeshElement {
+	struct MeshElement {
 		uint32 mStartVertex;
 		uint32 mVertexCount;
 		uint32 mStartIndex;
@@ -44,7 +44,7 @@ protected:
 
 	FbxInputStreamBridge mStream;
 	MeshBuffer* mSharedBuffer;
-	MeshElementList mMeshMap;
+	MeshElementList mElements;
 	FbxManager* mManager;
 	FbxScene* mScene;
 	String mPassword;
