@@ -9,7 +9,7 @@
 namespace FbxMeshImporter {
 
 
-class FbxMeshLoaderImplv1_0 : public nextar::AssetLoaderImpl {
+class FbxMeshLoaderImplv1_0 : public AllocGeneral {
 	NEX_LOG_HELPER(FbxMeshLoaderImplv1_0);
 
 public:
@@ -35,7 +35,8 @@ public:
 			FbxMesh* pMesh,
 			const IndexArray& polys);
 
-	void PostProcessInformation();
+	void BuildMesh(MeshTemplate::MeshBuilder* pMesh);
+	MaterialTemplatePtr CreateMaterial(FbxSurfaceMaterial*);
 
 protected:
 

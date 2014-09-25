@@ -4,4 +4,5 @@ Motion Capture data:
 http://gfx-motion-capture.blogspot.in/search?updated-max=2011-08-17T08:35:00-07:00&max-results=4
 Unsynchronized Buffers:
 http://www.seas.upenn.edu/~pcozzi/OpenGLInsights/OpenGLInsights-AsynchronousBufferTransfers.pdf
-
+Cloth:
+http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/real-time-cloth-simulation-with-b-spline-surfaces-r3814

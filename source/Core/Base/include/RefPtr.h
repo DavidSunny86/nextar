@@ -26,7 +26,7 @@ template<typename T, typename BaseClass>
 class Referenced: public BaseClass {
 
 private:
-	std::atomic_int_fast32_t refCount;
+	atomic_int refCount;
 
 protected:
 

@@ -85,10 +85,19 @@ struct unordered_set {
 };
 
 template<typename Kty, typename T, typename Hsh = std::hash<Kty>,
-		typename Pr = std::equal_to<Kty>, typename Allocator = AllocatorGeneral>
+		typename Pr = std::equal_to<Kty>, typename Allocator = AllocatorGeneral,
+		typename STDAllocatorType = STDAllocator<std::pair<Kty, T>, Allocator> >
 struct unordered_map {
 	typedef typename std::unordered_map<Kty, T, Hsh, Pr,
-			STDAllocator<std::pair<Kty, T>, Allocator> > type;
+			STDAllocatorType > type;
+};
+
+template<typename Kty, typename T, typename Hsh = std::hash<Kty>,
+		typename Pr = std::equal_to<Kty>, typename Allocator = AllocatorGeneral,
+		typename STDAllocatorType = STDAllocator<std::pair<Kty, T>, Allocator> >
+struct unordered_multimap {
+	typedef typename std::unordered_multimap<Kty, T, Hsh, Pr,
+			STDAllocatorType > type;
 };
 
 template<typename Kty, typename T, typename Pr = std::less<Kty>,

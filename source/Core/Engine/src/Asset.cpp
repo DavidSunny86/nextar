@@ -41,6 +41,7 @@ const String Asset::AssetLocatorAccessor::GetStringValue(
 }
 
 void Asset::Load(StreamRequest* req, bool async) {
+	//NEX_THREAD_LOCK_GUARD_MUTEX(assetLock);
 	if (IsLoaded() || IsLoading()) {
 		Debug("Asset already loaded: " + GetName());
 		return;
@@ -81,6 +82,7 @@ void Asset::Load(StreamRequest* req, bool async) {
 }
 
 void Asset::Unload() {
+	//NEX_THREAD_LOCK_GUARD_MUTEX(assetLock);
 	if (IsLoading()) {
 		Debug("Asset being loaded: " + GetName());
 		return;
@@ -95,6 +97,7 @@ void Asset::Unload() {
 }
 
 void Asset::Save(StreamRequest* req, bool async) {
+	//NEX_THREAD_LOCK_GUARD_MUTEX(assetLock);
 	if (!IsLoaded() || IsLoading() || IsSaving()) {
 		Debug("Asset has to be saved first: " + GetName());
 		return;
@@ -128,7 +131,8 @@ void Asset::Save(StreamRequest* req, bool async) {
 }
 
 void Asset::NotifyAssetLoaded() {
-	if (!streamRequest || (streamRequest->returnCode == StreamResult::STREAM_SUCCESS)) {
+	if (!streamRequest || (streamRequest->returnCode
+			== StreamResult::STREAM_SUCCESS)) {
 		if (NotifyAssetLoadedImpl()) {
 			streamRequest->flags |= StreamRequest::COMPLETED;
 			SetReady(true);

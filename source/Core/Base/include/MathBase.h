@@ -49,6 +49,8 @@ static constexpr float INV_SQRT_2 = 0.707106781188f;
 static constexpr float SQRT_3 = 1.73205080757f;
 static constexpr float INV_SQRT_3 = 0.577350269189f;
 
+static constexpr float MAX_RELATIVE_ERROR = 0.005f;
+
 using namespace ::nextar;
 
 /** Math function overrides */
@@ -323,6 +325,33 @@ inline float ArcTanPositive(float y, float x) {
 	t *= a;
 	t += d;
 	return t;
+}
+
+
+inline bool AlmostEqualUlps(float A, float B, int maxUlps)
+{
+	assert(sizeof(float) == sizeof(int));
+	if (A == B)
+		return true;
+	int intDiff = abs(*(int*)&A - *(int*)&B);
+	if (intDiff <= maxUlps)
+		return true;
+	return false;
+}
+
+inline bool AlmostEqualRelativeOrAbsolute(float A, float B,
+	float maxRelativeError, float maxAbsoluteError)
+{
+	if (fabs(A - B) < maxAbsoluteError)
+		return true;
+	float relativeError;
+	if (fabs(B) > fabs(A))
+		relativeError = fabs((A - B) / B);
+	else
+		relativeError = fabs((A - B) / A);
+	if (relativeError <= maxRelativeError)
+		return true;
+	return false;
 }
 
 inline void Clamp(float& clampwhat, float lowvalue, float hivalue) {

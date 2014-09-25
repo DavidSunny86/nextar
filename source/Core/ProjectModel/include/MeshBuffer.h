@@ -15,7 +15,7 @@ typedef nextar::vector<Vector2>::type Vec2Array;
 typedef nextar::vector<Vec3Array>::type Vec3ArrayList;
 typedef nextar::vector<Vec2Array>::type Vec2ArrayList;
 
-class VertexChannel : public AllocGeneral {
+class _NexProjectAPI VertexChannel : public AllocGeneral {
 public:
 
 	VertexChannel(VertexComponentSemantic _semantic, uint32 _semanticIdx, VertexComponentType _type) :
@@ -25,12 +25,15 @@ public:
 	virtual ~VertexChannel() {
 	}
 
+	virtual VertexChannel* CreateEmpty() const = 0;
 	virtual void Reserve(uint32 count) = 0;
-	virtual bool Equals(uint32 i, uint32 j) = 0;
+	virtual bool Equals(uint32 i, uint32 j) const = 0;
+	virtual uint32 Hash(uint32 i) const = 0;
 	virtual void PushVertex(const void* pData) = 0;
 	virtual void PushVertices(const void* pData, uint32 numVertices) = 0;
+	virtual void PushVertices(VertexChannel* channel) = 0;
 	virtual uint32 GetVertexCount() const = 0;
-	virtual void GenerateDuplicateMap(IndexArray& indices) = 0;
+	virtual const void* GetVertex(uint32 i) const = 0;
 
 	inline VertexComponentSemantic GetSemantic() const {
 		return semantic;
@@ -53,10 +56,13 @@ protected:
 typedef vector<VertexChannel*>::type VertexChannelList;
 
 class _NexProjectAPI MeshBuffer : public AllocGeneral {
+	NEX_LOG_HELPER(MeshBuffer);
+
 public:
 
 	
 	MeshBuffer(PrimitiveType type);
+	~MeshBuffer();
 	
 	uint32 AddVertexChannel(
 		VertexComponentSemantic _semantic, 
@@ -84,6 +90,7 @@ public:
 		return vertexSignature;
 	}
 
+	bool VertexEquals(uint32 i, uint32 j);
 	void MergeBuffer(const MeshBuffer& m);
 
 protected:

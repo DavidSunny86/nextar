@@ -14,7 +14,7 @@ class PooledAllocator {
 	// item per block count is correct or not.
 	typedef T ObjectType;
 	typedef AllocatorBase<Catagory> BaseAllocator;
-	typedef MemPool<NumPerBlock, mt::Mutex, BaseAllocator> MPool;
+	typedef MemPool<NumPerBlock, Mutex, BaseAllocator> MPool;
 
 	MPool pool;
 public:

@@ -79,7 +79,7 @@ protected:
 	size_t totalAllocations;
 	size_t maxAllocationsAtAnyTime;
 	Node* _head;
-	mt::spinlock_mutex _lock;
+	spinlock_mutex _lock;
 	typedef std::map<long, std::string> RevStringMap;
 	typedef std::map<std::string, long> StringMap;
 	long GetTicket(StringMap& smap, RevStringMap& rmap, const char* name);
@@ -89,7 +89,7 @@ protected:
 	StringMap filemap;
 	StringMap funcmap;
 	long ticket;
-	typedef std::lock_guard<mt::spinlock_mutex> LockGuard;
+	typedef std::lock_guard<spinlock_mutex> LockGuard;
 };
 
 } /* namespace RenderOpenGL */

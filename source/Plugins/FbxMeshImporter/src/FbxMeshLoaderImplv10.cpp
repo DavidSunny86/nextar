@@ -1,3 +1,4 @@
+
 #include <FbxMeshImporter.h>
 #include <FbxMeshLoaderImplv10.h>
 
@@ -109,8 +110,6 @@ void FbxMeshLoaderImplv1_0::ParseContent() {
 			ParseContent(lNode->GetChild(i));
 		}
 	}
-
-	PostProcessInformation();
 }
 
 void FbxMeshLoaderImplv1_0::ParseContent(FbxNode* pNode) {
@@ -161,6 +160,7 @@ void FbxMeshLoaderImplv1_0::ExportMesh(FbxNode* pNode) {
 		Warn("Non triangular mesh encountered: " + String(pMesh->GetName()));
 		return;
 	}
+	ParseMaterialConnections(pMesh);
 }
 
 void FbxMeshLoaderImplv1_0::ParseMaterialConnections(FbxMesh* pMesh) {
@@ -437,6 +437,44 @@ void FbxMeshLoaderImplv1_0::CreatePrimitiveGroupFrom(FbxSurfaceMaterial* pMtl,
 
 	mElements.push_back(kElement);
 
+}
+
+void FbxMeshLoaderImplv1_0::BuildMesh(MeshTemplate::MeshBuilder* pMesh) {
+
+	pMesh->SetSharedBuffer(mSharedBuffer);
+	mSharedBuffer = nullptr;
+	for(auto &e : mElements) {
+		MeshTemplate::PrimitiveGroup& pg = pMesh->AddPrimitiveGroup();
+		pg.buffer = e.mMesh;
+		pg.indexCount = e.mIndexCount;
+		pg.startIndex = e.mStartIndex;
+		pg.vertexCount = e.mVertexCount;
+		pg.startVertex = e.mStartVertex;
+		pg.material = CreateMaterial(e.mMaterial);
+		if (pg.material)
+			pMesh->metaInfo.AddDependency(pg.material);
+	}
+}
+
+MaterialTemplatePtr FbxMeshLoaderImplv1_0::CreateMaterial(FbxSurfaceMaterial* pFbxMat) {
+	MaterialTemplate::ID id(
+		NamedObject::AsyncStringID(pFbxMat->GetName()),
+		StringUtils::DefaultID,
+		StringUtils::DefaultID);
+	MaterialTemplatePtr material;
+	const FbxProperty lProperty = pFbxMat->FindProperty("NFX_Material");
+	if (lProperty.IsValid()) {
+		FbxString kMtlPath = lProperty.Get<FbxString>();
+		String url = (const char*)kMtlPath;
+		URL path = URL(url);
+		material = MaterialTemplate::Traits::Instance(id, path);
+		return material;
+	} else {
+		material = MaterialTemplate::Traits::Instance(id);
+	}
+
+	FbxMaterialLoaderImplv1_0 materialLoader(pFbxMat);
+	material->Load()
 }
 
 }

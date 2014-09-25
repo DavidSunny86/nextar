@@ -4,7 +4,7 @@
  *  Created on: 31-Aug-2014
  *      Author: obhi
  */
-
+#include <FbxMeshImporter.h>
 #include <FbxInputStreamBridge.h>
 
 namespace FbxMeshImporter {
@@ -79,6 +79,7 @@ void FbxInputStreamBridge::Seek(const FbxInt64& pOffset,
 long FbxInputStreamBridge::GetPosition() const {
 	if (inputStream)
 		return (inputStream->Tell() - inputLocation);
+	return -1;
 }
 
 void FbxInputStreamBridge::SetPosition(long pPosition) {

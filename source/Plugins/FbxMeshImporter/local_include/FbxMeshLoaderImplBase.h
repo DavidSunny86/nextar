@@ -17,6 +17,7 @@ namespace FbxMeshImporter {
  *
  */
 class FbxMeshLoaderImplBase: public nextar::AssetLoaderImpl {
+	NEX_LOG_HELPER(FbxMeshLoaderImplBase);
 public:
 	FbxMeshLoaderImplBase();
 	virtual ~FbxMeshLoaderImplBase();

@@ -96,18 +96,19 @@ public:
 #endif
 
 namespace Math {
+
 	template <typename T>
 	class Traits {
 	public:
-		static uint32 ElementCount() {
+		inline static uint32 ElementCount() {
 			return 1;
 		}
 
-		static bool Equals(const T& v1, const T& v2) {
+		inline static bool Equals(const T& v1, const T& v2) {
 			return v1 - v2 == 0;
 		}
 
-		static uint32 Hash(const T& v) {
+		inline static uint32 Hash(const T& v) {
 			return (uint32)v;
 		}
 	};
@@ -118,63 +119,66 @@ namespace Math {
 			return 1;
 		}
 
-		static bool Equals(const float v1, const float v2) {
-			return (bool)(Math::Abs(v1 - v2) < Math::EPSILON_MED);
+		inline static bool Equals(const float v1, const float v2) {
+			if (Math::AlmostEqualUlps(v1, v2, 2))
+				return true;
+			return Math::AlmostEqualRelativeOrAbsolute(v1, v1, MAX_RELATIVE_ERROR,
+					std::numeric_limits<float>::min());
 		}
 
-		static uint32 Hash(const float v) {
-			return (uint32)(v * 100.f);
+		inline static uint32 Hash(const float v) {
+			return (uint32)(v);
 		}
 	};
 
 	template <>
 	class Traits<Vector2> {
-		static uint32 ElementCount() {
+		inline static uint32 ElementCount() {
 			return 2;
 		}
 
-		static bool Equals(const Vector2& v1, const Vector2& v2) {
-			return (bool)( (Math::Abs(v1.x - v2.x) < Math::EPSILON_MED) &&
-				(Math::Abs(v1.y - v2.y) < Math::EPSILON_MED) );
+		inline static bool Equals(const Vector2& v1, const Vector2& v2) {
+			return (bool)( Math::Traits<float>::Equals(v1.x,v2.x) &&
+					Math::Traits<float>::Equals(v1.y,v2.y) );
 		}
 
-		static uint32 Hash(const Vector2& v) {
-			return (uint32)((v.x+v.y) * 100.f);
+		inline static uint32 Hash(const Vector2& v) {
+			return (uint32)((v.x+v.y));
 		}
 	};
 
 	template <>
 	class Traits<Vector3> {
-		static uint32 ElementCount() {
+		inline static uint32 ElementCount() {
 			return 3;
 		}
 
-		static bool Equals(const Vector3& v1, const Vector3& v2) {
-			return (bool)((Math::Abs(v1.x - v2.x) < Math::EPSILON_MED) &&
-				(Math::Abs(v1.y - v2.y) < Math::EPSILON_MED) &&
-				(Math::Abs(v1.z - v2.z) < Math::EPSILON_MED));
+		inline static bool Equals(const Vector3& v1, const Vector3& v2) {
+			return (bool)( Math::Traits<float>::Equals(v1.x,v2.x) &&
+						Math::Traits<float>::Equals(v1.y,v2.y) &&
+						Math::Traits<float>::Equals(v1.z,v2.z));
 		}
 
-		static uint32 Hash(const Vector3& v) {
-			return (uint32)((v.x+v.y+v.z) * 100.f);
+		inline static uint32 Hash(const Vector3& v) {
+			return (uint32)((v.x+v.y+v.z));
 		}
 	};
 
 	template <>
 	class Traits<Vector4> {
-		static uint32 ElementCount() {
+		inline static uint32 ElementCount() {
 			return 4;
 		}
 
-		static bool Equals(const Vector4& v1, const Vector4& v2) {
-			return (bool)((Math::Abs(v1.x - v2.x) < Math::EPSILON_MED) &&
-				(Math::Abs(v1.y - v2.y) < Math::EPSILON_MED) &&
-				(Math::Abs(v1.z - v2.z) < Math::EPSILON_MED) &&
-				(Math::Abs(v1.w - v2.w) < Math::EPSILON_MED));
+		inline static bool Equals(const Vector4& v1, const Vector4& v2) {
+			return (bool)( Math::Traits<float>::Equals(v1.x,v2.x) &&
+						Math::Traits<float>::Equals(v1.y,v2.y) &&
+						Math::Traits<float>::Equals(v1.z,v2.z) &&
+						Math::Traits<float>::Equals(v1.w,v2.w));
 		}
 
-		static uint32 Hash(const Vector4& v) {
-			return (uint32)((v.x+v.y+v.z+v.w) * 100.f);
+		inline static uint32 Hash(const Vector4& v) {
+			return (uint32)((v.x+v.y+v.z+v.w));
 		}
 	};
 }

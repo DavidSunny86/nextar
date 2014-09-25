@@ -14,11 +14,19 @@ public:
 		VertexChannel(_semantic, _index, _type) {
 	}
 
+	virtual VertexChannel* CreateEmpty() const {
+		return NEX_NEW(VertexChannelTempl<Vec>());
+	}
+
+	virtual uint32 Hash(uint32 i) const {
+		return Math::Traits<Vec>::Hash(vertices[i]);
+	}
+
 	virtual void Reserve(uint32 count) {
 		vertices.reserve(vertices.size() + count);
 	}
 
-	virtual bool Equals(uint32 i, uint32 j) {
+	virtual bool Equals(uint32 i, uint32 j) const {
 		return Math::Traits<Vec>::Equals(vertices[i], vertices[j]);
 	}
 
@@ -33,13 +41,19 @@ public:
 
 	virtual void PushVertices(const void* pData, uint32 numVertices) {
 		const Vec* v = reinterpret_cast<const Vec*>(pData);
-		for (uint32 i = 0; i < numVertices; ++i)
-			vertices.push_back(v[i]);
+		vertices.reserve(vertices.size() + numVertices);
+		vertices.insert(vertices.end(), v, v+numVertices);
 	}
 
-	virtual void GenerateDuplicateMap(IndexArray& indices) {
-
+	virtual void PushVertices(VertexChannel* channel) {
+		VertexChannelTempl<Vec>* c = static_cast< VertexChannelTempl<Vec> >(channel);
+		vertices.insert(vertices.end(), c->vertices.begin(), c->vertices.end());
 	}
+
+	virtual const void* GetVertex(uint32 i) const {
+		return &vertices[i];
+	}
+
 protected:
 
 	VertexArray vertices;
@@ -49,6 +63,12 @@ protected:
 MeshBuffer::MeshBuffer(PrimitiveType _type) :
 type(_type)
 ,flags(0) {
+}
+
+MeshBuffer::~MeshBuffer() {
+	for (auto& e : channels) {
+		NEX_DELETE(e);
+	}
 }
 
 void MeshBuffer::ReserveVertexSpace(uint32 numVertices) {
@@ -126,27 +146,91 @@ uint32 MeshBuffer::AddVertexChannel(
 	return -1;
 }
 
+bool MeshBuffer::VertexEquals(uint32 i, uint32 j) {
+	for (auto &c : channels) {
+		if(!c->Equals(i, j))
+			return false;
+	}
+	return true;
+}
+
 void MeshBuffer::RemoveDuplicates() {
-	/*uint32 nCount = GetVertexCount();
+	uint32 nCount = GetVertexCount();
 	IndexArray remapped;
-	remapped.resize(nCount, -1);
-	for(uint32 i = 0; i < nCount; ++i) {
-		if (remapped[i] == -1) {
-			for(uint32 j = i+1; j < nCount; ++j) {
-				bool equals = true;
-				for (auto &c : channels) {
-					equals &= c->Equals(i, j);
+
+	remapped.reserve(nCount);
+	for (uint32 i = 0; i < nCount; ++i)
+		remapped.push_back(i);
+
+	unordered_multimap<uint32_t, uint32_t>::type vertexMap;
+	for (uint32_t i = 0; i < nCount; ++i) {
+		uint32_t hashv = 0;
+		for (auto &c : channels) {
+			hashv += c->Hash(i);
+		}
+		vertexMap.emplace(hashv, i);
+	}
+
+	for (auto it = vertexMap.begin(), en = vertexMap.end(); it != en; ) {
+		auto nex = it;
+		do {
+			nex++;
+		} while (nex != en && nex->first == it->first);
+		for (auto i = it; i != nex; ++i) {
+			if (remapped[i->second] == i->second) {
+				auto j = i;
+				for (++j; j != nex; ++j) {
+					if (VertexEquals(i->second, j->second)) {
+						remapped[std::max(i->second, j->second)] = std::min(i->second, j->second);
+					}
 				}
-				if (equals)
-					remapped[j] = i;
 			}
+		}
+
+		it = nex;
+	}
+
+	VertexChannelList dupChannel;
+	dupChannel.reserve(channels.size());
+	for (auto c : channels) {
+		VertexChannel* vc = c->CreateEmpty();
+		dupChannel.push_back(vc);
+		vc->Reserve(nCount);
+	}
+
+	uint32_t vertexCount = 0;
+	for (uint32_t i = 0; i < nCount; ++i) {
+		if (remapped[i] == i) {
+			remapped[i] = vertexCount++;
+			for (uint32 c = 0; c < dupChannel.size(); ++c) {
+				dupChannel[c]->PushVertex(channels[c]->GetVertex(i));
+			}
+		} else {
+			remapped[i] = remapped[remapped[i]];
 		}
 	}
 
-	for(uint32 i = 0; i < remapped.size(); ++i) {
-		if(remapped[i] != -1)
-			std::replace(std::begin(indices), std::end(indices), i, remapped[i]);
-	}*/
+	Trace("Vertices removed: " + Convert::ToString(nCount - vertexCount));
+	for (uint32_t i = 0; i < indices.size(); ++i)
+		indices[i] = remapped[indices[i]];
+
+	for (auto& e : channels) {
+		NEX_DELETE(e);
+	}
+
+	channels = std::move(dupChannel);
+}
+
+void MeshBuffer::MergeBuffer(const MeshBuffer& m) {
+	NEX_ASSERT(vertexSignature == m.vertexSignature);
+	NEX_ASSERT(type == m.type);
+	flags |= m.flags;
+	indices.reserve(indices.size() + m.indices.size());
+	indices.insert(indices.end(), m.indices.begin(), m.indices.end());
+
+	for(uint32 c = 0; c < m.channels.size(); ++c) {
+		channels[c]->PushVertices(m.channels[c]);
+	}
 }
 
 }

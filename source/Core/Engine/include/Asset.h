@@ -376,7 +376,7 @@ protected:
 
 	static void _LoadDependencies(AssetStreamRequest* req);
 
-	NEX_THREAD_MUTEX(assetLock);
+	//NEX_THREAD_MUTEX(assetLock);
 	/* The asset locator */
 	URL assetLocator;
 	/* List of asset callbacks */
@@ -461,6 +461,17 @@ public:
 		return asset->GetAssetLocator().ToString();
 	}
 
+	inline const String& GetParameterValue(const String& name) const {
+		auto it = parameters.find(name);
+		if (it != parameters.end())
+			return (*it).second;
+		return StringUtils::Null;
+	}
+
+	inline void SetParameterValue(const String& name, const String& value) {
+		parameters[name] = value;
+	}
+
 protected:
 	union {
 		struct {
@@ -472,6 +483,7 @@ protected:
 			OutputStreamPtr outputStream;
 		};
 	};
+	NameValueMap parameters;
 	Asset::MetaInfo metaInfo;
 };
 
