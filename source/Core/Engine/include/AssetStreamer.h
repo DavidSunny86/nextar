@@ -13,6 +13,8 @@
 
 namespace nextar {
 
+class AssetStreamRequest;
+
 class _NexEngineAPI AssetStreamer:
 public nextar::Singleton<AssetStreamer>,
 public nextar::StreamHandler,
@@ -25,8 +27,8 @@ public:
 	AssetStreamer();
 	virtual ~AssetStreamer();
 
-	void RequestLoad(Asset* asset);
-	void RequestSave(Asset* asset);
+	void AsyncRequestLoad(AssetStreamRequest* asset);
+	void AsyncRequestSave(AssetStreamRequest* asset);
 
 	virtual void NotifyLoaded(StreamRequest*);
 	virtual void NotifySaved(StreamRequest*);

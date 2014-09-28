@@ -7,7 +7,7 @@ namespace nextar {
 Asset::AssetLocatorAccessor Asset::AssetLocatorAccessor::assetLocatorAccessor;
 
 Asset::Asset(const StringID id, const StringID factory) :
-		memoryCost(sizeof(Asset)), SharedComponent(id, factory), streamRequest(nullptr) {
+		memoryCost(sizeof(Asset)), SharedComponent(id, factory) {
 	if (OverrideDictionary("Asset")) {
 		Populate(GetDictionary());
 	}
@@ -40,8 +40,28 @@ const String Asset::AssetLocatorAccessor::GetStringValue(
 	return asset->GetAssetLocator().ToString();
 }
 
-void Asset::Load(StreamRequest* req, bool async) {
+bool Asset::AsyncRequestLoad(const StreamInfo& request, bool async) {
 	//NEX_THREAD_LOCK_GUARD_MUTEX(assetLock);
+	State expected = ASSET_CREATED;
+	if (assetState.compare_exchange_strong(expected,
+			ASSET_LOADING, std::memory_order_release,
+			std::memory_order_relaxed)) {
+		// only a single thread can reach here,
+		// if we have, we issue the draw request
+		AssetStreamRequest* requestPtr = nullptr;
+		if(request.locator != URL::Invalid)
+			SetAssetLocator(request.locator);
+		if(request.externalRequest)
+			requestPtr = request.externalRequest;
+		request.manualStreamer
+
+		if (async && IsBackgroundStreamed()) {
+		} else {
+
+		}
+		return true;
+	}
+	return false;
 	if (IsLoaded() || IsLoading()) {
 		Debug("Asset already loaded: " + GetName());
 		return;

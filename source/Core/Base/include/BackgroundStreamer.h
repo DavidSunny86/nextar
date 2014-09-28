@@ -89,7 +89,7 @@ public:
 	BackgroundStreamer();
 	virtual ~BackgroundStreamer();
 
-	virtual void AddRequest(StreamRequest*) = 0;
+	virtual void AsyncAddRequest(StreamRequest*) = 0;
 };
 
 } /* namespace nextar */

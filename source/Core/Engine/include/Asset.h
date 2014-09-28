@@ -22,6 +22,17 @@ protected:
 	}
 };
 
+union AssetStreamerInfo {
+	struct {
+		AssetLoaderImpl* manualLoader;
+		InputStreamPtr inputStream;
+	};
+	struct {
+		AssetSaverImpl* manualSaver;
+		OutputStreamPtr outputStream;
+	};
+};
+
 class Asset;
 class AssetStreamRequest;
 
@@ -54,15 +65,20 @@ public:
 	typedef list<AssetCallback*>::type AssetCallbackList;
 	typedef SharedComponent InstanceImplementor;
 
+	enum State : uint32 {
+		ASSET_CREATED,
+		ASSET_LOADING,
+		ASSET_LOADED,
+		ASSET_LOAD_FAILURE,
+		ASSET_READY,
+		ASSET_SAVING,
+		ASSET_UNLOADED
+
+	};
+
 	enum Flags {
 		BACKGROUND_STREAMED = Component::LAST_FLAG << 0,
-		ASSET_LOADING = Component::LAST_FLAG << 1,
-		ASSET_LOADED = Component::LAST_FLAG << 2,
-		ASSET_LOAD_FAILED = Component::LAST_FLAG << 3,
-		ASSET_READY = Component::LAST_FLAG << 4,
-		ASSET_SAVING = Component::LAST_FLAG << 5,
-		ASSET_SAVE_FAILED = Component::LAST_FLAG << 6,
-		LAST_FLAG = Component::LAST_FLAG << 7,
+		LAST_FLAG = Component::LAST_FLAG << 1,
 	};
 
 	struct AssetLocatorAccessor: public PropertyAccessor {
@@ -218,6 +234,14 @@ public:
 		AssetSet unresolvedDependencies;
 	};
 
+	struct StreamInfo {
+		static const StreamInfo Null;
+		AssetStreamRequest* externalRequest;
+		URL locator; // in case the locator is not set yet
+		AssetStreamerInfo manualStreamer;
+	};
+
+
 	Asset(const StringID name, const StringID factory);
 	virtual ~Asset();
 
@@ -226,60 +250,6 @@ public:
 	static void Populate(PropertyDictionary* dict);
 
 	// This should not be called from any thread other than main thread
-	inline void SetSaving(bool b) {
-		SetFlag(ASSET_SAVING, b);
-	}
-
-	// This should not be called from any thread other than main thread
-	inline bool IsSaving() const {
-		return (flags & ASSET_SAVING) != 0;
-	}
-
-	inline bool HasLoadFailed() const {
-		return (flags & ASSET_LOAD_FAILED) != 0;
-	}
-
-	inline bool HasSaveFailed() const {
-		return (flags & ASSET_SAVE_FAILED) != 0;
-	}
-
-	inline void SetLoadFailed(bool b) {
-		SetFlag(ASSET_LOAD_FAILED, b);
-	}
-
-	inline void SetSaveFailed(bool b) {
-		SetFlag(ASSET_SAVE_FAILED, b);
-	}
-
-	// This should not be called from any thread other than main thread
-	inline void SetLoading(bool b) {
-		SetFlag(ASSET_LOADING, b);
-	}
-
-	// This should not be called from any thread other than main thread
-	inline bool IsLoading() const {
-		return (flags & ASSET_LOADING) != 0;
-	}
-
-	// This should not be called from any thread other than main thread
-	inline void SetReady(bool b) {
-		SetFlag(ASSET_READY, b);
-	}
-
-	// This should not be called from any thread other than main thread
-	inline bool IsReady() const {
-		return (flags & ASSET_READY) != 0;
-	}
-
-	// This should not be called from any thread other than main thread
-	inline void SetLoaded(bool l) {
-		SetFlag(ASSET_LOADED, true);
-	}
-
-	// This should not be called from any thread other than main thread
-	inline bool IsLoaded() const {
-		return (flags & ASSET_LOADED) != 0;
-	}
 
 	inline bool IsBackgroundStreamed() const {
 		return (BACKGROUND_STREAMED & flags) != 0;
@@ -311,16 +281,6 @@ public:
 		callbacks.remove(assetCallback);
 	}
 
-	inline void Load(bool useAsyncLoad) {
-		Load(nullptr, useAsyncLoad);
-	}
-
-	inline void Save(bool useAsyncLoad) {
-		Save(nullptr, useAsyncLoad);
-	}
-
-	virtual void Load(StreamRequest* request, bool useAsyncLoad);
-	virtual void Save(StreamRequest* request, bool useAsyncLoad);
 	virtual void Unload();
 	/* Called from main thread when the asset has been unloaded */
 	virtual void NotifyAssetUnloaded();
@@ -330,20 +290,28 @@ public:
 	void NotifyAssetLoaded();
 	/* Called from main thread when the asset has been saved */
 	void NotifyAssetSaved();
-	/**
-	 * When load is called, stream request is either created
-	 * or retrieved from the asset implementation.
-	 * */
-	inline StreamRequest* GetStreamRequest(bool loadOrSave = true) {
-		return (streamRequest) ? streamRequest : (streamRequest =
-											CreateStreamRequestImpl(loadOrSave));
-	}
 
 	/* proxy objects when saved will return the object type it is saving via this call */
 	virtual uint32 GetProxyID() const {
 		return GetClassID();
 	}
 		
+	bool AsyncHasLoadFailed() const {
+		return (assetState.load(std::memory_order_acquire) == ASSET_LOAD_FAILURE) != 0;
+	}
+
+	bool AsyncIsLoaded() const {
+		return (assetState.load(std::memory_order_acquire) == ASSET_LOADED) != 0;
+	}
+
+	// @remarks Places a load request, or loads in place depending upon \p doAsyncLoad
+	// and returns true if the request was placed or a load was done.
+	// @returns false if the asset is not in a state when it can be loaded
+	virtual bool AsyncRequestLoad(const StreamInfo& request = StreamInfo::Null, bool doAsyncLoad = false);
+	// @remarks Places a save request, or saves in place depending upon \p doAsyncSave
+	// and returns true if the request was placed or a save was done.
+	// @returns false if the asset is not in a state when it can be saved
+	virtual bool AsyncRequestSave(const StreamInfo& request = StreamInfo::Null, bool doAsyncSave = false);
 	// @remarks Used by the engine to initialize resources
 	static AssetPtr AsyncLoad(const URL& input, const String& streamer = StringUtils::Null);
 	static AssetPtr AsyncLoad(InputStreamPtr& input, const String& streamer);
@@ -366,15 +334,16 @@ protected:
 	virtual void UnloadImpl() = 0;
 	virtual void SaveImpl(StreamRequest* req, bool isAsync);
 
-	virtual StreamRequest* CreateStreamRequestImpl(bool load);
-	virtual void DestroyStreamRequestImpl(StreamRequest*&, bool load = true);
-
 	void _FireCallbacksLoaded();
 	void _FireCallbacksUnloaded();
 	void _FireCallbacksUpdated();
 	void _FireCallbacksSaved();
 
 	static void _LoadDependencies(AssetStreamRequest* req);
+
+	// async state
+	std::atomic<State> assetState;
+	// end async state
 
 	//NEX_THREAD_MUTEX(assetLock);
 	/* The asset locator */
@@ -384,7 +353,7 @@ protected:
 	/* The asset memory used count in bytes */
 	size_t memoryCost;
 	/* Stream request object */
-	StreamRequest* streamRequest;
+
 
 private:
 	enum {
@@ -401,7 +370,7 @@ public:
 			uint16 exFlags = AUTO_DELETE_REQUEST) :
 			StreamRequest(asset, exFlags | ASSET_STREAM_REQUEST)
 			 {
-		manualLoader = nullptr;
+		manualStreamer.manualLoader = nullptr;
 	}
 
 	inline AssetStreamRequest(Asset* asset,
@@ -409,7 +378,7 @@ public:
 			uint16 exFlags = AUTO_DELETE_REQUEST) :
 			StreamRequest(asset, exFlags | ASSET_STREAM_REQUEST)
 			 {
-		manualLoader = _manualLoader;
+		manualStreamer.manualLoader = _manualLoader;
 	}
 
 	inline AssetStreamRequest(Asset* asset,
@@ -417,39 +386,39 @@ public:
 			uint16 exFlags = AUTO_DELETE_REQUEST) :
 			StreamRequest(asset, exFlags | ASSET_STREAM_REQUEST)
 			 {
-		manualSaver = _manualSaver;
+		manualStreamer.manualSaver = _manualSaver;
 	}
 
 	inline void SetManualLoader(AssetLoaderImpl* manualLoader) {
-		this->manualLoader = manualLoader;
+		this->manualStreamer.manualLoader = manualLoader;
 	}
 
 	inline void SetManualSaver(AssetSaverImpl* manualSaver) {
-		this->manualSaver = manualSaver;
+		this->manualStreamer.manualSaver = manualSaver;
 	}
 
 	inline void SetInputStream(const InputStreamPtr& inputStream) {
-		this->inputStream = inputStream;
+		this->manualStreamer.inputStream = inputStream;
 	}
 
 	inline void SetOutputStream(const OutputStreamPtr& outputStream) {
-		this->outputStream = outputStream;
+		this->manualStreamer.outputStream = outputStream;
 	}
 
 	inline AssetLoaderImpl* GetManualLoader() const {
-		return manualLoader;
+		return manualStreamer.manualLoader;
 	}
 
 	inline AssetSaverImpl* GetManualSaver() const {
-		return manualSaver;
+		return manualStreamer.manualSaver;
 	}
 
 	inline const InputStreamPtr& GetInputStream() const {
-		return inputStream;
+		return manualStreamer.inputStream;
 	}
 
 	inline const OutputStreamPtr& GetOutputStream() const {
-		return outputStream;
+		return manualStreamer.outputStream;
 	}
 
 	inline Asset::MetaInfo& GetMetaInfo() {
@@ -473,16 +442,7 @@ public:
 	}
 
 protected:
-	union {
-		struct {
-			AssetLoaderImpl* manualLoader;
-			InputStreamPtr inputStream;
-		};
-		struct {
-			AssetSaverImpl* manualSaver;
-			OutputStreamPtr outputStream;
-		};
-	};
+	AssetStreamerInfo manualStreamer;
 	NameValueMap parameters;
 	Asset::MetaInfo metaInfo;
 };

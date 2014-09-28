@@ -20,7 +20,7 @@ BackgroundStreamer::~BackgroundStreamer() {
 /************************************************************************/
 /* BackgroundStreamerImpl                                               */
 /************************************************************************/
-BackgroundStreamerImpl::BackgroundStreamerImpl() {
+BackgroundStreamerImpl::BackgroundStreamerImpl() : quitThreads(false) {
 	responseProcessed.clear(std::memory_order_release);
 	for (auto& t : streamingThreads) {
 		t = std::thread(&BackgroundStreamerImpl::ExecutePoolRequests, this);
@@ -43,7 +43,7 @@ BackgroundStreamerImpl::~BackgroundStreamerImpl() {
 	ApplicationContext::Instance().UnregisterListener(l);
 }
 
-void BackgroundStreamerImpl::AddRequest(StreamRequest* streamReq) {
+void BackgroundStreamerImpl::AsyncAddRequest(StreamRequest* streamReq) {
 	{
 		std::lock_guard<std::mutex> g(requestQueueLock);
 		requestQueue.push_back(streamReq);
@@ -75,7 +75,7 @@ void BackgroundStreamerImpl::ExecutePoolRequests() {
 			request->returnCode = StreamResult::STREAM_FAILED;
 		}
 		// add to loaded
-		AddResponse(request);
+		AsyncAddResponse(request);
 		// this might result in a call to process responses
 		// even when there are none, but thats not an issue.
 		responseProcessed.clear(std::memory_order_relaxed);
@@ -95,7 +95,7 @@ StreamRequest* BackgroundStreamerImpl::WaitAndPopRequest() {
 	return ret;
 }
 
-void BackgroundStreamerImpl::AddResponse(StreamRequest* request) {
+void BackgroundStreamerImpl::AsyncAddResponse(StreamRequest* request) {
 	std::lock_guard<std::mutex> g(responseQueueLock);
 	responseQueue.push_back(request);
 	// this is the safest place to clear this flag

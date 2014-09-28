@@ -18,46 +18,16 @@ NEX_DEFINE_SINGLETON_PTR(AssetStreamer);AssetStreamer ::AssetStreamer() {
 AssetStreamer::~AssetStreamer() {
 }
 
-void AssetStreamer::RequestLoad(Asset* asset) {
-	NEX_ASSERT(asset);
-	AssetStreamRequest* req = static_cast<AssetStreamRequest*>(asset->GetStreamRequest(true));
-	if (!(req->flags & StreamRequest::ASSET_STREAM_REQUEST)) {
-		Warn(
-				"Cannot register a generic load request for asset, "
-						"request must be of type AssetStreamRequest: "
-						+ req->GetName());
-		return;
-	}
+void AssetStreamer::AsyncRequestLoad(AssetStreamRequest* req) {
 	/** */
-	if (asset->IsLoading()) {
-		Warn(
-				"Redundant load request for asset: "
-						+ req->GetName());
-		return;
-	}
-	asset->SetLoading(true);
 	req->streamHandler = this;
-	BackgroundStreamer::Instance().AddRequest(req);
+	BackgroundStreamer::Instance().AsyncAddRequest(req);
 }
 
-void AssetStreamer::RequestSave(Asset* asset) {
-	AssetStreamRequest* req = static_cast<AssetStreamRequest*>(asset->GetStreamRequest(false));
-	if (asset->IsLoading() || !asset->IsLoaded()) {
-		Warn(
-				"Incorrect state for save: "
-						+ req->GetName());
-		return;
-	}
-
-	if (!(req->flags & StreamRequest::ASSET_STREAM_REQUEST)) {
-		Warn(
-				"Cannot register a generic save request for asset, "
-						"request must be of type AssetStreamRequest: "
-						+ req->GetName());
-		return;
-	}
+void AssetStreamer::AsyncRequestSave(AssetStreamRequest* req) {
 	req->flags |= StreamRequest::REQUEST_SAVE;
-	BackgroundStreamer::Instance().AddRequest(req);
+	req->streamHandler = this;
+	BackgroundStreamer::Instance().AsyncAddRequest(req);
 }
 
 void AssetStreamer::NotifySaved(StreamRequest* request) {
@@ -82,7 +52,7 @@ void AssetStreamer::NotifyLoaded(StreamRequest* request) {
 		// probably kill starvation, but two things need to be atomic in such a case (or may
 		// be one depending on memory ordering). The request pointer, and the atomic state.
 		for (auto it = dependencies.begin(); it != dependencies.end();) {
-			if ((*it)->HasLoadFailed()) {
+			if ((*it)->AsyncHasLoadFailed()) {
 				dependencies.clear();
 				assetReq->returnCode = StreamResult::STREAM_FAILED;
 				_NotifyAssetLoaded(asset, assetReq);

@@ -28,14 +28,14 @@ public:
 	BackgroundStreamerImpl();
 	virtual ~BackgroundStreamerImpl();
 
-	virtual void AddRequest(StreamRequest*);
+	virtual void AsyncAddRequest(StreamRequest*);
 
 protected:
 
 	// thread entry point
 	void ExecutePoolRequests();
 	StreamRequest* WaitAndPopRequest();
-	void AddResponse(StreamRequest* request);
+	void AsyncAddResponse(StreamRequest* request);
 
 	virtual void EndFrame(uint32 timeElapsed);
 
