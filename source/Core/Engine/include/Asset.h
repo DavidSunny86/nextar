@@ -33,6 +33,14 @@ union AssetStreamerInfo {
 	};
 };
 
+enum StreamNotification : uint32 {
+	NOTIFY_READY = 1 << 0,
+	NOTIFY_COMPLETED = 1 << 1,
+	NOTIFY_FAILED = 1 << 2,
+};
+
+NEX_ENUM_FLAGS(StreamNotification, uint32);
+
 class Asset;
 class AssetStreamRequest;
 
@@ -66,14 +74,13 @@ public:
 	typedef SharedComponent InstanceImplementor;
 
 	enum State : uint32 {
-		ASSET_CREATED,
-		ASSET_LOADING,
-		ASSET_LOADED,
-		ASSET_LOAD_FAILURE,
-		ASSET_READY,
-		ASSET_SAVING,
-		ASSET_UNLOADED
-
+		ASSET_CREATED = 1 << 0,
+		ASSET_LOADING = 1 << 1,
+		ASSET_LOADED = 1 << 2,
+		ASSET_LOAD_FAILURE = 1 << 3,
+		ASSET_READY = ASSET_LOADED|(1 << 4),
+		ASSET_SAVING = ASSET_READY|(1 << 5),
+		ASSET_UNLOADING = 1 << 6,
 	};
 
 	enum Flags {
@@ -297,33 +304,64 @@ public:
 	}
 		
 	bool AsyncHasLoadFailed() const {
-		return (assetState.load(std::memory_order_acquire) == ASSET_LOAD_FAILURE) != 0;
+		return (assetState.load(std::memory_order_acquire) & ASSET_LOAD_FAILURE) != 0;
 	}
 
 	bool AsyncIsLoaded() const {
-		return (assetState.load(std::memory_order_acquire) == ASSET_LOADED) != 0;
+		return (assetState.load(std::memory_order_acquire) & ASSET_LOADED) != 0;
 	}
 
-	// @remarks Places a load request, or loads in place depending upon \p doAsyncLoad
-	// and returns true if the request was placed or a load was done.
+	bool AsyncIsLoading() const {
+		return (assetState.load(std::memory_order_acquire) & ASSET_LOADING) != 0;
+	}
+
+	bool AsyncIsReady() const {
+		return (assetState.load(std::memory_order_acquire) & ASSET_READY) != 0;
+	}
+
+	bool AsyncIsCreated() const {
+		return (assetState.load(std::memory_order_acquire) & ASSET_CREATED) != 0;
+	}
+
+	// @remarks call to blocking load
 	// @returns false if the asset is not in a state when it can be loaded
-	virtual bool AsyncRequestLoad(const StreamInfo& request = StreamInfo::Null, bool doAsyncLoad = false);
-	// @remarks Places a save request, or saves in place depending upon \p doAsyncSave
-	// and returns true if the request was placed or a save was done.
+	bool RequestLoad(const StreamInfo& request = StreamInfo::Null) {
+		return AsyncLoad(request, false);
+	}
+	// @remarks call to blocking save 
 	// @returns false if the asset is not in a state when it can be saved
-	virtual bool AsyncRequestSave(const StreamInfo& request = StreamInfo::Null, bool doAsyncSave = false);
+	bool RequestSave(const StreamInfo& request = StreamInfo::Null) {
+		return AsyncSave(request, false);
+	}
+	// @remarks Places a load request, and returns true if the request was placed
+	// @returns false if the asset is not in a state when it can be loaded
+	bool AsyncRequestLoad(const StreamInfo& request = StreamInfo::Null) {
+		return AsyncLoad(request, true);
+	}
+	// @remarks Places a save request, and returns true if the request was placed
+	// @returns false if the asset is not in a state when it can be saved
+	bool AsyncRequestSave(const StreamInfo& request = StreamInfo::Null) {
+		return AsyncSave(request, true);
+	}
 	// @remarks Used by the engine to initialize resources
-	static AssetPtr AsyncLoad(const URL& input, const String& streamer = StringUtils::Null);
-	static AssetPtr AsyncLoad(InputStreamPtr& input, const String& streamer);
+	static AssetPtr AssetLoad(const URL& input, const String& streamer = StringUtils::Null);
+	static AssetPtr AssetLoad(InputStreamPtr& input, const String& streamer);
 	// @remarks Used by the engine to stream out resources
-	static void AsyncSave(AssetPtr& asset, const URL& output, const String& streamer = StringUtils::Null);
-	static void AsyncSave(AssetPtr& asset, OutputStreamPtr& output, const String& streamer);
+	static void AssetSave(AssetPtr& asset, const URL& output, const String& streamer = StringUtils::Null);
+	static void AssetSave(AssetPtr& asset, OutputStreamPtr& output, const String& streamer);
 
 protected:
+
+	
+	virtual StreamRequest* CreateStreamRequestImpl(bool load) = 0;
+
 	/* return true if the loading was completed */
-	virtual bool NotifyAssetLoadedImpl();
+	virtual StreamNotification NotifyAssetLoadedImpl(StreamRequest* request);
 	/* return true if the saving was completed */
-	virtual bool NotifyAssetSavedImpl();
+	virtual StreamNotification NotifyAssetSavedImpl(StreamRequest* request);
+
+	bool AsyncLoad(const StreamInfo& request, bool async);
+	bool AsyncSave(const StreamInfo& request, bool async);
 
 	/** Streamable */
 	virtual void AsyncLoad(StreamRequest* req);
@@ -356,6 +394,7 @@ protected:
 
 
 private:
+	StreamRequest* _savedRequestPtr;
 	enum {
 		ASSET_HEADER = 0xa5e7,
 	};
@@ -439,6 +478,10 @@ public:
 
 	inline void SetParameterValue(const String& name, const String& value) {
 		parameters[name] = value;
+	}
+
+	inline void SetStreamerInfo(const AssetStreamerInfo& info) {
+		manualStreamer = info;
 	}
 
 protected:

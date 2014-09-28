@@ -58,7 +58,7 @@ void AssetStreamer::NotifyLoaded(StreamRequest* request) {
 				_NotifyAssetLoaded(asset, assetReq);
 				break;
 			}
-			if ((*it)->IsLoaded())
+			if ((*it)->AsyncIsLoaded())
 				dependencies.erase(it++);
 			else {
 				/**

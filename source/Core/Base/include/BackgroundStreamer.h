@@ -45,7 +45,7 @@ protected:
 	~StreamHandler() {}
 };
 
-class StreamRequest {
+class StreamRequest : public AllocGeneral {
 public:
 	enum StreamRequestFlags {
 
@@ -78,6 +78,7 @@ public:
 			0), tryCount(1) {
 	}
 
+	virtual ~StreamRequest() {}
 };
 
 // to extend this class to support external streaming as well as component streaming
