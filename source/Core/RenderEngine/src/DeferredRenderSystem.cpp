@@ -76,7 +76,7 @@ void DeferredRenderSystem::PrepareGeometryBuffer() {
 void DeferredRenderSystem::PrepareMaterials() {
 	if (!lightMaterial) {
 		URL lightMaterialPath(FileSystem::ArchiveEngineData_Name, "Materials/DeferredLights.mtl");
-		lightMaterial = Asset::AsyncLoad(lightMaterialPath);
+		lightMaterial = Asset::AssetLoad(lightMaterialPath);
 	}
 }
 

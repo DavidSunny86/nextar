@@ -24,7 +24,11 @@ public:
 
 	virtual void Load(InputStreamPtr&, AssetLoader& loader);
 
+	static FbxMeshLoaderImplBase loader;
+
 protected:
+
+
 	FbxManager* mManager;
 	FbxIOSettings* mIOSettings;
 

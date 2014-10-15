@@ -27,6 +27,8 @@ public:
 		uint32 startIndex;
 		uint32 indexCount;
 		MaterialTemplatePtr material;
+		BoundsInfo bounds;
+		// this is null if shared buffer is being used
 		MeshBuffer* buffer;
 	};
 
@@ -47,14 +49,54 @@ public:
 			sharedBuffer = buffer;
 		}
 		
+		void SetBounds(const BoundsInfo& bounds) {
+			this->bounds = bounds;
+		}
+
 	protected:
+		friend class MeshTemplate;
+
+		BoundsInfo bounds;
 		MaterialTemplatePtr sharedMaterial;
 		PrimitiveGroupList primitives;
 		MeshBuffer* sharedBuffer;
 	};
 
+	typedef AssetTraits<MeshTemplate> Traits;
+	typedef FactoryTraits<MeshTemplate> FactoryTraits;
+
+	MeshTemplate(const StringID name, const StringID factory);
+	~MeshTemplate();
+
+	uint32 GetNumPrimitiveGroups() const {
+		return primitives.size();
+	}
+
+	void SetBounds(const BoundsInfo& bounds) {
+		this->bounds = bounds;
+	}
+
+	inline const BoundsInfo& GetBounds() const {
+		return bounds;
+	}
+
+	inline MeshBuffer* GetSharedMeshBuffer() const {
+		return sharedBuffer;
+	}
+
+	inline MaterialTemplatePtr GetSharedMaterial() const {
+		return sharedMaterial;
+	}
+
+	inline const PrimitiveGroup& GetPrimitive(uint32 i) const {
+		return primitives[i];
+	}
+
+	virtual StreamNotification NotifyAssetLoadedImpl(StreamRequest* request);
+
 protected:
 
+	BoundsInfo bounds;
 	MaterialTemplatePtr sharedMaterial;
 	MeshBuffer* sharedBuffer;
 	PrimitiveGroupList primitives;

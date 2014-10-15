@@ -13,5 +13,6 @@
 #include <AssetTemplate.h>
 #include <ShaderTemplate.h>
 #include <MaterialTemplate.h>
+#include <MeshTemplate.h>
 
 #endif /* PROJECTMODELHEADERS_H_ */

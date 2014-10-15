@@ -6,7 +6,7 @@
 
 namespace nextar {
 
-enum VertexComponentSemantic {
+enum VertexComponentSemantic : uint16 {
 	/* Basic position component.  */
 	COMP_POSITION,
 	/* Transformed 2D position component, in normalized
@@ -32,14 +32,14 @@ enum VertexComponentSemantic {
 	COMP_RESERVED_COUNT,
 };
 
-enum VertexComponentBaseType {
+enum VertexComponentBaseType : uint16 {
 	COMP_BASE_TYPE_FLOAT,
 	COMP_BASE_TYPE_UNSIGNED_INT,
 	COMP_BASE_TYPE_UNSIGNED_SHORT,
 	COMP_BASE_TYPE_INVALID,
 };
 
-enum VertexComponentType {
+enum VertexComponentType : uint16 {
 	COMP_TYPE_FLOAT1,
 	COMP_TYPE_FLOAT2,
 	COMP_TYPE_FLOAT3,
@@ -67,13 +67,13 @@ struct SemanticDef {
 	/* eg: 0,1, for COMP_TEXTURE_COORDINATE */
 	uint8 semanticIndex;
 	/* eg: COMP_TEXTURE_COORDINATE */
-	uint16 semantic;
+	VertexComponentSemantic semantic;
 	//uint16 feedBackRemap;
 
 	typedef map<String, SemanticDef>::type SemanticMap;
 	static SemanticMap semanticMap;
 
-	SemanticDef(uint16 sem, uint8 idx, bool input = true, bool inst = false,
+	SemanticDef(VertexComponentSemantic sem, uint8 idx, bool input = true, bool inst = false,
 			uint16 fbRem = COMP_RESERVED_COUNT) :
 			semantic(sem), semanticIndex(idx) /*, feedBackRemap(fbRem) */{
 		instanceData = inst;
@@ -89,18 +89,19 @@ struct _NexEngineAPI VertexSemantic: public AllocGraphics {
 	uint8 semanticIndex;
 	/* Semantic that maps with the shader
 	 * eg: COMP_TEXTURE_COORDINATE */
-	uint16 semantic;
+	VertexComponentSemantic semantic;
 	/* Feedback semantic remap */
 	//uint16 feedBackRemap;
 	/* component type
 	 * eg: COMP_TYPE_FLOAT1 */
-	uint16 type;
+	VertexComponentType type;
 
 	inline VertexSemantic() :
 	semantic(-1), type(-1), semanticIndex(-1), instanceData(false) {
 	}
 
-	inline VertexSemantic(uint16 sem, uint8 semIndex, uint16 elementType,
+	inline VertexSemantic(VertexComponentSemantic sem, uint8 semIndex,
+			VertexComponentType elementType,
 			bool instData = false) :
 	semantic(sem), semanticIndex(semIndex), type(elementType), instanceData(
 			instData) /*, feedBackRemap(fbRemap) */{

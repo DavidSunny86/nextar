@@ -93,9 +93,9 @@ void MeshAsset::_FillIndexData(MeshIndexData* data,
 	indexBufferIt++;
 }
 
-bool MeshAsset::NotifyAssetLoadedImpl() {
+StreamNotification MeshAsset::NotifyAssetLoadedImpl(StreamRequest* _request) {
 	MeshAsset::StreamRequest* request =
-			static_cast<MeshAsset::StreamRequest*>(GetStreamRequest());
+			static_cast<MeshAsset::StreamRequest*>(_request);
 	defaultSharedMaterial = request->sharedMaterial;
 	sharedIndexData = request->sharedIndexData;
 	sharedVertexData = request->sharedVertexData;
@@ -127,7 +127,7 @@ bool MeshAsset::NotifyAssetLoadedImpl() {
 			p.defaultMaterial = defaultSharedMaterial;
 	}
 
-	return true;
+	return StreamNotification::NOTIFY_COMPLETED_AND_READY;
 }
 
 void MeshAsset::NotifyAssetUnloaded() {
@@ -140,13 +140,6 @@ void MeshAsset::NotifyAssetUpdated() {
 
 StreamRequest* MeshAsset::CreateStreamRequestImpl(bool load) {
 	return NEX_NEW(MeshAsset::StreamRequest(this));
-}
-
-void MeshAsset::DestroyStreamRequestImpl(nextar::StreamRequest*& _request,
-		bool load/*=true*/) {
-	MeshAsset::StreamRequest* request = static_cast<MeshAsset::StreamRequest*>(_request);
-	NEX_DELETE(request);
-	_request = nullptr;
 }
 
 void MeshAsset::EndianFlip(void* data, const VertexElement* veBegin,

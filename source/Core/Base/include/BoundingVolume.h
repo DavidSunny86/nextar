@@ -14,15 +14,21 @@
 namespace nextar {
 
 struct BoundsInfo {
+
+	static BoundsInfo Null;
+
 	Vector3 center;
 	Vector3 extends;
 	float radius;
+
+	BoundsInfo() : radius(0), center(0,0,0), extends(0,0,0) {
+	}
 };
+
 class _NexBaseAPI BoundingBox: public AllocMathPool<BoundingBox,
 		NEX_BV_POOL_NUM_PER_BLOCK> {
 public:
 
-	static BoundingBox Null;
 
 	BoundingBox();
 

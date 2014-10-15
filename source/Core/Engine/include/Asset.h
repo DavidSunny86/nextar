@@ -33,10 +33,34 @@ union AssetStreamerInfo {
 	};
 };
 
+struct StreamInfo {
+	static const StreamInfo Null;
+	AssetStreamRequest* externalRequest;
+	URL locator; // in case the locator is not set yet
+	AssetStreamerInfo manualStreamer;
+
+	StreamInfo() : externalRequest(nullptr) {
+		manualStreamer.manualLoader = nullptr;
+	}
+
+	StreamInfo(AssetLoaderImpl* loader, const InputStreamPtr& streamPtr) : externalRequest(nullptr) {
+		manualStreamer.manualLoader = loader;
+		manualStreamer.inputStream = streamPtr;
+	}
+
+	StreamInfo(AssetSaverImpl* saver, const OutputStreamPtr& streamPtr) : externalRequest(nullptr) {
+		manualStreamer.manualSaver = saver;
+		manualStreamer.outputStream = streamPtr;
+	}
+};
+
 enum StreamNotification : uint32 {
 	NOTIFY_READY = 1 << 0,
 	NOTIFY_COMPLETED = 1 << 1,
-	NOTIFY_FAILED = 1 << 2,
+	NOTIFY_RESUBMIT = 1 << 2,
+	NOTIFY_FAILED = 1 << 3,
+	NOTIFY_COMPLETED_AND_READY = NOTIFY_COMPLETED|NOTIFY_READY,
+	NOTIFY_RESUBMIT_AND_READY = NOTIFY_RESUBMIT|NOTIFY_READY,
 };
 
 NEX_ENUM_FLAGS(StreamNotification, uint32);
@@ -241,13 +265,6 @@ public:
 		AssetSet unresolvedDependencies;
 	};
 
-	struct StreamInfo {
-		static const StreamInfo Null;
-		AssetStreamRequest* externalRequest;
-		URL locator; // in case the locator is not set yet
-		AssetStreamerInfo manualStreamer;
-	};
-
 
 	Asset(const StringID name, const StringID factory);
 	virtual ~Asset();
@@ -302,6 +319,13 @@ public:
 	virtual uint32 GetProxyID() const {
 		return GetClassID();
 	}
+
+	void AddDependent(AssetStreamRequest* request) {
+		if (_savedRequestPtr) {
+			NEX_ASSERT(_savedRequestPtr->flags & StreamRequest::ASSET_STREAM_REQUEST);
+			static_cast<AssetStreamRequest*>(_savedRequestPtr)->GetMetaInfo().AddDependent(request);
+		}
+	}
 		
 	bool AsyncHasLoadFailed() const {
 		return (assetState.load(std::memory_order_acquire) & ASSET_LOAD_FAILURE) != 0;
@@ -313,6 +337,10 @@ public:
 
 	bool AsyncIsLoading() const {
 		return (assetState.load(std::memory_order_acquire) & ASSET_LOADING) != 0;
+	}
+
+	bool AsyncIsSaving() const {
+		return (assetState.load(std::memory_order_acquire) & ASSET_SAVING) != 0;
 	}
 
 	bool AsyncIsReady() const {
@@ -349,6 +377,7 @@ public:
 	// @remarks Used by the engine to stream out resources
 	static void AssetSave(AssetPtr& asset, const URL& output, const String& streamer = StringUtils::Null);
 	static void AssetSave(AssetPtr& asset, OutputStreamPtr& output, const String& streamer);
+
 
 protected:
 
@@ -484,7 +513,20 @@ public:
 		manualStreamer = info;
 	}
 
+	inline void SetAssetLocator(const URL& locator) {
+		this->locator = locator;
+	}
+
+	inline const URL& GetAssetLocator() const {
+		return locator;
+	}
+
+	inline uint32 RemoveDependency(Asset* asset) {
+		return metaInfo.RemoveDependency(asset);
+	}
+
 protected:
+	URL locator;
 	AssetStreamerInfo manualStreamer;
 	NameValueMap parameters;
 	Asset::MetaInfo metaInfo;

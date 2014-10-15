@@ -10,8 +10,8 @@ public:
 	typedef vector<Vec>::type VertexArray;
 
 
-	VertexChannelTempl(VertexComponentSemantic _semantic, uint32 _index, VertexComponentType _type) :
-		VertexChannel(_semantic, _index, _type) {
+	VertexChannelTempl(VertexComponentSemantic _semantic, uint32 _index, VertexComponentType _type, uint32 streamIdx) :
+		VertexChannel(_semantic, _index, _type, Math::Traits<Vec>::Size(), streamIdx) {
 	}
 
 	virtual VertexChannel* CreateEmpty() const {
@@ -54,6 +54,13 @@ public:
 		return &vertices[i];
 	}
 
+	virtual void GetVerties(void* destBuffer, uint32 outStride) {
+		uint8* vert = static_cast<uint8*>(destBuffer);
+		for(auto& e : vertices) {
+			std::memcpy(vert, &e, stride);
+			vert += outStride;
+		}
+	}
 protected:
 
 	VertexArray vertices;
@@ -81,8 +88,21 @@ void MeshBuffer::ReserveIndexSpace(uint32 indexCount) {
 	indices.reserve(indices.size() + indexCount);
 }
 
-VertexChannel* MeshBuffer::GetVertexChannel(uint32 i) {
+VertexChannel* MeshBuffer::GetVertexChannel(uint32 i) const {
 	return channels[i];
+}
+
+uint32 MeshBuffer::GetVertexBufferCount() const {
+	uint32 vbCount = 0;
+	uint32 currentStream = -1;
+	for (auto &c : channels) {
+		if (currentStream != c->streamIndex) {
+			currentStream = c->streamIndex;
+			vbCount++;
+		}
+	}
+
+	return vbCount;
 }
 
 uint32 MeshBuffer::GetVertexCount() const {
@@ -91,7 +111,7 @@ uint32 MeshBuffer::GetVertexCount() const {
 	return 0;
 }
 
-VertexChannel* MeshBuffer::GetVertexChannel(VertexComponentSemantic _semantic, uint32 _semanticIdx) {
+VertexChannel* MeshBuffer::GetVertexChannel(VertexComponentSemantic _semantic, uint32 _semanticIdx) const {
 	for (auto &c : channels) {
 		if (c->GetSemantic() == _semantic &&
 			c->GetSemanticIndex() == _semanticIdx)
@@ -101,7 +121,7 @@ VertexChannel* MeshBuffer::GetVertexChannel(VertexComponentSemantic _semantic, u
 	return nullptr;
 }
 
-uint32 MeshBuffer::GetChannelCount(VertexComponentSemantic _semantic) {
+uint32 MeshBuffer::GetChannelCount(VertexComponentSemantic _semantic) const {
 	uint32 count = 0;
 	for (auto &c : channels) {
 		if (c->GetSemantic() == _semantic)
@@ -114,25 +134,26 @@ uint32 MeshBuffer::GetChannelCount(VertexComponentSemantic _semantic) {
 uint32 MeshBuffer::AddVertexChannel(
 	VertexComponentSemantic _semantic,
 	uint32 _semanticIdx,
-	VertexComponentType _type) {
+	VertexComponentType _type,
+	uint32 streamIdx) {
 	VertexChannel* channel = GetVertexChannel(_semantic, _semanticIdx);
 	if (!channel) {
 		switch (_type) {
 		case COMP_TYPE_FLOAT1:
-			channel = NEX_NEW(VertexChannelTempl<float>(_semantic, _semanticIdx, _type));
+			channel = NEX_NEW(VertexChannelTempl<float>(_semantic, _semanticIdx, _type, streamIdx));
 			break;
 		case COMP_TYPE_FLOAT2:
-			channel = NEX_NEW(VertexChannelTempl<Vector2>(_semantic, _semanticIdx, _type));
+			channel = NEX_NEW(VertexChannelTempl<Vector2>(_semantic, _semanticIdx, _type, streamIdx));
 			break;
 		case COMP_TYPE_FLOAT3:
-			channel = NEX_NEW(VertexChannelTempl<Vector3>(_semantic, _semanticIdx, _type));
+			channel = NEX_NEW(VertexChannelTempl<Vector3>(_semantic, _semanticIdx, _type, streamIdx));
 			break;
 		case COMP_TYPE_FLOAT4:
-			channel = NEX_NEW(VertexChannelTempl<Vector4>(_semantic, _semanticIdx, _type));
+			channel = NEX_NEW(VertexChannelTempl<Vector4>(_semantic, _semanticIdx, _type, streamIdx));
 			break;
 		case COMP_TYPE_UNSIGNED_INT:
 		case COMP_TYPE_COLOR:
-			channel = NEX_NEW(VertexChannelTempl<uint32>(_semantic, _semanticIdx, _type));
+			channel = NEX_NEW(VertexChannelTempl<uint32>(_semantic, _semanticIdx, _type, streamIdx));
 			break;
 		}
 		if (channel) {
@@ -152,6 +173,26 @@ bool MeshBuffer::VertexEquals(uint32 i, uint32 j) {
 			return false;
 	}
 	return true;
+}
+
+BoundsInfo MeshBuffer::ComputeBounds() const {
+	BoundsInfo bounds;
+	VertexChannel* vc = GetVertexChannel(COMP_POSITION, 0);
+	if (vc && vc->GetType() == COMP_TYPE_FLOAT3) {
+		const Vector3* v = reinterpret_cast<const Vector3*>(vc->GetVertex(0));
+		uint32 nCount = vc->GetVertexCount();
+		Vector3 minPoint(Math::SCALAR_MAX), maxPoint(-Math::SCALAR_MAX);
+		for(uint32 i = 0; i < nCount; ++i) {
+			v[i].GetMinElements(minPoint);
+			v[i].GetMaxElements(maxPoint);
+		}
+
+		bounds.center = (maxPoint + minPoint) * 0.5f;
+		bounds.extends = (maxPoint - minPoint) * 0.5f;
+		bounds.radius = bounds.extends.Length();
+	}
+
+	return bounds;
 }
 
 void MeshBuffer::RemoveDuplicates() {
@@ -230,6 +271,95 @@ void MeshBuffer::MergeBuffer(const MeshBuffer& m) {
 
 	for(uint32 c = 0; c < m.channels.size(); ++c) {
 		channels[c]->PushVertices(m.channels[c]);
+	}
+}
+
+void MeshBuffer::GetVertex(uint32 i, uint32 stream, ByteStream& out) const {
+	out.clear();
+	for (auto& e : channels) {
+		if (e->streamIndex == stream) {
+			const void* data = e->GetVertex(i);
+			size_t size = e->GetStride();
+			out.insert(out.end(), data, data+size);
+		}
+	}
+}
+
+void MeshBuffer::GetVertices(uint32 stream, ByteStream& out) const {
+	out.clear();
+	uint32 stride = GetVertexStride(stream);
+	uint32 totalVertSize = stride * GetVertexCount();
+	out.resize(totalVertSize);
+	uint8* buff = out.data();
+	for (auto& e : channels) {
+		if (e->streamIndex == stream) {
+			e->GetVerties(buff, stride);
+			buff += e->stride;
+		}
+	}
+}
+
+void MeshBuffer::GetOptimizedIndices(ByteStream& out) const {
+	uint32 count = GetVertexCount();
+	if (count > std::numeric_limits<uint16>::max()) {
+		out.resize(sizeof(uint32)*indices.size());
+		std::memcpy(out.data(), indices.data(), out.size());
+	} else {
+		out.resize(sizeof(uint16)*indices.size());
+		uint16* data = static_cast<uint16*>(out.data());
+		for(uint32 i = 0; i < indices.size(); ++i)
+			data[i] = (uint16)indices[i];
+	}
+}
+
+uint32 MeshBuffer::GetVertexStride(uint32 streamIdx) const {
+	uint32 stride = 0;
+	for (auto& e : channels) {
+		if (e->streamIndex == streamIdx)
+			stride += e->GetStride();
+	}
+	return stride;
+}
+
+void MeshBuffer::GetVertexLayout(VertexLayoutInfo& layout) const {
+	// all elements go to a single buffer
+	// elements are laid out as channels are laid out
+	layout.layoutType = CUSTOM_LAYOUT;
+	uint32 layoutCount = VERTEX_LAYOUT_COUNT;
+	for(uint32 i = 0; i < layoutCount; ++i) {
+		const VertexElement* elements = nullptr;
+		uint32 numElements = 0;
+		VertexLayout::GetCustomLayoutElements((VertexLayoutType)i, elements, numElements);
+		if (numElements == channels.size()) {
+			int32 found = (int32)i;
+			for (uint32 j = 0; j < channels.size(); ++j) {
+				if( !(channels[j]->semantic == elements[j].desc.semantic.semantic &&
+					channels[j]->semanticIdx == elements[j].desc.semantic.semanticIndex &&
+					channels[j]->type == elements[j].desc.semantic.type &&
+					channels[j]->streamIndex == elements[j].streamIndex) ) {
+					found = -1;
+					break;
+				}
+			}
+			if (found >= 0) {
+				layout.layoutType = (VertexLayoutType)i;
+				layout.vertexElements.assign(elements, elements+numElements);
+				return;
+			}
+		}
+	}
+
+	layout.vertexElements.reserve(channels.size());
+	uint16 offset = 0;
+	for (auto& e : channels) {
+
+		layout.vertexElements.push_back(
+			VertexElement(
+				VertexDesc(
+					VertexSemantic(
+						e->semantic, e->semanticIdx, e->type), offset), e->streamIndex)
+				);
+		offset += e->GetStride();
 	}
 }
 

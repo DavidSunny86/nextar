@@ -11,6 +11,7 @@
 #include <MaterialSaverImplv10.h>
 #include <ShaderTemplate.h>
 #include <MaterialTemplate.h>
+#include <MeshTemplate.h>
 
 namespace nextar {
 
@@ -29,6 +30,7 @@ void ProjectApplicationContext::CreateExtendedInterfacesImpl() {
 void ProjectApplicationContext::RegisterTemplateFactories() {
 	ShaderTemplate::FactoryTraits::_InternalRegisterToArchive();
 	MaterialTemplate::FactoryTraits::_InternalRegisterToArchive();
+	MeshTemplate::FactoryTraits::_InternalRegisterToArchive();
 
 	AssetSaver::RegisterFactory("MTL",
 			MaterialTemplate::Traits::CLASS_ID,
@@ -36,6 +38,9 @@ void ProjectApplicationContext::RegisterTemplateFactories() {
 	AssetSaver::RegisterFactory("NFX",
 			ShaderTemplate::Traits::CLASS_ID,
 			&ShaderSaverImplv1_0::saver);
+	AssetSaver::RegisterFactory("MESH",
+				MeshTemplate::Traits::CLASS_ID,
+				&MeshSaverImplv1_0::saver);
 }
 
 void ProjectApplicationContext::ReleaseResourcesImpl() {

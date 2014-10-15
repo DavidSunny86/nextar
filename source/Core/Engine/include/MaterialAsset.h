@@ -32,7 +32,7 @@ public:
 	typedef AssetTraits<MaterialAsset> Traits;
 	typedef FactoryTraits<MaterialAsset> FactoryTraits;
 
-	class _NexEngineAPI StreamRequest: public AllocGeneral, public AssetStreamRequest {
+	class _NexEngineAPI StreamRequest: public AssetStreamRequest {
 		NEX_LOG_HELPER(MaterialAsset::StreamRequest)
 		;
 	public:
@@ -80,16 +80,16 @@ public:
 
 protected:
 	/* notify loaded/unloaded */
-	virtual bool NotifyAssetLoadedImpl();
-	virtual void NotifyAssetUnloaded();
-	virtual void NotifyAssetUpdated();
-	virtual bool NotifyAssetSavedImpl();
+	virtual StreamNotification NotifyAssetLoadedImpl(StreamRequest* request) override;
+	virtual StreamNotification NotifyAssetSavedImpl(StreamRequest* request) override;
+
+	virtual void NotifyAssetUnloaded() override;
+	virtual void NotifyAssetUpdated() override;
+
 
 	virtual void UnloadImpl();
 
 	virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);
-	virtual void DestroyStreamRequestImpl(nextar::StreamRequest*&, bool load =
-			true);
 
 	void PrepareMaterial(MaterialAsset::StreamRequest*);
 	void SetParamBufferSize(size_t size);

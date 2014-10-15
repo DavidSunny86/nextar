@@ -60,7 +60,7 @@ public:
 	// todo Make this a list not a vector
 	typedef vector<StreamPass>::type StreamPassList;
 
-	class _NexEngineAPI StreamRequest: public AllocGeneral, public AssetStreamRequest {
+	class _NexEngineAPI StreamRequest: public AssetStreamRequest {
 		NEX_LOG_HELPER(ShaderAsset::StreamRequest)
 		;
 	public:
@@ -149,15 +149,13 @@ public:
 	}
 protected:
 
-	virtual bool NotifyAssetLoadedImpl();
-	virtual void NotifyAssetUnloaded();
-	virtual void NotifyAssetUpdated();
+	virtual StreamNotification NotifyAssetLoadedImpl(StreamRequest* request);
+	virtual void NotifyAssetUnloaded() override;
+	virtual void NotifyAssetUpdated() override;
 
 	virtual void UnloadImpl();
 
 	virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);
-	virtual void DestroyStreamRequestImpl(nextar::StreamRequest*&, bool load =
-			true);
 
 	struct ParamTableBuilder {
 		uint32 viewParamCount;

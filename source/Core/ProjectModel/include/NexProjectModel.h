@@ -19,7 +19,7 @@ class MeshTemplate;
 
 typedef RefPtr<MaterialTemplate> MaterialTemplatePtr;
 typedef RefPtr<ShaderTemplate> ShaderTemplatePtr;
-typedef RefPtr<MeshTemplate> MeshTempaltePtr;
+typedef RefPtr<MeshTemplate> MeshTemplatePtr;
 
 }
 

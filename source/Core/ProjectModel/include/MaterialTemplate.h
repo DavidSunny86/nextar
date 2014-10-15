@@ -29,7 +29,7 @@ public:
 	typedef AssetTraits<MaterialTemplate> Traits;
 	typedef FactoryTraits<MaterialTemplate> FactoryTraits;
 
-	class _NexProjectAPI StreamRequest: public AllocGeneral, public AssetStreamRequest {
+	class _NexProjectAPI StreamRequest: public AssetStreamRequest {
 		NEX_LOG_HELPER(MaterialTemplate::StreamRequest);
 	public:
 		StreamRequest(MaterialTemplate* materialTemplate);
@@ -47,8 +47,8 @@ public:
 	/* notify loaded/unloaded */
 	virtual void NotifyAssetUnloaded();
 	virtual void NotifyAssetUpdated();
-	virtual bool NotifyAssetLoadedImpl();
-	virtual bool NotifyAssetSavedImpl();
+	virtual StreamNotification NotifyAssetLoadedImpl(StreamRequest* request);
+	virtual StreamNotification NotifyAssetSavedImpl(StreamRequest* request);
 
 	void SetMaterialID(const MaterialAsset::ID& id);
 	void SetShader(const ShaderTemplatePtr& shader);
@@ -57,7 +57,6 @@ public:
 
 	virtual void UnloadImpl();
 	virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);
-	virtual void DestroyStreamRequestImpl(nextar::StreamRequest*&, bool load = true);
 
 	void SetLayer(Layer layer) {
 		this->layer = layer;
@@ -82,6 +81,11 @@ public:
 	// load a shader
 	virtual uint32 GetClassID() const;
 	virtual uint32 GetProxyID() const;
+
+	inline MaterialAsset::ID GetMaterialID() const {
+		return assetId;
+	}
+
 protected:
 
 	class MaterialFromTemplate : public AssetLoaderImpl {

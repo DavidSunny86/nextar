@@ -35,21 +35,6 @@ uint32 ShaderTemplate::GetProxyID() const {
 	return ShaderAsset::CLASS_ID;
 }
 
-void ShaderTemplate::DestroyStreamRequestImpl(
-		nextar::StreamRequest*& streamRequest, bool load) {
-	
-	if (load) {
-		auto request = static_cast<LoadStreamRequest*>(streamRequest);
-		NEX_DELETE(request);
-	}
-	else {
-		auto request = static_cast<SaveStreamRequest*>(streamRequest);
-		NEX_DELETE(request);
-	}
-
-	streamRequest = nullptr;
-}
-
 String ShaderTemplate::GetHashNameFromOptions(const StringUtils::WordList& opt) {
 	StringUtils::TokenIterator it = 0;
 	String word;
@@ -99,25 +84,13 @@ ShaderAssetPtr& ShaderTemplate::CreateShader(const String& hash,
 	return unit.shaderObject;
 }
 
-void ShaderTemplate::NotifyAssetUnloaded() {
-	AssetTemplate::NotifyAssetUnloaded();
-}
-
-void ShaderTemplate::NotifyAssetUpdated() {
-	AssetTemplate::NotifyAssetUpdated();
-}
-
-bool ShaderTemplate::NotifyAssetLoadedImpl() {
-	return true;
-}
-
-bool ShaderTemplate::NotifyAssetSavedImpl() {
+StreamNotification ShaderTemplate::NotifyAssetSavedImpl(StreamRequest* ) {
 	// make sure these shaders are loaded from the current saved path
 	for (auto &s : shaders) {
 		if(s.second.shaderObject)
 			s.second.shaderObject->SetAssetLocator(GetAssetLocator());
 	}
-	return true;
+	return StreamNotification::NOTIFY_COMPLETED_AND_READY;
 }
 
 void ShaderTemplate::UnloadImpl() {

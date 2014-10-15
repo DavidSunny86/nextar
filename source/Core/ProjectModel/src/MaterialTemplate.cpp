@@ -21,7 +21,7 @@ MaterialTemplate::MaterialTemplate(const StringID name, const StringID factory) 
 MaterialTemplate::~MaterialTemplate() {
 }
 
-bool MaterialTemplate::NotifyAssetLoadedImpl() {
+StreamNotification MaterialTemplate::NotifyAssetLoadedImpl(StreamRequest* request) {
 	if(!shader) {
 		Error("Shader failed to load");
 		// request is complete
@@ -30,20 +30,19 @@ bool MaterialTemplate::NotifyAssetLoadedImpl() {
 	ShaderAssetPtr shaderPtr =
 			shader->GetShaderUnit(compilationOptions);
 	material = MaterialAsset::Traits::Instance(assetId);
-	if (!material->IsLoaded()) {
-		auto streamRequest = static_cast<AssetStreamRequest*>(
-			material->GetStreamRequest(true));
+	if (!material->AsyncIsLoaded()) {
+		InputStreamPtr dummy;
+		StreamInfo info(this, dummy);
 		MaterialFromTemplate loader(this, shaderPtr);
-		streamRequest->SetManualLoader(&loader);
-		material->Load(false);
+		material->RequestLoad(info);
 	}
-	return true;
+	return StreamNotification::NOTIFY_COMPLETED_AND_READY;
 }
 
-bool MaterialTemplate::NotifyAssetSavedImpl() {
+StreamNotification MaterialTemplate::NotifyAssetSavedImpl(StreamRequest* request) {
 	if (material)
 		material->SetAssetLocator(GetAssetLocator());
-	return true;
+	return StreamNotification::NOTIFY_COMPLETED_AND_READY;
 }
 
 void MaterialTemplate::NotifyAssetUnloaded() {
@@ -77,16 +76,6 @@ StreamRequest* MaterialTemplate::CreateStreamRequestImpl(bool load) {
 
 void MaterialTemplate::SetMaterialID(const MaterialAsset::ID& id) {
 	assetId = id;
-}
-
-void MaterialTemplate::DestroyStreamRequestImpl(nextar::StreamRequest*& streamRequest,
-		bool load) {
-	if (streamRequest) {
-		MaterialTemplate::StreamRequest* req = 
-			static_cast<MaterialTemplate::StreamRequest*>(streamRequest);
-		NEX_DELETE(req);
-	}
-	streamRequest = nullptr;
 }
 
 uint32 MaterialTemplate::GetClassID() const {

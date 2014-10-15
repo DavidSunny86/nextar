@@ -113,7 +113,7 @@ public:
 	typedef AssetTraits<MeshAsset> Traits;
 	typedef FactoryTraits<MeshAsset> FactoryTraits;
 
-	class _NexEngineAPI StreamRequest: public AllocGeneral, public AssetStreamRequest {
+	class _NexEngineAPI StreamRequest: public AssetStreamRequest {
 	public:
 		StreamRequest(MeshAsset* a);
 
@@ -238,14 +238,14 @@ public:
 
 protected:
 
-	virtual bool NotifyAssetLoadedImpl();
+	virtual StreamNotification NotifyAssetLoadedImpl(StreamRequest* request);
+
 	virtual void NotifyAssetUnloaded();
 	virtual void NotifyAssetUpdated();
 
 	virtual void UnloadImpl();
 
 	virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);
-	virtual void DestroyStreamRequestImpl(nextar::StreamRequest*&, bool load = true);
 
 	static void _FillVertexData(MeshVertexData*,
 			MeshBufferData::BufferList::iterator&);

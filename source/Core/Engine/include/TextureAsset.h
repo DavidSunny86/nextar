@@ -48,7 +48,7 @@ public:
 		}
 	};
 
-	class TextureStreamRequest: public AllocGeneral, public AssetStreamRequest {
+	class TextureStreamRequest: public AssetStreamRequest {
 	public:
 		/** todo, global render options can be checked */
 		enum {
@@ -95,13 +95,12 @@ protected:
 	virtual void NotifyAssetUnloaded();
 	virtual void NotifyAssetUpdated();
 
-	virtual bool NotifyAssetLoadedImpl();
+	virtual StreamNotification NotifyAssetLoadedImpl(StreamRequest* request);
 
 	virtual void LoadImpl(StreamRequest* req, bool isAsync);
 	virtual void UnloadImpl();
 
 	virtual StreamRequest* CreateStreamRequestImpl(bool load);
-	virtual void DestroyStreamRequestImpl(StreamRequest*&, bool load = true);
 
 	LodStrategy* lodStrategy;
 };

@@ -19,6 +19,7 @@ public:
 		uint32 mStartIndex;
 		uint32 mIndexCount;
 		FbxSurfaceMaterial* mMaterial;
+		BoundsInfo mBounds;
 		MeshBuffer* mMesh;
 	};
 
@@ -44,6 +45,7 @@ protected:
 	typedef map<FbxSurfaceMaterial*, IndexArray>::type MaterialPolygonMap;
 
 	FbxInputStreamBridge mStream;
+	BoundsInfo mFullBounds;
 	MeshBuffer* mSharedBuffer;
 	MeshElementList mElements;
 	FbxManager* mManager;

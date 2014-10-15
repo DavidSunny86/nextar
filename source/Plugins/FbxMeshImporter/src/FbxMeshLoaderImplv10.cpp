@@ -421,6 +421,8 @@ void FbxMeshLoaderImplv1_0::CreatePrimitiveGroupFrom(FbxSurfaceMaterial* pMtl,
 	kElement.mVertexCount = pBuffer->GetVertexCount();
 	kElement.mIndexCount = pBuffer->GetIndexCount();
 	kElement.mMaterial = pMtl;
+	kElement.mBounds = pBuffer->ComputeBounds();
+
 	if (useSharedVertexSpace && mSharedBuffer) {
 		kElement.mStartVertex = mSharedBuffer->GetVertexCount();
 		kElement.mStartIndex = mSharedBuffer->GetIndexCount();
@@ -436,24 +438,28 @@ void FbxMeshLoaderImplv1_0::CreatePrimitiveGroupFrom(FbxSurfaceMaterial* pMtl,
 	}
 
 	mElements.push_back(kElement);
-
 }
 
 void FbxMeshLoaderImplv1_0::BuildMesh(MeshTemplate::MeshBuilder* pMesh) {
 
+	pMesh->SetBounds(mFullBounds);
 	pMesh->SetSharedBuffer(mSharedBuffer);
-	mSharedBuffer = nullptr;
 	for(auto &e : mElements) {
 		MeshTemplate::PrimitiveGroup& pg = pMesh->AddPrimitiveGroup();
-		pg.buffer = e.mMesh;
+		pg.buffer = e.mMesh == mSharedBuffer ? nullptr : e.mMesh;
 		pg.indexCount = e.mIndexCount;
 		pg.startIndex = e.mStartIndex;
 		pg.vertexCount = e.mVertexCount;
 		pg.startVertex = e.mStartVertex;
+		pg.bounds = e.mBounds;
 		pg.material = CreateMaterial(e.mMaterial);
+
 		if (pg.material)
 			pMesh->metaInfo.AddDependency(pg.material);
 	}
+
+	mElements.clear();
+	mSharedBuffer = nullptr;
 }
 
 MaterialTemplatePtr FbxMeshLoaderImplv1_0::CreateMaterial(FbxSurfaceMaterial* pFbxMat) {
@@ -473,8 +479,14 @@ MaterialTemplatePtr FbxMeshLoaderImplv1_0::CreateMaterial(FbxSurfaceMaterial* pF
 		material = MaterialTemplate::Traits::Instance(id);
 	}
 
-	FbxMaterialLoaderImplv1_0 materialLoader(pFbxMat);
-	material->Load()
+	if (!material->AsyncIsLoaded()) {
+		InputStreamPtr dummy;
+		FbxMaterialLoaderImplv1_0* manualLoader = NEX_NEW(FbxMaterialLoaderImplv1_0(pFbxMat));
+		StreamInfo streamInfo(manualLoader, dummy);
+		material->AsyncRequestLoad(streamInfo);
+	}
+
+	return material;
 }
 
 }

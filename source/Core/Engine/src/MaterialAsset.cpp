@@ -28,17 +28,17 @@ uint32 MaterialAsset::GetClassID() const {
 	return CLASS_ID;
 }
 
-bool MaterialAsset::NotifyAssetLoadedImpl() {
+StreamNotification MaterialAsset::NotifyAssetLoadedImpl(StreamRequest* request) {
 	/* loaded only when dependencies are resolved */
 	MaterialAsset::StreamRequest* req =
-			static_cast<MaterialAsset::StreamRequest*>(GetStreamRequest());
+			static_cast<MaterialAsset::StreamRequest*>(request);
 	PrepareMaterial(req);
-	return true;
+	return StreamNotification::NOTIFY_COMPLETED_AND_READY;
 }
 
-bool MaterialAsset::NotifyAssetSavedImpl() {
+StreamNotification MaterialAsset::NotifyAssetSavedImpl(StreamRequest* request) {
 	/* loaded only when dependencies are resolved */
-	return true;
+	return StreamNotification::NOTIFY_COMPLETED_AND_READY;
 }
 
 void MaterialAsset::NotifyAssetUnloaded() {
@@ -62,14 +62,6 @@ void MaterialAsset::UnloadImpl() {
 
 nextar::StreamRequest* MaterialAsset::CreateStreamRequestImpl(bool load) {
 	return NEX_NEW(MaterialAsset::StreamRequest(this));
-}
-
-void MaterialAsset::DestroyStreamRequestImpl(nextar::StreamRequest*& request,
-		bool load) {
-	MaterialAsset::StreamRequest* req =
-			static_cast<MaterialAsset::StreamRequest*>(request);
-	NEX_DELETE(req);
-	request = nullptr;
 }
 
 void MaterialAsset::SetParamBufferSize(size_t size) {

@@ -111,6 +111,10 @@ namespace Math {
 		inline static uint32 Hash(const T& v) {
 			return (uint32)v;
 		}
+
+		inline static uint32 Size() {
+			return sizeof(T);
+		}
 	};
 
 	template <>
@@ -129,6 +133,10 @@ namespace Math {
 		inline static uint32 Hash(const float v) {
 			return (uint32)(v);
 		}
+
+		inline static uint32 Size() {
+			return sizeof(float);
+		}
 	};
 
 	template <>
@@ -144,6 +152,10 @@ namespace Math {
 
 		inline static uint32 Hash(const Vector2& v) {
 			return (uint32)((v.x+v.y));
+		}
+
+		inline static uint32 Size() {
+			return sizeof(float) * 2;
 		}
 	};
 
@@ -162,6 +174,10 @@ namespace Math {
 		inline static uint32 Hash(const Vector3& v) {
 			return (uint32)((v.x+v.y+v.z));
 		}
+
+		inline static uint32 Size() {
+			return sizeof(float) * 3;
+		}
 	};
 
 	template <>
@@ -179,6 +195,10 @@ namespace Math {
 
 		inline static uint32 Hash(const Vector4& v) {
 			return (uint32)((v.x+v.y+v.z+v.w));
+		}
+
+		inline static uint32 Size() {
+			return sizeof(float) * 4;
 		}
 	};
 }

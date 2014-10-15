@@ -79,12 +79,12 @@ public:
 	typedef AssetTraits<ShaderTemplate> Traits;
 	typedef FactoryTraits<ShaderTemplate> FactoryTraits;
 
-	class _NexProjectAPI SaveStreamRequest: public AllocGeneral, public AssetStreamRequest {
+	class _NexProjectAPI SaveStreamRequest: public AssetStreamRequest {
 	public:
 		SaveStreamRequest(ShaderTemplate* shaderTemplate) : AssetStreamRequest(shaderTemplate) {}
 	};
 
-	class _NexProjectAPI LoadStreamRequest: public AllocGeneral, public AssetStreamRequest {
+	class _NexProjectAPI LoadStreamRequest: public AssetStreamRequest {
 		NEX_LOG_HELPER(ShaderTemplate::LoadStreamRequest);
 	public:
 
@@ -117,15 +117,11 @@ public:
 	virtual ~ShaderTemplate();
 
 	/* notify loaded/unloaded */
-	virtual void NotifyAssetUnloaded();
-	virtual void NotifyAssetUpdated();
-	virtual bool NotifyAssetLoadedImpl();
-	virtual bool NotifyAssetSavedImpl();
+	virtual StreamNotification NotifyAssetSavedImpl(StreamRequest* request);
 
 	virtual void UnloadImpl();
 
 	virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);
-	virtual void DestroyStreamRequestImpl(nextar::StreamRequest*&, bool load);
 
 	ShaderAssetPtr& GetShaderUnit(const StringUtils::WordList& options);
 	ShaderAssetPtr& CreateShader(const String& hash, const StringUtils::WordList& options);

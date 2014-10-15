@@ -10,6 +10,8 @@
 
 namespace FbxMeshImporter {
 
+FbxMeshLoaderImplBase FbxMeshLoaderImplBase::loader;
+
 FbxMeshLoaderImplBase::FbxMeshLoaderImplBase() {
 	mManager = FbxManager::Create();
 	mIOSettings = FbxIOSettings::Create(mManager, IOSROOT);

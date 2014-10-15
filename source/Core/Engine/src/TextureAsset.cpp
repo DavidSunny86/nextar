@@ -88,9 +88,9 @@ void TextureAsset::LoadImpl(StreamRequest* request, bool isStreamed) {
 	}
 }
 
-bool TextureAsset::NotifyAssetLoadedImpl() {
+StreamNotification TextureAsset::NotifyAssetLoadedImpl(StreamRequest* request) {
 	TextureStreamRequest* textureParams =
-			static_cast<TextureStreamRequest*>(GetStreamRequest());
+			static_cast<TextureStreamRequest*>(request);
 
 	// set up the highest dimensions currently available
 	width = textureParams->image.GetWidth();
@@ -126,9 +126,7 @@ bool TextureAsset::NotifyAssetLoadedImpl() {
 	bool completed = false;
 	/* should we stream again, in case it was not fully loaded ? */
 	if (currentMaxMipLevel < numMipMaps) {
-		if (IsAutoStreamEnabled()) {
-			AssetStreamer::Instance().RequestLoad(this);
-		} else {
+		if (!IsAutoStreamEnabled()) {
 			textureParams->flags |= StreamRequest::COMPLETED;
 			completed = true;
 		}
@@ -144,7 +142,7 @@ bool TextureAsset::NotifyAssetLoadedImpl() {
 		Asset::NotifyAssetUpdated();
 	}
 
-	return completed;
+	return completed ? StreamNotification::NOTIFY_COMPLETED_AND_READY : StreamNotification::NOTIFY_RESUBMIT_AND_READY;
 }
 
 void TextureAsset::NotifyAssetUnloaded() {
@@ -166,13 +164,6 @@ void TextureAsset::UnloadImpl() {
 
 StreamRequest* TextureAsset::CreateStreamRequestImpl(bool load) {
 	return NEX_NEW(TextureStreamRequest(this));
-}
-
-void TextureAsset::DestroyStreamRequestImpl(StreamRequest*& request,
-		bool load) {
-	TextureStreamRequest* req = static_cast<TextureStreamRequest*>(request);
-	NEX_DELETE(req);
-	request = nullptr;
 }
 
 } /* namespace nextar */

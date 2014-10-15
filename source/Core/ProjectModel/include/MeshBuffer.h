@@ -18,8 +18,10 @@ typedef nextar::vector<Vec2Array>::type Vec2ArrayList;
 class _NexProjectAPI VertexChannel : public AllocGeneral {
 public:
 
-	VertexChannel(VertexComponentSemantic _semantic, uint32 _semanticIdx, VertexComponentType _type) :
-		semantic(_semantic), semanticIdx(_semanticIdx), type(_type) {
+	VertexChannel(VertexComponentSemantic _semantic, uint32 _semanticIdx, VertexComponentType _type, uint32 _stride,
+			uint32 _stream) :
+		semantic(_semantic), semanticIdx(_semanticIdx), type(_type), stride(_stride),
+		streamIndex(_stream) {
 	}
 
 	virtual ~VertexChannel() {
@@ -34,6 +36,7 @@ public:
 	virtual void PushVertices(VertexChannel* channel) = 0;
 	virtual uint32 GetVertexCount() const = 0;
 	virtual const void* GetVertex(uint32 i) const = 0;
+	virtual void GetVerties(void* destBuffer, uint32 outStride) = 0;
 
 	inline VertexComponentSemantic GetSemantic() const {
 		return semantic;
@@ -47,13 +50,28 @@ public:
 		return type;
 	}
 
+	inline uint32 GetStride() const {
+		return stride;
+	}
+
+	inline uint32 GetStreamIndex() const {
+		return streamIndex;
+	}
+
 protected:
+	uint32 streamIndex;
+	uint32 stride;
 	uint32 semanticIdx;
 	VertexComponentType type;
 	VertexComponentSemantic semantic;
 };
 
 typedef vector<VertexChannel*>::type VertexChannelList;
+
+struct VertexLayoutInfo {
+	VertexLayoutType layoutType;
+	VertexElementList vertexElements;
+};
 
 class _NexProjectAPI MeshBuffer : public AllocGeneral {
 	NEX_LOG_HELPER(MeshBuffer);
@@ -67,20 +85,27 @@ public:
 	uint32 AddVertexChannel(
 		VertexComponentSemantic _semantic, 
 		uint32 _semanticIdx, 
-		VertexComponentType _type);
+		VertexComponentType _type,
+		uint32 streamIndex = 0);
 
-	VertexChannel* GetVertexChannel(uint32 i);
-	VertexChannel* GetVertexChannel(VertexComponentSemantic _semantic, uint32 _semanticIdx);
-	uint32 GetChannelCount(VertexComponentSemantic _semantic);
+	VertexChannel* GetVertexChannel(uint32 i) const;
+	VertexChannel* GetVertexChannel(VertexComponentSemantic _semantic, uint32 _semanticIdx) const;
+	uint32 GetChannelCount(VertexComponentSemantic _semantic) const ;
 
 	void RemoveDuplicates();
 
+	BoundsInfo ComputeBounds() const;
 	void ReserveVertexSpace(uint32 nVertex);
 	void ReserveIndexSpace(uint32 nIndex);
+
+	void GetVertexLayout(VertexLayoutInfo&) const;
 	uint32 GetVertexCount() const;
+	uint32 GetVertexBufferCount() const;
 	uint32 GetIndexCount() const {
 		return indices.size();
 	}
+
+	uint32 GetVertexStride(uint32 streamIdx) const;
 
 	inline void PushIndex(uint32 index) {
 		indices.push_back(index);
@@ -90,8 +115,16 @@ public:
 		return vertexSignature;
 	}
 
+	inline PrimitiveType GetPrimitiveType() const {
+		return type;
+	}
+
 	bool VertexEquals(uint32 i, uint32 j);
 	void MergeBuffer(const MeshBuffer& m);
+
+	void GetVertex(uint32 i, uint32 streamIdx, ByteStream& out) const;
+	void GetVertices(uint32 streamIdx, ByteStream& out) const;
+	void GetOptimizedIndices(ByteStream& out) const;
 
 protected:
 

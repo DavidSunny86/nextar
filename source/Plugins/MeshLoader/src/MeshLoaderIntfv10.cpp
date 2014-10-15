@@ -97,12 +97,15 @@ void MeshLoaderIntfv1_0::ReadVertexElementData(
 	uint32 i = 0;
 	while (i < vertexElementCount) {
 		VertexElement element;
+		uint16 semantic, type;
 		ser >> (element.desc.semantic.instanceData)
-				>> (element.desc.semantic.semantic)
+				>> semantic
 				>> (element.desc.semantic.semanticIndex)
-				>> (element.desc.semantic.type) >> (element.desc.offset)
+				>> (type) >> (element.desc.offset)
 				>> (element.stepRate)
 				>> (element.streamIndex);
+		element.desc.semantic.semantic = (VertexComponentSemantic)semantic;
+		element.desc.semantic.type = (VertexComponentBaseType)type;
 		/** todo check sanity */
 		vertexElements[i++] = element;
 	}
@@ -269,11 +272,10 @@ void MeshLoaderIntfv1_0::ReadSubMesh(MeshAsset::StreamRequest* request,
 				request->SetPrimitiveType(subMesh, (PrimitiveType)primType);
 				break;
 			case MCID_VERTEX_DATA:
-				vertexData = request->GetSharedVertexData();
-				if (vertexData) {
-					vetype = vertexData->layoutType;
-					ve = vertexData->vertexElements;
-					vec = vertexData->numVertexElements;
+				if (MeshVertexData* sharedData = request->GetSharedVertexData()) {
+					vetype = sharedData->layoutType;
+					ve = sharedData->vertexElements;
+					vec = sharedData->numVertexElements;
 				}
 				vertexData = ReadVertexData(request, ser, ve, vec, vetype);
 				request->SetPrimitiveVertexData(subMesh, vertexData, 0,

@@ -65,12 +65,9 @@ void AssetStreamer::NotifyLoaded(StreamRequest* request) {
 				 * Note we touch dependent list but not unresolvedDependencies
 				 * because that might be accessed from the loading thread.
 				 * */
-				StreamRequest* dep = (*it)->GetStreamRequest();
-				NEX_ASSERT(dep->flags & StreamRequest::ASSET_STREAM_REQUEST);
-				AssetStreamRequest* asr = static_cast<AssetStreamRequest*>(dep);
-				asr->GetMetaInfo().AddDependent(assetReq);
-				if (!(*it)->IsLoading() && !(*it)->HasLoadFailed())
-					RequestLoad((*it));
+				(*it)->AddDependent(assetReq);
+				if (!(*it)->AsyncIsLoaded())
+					(*it)->AsyncRequestLoad();
 				++it;
 			}
 		}
@@ -80,28 +77,20 @@ void AssetStreamer::NotifyLoaded(StreamRequest* request) {
 void AssetStreamer::_NotifyAssetLoaded(Asset* asset,
 		AssetStreamRequest* assetReq) {
 	Asset::MetaInfo& meta = assetReq->GetMetaInfo();
-	asset->SetLoading(false);
-	if (assetReq->returnCode == StreamResult::STREAM_SUCCESS) {
-		asset->SetLoaded(true);
-	} else {
-		asset->SetLoadFailed(true);
-		assetReq->flags |= StreamRequest::COMPLETED;
-	}
+	AssetStreamRequestSet reqSet;
+	// swap dependents as the stream request might get deleted
+	reqSet.swap(meta.GetDependents());
+	// the assetReq might become invalid after this call
 	asset->NotifyAssetLoaded();
+	// redundant, but safety measure as the assetReq is invalid now
+	assetReq = nullptr;
 	// do a quick swap for the dependent set, as the request might
 	// get deleted in notify, and request pointer is no more required.
-	AssetStreamRequestSet reqSet;
-	reqSet.swap(meta.GetDependents());	
 	_NotifyDependents(asset, reqSet);
 }
 
 void AssetStreamer::_NotifyAssetSaved(Asset* asset,
 		AssetStreamRequest* assetReq) {
-	asset->SetSaving(false);
-	if (assetReq->returnCode != StreamResult::STREAM_SUCCESS) {
-		asset->SetSaveFailed(true);
-		assetReq->flags |= StreamRequest::COMPLETED;
-	}
 	asset->NotifyAssetSaved();
 }
 
@@ -118,7 +107,7 @@ void AssetStreamer::_NotifyDependents(Asset* asset,
 	 * these dependencies are resolved is the Main thread.
 	 * */
 	for (auto d : reqSet) {
-		if (!d->GetMetaInfo().RemoveDependency(asset)) {
+		if (!d->RemoveDependency(asset)) {
 			_NotifyAssetLoaded(static_cast<Asset*>(d->streamedObject), d);
 		}
 	}

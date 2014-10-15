@@ -5,6 +5,7 @@
 namespace nextar {
 
 Asset::AssetLocatorAccessor Asset::AssetLocatorAccessor::assetLocatorAccessor;
+StreamInfo StreamInfo::Null;
 
 Asset::Asset(const StringID id, const StringID factory) :
 	memoryCost(sizeof(Asset)), SharedComponent(id, factory), _savedRequestPtr(nullptr) {
@@ -49,15 +50,22 @@ bool Asset::AsyncLoad(const StreamInfo& request, bool async) {
 		// only a single thread can reach here,
 		// if we have, we issue the draw request
 		_savedRequestPtr = nullptr;
-		if (request.locator != URL::Invalid)
-			SetAssetLocator(request.locator);
 		if (request.externalRequest)
 			_savedRequestPtr = request.externalRequest;
 		else if (!_savedRequestPtr)
 			_savedRequestPtr = CreateStreamRequestImpl(true);
 
-		if (_savedRequestPtr->flags & StreamRequest::ASSET_STREAM_REQUEST)
-			static_cast<AssetStreamRequest*>(_savedRequestPtr)->SetStreamerInfo(request.manualStreamer);
+		if (_savedRequestPtr->flags & StreamRequest::ASSET_STREAM_REQUEST) {
+			AssetStreamRequest* assetRequest = static_cast<AssetStreamRequest*>(_savedRequestPtr);
+			assetRequest->SetStreamerInfo(request.manualStreamer);
+			// @todo potentially dangerous because this value might
+			// be written from outside using SetAssetLocator, when
+			// GetAssetLocator is called, may be guard the calls using a spinlock
+			if (request.locator != URL::Invalid)
+				assetRequest->SetAssetLocator(request.locator);
+			else
+				assetRequest->SetAssetLocator(GetAssetLocator());
+		}
 
 		if (async) {
 			if (IsBackgroundStreamed() &&
@@ -85,6 +93,7 @@ bool Asset::AsyncLoad(const StreamInfo& request, bool async) {
 }
 
 void Asset::NotifyAssetLoaded() {
+	bool resubmitRequest = false;
 	if (!_savedRequestPtr || (_savedRequestPtr->returnCode
 		== StreamResult::STREAM_SUCCESS)) {
 		assetState.store(ASSET_LOADED, std::memory_order_release);
@@ -93,6 +102,8 @@ void Asset::NotifyAssetLoaded() {
 			_savedRequestPtr->flags |= StreamRequest::COMPLETED;
 		if (state & NOTIFY_READY)
 			assetState.store(ASSET_READY, std::memory_order_release);
+		if (state & NOTIFY_RESUBMIT)
+			resubmitRequest = true;
 		else if (state & NOTIFY_FAILED) {
 			_savedRequestPtr->flags |= StreamRequest::COMPLETED;
 			assetState.store(ASSET_LOAD_FAILURE, std::memory_order_release);
@@ -103,13 +114,17 @@ void Asset::NotifyAssetLoaded() {
 	}
 	_FireCallbacksLoaded();
 	if (_savedRequestPtr) {
-		uint16 reqflags = _savedRequestPtr->flags;
-		if ((reqflags
-			& (StreamRequest::AUTO_DELETE_REQUEST | StreamRequest::COMPLETED))
-			== (StreamRequest::AUTO_DELETE_REQUEST
-			| StreamRequest::COMPLETED))
-			NEX_DELETE(_savedRequestPtr);
-		_savedRequestPtr = nullptr;
+		if (resubmitRequest)
+			AssetStreamer::Instance().AsyncRequestLoad(static_cast<AssetStreamRequest*>(_savedRequestPtr));
+		else {
+			uint16 reqflags = _savedRequestPtr->flags;
+			if ((reqflags
+				& (StreamRequest::AUTO_DELETE_REQUEST | StreamRequest::COMPLETED))
+				== (StreamRequest::AUTO_DELETE_REQUEST
+				| StreamRequest::COMPLETED))
+				NEX_DELETE(_savedRequestPtr);
+			_savedRequestPtr = nullptr;
+		}
 	}
 }
 
@@ -129,8 +144,17 @@ bool Asset::AsyncSave(const StreamInfo& request, bool async) {
 		else if (!_savedRequestPtr)
 			_savedRequestPtr = CreateStreamRequestImpl(true);
 
-		if (_savedRequestPtr->flags & StreamRequest::ASSET_STREAM_REQUEST)
-			static_cast<AssetStreamRequest*>(_savedRequestPtr)->SetStreamerInfo(request.manualStreamer);
+		if (_savedRequestPtr->flags & StreamRequest::ASSET_STREAM_REQUEST) {
+			AssetStreamRequest* assetRequest = static_cast<AssetStreamRequest*>(_savedRequestPtr);
+			assetRequest->SetStreamerInfo(request.manualStreamer);
+			// @todo potentially dangerous because this value might
+			// be written from outside using SetAssetLocator, when
+			// GetAssetLocator is called, may be guard the calls using a spinlock
+			if (request.locator != URL::Invalid)
+				assetRequest->SetAssetLocator(request.locator);
+			else
+				assetRequest->SetAssetLocator(GetAssetLocator());
+		}
 
 		if (async) {
 			if (IsBackgroundStreamed() &&
@@ -158,24 +182,31 @@ bool Asset::AsyncSave(const StreamInfo& request, bool async) {
 }
 
 void Asset::NotifyAssetSaved() {
+	bool resubmitRequest = false;
 	if (!_savedRequestPtr || (_savedRequestPtr->returnCode == StreamResult::STREAM_SUCCESS)) {
 		assetState.store(ASSET_READY, std::memory_order_release);
 		StreamNotification state = NotifyAssetSavedImpl(_savedRequestPtr);
 		if (state & NOTIFY_COMPLETED)
 			_savedRequestPtr->flags |= StreamRequest::COMPLETED;
+		else if (state & NOTIFY_RESUBMIT)
+			resubmitRequest = true;
 	} else if (_savedRequestPtr->returnCode == StreamResult::STREAM_FAILED) {
 		_savedRequestPtr->flags |= StreamRequest::COMPLETED;
 	}
 
 	_FireCallbacksSaved();
 	if (_savedRequestPtr) {
-		uint16 reqflags = _savedRequestPtr->flags;
-		if ((reqflags
-			& (StreamRequest::AUTO_DELETE_REQUEST | StreamRequest::COMPLETED))
-			== (StreamRequest::AUTO_DELETE_REQUEST
-			| StreamRequest::COMPLETED))
-			NEX_DELETE(_savedRequestPtr);
-		_savedRequestPtr = nullptr;
+		if (resubmitRequest)
+			AssetStreamer::Instance().AsyncRequestSave(static_cast<AssetStreamRequest*>(_savedRequestPtr));
+		else {
+			uint16 reqflags = _savedRequestPtr->flags;
+			if ((reqflags
+				& (StreamRequest::AUTO_DELETE_REQUEST | StreamRequest::COMPLETED))
+				== (StreamRequest::AUTO_DELETE_REQUEST
+				| StreamRequest::COMPLETED))
+				NEX_DELETE(_savedRequestPtr);
+			_savedRequestPtr = nullptr;
+		}
 	}
 }
 
@@ -309,9 +340,7 @@ AssetPtr Asset::AssetLoad(InputStreamPtr& input, const String& streamer) {
 				StringUtils::ToUpper(streamerImpl);
 				AssetLoaderImpl* impl = AssetLoader::GetImpl(streamerImpl, classId);
 				// @todo Write appropriate constructor to initialize the loader/input combo
-				StreamInfo streamInfo;
-				streamInfo.manualStreamer.inputStream = input;
-				streamInfo.manualStreamer.manualLoader = impl;
+				StreamInfo streamInfo(impl, input);
 				// load synchronously
 				asset->RequestLoad(streamInfo);
 			}
@@ -346,9 +375,7 @@ void Asset::AssetSave(AssetPtr& asset, OutputStreamPtr& output, const String& st
 		StringUtils::ToUpper(streamerImpl);
 		AssetSaverImpl* impl = AssetSaver::GetImpl(streamerImpl, asset->GetClassID());
 		// @todo Write appropriate constructor to initialize the loader/input combo
-		StreamInfo streamInfo;
-		streamInfo.manualStreamer.outputStream = output;
-		streamInfo.manualStreamer.manualSaver = impl;	
+		StreamInfo streamInfo(impl, output);
 		asset->RequestSave(streamInfo);
 	}
 }
@@ -369,7 +396,7 @@ void AssetLoader::Serialize() {
 	Asset* assetPtr = static_cast<Asset*>(request->GetStreamedObject());
 	AssetLoaderImpl* impl = request->GetManualLoader();
 
-	const URL& location = assetPtr->GetAssetLocator();
+	const URL& location = request->GetAssetLocator();
 
 	if (!impl) {
 		String ext = location.GetExtension();
@@ -406,7 +433,7 @@ void AssetSaver::Serialize() {
 	Asset* assetPtr = static_cast<Asset*>(request->GetStreamedObject());
 	AssetSaverImpl* impl = request->GetManualSaver();
 
-	const URL& location = assetPtr->GetAssetLocator();
+	const URL& location = request->GetAssetLocator();
 
 	if (!impl) {
 

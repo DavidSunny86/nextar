@@ -9,3 +9,5 @@
 #============================================================
 
 add_unit_test(MaterialAndShader)
+add_unit_test(MeshExport)
+

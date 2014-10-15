@@ -33,8 +33,8 @@ uint32 ShaderAsset::GetClassID() const {
 	return CLASS_ID;
 }
 
-bool ShaderAsset::NotifyAssetLoadedImpl() {
-	StreamRequest* creationParams = static_cast<StreamRequest*>(streamRequest);
+StreamNotification ShaderAsset::NotifyAssetLoadedImpl(StreamRequest* request) {
+	StreamRequest* creationParams = static_cast<StreamRequest*>(request);
 	/* update programs */
 	/* build with compilation options */
 	_DestroyPasses();
@@ -77,7 +77,7 @@ bool ShaderAsset::NotifyAssetLoadedImpl() {
 		visibilityMask = VisibilityMask::VISIBILITY_OPAQUE;
 
 	/* notify dependents */
-	return true;
+	return StreamNotification::NOTIFY_COMPLETED_AND_READY;
 }
 
 void ShaderAsset::_CompilePass(Pass& r, ShaderAsset::StreamPass& p,
@@ -106,14 +106,6 @@ void ShaderAsset::NotifyAssetUpdated() {
 
 nextar::StreamRequest* ShaderAsset::CreateStreamRequestImpl(bool load) {
 	return NEX_NEW(ShaderAsset::StreamRequest(this));
-}
-
-void ShaderAsset::DestroyStreamRequestImpl(nextar::StreamRequest*& request,
-		bool load) {
-	ShaderAsset::StreamRequest* req =
-			static_cast<ShaderAsset::StreamRequest*>(request);
-	NEX_DELETE(req);
-	request = nullptr;
 }
 
 void ShaderAsset::_BuildParameterTable(StreamPassList& spl) {

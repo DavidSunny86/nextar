@@ -110,8 +110,8 @@ void WriteBoundsInfo(ChunkOutputStream& outStream) {
 	OutputSerializer& ser = outStream.BeginChunk(MCID_BOUNDS_INFO);
 	float radius = 3.5f;
 	float extendsAndCenter[6] = {
+		0, 0, 0,
 		1, 1, 1,
-		0, 0, 0
 	};
 	OutputSerializer::FloatArray extends(extendsAndCenter, 6);
 	ser << radius << extends;
