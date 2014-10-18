@@ -33,7 +33,7 @@ MaterialLoaderImplv1_0::~MaterialLoaderImplv1_0() {
 void MaterialLoaderImplv1_0::Load(InputStreamPtr& stream,
 		AssetLoader& loader) {
 
-	MaterialAsset::StreamRequest* request = static_cast<MaterialAsset::StreamRequest*>(
+	MaterialAsset::MaterialLoadRequest* request = static_cast<MaterialAsset::MaterialLoadRequest*>(
 			loader.GetRequestPtr());
 	MaterialAsset* material = static_cast<MaterialAsset*>(
 				request->GetStreamedObject());
@@ -64,7 +64,7 @@ void MaterialLoaderImplv1_0::Load(InputStreamPtr& stream,
 	ser.ReadChunk(MATERIAL_PARAMETERS, paramChunk, chunk);
 	if (InputSerializer::IsValid(paramChunk)) {
 		ParameterBuffer buffer;
-		buffer.Load(ser, request);
+		buffer.AsyncLoad(ser, request);
 		request->SetParameterBuffer(std::move(buffer));
 	} else {
 		Error("Material does not have a valid param buffer: " + request->GetName());

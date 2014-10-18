@@ -138,8 +138,6 @@ StreamNotification TextureAsset::NotifyAssetLoadedImpl(StreamRequest* request) {
 
 	if (!IsTextureInited()) {
 		SetTextureInited(true);
-	} else {
-		Asset::NotifyAssetUpdated();
 	}
 
 	return completed ? StreamNotification::NOTIFY_COMPLETED_AND_READY : StreamNotification::NOTIFY_RESUBMIT_AND_READY;
@@ -151,11 +149,7 @@ void TextureAsset::NotifyAssetUnloaded() {
 }
 
 void TextureAsset::NotifyAssetUpdated() {
-	TextureStreamRequest* textureParams =
-			static_cast<TextureStreamRequest*>(GetStreamRequest());
-	// @TODO update parameters?
-	ContextObject::RequestUpdate(MSG_TEX_RESIZE,
-			reinterpret_cast<ContextObject::ContextParamPtr>(textureParams));
+
 	Asset::NotifyAssetUpdated();
 }
 

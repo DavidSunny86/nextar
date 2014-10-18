@@ -5,7 +5,7 @@
 namespace nextar {
 
 Asset::AssetLocatorAccessor Asset::AssetLocatorAccessor::assetLocatorAccessor;
-StreamInfo StreamInfo::Null;
+const StreamInfo StreamInfo::Null;
 
 Asset::Asset(const StringID id, const StringID factory) :
 	memoryCost(sizeof(Asset)), SharedComponent(id, factory), _savedRequestPtr(nullptr) {
@@ -377,6 +377,13 @@ void Asset::AssetSave(AssetPtr& asset, OutputStreamPtr& output, const String& st
 		// @todo Write appropriate constructor to initialize the loader/input combo
 		StreamInfo streamInfo(impl, output);
 		asset->RequestSave(streamInfo);
+	}
+}
+
+void Asset::AddDependent(AssetStreamRequest* request) {
+	if (_savedRequestPtr) {
+		NEX_ASSERT(_savedRequestPtr->flags & StreamRequest::ASSET_STREAM_REQUEST);
+		static_cast<AssetStreamRequest*>(_savedRequestPtr)->GetMetaInfo().AddDependent(request);
 	}
 }
 

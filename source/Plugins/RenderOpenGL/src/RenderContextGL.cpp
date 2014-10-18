@@ -1072,7 +1072,7 @@ GLenum RenderContextGL::GetGlCompareFunc(TextureComparisonMode type) {
 	return 0;
 }
 
-uint16 RenderContextGL::GetSemanticType(GLenum e) {
+VertexComponentType RenderContextGL::GetSemanticType(GLenum e) {
 	switch (e) {
 	case GL_FLOAT:
 		return COMP_TYPE_FLOAT1;
@@ -1087,7 +1087,7 @@ uint16 RenderContextGL::GetSemanticType(GLenum e) {
 	default:
 		NEX_ASSERT(0);
 	}
-	return -1;
+	return COMP_TYPE_INVALID;
 }
 
 uint16 RenderContextGL::GetShaderParamSize(GLuint type) {

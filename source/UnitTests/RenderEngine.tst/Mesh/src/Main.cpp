@@ -16,7 +16,7 @@ public:
 		
 		MeshAssetPtr mesh = MeshAsset::Traits::Instance(id, url);
 		if (mesh) {
-			mesh->Load(false);
+			mesh->RequestLoad();
 		}
 
 		Entity::Factory* entityFactory =

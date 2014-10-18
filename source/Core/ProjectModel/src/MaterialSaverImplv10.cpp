@@ -46,7 +46,7 @@ void MaterialSaverImplv1_0::Save(OutputStreamPtr& out, AssetSaver& saver) {
 
 	{
 	OutputSerializer& ser = stream.BeginChunk(MATERIAL_PARAMETERS);
-	asset->GetParameters()->Save(ser);
+	asset->GetParameters()->AsyncSave(ser);
 	stream.EndChunk();
 	}
 }

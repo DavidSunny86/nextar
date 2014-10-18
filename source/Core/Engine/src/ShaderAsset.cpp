@@ -21,7 +21,7 @@ ShaderAsset::ShaderAsset(const StringID name, const StringID factory) :
 }
 
 ShaderAsset::~ShaderAsset() {
-	if (IsLoaded())
+	if (AsyncIsLoaded())
 		Unload();
 }
 
@@ -129,7 +129,7 @@ void ShaderAsset::_BuildParameterTable(StreamPassList& spl) {
 		paramsPerContext[ctx].endIt = en;
 		paramsPerContext[ctx].totalParamBufferSize = 0;
 	}
-	auto& it = paramLookup.begin();
+	auto it = paramLookup.begin();
 	for (; it != en; ++it) {
 		auto &e = (*it);
 		if (e.context != lastContext) {

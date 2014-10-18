@@ -89,9 +89,6 @@ public:
 	inline const AsymmetricParams& GetAsymmetricParams() const;
 	/* */
 	inline const Frustum& GetFrustum() const;
-	inline void SetPerspectiveParams(const PerspectiveParams& params);
-	inline void SetOrthographicParams(const OrthographicParams& params);
-	inline void SetAsymmetricParams(const AsymmetricParams& params);
 	inline void SetNearDistance(float d);
 	inline void SetFarDistance(float d);
 
@@ -114,6 +111,10 @@ public:
 
 	void UpdateProjection();
 	void UpdateFrustum();
+
+	void SetPerspectiveParams(const PerspectiveParams& params);
+	void SetOrthographicParams(const OrthographicParams& params);
+	void SetAsymmetricParams(const AsymmetricParams& params);
 
 	inline Vector3A GetRightDirection() const;
 	inline Vector3A GetUpDirection() const;

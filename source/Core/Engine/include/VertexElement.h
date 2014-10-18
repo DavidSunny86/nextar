@@ -74,7 +74,7 @@ struct SemanticDef {
 	static SemanticMap semanticMap;
 
 	SemanticDef(VertexComponentSemantic sem, uint8 idx, bool input = true, bool inst = false,
-			uint16 fbRem = COMP_RESERVED_COUNT) :
+			VertexComponentSemantic fbRem = COMP_RESERVED_COUNT) :
 			semantic(sem), semanticIndex(idx) /*, feedBackRemap(fbRem) */{
 		instanceData = inst;
 		inputSemantic = input;
@@ -97,7 +97,7 @@ struct _NexEngineAPI VertexSemantic: public AllocGraphics {
 	VertexComponentType type;
 
 	inline VertexSemantic() :
-	semantic(-1), type(-1), semanticIndex(-1), instanceData(false) {
+	semantic(COMP_RESERVED_COUNT), type(COMP_TYPE_INVALID), semanticIndex(-1), instanceData(false) {
 	}
 
 	inline VertexSemantic(VertexComponentSemantic sem, uint8 semIndex,

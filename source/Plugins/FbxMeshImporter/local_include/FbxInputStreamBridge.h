@@ -35,7 +35,7 @@ public:
 	virtual bool Close();
 
 protected:
-	bool errorFlag;
+	mutable bool errorFlag;
 	std::streamoff inputLocation;
 	mutable InputStreamPtr inputStream;
 };

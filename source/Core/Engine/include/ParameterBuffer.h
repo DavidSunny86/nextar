@@ -48,8 +48,8 @@ public:
 		return size;
 	}
 
-	void Load(InputSerializer& ser, AssetStreamRequest* request = nullptr);
-	void Save(OutputSerializer& ser) const;
+	void AsyncLoad(InputSerializer& ser, AssetStreamRequest* request = nullptr);
+	void AsyncSave(OutputSerializer& ser) const;
 
 	void SetData(const void* data, size_t offset, size_t size);
 	void SetData(const TextureUnit* data, size_t offset);

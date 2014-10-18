@@ -98,6 +98,10 @@ set(NEX_ARCHITECTURE_NAME "x86_64" CACHE STRING "Architecture chosen for cross c
 set(NEX_SUPPORTED_ARCHITECTURE_LIST "x86;x86_64;ia64;ppc;alpha")
 set_property(CACHE NEX_ARCHITECTURE_NAME PROPERTY STRINGS ${NEX_SUPPORTED_ARCHITECTURE_LIST})
 
+if(${NEX_UNITY_BUILD})
+	message("Unity build is on.")
+endif()
+
 #if (NEX_CROSS_COMPILE)
 	string(TOUPPER ${NEX_ARCHITECTURE_NAME} NEX_ARCHITECTURE)
 #endif (NEX_CROSS_COMPILE)
@@ -311,7 +315,6 @@ endmacro(pre_configure)
 #============================================================
 macro(clean_unity_file index)
 	if (EXISTS "${NEX_UNITY_SRC_PATH}/c${ARGV0}.cpp")
-		list(APPEND NEXTAR_SRC_FILES_UNITY "${NEX_UNITY_SRC_PATH}/c${ARGV0}.cpp")
 		file(WRITE "${NEX_UNITY_SRC_PATH}/c${ARGV0}.cpp" "")
 	endif()
 endmacro(clean_unity_file)
@@ -320,6 +323,7 @@ endmacro(clean_unity_file)
 #============================================================
 macro(unity_file index path)
 	file(APPEND "${NEX_UNITY_SRC_PATH}/c${ARGV0}.cpp" "#include \"${ARGV1}\"\n")
+	list(APPEND NEXTAR_SRC_FILES_UNITY "${NEX_UNITY_SRC_PATH}/c${ARGV0}.cpp")
 endmacro(unity_file)
 #============================================================
 # config_unity

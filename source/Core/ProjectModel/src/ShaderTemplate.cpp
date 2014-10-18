@@ -69,14 +69,12 @@ ShaderAssetPtr& ShaderTemplate::CreateShader(const String& hash,
 		const StringUtils::WordList& options) {
 	String uniqueName = GetName() + "#" + Convert::ToString((uint32)shaders.size(), ' ', std::ios::hex);
 	ShaderAssetPtr shaderObject = ShaderAsset::Traits::Instance(NamedObject::AsyncStringID(uniqueName), nullptr, GetGroup() );
-	if (!shaderObject->IsLoaded()) {
+	if (!shaderObject->AsyncIsLoaded()) {
 		// load and prepare the shader object
-		auto streamRequest = static_cast<AssetStreamRequest*>(
-			shaderObject->GetStreamRequest(true));
-
 		ShaderFromTemplate loader(this, options);
-		streamRequest->SetManualLoader(&loader);
-		shaderObject->Load(false);
+		InputStreamPtr input;
+		StreamInfo info(&loader, input);
+		shaderObject->RequestLoad(info);
 	}
 	ShaderUnit &unit = shaders[hash];
 	unit.shaderObject = shaderObject;

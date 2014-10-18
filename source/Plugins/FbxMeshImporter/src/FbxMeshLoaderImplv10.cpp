@@ -1,6 +1,7 @@
 
 #include <FbxMeshImporter.h>
 #include <FbxMeshLoaderImplv10.h>
+#include <FbxMaterialLoaderImplv10.h>
 
 namespace FbxMeshImporter {
 #ifdef IOS_REF
@@ -455,7 +456,7 @@ void FbxMeshLoaderImplv1_0::BuildMesh(MeshTemplate::MeshBuilder* pMesh) {
 		pg.material = CreateMaterial(e.mMaterial);
 
 		if (pg.material)
-			pMesh->metaInfo.AddDependency(pg.material);
+			pMesh->GetMetaInfo().AddDependency(pg.material);
 	}
 
 	mElements.clear();

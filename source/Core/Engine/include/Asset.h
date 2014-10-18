@@ -22,15 +22,14 @@ protected:
 	}
 };
 
-union AssetStreamerInfo {
-	struct {
+struct AssetStreamerInfo {
+	union {
 		AssetLoaderImpl* manualLoader;
-		InputStreamPtr inputStream;
-	};
-	struct {
 		AssetSaverImpl* manualSaver;
-		OutputStreamPtr outputStream;
 	};
+
+	InputStreamPtr inputStream;
+	OutputStreamPtr outputStream;
 };
 
 struct StreamInfo {
@@ -142,7 +141,7 @@ public:
 				groupPtr = ComponentGroupArchive::Instance().AsyncFindOrCreate(
 						group);
 			SharedComponentPtr ret;
-			InstanceImplementor::Instance(ret, CLASS_ID, name, factory,
+			InstanceImplementor::Instance(ret, AssetType::CLASS_ID, name, factory,
 								groupPtr);
 			return ret;
 		}
@@ -151,7 +150,7 @@ public:
 				Component::Factory* factory,
 				SharedComponent::Group* group) {
 			SharedComponentPtr ret;
-			InstanceImplementor::Instance(ret, CLASS_ID, name, factory, group);
+			InstanceImplementor::Instance(ret, AssetType::CLASS_ID, name, factory, group);
 			return ret;
 		}
 
@@ -159,7 +158,7 @@ public:
 				const URL& locator, Component::Factory* factory,
 				SharedComponent::Group* group) {
 			SharedComponentPtr asset;
-			if(InstanceImplementor::Instance(asset, CLASS_ID, name,
+			if(InstanceImplementor::Instance(asset, AssetType::CLASS_ID, name,
 					factory, group) == SharedComponent::INSTANCE_CREATED) {
 				NEX_ASSERT(asset);
 				static_cast<Asset*>(asset.GetPtr())->SetAssetLocator(locator);
@@ -175,7 +174,7 @@ public:
 			if (group != StringUtils::NullID)
 				groupPtr = ComponentGroupArchive::Instance().AsyncFindOrCreate(
 						group);
-			if(InstanceImplementor::Instance(asset, CLASS_ID, name,
+			if(InstanceImplementor::Instance(asset, AssetType::CLASS_ID, name,
 					factory, groupPtr) == SharedComponent::INSTANCE_CREATED) {
 				NEX_ASSERT(asset);
 				static_cast<Asset*>(asset.GetPtr())->SetAssetLocator(locator);
@@ -320,13 +319,7 @@ public:
 		return GetClassID();
 	}
 
-	void AddDependent(AssetStreamRequest* request) {
-		if (_savedRequestPtr) {
-			NEX_ASSERT(_savedRequestPtr->flags & StreamRequest::ASSET_STREAM_REQUEST);
-			static_cast<AssetStreamRequest*>(_savedRequestPtr)->GetMetaInfo().AddDependent(request);
-		}
-	}
-		
+	void AddDependent(AssetStreamRequest* request);
 	bool AsyncHasLoadFailed() const {
 		return (assetState.load(std::memory_order_acquire) & ASSET_LOAD_FAILURE) != 0;
 	}

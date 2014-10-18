@@ -4,6 +4,7 @@
 
 #include <NexProjectModel.h>
 #include <AssetTemplate.h>
+#include <EngineHeaders.h>
 
 namespace nextar {
 

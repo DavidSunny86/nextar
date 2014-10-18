@@ -7,7 +7,7 @@ namespace nextar {
 template <typename Vec>
 class VertexChannelTempl : public VertexChannel {
 public:
-	typedef vector<Vec>::type VertexArray;
+	typedef typename vector<Vec>::type VertexArray;
 
 
 	VertexChannelTempl(VertexComponentSemantic _semantic, uint32 _index, VertexComponentType _type, uint32 streamIdx) :
@@ -15,7 +15,7 @@ public:
 	}
 
 	virtual VertexChannel* CreateEmpty() const {
-		return NEX_NEW(VertexChannelTempl<Vec>());
+		return NEX_NEW(VertexChannelTempl<Vec>(semantic, semanticIdx, type, streamIndex));
 	}
 
 	virtual uint32 Hash(uint32 i) const {
@@ -46,7 +46,7 @@ public:
 	}
 
 	virtual void PushVertices(VertexChannel* channel) {
-		VertexChannelTempl<Vec>* c = static_cast< VertexChannelTempl<Vec> >(channel);
+		VertexChannelTempl<Vec>* c = static_cast< VertexChannelTempl<Vec>* >(channel);
 		vertices.insert(vertices.end(), c->vertices.begin(), c->vertices.end());
 	}
 
@@ -96,8 +96,8 @@ uint32 MeshBuffer::GetVertexBufferCount() const {
 	uint32 vbCount = 0;
 	uint32 currentStream = -1;
 	for (auto &c : channels) {
-		if (currentStream != c->streamIndex) {
-			currentStream = c->streamIndex;
+		if (currentStream != c->GetStreamIndex()) {
+			currentStream = c->GetStreamIndex();
 			vbCount++;
 		}
 	}
@@ -277,8 +277,8 @@ void MeshBuffer::MergeBuffer(const MeshBuffer& m) {
 void MeshBuffer::GetVertex(uint32 i, uint32 stream, ByteStream& out) const {
 	out.clear();
 	for (auto& e : channels) {
-		if (e->streamIndex == stream) {
-			const void* data = e->GetVertex(i);
+		if (e->GetStreamIndex() == stream) {
+			const uint8* data = reinterpret_cast<const uint8*>(e->GetVertex(i));
 			size_t size = e->GetStride();
 			out.insert(out.end(), data, data+size);
 		}
@@ -292,9 +292,9 @@ void MeshBuffer::GetVertices(uint32 stream, ByteStream& out) const {
 	out.resize(totalVertSize);
 	uint8* buff = out.data();
 	for (auto& e : channels) {
-		if (e->streamIndex == stream) {
+		if (e->GetStreamIndex() == stream) {
 			e->GetVerties(buff, stride);
-			buff += e->stride;
+			buff += e->GetStride();
 		}
 	}
 }
@@ -306,7 +306,7 @@ void MeshBuffer::GetOptimizedIndices(ByteStream& out) const {
 		std::memcpy(out.data(), indices.data(), out.size());
 	} else {
 		out.resize(sizeof(uint16)*indices.size());
-		uint16* data = static_cast<uint16*>(out.data());
+		uint16* data = reinterpret_cast<uint16*>(out.data());
 		for(uint32 i = 0; i < indices.size(); ++i)
 			data[i] = (uint16)indices[i];
 	}
@@ -315,7 +315,7 @@ void MeshBuffer::GetOptimizedIndices(ByteStream& out) const {
 uint32 MeshBuffer::GetVertexStride(uint32 streamIdx) const {
 	uint32 stride = 0;
 	for (auto& e : channels) {
-		if (e->streamIndex == streamIdx)
+		if (e->GetStreamIndex() == streamIdx)
 			stride += e->GetStride();
 	}
 	return stride;
@@ -333,10 +333,10 @@ void MeshBuffer::GetVertexLayout(VertexLayoutInfo& layout) const {
 		if (numElements == channels.size()) {
 			int32 found = (int32)i;
 			for (uint32 j = 0; j < channels.size(); ++j) {
-				if( !(channels[j]->semantic == elements[j].desc.semantic.semantic &&
-					channels[j]->semanticIdx == elements[j].desc.semantic.semanticIndex &&
-					channels[j]->type == elements[j].desc.semantic.type &&
-					channels[j]->streamIndex == elements[j].streamIndex) ) {
+				if( !(channels[j]->GetSemantic() == elements[j].desc.semantic.semantic &&
+					channels[j]->GetSemanticIndex() == elements[j].desc.semantic.semanticIndex &&
+					channels[j]->GetType() == elements[j].desc.semantic.type &&
+					channels[j]->GetStreamIndex() == elements[j].streamIndex) ) {
 					found = -1;
 					break;
 				}
@@ -357,7 +357,7 @@ void MeshBuffer::GetVertexLayout(VertexLayoutInfo& layout) const {
 			VertexElement(
 				VertexDesc(
 					VertexSemantic(
-						e->semantic, e->semanticIdx, e->type), offset), e->streamIndex)
+						e->GetSemantic(), e->GetSemanticIndex(), e->GetType()), offset), e->GetStreamIndex())
 				);
 		offset += e->GetStride();
 	}

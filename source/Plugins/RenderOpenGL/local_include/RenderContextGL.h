@@ -117,7 +117,7 @@ public:
 
 	static ParamDataType GetShaderParamType(GLuint type);
 	static uint16 GetShaderParamSize(GLuint type);
-	static uint16 GetSemanticType(GLenum);
+	static VertexComponentType GetSemanticType(GLenum);
 	static bool IsSamplerType(GLint type);
 	static GLint GetGlAddressMode(TextureAddressMode t);
 	static GLenum GetGlCompareFunc(TextureComparisonMode type);

@@ -96,7 +96,7 @@ ParameterBuffer& ParameterBuffer::operator=(ParameterBuffer&& pb) {
 	return *this;
 }
 
-void ParameterBuffer::Load(InputSerializer& ser, AssetStreamRequest* request) {
+void ParameterBuffer::AsyncLoad(InputSerializer& ser, AssetStreamRequest* request) {
 	ser >> size;
 	if (size) {
 		this->data.reset((uint8*) NEX_ALLOC(size, MEMCAT_CACHEALIGNED));
@@ -145,7 +145,7 @@ void ParameterBuffer::Load(InputSerializer& ser, AssetStreamRequest* request) {
 				if (request)
 					request->GetMetaInfo().AddDependency(assetPtr);
 				else
-					assetPtr->Load(false);
+					assetPtr->AsyncRequestLoad();
 				tu->texture = assetPtr;
 				assetPtr->AddRef();
 			} else
@@ -158,7 +158,7 @@ void ParameterBuffer::Load(InputSerializer& ser, AssetStreamRequest* request) {
 	}
 }
 
-void ParameterBuffer::Save(OutputSerializer& ser) const {
+void ParameterBuffer::AsyncSave(OutputSerializer& ser) const {
 	ser << size;
 	if (size) {
 		const uint8* buffer = data.get();

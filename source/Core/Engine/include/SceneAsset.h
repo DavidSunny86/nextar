@@ -41,6 +41,9 @@ public:
 	typedef FactoryTraits<SceneAsset> FactoryTraits;
 
 	class SceneStreamRequest: public AssetStreamRequest {
+	public:
+		SceneStreamRequest(SceneAsset* asset) : AssetStreamRequest(asset) {
+		}
 	};
 
 	SceneAsset(const StringID name, const StringID factory);
@@ -57,6 +60,7 @@ public:
 
 protected:
 
+	virtual StreamRequest* CreateStreamRequestImpl(bool load);
 	virtual void UnloadImpl();
 
 	SceneParameters parameters;

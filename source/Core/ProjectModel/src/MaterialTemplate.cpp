@@ -25,15 +25,15 @@ StreamNotification MaterialTemplate::NotifyAssetLoadedImpl(StreamRequest* reques
 	if(!shader) {
 		Error("Shader failed to load");
 		// request is complete
-		return true;
+		return StreamNotification::NOTIFY_COMPLETED;
 	}
 	ShaderAssetPtr shaderPtr =
 			shader->GetShaderUnit(compilationOptions);
 	material = MaterialAsset::Traits::Instance(assetId);
 	if (!material->AsyncIsLoaded()) {
 		InputStreamPtr dummy;
-		StreamInfo info(this, dummy);
 		MaterialFromTemplate loader(this, shaderPtr);
+		StreamInfo info(&loader, dummy);
 		material->RequestLoad(info);
 	}
 	return StreamNotification::NOTIFY_COMPLETED_AND_READY;
@@ -138,7 +138,7 @@ MaterialTemplate::MaterialFromTemplate::MaterialFromTemplate(MaterialTemplate* _
 }
 
 void MaterialTemplate::MaterialFromTemplate::Load(InputStreamPtr& stream, AssetLoader& loader) {
-	MaterialAsset::StreamRequest* request = static_cast<MaterialAsset::StreamRequest*>(
+	MaterialAsset::MaterialLoadRequest* request = static_cast<MaterialAsset::MaterialLoadRequest*>(
 			loader.GetRequestPtr());
 
 	auto paramValues = parent->paramValues;

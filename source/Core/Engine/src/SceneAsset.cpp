@@ -99,4 +99,8 @@ void SceneAsset::DisownCullingSystem(bool removeBodies) {
 	}
 }
 
+StreamRequest* SceneAsset::CreateStreamRequestImpl(bool load) {
+	return NEX_NEW(SceneStreamRequest(this));
+}
+
 } /* namespace nextar */

@@ -91,10 +91,10 @@ void MeshSaverImplv1_0::WriteIndexData(MeshBuffer* buffer,
 	uint32 count = buffer->GetIndexCount();
 	ser << size << count;
 	if ((size / count) == 4) {
-		OutputSerializer::UIntArray arr(static_cast<uint32*>(indices.data()), count);
+		OutputSerializer::UIntArray arr(reinterpret_cast<uint32*>(indices.data()), count);
 		ser	 << arr;
 	} else {
-		OutputSerializer::UShortArray arr(static_cast<uint16*>(indices.data()), count);
+		OutputSerializer::UShortArray arr(reinterpret_cast<uint16*>(indices.data()), count);
 		ser	 << arr;
 	}
 	outStream.EndChunk();

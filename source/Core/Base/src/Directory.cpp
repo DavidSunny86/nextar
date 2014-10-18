@@ -196,7 +196,7 @@ namespace nextar {
 					|| StringUtils::PatternMatch(pattern.c_str(), dirp->d_name,
 					true)) {
 					String fullPath = URL::GetAppendedPath(path, dirp->d_name);
-					attr.fileName = URL(Directory::TYPE, GetName(),
+					attr.fileName = URL(GetName(),
 						URL::GetAppendedPath(subPath, dirp->d_name));
 					attr.flags = 0;
 					struct stat filestat;
@@ -288,7 +288,7 @@ namespace nextar {
 			struct stat filestat;
 			int ret = stat(fullPath.c_str(), &filestat);
 			if (ret == 0) {
-				attr.fileName = URL(Directory::TYPE, GetName(), fileName);
+				attr.fileName = URL(GetName(), fileName);
 				attr.flags = 0;
 				StatToAttribute(filestat, attr);
 			}

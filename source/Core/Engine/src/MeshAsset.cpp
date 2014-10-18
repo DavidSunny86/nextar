@@ -38,7 +38,7 @@ MeshAsset::MeshAsset(const StringID name, const StringID factory) :
 }
 
 MeshAsset::~MeshAsset() {
-	if (IsLoaded())
+	if (AsyncIsLoaded())
 		Unload();
 }
 

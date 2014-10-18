@@ -195,7 +195,7 @@ void DeleteContents(_It beg, _It en) {
 template<typename _It>
 void DeleteMapContents(_It beg, _It en) {
 	while (beg != en) {
-		NEX_DELETE(*beg).second;
+		NEX_DELETE( (*beg).second );
 		++beg;
 	}
 }

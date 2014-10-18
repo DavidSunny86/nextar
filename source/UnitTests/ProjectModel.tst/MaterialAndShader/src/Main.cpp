@@ -18,12 +18,12 @@ public:
 		URL saveUrl("{EngineData}/Materials/Box.mtl");
 		URL saveShaderUrl("{EngineData}/Shaders/Deferred.nfx");
 		material = MaterialTemplate::Traits::Instance(id, loadUrl);
-		material->Load(false);
+		material->RequestLoad();
 		material->SetAssetLocator(saveUrl);
 		shader = material->GetShaderTemplate();
 		shader->SetAssetLocator(saveShaderUrl);
-		shader->Save(false);
-		material->Save(false);
+		shader->RequestSave();
+		material->RequestSave();
 
 		// save engine lights
 		
@@ -32,12 +32,12 @@ public:
 		URL saveDlMaterialUrl("{EngineData}/Materials/DeferredLights.mtl");
 		URL saveDlShaderUrl("{EngineData}/Shaders/DeferredLights.nfx");
 		material = MaterialTemplate::Traits::Instance(id2, dlMaterialUrl);
-		material->Load(false);
+		material->RequestLoad();
 		shader = material->GetShaderTemplate();
 		shader->SetAssetLocator(saveDlShaderUrl);
-		shader->Save(false);
+		shader->RequestSave();
 		AssetPtr mtl = material;
-		Asset::AsyncSave(mtl, saveDlMaterialUrl);
+		Asset::AssetSave(mtl, saveDlMaterialUrl);
 	}
 };
 

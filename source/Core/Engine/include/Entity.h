@@ -112,7 +112,7 @@ protected:
 };
 
 template <> template <>
-Camera* Component::ComponentTraits<Camera>::Cast(Entity* entity) {
+inline Camera* Component::ComponentTraits<Camera>::Cast(Entity* entity) {
 	Component* anyComponent = entity->GetSpatial();
 	NEX_ASSERT(anyComponent);
 	NEX_ASSERT(COMPONENT_CAT(anyComponent->GetClassID()) == COMPONENT_CAT(GetClassID()));
@@ -121,7 +121,7 @@ Camera* Component::ComponentTraits<Camera>::Cast(Entity* entity) {
 
 
 template <> template <>
-Moveable* Component::ComponentTraits<Moveable>::Cast(Entity* entity) {
+inline Moveable* Component::ComponentTraits<Moveable>::Cast(Entity* entity) {
 	Component* anyComponent = entity->GetMoveable();
 	NEX_ASSERT(anyComponent);
 	NEX_ASSERT(COMPONENT_CAT(anyComponent->GetClassID()) == COMPONENT_CAT(GetClassID()));
@@ -130,7 +130,7 @@ Moveable* Component::ComponentTraits<Moveable>::Cast(Entity* entity) {
 
 
 template <> template <>
-Mesh* Component::ComponentTraits<Mesh>::Cast(Entity* entity) {
+inline Mesh* Component::ComponentTraits<Mesh>::Cast(Entity* entity) {
 	Component* anyComponent = entity->GetSpatial();
 	NEX_ASSERT(anyComponent);
 	NEX_ASSERT(COMPONENT_CAT(anyComponent->GetClassID()) == COMPONENT_CAT(GetClassID()));
@@ -138,7 +138,7 @@ Mesh* Component::ComponentTraits<Mesh>::Cast(Entity* entity) {
 }
 
 template <> template <>
-BVCullingSystem* Component::ComponentTraits<BVCullingSystem>::Cast(Entity* entity) {
+inline BVCullingSystem* Component::ComponentTraits<BVCullingSystem>::Cast(Entity* entity) {
 	Component* anyComponent = entity->GetSpatial();
 	NEX_ASSERT(anyComponent);
 	NEX_ASSERT(COMPONENT_CAT(anyComponent->GetClassID()) == COMPONENT_CAT(GetClassID()));

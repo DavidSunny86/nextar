@@ -21,6 +21,7 @@ public:
 
 		PrimitiveGroup() : buffer(nullptr), startVertex(0),
 				vertexCount(0), startIndex(0), indexCount(0) {}
+		~PrimitiveGroup();
 
 		uint32 startVertex;
 		uint32 vertexCount;
@@ -32,9 +33,12 @@ public:
 		MeshBuffer* buffer;
 	};
 
-	typedef list<PrimitiveGroup>::type PrimitiveGroupList;
+	typedef vector<PrimitiveGroup>::type PrimitiveGroupList;
 	class MeshBuilder : public AssetStreamRequest {
 	public:
+
+		MeshBuilder(MeshTemplate* asset) : AssetStreamRequest(asset), sharedBuffer(nullptr) {
+		}
 
 		PrimitiveGroup& AddPrimitiveGroup() {
 			primitives.push_back(PrimitiveGroup());
@@ -94,7 +98,13 @@ public:
 
 	virtual StreamNotification NotifyAssetLoadedImpl(StreamRequest* request);
 
+	virtual uint32 GetClassID() const;
+
+
 protected:
+
+	virtual StreamRequest* CreateStreamRequestImpl(bool load);
+	virtual void UnloadImpl();
 
 	BoundsInfo bounds;
 	MaterialTemplatePtr sharedMaterial;

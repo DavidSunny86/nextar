@@ -105,7 +105,7 @@ void MeshLoaderIntfv1_0::ReadVertexElementData(
 				>> (element.stepRate)
 				>> (element.streamIndex);
 		element.desc.semantic.semantic = (VertexComponentSemantic)semantic;
-		element.desc.semantic.type = (VertexComponentBaseType)type;
+		element.desc.semantic.type = (VertexComponentType)type;
 		/** todo check sanity */
 		vertexElements[i++] = element;
 	}

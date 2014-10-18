@@ -27,18 +27,18 @@ public:
 		CATAGORY = COMPONENT_CAT(CLASS_ID),
 	};
 
-	class StreamRequest;
+	class MaterialLoadRequest;
 
 	typedef AssetTraits<MaterialAsset> Traits;
 	typedef FactoryTraits<MaterialAsset> FactoryTraits;
 
-	class _NexEngineAPI StreamRequest: public AssetStreamRequest {
-		NEX_LOG_HELPER(MaterialAsset::StreamRequest)
+	class _NexEngineAPI MaterialLoadRequest: public AssetStreamRequest {
+		NEX_LOG_HELPER(MaterialAsset::MaterialLoadRequest)
 		;
 	public:
 
-		StreamRequest(Asset*);
-		~StreamRequest();
+		MaterialLoadRequest(Asset*);
+		~MaterialLoadRequest();
 
 		void SetShader(ShaderAssetPtr& shader);
 		void SetShader(const ShaderAsset::ID& id, const URL& location);
@@ -91,7 +91,7 @@ protected:
 
 	virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);
 
-	void PrepareMaterial(MaterialAsset::StreamRequest*);
+	void PrepareMaterial(MaterialAsset::MaterialLoadRequest*);
 	void SetParamBufferSize(size_t size);
 	void SetParamData(const void* data, size_t offset, size_t size);
 	void SetParamData(const TextureUnit* data, size_t offset);
@@ -105,7 +105,7 @@ protected:
 	// todo
 	ParameterBuffer materialParamData;
 
-	friend class StreamRequest;
+	friend class MaterialLoadRequest;
 };
 
 } /* namespace nextar */

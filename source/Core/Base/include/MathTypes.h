@@ -119,6 +119,7 @@ namespace Math {
 
 	template <>
 	class Traits<float> {
+	public:
 		static uint32 ElementCount() {
 			return 1;
 		}
@@ -141,6 +142,7 @@ namespace Math {
 
 	template <>
 	class Traits<Vector2> {
+	public:
 		inline static uint32 ElementCount() {
 			return 2;
 		}
@@ -161,6 +163,7 @@ namespace Math {
 
 	template <>
 	class Traits<Vector3> {
+	public:
 		inline static uint32 ElementCount() {
 			return 3;
 		}
@@ -182,6 +185,7 @@ namespace Math {
 
 	template <>
 	class Traits<Vector4> {
+	public:
 		inline static uint32 ElementCount() {
 			return 4;
 		}

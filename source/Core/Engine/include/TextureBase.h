@@ -50,7 +50,7 @@ public:
 	struct ReadPixelUpdateParams {
 		std::atomic_flag lock;
 		PixelBox* box;
-		ReadPixelUpdateParams() {
+		ReadPixelUpdateParams() : box(nullptr) {
 			lock.clear(std::memory_order_relaxed);
 		}
 	};

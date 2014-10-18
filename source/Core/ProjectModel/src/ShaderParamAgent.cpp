@@ -40,7 +40,7 @@ ShaderParamAgent* ShaderParamAgent::GetAgent(ParamDataType type) {
 }
 
 void ShaderParamAgent::SetParamValue(size_t offset,
-		MaterialAsset::StreamRequest* request, const ParamEntry& pe,
+		MaterialAsset::MaterialLoadRequest* request, const ParamEntry& pe,
 		const String& value) {
 	size_t start = 0;
 	bool stop = false;
@@ -61,7 +61,7 @@ void ShaderParamAgent::SetParamValue(size_t offset,
 }
 
 void ShaderParamScalar::SetParamValueImpl(size_t offset,
-		MaterialAsset::StreamRequest* request, const ParamEntry& pe,
+		MaterialAsset::MaterialLoadRequest* request, const ParamEntry& pe,
 		const String& value) {
 	switch(pe.type) {
 	case ParamDataType::PDT_BOOL:
@@ -94,7 +94,7 @@ void ShaderParamScalar::SetParamValueImpl(size_t offset,
 }
 
 void ShaderParamVector::SetParamValueImpl(size_t offset,
-		MaterialAsset::StreamRequest* request, const ParamEntry& pe,
+		MaterialAsset::MaterialLoadRequest* request, const ParamEntry& pe,
 		const String& value) {
 	switch(pe.type) {
 	case ParamDataType::PDT_VEC2:
@@ -139,7 +139,7 @@ void ShaderParamVector::SetParamValueImpl(size_t offset,
 }
 
 void ShaderParamMatrix::SetParamValueImpl(size_t offset,
-		MaterialAsset::StreamRequest* request, const ParamEntry& pe,
+		MaterialAsset::MaterialLoadRequest* request, const ParamEntry& pe,
 		const String& value) {
 	switch(pe.type) {
 	case ParamDataType::PDT_MAT4x4:
@@ -160,7 +160,7 @@ void ShaderParamMatrix::SetParamValueImpl(size_t offset,
 }
 
 void ShaderParamTexture::SetParamValueImpl(size_t offset,
-		MaterialAsset::StreamRequest* request, const ParamEntry& pe,
+		MaterialAsset::MaterialLoadRequest* request, const ParamEntry& pe,
 		const String& value) {
 	URL locator;
 	Asset::ID objectId;
