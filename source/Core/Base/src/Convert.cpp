@@ -54,9 +54,9 @@ _NexBaseAPI int32 ToLong(const String& str) {
 	return ret;
 }
 
-_NexBaseAPI size_t ToULong(const String& str) {
+_NexBaseAPI uint32 ToULong(const String& str) {
 	InStringStream strm(str);
-	size_t ret = -1;
+	uint32 ret = -1;
 	strm >> ret;
 	return ret;
 }

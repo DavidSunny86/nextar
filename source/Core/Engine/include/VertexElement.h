@@ -164,10 +164,10 @@ struct _NexEngineAPI VertexSemantic: public AllocGraphics {
 	static VertexComponentBaseType GetComponentBaseType(
 			VertexComponentType);
 
-	static size_t MapSignatureToSemantics(const VertexSemantic* signature,
-			size_t semanticStride, uint32 numSemantics,
-			const VertexElement* elements, size_t elementsStride,
-			size_t numElements, uint16* outElements);
+	static uint32 MapSignatureToSemantics(const VertexSemantic* signature,
+		uint32 semanticStride, uint32 numSemantics,
+		const VertexElement* elements, uint32 elementsStride,
+		uint32 numElements, uint16* outElements);
 };
 
 struct VertexDesc: public AllocGraphics {

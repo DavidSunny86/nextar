@@ -67,25 +67,25 @@ void ShaderParamScalar::SetParamValueImpl(size_t offset,
 	case ParamDataType::PDT_BOOL:
 	{
 		bool c_value = Convert::ToBool(value);
-		request->SetParamValue(offset, &c_value, 1);
+		request->SetParamValue((uint32)offset, &c_value, 1);
 	}
 	break;
 	case ParamDataType::PDT_UINT:
 	{
 		int32 c_value = Convert::ToLong(value);
-		request->SetParamValue(offset, &c_value, 4);
+		request->SetParamValue((uint32)offset, &c_value, 4);
 	}
 	break;
 	case ParamDataType::PDT_INT:
 	{
-		uint32 c_value = Convert::ToULong(value);
-		request->SetParamValue(offset, &c_value, 4);
+		uint32 c_value = (uint32)Convert::ToULong(value);
+		request->SetParamValue((uint32)offset, &c_value, 4);
 	}
 	break;
 	case ParamDataType::PDT_FLOAT:
 	{
 		float c_value = Convert::ToFloat(value);
-		request->SetParamValue(offset, &c_value, 4);
+		request->SetParamValue((uint32)offset, &c_value, 4);
 	}
 	break;
 	default:
@@ -100,37 +100,37 @@ void ShaderParamVector::SetParamValueImpl(size_t offset,
 	case ParamDataType::PDT_VEC2:
 	{
 		Vector2 c_value = Convert::ToVector2(value);
-		request->SetParamValue(offset, &c_value, 4*2);
+		request->SetParamValue((uint32)offset, &c_value, 4 * 2);
 	}
 	break;
 	case ParamDataType::PDT_VEC3:
 	{
 		Vector3 c_value = Convert::ToVector3(value);
-		request->SetParamValue(offset, &c_value, 4*3);
+		request->SetParamValue((uint32)offset, &c_value, 4 * 3);
 	}
 	break;
 	case ParamDataType::PDT_VEC4:
 	{
 		Vector4 c_value = Convert::ToVector4(value);
-		request->SetParamValue(offset, &c_value, 4*4);
+		request->SetParamValue((uint32)offset, &c_value, 4 * 4);
 	}
 	break;
 	case ParamDataType::PDT_IVEC2:
 	{
 		IVector2 c_value = Convert::ToIVector2(value);
-		request->SetParamValue(offset, c_value.data(), 4*2);
+		request->SetParamValue((uint32)offset, c_value.data(), 4 * 2);
 	}
 	break;
 	case ParamDataType::PDT_IVEC3:
 	{
 		IVector3 c_value = Convert::ToIVector3(value);
-		request->SetParamValue(offset, c_value.data(), 4*3);
+		request->SetParamValue((uint32)offset, c_value.data(), 4 * 3);
 	}
 	break;
 	case ParamDataType::PDT_IVEC4:
 	{
 		IVector4 c_value = Convert::ToIVector4(value);
-		request->SetParamValue(offset, c_value.data(), 4*4);
+		request->SetParamValue((uint32)offset, c_value.data(), 4 * 4);
 	}
 	break;
 	default:
@@ -145,13 +145,13 @@ void ShaderParamMatrix::SetParamValueImpl(size_t offset,
 	case ParamDataType::PDT_MAT4x4:
 	{
 		Matrix4x4 c_value = Convert::ToMat4x4(value);
-		request->SetParamValue(offset, &c_value, 4*16);
+		request->SetParamValue((uint32)offset, &c_value, 4 * 16);
 	}
 	break;
 	case ParamDataType::PDT_MAT3x4:
 	{
 		Matrix3x4 c_value = Convert::ToMat3x4(value);
-		request->SetParamValue(offset, &c_value, 4*12);
+		request->SetParamValue((uint32)offset, &c_value, 4 * 12);
 	}
 	break;
 	default:
@@ -180,7 +180,7 @@ void ShaderParamTexture::SetParamValueImpl(size_t offset,
 		objectId = Asset::ToID(locator);
 	TextureAssetPtr texture = TextureAsset::Traits::Instance(objectId, locator);
 	TextureUnit unit(texture);
-	request->SetTextureValue(offset, &unit);
+	request->SetTextureValue((uint32)offset, &unit);
 }
 
 } /* namespace MaterialCompiler */

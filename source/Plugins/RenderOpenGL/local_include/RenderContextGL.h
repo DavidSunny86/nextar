@@ -136,7 +136,7 @@ protected:
 
 	UniformBufferGL* CreateUniformBuffer(PassViewGL* pass, uint32 passIndex,
 			const String& name, GLint blockIndex, GLuint prog, GLuint numParams,
-			size_t size, ParamEntryTable* paramTable);
+			uint32 size, ParamEntryTable* paramTable);
 
 	enum {
 		CONTEXT_READY = 1 << 0, 

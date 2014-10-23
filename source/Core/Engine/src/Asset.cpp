@@ -8,8 +8,14 @@ Asset::AssetLocatorAccessor Asset::AssetLocatorAccessor::assetLocatorAccessor;
 const StreamInfo StreamInfo::Null;
 
 Asset::Asset(const StringID id, const StringID factory) :
+<<<<<<< HEAD
 	memoryCost(sizeof(Asset)), SharedComponent(id, factory), _savedRequestPtr(nullptr) {
 	assetState = ASSET_CREATED;
+=======
+	memoryCost(sizeof(Asset)), SharedComponent(id, factory), _savedRequestPtr(nullptr),
+	assetState(ASSET_CREATED) {
+	
+>>>>>>> 71b15a1f10310ca15601df42ebede165149705cc
 	if (OverrideDictionary("Asset")) {
 		Populate(GetDictionary());
 	}

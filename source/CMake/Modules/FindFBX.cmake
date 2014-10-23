@@ -44,7 +44,10 @@ set( FBX_SEARCH_PATHS
 	    $ENV{FBX_DIR}
 	    "$ENV{ProgramW6432}/Autodesk/FBX/FBX SDK/2015.2"
 	    "$ENV{PROGRAMFILES}/Autodesk/FBX/FBX SDK/2015.2"
+		"$ENV{ProgramW6432}/Autodesk/FBX/FBX SDK/2015.1"
+	    "$ENV{PROGRAMFILES}/Autodesk/FBX/FBX SDK/2015.1"
 	    /Applications/Autodesk/FBXSDK20152
+		/Applications/Autodesk/FBXSDK20151
 	)
 
 find_path(FBX_INCLUDE "fbxsdk.h"

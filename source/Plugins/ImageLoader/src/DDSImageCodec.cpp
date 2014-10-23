@@ -41,7 +41,7 @@ ImageData DDSImageCodec::Load(InputStreamPtr& file, const ImageParams& params, I
 	}
 
 	DDS_HEADER header;
-	InputSerializer::UIntArray arr((uint32*) &header, sizeof(header) / 4);
+	InputSerializer::UIntArray arr((uint32*)&header, (uint32)(sizeof(header) / 4));
 	ser >> arr;
 	// Verify header to validate DDS file
 	if (header.size != sizeof(DDS_HEADER)
@@ -109,7 +109,7 @@ ImageData DDSImageCodec::CreateImageData(InputSerializer& ser,
 			&& (MAKEFOURCC('D', 'X', '1', '0') == header->ddspf.fourCC)) {
 		DDS_HEADER_DXT10 d3d10ext;
 		InputSerializer::UIntArray arr((uint32*) &d3d10ext,
-				sizeof(d3d10ext) / 4);
+			(uint32)(sizeof(d3d10ext) / 4));
 		ser >> arr;
 		arraySize = d3d10ext.arraySize;
 		if (arraySize == 0) {
@@ -420,7 +420,7 @@ ImageData DDSImageCodec::FillInitData(InputSerializer& ser, size_t arraySize,
 					//
 				}
 #else
-				InputSerializer::UByteArray arr(byteArr, numBytes * d);
+				InputSerializer::UByteArray arr(byteArr, (uint32)(numBytes * d));
 				ser >> arr;
 #endif
 			} else {

@@ -38,7 +38,7 @@ _NexBaseAPI String ToString(const nextar::IVector4& v);
 _NexBaseAPI String ToString(const Color& mat);
 _NexBaseAPI String ToString(const Color32& mat);
 _NexBaseAPI int32 ToLong(const String&);
-_NexBaseAPI size_t ToULong(const String&);
+_NexBaseAPI uint32 ToULong(const String&);
 _NexBaseAPI float ToFloat(const String&);
 _NexBaseAPI bool ToBool(const String&);
 _NexBaseAPI VersionID ToVersion(const String&);

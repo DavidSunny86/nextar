@@ -87,7 +87,7 @@ void BlendTargetCmd::Execute(int parentType, void* state,
 	const StringUtils::WordList& paramContext = ctx.GetParamList();
 	it = StringUtils::NextWord(paramContext, value, it);
 	if (it != String::npos) {
-		targetIndex = Convert::ToULong(value);
+		targetIndex = (uint32)Convert::ToULong(value);
 		if (targetIndex >= blendState.numRenderTargets) {
 			ctx.Error(
 					"Target index is out of bounds. "

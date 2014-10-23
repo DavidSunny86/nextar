@@ -79,7 +79,7 @@ void FbxInputStreamBridge::Seek(const FbxInt64& pOffset,
 
 long FbxInputStreamBridge::GetPosition() const {
 	if (inputStream)
-		return (inputStream->Tell() - inputLocation);
+		return (long)(inputStream->Tell() - inputLocation);
 	return -1;
 }
 

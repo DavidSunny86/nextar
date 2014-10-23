@@ -28,9 +28,7 @@ bool FbxMeshLoaderImplv1_0::LoadScene() {
 	int lFileMajor, lFileMinor, lFileRevision;
 	int lSDKMajor, lSDKMinor, lSDKRevision;
 	//int lFileFormat = -1;
-	int i, lAnimStackCount;
 	bool lStatus;
-	char lPassword[1024];
 
 	// Get the file version number generate by the FBX SDK.
 	FbxManager::GetFileFormatVersion(lSDKMajor, lSDKMinor, lSDKRevision);
@@ -312,7 +310,7 @@ void CopyVertexChannel(FbxMesh* pMesh, FbxLayerType* layer,
 
 				break;
 
-			defualt: // rest doesn't make much sense
+			default: // rest doesn't make much sense
 				break;
 			}
 
@@ -354,8 +352,8 @@ void FbxMeshLoaderImplv1_0::CreatePrimitiveGroupFrom(FbxSurfaceMaterial* pMtl,
 		}
 	}
 
-	pBuffer->ReserveVertexSpace(polys.size() * 3);
-	pBuffer->ReserveIndexSpace(polys.size() * 3);
+	pBuffer->ReserveVertexSpace((uint32)polys.size() * 3);
+	pBuffer->ReserveIndexSpace((uint32)polys.size() * 3);
 
 	uint32 baseVertexIdx = pBuffer->GetVertexCount();
 	FbxVector4* lControlPoints = pMesh->GetControlPoints();

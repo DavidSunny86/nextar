@@ -113,7 +113,7 @@ public:
 	}
 
 	IndexData(size_t indexStart, size_t indexCount, IndexBufferPtr indexBuffer) :
-			start(indexStart), count(indexCount), indices(indexBuffer) {
+		start((uint32)indexStart), count((uint32)indexCount), indices(indexBuffer) {
 	}
 };
 
