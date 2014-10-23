@@ -36,6 +36,7 @@ void FbxMeshLoaderImplBase::Load(InputStreamPtr& stream,
 	}
 
 	mainLoader.ParseContent();
+	loader.GetRequestPtr()->SetCompleted(true);
 
 }
 

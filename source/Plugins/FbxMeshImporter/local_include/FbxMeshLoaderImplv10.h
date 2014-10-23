@@ -39,7 +39,10 @@ public:
 	void BuildMesh(MeshTemplate::MeshBuilder* pMesh);
 	MaterialTemplatePtr CreateMaterial(FbxSurfaceMaterial*);
 
+
 protected:
+
+	static int GetFbxReaderID(FbxManager*);
 
 	typedef vector<MeshElement>::type MeshElementList;
 	typedef map<FbxSurfaceMaterial*, IndexArray>::type MaterialPolygonMap;

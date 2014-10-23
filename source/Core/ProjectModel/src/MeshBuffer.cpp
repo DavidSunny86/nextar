@@ -136,32 +136,39 @@ uint32 MeshBuffer::AddVertexChannel(
 	uint32 _semanticIdx,
 	VertexComponentType _type,
 	uint32 streamIdx) {
-	VertexChannel* channel = GetVertexChannel(_semantic, _semanticIdx);
-	if (!channel) {
-		switch (_type) {
-		case COMP_TYPE_FLOAT1:
-			channel = NEX_NEW(VertexChannelTempl<float>(_semantic, _semanticIdx, _type, streamIdx));
-			break;
-		case COMP_TYPE_FLOAT2:
-			channel = NEX_NEW(VertexChannelTempl<Vector2>(_semantic, _semanticIdx, _type, streamIdx));
-			break;
-		case COMP_TYPE_FLOAT3:
-			channel = NEX_NEW(VertexChannelTempl<Vector3>(_semantic, _semanticIdx, _type, streamIdx));
-			break;
-		case COMP_TYPE_FLOAT4:
-			channel = NEX_NEW(VertexChannelTempl<Vector4>(_semantic, _semanticIdx, _type, streamIdx));
-			break;
-		case COMP_TYPE_UNSIGNED_INT:
-		case COMP_TYPE_COLOR:
-			channel = NEX_NEW(VertexChannelTempl<uint32>(_semantic, _semanticIdx, _type, streamIdx));
-			break;
-		}
-		if (channel) {
-			channels.push_back(channel);
-			vertexSignature += "#";
-			vertexSignature += Convert::ToString((uint32)_semantic) + ":" + Convert::ToString((uint32)_semanticIdx);
-			return channels.size() - 1;
-		}
+	uint32 index = 0;
+	for (auto &c : channels) {
+		if (c->GetSemantic() == _semantic &&
+			c->GetSemanticIndex() == _semanticIdx)
+			return index;
+		index++;
+	}
+
+	VertexChannel* channel = nullptr;
+	switch (_type) {
+	case COMP_TYPE_FLOAT1:
+		channel = NEX_NEW(VertexChannelTempl<float>(_semantic, _semanticIdx, _type, streamIdx));
+		break;
+	case COMP_TYPE_FLOAT2:
+		channel = NEX_NEW(VertexChannelTempl<Vector2>(_semantic, _semanticIdx, _type, streamIdx));
+		break;
+	case COMP_TYPE_FLOAT3:
+		channel = NEX_NEW(VertexChannelTempl<Vector3>(_semantic, _semanticIdx, _type, streamIdx));
+		break;
+	case COMP_TYPE_FLOAT4:
+		channel = NEX_NEW(VertexChannelTempl<Vector4>(_semantic, _semanticIdx, _type, streamIdx));
+		break;
+	case COMP_TYPE_UNSIGNED_INT:
+	case COMP_TYPE_COLOR:
+		channel = NEX_NEW(VertexChannelTempl<uint32>(_semantic, _semanticIdx, _type, streamIdx));
+		break;
+	}
+
+	if (channel) {
+		channels.push_back(channel);
+		vertexSignature += "#";
+		vertexSignature += Convert::ToString((uint32)_semantic) + ":" + Convert::ToString((uint32)_semanticIdx);
+		return channels.size() - 1;
 	}
 
 	return -1;

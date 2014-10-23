@@ -12,12 +12,16 @@ namespace FbxMeshImporter {
 FbxMeshLoaderImplv1_0::FbxMeshLoaderImplv1_0(FbxManager* pManager,
 		InputStreamPtr& pInput, const String& kPassword) :
 		mManager(pManager), mPassword(kPassword), mScene(nullptr), mSharedBuffer(
-				nullptr), mStream(pInput) {
+				nullptr), mStream(pInput, GetFbxReaderID(pManager)) {
 	mScene = FbxScene::Create(mManager, "");
 }
 
 FbxMeshLoaderImplv1_0::~FbxMeshLoaderImplv1_0() {
 	mScene->Destroy(true);
+}
+
+int FbxMeshLoaderImplv1_0::GetFbxReaderID(FbxManager* pManager) {
+	return pManager->GetIOPluginRegistry()->FindReaderIDByExtension("fbx");
 }
 
 bool FbxMeshLoaderImplv1_0::LoadScene() {
@@ -95,7 +99,12 @@ bool FbxMeshLoaderImplv1_0::LoadScene() {
 			Warn("Password is wrong, import aborted.");
 		}
 	}
-
+	if (lStatus) {
+		FbxGeometryConverter converter(mManager);
+		if(!converter.Triangulate(mScene, true)) {
+			Warn("Not all meshes were converted!");
+		}
+	}
 	// Destroy the importer.
 	lImporter->Destroy();
 
@@ -351,7 +360,7 @@ void FbxMeshLoaderImplv1_0::CreatePrimitiveGroupFrom(FbxSurfaceMaterial* pMtl,
 	uint32 baseVertexIdx = pBuffer->GetVertexCount();
 	FbxVector4* lControlPoints = pMesh->GetControlPoints();
 	VertexChannel* pPosition = pBuffer->GetVertexChannel(
-			pBuffer->AddVertexChannel(COMP_POSITION, 0, COMP_TYPE_FLOAT3));
+			COMP_POSITION, 0);
 
 	for (auto p : polys) {
 		uint32 lPolygonSize = pMesh->GetPolygonSize(p);

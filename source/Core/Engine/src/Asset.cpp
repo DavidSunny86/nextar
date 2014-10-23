@@ -9,6 +9,7 @@ const StreamInfo StreamInfo::Null;
 
 Asset::Asset(const StringID id, const StringID factory) :
 	memoryCost(sizeof(Asset)), SharedComponent(id, factory), _savedRequestPtr(nullptr) {
+	assetState = ASSET_CREATED;
 	if (OverrideDictionary("Asset")) {
 		Populate(GetDictionary());
 	}

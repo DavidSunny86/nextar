@@ -9,8 +9,8 @@
 
 namespace FbxMeshImporter {
 
-FbxInputStreamBridge::FbxInputStreamBridge(InputStreamPtr& input) :
-	inputStream(input), inputLocation(-1),
+FbxInputStreamBridge::FbxInputStreamBridge(InputStreamPtr& input, int _readerId) :
+	inputStream(input), inputLocation(-1), readerId(_readerId),
 	errorFlag(false) {
 	if (inputStream)
 		inputLocation = inputStream->Tell();
@@ -43,16 +43,17 @@ int FbxInputStreamBridge::Write(const void*, int numBytes) {
 }
 
 int FbxInputStreamBridge::Read(void* buffer, int numBytes) const {
+	int numReadBytes = 0;
 	if (inputStream && numBytes > 0 ) {
-		if( (int)inputStream->Read(buffer, (uint32)numBytes) != numBytes )
+		if( (numReadBytes = (int)inputStream->Read(buffer, (uint32)numBytes)) != numBytes )
 			errorFlag = true;
 	} else
 		errorFlag = true;
-	return 0;
+	return numReadBytes;
 }
 
 int FbxInputStreamBridge::GetReaderID() const {
-	return -1;
+	return readerId;
 }
 
 int FbxInputStreamBridge::GetWriterID() const {

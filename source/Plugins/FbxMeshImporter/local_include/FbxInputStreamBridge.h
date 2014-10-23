@@ -17,7 +17,7 @@ namespace FbxMeshImporter {
  */
 class FbxInputStreamBridge: public FbxStream {
 public:
-	FbxInputStreamBridge(InputStreamPtr& inputStream);
+	FbxInputStreamBridge(InputStreamPtr& inputStream, int readerId);
 	virtual ~FbxInputStreamBridge();
 
 	virtual bool Open(void* pStreamData);
@@ -36,6 +36,7 @@ public:
 
 protected:
 	mutable bool errorFlag;
+	int readerId;
 	std::streamoff inputLocation;
 	mutable InputStreamPtr inputStream;
 };

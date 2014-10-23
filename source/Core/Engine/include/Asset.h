@@ -491,6 +491,10 @@ public:
 		return asset->GetAssetLocator().ToString();
 	}
 
+	inline void SetCompleted(bool status) {
+		returnCode = status ? StreamResult::STREAM_SUCCESS : StreamResult::STREAM_FAILED;
+	}
+
 	inline const String& GetParameterValue(const String& name) const {
 		auto it = parameters.find(name);
 		if (it != parameters.end())
