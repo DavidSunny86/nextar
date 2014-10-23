@@ -281,10 +281,10 @@ void RenderContextWGL::EnumVideoModes() {
 			(uint16) dmi.dmDisplayFrequency);
 		auto it = std::find(videoModes.begin(), videoModes.end(), vm);
 		if (it != videoModes.end())
-			currentVideoMode = originalVideoMode = it-videoModes.begin();
+			currentVideoMode = originalVideoMode = (uint32)(it - videoModes.begin());
 		else {
 			videoModes.push_back(vm);
-			currentVideoMode = originalVideoMode = videoModes.size()-1;
+			currentVideoMode = originalVideoMode = (uint32)videoModes.size() - 1;
 		}
 	} else {
 		Error("Failed to enumerate current mode");

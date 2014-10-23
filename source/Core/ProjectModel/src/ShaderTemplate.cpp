@@ -157,7 +157,7 @@ void ShaderTemplate::LoadStreamRequest::AddMacro(const String& param,
 	ShaderTemplate* shader = static_cast<ShaderTemplate*>(GetStreamedObject());
 	auto& macro = shader->macros[name];
 	if (macro.index == -1) {
-		macro.index = shader->macros.size();
+		macro.index = (uint32)shader->macros.size();
 		macro.uiName = StringUtils::FormatName(name);
 		macro.uiDescription = description;
 	}

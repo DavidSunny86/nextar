@@ -87,7 +87,7 @@ void MeshSaverImplv1_0::WriteIndexData(MeshBuffer* buffer,
 	ByteStream indices;
 	buffer->GetOptimizedIndices(indices);
 	OutputSerializer& ser = outStream.BeginChunk(MCID_INDEX_DATA);
-	uint32 size = indices.size();
+	uint32 size = (uint32)indices.size();
 	uint32 count = buffer->GetIndexCount();
 	ser << size << count;
 	if ((size / count) == 4) {
@@ -112,7 +112,7 @@ void MeshSaverImplv1_0::WriteVertexBufferData(MeshBuffer* buffer,
 		uint32 bufferSize =  vertexCount * vertexStride;
 		ser << bufferSize << vertexCount << i << vertexStride;
 		buffer->GetVertices(i, bytes);
-		OutputSerializer::UByteArray arr(bytes.data(), bytes.size());
+		OutputSerializer::UByteArray arr(bytes.data(), (uint32)bytes.size());
 		NEX_ASSERT(arr.second == bufferSize);
 		ser << arr;
 		outStream.EndChunk();

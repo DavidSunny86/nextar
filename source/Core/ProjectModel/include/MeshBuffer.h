@@ -103,7 +103,7 @@ public:
 	uint32 GetVertexCount() const;
 	uint32 GetVertexBufferCount() const;
 	uint32 GetIndexCount() const {
-		return indices.size();
+		return (uint32)indices.size();
 	}
 
 	uint32 GetVertexStride(uint32 streamIdx) const;

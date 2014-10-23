@@ -176,8 +176,8 @@ uint32 RenderContextGL::ReadProgramSemantics(GLuint program,
 	// outputSignature = 0;
 
 	char attribName[64];
-	size_t inpCount = 0;
-	size_t outCount = 0;
+	uint32 inpCount = 0;
+	uint32 outCount = 0;
 
 	GlGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &numAttribs);
 	String signature;
@@ -217,7 +217,7 @@ uint32 RenderContextGL::ReadProgramSemantics(GLuint program,
 
 	/* sort based on semantic + index to keep signature consistents */
 	//std::sort( inpComp, inpComp + inpCount );
-	return inpCount;
+	return (uint32)inpCount;
 }
 
 void RenderContextGL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
@@ -284,7 +284,7 @@ void RenderContextGL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
 
 UniformBufferGL* RenderContextGL::CreateUniformBuffer(PassViewGL* pass,
 		uint32 passIndex, const String& name, GLint blockIndex, GLuint prog,
-		GLuint numParams, size_t size, ParamEntryTable* table) {
+		GLuint numParams, uint32 size, ParamEntryTable* table) {
 
 	NEX_ASSERT(size > 0);
 	uint16 numUnmappedParams = 0;
@@ -384,7 +384,7 @@ UniformBufferGL* RenderContextGL::CreateUniformBuffer(PassViewGL* pass,
 	UniformGL* uniforms = NEX_NEW(UniformGL[numParams]);
 	uint32 startParamIndex = -1;
 	if (storeIndividualParams) {
-		startParamIndex = table->size();
+		startParamIndex = (uint32)table->size();
 		table->reserve(startParamIndex + numParams);
 	}
 	for (GLint i = 0; i < (GLint) numParams; ++i) {
@@ -505,7 +505,7 @@ void RenderContextGL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 	uint32 mapped = 0;
 	uint32 startParamIndex = -1;
 	if (paramTable) {
-		startParamIndex = paramTable->size();
+		startParamIndex = (uint32)paramTable->size();
 		paramTable->reserve(numUni + startParamIndex);
 	}
 	GlUseProgram(program);
@@ -909,7 +909,7 @@ void RenderContextGL::AllocateTextureLevel(GLenum target, GLint level,
 	case GL_TEXTURE_1D:
 		if (format.isCompressed)
 			GlCompressedTexImage1D(target, level, format.internalFormat, width,
-					0, size, data);
+					0, (GLsizei)size, data);
 		else
 			glTexImage1D(target, level, format.internalFormat, width, 0,
 					format.sourceFormat, format.dataType, data);
@@ -920,7 +920,7 @@ void RenderContextGL::AllocateTextureLevel(GLenum target, GLint level,
 	case GL_TEXTURE_1D_ARRAY:
 		if (format.isCompressed)
 			GlCompressedTexImage2D(target, level, format.internalFormat, width,
-					height, 0, size, data);
+			height, 0, (GLsizei)size, data);
 		else
 			glTexImage2D(target, level, format.internalFormat, width, height, 0,
 					format.sourceFormat, format.dataType, data);
@@ -930,7 +930,7 @@ void RenderContextGL::AllocateTextureLevel(GLenum target, GLint level,
 	case GL_TEXTURE_CUBE_MAP_ARRAY:
 		if (format.isCompressed)
 			GlCompressedTexImage3D(target, level, format.internalFormat, width,
-					height, depth, 0, size, data);
+			height, depth, 0, (GLsizei)size, data);
 		else
 			GlTexImage3D(target, level, format.internalFormat, width, height,
 					depth, 0, format.sourceFormat, format.dataType, data);

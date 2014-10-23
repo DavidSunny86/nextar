@@ -128,11 +128,11 @@ public:
 
 	// inlines
 	inline uint32 GetPassCount() const {
-		return passes.size();
+		return (uint32)passes.size();
 	}
 
 	inline uint32 GetShaderCount() const {
-		return shaders.size();
+		return (uint32)shaders.size();
 	}
 
 	inline const PassList& GetPassList() const {

@@ -202,7 +202,7 @@ inline OutputSerializer& OutputSerializer::operator <<(
 
 inline OutputSerializer& OutputSerializer::operator <<(const String& object) {
 	ByteArray arr(reinterpret_cast<const int8*>(object.c_str()),
-			object.length());
+			(uint32)object.length());
 	(*this) << (uint8) MARKER_STRING_UTF8 << arr.second << arr;
 	return *this;
 }
@@ -210,7 +210,7 @@ inline OutputSerializer& OutputSerializer::operator <<(const String& object) {
 inline OutputSerializer& OutputSerializer::operator <<(
 		const UniString& object) {
 	ShortArray arr(reinterpret_cast<const int16*>(object.c_str()),
-			object.length());
+			(uint32)object.length());
 	(*this) << (uint8) MARKER_STRING_UTF16 << arr.second << arr;
 	return *this;
 }

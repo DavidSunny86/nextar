@@ -91,7 +91,7 @@ void UnitCmd::Execute(int parentType, void* state,
 	}
 	it = StringUtils::NextWord(paramContext, value, it);
 	if (it != String::npos) {
-		texUnitParams.maxAnisotropy = Convert::ToULong(value);
+		texUnitParams.maxAnisotropy = (uint32)Convert::ToULong(value);
 	}
 	it = StringUtils::NextWord(paramContext, value, it);
 	if (it != String::npos) {

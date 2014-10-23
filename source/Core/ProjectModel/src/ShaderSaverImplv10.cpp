@@ -79,7 +79,7 @@ void ShaderSaverImplv1_0::SavePass(const ShaderTemplate::PassUnit& pu,
 	// todo Texture unit states and source map
 	ser << (uint16)PASS_TEXTURE_STATE;
 	auto& tuMap = pu.textureUnitStates;
-	uint32 numUnits = tuMap.size();
+	uint32 numUnits = (uint32)tuMap.size();
 	ser << numUnits;
 	for(auto& e : tuMap) {
 		bool defaultTexture = e.second.defaultTexture;
@@ -115,7 +115,7 @@ void ShaderSaverImplv1_0::SavePass(const ShaderTemplate::PassUnit& pu,
 		auto range = srcMap.equal_range((RenderManager::ShaderLanguage)i);
 		if (range.first != srcMap.end()) {
 			OutputSerializer& ser = stream.BeginChunk((uint16)(languageDumps[i]));
-			uint32 numStages = std::distance(range.first, range.second);
+			uint32 numStages = (uint32)std::distance(range.first, range.second);
 			ser << numStages;
 			for(auto it = range.first; it != range.second; ++it) {
 				uint16 stage = (uint16)(*it).second.first;

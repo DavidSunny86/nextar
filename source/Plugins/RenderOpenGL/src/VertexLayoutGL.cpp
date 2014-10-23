@@ -124,7 +124,7 @@ void VertexLayoutStaticGL::Enable(VertexBufferBinding& binding,
 		passVertexArrayPairs.clear();
 		cachedIndex = 0;
 	}
-	uint32 numPairs = passVertexArrayPairs.size();
+	uint32 numPairs = (uint32)passVertexArrayPairs.size();
 	uint32 count = 0;
 	for (; count < numPairs; cachedIndex = (cachedIndex+1)%numPairs, count++) {
 		if (passVertexArrayPairs[cachedIndex].first == id) {
@@ -150,8 +150,8 @@ GLuint VertexLayoutStaticGL::CreateLayout(RenderContextGL* gl,
 
 	uint16 outElements[RenderConstants::MAX_VERTEX_ELEMENT];
 	uint32 numMapped = VertexSemantic::MapSignatureToSemantics(
-			&semantics[0].semantic, sizeof(VertexSemanticGL), semantics.size(),
-			&attributes[0].element, sizeof(VertexAttribGL), attributes.size(),
+		&semantics[0].semantic, (uint32)sizeof(VertexSemanticGL), (uint32)semantics.size(),
+		&attributes[0].element, (uint32)sizeof(VertexAttribGL), (uint32)attributes.size(),
 			outElements);
 
 	if (numMapped) {
@@ -225,7 +225,7 @@ void VertexLayoutFlexibleGL::Enable(VertexBufferBinding& binding,
 		GL_CHECK();
 	}
 	uint32 id = pass->GetInputLayoutID();
-	uint32 numPairs = passVertexArrayPairs.size();
+	uint32 numPairs = (uint32)passVertexArrayPairs.size();
 	uint32 count = 0;
 	for (; count < numPairs; cachedIndex = (cachedIndex+1)%numPairs, count++) {
 		if (passVertexArrayPairs[cachedIndex].first == id) {
@@ -251,8 +251,8 @@ GLuint VertexLayoutFlexibleGL::CreateLayout(RenderContextGL* gl,
 		const VertexSemanticListGL& semantics) {
 	uint16 outElements[RenderConstants::MAX_VERTEX_ELEMENT];
 	uint32 numMapped = VertexSemantic::MapSignatureToSemantics(
-				&semantics[0].semantic, sizeof(VertexSemanticGL), semantics.size(),
-				&attributes[0].element, sizeof(VertexAttribGL), attributes.size(),
+		&semantics[0].semantic, (uint32)sizeof(VertexSemanticGL), (uint32)semantics.size(),
+		&attributes[0].element, (uint32)sizeof(VertexAttribGL), (uint32)attributes.size(),
 				outElements);
 	if (numMapped) {
 		uint16 stream = -1;
@@ -302,9 +302,9 @@ void VertexLayoutDynamicGL::Enable(VertexBufferBinding& binding,
 			uint16 outElements[RenderConstants::MAX_VERTEX_ELEMENT];
 			const VertexSemanticListGL& semantics = pass->GetInputSemantics();
 			uint32 numMapped = VertexSemantic::MapSignatureToSemantics(
-					&semantics[0].semantic, sizeof(VertexSemanticGL),
-					semantics.size(), &attributes[0].element,
-					sizeof(VertexAttribGL), attributes.size(), outElements);
+				&semantics[0].semantic, (uint32)sizeof(VertexSemanticGL),
+					(uint32)semantics.size(), &attributes[0].element,
+					(uint32)sizeof(VertexAttribGL), (uint32)attributes.size(), outElements);
 			if (numMapped) {
 				numberOfStoredPassMapping++;
 				indices.resize(indices.size() + 2 + numMapped * 2);

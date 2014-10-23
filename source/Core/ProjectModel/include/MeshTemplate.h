@@ -17,9 +17,9 @@ public:
 		CATAGORY = COMPONENT_CAT(CLASS_ID),
 	};
 
-	struct PrimitiveGroup : public AllocGeneral {
+	struct _NexProjectAPI PrimitiveGroup : public AllocGeneral {
 
-		PrimitiveGroup() : buffer(nullptr), startVertex(0),
+		inline PrimitiveGroup() : buffer(nullptr), startVertex(0),
 				vertexCount(0), startIndex(0), indexCount(0) {}
 		~PrimitiveGroup();
 
@@ -34,7 +34,7 @@ public:
 	};
 
 	typedef vector<PrimitiveGroup>::type PrimitiveGroupList;
-	class MeshBuilder : public AssetStreamRequest {
+	class _NexProjectAPI MeshBuilder : public AssetStreamRequest {
 	public:
 
 		MeshBuilder(MeshTemplate* asset) : AssetStreamRequest(asset), sharedBuffer(nullptr) {
@@ -73,7 +73,7 @@ public:
 	~MeshTemplate();
 
 	uint32 GetNumPrimitiveGroups() const {
-		return primitives.size();
+		return (uint32)primitives.size();
 	}
 
 	void SetBounds(const BoundsInfo& bounds) {

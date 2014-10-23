@@ -43,10 +43,10 @@ ExtensionsGL::ExtensionsGL() {
 
 bool ExtensionsGL::IsSupported(const char* ext_name, const char* p) {
 	int ext_name_len;
-	ext_name_len = std::strlen(ext_name);
+	ext_name_len = (uint32)std::strlen(ext_name);
 
 	while (*p) {
-		int n = std::strcspn(p, " ");
+		int n = (int)std::strcspn(p, " ");
 		if ((ext_name_len == n) && (std::strncmp(ext_name, p, n) == 0)) {
 			return true;
 		}

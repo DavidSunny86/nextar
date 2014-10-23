@@ -32,7 +32,7 @@ struct AssetStreamerInfo {
 	OutputStreamPtr outputStream;
 };
 
-struct StreamInfo {
+struct _NexEngineAPI StreamInfo {
 	static const StreamInfo Null;
 	AssetStreamRequest* externalRequest;
 	URL locator; // in case the locator is not set yet

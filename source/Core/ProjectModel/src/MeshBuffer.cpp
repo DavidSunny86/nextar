@@ -31,7 +31,7 @@ public:
 	}
 
 	virtual uint32 GetVertexCount() const {
-		return vertices.size();
+		return (uint32)vertices.size();
 	}
 
 	virtual void PushVertex(const void* pData) {
@@ -160,7 +160,7 @@ uint32 MeshBuffer::AddVertexChannel(
 			channels.push_back(channel);
 			vertexSignature += "#";
 			vertexSignature += Convert::ToString((uint32)_semantic) + ":" + Convert::ToString((uint32)_semanticIdx);
-			return channels.size() - 1;
+			return (uint32)channels.size() - 1;
 		}
 	}
 

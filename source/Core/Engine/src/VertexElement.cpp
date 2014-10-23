@@ -64,17 +64,17 @@ SemanticDef VertexSemantic::MapSemantic(const String& name) {
 	return SemanticDef(COMP_RESERVED_COUNT, -1);
 }
 
-size_t VertexSemantic::MapSignatureToSemantics(const VertexSemantic* signature,
-		size_t semanticStride, uint32 numSemantics,
-		const VertexElement* elements, size_t elementsStride,
-		size_t numElements, uint16* outElements) {
-	size_t numMapped = 0;
-	for (size_t i = 0; i < numSemantics; ++i) {
+uint32 VertexSemantic::MapSignatureToSemantics(const VertexSemantic* signature,
+	uint32 semanticStride, uint32 numSemantics,
+	const VertexElement* elements, uint32 elementsStride,
+		uint32 numElements, uint16* outElements) {
+	uint32 numMapped = 0;
+	for (uint32 i = 0; i < numSemantics; ++i) {
 		const VertexSemantic& vs =
 				*(reinterpret_cast<const VertexSemantic*>(((const uint8*) signature)
 						+ i * semanticStride));
-		size_t lastMap = numMapped;
-		for (size_t j = 0; j < numElements; ++j) {
+		uint32 lastMap = numMapped;
+		for (uint32 j = 0; j < numElements; ++j) {
 			const VertexElement& element =
 					*(reinterpret_cast<const VertexElement*>(((const uint8*) elements)
 							+ j * elementsStride));

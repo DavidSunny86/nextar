@@ -52,6 +52,7 @@ void MeshTemplate::UnloadImpl() {
 /**************************************
  * PrimitiveGroup
  **************************************/
+
 MeshTemplate::PrimitiveGroup::~PrimitiveGroup() {
 	if (buffer)
 		NEX_DELETE(buffer);

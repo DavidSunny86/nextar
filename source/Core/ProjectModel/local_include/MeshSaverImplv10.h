@@ -9,6 +9,7 @@
 #define MESHSAVERIMPLV10_H_
 
 #include <Asset.h>
+#include <MeshTemplate.h>
 
 namespace nextar {
 
