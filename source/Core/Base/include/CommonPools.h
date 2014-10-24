@@ -7,51 +7,33 @@
 
 namespace nextar {
 
-template<typename T, const size_t NumPerBlock, enum MemoryCategory Catagory>
-class PooledAllocator {
-	// todo write an usage reporting function that will automatically be invoked at the end and report
-	// the total allocations, alive pointer avg, total blocks allocated, etc to get an idea of
-	// item per block count is correct or not.
-	typedef T ObjectType;
+// Typically we want a single uniform pool for same sized objects.
+// Current Implementation however uses multiple pools per object type,
+// So we move the implementation of PooledAllocator to PoolProvider
+template<const size_t ObjectSize, const size_t NumPerBlock, enum MemoryCategory Catagory>
+class PoolProvider {
 	typedef AllocatorBase<Catagory> BaseAllocator;
 	typedef MemPool<NumPerBlock, Mutex, BaseAllocator> MPool;
-
 	MPool pool;
 public:
-	typedef PooledAllocator<T, NumPerBlock, Catagory> Type;
+	typedef PoolProvider<ObjectSize, NumPerBlock, Catagory> Type;
 
-	PooledAllocator() :
-			pool(sizeof(ObjectType)) {
+	PoolProvider() :
+		pool(ObjectSize) {
 	}
-	~PooledAllocator() {
+	~PoolProvider() {
 #ifdef NEX_DEBUG
 		std::ostringstream info;
 		info << "\n*********************************************"
-			 << "\n  Pool Allocator: "
-			 << typeid(T).name()
-			 << "\n*********************************************";
+			<< "\n  Pool Allocator: [" << ObjectSize << ", " << NumPerBlock << ", " << Catagory << "]"
+			<< "\n*********************************************";
 		Platform::OutputDebug(info.str().c_str());
 #endif
 	}
 
-	/* generic */
-	inline static void* Alloc(size_t amount) {
-		if (amount == Instance().pool.GetChunkSize())
-			return AllocSingle(amount);
-		return AllocMultiple(amount);
-	}
-
-	inline static void Free(void* ptr) {
-		FreeSingle(ptr);
-	}
-
-	inline static void Free(void* ptr, size_t totalSize) {
-		FreeMultiple(ptr);
-	}
-
 	/* optimized */
 	inline static void* AllocSingle(size_t amount) {
-		NEX_ASSERT(amount == Instance().pool.GetChunkSize());
+		NEX_ASSERT(amount == ObjectSize);
 		return Instance().pool.Alloc();
 	}
 
@@ -76,9 +58,59 @@ protected:
 
 	static Type& Instance() {
 		// @urgent The static initialization is potentially dangerous and unsafe.
+		// May be we should use a registry to avoid instantiating large number of
+		// memory pools.
 		static Type _singletonPool;
 		return _singletonPool;
 	}
+};
+
+template<typename T, const size_t NumPerBlock, enum MemoryCategory Catagory>
+class PooledAllocator {
+	typedef T ObjectType;
+	typedef PoolProvider<sizeof(T), NumPerBlock, Catagory> ProviderSpecialization;
+public:
+	typedef PooledAllocator<T, NumPerBlock, Catagory> Type;
+
+	PooledAllocator() :
+			pool(sizeof(ObjectType)) {
+	}
+	~PooledAllocator() {
+	}
+
+	/* generic */
+	inline static void* Alloc(size_t amount) {
+		if (amount == sizeof(T))
+			return ProviderSpecialization::AllocSingle(amount);
+		return ProviderSpecialization::AllocMultiple(amount);
+	}
+
+	inline static void Free(void* ptr) {
+		ProviderSpecialization::FreeSingle(ptr);
+	}
+
+	inline static void Free(void* ptr, size_t totalSize) {
+		ProviderSpecialization::FreeMultiple(ptr);
+	}
+
+	inline static void* AllocSingle(size_t amount) {
+		return ProviderSpecialization::AllocSingle(amount);
+	}
+
+	inline static void FreeSingle(void* ptr) {
+		ProviderSpecialization::FreeSingle(ptr);
+	}
+
+	/* use base allocator */
+	inline static void* AllocMultiple(size_t amount) {
+		return ProviderSpecialization::AllocMultiple(amount);
+	}
+
+	inline static void FreeMultiple(void* ptr) {
+		ProviderSpecialization::FreeMultiple(ptr);
+	}
+
+protected:
 };
 
 template<typename T, const size_t NumPerBlock, enum MemoryCategory Catagory>

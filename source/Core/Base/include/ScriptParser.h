@@ -134,7 +134,7 @@ public:
 	ScriptParser();
 	virtual ~ScriptParser();
 
-	void ParseScript(ScriptListener* listener, const String& scriptName,
+	bool ParseScript(ScriptListener* listener, const String& scriptName,
 			InputStreamPtr& input);
 };
 

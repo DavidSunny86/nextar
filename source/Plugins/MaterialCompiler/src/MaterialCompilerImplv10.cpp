@@ -28,7 +28,8 @@ void MaterialCompilerImplv1_0::Load(InputStreamPtr& input, AssetLoader& material
 	auto request = static_cast<MaterialTemplate::StreamRequest*>(material.GetRequestPtr());
 	MaterialScript s(request);
 	String scriptName = request->GetName();
-	scriptParser.ParseScript(&s, scriptName, input);
+	bool completeStatus = scriptParser.ParseScript(&s, scriptName, input);
+	request->SetCompleted(completeStatus);
 }
 
 } /* namespace MaterialLoader */

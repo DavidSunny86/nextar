@@ -200,6 +200,7 @@ void ShaderTemplate::ShaderFromTemplate::Load(InputStreamPtr& stream, AssetLoade
 	}
 
 	request->SetRenderQueueFlags(parent->renderFlags);
+	request->SetCompleted(true);
 }
 
 } /* namespace nextar */

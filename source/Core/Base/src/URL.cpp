@@ -121,6 +121,17 @@ String URL::GetComputedName() const {
 	return relativePath.substr(start, end - start);
 }
 
+String URL::GetComputedFilePath() const {
+	String ret = ToString();
+	String::size_type end = ret.find_last_of('/');
+	if (end == String::npos) {
+		ret += '/';
+		return ret;
+	} else {
+		return ret.substr(0, end + 1);
+	}
+}
+
 _NexBaseAPI OutputSerializer& operator << (OutputSerializer& ser, const URL& url) {
 	ser << url.archiveName << url.relativePath;
 	return ser;

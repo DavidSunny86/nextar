@@ -10,8 +10,8 @@ class UTApplicationMeshExport: public UTApplication {
 public:
 	virtual void _SetupScene(SceneAssetPtr& scene) {
 		UTApplication::_SetupScene(scene);
-		MeshTemplate::ID id(NamedObject::AsyncStringID("Buggy"));
-		URL location(FileSystem::ArchiveEngineData_Name, "Meshes/FBX/Buggy/buggy.FBX");
+		MeshTemplate::ID id(NamedObject::AsyncStringID("BuggyNew"));
+		URL location(FileSystem::ArchiveEngineData_Name, "Meshes/FBX/BuggyNew/buggy.FBX");
 		
 		MeshTemplatePtr mesh =
 				MeshTemplate::Traits::Instance(id,

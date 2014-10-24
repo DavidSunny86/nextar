@@ -90,9 +90,9 @@ typedef RefPtr<SceneAsset> SceneAssetPtr;
 
 enum class EngineConstants
 	: uint32 {
-		NUM_ASSET_POINTER_PER_POOL_BLOCK = 128,
-	NUM_STREAM_REQ_POINTER_PER_POOL_BLOCK = 32,
+	NUM_POINTER_PER_POOL_BLOCK = (uint32)BaseConstants::NUM_POINTER_PER_POOL_BLOCK,
 };
+
 }
 
 #endif /* NEXENGINE_H_ */

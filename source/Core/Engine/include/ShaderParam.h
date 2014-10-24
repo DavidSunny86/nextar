@@ -14,7 +14,9 @@
 namespace nextar {
 
 
-class AutoParamProcessor;
+class CommitContext;
+class ShaderParameter;
+typedef void(*ParamProcessorProc) (CommitContext& context, const ShaderParameter* d);
 
 /**
  * This struct serves as a parameter entry. 
@@ -27,7 +29,7 @@ class AutoParamProcessor;
  */
 class _NexEngineAPI ShaderParameter: public AllocGeneral {
 public:
-	AutoParamProcessor* processor;
+	ParamProcessorProc processor;
 	ParamDataType type;
 	uint16 arrayCount;
 	AutoParamName autoName;
@@ -109,19 +111,13 @@ struct ParameterGroupItem {
 
 typedef array<ParameterGroupItem, (size_t) ParameterContext::CTX_COUNT>::type ParameterGroupEntries;
 
-class AutoParamProcessor {
-public:
-	virtual void Apply(CommitContext& context, const ShaderParameter* d) = 0;
-protected:
-	~AutoParamProcessor() {
-	}
-};
-
 struct AutoParam: public AllocGeneral {
+		
+
 	ParamDataType type;
 	AutoParamName autoName;
 	ParameterContext context;
-	AutoParamProcessor* processor;
+	ParamProcessorProc processor;
 	// todo May not be useful except in UI
 	const char* name;
 	String desc;

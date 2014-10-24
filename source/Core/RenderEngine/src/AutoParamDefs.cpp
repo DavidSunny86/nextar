@@ -9,89 +9,66 @@ namespace nextar {
 #define MAKE_AUTO_PARAM_REGISTER(variable, variableName, type, autoName, context, description)	\
 	Pass::AddParamDef(variableName, type, autoName, context, &variable, description)
 
-#define MAKE_AUTO_PARAM_DECL(Class)	static Class _apply##Class;
-
-#define MAKE_AUTO_PARAM_REF(Class)		_apply##Class
+#define MAKE_AUTO_PARAM_REF(Class)		Class##Apply
 
 #define MAKE_AUTO_PARAM(Class, variableName, type, autoName, context, description)	\
-	MAKE_AUTO_PARAM_DECL(Class);													\
 	MAKE_AUTO_PARAM_REGISTER(MAKE_AUTO_PARAM_REF(Class), variableName, type, autoName, context, description)
 
-class ObjectTransforms : public AutoParamProcessor {
-public:
+void ObjectTransformsApply(CommitContext& context, const ShaderParameter* d) {
+	NEX_ASSERT(context.primitive);
+	const Matrix4x4* m = context.primitive->GetWorldMatrices();
+	context.paramGroup->WriteRawData(context.renderContext, m);
+	Matrix4x4 modelView = Mat4x4Mul(*m, *context.viewMatrix);
+	context.paramGroup->WriteRawData(context.renderContext, &modelView, 16*4);
+}
 
-	virtual void Apply(CommitContext& context, const ShaderParameter* d) {
-		NEX_ASSERT(context.primitive);
-		const Matrix4x4* m = context.primitive->GetWorldMatrices();
-		context.paramGroup->WriteRawData(context.renderContext, m);
-		Matrix4x4 modelView = Mat4x4Mul(*m, *context.viewMatrix);
-		context.paramGroup->WriteRawData(context.renderContext, &modelView, 16*4);
-	}
-};
 
-class InvProjectionTransform : public AutoParamProcessor {
-public:
+void InvProjectionTransformApply(CommitContext& context, const ShaderParameter* param) {
+	NEX_ASSERT(context.primitive);
+	const Matrix4x4* m = context.invProjectionMatrix;
+	const ConstantParameter* constParam =
+		static_cast<const ConstantParameter*>(param);
+	context.paramGroup->SetRawBuffer(context.renderContext, *constParam, m);
+}
 
-	virtual void Apply(CommitContext& context, const ShaderParameter* param) {
-		NEX_ASSERT(context.primitive);
-		const Matrix4x4* m = context.invProjectionMatrix;
-		const ConstantParameter* constParam =
-			static_cast<const ConstantParameter*>(param);
-		context.paramGroup->SetRawBuffer(context.renderContext, *constParam, m);
-	}
-};
+void OmniLightPropertiesApply(CommitContext& context, const ShaderParameter* param) {
+	NEX_ASSERT(context.light);
+	Vector4A params[2];
+	const Color& color = context.light->GetLightColor();
+	params[0] = Vec4ASet(color.red, color.green, color.blue, color.alpha);
+	params[1] = Vec4ASetW(context.light->GetTranslation(), 
+		context.light->GetRadius());
+	const ConstantParameter* constParam =
+		static_cast<const ConstantParameter*>(param);
+	context.paramGroup->SetRawBuffer(context.renderContext, *constParam, params);
+}
 
-class OmniLightProperties : public AutoParamProcessor {
-public:
+void AlbedoAndGlossMapApply(CommitContext& context, const ShaderParameter* param) {
+	TextureUnit tu;
+	tu.texture = context.albedoAndGlossMap;
+	const SamplerParameter* samplerParam =
+		static_cast<const SamplerParameter*>(param);
+	context.pass->SetTexture(context.renderContext, *samplerParam,
+		&tu);
+}
 
-	virtual void Apply(CommitContext& context, const ShaderParameter* param) {
-		NEX_ASSERT(context.light);
-		Vector4A params[2];
-		const Color& color = context.light->GetLightColor();
-		params[0] = Vec4ASet(color.red, color.green, color.blue, color.alpha);
-		params[1] = Vec4ASetW(context.light->GetTranslation(), 
-			context.light->GetRadius());
-		const ConstantParameter* constParam =
-			static_cast<const ConstantParameter*>(param);
-		context.paramGroup->SetRawBuffer(context.renderContext, *constParam, params);
-	}
-};
+void DepthMapApply(CommitContext& context, const ShaderParameter* param) {
+	TextureUnit tu;
+	tu.texture = context.depthMap;
+	const SamplerParameter* samplerParam =
+		static_cast<const SamplerParameter*>(param);
+	context.pass->SetTexture(context.renderContext, *samplerParam,
+		&tu);
+}
 
-class AlbedoAndGlossMap : public AutoParamProcessor {
-public:
-	virtual void Apply(CommitContext& context, const ShaderParameter* param) {
-		TextureUnit tu;
-		tu.texture = context.albedoAndGlossMap;
-		const SamplerParameter* samplerParam =
-			static_cast<const SamplerParameter*>(param);
-		context.pass->SetTexture(context.renderContext, *samplerParam,
-			&tu);
-	}
-};
-
-class DepthMap : public AutoParamProcessor {
-public:
-	virtual void Apply(CommitContext& context, const ShaderParameter* param) {
-		TextureUnit tu;
-		tu.texture = context.depthMap;
-		const SamplerParameter* samplerParam =
-			static_cast<const SamplerParameter*>(param);
-		context.pass->SetTexture(context.renderContext, *samplerParam,
-			&tu);
-	}
-};
-
-class NormalMap : public AutoParamProcessor {
-public:
-	virtual void Apply(CommitContext& context, const ShaderParameter* param) {
-		TextureUnit tu;
-		tu.texture = context.normalMap;
-		const SamplerParameter* samplerParam =
-			static_cast<const SamplerParameter*>(param);
-		context.pass->SetTexture(context.renderContext, *samplerParam,
-			&tu);
-	}
-};
+void NormalMapApply(CommitContext& context, const ShaderParameter* param) {
+	TextureUnit tu;
+	tu.texture = context.normalMap;
+	const SamplerParameter* samplerParam =
+		static_cast<const SamplerParameter*>(param);
+	context.pass->SetTexture(context.renderContext, *samplerParam,
+		&tu);
+}
 
 void BaseRenderManager::RegisterAutoParams() {
 

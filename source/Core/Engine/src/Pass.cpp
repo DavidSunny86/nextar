@@ -53,7 +53,7 @@ const Pass::SamplerDesc* Pass::MapSamplerParams(const String& name,
 }
 
 void Pass::AddParamDef(const char* name, ParamDataType type, AutoParamName autoName, ParameterContext context,
-	AutoParamProcessor* processor, const String& desc) {
+	ParamProcessorProc processor, const String& desc) {
 	auto& param = autoParams[name];
 	param.autoName = autoName;
 	param.context = context;
@@ -149,13 +149,13 @@ void Pass::View::UpdateParams(CommitContext& ctx, ParameterContext type,
 		ctx.paramGroup = group;
 		if (group->processor) {
 			ctx.groupDataPtr = nullptr;
-			group->processor->Apply(ctx, group);
+			group->processor(ctx, group);
 		} else {
 			ctx.groupDataPtr = group->Map(ctx.renderContext);
 			for (uint32 i = 0; i < group->numParams; ++i) {
 				ConstantParameter* parameter = group->GetParamByIndex(i);
 				NEX_ASSERT(parameter->processor);
-				parameter->processor->Apply(ctx, parameter);
+				parameter->processor(ctx, parameter);
 			}
 			group->Unmap(ctx.renderContext);
 		}
@@ -167,24 +167,14 @@ void Pass::View::UpdateParams(CommitContext& ctx, ParameterContext type,
 			SamplerParameter::Next(it)) {
 		NEX_ASSERT(it->processor);
 		if (it->context == type)
-			it->processor->Apply(ctx, it);
+			it->processor(ctx, it);
 	}
 }
 
 /****************************************************/
 /* CustomTextureProcessor
  /****************************************************/
-class CustomTextureProcessor: public AutoParamProcessor {
-public:
-	static CustomTextureProcessor instance;
-
-	virtual void Apply(CommitContext& context, const ShaderParameter* param);
-protected:
-	~CustomTextureProcessor() {
-	}
-};
-
-void CustomTextureProcessor::Apply(CommitContext& context,
+void CustomTextureProcessorApply(CommitContext& context,
 		const ShaderParameter* param) {
 	NEX_ASSERT(param->autoName == AutoParamName::AUTO_CUSTOM_CONSTANT);
 	const SamplerParameter* sampler =
@@ -198,17 +188,7 @@ void CustomTextureProcessor::Apply(CommitContext& context,
 /****************************************************/
 /* CustomParameterProcessor
  /****************************************************/
-class CustomParameterProcessor: public AutoParamProcessor {
-public:
-	static CustomParameterProcessor instance;
-
-	virtual void Apply(CommitContext& context, const ShaderParameter* param);
-protected:
-	~CustomParameterProcessor() {
-	}
-};
-
-void CustomParameterProcessor::Apply(CommitContext& context,
+void CustomParameterProcessorApply(CommitContext& context,
 		const ShaderParameter* param) {
 	NEX_ASSERT(param->autoName == AutoParamName::AUTO_CUSTOM_CONSTANT);
 	const ConstantParameter* constParam =
@@ -222,17 +202,7 @@ void CustomParameterProcessor::Apply(CommitContext& context,
 /****************************************************/
 /* CustomStructProcessor
  /****************************************************/
-class CustomStructProcessor: public AutoParamProcessor {
-public:
-	static CustomStructProcessor instance;
-
-	virtual void Apply(CommitContext& context, const ShaderParameter* param);
-protected:
-	~CustomStructProcessor() {
-	}
-};
-
-void CustomStructProcessor::Apply(CommitContext& context,
+void CustomStructProcessorApply(CommitContext& context,
 		const ShaderParameter* param) {
 	NEX_ASSERT(param->type == ParamDataType::PDT_STRUCT);
 
@@ -243,14 +213,10 @@ void CustomStructProcessor::Apply(CommitContext& context,
 	pc.first += size;
 }
 
-CustomParameterProcessor CustomParameterProcessor::instance;
-CustomTextureProcessor CustomTextureProcessor::instance;
-CustomStructProcessor CustomStructProcessor::instance;
-
-AutoParamProcessor* Pass::customConstantProcessor =
-		&CustomParameterProcessor::instance;
-AutoParamProcessor* Pass::customTextureProcessor =
-		&CustomTextureProcessor::instance;
-AutoParamProcessor* Pass::customStructProcessor =
-		&CustomStructProcessor::instance;
+ParamProcessorProc Pass::customConstantProcessor =
+		&CustomParameterProcessorApply;
+ParamProcessorProc Pass::customTextureProcessor =
+		&CustomTextureProcessorApply;
+ParamProcessorProc Pass::customStructProcessor =
+		&CustomStructProcessorApply;
 } /* namespace nextar */

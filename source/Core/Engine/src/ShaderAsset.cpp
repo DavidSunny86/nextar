@@ -33,7 +33,7 @@ uint32 ShaderAsset::GetClassID() const {
 	return CLASS_ID;
 }
 
-StreamNotification ShaderAsset::NotifyAssetLoadedImpl(StreamRequest* request) {
+StreamNotification ShaderAsset::NotifyAssetLoadedImpl(nextar::StreamRequest* request) {
 	StreamRequest* creationParams = static_cast<StreamRequest*>(request);
 	/* update programs */
 	/* build with compilation options */

@@ -68,10 +68,10 @@ class Asset;
 class AssetStreamRequest;
 
 typedef STDPoolAllocator<AssetStreamRequest*,
-		(uint32) EngineConstants::NUM_STREAM_REQ_POINTER_PER_POOL_BLOCK,
+	(uint32)EngineConstants::NUM_POINTER_PER_POOL_BLOCK,
 		MEMCAT_GENERAL> AssetStreamRequestSetAllocator;
 typedef STDPoolAllocator<Asset*,
-		(uint32) EngineConstants::NUM_ASSET_POINTER_PER_POOL_BLOCK,
+	(uint32)EngineConstants::NUM_POINTER_PER_POOL_BLOCK,
 		MEMCAT_GENERAL> AssetSetAllocator;
 
 typedef unordered_set<AssetStreamRequest*, std::hash<AssetStreamRequest*>,
@@ -223,7 +223,7 @@ public:
 	/**
 	 * Can hold creation data. The background streamer will retr
 	 **/
-	class MetaInfo: public AllocGeneral {
+	class _NexEngineAPI MetaInfo : public AllocGeneral {
 	public:
 
 		inline bool AddDependency(Asset* asset) {
@@ -424,7 +424,7 @@ private:
 	friend class AssetStreamer;
 };
 
-class AssetStreamRequest: public StreamRequest {
+class _NexEngineAPI AssetStreamRequest : public StreamRequest {
 public:
 
 	inline AssetStreamRequest(Asset* asset,
@@ -529,7 +529,7 @@ protected:
 	Asset::MetaInfo metaInfo;
 };
 
-class AssetLoaderImpl {
+class _NexEngineAPI AssetLoaderImpl {
 public:
 
 	virtual void Load(InputStreamPtr&, AssetLoader&) = 0;

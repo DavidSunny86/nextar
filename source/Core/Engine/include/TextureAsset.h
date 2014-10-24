@@ -95,7 +95,7 @@ protected:
 	virtual void NotifyAssetUnloaded();
 	virtual void NotifyAssetUpdated();
 
-	virtual StreamNotification NotifyAssetLoadedImpl(StreamRequest* request);
+	virtual StreamNotification NotifyAssetLoadedImpl(nextar::StreamRequest* request) override;
 
 	virtual void LoadImpl(StreamRequest* req, bool isAsync);
 	virtual void UnloadImpl();

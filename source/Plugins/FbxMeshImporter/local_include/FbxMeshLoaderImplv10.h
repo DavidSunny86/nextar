@@ -37,7 +37,7 @@ public:
 			const IndexArray& polys);
 
 	void BuildMesh(MeshTemplate::MeshBuilder* pMesh);
-	MaterialTemplatePtr CreateMaterial(FbxSurfaceMaterial*);
+	MaterialTemplatePtr CreateMaterial(FbxSurfaceMaterial*, const URL& kAssetLoc);
 
 
 protected:

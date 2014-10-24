@@ -8,14 +8,9 @@ Asset::AssetLocatorAccessor Asset::AssetLocatorAccessor::assetLocatorAccessor;
 const StreamInfo StreamInfo::Null;
 
 Asset::Asset(const StringID id, const StringID factory) :
-<<<<<<< HEAD
-	memoryCost(sizeof(Asset)), SharedComponent(id, factory), _savedRequestPtr(nullptr) {
-	assetState = ASSET_CREATED;
-=======
 	memoryCost(sizeof(Asset)), SharedComponent(id, factory), _savedRequestPtr(nullptr),
 	assetState(ASSET_CREATED) {
 	
->>>>>>> 71b15a1f10310ca15601df42ebede165149705cc
 	if (OverrideDictionary("Asset")) {
 		Populate(GetDictionary());
 	}
@@ -104,7 +99,9 @@ void Asset::NotifyAssetLoaded() {
 	if (!_savedRequestPtr || (_savedRequestPtr->returnCode
 		== StreamResult::STREAM_SUCCESS)) {
 		assetState.store(ASSET_LOADED, std::memory_order_release);
+
 		StreamNotification state = NotifyAssetLoadedImpl(_savedRequestPtr);
+
 		if (state & NOTIFY_COMPLETED) 
 			_savedRequestPtr->flags |= StreamRequest::COMPLETED;
 		if (state & NOTIFY_READY)

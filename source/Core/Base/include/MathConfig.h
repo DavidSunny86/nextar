@@ -14,8 +14,8 @@
 #define NEX_CORE_DEBUG_CHECKS		1
 
 // Num matrix per block in matrix pool
-#define NEX_MATRIX_POOL_NUM_PER_BLOCK 32
-#define NEX_BV_POOL_NUM_PER_BLOCK 32
+#define NEX_MATRIX_POOL_NUM_PER_BLOCK ((size_t)BaseConstants::NUM_MATRIX_PER_BLOCK)
+#define NEX_BV_POOL_NUM_PER_BLOCK ((size_t)BaseConstants::NUM_BV_PER_BLOCK)
 #ifdef NEX_USE_ASM_WHEN_REQUIRED 
 #	define NEX_CORE_USE_ASM
 #endif

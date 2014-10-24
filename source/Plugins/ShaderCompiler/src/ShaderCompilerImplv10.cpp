@@ -35,7 +35,8 @@ void ShaderCompilerImplv1_0::Load(InputStreamPtr& input, AssetLoader& shader) {
 	auto request = static_cast<ShaderTemplate::LoadStreamRequest*>(shader.GetRequestPtr());
 	ShaderScript s(request);
 	String scriptName = request->GetName();
-	scriptParser.ParseScript(&s, scriptName, input);
+	bool completeStatus = scriptParser.ParseScript(&s, scriptName, input);
+	request->SetCompleted(completeStatus);
 }
 
 } /* namespace nextar */

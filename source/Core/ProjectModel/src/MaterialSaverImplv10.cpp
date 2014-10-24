@@ -24,8 +24,8 @@ void MaterialSaverImplv1_0::Save(OutputStreamPtr& out, AssetSaver& saver) {
 			saver.GetRequestPtr()->GetStreamedObject());
 	MaterialAsset* asset = material->GetMaterial();
 	MaterialHeader header;
-	if (!asset->GetShader()) {
-		saver.GetRequestPtr()->returnCode = StreamResult::STREAM_FAILED;
+	if (!asset || !asset->GetShader()) {
+		saver.GetRequestPtr()->SetCompleted(false);
 		return;
 	}
 	header.version = NEX_MAKE_VERSION(1, 0, 0);
@@ -49,6 +49,8 @@ void MaterialSaverImplv1_0::Save(OutputStreamPtr& out, AssetSaver& saver) {
 	asset->GetParameters()->AsyncSave(ser);
 	stream.EndChunk();
 	}
+
+	saver.GetRequestPtr()->SetCompleted(true);
 }
 
 } /* namespace nextar */

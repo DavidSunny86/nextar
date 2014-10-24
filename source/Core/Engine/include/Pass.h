@@ -139,7 +139,7 @@ public:
 	//const TextureUnitParams* GetTextureUnit(const String& name) const;
 
 	static void AddParamDef(const char* name, ParamDataType type, AutoParamName autoName, ParameterContext context,
-		AutoParamProcessor* processor, const String& desc);
+		ParamProcessorProc processor, const String& desc);
 	static const AutoParam* MapParam(const char* name);
 
 	static const SamplerDesc* MapSamplerParams(const String& name,
@@ -147,15 +147,15 @@ public:
 
 	// Set texture states, called during pass creation
 
-	static inline AutoParamProcessor* GetStructProcessor() {
+	static inline ParamProcessorProc GetStructProcessor() {
 		return customStructProcessor;
 	}
 
-	static inline AutoParamProcessor* GetConstantProcessor() {
+	static inline ParamProcessorProc GetConstantProcessor() {
 		return customConstantProcessor;
 	}
 
-	static inline AutoParamProcessor* GetTextureProcessor() {
+	static inline ParamProcessorProc GetTextureProcessor() {
 		return customTextureProcessor;
 	}
 
@@ -166,9 +166,9 @@ protected:
 	uint16 flags;
 
 	//static AutoParam autoParams[AutoParamName::AUTO_COUNT];
-	static AutoParamProcessor* customConstantProcessor;
-	static AutoParamProcessor* customTextureProcessor;
-	static AutoParamProcessor* customStructProcessor;
+	static ParamProcessorProc customConstantProcessor;
+	static ParamProcessorProc customTextureProcessor;
+	static ParamProcessorProc customStructProcessor;
 
 	typedef map<const char*, AutoParam, StringUtils::NoCaseLess>::type AutoParamMap;
 	static AutoParamMap autoParams;

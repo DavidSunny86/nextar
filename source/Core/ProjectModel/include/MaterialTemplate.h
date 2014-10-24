@@ -47,8 +47,8 @@ public:
 	/* notify loaded/unloaded */
 	virtual void NotifyAssetUnloaded();
 	virtual void NotifyAssetUpdated();
-	virtual StreamNotification NotifyAssetLoadedImpl(StreamRequest* request);
-	virtual StreamNotification NotifyAssetSavedImpl(StreamRequest* request);
+	virtual StreamNotification NotifyAssetLoadedImpl(nextar::StreamRequest* request) override;
+	virtual StreamNotification NotifyAssetSavedImpl(nextar::StreamRequest* request) override;
 
 	void SetMaterialID(const MaterialAsset::ID& id);
 	void SetShader(const ShaderTemplatePtr& shader);

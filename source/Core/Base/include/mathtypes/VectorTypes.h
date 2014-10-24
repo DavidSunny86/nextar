@@ -34,7 +34,7 @@ using Matrix4x4 alignas(16) = _Matrix4x4;
 using Matrix3x4 = _Matrix3x4;
 using Matrix4x4 = _Matrix4x4;
 #endif
-struct _Matrix3x4: public AllocMathCore {
+struct _NexBaseAPI _Matrix3x4 : public AllocMathCore {
 
 	union {
 		struct {
@@ -74,9 +74,9 @@ struct _Matrix3x4: public AllocMathCore {
 	inline _Matrix3x4& operator =(const Matrix3x4&);
 };
 
-struct _Matrix4x4: public AllocMathPool<_Matrix4x4,
+struct _NexBaseAPI _Matrix4x4: public AllocMathPool<_Matrix4x4,
 		NEX_MATRIX_POOL_NUM_PER_BLOCK> {
-	static _NexBaseAPI const Matrix4x4 IdentityMatrix;
+	static const Matrix4x4 IdentityMatrix;
 
 	union {
 		struct {

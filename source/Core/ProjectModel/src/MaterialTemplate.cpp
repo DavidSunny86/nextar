@@ -21,7 +21,7 @@ MaterialTemplate::MaterialTemplate(const StringID name, const StringID factory) 
 MaterialTemplate::~MaterialTemplate() {
 }
 
-StreamNotification MaterialTemplate::NotifyAssetLoadedImpl(StreamRequest* request) {
+StreamNotification MaterialTemplate::NotifyAssetLoadedImpl(nextar::StreamRequest* request) {
 	if(!shader) {
 		Error("Shader failed to load");
 		// request is complete
@@ -39,7 +39,7 @@ StreamNotification MaterialTemplate::NotifyAssetLoadedImpl(StreamRequest* reques
 	return StreamNotification::NOTIFY_COMPLETED_AND_READY;
 }
 
-StreamNotification MaterialTemplate::NotifyAssetSavedImpl(StreamRequest* request) {
+StreamNotification MaterialTemplate::NotifyAssetSavedImpl(nextar::StreamRequest* request) {
 	if (material)
 		material->SetAssetLocator(GetAssetLocator());
 	return StreamNotification::NOTIFY_COMPLETED_AND_READY;
@@ -162,6 +162,7 @@ void MaterialTemplate::MaterialFromTemplate::Load(InputStreamPtr& stream, AssetL
 	}
 	/* Find relevant params and set
 	 * */
+	request->SetCompleted(true);
 }
 
 } /* namespace nextar */

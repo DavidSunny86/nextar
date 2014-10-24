@@ -19,11 +19,11 @@ ScriptParser::ScriptParser() {
 ScriptParser::~ScriptParser() {
 }
 
-void ScriptParser::ParseScript(ScriptListener* listener,
+bool ScriptParser::ParseScript(ScriptListener* listener,
 		const String& scriptName, InputStreamPtr& input) {
 
 	if (!listener)
-		return;
+		return false;
 	const void* readOnlyBuffer = 0;
 	size_t readSize = input->AcquireBuffer(readOnlyBuffer);
 
@@ -33,8 +33,10 @@ void ScriptParser::ParseScript(ScriptListener* listener,
 
 	if (context.IsErrorBitSet()) {
 		Error("Errors in script: " + scriptName + ": " + context.GetErrors());
+		return false;
 	}
 	input->ReleaseBuffer(readOnlyBuffer);
+	return true;
 }
 /***************************************************
  * ScriptParser::ScriptContext

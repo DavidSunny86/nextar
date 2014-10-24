@@ -42,6 +42,16 @@ typedef RefPtr<GenericOutputStream> GenericOutputStreamPtr;
 typedef RefPtr<FileInputStream> FileInputStreamPtr;
 typedef RefPtr<FileOutputStream> FileOutputStreamPtr;
 
+enum class BaseConstants
+	: uint32 {
+	NUM_POINTER_PER_POOL_BLOCK = 128,
+	NUM_16B_PER_BLOCK = 128,
+	NUM_64B_PER_BLOCK = 32,
+	NUM_MATRIX_PER_BLOCK = NUM_64B_PER_BLOCK,
+	NUM_BV_PER_BLOCK = NUM_64B_PER_BLOCK,
+	NUM_EVENT_PER_BLOCK = 16
+};
+
 }
 
 #endif //NEXBASE_H__

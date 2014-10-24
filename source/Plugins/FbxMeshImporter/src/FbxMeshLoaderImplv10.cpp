@@ -460,7 +460,7 @@ void FbxMeshLoaderImplv1_0::BuildMesh(MeshTemplate::MeshBuilder* pMesh) {
 		pg.vertexCount = e.mVertexCount;
 		pg.startVertex = e.mStartVertex;
 		pg.bounds = e.mBounds;
-		pg.material = CreateMaterial(e.mMaterial);
+		pg.material = CreateMaterial(e.mMaterial, pMesh->GetAssetLocator());
 
 		if (pg.material)
 			pMesh->GetMetaInfo().AddDependency(pg.material);
@@ -470,7 +470,7 @@ void FbxMeshLoaderImplv1_0::BuildMesh(MeshTemplate::MeshBuilder* pMesh) {
 	mSharedBuffer = nullptr;
 }
 
-MaterialTemplatePtr FbxMeshLoaderImplv1_0::CreateMaterial(FbxSurfaceMaterial* pFbxMat) {
+MaterialTemplatePtr FbxMeshLoaderImplv1_0::CreateMaterial(FbxSurfaceMaterial* pFbxMat, const URL& kAssetLoc) {
 	MaterialTemplate::ID id(
 		NamedObject::AsyncStringID(pFbxMat->GetName()),
 		StringUtils::DefaultID,
@@ -489,7 +489,7 @@ MaterialTemplatePtr FbxMeshLoaderImplv1_0::CreateMaterial(FbxSurfaceMaterial* pF
 
 	if (!material->AsyncIsLoaded()) {
 		InputStreamPtr dummy;
-		FbxMaterialLoaderImplv1_0* manualLoader = NEX_NEW(FbxMaterialLoaderImplv1_0(pFbxMat));
+		FbxMaterialLoaderImplv1_0* manualLoader = NEX_NEW(FbxMaterialLoaderImplv1_0(pFbxMat, kAssetLoc));
 		StreamInfo streamInfo(manualLoader, dummy);
 		material->AsyncRequestLoad(streamInfo);
 	}

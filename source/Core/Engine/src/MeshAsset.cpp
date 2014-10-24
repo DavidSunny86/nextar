@@ -93,7 +93,7 @@ void MeshAsset::_FillIndexData(MeshIndexData* data,
 	indexBufferIt++;
 }
 
-StreamNotification MeshAsset::NotifyAssetLoadedImpl(StreamRequest* _request) {
+StreamNotification MeshAsset::NotifyAssetLoadedImpl(nextar::StreamRequest* _request) {
 	MeshAsset::StreamRequest* request =
 			static_cast<MeshAsset::StreamRequest*>(_request);
 	defaultSharedMaterial = request->sharedMaterial;

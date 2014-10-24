@@ -70,7 +70,7 @@ void TextureAsset::LoadImpl(StreamRequest* request, bool isStreamed) {
 				GetAssetLocator());
 		if (!textureParams->inputStream) {
 			Warn("Texture not found: " + GetAssetLocator().ToString());
-			request->returnCode = StreamResult::STREAM_FAILED; // todo Not found return code. unify return codes??
+			textureParams->SetCompleted(false); // todo Not found return code. unify return codes??
 			return;
 		}
 	} else
@@ -86,9 +86,10 @@ void TextureAsset::LoadImpl(StreamRequest* request, bool isStreamed) {
 	if (!(textureParams->flags & TextureStreamRequest::TEXTURE_PARAMS_INITED)) {
 		textureParams->flags |= TextureStreamRequest::TEXTURE_PARAMS_INITED;
 	}
+	textureParams->SetCompleted(true);
 }
 
-StreamNotification TextureAsset::NotifyAssetLoadedImpl(StreamRequest* request) {
+StreamNotification TextureAsset::NotifyAssetLoadedImpl(nextar::StreamRequest* request) {
 	TextureStreamRequest* textureParams =
 			static_cast<TextureStreamRequest*>(request);
 

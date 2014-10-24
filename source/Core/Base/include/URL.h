@@ -52,6 +52,9 @@ public:
 	/* extension */
 	String GetExtension() const;
 	String GetComputedName() const;
+	// returns the relative path where the file exists.
+	// For Eg: If URL is {Archive}/mesh/file.fbx, this function returns -> {Archive}/mesh/
+	String GetComputedFilePath() const;
 
 	_NexBaseAPI friend OutputSerializer& operator << (OutputSerializer& ser, const URL& url);
 	_NexBaseAPI friend InputSerializer& operator >> (InputSerializer& ser, URL& url);

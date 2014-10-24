@@ -156,6 +156,8 @@ void ShaderSaverImplv1_0::Save(OutputStreamPtr& out, AssetSaver& saver) {
 			<< s.second.compilationOptions;
 		stream.EndChunk();
 	}
+
+	saver.GetRequestPtr()->SetCompleted(true);
 }
 
 } /* namespace nextar */

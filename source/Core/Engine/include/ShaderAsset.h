@@ -149,7 +149,7 @@ public:
 	}
 protected:
 
-	virtual StreamNotification NotifyAssetLoadedImpl(StreamRequest* request);
+	virtual StreamNotification NotifyAssetLoadedImpl(nextar::StreamRequest* request) override;
 	virtual void NotifyAssetUnloaded() override;
 	virtual void NotifyAssetUpdated() override;
 

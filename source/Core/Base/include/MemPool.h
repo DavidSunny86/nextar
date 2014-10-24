@@ -58,10 +58,10 @@ public:
 	}
 
 	void FreePool() {
-		_FreeBlocks(freeBlock);
 #ifdef NEX_DEBUG
 		_PrintDebug();
 #endif
+		_FreeBlocks(freeBlock);
 		_FreeBlocks(usedBlock);
 		freeBlock = nullptr;
 		usedBlock = nullptr;

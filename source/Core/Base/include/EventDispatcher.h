@@ -31,7 +31,8 @@ protected:
 
 	typedef std::pair<EventCallback, void*> ValueType;
 	typedef std::pair<EventID, ValueType> KeyValuePair;
-	typedef multimap<EventID, ValueType, std::less<EventID>, AllocatorGeneral, STDPoolAllocator<KeyValuePair, 16, MEMCAT_GENERAL> >::type SubscriberList;
+	typedef multimap<EventID, ValueType, std::less<EventID>, AllocatorGeneral, STDPoolAllocator<KeyValuePair, 
+		(size_t)BaseConstants::NUM_EVENT_PER_BLOCK, MEMCAT_GENERAL> >::type SubscriberList;
 
 	SubscriberList subscribers;
 };

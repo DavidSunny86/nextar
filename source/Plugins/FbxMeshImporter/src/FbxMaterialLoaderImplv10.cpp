@@ -10,8 +10,11 @@
 
 namespace FbxMeshImporter {
 
-FbxMaterialLoaderImplv1_0::FbxMaterialLoaderImplv1_0(FbxSurfaceMaterial* pFbxMat) {
-
+FbxMaterialLoaderImplv1_0::FbxMaterialLoaderImplv1_0(FbxSurfaceMaterial* pFbxMat, const URL& relativePath) :
+hasDiffuseMap(false)
+,hasNormalMap(false)
+,hasSpecularMap(false) {
+	relativePathOfMesh = relativePath.GetComputedFilePath();
 	CreateFromMaterial(pFbxMat);
 }
 
@@ -22,7 +25,7 @@ FbxMaterialLoaderImplv1_0::~FbxMaterialLoaderImplv1_0() {
 void FbxMaterialLoaderImplv1_0::Load(InputStreamPtr& input,
 		AssetLoader& assetLoader) {
 
-	delete this;
+	NEX_DELETE(this);
 }
 
 bool FbxMaterialLoaderImplv1_0::ParseMap(FbxSurfaceMaterial* pFbxMat,
@@ -34,12 +37,19 @@ bool FbxMaterialLoaderImplv1_0::ParseMap(FbxSurfaceMaterial* pFbxMat,
 	if(lLayeredTextureCount > 0) {
 		for(int j=0; j<lLayeredTextureCount; ++j) {
 			FbxLayeredTexture *lLayeredTexture = lProperty.GetSrcObject<FbxLayeredTexture>(j);
-			int lNbTextures = lLayeredTexture->GetSrcObjectCount<FbxTexture>();
+			int lNbTextures = lLayeredTexture->GetSrcObjectCount<FbxFileTexture>();
 			for(int k =0; k<lNbTextures; ++k) {
-				String kName = lLayeredTexture->GetNameOnly().Buffer();
-				String kPath = lLayeredTexture->GetName();
+				FbxFileTexture* pIndiTexture = lLayeredTexture->GetSrcObject<FbxFileTexture>(k);
+				String kName = pIndiTexture->GetNameOnly().Buffer();
+				const char* pRelativePath = pIndiTexture->GetRelativeFileName();
+				String kPath;
+				if (!pRelativePath) {
+					// find relative path here
+					NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
+				} else
+					kPath = pRelativePath;
 				id.name = NamedObject::AsyncStringID(kName);
-				location = URL("Textures", kPath);
+				location = URL(relativePathOfMesh + kPath);
 				return true;
 	        }
 	    }
@@ -49,12 +59,18 @@ bool FbxMaterialLoaderImplv1_0::ParseMap(FbxSurfaceMaterial* pFbxMat,
 		int lNbTextures = lProperty.GetSrcObjectCount<FbxTexture>();
 		if(lNbTextures > 0) {
 			for(int j =0; j<lNbTextures; ++j) {
-				FbxTexture* lTexture = lProperty.GetSrcObject<FbxTexture>(j);
+				FbxFileTexture* lTexture = lProperty.GetSrcObject<FbxFileTexture>(j);
 				if(lTexture) {
 					String kName = lTexture->GetNameOnly().Buffer();
-					String kPath = lTexture->GetName();
+					const char* pRelativePath = lTexture->GetRelativeFileName();
+					String kPath;
+					if (!pRelativePath) {
+						// find relative path here
+						NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
+					} else
+						kPath = pRelativePath;
 					id.name = NamedObject::AsyncStringID(kName);
-					location = URL("Textures", kPath);
+					location = URL(relativePathOfMesh + kPath);
 					return true;
 	            }
 	        }
@@ -83,7 +99,9 @@ void FbxMaterialLoaderImplv1_0::CreateFromMaterial(FbxSurfaceMaterial* pFbxMat) 
 		gloss = static_cast<float>(1.0);
 	}
 
-	ParseMap(pFbxMat, FbxSurfaceMaterial::sDiffuse, diffuseMapId, diffuseLocation);
+	hasDiffuseMap = ParseMap(pFbxMat, FbxSurfaceMaterial::sDiffuse, diffuseMapId, diffuseLocation);
+	hasNormalMap = ParseMap(pFbxMat, FbxSurfaceMaterial::sNormalMap, normalMapId, normalLocation);
+	hasSpecularMap = ParseMap(pFbxMat, FbxSurfaceMaterial::sSpecular, specularMapId, specularLocation);
 }
 
 }

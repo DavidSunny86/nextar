@@ -17,7 +17,7 @@ class FbxMaterialLoaderImplv1_0: public nextar::AssetLoaderImpl,
 	public AllocGeneral {
 public:
 
-	FbxMaterialLoaderImplv1_0(FbxSurfaceMaterial* pFbxMat);
+	FbxMaterialLoaderImplv1_0(FbxSurfaceMaterial* pFbxMat, const URL& kMeshPath);
 	virtual ~FbxMaterialLoaderImplv1_0();
 
 	virtual void Load(InputStreamPtr&, AssetLoader&);
@@ -29,13 +29,23 @@ protected:
 	Color diffuseColor;
 	float gloss;
 
+	bool hasDiffuseMap;
 	URL diffuseLocation;
 	TextureAsset::ID diffuseMapId;
+
+	bool hasSpecularMap;
+	URL specularLocation;
+	TextureAsset::ID specularMapId;
+
+	bool hasNormalMap;
+	URL normalLocation;
+	TextureAsset::ID normalMapId;
 
 	URL shaderLocation;
 	ShaderAsset::ID shaderId;
 	NameValueMap params;
 
+	String relativePathOfMesh;
 };
 
 }
