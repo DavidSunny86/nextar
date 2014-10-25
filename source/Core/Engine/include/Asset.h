@@ -98,12 +98,14 @@ public:
 
 	enum State : uint32 {
 		ASSET_CREATED = 1 << 0,
-		ASSET_LOADING = 1 << 1,
-		ASSET_LOADED = 1 << 2,
-		ASSET_LOAD_FAILURE = 1 << 3,
-		ASSET_READY = ASSET_LOADED|(1 << 4),
-		ASSET_SAVING = ASSET_READY|(1 << 5),
-		ASSET_UNLOADING = 1 << 6,
+		ASSET_LOADINFO_REG = 1 << 1,
+		ASSET_LOADING = 1 << 2,
+		ASSET_LOADED = 1 << 3,
+		ASSET_LOAD_FAILURE = 1 << 4,
+		ASSET_READY = ASSET_LOADED|(1 << 5),
+		ASSET_SAVEINFO_REG = ASSET_READY|(1 << 6),
+		ASSET_SAVING = ASSET_READY|(1 << 7),
+		ASSET_UNLOADING = 1 << 8,
 	};
 
 	enum Flags {
@@ -355,15 +357,26 @@ public:
 		return AsyncSave(request, false);
 	}
 	// @remarks Places a load request, and returns true if the request was placed
+	// This should not be called by loader implementations. Loaders should
+	// just add dependencies.
 	// @returns false if the asset is not in a state when it can be loaded
 	bool AsyncRequestLoad(const StreamInfo& request = StreamInfo::Null) {
 		return AsyncLoad(request, true);
 	}
-	// @remarks Places a save request, and returns true if the request was placed
+	// @remarks Places a save request, and returns true if the request was placed.
+	// This should not be called by saver implementations. 
 	// @returns false if the asset is not in a state when it can be saved
 	bool AsyncRequestSave(const StreamInfo& request = StreamInfo::Null) {
 		return AsyncSave(request, true);
 	}
+	// @remarks load and save cannot be called from a streaming thread,
+	// however, since loading might require to set streaming info
+	// this function can be used for the same
+	bool AsyncSetLoadInfo(const StreamInfo& request);
+	// @remarks load and save cannot be called from a streaming thread,
+	// however, since loading might require to set streaming info
+	// this function can be used for the same
+	bool AsyncSetSaveInfo(const StreamInfo& request);
 	// @remarks Used by the engine to initialize resources
 	static AssetPtr AssetLoad(const URL& input, const String& streamer = StringUtils::Null);
 	static AssetPtr AssetLoad(InputStreamPtr& input, const String& streamer);

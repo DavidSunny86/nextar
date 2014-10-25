@@ -34,21 +34,21 @@ in vec2 texCoord;
 out vec4 vFragColor;
 
 vec3 getDecodedNormal(vec4 enc) {
-    vec4 nn = enc*vec4(2,2,0,0) + vec4(-1,-1,1,-1);
-    float l = dot(nn.xyz,-nn.xyw);
-    nn.z = l;
-    nn.xy *= sqrt(l);
-    return nn.xyz * 2 + vec3(0,0,-1);
+	vec4 nn = enc*vec4(2,2,0,0) + vec4(-1,-1,1,-1);
+	float l = dot(nn.xyz,-nn.xyw);
+	nn.z = l;
+	nn.xy *= sqrt(l);
+	return nn.xyz * 2 + vec3(0,0,-1);
 }
 
 vec3 getPosition(vec2 texCoord) {
-    float z = texture(depthMap, texCoord).r;  
-    float x = texCoord.x * 2 - 1;
-    float y = (1 - texCoord.y) * 2 - 1;
-    vec4 vProjectedPos = vec4(x, y, z, 1.0f);
-    vec4 vPositionVS = mul(vProjectedPos, invProjection);  
-    // Divide by w to get the view-space position
-    return vPositionVS.xyz / vPositionVS.w;  
+	float z = texture(depthMap, texCoord).r;  
+	float x = texCoord.x * 2 - 1;
+	float y = (1 - texCoord.y) * 2 - 1;
+	vec4 vProjectedPos = vec4(x, y, z, 1.0f);
+	vec4 vPositionVS = mul(vProjectedPos, invProjection);  
+	// Divide by w to get the view-space position
+	return vPositionVS.xyz / vPositionVS.w;  
 }
 
 vec3 getNormal(vec2 texCoord) {

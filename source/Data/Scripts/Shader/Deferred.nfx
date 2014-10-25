@@ -6,8 +6,8 @@
 in vec4 vertPos;
 in vec3 vertNorm;
 
-#ifdef USE_DIFFUSE_SAMPLER
-	in vec2 vertDiffuseUV;
+#ifdef USE_DIFFUSE_MAP
+	in vec2 texCoord0;
 #endif
 
 uniform ObjectTransforms {
@@ -16,15 +16,15 @@ uniform ObjectTransforms {
 };
 
 smooth out vec4 varyingNormal;
-#ifdef USE_DIFFUSE_SAMPLER
+#ifdef USE_DIFFUSE_MAP
 	smooth out vec2 varyingUV;
 #endif
 
 void main(void)
 {
 	varyingNormal = matMv * vec4(vertNorm, 0.0);	
-#ifdef USE_DIFFUSE_SAMPLER
-	varyingUV = vertDiffuseUV;
+#ifdef USE_DIFFUSE_MAP
+	varyingUV = texCoord0;
 #endif
 	gl_Position = matMvp * vertPos;
 }
@@ -42,13 +42,21 @@ uniform per_material_properties {
 	vec4 diffuseAndGloss;
 };
 
-#ifdef USE_DIFFUSE_SAMPLER
+#ifdef USE_DIFFUSE_MAP
 	uniform sampler2D diffuseMap;
 	smooth in vec2 texCoord0;
 #endif
 
+#ifdef USE_DIFFUSE_MAP
+	uniform sampler2D specularMap;
+#endif
+
+#ifdef USE_NORMAL_MAP
+	uniform sampler2D normalMap;
+#endif
+
 vec3 getDiffuseColor() {
-#ifdef USE_DIFFUSE_SAMPLER
+#ifdef USE_DIFFUSE_MAP
 	return (texture(diffuseMap, texCoord0).rgb * diffuseAndGloss.rgb);
 #else
 	return diffuseAndGloss.rgb;
@@ -61,8 +69,8 @@ float getGloss() {
 
 vec2 getEncodedNormal(vec3 n) {
 	vec2 enc = normalize(n.xy) * (sqrt(n.z*0.5+0.5));
-    enc = enc*0.5+0.5;
-    return enc;
+	enc = enc*0.5+0.5;
+	return enc;
 }
 
 vec2 getNormal() {
@@ -103,7 +111,7 @@ shader Deferred {
 			
 			param vec4:diffuseAndGloss DiffuseColorAndGloss;
 			param texture:diffuseMap DiffuseMap;
-			option USE_DIFFUSE_SAMPLER HasDiffuseMap;
+			option USE_DIFFUSE_MAP HasDiffuseMap;
 			
 			vertex_program VSGBuffer;
 			fragment_program PSGBuffer;

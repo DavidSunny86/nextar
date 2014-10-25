@@ -487,11 +487,12 @@ MaterialTemplatePtr FbxMeshLoaderImplv1_0::CreateMaterial(FbxSurfaceMaterial* pF
 		material = MaterialTemplate::Traits::Instance(id);
 	}
 
-	if (!material->AsyncIsLoaded()) {
+	if (material->AsyncIsCreated()) {
 		InputStreamPtr dummy;
 		FbxMaterialLoaderImplv1_0* manualLoader = NEX_NEW(FbxMaterialLoaderImplv1_0(pFbxMat, kAssetLoc));
 		StreamInfo streamInfo(manualLoader, dummy);
-		material->AsyncRequestLoad(streamInfo);
+		if(!material->AsyncSetLoadInfo(streamInfo))
+			NEX_DELETE(manualLoader);
 	}
 
 	return material;

@@ -43,11 +43,10 @@ const String Asset::AssetLocatorAccessor::GetStringValue(
 	return asset->GetAssetLocator().ToString();
 }
 
-bool Asset::AsyncLoad(const StreamInfo& request, bool async) {
-	//NEX_THREAD_LOCK_GUARD_MUTEX(assetLock);
+bool Asset::AsyncSetLoadInfo(const StreamInfo& request) {
 	State expected = ASSET_CREATED;
 	if (assetState.compare_exchange_strong(expected,
-		ASSET_LOADING, std::memory_order_release,
+		ASSET_LOADINFO_REG, std::memory_order_release,
 		std::memory_order_relaxed)) {
 		// only a single thread can reach here,
 		// if we have, we issue the draw request
@@ -68,7 +67,20 @@ bool Asset::AsyncLoad(const StreamInfo& request, bool async) {
 			else
 				assetRequest->SetAssetLocator(GetAssetLocator());
 		}
+		return true;
+	}
+	return false;
+}
 
+bool Asset::AsyncLoad(const StreamInfo& request, bool async) {
+	if (AsyncIsLoaded())
+		return true;
+	//NEX_THREAD_LOCK_GUARD_MUTEX(assetLock);
+	AsyncSetLoadInfo(request);
+	State expected = ASSET_LOADINFO_REG;
+	if (assetState.compare_exchange_strong(expected,
+		ASSET_LOADING, std::memory_order_release,
+		std::memory_order_relaxed)) {
 		if (async) {
 			if (IsBackgroundStreamed() &&
 				(_savedRequestPtr->flags & StreamRequest::ASSET_STREAM_REQUEST)) {
@@ -132,11 +144,10 @@ void Asset::NotifyAssetLoaded() {
 	}
 }
 
-bool Asset::AsyncSave(const StreamInfo& request, bool async) {
-	//NEX_THREAD_LOCK_GUARD_MUTEX(assetLock);
+bool Asset::AsyncSetSaveInfo(const StreamInfo& request) {
 	State expected = ASSET_READY;
 	if (assetState.compare_exchange_strong(expected,
-		ASSET_SAVING, std::memory_order_release,
+		ASSET_SAVEINFO_REG, std::memory_order_release,
 		std::memory_order_relaxed)) {
 		// only a single thread can reach here,
 		// if we have, we issue the draw request
@@ -159,7 +170,17 @@ bool Asset::AsyncSave(const StreamInfo& request, bool async) {
 			else
 				assetRequest->SetAssetLocator(GetAssetLocator());
 		}
+		return true;
+	}
+	return false;
+}
 
+bool Asset::AsyncSave(const StreamInfo& request, bool async) {
+	AsyncSetSaveInfo(request);
+	State expected = ASSET_SAVEINFO_REG;
+	if (assetState.compare_exchange_strong(expected,
+		ASSET_SAVING, std::memory_order_release,
+		std::memory_order_relaxed)) {
 		if (async) {
 			if (IsBackgroundStreamed() &&
 				(_savedRequestPtr->flags & StreamRequest::ASSET_STREAM_REQUEST)) {
@@ -168,12 +189,10 @@ bool Asset::AsyncSave(const StreamInfo& request, bool async) {
 			else {
 				Warn("Asset cannot be background saved!");
 			}
-		}
-		else {
+		} else {
 			try {
 				SaveImpl(_savedRequestPtr, false);
-			}
-			catch (GracefulErrorExcept& e) {
+			} catch (GracefulErrorExcept& e) {
 				Debug(e.GetMsg());
 				// @todo Combine the flags set/unset
 				_savedRequestPtr->returnCode = StreamResult::STREAM_FAILED;
@@ -223,8 +242,7 @@ void Asset::Unload() {
 		try {
 			UnloadImpl();
 			NotifyAssetUnloaded();
-		}
-		catch (GracefulErrorExcept& e) {
+		} catch (GracefulErrorExcept& e) {
 			Debug(e.GetMsg());
 		}
 
@@ -265,11 +283,13 @@ void Asset::AsyncSave(StreamRequest* request) {
 }
 
 void Asset::LoadImpl(nextar::StreamRequest* request, bool) {
+	//NEX_THREAD_LOCK_GUARD_MUTEX(assetLock);
 	AssetLoader loader(static_cast<AssetStreamRequest*>(request));
 	loader.Serialize();
 }
 
 void Asset::SaveImpl(nextar::StreamRequest* request, bool) {
+	//NEX_THREAD_LOCK_GUARD_MUTEX(assetLock);
 	AssetSaver saver(static_cast<AssetStreamRequest*>(request));
 	saver.Serialize();
 }
@@ -305,7 +325,11 @@ void Asset::_FireCallbacksSaved() {
 void Asset::_LoadDependencies(AssetStreamRequest* req) {
 	AssetSet& s = req->GetMetaInfo().GetDependencies();
 	for (auto a : s) {
-		a->RequestLoad();
+		if (!a->AsyncIsReady() && !a->AsyncHasLoadFailed()) {
+			NEX_ASSERT(!a->AsyncIsLoading());
+			a->RequestLoad();
+		}
+		
 		if (a->AsyncHasLoadFailed()) {
 			req->returnCode = StreamResult::STREAM_FAILED;
 			return;

@@ -20,7 +20,7 @@ public:
 
 	virtual void Register(const AABox3& box, const Color& color,
 			float expiryTimeInSec = 0.0f) = 0;
-	virtual void Register(Mat3x4R tform, const Color& color,
+	virtual void Register(Mat3x4R tform, const Color& color = Color::Black,
 			float expiryTimeInSec = 0.0f) = 0;
 	virtual void Register(PlaneF plane, const Color& color,
 			float expiryTimeInSec = 0.0f) = 0;
