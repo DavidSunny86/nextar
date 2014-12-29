@@ -1,0 +1,43 @@
+shader DeferredLights {
+	
+	flags basic_deferred;
+
+	pass OmniLight {
+	
+		cbuffer OmniLight;
+	
+		depth_stencil_state {
+			depth_state false;
+			stencil_test false;
+		}
+		
+		blend_state {
+			blend false;
+		}
+		
+		raster_state {
+			raster solid back true;
+			scissor false;
+			anti_aliasing false false;
+		}
+	
+		texture_state {
+			sampler nearest_sampler {
+				min_filter nearest;
+				mag_filter nearest;
+				address_u clamp;
+				address_v clamp;				
+			}
+			
+			unit nearest_sampler albedoAndGlossMap:ALBEDOANDGLOSS;
+			unit nearest_sampler normalMap:NORMALMAP;
+			unit nearest_sampler depthMap:DEPTHMAP;
+		}
+
+		program {
+			define HAS_2DVERT;
+			vertex_program Common Quad;
+			fragment_program Lights;
+		}
+	}
+}

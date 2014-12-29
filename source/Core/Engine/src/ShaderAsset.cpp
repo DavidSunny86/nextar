@@ -180,7 +180,8 @@ ShaderAsset::StreamPass& ShaderAsset::StreamPass::operator = (const nextar::Shad
 /* ShaderAsset::StreamRequest							 */
 /*****************************************************/
 ShaderAsset::StreamRequest::StreamRequest(ShaderAsset* shader) :
-		AssetStreamRequest(shader) {
+		AssetStreamRequest(shader),
+		renderQueueFlags(0) {
 }
 
 ShaderAsset::StreamRequest::~StreamRequest() {
@@ -195,18 +196,26 @@ void ShaderAsset::StreamRequest::SetCompilationOptions(const String& options) {
 	compilationOptions = options;
 }
 
-void ShaderAsset::StreamRequest::AddTextureUnit(const String& unitName,
-		TextureUnitParams& tu, TextureBase* texture) {
+void ShaderAsset::StreamRequest::AddSamplerUnit(
+		TextureUnitParams& tu,
+		const String& unitNames,
+		TextureBase* texture) {
 	ShaderAsset* shader = static_cast<ShaderAsset*>(streamedObject);
 	Pass::TextureDescMap& defaultTextureUnits =
 			(*currentPass).compileParams.textureStates;
-	Pass::SamplerDesc& sd = defaultTextureUnits[unitName];
+	defaultTextureUnits.push_back(Pass::SamplerDesc());
+	Pass::SamplerDesc& sd = defaultTextureUnits.back();
+	sd.unitsBound = unitNames;
 	sd.texUnitParams = tu;
 	sd.defaultTexture = texture;
 	if (texture && texture->IsTextureAsset()) {
 		static_cast<TextureAsset*>(texture)->AddRef();
 		metaInfo.AddDependency(static_cast<TextureAsset*>(texture));
 	}
+}
+
+void ShaderAsset::StreamRequest::AddAutoNameMapping(const String& varName, AutoParamName name) {
+	(*currentPass).compileParams.autoNames[varName] = name;
 }
 
 void ShaderAsset::StreamRequest::SetBlendState(BlendState& state) {
@@ -230,40 +239,6 @@ void ShaderAsset::StreamRequest::AddPass(StringID name) {
 void ShaderAsset::StreamRequest::SetParamterBuffer(ParameterBuffer&& data) {
 	ShaderAsset* shader = static_cast<ShaderAsset*>(streamedObject);
 	shader->passParamData = std::move(data);
-}
-
-ParamDataType ShaderAsset::MapParamType(const String& typeName) {
-	typedef std::pair<const char*, ParamDataType> ParamTypeNamePair;
-	static ParamTypeNamePair paramTypeNameTable[] = {
-		ParamTypeNamePair("bool", ParamDataType::PDT_BOOL),
-		ParamTypeNamePair("count", ParamDataType::PDT_COUNT),
-		ParamTypeNamePair("float", ParamDataType::PDT_FLOAT),
-		ParamTypeNamePair("int", ParamDataType::PDT_INT),
-		ParamTypeNamePair("ivec2", ParamDataType::PDT_IVEC2),
-		ParamTypeNamePair("ivec3", ParamDataType::PDT_IVEC3),
-		ParamTypeNamePair("ivec4", ParamDataType::PDT_IVEC4),
-		ParamTypeNamePair("mat3x4", ParamDataType::PDT_MAT3x4),
-		ParamTypeNamePair("mat4x4", ParamDataType::PDT_MAT4x4),
-		ParamTypeNamePair("struct", ParamDataType::PDT_STRUCT),
-		ParamTypeNamePair("texture", ParamDataType::PDT_TEXTURE),
-		ParamTypeNamePair("uint", ParamDataType::PDT_UINT),
-		ParamTypeNamePair("unknown", ParamDataType::PDT_UNKNOWN),
-		ParamTypeNamePair("vec2", ParamDataType::PDT_VEC2),
-		ParamTypeNamePair("vec3", ParamDataType::PDT_VEC3),
-		ParamTypeNamePair("vec4", ParamDataType::PDT_VEC4),
-	};
-	static const uint32 arraySize = sizeof(paramTypeNameTable) / sizeof(paramTypeNameTable[0]);
-	ParamTypeNamePair* last = paramTypeNameTable + arraySize;
-	ParamTypeNamePair* ptr = std::lower_bound(paramTypeNameTable, last, typeName,
-			[] (const ParamTypeNamePair& p1, const String& searchText) -> int {
-				return searchText.compare(p1.first);
-	});
-
-	if (ptr && ptr != last) {
-		return ptr->second;
-	}
-
-	return ParamDataType::PDT_UNKNOWN;
 }
 
 void ShaderAsset::StreamRequest::SetRenderQueueFlags(uint32 flags) {

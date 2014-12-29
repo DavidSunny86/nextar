@@ -1,0 +1,6 @@
+
+cbuffer DebugModelView {
+	var mat4 modelViewProj:MODELVIEWPROJECTION;
+	var float fadeFactor:FADEFACTOR;
+}
+

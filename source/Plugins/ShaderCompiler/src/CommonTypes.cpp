@@ -267,6 +267,7 @@ TextureAddressMode Helper::GetTextureAddressMode(const String& val) {
 uint32 Helper::GetShaderFlag(const String& val) {
 	static EnumNamePair names[] = {
 			{ RenderQueueFlags::BACKGROUND, _SS(ARG_BACKGROUND) },
+			{ RenderQueueFlags::DEBUG, _SS(ARG_DEBUG) },
 			{ RenderQueueFlags::DEFERRED, _SS(ARG_BASIC_DEFERRED) },
 			{ RenderQueueFlags::DEFERRED_LIGHTING, _SS(ARG_DEFERRED_LIGHTING) },
 			{ RenderQueueFlags::OVERLAY, _SS(ARG_OVERLAY) },
@@ -283,4 +284,23 @@ uint32 Helper::GetShaderFlag(const String& val) {
 	return 0;
 }
 
+AutoParamName Helper::GetAutoParam(const String& val) {
+	static EnumNamePair names[] = {
+			{AutoParamName::AUTO_ALBEDO_AND_GLOSS, _SS(ARG_ALBEDO_AND_GLOSS)},
+			{AutoParamName::AUTO_DEPTH_MAP, _SS(ARG_DEPTH_MAP)},
+			{AutoParamName::AUTO_INV_PROJECTION, _SS(ARG_INV_PROJECTION)},
+			{AutoParamName::AUTO_NORMAL_MAP, _SS(ARG_NORMAL_MAP)},
+			{AutoParamName::AUTO_OBJECT_TRANSFORM, _SS(ARG_OBJECT_TRANSFORM)},
+			{AutoParamName::AUTO_OMNI_LIGHT_PROPERTIES, _SS(ARG_OMNI_LIGHT_PROPERTIES)},
+	};
+	const size_t array_size = sizeof(names) / sizeof(names[0]);
+
+	EnumNamePair* ptr = std::lower_bound(names, names + array_size, val,
+			EnumNameCompare());
+	if (ptr != names + array_size)
+		return static_cast<AutoParamName>(ptr->val);
+	return AutoParamName::AUTO_INVALID_PARAM;
 }
+
+}
+

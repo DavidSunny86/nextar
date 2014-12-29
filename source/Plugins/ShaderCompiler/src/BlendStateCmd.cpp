@@ -101,10 +101,6 @@ void BlendTargetCmd::Execute(int parentType, void* state,
 	}
 	it = StringUtils::NextWord(paramContext, value, it);
 	if (it != String::npos) {
-		blendOp.mask = Helper::GetColorMask(value);
-	}
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
 		blendOp.srcCol = Helper::GetBlendSource(value);
 	}
 	it = StringUtils::NextWord(paramContext, value, it);
@@ -126,6 +122,10 @@ void BlendTargetCmd::Execute(int parentType, void* state,
 	it = StringUtils::NextWord(paramContext, value, it);
 	if (it != String::npos) {
 		blendOp.alphaOp = Helper::GetColorOperation(value);
+	}
+	it = StringUtils::NextWord(paramContext, value, it);
+	if (it != String::npos) {
+		blendOp.mask = Helper::GetColorMask(value);
 	}
 }
 }

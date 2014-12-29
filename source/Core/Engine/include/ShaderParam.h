@@ -35,6 +35,7 @@ public:
 	AutoParamName autoName;
 	uint32 size;
 
+	static ParamDataType MapParamType(const String& typeName);
 	static ParamDataBaseType GetBaseType(ParamDataType type);
 };
 
@@ -112,15 +113,17 @@ struct ParameterGroupItem {
 typedef array<ParameterGroupItem, (size_t) ParameterContext::CTX_COUNT>::type ParameterGroupEntries;
 
 struct AutoParam: public AllocGeneral {
-		
-
 	ParamDataType type;
 	AutoParamName autoName;
 	ParameterContext context;
 	ParamProcessorProc processor;
-	// todo May not be useful except in UI
-	const char* name;
 	String desc;
+
+	AutoParam() : autoName(AutoParamName::AUTO_INVALID_PARAM),
+			processor(nullptr),
+			type(PDT_UNKNOWN),
+			context(ParameterContext::CTX_UNKNOWN) {
+	}
 };
 
 struct ParamEntry {

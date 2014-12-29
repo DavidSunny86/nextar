@@ -1,0 +1,47 @@
+
+
+shader Deferred {
+	
+	flags basic_deferred;
+
+	pass GBuffer {
+	
+		cbuffer ObjectProperties;
+
+		texture_state {
+			sampler linear_sampler {
+				min_filter linear_mip_linear;
+				mag_filter linear;
+				address_u clamp;
+				address_v clamp;
+			}
+			
+			unit linear_sampler diffuseMap DiffuseMap;
+			unit linear_sampler specularMap SpecularMap;
+			unit linear_sampler normalMap NormalMap;
+		}
+
+		depth_stencil_state {
+			depth_state true true lessEq;
+			stencil_test false;
+		}
+		
+		blend_state {
+			blend false;
+		}
+		
+		raster_state {
+			raster solid back true;
+			scissor false;
+			anti_aliasing false false;
+		}
+		
+
+		program {
+			option HAS_DIFFUSE_MAP HasDiffuseMap;
+			define HAS_NORMAL
+			vertex_program PreConfig Common PostConfig Deferred;
+			fragment_program Deferred;
+		}
+	}
+}

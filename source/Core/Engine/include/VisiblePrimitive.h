@@ -82,5 +82,7 @@ protected:
 	ParameterBuffer* parameters;
 };
 
+typedef vector<VisiblePrimitive*>::type VisiblePrimitiveList;
+
 } /* namespace nextar */
 #endif /* VISIBLEPRIMITIVE_H_ */

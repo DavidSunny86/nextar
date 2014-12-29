@@ -90,8 +90,10 @@ public:
 		void SetDepthStencilState(DepthStencilState& state);
 		// If called multiple times for the same unit, the texture will be appended in a
 		// list and if the sampler is an array
-		void AddTextureUnit(const String& unitName, TextureUnitParams& unit,
+		void AddSamplerUnit(TextureUnitParams& unit,
+				const String& boundUnitNames,
 				TextureBase* defaultTexture);
+		void AddAutoNameMapping(const String& varName, AutoParamName name);
 		void SetRenderQueueFlags(uint32 flags);
 
 	protected:
@@ -125,8 +127,6 @@ public:
 
 	virtual uint32 GetClassID() const override;
 	
-	// todo
-	static ParamDataType MapParamType(const String& typeName);
 
 	const ParamEntryTableItem& GetParamTableItem(ParameterContext context) {
 		return paramsPerContext[(uint32)context];

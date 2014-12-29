@@ -133,9 +133,9 @@ void DeferredRenderSystem::Commit(CommitContext& context) {
 	/* Display Image */
 	if (context.debugDisplay) {
 		Box2D box(0, 0, 0.25f, 0.25f);
-		context.debugDisplay->Register(box, Color::Red, gbuffer.normalMap);
+		context.debugDisplay->Register(context, box, Color::Red, gbuffer.normalMap);
 		Box2D box2(0.25, 0, 0.5f, 0.25f);
-		context.debugDisplay->Register(box2, Color::Red, gbuffer.albedoSpecular);
+		context.debugDisplay->Register(context, box2, Color::Red, gbuffer.albedoSpecular);
 	}
 
 	context.albedoAndGlossMap = gbuffer.albedoSpecular;

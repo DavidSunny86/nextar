@@ -11,6 +11,7 @@ namespace RenderOpenGL {
 class SamplerState: public SamplerParameter {
 public:
 	uint32 index;
+	uint32 samplerRefCount;
 	GLint location;
 	GLuint sampler;
 };

@@ -1,34 +1,8 @@
-//***************************************************************************
-@script:glsl:VSOmni
-//***************************************************************************
-#version 330
-
-in vec2 vert2DPos;
-smooth out vec2 texCoord;
-
-void main(void)
-{
-	gl_Position = vec4(vert2DPos.x, vert2DPos.y, 0, 1);
-	texCoord = vert2DPos * vec2(0.5, 0.5) + vec2(0.5, 0.5);
-}
-
-//***************************************************************************
-@script:glsl:PSOmni
-//***************************************************************************
 #version 330
 
 uniform sampler2D depthMap;
 uniform sampler2D normalMap;
 uniform sampler2D albedoAndGlossMap;
-
-uniform ViewTransforms {
-	mat4 invProjection;
-};
-
-uniform OmniLightProperties {
-	vec4 lightColor;
-	vec4 lightPosAndRadius;
-};
 
 in vec2 texCoord;
 out vec4 vFragColor;
@@ -78,39 +52,4 @@ void main(void) {
 	vFragColor *= (atten*atten);
 }
 
-//***************************************************************************
-@effect 
-//***************************************************************************
-shader DeferredLights {
-	
-	flags basic_deferred;
 
-	pass OmniLight {
-	
-		depth_stencil_state {
-			depth_state false;
-			stencil_test false;
-		}
-		
-		blend_state {
-			blend false;
-		}
-		
-		raster_state {
-			raster solid back true;
-			scissor false;
-			anti_aliasing false false;
-		}
-	
-		texture_state {
-			unit albedoAndGlossMap nearest nearest clamp;
-			unit normalMap nearest nearest clamp;
-			unit depthMap nearest nearest clamp;
-		}
-
-		program {
-			vertex_program VSOmni;
-			fragment_program PSOmni;
-		}
-	}
-}

@@ -46,6 +46,8 @@ public:
 	};
 
 	struct SamplerDesc {
+		// comma seperated units bound to this sampler
+		String unitsBound;
 		TextureUnitParams texUnitParams;
 		TextureBase* defaultTexture;
 		~SamplerDesc() {
@@ -56,11 +58,13 @@ public:
 		}
 	};
 
-	typedef map<String, SamplerDesc>::type TextureDescMap;
+	typedef vector<SamplerDesc>::type TextureDescMap;
 
 	struct ParamBufferOffsetParams {
 		uint32 offset[(size_t) ParameterContext::CTX_COUNT];
 	};
+
+	typedef map<String, AutoParamName>::type VarToAutoParamMap;
 
 	class CompileParams {
 	public:
@@ -71,11 +75,13 @@ public:
 		DepthStencilState depthStencilState;
 		Pass::TextureDescMap textureStates;
 		ParamEntryTable* parameters;
+		VarToAutoParamMap autoNames;
 		//uint16* inputLayoutId;
 		uint32 passIndex;
 		String programSources[Pass::STAGE_COUNT];
 
-		CompileParams() : passIndex(-1) {
+		CompileParams() : passIndex(-1),
+				compileOptions(nullptr), parameters(nullptr) {
 			inited.clear(std::memory_order_release);
 		}
 
@@ -103,7 +109,7 @@ public:
 		// todo refer to the static table as well as a custom table
 		// created from parsing the shader script
 		// string should be in uppercase
-		inline const AutoParam* MapParam(const char* name) {
+		inline const AutoParam* MapParam(AutoParamName name) {
 			return Pass::MapParam(name);
 		}
 
@@ -138,11 +144,12 @@ public:
 	//TextureBase* GetDefaultTexture(const String& name, uint32 index) const;
 	//const TextureUnitParams* GetTextureUnit(const String& name) const;
 
-	static void AddParamDef(const char* name, ParamDataType type, AutoParamName autoName, ParameterContext context,
+	static void AddParamDef(AutoParamName autoName, ParamDataType type, ParameterContext context,
 		ParamProcessorProc processor, const String& desc);
-	static const AutoParam* MapParam(const char* name);
 
-	static const SamplerDesc* MapSamplerParams(const String& name,
+	static const AutoParam* MapParam(AutoParamName name);
+
+	static uint32 MapSamplerParams(const String& name,
 			const TextureDescMap& texMap);
 
 	// Set texture states, called during pass creation
@@ -170,8 +177,8 @@ protected:
 	static ParamProcessorProc customTextureProcessor;
 	static ParamProcessorProc customStructProcessor;
 
-	typedef map<const char*, AutoParam, StringUtils::NoCaseLess>::type AutoParamMap;
-	static AutoParamMap autoParams;
+	typedef array<AutoParam, (size_t)AutoParamName::AUTO_COUNT>::type AutoParamList;
+	static AutoParamList autoParams;
 	friend class ShaderAsset;
 
 private:

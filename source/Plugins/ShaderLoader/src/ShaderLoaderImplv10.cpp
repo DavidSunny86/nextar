@@ -175,7 +175,7 @@ void ShaderLoaderImplv1_0::ReadPass(ShaderAsset::StreamRequest* request,
 			ser >> id >> locator;
 			texture = TextureAsset::Traits::Instance(id, locator);
 		}
-		request->AddTextureUnit(unitName, params, texture);
+		request->AddSamplerUnit(params, unitName, texture);
 	}
 
 	std::array<ShaderFormatChunkHeaders, (uint32)RenderManager::SPP_COUNT> 	languageDumps;

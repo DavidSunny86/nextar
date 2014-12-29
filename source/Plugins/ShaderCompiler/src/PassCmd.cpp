@@ -15,6 +15,7 @@
 #include <ScriptStrings.h>
 #include <ProgramCmd.h>
 #include <PassCmd.h>
+#include <ConstBufferCmd.h>
 
 namespace ShaderCompiler {
 
@@ -25,6 +26,7 @@ PassCmd PassCmd::command;
  **************************************************************/
 CommandNamePair PassListener::commands[] = {
 		{ _SS(CMD_BLEND_STATE), &BlendStateCmd::command },
+		{ _SS(CMD_CBUFFER), &ConstBufferCmd::command },
 		{ _SS(CMD_DEPTH_STENCIL_STATE), &DepthStencilStateCmd::command },
 		{ _SS(CMD_PROGRAM), &ProgramCmd::command },
 		{ _SS(CMD_RASTER_STATE), &RasterStateCmd::command },

@@ -12,7 +12,7 @@
 
 namespace nextar {
 
-Pass::AutoParamMap Pass::autoParams;
+Pass::AutoParamList Pass::autoParams;
 
 Pass::Pass(StringID name) :
 		NamedObject(name),
@@ -29,36 +29,35 @@ Pass::Pass(Pass&& p) :
 
 Pass::Pass(const Pass& p) {
 	NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
+	flags = 0;
 }
 
 Pass::~Pass() {
-	Debug("Pass destroyed.");
 }
 
-const AutoParam* Pass::MapParam(const char* name) {
-	auto ap = autoParams.find(name);
-	if (ap == autoParams.end())
-		return nullptr;
-	// todo map parsed params
-	return &(*ap).second;
+const AutoParam* Pass::MapParam(AutoParamName name) {
+	if(name >= 0 && name < AutoParamName::AUTO_COUNT) {
+		if (autoParams[name].autoName != AutoParamName::AUTO_INVALID_PARAM)
+			return &autoParams[name];
+	}
+	return nullptr;
 }
 
-const Pass::SamplerDesc* Pass::MapSamplerParams(const String& name,
+uint32 Pass::MapSamplerParams(const String& name,
 		const TextureDescMap& texMap) {
-	auto sp = texMap.find(name);
-	if (sp == texMap.end())
-		return nullptr;
-	// todo map parsed params
-	return &(*sp).second;
+	for(uint32 i = 0; i < texMap.size(); ++i) {
+		if(texMap[i].unitsBound.find(name) != String::npos)
+			return i;
+	}
+	return -1;
 }
 
-void Pass::AddParamDef(const char* name, ParamDataType type, AutoParamName autoName, ParameterContext context,
+void Pass::AddParamDef(AutoParamName autoName, ParamDataType type, ParameterContext context,
 	ParamProcessorProc processor, const String& desc) {
-	auto& param = autoParams[name];
+	auto& param = autoParams[autoName];
 	param.autoName = autoName;
 	param.context = context;
 	param.desc = desc;
-	param.name = name;
 	param.processor = processor;
 	param.type = type;
 }
@@ -67,7 +66,8 @@ void Pass::AddParamDef(const char* name, ParamDataType type, AutoParamName autoN
 /* Pass::View
  /****************************************************/
 Pass::View::View() :
-		samplers(nullptr), numSamplerCount(0) {
+		samplers(nullptr), numSamplerCount(0),
+		viewNumber(0), frameNumber(0), passNumber(0) {
 }
 
 void Pass::View::Update(RenderContext* rc, uint32 msg, ContextParamPtr param) {

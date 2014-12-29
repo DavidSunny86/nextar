@@ -62,6 +62,7 @@ public:
 
 	typedef map<String, TextureUnit>::type TextureUnitMap;
 	typedef multimap<RenderManager::ShaderLanguage, std::pair<Pass::ProgramStage, String>>::type SourceMap;
+	typedef Pass::VarToAutoParamMap VarToAutoParamMap;
 
 	struct PassUnit {
 		StringID name;
@@ -69,6 +70,7 @@ public:
 		BlendState blendState;
 		DepthStencilState depthStencilState;
 		TextureUnitMap textureUnitStates;
+		VarToAutoParamMap semanticMap;
 		SourceMap sourceMap;
 	};
 
@@ -108,6 +110,8 @@ public:
 		virtual void AddMacro(const String& param,
 				const String& name,
 				const String& description);
+		virtual void AddSemanticBinding(const String& var,
+				AutoParamName name);
 
 	protected:
 		PassUnit* current;

@@ -75,7 +75,7 @@ void ParamCmd::Execute(int parentType, void* state,
 	if (it != String::npos) {
 		StringUtils::StringPair p = StringUtils::Split(value);
 		if (p.second.length()) {
-			type = ShaderAsset::MapParamType(p.first);
+			type = ShaderParameter::MapParamType(p.first);
 			param = p.second;
 		} else
 			param = p.first;
@@ -108,7 +108,7 @@ void ShaderCmd::Execute(int parentType, void* parentParam,
 	String programRegion;
 	StringUtils::TokenIterator it = StringUtils::NextWord(statement.GetParamList(),
 			programRegion);
-	script->SetRegionAsSource(stage, programRegion);
+	//script->SetRegionAsSource(stage, programRegion);
 }
 
 } /* namespace ShaderCompiler */

@@ -24,6 +24,7 @@ enum RenderQueueFlags
 	FORWARD = 1 << 5,
 	DEFERRED_LIGHTING = 1 << 6,
 	POST_FX = 1 << 7,
+	DEBUG = 1 << 8,
 	DEFAULT_FLAGS = SORT_ENABLED | DEFERRED,
 };
 

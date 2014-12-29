@@ -55,7 +55,7 @@ struct BlendState {
 	RenderTargetBlendOp blendOp[(uint32) RenderConstants::MAX_RENDER_TARGETS];
 
 	BlendState() :
-			enabled(false), alphaToCoverage(false), numRenderTargets(0) {
+			enabled(false), alphaToCoverage(false), numRenderTargets(1) {
 	}
 };
 }

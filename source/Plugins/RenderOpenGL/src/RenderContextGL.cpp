@@ -221,7 +221,9 @@ uint32 RenderContextGL::ReadProgramSemantics(GLuint program,
 }
 
 void RenderContextGL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
-	GLuint program, ParamEntryTable* paramTable) {
+	GLuint program,
+	Pass::VarToAutoParamMap& remapParams,
+	ParamEntryTable* paramTable) {
 	GLint numBlocks = 0;
 	GlGetProgramiv(program, GL_ACTIVE_UNIFORM_BLOCKS, &numBlocks);
 	GL_CHECK();
@@ -264,7 +266,7 @@ void RenderContextGL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
 		if (!ubPtr) {
 			// create a new uniform buffer
 			ubPtr = CreateUniformBuffer(pass, passIndex, uniName, i, program,
-				numParams, size, paramTable);
+				numParams, size, remapParams, paramTable);
 			GL_CHECK();
 			//ubPtr->SetBinding((GLuint) uniformBufferMap.size()-1);
 		}
@@ -284,7 +286,8 @@ void RenderContextGL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
 
 UniformBufferGL* RenderContextGL::CreateUniformBuffer(PassViewGL* pass,
 		uint32 passIndex, const String& name, GLint blockIndex, GLuint prog,
-		GLuint numParams, uint32 size, ParamEntryTable* table) {
+		GLuint numParams, uint32 size, Pass::VarToAutoParamMap& remapParams,
+		ParamEntryTable* table) {
 
 	NEX_ASSERT(size > 0);
 	uint16 numUnmappedParams = 0;
@@ -307,8 +310,12 @@ UniformBufferGL* RenderContextGL::CreateUniformBuffer(PassViewGL* pass,
 
 	bool storeIndividualParams = table != nullptr;
 	bool parseIndividualParams = true;
+	const AutoParam* autoParam = nullptr;
 	// look for AutoParams
-	const AutoParam* autoParam = pass->MapParam(name.c_str());
+	auto it = remapParams.find(name);
+
+	if (it != remapParams.end())
+		autoParam = pass->MapParam((*it).second);
 	if (autoParam && autoParam->type == ParamDataType::PDT_STRUCT) {
 		u.autoName = autoParam->autoName;
 		u.context = autoParam->context;
@@ -392,7 +399,11 @@ UniformBufferGL* RenderContextGL::CreateUniformBuffer(PassViewGL* pass,
 		GlGetActiveUniformName(prog, indices[i], 128, 0, uniName);
 		GL_CHECK();
 		String paramName = uniName;
-		const AutoParam* paramDef = pass->MapParam(uniName);
+		auto it = remapParams.find(paramName);
+		const AutoParam* paramDef = nullptr;
+		if (it != remapParams.end())
+			paramDef = pass->MapParam((*it).second);
+
 		if (paramDef) {
 			if (chosen == ParameterContext::CTX_UNKNOWN)
 				chosen = paramDef->context;
@@ -475,8 +486,58 @@ UniformBufferGL* RenderContextGL::CreateUniformBuffer(PassViewGL* pass,
 	return &u;
 }
 
+GLuint RenderContextGL::CreateSamplerFromParams(const TextureUnitParams& params) {
+	GLuint sampler;
+	GlGenSamplers(1, &sampler);
+	GL_CHECK();
+	if (sampler) {
+		GlSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER,
+				GetGlMinFilter(params.minFilter));
+		GL_CHECK();
+		GlSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER,
+				GetGlMagFilter(params.magFilter));
+		GL_CHECK();
+		GlSamplerParameteri(sampler, GL_TEXTURE_WRAP_S,
+				GetGlAddressMode(params.uAddress));
+		GL_CHECK();
+		GlSamplerParameteri(sampler, GL_TEXTURE_WRAP_T,
+				GetGlAddressMode(params.vAddress));
+		GL_CHECK();
+		GlSamplerParameteri(sampler, GL_TEXTURE_WRAP_R,
+				GetGlAddressMode(params.wAddress));
+		GL_CHECK();
+	}
+	if (params.comparisonFunc != TEXCOMP_NONE) {
+		GlSamplerParameteri(sampler, GL_TEXTURE_COMPARE_FUNC,
+				GetGlCompareFunc(params.comparisonFunc));
+		GL_CHECK();
+		GlSamplerParameteri(sampler, GL_TEXTURE_COMPARE_MODE,
+				GL_COMPARE_REF_TO_TEXTURE);
+		GL_CHECK();
+	} else {
+		GlSamplerParameteri(sampler, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+		GL_CHECK();
+	}
+	GlSamplerParameterf(sampler, GL_TEXTURE_LOD_BIAS,
+			params.lodBias);
+	GL_CHECK();
+	GlSamplerParameterf(sampler, GL_TEXTURE_MIN_LOD, params.minLod);
+	GL_CHECK();
+	GlSamplerParameterf(sampler, GL_TEXTURE_MAX_LOD, params.maxLod);
+	GL_CHECK();
+	GlSamplerParameteri(sampler, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+			params.maxAnisotropy);
+	GL_CHECK();
+	GlSamplerParameterfv(sampler, GL_TEXTURE_BORDER_COLOR,
+			params.borderColor.AsFloatArray());
+	GL_CHECK();
+	return sampler;
+}
+
 void RenderContextGL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
-		GLuint program, ParamEntryTable* paramTable,
+		GLuint program,
+		Pass::VarToAutoParamMap& remapParams,
+		ParamEntryTable* paramTable,
 		const Pass::TextureDescMap& texMap) {
 	/** todo Massive work left for sampler arrays */
 	GLint numUni = 0;
@@ -484,6 +545,11 @@ void RenderContextGL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 	char name[128];
 	size_t extra = 0;
 	GlGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numUni);
+	vector<GLuint>::type samplerList;
+
+	for(auto& s : texMap) {
+		samplerList.push_back(CreateSamplerFromParams(s.texUnitParams));
+	}
 
 	for (GLuint i = 0; i < (GLuint)numUni; ++i) {
 		GLint type;
@@ -528,24 +594,28 @@ void RenderContextGL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 			SamplerState& ss = samplers[mapped];
 			ss.index = mapped++;
 			ss.arrayCount = 1;
-			const Pass::SamplerDesc* tu = Pass::MapSamplerParams(unitName,
+			uint32 tu = Pass::MapSamplerParams(unitName,
 					texMap);
-			if (tu == nullptr) {
+			if (tu >= samplerList.size()) {
 				Error(
 						String(
 								"Overflowing/Unspecified texture unit index for ")
 								+ name);
 				continue;
 			}
-			const AutoParam* paramDef = Pass::MapParam(name);
+			const AutoParam* paramDef = nullptr;
+			auto it = remapParams.find(name);
+			if (it != remapParams.end())
+				paramDef = pass->MapParam((*it).second);
+			ss.sampler = samplerList[tu];
 			ss.location = loc;
 			if (paramDef == nullptr) {
 				ss.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
-				if (tu->texUnitParams.context == ParameterContext::CTX_UNKNOWN)
+				if (texMap[tu].texUnitParams.context == ParameterContext::CTX_UNKNOWN)
 					ss.context = GuessContextByName(unitName,
 						ParameterContext::CTX_MATERIAL);
 				else
-					ss.context = tu->texUnitParams.context;
+					ss.context = texMap[tu].texUnitParams.context;
 				ss.processor = Pass::GetTextureProcessor();
 			} else {
 				ss.autoName = paramDef->autoName;
@@ -554,7 +624,7 @@ void RenderContextGL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 			}
 			ss.size = sizeof(TextureUnit);
 			// todo Should be a view
-			ss.defaultTexture.texture = tu->defaultTexture;
+			ss.defaultTexture.texture = texMap[tu].defaultTexture;
 			if (paramTable && !paramDef) {
 				ParamEntry pe;
 				pe.arrayCount = 1;
@@ -566,55 +636,9 @@ void RenderContextGL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 				pe.type = ParamDataType::PDT_TEXTURE;
 				paramTable->push_back(pe);
 			}
-
-			const TextureUnitParams& params = tu->texUnitParams;
-
 			// @optimize Reuse samplers. Samplers are currently bound to unit names
 			// It is possible to bind multiple units to sampler sampler in GLSL.
 			// This support is necessary in here.
-			GlGenSamplers(1, &ss.sampler);
-			GL_CHECK();
-			if (ss.sampler) {
-				GlSamplerParameteri(ss.sampler, GL_TEXTURE_MIN_FILTER,
-						GetGlMinFilter(params.minFilter));
-				GL_CHECK();
-				GlSamplerParameteri(ss.sampler, GL_TEXTURE_MAG_FILTER,
-						GetGlMagFilter(params.magFilter));
-				GL_CHECK();
-				GlSamplerParameteri(ss.sampler, GL_TEXTURE_WRAP_S,
-						GetGlAddressMode(params.uAddress));
-				GL_CHECK();
-				GlSamplerParameteri(ss.sampler, GL_TEXTURE_WRAP_T,
-						GetGlAddressMode(params.vAddress));
-				GL_CHECK();
-				GlSamplerParameteri(ss.sampler, GL_TEXTURE_WRAP_R,
-						GetGlAddressMode(params.wAddress));
-				GL_CHECK();
-			}
-			if (params.comparisonFunc != TEXCOMP_NONE) {
-				GlSamplerParameteri(ss.sampler, GL_TEXTURE_COMPARE_FUNC,
-						GetGlCompareFunc(params.comparisonFunc));
-				GL_CHECK();
-				GlSamplerParameteri(ss.sampler, GL_TEXTURE_COMPARE_MODE,
-						GL_COMPARE_REF_TO_TEXTURE);
-				GL_CHECK();
-			} else {
-				GlSamplerParameteri(ss.sampler, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-				GL_CHECK();
-			}
-			GlSamplerParameterf(ss.sampler, GL_TEXTURE_LOD_BIAS,
-					params.lodBias);
-			GL_CHECK();
-			GlSamplerParameterf(ss.sampler, GL_TEXTURE_MIN_LOD, params.minLod);
-			GL_CHECK();
-			GlSamplerParameterf(ss.sampler, GL_TEXTURE_MAX_LOD, params.maxLod);
-			GL_CHECK();
-			GlSamplerParameteri(ss.sampler, GL_TEXTURE_MAX_ANISOTROPY_EXT,
-					params.maxAnisotropy);
-			GL_CHECK();
-			GlSamplerParameterfv(ss.sampler, GL_TEXTURE_BORDER_COLOR,
-					params.borderColor.AsFloatArray());
-			GL_CHECK();
 			// Bind the sampler variable to sampler index
 			GlUniform1i(ss.location, ss.index);
 			GL_CHECK();

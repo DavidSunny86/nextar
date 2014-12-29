@@ -104,6 +104,7 @@ public:
 	static TextureMagFilter GetMagFilter(const String& val);
 	static TextureAddressMode GetTextureAddressMode(const String& val);
 	static uint32 GetShaderFlag(const String& val);
+	static AutoParamName GetAutoParam(const String& val);
 };
 }
 

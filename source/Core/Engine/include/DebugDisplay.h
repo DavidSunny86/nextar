@@ -15,18 +15,21 @@
 
 namespace nextar {
 
+class CommitContext;
 class DebugDisplay: public AllocGraphics {
 public:
 
-	virtual void Register(const AABox3& box, const Color& color,
+	virtual VisiblePrimitiveList& GetPrimitives(CommitContext& context) = 0;
+
+	virtual void Register(CommitContext& context, const AABox3& box, const Color& color,
 			float expiryTimeInSec = 0.0f) = 0;
-	virtual void Register(Mat3x4R tform, const Color& color = Color::Black,
+	virtual void Register(CommitContext& context, Mat3x4R tform, const Color& color = Color::Black,
 			float expiryTimeInSec = 0.0f) = 0;
-	virtual void Register(PlaneF plane, const Color& color,
+	virtual void Register(CommitContext& context, PlaneF plane, const Color& color,
 			float expiryTimeInSec = 0.0f) = 0;
-	virtual void Register(const Frustum& frustum, const Color& color,
+	virtual void Register(CommitContext& context, const Frustum& frustum, const Color& color,
 			float expiryTimeInSec = 0.0f) = 0;
-	virtual void Register(const Box2D& rect, const Color& color,
+	virtual void Register(CommitContext& context, const Box2D& rect, const Color& color,
 			TextureBase* textured = 0, bool border = true,
 			float expiryTimeInSec = 0.0f) = 0;
 

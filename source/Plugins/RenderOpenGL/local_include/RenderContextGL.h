@@ -63,9 +63,11 @@ public:
 			VertexSemanticGL* inputSemantics);
 	/* Read uniform data */
 	void ReadUniforms(PassViewGL*, uint32 passIndex, GLuint program,
+			Pass::VarToAutoParamMap& remapParams,
 			ParamEntryTable*);
 	/* Read sampler information */
 	void ReadSamplers(PassViewGL*, uint32 passIndex, GLuint program,
+			Pass::VarToAutoParamMap& remapParams,
 			ParamEntryTable*, const Pass::TextureDescMap& texMap);
 
 	GLuint CreateBuffer(size_t size, GLenum usage, GLenum type);
@@ -134,9 +136,11 @@ public:
 
 protected:
 
+	GLuint RenderContextGL::CreateSamplerFromParams(const TextureUnitParams& params);
 	UniformBufferGL* CreateUniformBuffer(PassViewGL* pass, uint32 passIndex,
 			const String& name, GLint blockIndex, GLuint prog, GLuint numParams,
-			uint32 size, ParamEntryTable* paramTable);
+			uint32 size, Pass::VarToAutoParamMap& remapParams,
+			ParamEntryTable* paramTable);
 
 	enum {
 		CONTEXT_READY = 1 << 0, 

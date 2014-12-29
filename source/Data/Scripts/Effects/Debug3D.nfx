@@ -1,0 +1,32 @@
+
+shader Debug3D {
+
+	flags debug;
+	pass Main {
+	
+		cbuffer DebugTransforms;
+		
+		depth_stencil_state {
+			depth_state true true lessEq;
+			stencil_test false;
+		}
+		
+		blend_state {
+			blend true;
+			target true src_alpha inv_src_alpha;
+		}
+		
+		raster_state {
+			raster solid back true;
+			scissor false;
+			anti_aliasing false false;
+		}
+		
+		program {
+			define HAS_COLOR;
+			vertex_program Common Debug3D;
+			fragment_program Debug3D;
+		}
+
+	}
+}

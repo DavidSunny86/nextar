@@ -163,6 +163,10 @@ void ShaderTemplate::LoadStreamRequest::AddMacro(const String& param,
 	}
 }
 
+void ShaderTemplate::LoadStreamRequest::AddSemanticBinding(const String& var,
+		AutoParamName name) {
+	current->semanticMap[var] = name;
+}
 
 /********************************************
  * ShaderTemplate::ShaderFromTemplate
@@ -189,7 +193,7 @@ void ShaderTemplate::ShaderFromTemplate::Load(InputStreamPtr& stream, AssetLoade
 						tu.second.defaultTexturePath.GetComputedName());
 				tu.second.defaultTexture = TextureAsset::Traits::Instance(name, tu.second.defaultTexturePath);
 			}
-			request->AddTextureUnit(tu.first, tu.second.params, tu.second.defaultTexture.GetPtr());
+			request->AddSamplerUnit(tu.second.params, tu.first, tu.second.defaultTexture.GetPtr());
 		}
 
 		auto range = p.sourceMap.equal_range(language);

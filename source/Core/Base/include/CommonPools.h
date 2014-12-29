@@ -72,8 +72,7 @@ class PooledAllocator {
 public:
 	typedef PooledAllocator<T, NumPerBlock, Catagory> Type;
 
-	PooledAllocator() :
-			pool(sizeof(ObjectType)) {
+	PooledAllocator() {
 	}
 	~PooledAllocator() {
 	}

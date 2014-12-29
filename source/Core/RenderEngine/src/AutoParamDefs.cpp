@@ -6,13 +6,13 @@
 
 namespace nextar {
 
-#define MAKE_AUTO_PARAM_REGISTER(variable, variableName, type, autoName, context, description)	\
-	Pass::AddParamDef(variableName, type, autoName, context, &variable, description)
+#define MAKE_AUTO_PARAM_REGISTER(variable, autoName, type, context, description)	\
+	Pass::AddParamDef(autoName, type, context, &variable, description)
 
 #define MAKE_AUTO_PARAM_REF(Class)		Class##Apply
 
-#define MAKE_AUTO_PARAM(Class, variableName, type, autoName, context, description)	\
-	MAKE_AUTO_PARAM_REGISTER(MAKE_AUTO_PARAM_REF(Class), variableName, type, autoName, context, description)
+#define MAKE_AUTO_PARAM(Class, variableName, type, context, description)	\
+	MAKE_AUTO_PARAM_REGISTER(MAKE_AUTO_PARAM_REF(Class), variableName, type, context, description)
 
 void ObjectTransformsApply(CommitContext& context, const ShaderParameter* d) {
 	NEX_ASSERT(context.primitive);
@@ -72,17 +72,17 @@ void NormalMapApply(CommitContext& context, const ShaderParameter* param) {
 
 void BaseRenderManager::RegisterAutoParams() {
 
-	MAKE_AUTO_PARAM(ObjectTransforms, "OBJECTTRANSFORMS", PDT_STRUCT, AutoParamName::AUTO_OBJECT_TRANSFORM,
+	MAKE_AUTO_PARAM(ObjectTransforms, AutoParamName::AUTO_OBJECT_TRANSFORM, PDT_STRUCT,
 		ParameterContext::CTX_OBJECT, "Model view projection and model view matrix.");
-	MAKE_AUTO_PARAM(InvProjectionTransform, "INVPROJECTION", PDT_MAT4x4, AutoParamName::AUTO_INV_PROJECTION,
+	MAKE_AUTO_PARAM(InvProjectionTransform, AutoParamName::AUTO_INV_PROJECTION, PDT_MAT4x4,
 		ParameterContext::CTX_VIEW, "Inverse projection matrix.");
-	MAKE_AUTO_PARAM(OmniLightProperties, "OMNILIGHTPROPERTIES", PDT_STRUCT, AutoParamName::AUTO_OMNI_LIGHT_PROPERTIES,
+	MAKE_AUTO_PARAM(OmniLightProperties, AutoParamName::AUTO_OMNI_LIGHT_PROPERTIES, PDT_STRUCT,
 		ParameterContext::CTX_OBJECT, "Omni light properties.");
-	MAKE_AUTO_PARAM(AlbedoAndGlossMap, "ALBEDOANDGLOSSMAP", PDT_TEXTURE, AutoParamName::AUTO_ALBEDO_AND_GLOSS,
+	MAKE_AUTO_PARAM(AlbedoAndGlossMap, AutoParamName::AUTO_ALBEDO_AND_GLOSS, PDT_TEXTURE,
 		ParameterContext::CTX_PASS, "GBuffer albedo and gloss.");
-	MAKE_AUTO_PARAM(NormalMap, "NORMALMAP", PDT_TEXTURE, AutoParamName::AUTO_NORMAL_MAP,
+	MAKE_AUTO_PARAM(NormalMap, AutoParamName::AUTO_NORMAL_MAP, PDT_TEXTURE,
 		ParameterContext::CTX_PASS, "GBuffer normal map.");
-	MAKE_AUTO_PARAM(DepthMap, "DEPTHMAP", PDT_TEXTURE, AutoParamName::AUTO_DEPTH_MAP,
+	MAKE_AUTO_PARAM(DepthMap, AutoParamName::AUTO_DEPTH_MAP, PDT_TEXTURE,
 		ParameterContext::CTX_PASS, "GBuffer depth map.");
 }
 
