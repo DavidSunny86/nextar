@@ -49,7 +49,11 @@ public:
 	}
 
 	InputStreamPtr FetchConstBuffer(const String& name);
+	InputStreamPtr FetchProgram(const String& name, RenderManager::ShaderLanguage lang,
+			Pass::ProgramStage stage);
+
 	void AddRegion(const String& name, RenderManager::ShaderLanguage lang, String&& value);
+	void RemoveRegion(const String& name);
 
 	virtual void EnterRegion(ScriptParser::RegionContext& regionCtx);
 	virtual void EnterScript(ScriptParser::ScriptContext& block);

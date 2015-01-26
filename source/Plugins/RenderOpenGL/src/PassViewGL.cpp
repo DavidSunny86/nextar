@@ -66,9 +66,11 @@ void PassViewGL::Compile(nextar::RenderContext* rc,
 	bool produceReflectionData = !params.inited.test_and_set(std::memory_order_relaxed);
 	// read uniform data and register to uniform buffer manager
 	ctx->ReadUniforms(this, params.passIndex, iGlProgram,
+			params.autoNames,
 			produceReflectionData ? params.parameters : nullptr);
 	// read samplers
 	ctx->ReadSamplers(this, params.passIndex, iGlProgram,
+			params.autoNames,
 			produceReflectionData ? params.parameters : nullptr,
 			params.textureStates);
 

@@ -99,21 +99,23 @@ public:
 		void SetRasterState(RasterState& state);
 		void SetBlendState(BlendState& state);
 		void SetDepthStencilState(DepthStencilState& state);
+		void SetRenderFlags(uint32 flags);
 
 		void AddTextureUnit(const String& unitName,
 				TextureUnitParams& unit,
 				URL& defaultTexturePath);
-		virtual void AddParam(const String& param,
+		void AddParam(const String& param,
 				const String& name,
 				const String& description,
 				ParamDataType type);
-		virtual void AddMacro(const String& param,
+		void AddMacro(const String& param,
 				const String& name,
 				const String& description);
-		virtual void AddSemanticBinding(const String& var,
+		void AddSemanticBinding(const String& var,
 				AutoParamName name);
 
 	protected:
+
 		PassUnit* current;
 	};
 

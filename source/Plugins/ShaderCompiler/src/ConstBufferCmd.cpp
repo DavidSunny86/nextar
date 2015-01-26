@@ -26,8 +26,12 @@ void ConstBufferCmd::Execute(int parentType, void* parentParam,
 
 	InputStreamPtr file = script->FetchConstBuffer(name);
 
-	ConstBufferTranslator translator;
-	translator.Translate(script, name, file);
+	if (file) {
+		ConstBufferTranslator translator;
+		translator.Translate(script, name, file);
+	} else {
+		ctx.Error("Could not load cbuffer: " + name);
+	}
 }
 
 } /* namespace ShaderCompiler */

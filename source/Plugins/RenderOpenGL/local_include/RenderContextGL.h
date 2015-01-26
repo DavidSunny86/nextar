@@ -136,7 +136,8 @@ public:
 
 protected:
 
-	GLuint RenderContextGL::CreateSamplerFromParams(const TextureUnitParams& params);
+	GLuint CreateSamplerFromParams(const TextureUnitParams& params);
+
 	UniformBufferGL* CreateUniformBuffer(PassViewGL* pass, uint32 passIndex,
 			const String& name, GLint blockIndex, GLuint prog, GLuint numParams,
 			uint32 size, Pass::VarToAutoParamMap& remapParams,

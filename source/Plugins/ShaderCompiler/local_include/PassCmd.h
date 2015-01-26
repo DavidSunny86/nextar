@@ -21,6 +21,7 @@ public:
 	static PassCmd command;
 	virtual void Execute(int parentType, void* parentParam,
 				ScriptParser::StatementContext& statement);
+	void CreateSourcesFromRegions(ShaderScript* ss);
 
 protected:
 	~PassCmd() {

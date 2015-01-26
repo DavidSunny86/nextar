@@ -13,7 +13,8 @@ namespace nextar {
 /********************************************
  * ShaderTemplate
  *********************************************/
-ShaderTemplate::ShaderTemplate(const StringID name, const StringID factory) : AssetTemplate(name, factory) {
+ShaderTemplate::ShaderTemplate(const StringID name, const StringID factory) : AssetTemplate(name, factory),
+		renderFlags(0) {
 }
 
 ShaderTemplate::~ShaderTemplate() {
@@ -168,6 +169,10 @@ void ShaderTemplate::LoadStreamRequest::AddSemanticBinding(const String& var,
 	current->semanticMap[var] = name;
 }
 
+void ShaderTemplate::LoadStreamRequest::SetRenderFlags(uint32 rf) {
+	ShaderTemplate* shader = static_cast<ShaderTemplate*>(GetStreamedObject());
+	shader->SetRenderFlags(rf);
+}
 /********************************************
  * ShaderTemplate::ShaderFromTemplate
  *********************************************/

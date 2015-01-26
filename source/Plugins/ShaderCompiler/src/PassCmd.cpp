@@ -44,11 +44,42 @@ void PassCmd::Execute(int parentType, void* parentParam,
 	if (parentType == CommandDelegate::SHADER_BLOCK) {
 		String name;
 		StringUtils::NextWord(ctx.GetParamList(), name);
-		PassListener pass(static_cast<ShaderScript*>(parentParam), name);
+		auto shaderScript = static_cast<ShaderScript*>(parentParam);
+		PassListener pass(shaderScript, name);
 		ctx.ParseBlock(&pass);
+		// create sources from regions
+		CreateSourcesFromRegions(shaderScript);
 	} else {
 		ctx.Error("BlendState block needs to be inside Shader declaration.");
 	}
+}
+
+void PassCmd::CreateSourcesFromRegions(ShaderScript* shaderScript) {
+	String cbuffer = _SS(CMD_CBUFFER);
+	for(uint32 i = 0; i < Pass::STAGE_COUNT; ++i) {
+		StringUtils::WordList words;
+		String src;
+
+		switch((Pass::ProgramStage)i) {
+		case Pass::ProgramStage::STAGE_DOMAIN:
+			src = _SS(CMD_DOMAIN_PROG); break;
+		case Pass::ProgramStage::STAGE_VERTEX:
+			src = _SS(CMD_VERTEX_PROG); break;
+		case Pass::ProgramStage::STAGE_FRAGMENT:
+			src = _SS(CMD_FRAGMENT_PROG); break;
+		case Pass::ProgramStage::STAGE_HULL:
+			src = _SS(CMD_HULL_PROG); break;
+		case Pass::ProgramStage::STAGE_GEOMETRY:
+			src = _SS(CMD_GEOMETRY_PROG); break;
+
+		}
+		StringUtils::PushBackWord(words, cbuffer);
+		StringUtils::PushBackWord(words, src);
+		shaderScript->SetRegionsAsSource(Pass::STAGE_VERTEX, words);
+		shaderScript->RemoveRegion(src);
+	}
+
+	shaderScript->RemoveRegion(cbuffer);
 }
 
 /**************************************************************
@@ -68,7 +99,8 @@ void PassListener::EnterStatement(ScriptParser::StatementContext& ctx) {
 			PassListener::commandCount, ctx.GetCommand());
 	if (cmd)
 		cmd->Execute(CommandDelegate::PASS_BLOCK, shaderScript, ctx);
-	// todo else throw error command not supported
+	else
+		ctx.Error("Command not supported: " + ctx.GetCommand());
 }
 
 } /* namespace ShaderCompiler */

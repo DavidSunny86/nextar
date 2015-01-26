@@ -51,7 +51,8 @@ protected:
 
 class ShaderCmd: public CommandDelegate {
 public:
-	ShaderCmd(Pass::ProgramStage _stage) : stage(_stage) {};
+	ShaderCmd(const char* _shaderName, Pass::ProgramStage _stage) : shaderStageName(_shaderName),
+	stage(_stage) {};
 	static ShaderCmd commandVertex;
 	static ShaderCmd commandFragment;
 	static ShaderCmd commandGeometry;
@@ -62,6 +63,7 @@ public:
 protected:
 	~ShaderCmd() {
 	}
+	const char* shaderStageName;
 	Pass::ProgramStage stage;
 };
 

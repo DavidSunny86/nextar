@@ -16,11 +16,11 @@ namespace ShaderCompiler {
 ProgramCmd ProgramCmd::command;
 ParamCmd ParamCmd::command;
 //AutoParamCmd AutoParamCmd::command;
-ShaderCmd ShaderCmd::commandDomain(Pass::ProgramStage::STAGE_DOMAIN);
-ShaderCmd ShaderCmd::commandVertex(Pass::ProgramStage::STAGE_VERTEX);
-ShaderCmd ShaderCmd::commandFragment(Pass::ProgramStage::STAGE_FRAGMENT);
-ShaderCmd ShaderCmd::commandHull(Pass::ProgramStage::STAGE_HULL);
-ShaderCmd ShaderCmd::commandGeometry(Pass::ProgramStage::STAGE_GEOMETRY);
+ShaderCmd ShaderCmd::commandDomain(_SS(CMD_DOMAIN_PROG), Pass::ProgramStage::STAGE_DOMAIN);
+ShaderCmd ShaderCmd::commandVertex(_SS(CMD_VERTEX_PROG), Pass::ProgramStage::STAGE_VERTEX);
+ShaderCmd ShaderCmd::commandFragment(_SS(CMD_FRAGMENT_PROG), Pass::ProgramStage::STAGE_FRAGMENT);
+ShaderCmd ShaderCmd::commandHull(_SS(CMD_HULL_PROG), Pass::ProgramStage::STAGE_HULL);
+ShaderCmd ShaderCmd::commandGeometry(_SS(CMD_GEOMETRY_PROG), Pass::ProgramStage::STAGE_GEOMETRY);
 
 CommandNamePair ProgramListener::commands[] = {
 //{ "AutoParam", &AutoParamCmd::command },
@@ -105,9 +105,26 @@ void ShaderCmd::Execute(int parentType, void* parentParam,
 		ScriptParser::StatementContext& statement) {
 	NEX_ASSERT(parentType == CommandDelegate::SHADER_BLOCK);
 	ShaderScript* script = (static_cast<ShaderScript*>(parentParam));
-	String programRegion;
-	StringUtils::TokenIterator it = StringUtils::NextWord(statement.GetParamList(),
-			programRegion);
+	String programName;
+	const StringUtils::WordList& words = statement.GetParamList();
+	StringUtils::TokenIterator prev = 0;
+	while (	(prev = StringUtils::NextWord(words, programName, prev))
+			!= String::npos ) {
+		for(int i = 0; i < RenderManager::ShaderLanguage::SPP_COUNT; ++i) {
+			InputStreamPtr program =
+					script->FetchProgram(programName, (RenderManager::ShaderLanguage)i, stage);
+			if (program) {
+
+				const void* buffer = nullptr;
+				program->AcquireBuffer(buffer);
+				String regionName = shaderStageName;
+				String programString = (const char*)buffer;
+				script->AddRegion(regionName, (RenderManager::ShaderLanguage)i,
+						std::move(programString));
+			}
+
+		}
+	}
 	//script->SetRegionAsSource(stage, programRegion);
 }
 

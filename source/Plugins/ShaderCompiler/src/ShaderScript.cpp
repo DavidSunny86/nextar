@@ -33,7 +33,6 @@ void ShaderScript::SetRegionsAsSource(Pass::ProgramStage type,
 	while ((regIt = StringUtils::NextWord(regionNames, name, regIt)) != String::npos) {
 		auto it = regions.equal_range(name);
 		if (it.first == regions.end()) {
-			Error("Requested region does not exist: " + name);
 			return;
 		}
 		for(; it.first != it.second; ++it.first) {
@@ -53,7 +52,7 @@ void ShaderScript::EnterScript(ScriptParser::ScriptContext& block) {
 }
 
 void ShaderScript::EnterRegion(ScriptParser::RegionContext& ctx) {
-	const String& name = ctx.GetName();
+	//const String& name = ctx.GetName();
 	ctx.ParseStatements(this);
 	/*} else {
 		String script = _SS(PROGRAM_SCRIPT);
@@ -104,10 +103,59 @@ InputStreamPtr ShaderScript::FetchConstBuffer(const String& name) {
 	return retFile;
 }
 
+InputStreamPtr ShaderScript::FetchProgram(const String& name,
+		RenderManager::ShaderLanguage lang,
+		Pass::ProgramStage stage) {
+
+	StringUtils::TokenIterator it = 0;
+	String store;
+	URL url;
+	InputStreamPtr retFile;
+	switch(stage) {
+	case Pass::ProgramStage::STAGE_VERTEX:
+		stage = ".vert"; break;
+	case Pass::ProgramStage::STAGE_FRAGMENT:
+		stage = ".frag"; break;
+	case Pass::ProgramStage::STAGE_GEOMETRY:
+		stage = ".geom"; break;
+	case Pass::ProgramStage::STAGE_HULL:
+		stage = ".hull"; break;
+	case Pass::ProgramStage::STAGE_DOMAIN:
+		stage = ".dom"; break;
+	default:
+		Warn("Invalid stage: " + name);
+		return retFile;
+	}
+
+	while((it = StringUtils::NextWord(programIncludePath, store, it)) != String::npos) {
+		const char* stage = 0;
+		switch (lang) {
+		case RenderManager::SPP_GLSL:
+			url = store + "GLSL/" + name + stage;
+			break;
+		case RenderManager::SPP_HLSL:
+			url = store + "HLSL/" + name + stage;
+			break;
+		}
+
+		retFile = FileSystem::Instance().OpenRead(url);
+		if (retFile)
+			return retFile;
+	}
+
+	Warn("Could not open constant buffer file: " + name);
+	return retFile;
+
+}
+
 void ShaderScript::AddRegion(const String& name,
 		RenderManager::ShaderLanguage lang, String&& value) {
 	regions.emplace(name,
 			std::pair<RenderManager::ShaderLanguage, String>(std::move(lang), std::move(value)));
+}
+
+void ShaderScript::RemoveRegion(const String& name) {
+	regions.erase(name);
 }
 
 } /* namespace nextar */
