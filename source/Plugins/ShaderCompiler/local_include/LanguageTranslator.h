@@ -1,5 +1,5 @@
 /*
- * ConstBufferTranslator.h
+ * LanguageTranslator.h
  *
  *  Created on: 26-Oct-2014
  *      Author: obhi
@@ -12,16 +12,23 @@
 
 namespace ShaderCompiler {
 
-class ConstBufferTranslatorImpl {
+class ShaderScript;
+
+class LanguageTranslatorIntf {
 public:
+
+	/** Macro operator */
+	virtual void AddPredefs(Pass::ProgramStage stage, ShaderScript* script) = 0;
+	virtual void AddMacro(ShaderScript* script, const String& name) = 0;
+	/** Constant buffer operator */
 	virtual void BeginBuffer(const String& name) = 0;
 	virtual void AddParam(ParamDataType dataType, const String& name, uint32 arrayCount) = 0;
 	virtual void EndBuffer(ShaderScript* script) = 0;
-protected:
-	~ConstBufferTranslatorImpl() {}
+
+	virtual ~LanguageTranslatorIntf() {}
 };
 
-class ConstBufferTranslator : public ConstBufferTranslatorImpl {
+class LanguageTranslator : public LanguageTranslatorIntf {
 public:
 
 	enum {
@@ -30,15 +37,15 @@ public:
 		TRANSLATOR_COUNT,
 	};
 
-	ConstBufferTranslator();
-	virtual ~ConstBufferTranslator();
+	LanguageTranslator();
+	virtual ~LanguageTranslator();
 
 	class ConstBufferListener :public ScriptParser::RegionListener,
 		public ScriptParser::ScriptListener,
 		public ScriptParser::StatementListener {
 	public:
 
-		ConstBufferListener(ConstBufferTranslator* _translator,
+		ConstBufferListener(LanguageTranslator* _translator,
 				ShaderScript* _script) : script(_script), translator(_translator) {}
 
 		virtual void EnterRegion(ScriptParser::RegionContext& regionCtx);
@@ -46,7 +53,7 @@ public:
 		virtual void EnterStatement(ScriptParser::StatementContext& ctx);
 
 	protected:
-		ConstBufferTranslator* translator;
+		LanguageTranslator* translator;
 		ShaderScript* script;
 	};
 
@@ -54,8 +61,8 @@ public:
 	public ScriptParser::BlockListener {
 	public:
 		ConstBufferCommandListener(ShaderScript* _script,
-				ConstBufferTranslator* _translator) : script(_script),
-				translator(_translator) {
+				LanguageTranslator* _translator, bool _cbIsAutoParam) : script(_script),
+				translator(_translator), cbIsAutoParam(_cbIsAutoParam) {
 		}
 
 		virtual void EnterBlock(ScriptParser::BlockContext& block);
@@ -63,19 +70,24 @@ public:
 
 	protected:
 
-		ConstBufferTranslator* translator;
+		bool cbIsAutoParam;
+		LanguageTranslator* translator;
 		ShaderScript* script;
 	};
 
+	virtual void AddMacro(ShaderScript* script, const String& name);
+	virtual void AddPredefs(Pass::ProgramStage stage, ShaderScript* script);
 
 	virtual void BeginBuffer(const String& name);
 	virtual void AddParam(ParamDataType dataType, const String& name, uint32 arrayCount);
 	virtual void EndBuffer(ShaderScript* script);
 
-	void Translate(ShaderScript* script, const String& name, nextar::InputStreamPtr);
+
+	void TranslateConstantBuffer(ShaderScript* script, const String& name, nextar::InputStreamPtr);
+	void TranslateMacro(ShaderScript* script, const String& name);
 
 protected:
-	typedef array<ConstBufferTranslatorImpl*, TRANSLATOR_COUNT>::type ImplList;
+	typedef array<LanguageTranslatorIntf*, TRANSLATOR_COUNT>::type ImplList;
 
 	ImplList translators;
 };

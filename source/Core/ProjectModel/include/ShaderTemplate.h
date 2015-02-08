@@ -42,6 +42,7 @@ public:
 		uint32 index;
 		String uiName;
 		String uiDescription;
+		String catagory;
 	};
 
 	typedef map<String, Macro>::type MacroTable;
@@ -53,14 +54,13 @@ public:
 
 	typedef map<String, ShaderUnit>::type ShaderTable;
 
-	struct TextureUnit {
-
+	struct SamplerUnit {
+		String unitsBound;
 		TextureUnitParams params;
-		TextureAssetPtr defaultTexture;
-		URL defaultTexturePath;
 	};
 
-	typedef map<String, TextureUnit>::type TextureUnitMap;
+	typedef map<String, SamplerUnit>::type SamplerMap;
+	typedef map<String, ShaderUnit>::type ShaderTable;
 	typedef multimap<RenderManager::ShaderLanguage, std::pair<Pass::ProgramStage, String>>::type SourceMap;
 	typedef Pass::VarToAutoParamMap VarToAutoParamMap;
 
@@ -69,7 +69,7 @@ public:
 		RasterState rasterState;
 		BlendState blendState;
 		DepthStencilState depthStencilState;
-		TextureUnitMap textureUnitStates;
+		SamplerMap textureUnitStates;
 		VarToAutoParamMap semanticMap;
 		SourceMap sourceMap;
 	};
@@ -101,9 +101,10 @@ public:
 		void SetDepthStencilState(DepthStencilState& state);
 		void SetRenderFlags(uint32 flags);
 
-		void AddTextureUnit(const String& unitName,
-				TextureUnitParams& unit,
-				URL& defaultTexturePath);
+		void AddTextureUnit(const String& unitName, const String& samplerName);
+		void AddSampler(const String& samplerName,
+				TextureUnitParams& unit);
+
 		void AddParam(const String& param,
 				const String& name,
 				const String& description,

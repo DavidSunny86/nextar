@@ -48,7 +48,8 @@ void MaterialLoaderImplv1_0::Load(InputStreamPtr& stream,
 		ser >> header.version;
 		if (!TestVersion(NEX_MAKE_VERSION(1,0,0), header.version)) {
 			Error("Material is of higher version: " + request->GetName());
-			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
+			request->SetCompleted(false);
+			return;
 		}
 
 		ser >> header.layerMask
@@ -58,7 +59,8 @@ void MaterialLoaderImplv1_0::Load(InputStreamPtr& stream,
 		request->SetShader(header.shader, header.shaderLocation);
 	} else {
 		Error("Material does not have a valid header: " +request->GetName());
-		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
+		request->SetCompleted(false);
+		return;
 	}
 
 	ser.ReadChunk(MATERIAL_PARAMETERS, paramChunk, chunk);
@@ -68,8 +70,12 @@ void MaterialLoaderImplv1_0::Load(InputStreamPtr& stream,
 		request->SetParameterBuffer(std::move(buffer));
 	} else {
 		Error("Material does not have a valid param buffer: " + request->GetName());
-		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
+		request->SetCompleted(false);
+		return;
 	}
+
+	request->SetCompleted(true);
+	return;
 }
 
 } /* namespace MaterialLoader */

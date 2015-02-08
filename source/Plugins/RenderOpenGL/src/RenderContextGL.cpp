@@ -55,6 +55,7 @@ void RenderContextGL::PostWindowCreation(RenderWindow* gw) {
 			_ReadyExtensions(contextCreationParams.reqOpenGLVersionMajor,
 					contextCreationParams.reqOpenGLVersionMinor);
 			GL_CHECK();
+			DetermineShaderTarget();
 			contextFlags |= EXTENSIONS_READY;
 		}
 	}
@@ -70,15 +71,58 @@ void RenderContextGL::CreateImpl(
 	GL_CHECK();
 }
 
+void RenderContextGL::DetermineShaderTarget() {
+	VersionGL ver = GetContextVersion();
+	String target;
+	switch (ver) {
+	case GLV_2_1:
+		target = "120\n"; break;
+	case GLV_3_0:
+		target = "130\n"; break;
+	case GLV_3_1:
+		target = "140\n"; break;
+	case GLV_3_2:
+		target = "150\n"; break;
+	case GLV_3_3:
+		target = "330\n"; break;
+	case GLV_4_0:
+		target = "400\n"; break;
+	case GLV_4_1:
+		target = "410\n"; break;
+	case GLV_4_2:
+		target = "420\n"; break;
+	case GLV_4_3:
+		target = "430\n"; break;
+	case GLV_4_4:
+		target = "440\n"; break;
+	case GLV_4_5:
+		target = "450\n"; break;
+	case GLV_1_3:
+	case GLV_1_4:
+	case GLV_1_5:
+	case GLV_2_0:
+	default:
+		target += "110\n"; break;
+
+	}
+
+	shaderTarget += "#version " + target;
+	shaderTarget += "#define GLSL_version " + target;
+	shaderTarget += "\n";
+}
+
 GLuint RenderContextGL::CreateShader(GLenum type, const char* preDef,
 		const char* source) {
-	const GLchar* sourceBuff[2] = { 0 };
-	sourceBuff[0] = static_cast<const GLchar*>(preDef ? preDef : "");
-	sourceBuff[1] = static_cast<const GLchar*>(source);
+	const GLchar* sourceBuff[3] = { 0 };
+	// determine shader version
+
+	sourceBuff[0] = shaderTarget.c_str();
+	sourceBuff[1] = static_cast<const GLchar*>(preDef ? preDef : "");
+	sourceBuff[2] = static_cast<const GLchar*>(source);
 	GL_CHECK();
 	GLuint shaderObject = GlCreateShader(type);
 	GL_CHECK();
-	GlShaderSource(shaderObject, 2, sourceBuff, NULL);
+	GlShaderSource(shaderObject, 3, sourceBuff, NULL);
 	GL_CHECK();
 	GlCompileShader(shaderObject);
 	GL_CHECK();
@@ -222,7 +266,7 @@ uint32 RenderContextGL::ReadProgramSemantics(GLuint program,
 
 void RenderContextGL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
 	GLuint program,
-	Pass::VarToAutoParamMap& remapParams,
+	const Pass::VarToAutoParamMap& remapParams,
 	ParamEntryTable* paramTable) {
 	GLint numBlocks = 0;
 	GlGetProgramiv(program, GL_ACTIVE_UNIFORM_BLOCKS, &numBlocks);
@@ -286,7 +330,7 @@ void RenderContextGL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
 
 UniformBufferGL* RenderContextGL::CreateUniformBuffer(PassViewGL* pass,
 		uint32 passIndex, const String& name, GLint blockIndex, GLuint prog,
-		GLuint numParams, uint32 size, Pass::VarToAutoParamMap& remapParams,
+		GLuint numParams, uint32 size, const Pass::VarToAutoParamMap& remapParams,
 		ParamEntryTable* table) {
 
 	NEX_ASSERT(size > 0);
@@ -536,7 +580,7 @@ GLuint RenderContextGL::CreateSamplerFromParams(const TextureUnitParams& params)
 
 void RenderContextGL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 		GLuint program,
-		Pass::VarToAutoParamMap& remapParams,
+		const Pass::VarToAutoParamMap& remapParams,
 		ParamEntryTable* paramTable,
 		const Pass::TextureDescMap& texMap) {
 	/** todo Massive work left for sampler arrays */
@@ -624,7 +668,6 @@ void RenderContextGL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 			}
 			ss.size = sizeof(TextureUnit);
 			// todo Should be a view
-			ss.defaultTexture.texture = texMap[tu].defaultTexture;
 			if (paramTable && !paramDef) {
 				ParamEntry pe;
 				pe.arrayCount = 1;
@@ -1302,15 +1345,15 @@ ParameterContext RenderContextGL::GuessContextByName(const String& name,
 		ParameterContext defaultContex) {
 	String lowerName = name;
 	StringUtils::ToLower(lowerName);
-	if (lowerName.find("frame") != String::npos)
+	if (lowerName.find("__frame") != String::npos)
 		return ParameterContext::CTX_FRAME;
-	else if (lowerName.find("view") != String::npos)
+	else if (lowerName.find("__view") != String::npos)
 		return ParameterContext::CTX_VIEW;
-	else if (lowerName.find("pass") != String::npos)
+	else if (lowerName.find("__pass") != String::npos)
 		return ParameterContext::CTX_PASS;
-	else if (lowerName.find("material") != String::npos)
+	else if (lowerName.find("__material") != String::npos)
 		return ParameterContext::CTX_MATERIAL;
-	else if (lowerName.find("object") != String::npos)
+	else if (lowerName.find("__object") != String::npos)
 		return ParameterContext::CTX_OBJECT;
 	return defaultContex;
 }

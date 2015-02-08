@@ -12,42 +12,8 @@ namespace MaterialCompiler {
 
 class MaterialScript;
 
-class ShaderCmd: public CommandDelegate {
-public:
+class Commands {
 
-	static ShaderCmd command;
-	virtual void Execute(void* parentParam,
-				ScriptParser::StatementContext& statement);
-protected:
-
-};
-
-class OptionsCmd: public CommandDelegate {
-public:
-
-	static OptionsCmd command;
-	virtual void Execute(void* parentParam,
-				ScriptParser::StatementContext& statement);
-protected:
-
-};
-
-class ParamValueCmd: public CommandDelegate {
-public:
-
-	static ParamValueCmd command;
-	virtual void Execute(void* parentParam,
-				ScriptParser::StatementContext& statement);
-protected:
-
-};
-
-class LayerCmd: public CommandDelegate {
-public:
-
-	static LayerCmd command;
-	virtual void Execute(void* parentParam,
-				ScriptParser::StatementContext& statement);
 protected:
 
 };
@@ -61,6 +27,17 @@ class MaterialListener:
 	MaterialScript* script;
 public:
 	static CommandNamePair commands[];
+
+
+	static void ShaderCmd_Execute(void* parentParam,
+		ScriptParser::StatementContext& statement);
+	static void OptionsCmd_Execute(void* parentParam,
+		ScriptParser::StatementContext& statement);
+	static void ParamValueCmd_Execute(void* parentParam,
+		ScriptParser::StatementContext& statement);
+	static void LayerCmd_Execute(void* parentParam,
+		ScriptParser::StatementContext& statement);
+
 	static const size_t commandCount;
 
 	MaterialListener(MaterialScript* _script) : script(_script) {

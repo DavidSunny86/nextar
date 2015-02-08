@@ -27,23 +27,21 @@ public:
 
 	virtual void EnterBlock(ScriptParser::BlockContext& block);
 	virtual void EnterStatement(ScriptParser::StatementContext& statement);
+
+	static void PassCmd_Execute(int parentType, void* parentParam,
+		ScriptParser::StatementContext& statement);
+	static void FlagsCmd_Execute(int parentType, void* parentParam,
+		ScriptParser::StatementContext& statement);
+
 protected:
+
+	static void CreateSourcesFromRegions(ShaderScript* ss);
+
 	friend class ShaderScript;
 	~ShaderListener() {
 	}
 };
 
-class FlagsCmd: public CommandDelegate {
-public:
-
-	static FlagsCmd command;
-	virtual void Execute(int parentType, void* parentParam,
-				ScriptParser::StatementContext& statement);
-
-protected:
-	~FlagsCmd() {
-	}
-};
 
 }
 

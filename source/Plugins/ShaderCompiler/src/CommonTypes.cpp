@@ -17,12 +17,12 @@ namespace ShaderCompiler {
 /**************************************************************
  * Helper
  **************************************************************/
-CommandDelegate* Helper::FindCommand(CommandNamePair cmdMap[], size_t arraySize,
+CommandDelegate_Execute Helper::FindCommand(CommandNamePair cmdMap[], size_t arraySize,
 		const String& name) {
 	CommandNamePair* ptr = std::lower_bound(cmdMap, cmdMap + arraySize, name,
 			CommandNameCompare());
-	if (ptr != cmdMap + arraySize)
-		return static_cast<CommandDelegate*>(ptr->command);
+	if (ptr != cmdMap + arraySize && !(name.compare(ptr->name) < 0))
+		return static_cast<CommandDelegate_Execute>(ptr->command);
 	return 0;
 }
 
@@ -42,7 +42,7 @@ ComparisonFunc Helper::GetComparisonFunc(const String& val) {
 
 	EnumNamePair* ptr = std::lower_bound(names, names + arraySize, val,
 			EnumNameCompare());
-	if (ptr != names + arraySize)
+	if (ptr != names + arraySize && !(val.compare(ptr->name) < 0) )
 		return static_cast<ComparisonFunc>(ptr->val);
 
 	return NFX_COMP_UNKNOWN;
@@ -64,7 +64,7 @@ StencilOp Helper::GetStencilOp(const String& val) {
 
 	EnumNamePair* ptr = std::lower_bound(names, names + array_size, val,
 			EnumNameCompare());
-	if (ptr != names + array_size)
+	if (ptr != names + array_size && !(val.compare(ptr->name) < 0))
 		return static_cast<StencilOp>(ptr->val);
 
 	return STENCILOP_ZERO;
@@ -132,7 +132,7 @@ BlendDataSource Helper::GetBlendSource(const String& val) {
 
 	EnumNamePair* ptr = std::lower_bound(names, names + array_size, val,
 			EnumNameCompare());
-	if (ptr != names + array_size)
+	if (ptr != names + array_size && !(val.compare(ptr->name) < 0))
 		return static_cast<BlendDataSource>(ptr->val);
 	return BDS_DEFAULT;
 }
@@ -150,7 +150,7 @@ BlendOp Helper::GetColorOperation(const String& val) {
 
 	EnumNamePair* ptr = std::lower_bound(names, names + array_size, val,
 			EnumNameCompare());
-	if (ptr != names + array_size)
+	if (ptr != names + array_size && !(val.compare(ptr->name) < 0))
 		return static_cast<BlendOp>(ptr->val);
 	return BOP_ADD;
 }
@@ -213,7 +213,7 @@ FilterType Helper::GetFilterType(const String& val) {
 
 	EnumNamePair* ptr = std::lower_bound(names, names + array_size, val,
 			EnumNameCompare());
-	if (ptr != names + array_size)
+	if (ptr != names + array_size && !(val.compare(ptr->name) < 0))
 		return static_cast<FilterType>(ptr->val);
 
 	return NFX_LINEAR;
@@ -259,7 +259,7 @@ TextureAddressMode Helper::GetTextureAddressMode(const String& val) {
 
 	EnumNamePair* ptr = std::lower_bound(names, names + array_size, val,
 			EnumNameCompare());
-	if (ptr != names + array_size)
+	if (ptr != names + array_size && !(val.compare(ptr->name) < 0))
 		return static_cast<TextureAddressMode>(ptr->val);
 	return TAM_WRAP;
 }
@@ -279,7 +279,7 @@ uint32 Helper::GetShaderFlag(const String& val) {
 
 	EnumNamePair* ptr = std::lower_bound(names, names + array_size, val,
 			EnumNameCompare());
-	if (ptr != names + array_size)
+	if (ptr != names + array_size && !(val.compare(ptr->name) < 0))
 		return static_cast<TextureAddressMode>(ptr->val);
 	return 0;
 }
@@ -297,7 +297,7 @@ AutoParamName Helper::GetAutoParam(const String& val) {
 
 	EnumNamePair* ptr = std::lower_bound(names, names + array_size, val,
 			EnumNameCompare());
-	if (ptr != names + array_size)
+	if (ptr != names + array_size && !(val.compare(ptr->name) < 0))
 		return static_cast<AutoParamName>(ptr->val);
 	return AutoParamName::AUTO_INVALID_PARAM;
 }

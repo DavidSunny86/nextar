@@ -1,12 +1,12 @@
 
-cbuffer OmniLightProperties:OMNILIGHT {
+cbuffer OmniLightProperties:OMNILIGHTPROPERTIES {
 	var vec4 lightColor;
 	var vec4 lightPosAndRadius;
 };
 
 
 cbuffer InvProjection {
-	var mat4 invProjection:INVPROJECTION;
+	var mat4x4 invProjection:INVPROJECTION;
 };
 
 

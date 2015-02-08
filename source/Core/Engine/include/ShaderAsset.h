@@ -91,10 +91,10 @@ public:
 		// If called multiple times for the same unit, the texture will be appended in a
 		// list and if the sampler is an array
 		void AddSamplerUnit(TextureUnitParams& unit,
-				const String& boundUnitNames,
-				TextureBase* defaultTexture);
+				const String& boundUnitNames);
 		void AddAutoNameMapping(const String& varName, AutoParamName name);
 		void SetRenderQueueFlags(uint32 flags);
+		void SetSemanticMap(const Pass::VarToAutoParamMap& m);
 
 	protected:
 

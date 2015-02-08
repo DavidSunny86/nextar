@@ -1,8 +1,7 @@
-#version 330
 
 smooth in vec4 varyingNormal;
-layout(location = 0) out vec4 albedoAndGlossMap;
-layout(location = 1) out vec4 normalMap;
+layout(location = 0) out vec4 oAlbedoAndGlossMap;
+layout(location = 1) out vec4 oNormalMap;
 
 #ifdef HAS_DIFFUSE_MAP
 	uniform sampler2D diffuseMap;
@@ -40,7 +39,7 @@ vec2 getNormal() {
 }
 
 void main(void) {
-	albedoAndGlossMap = vec4(getDiffuseColor(), getGloss());
-	normalMap = vec4(getNormal(), 0, 0);
+	oAlbedoAndGlossMap = vec4(getDiffuseColor(), getGloss());
+	oNormalMap = vec4(getNormal(), 0, 0);
 }
 

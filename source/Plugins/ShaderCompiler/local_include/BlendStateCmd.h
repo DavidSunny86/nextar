@@ -13,48 +13,24 @@
 
 namespace ShaderCompiler {
 /** BlendState {} */
-class BlendStateCmd: public CommandDelegate {
-public:
-	static BlendStateCmd command;
-	virtual void Execute(int parentType, void* parentParam,
-			ScriptParser::StatementContext& statement);
-protected:
-	~BlendStateCmd() {
-	}
-};
-
 class BlendStateListener: public ScriptParser::BlockListener,
 		public ScriptParser::StatementListener {
 public:
 	static CommandNamePair commands[];
 	static const size_t commandCount;
 	BlendState state;
-
+	
 	virtual void EnterBlock(ScriptParser::BlockContext& block);
 	virtual void EnterStatement(ScriptParser::StatementContext& statement);
+
+	static void BlendCmd_Execute(int parentType, void* parentParam,
+		ScriptParser::StatementContext& statement);
+	static void BlendTargetCmd_Execute(int parentType, void* parentParam,
+		ScriptParser::StatementContext& statement);
+
 protected:
-	friend class BlendStateCmd;
+	friend class PassListener;
 	~BlendStateListener() {
-	}
-};
-
-class BlendCmd: public CommandDelegate {
-public:
-	static BlendCmd command;
-	virtual void Execute(int parentType, void* parentParam,
-			ScriptParser::StatementContext& statement);
-protected:
-	~BlendCmd() {
-	}
-};
-
-struct BlendTargetCmd: public CommandDelegate {
-public:
-	static BlendTargetCmd command;
-	virtual void Execute(int parentType, void* parentParam,
-			ScriptParser::StatementContext& statement);
-protected:
-	~BlendTargetCmd() {
 	}
 };
 

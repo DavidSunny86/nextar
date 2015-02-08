@@ -31,6 +31,8 @@ enum VersionGL {
 	GLV_4_1,
 	GLV_4_2,
 	GLV_4_3,
+	GLV_4_4,
+	GLV_4_5,
 
 	GLV_MAX_VERSION
 };

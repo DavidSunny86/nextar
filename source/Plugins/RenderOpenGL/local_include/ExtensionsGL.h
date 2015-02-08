@@ -43,6 +43,10 @@ public:
 
 protected:
 
+	inline VersionGL GetContextVersion() const {
+		return GLE_version;
+	}
+
 	void _ReadyExtensions(uint16 major, uint16 minior);
 	static bool IsSupported(const char* ext_name, const char* p);
 	static void RequiredExtensionNotFound(const char* what);

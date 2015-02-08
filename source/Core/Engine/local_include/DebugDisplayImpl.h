@@ -39,8 +39,8 @@ public:
 
 protected:
 
-	void LoadMaterials();
-	void CreateAxisSystemData();
+	void LoadMaterials() {}
+	void CreateAxisSystemData() {}
 
 	StreamData axisData;
 	VisiblePrimitiveList alivePrimitives;

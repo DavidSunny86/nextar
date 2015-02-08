@@ -1,4 +1,3 @@
-#version 330
 
 uniform sampler2D depthMap;
 uniform sampler2D normalMap;

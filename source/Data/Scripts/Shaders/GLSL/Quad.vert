@@ -1,4 +1,3 @@
-#version 330
 
 smooth out vec2 texCoord;
 

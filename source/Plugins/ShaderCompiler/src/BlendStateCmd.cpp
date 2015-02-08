@@ -14,51 +14,31 @@
 
 namespace ShaderCompiler {
 
-BlendStateCmd BlendStateCmd::command;
-BlendCmd BlendCmd::command;
-BlendTargetCmd BlendTargetCmd::command;
 
 CommandNamePair BlendStateListener::commands[] = {
-		{ _SS(CMD_BLEND), &BlendCmd::command },
-		{ _SS(CMD_TARGET), &BlendTargetCmd::command },
+		{ _SS(CMD_BLEND), &BlendCmd_Execute },
+		{ _SS(CMD_TARGET), &BlendTargetCmd_Execute },
 };
 
 const size_t BlendStateListener::commandCount =
 		sizeof(BlendStateListener::commands)
 				/ sizeof(BlendStateListener::commands[0]);
 
-/**************************************************************
- * BlendState
- ***************************************************************/
-void BlendStateCmd::Execute(int parentType, void* parentParam,
-		ScriptParser::StatementContext& ctx) {
-	if (parentType == CommandDelegate::PASS_BLOCK) {
-		BlendStateListener blend;
-		ShaderTemplate::LoadStreamRequest* shader =
-				static_cast<ShaderScript*>(parentParam)->GetRequest();
-		ctx.ParseBlock(&blend);
-		if (!ctx.IsErrorBitSet()) {
-			shader->SetBlendState(blend.state);
-		}
-	} else {
-		ctx.Error("BlendState block needs to be inside Shader declaration.");
-	}
-}
 
 void BlendStateListener::EnterBlock(ScriptParser::BlockContext& ctx) {
 	ctx.ParseStatements(this);
 }
 
 void BlendStateListener::EnterStatement(ScriptParser::StatementContext& ctx) {
-	CommandDelegate* cmd = Helper::FindCommand(BlendStateListener::commands,
+	CommandDelegate_Execute cmd = Helper::FindCommand(BlendStateListener::commands,
 			BlendStateListener::commandCount, ctx.GetCommand());
 	if (cmd)
-		cmd->Execute(CommandDelegate::BLEND_STATE_BLOCK, &this->state, ctx);
+		cmd(CommandDelegateBlock::BLEND_STATE_BLOCK, &this->state, ctx);
 }
 
-void BlendCmd::Execute(int parentType, void* state,
+void BlendStateListener::BlendCmd_Execute(int parentType, void* state,
 		ScriptParser::StatementContext& ctx) {
-	NEX_ASSERT(parentType == CommandDelegate::BLEND_STATE_BLOCK);
+	NEX_ASSERT(parentType == CommandDelegateBlock::BLEND_STATE_BLOCK);
 	BlendState& blendState = *(static_cast<BlendState*>(state));
 	StringUtils::TokenIterator it = 0;
 	String value;
@@ -77,9 +57,9 @@ void BlendCmd::Execute(int parentType, void* state,
 	}
 }
 
-void BlendTargetCmd::Execute(int parentType, void* state,
+void BlendStateListener::BlendTargetCmd_Execute(int parentType, void* state,
 		ScriptParser::StatementContext& ctx) {
-	NEX_ASSERT(parentType == CommandDelegate::BLEND_STATE_BLOCK);
+	NEX_ASSERT(parentType == CommandDelegateBlock::BLEND_STATE_BLOCK);
 	BlendState& blendState = *(static_cast<BlendState*>(state));
 	uint32 targetIndex = 0;
 	StringUtils::TokenIterator it = 0;

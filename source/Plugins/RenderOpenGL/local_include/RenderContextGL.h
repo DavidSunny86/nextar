@@ -63,11 +63,11 @@ public:
 			VertexSemanticGL* inputSemantics);
 	/* Read uniform data */
 	void ReadUniforms(PassViewGL*, uint32 passIndex, GLuint program,
-			Pass::VarToAutoParamMap& remapParams,
+			const Pass::VarToAutoParamMap& remapParams,
 			ParamEntryTable*);
 	/* Read sampler information */
 	void ReadSamplers(PassViewGL*, uint32 passIndex, GLuint program,
-			Pass::VarToAutoParamMap& remapParams,
+		const Pass::VarToAutoParamMap& remapParams,
 			ParamEntryTable*, const Pass::TextureDescMap& texMap);
 
 	GLuint CreateBuffer(size_t size, GLenum usage, GLenum type);
@@ -136,11 +136,12 @@ public:
 
 protected:
 
+	void DetermineShaderTarget();
 	GLuint CreateSamplerFromParams(const TextureUnitParams& params);
 
 	UniformBufferGL* CreateUniformBuffer(PassViewGL* pass, uint32 passIndex,
 			const String& name, GLint blockIndex, GLuint prog, GLuint numParams,
-			uint32 size, Pass::VarToAutoParamMap& remapParams,
+			uint32 size, const Pass::VarToAutoParamMap& remapParams,
 			ParamEntryTable* paramTable);
 
 	enum {
@@ -164,6 +165,7 @@ protected:
 	virtual void SetCurrentWindow(RenderTarget* rt) = 0;
 
 	uint32 contextFlags;
+	String shaderTarget;
 	//GpuObjectTable gpuObjects;
 	/* uniform buffer table */
 	typedef unordered_map<String, UniformBufferGL>::type UniformBufferMap;

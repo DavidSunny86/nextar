@@ -1,26 +1,26 @@
 /*
- * ConstBufferGLSL.cpp
+ * TranslatorGLSL.cpp
  *
  *  Created on: 26-Oct-2014
  *      Author: obhi
  */
-#include <ConstBufferTranslator.h>
-#include <ConstBufferGLSL.h>
+#include <LanguageTranslator.h>
+#include <TranslatorGLSL.h>
 
 namespace ShaderCompiler {
 
-ConstBufferGLSL::ConstBufferGLSL() {
+TranslatorGLSL::TranslatorGLSL() {
 }
 
-ConstBufferGLSL::~ConstBufferGLSL() {
+TranslatorGLSL::~TranslatorGLSL() {
 }
 
-void ConstBufferGLSL::BeginBuffer(const String& name) {
+void TranslatorGLSL::BeginBuffer(const String& name) {
 	transientBuffer.clear();
 	transientBuffer += "uniform " + name + " {\n";
 }
 
-void ConstBufferGLSL::AddParam(ParamDataType dataType, const String& name,
+void TranslatorGLSL::AddParam(ParamDataType dataType, const String& name,
 		uint32 arrayCount) {
 	switch(dataType) {
 	case PDT_BOOL:
@@ -67,10 +67,21 @@ void ConstBufferGLSL::AddParam(ParamDataType dataType, const String& name,
 	transientBuffer += ";\n";
 }
 
-void ConstBufferGLSL::EndBuffer(ShaderScript* _script) {
-	transientBuffer += "}\n";
-	_script->AddRegion("cbuffer",  RenderManager::ShaderLanguage::SPP_GLSL,
+void TranslatorGLSL::EndBuffer(ShaderScript* _script) {
+	transientBuffer += "};\n";
+	_script->AddRegion(_SS(REG_CBUFFER), RenderManager::ShaderLanguage::SPP_GLSL,
 			std::move(transientBuffer));
+}
+
+void TranslatorGLSL::AddMacro(ShaderScript* script, const String& name) {
+	String val = "#define ";
+	val += name;
+	val += "\n";
+	script->AddRegion(_SS(REG_DEFINE), RenderManager::ShaderLanguage::SPP_GLSL,
+		std::move(val));
+}
+
+void TranslatorGLSL::AddPredefs(Pass::ProgramStage stage, ShaderScript* script) {
 }
 
 } /* namespace ShaderCompiler */

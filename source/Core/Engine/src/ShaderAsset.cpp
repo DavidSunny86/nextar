@@ -198,8 +198,7 @@ void ShaderAsset::StreamRequest::SetCompilationOptions(const String& options) {
 
 void ShaderAsset::StreamRequest::AddSamplerUnit(
 		TextureUnitParams& tu,
-		const String& unitNames,
-		TextureBase* texture) {
+		const String& unitNames) {
 	ShaderAsset* shader = static_cast<ShaderAsset*>(streamedObject);
 	Pass::TextureDescMap& defaultTextureUnits =
 			(*currentPass).compileParams.textureStates;
@@ -207,11 +206,6 @@ void ShaderAsset::StreamRequest::AddSamplerUnit(
 	Pass::SamplerDesc& sd = defaultTextureUnits.back();
 	sd.unitsBound = unitNames;
 	sd.texUnitParams = tu;
-	sd.defaultTexture = texture;
-	if (texture && texture->IsTextureAsset()) {
-		static_cast<TextureAsset*>(texture)->AddRef();
-		metaInfo.AddDependency(static_cast<TextureAsset*>(texture));
-	}
 }
 
 void ShaderAsset::StreamRequest::AddAutoNameMapping(const String& varName, AutoParamName name) {
@@ -243,6 +237,10 @@ void ShaderAsset::StreamRequest::SetParamterBuffer(ParameterBuffer&& data) {
 
 void ShaderAsset::StreamRequest::SetRenderQueueFlags(uint32 flags) {
 	renderQueueFlags = flags;
+}
+
+void ShaderAsset::StreamRequest::SetSemanticMap(const Pass::VarToAutoParamMap& m) {
+	(*currentPass).compileParams.autoNames = m;
 }
 
 } /* namespace nextar */

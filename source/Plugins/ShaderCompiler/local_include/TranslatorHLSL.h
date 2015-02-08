@@ -8,19 +8,23 @@
 #ifndef PLUGINS_SHADERCOMPILER_LOCAL_INCLUDE_CONSTBUFFERHLSL_H_
 #define PLUGINS_SHADERCOMPILER_LOCAL_INCLUDE_CONSTBUFFERHLSL_H_
 
-#include <ConstBufferTranslator.h>
+#include <LanguageTranslator.h>
 
 namespace ShaderCompiler {
 
-class ConstBufferHLSL :
-		public ConstBufferTranslatorImpl {
+class TranslatorHLSL :
+		public AllocGeneral,
+		public LanguageTranslatorIntf {
 public:
-	ConstBufferHLSL();
-	virtual ~ConstBufferHLSL();
+	TranslatorHLSL();
+	virtual ~TranslatorHLSL();
 
 	virtual void BeginBuffer(const String& name);
 	virtual void AddParam(ParamDataType dataType, const String& name, uint32 arrayCount);
 	virtual void EndBuffer(ShaderScript* _script);
+
+	virtual void AddMacro(ShaderScript* script, const String& name);
+	virtual void AddPredefs(Pass::ProgramStage stage, ShaderScript* script);
 
 protected:
 	String transientBuffer;

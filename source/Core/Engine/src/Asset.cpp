@@ -447,6 +447,11 @@ void AssetLoader::Serialize() {
 
 	if (!input && location != URL::Invalid) {
 		input = FileSystem::Instance().OpenRead(location);
+
+		if (!input) {
+			Error("Failed to open file: " + location.ToString());
+			return;
+		}
 	}
 
 	impl->Load(input, *this);
@@ -485,6 +490,11 @@ void AssetSaver::Serialize() {
 
 	if (!output && location != URL::Invalid) {
 		output = FileSystem::Instance().OpenWrite(location);
+
+		if (!output) {
+			Error("Failed to open file: " + location.ToString());
+			return;
+		}
 	}
 
 	impl->Save(output, *this);

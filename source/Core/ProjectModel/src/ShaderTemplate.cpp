@@ -134,11 +134,17 @@ void ShaderTemplate::LoadStreamRequest::SetDepthStencilState(
 	current->depthStencilState = state;
 }
 
-void ShaderTemplate::LoadStreamRequest::AddTextureUnit(const String& unitName,
-		TextureUnitParams& unit, URL& defaultTexturePath) {
-	auto& state = current->textureUnitStates[unitName];
-	state.defaultTexturePath = defaultTexturePath;
+void ShaderTemplate::LoadStreamRequest::AddSampler(const String& samplerName,
+		TextureUnitParams& unit) {
+	auto& state = current->textureUnitStates[samplerName];
 	state.params = unit;
+}
+
+void ShaderTemplate::LoadStreamRequest::AddTextureUnit(const String& unitName,
+	const String& samplerName) {
+	auto& state = current->textureUnitStates[samplerName];
+	state.unitsBound += ", ";
+	state.unitsBound += unitName;
 }
 
 void ShaderTemplate::LoadStreamRequest::AddParam(const String& param,
@@ -158,9 +164,11 @@ void ShaderTemplate::LoadStreamRequest::AddMacro(const String& param,
 	ShaderTemplate* shader = static_cast<ShaderTemplate*>(GetStreamedObject());
 	auto& macro = shader->macros[name];
 	if (macro.index == -1) {
+		auto namePair = StringUtils::Split(name, '.');
 		macro.index = (uint32)shader->macros.size();
-		macro.uiName = StringUtils::FormatName(name);
+		macro.uiName = StringUtils::FormatName(namePair.second);
 		macro.uiDescription = description;
+		macro.catagory = StringUtils::FormatName(namePair.first);
 	}
 }
 
@@ -193,12 +201,7 @@ void ShaderTemplate::ShaderFromTemplate::Load(InputStreamPtr& stream, AssetLoade
 		request->SetDepthStencilState(p.depthStencilState);
 		request->SetRasterState(p.rasterState);
 		for(auto& tu : p.textureUnitStates) {
-			if (tu.second.defaultTexturePath != URL::Invalid) {
-				StringID name = NamedObject::AsyncStringID(
-						tu.second.defaultTexturePath.GetComputedName());
-				tu.second.defaultTexture = TextureAsset::Traits::Instance(name, tu.second.defaultTexturePath);
-			}
-			request->AddSamplerUnit(tu.second.params, tu.first, tu.second.defaultTexture.GetPtr());
+			request->AddSamplerUnit(tu.second.params, tu.second.unitsBound);
 		}
 
 		auto range = p.sourceMap.equal_range(language);
@@ -206,8 +209,11 @@ void ShaderTemplate::ShaderFromTemplate::Load(InputStreamPtr& stream, AssetLoade
 			String sourceCpy = (*i).second.second;
 			request->SetProgramSource((*i).second.first, std::move(sourceCpy));
 		}
+
+		request->SetSemanticMap(p.semanticMap);
 	}
 
+	
 	request->SetRenderQueueFlags(parent->renderFlags);
 	request->SetCompleted(true);
 }

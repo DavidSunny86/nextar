@@ -24,6 +24,7 @@ enum ShaderFormatKeys : uint16 {
 	PASS_DEPTH_STATE = 0xde97,
 	PASS_RASTER_STATE = 0x6a57,
 	PASS_TEXTURE_STATE = 0x7e87,
+	PASS_SEMANTIC_MAP = 0x1fde,
 };
 
 struct ShaderHeader {

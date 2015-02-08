@@ -13,16 +13,11 @@
 using namespace nextar;
 namespace MaterialCompiler {
 
-class CommandDelegate {
-public:
-	virtual void Execute(void* parentParam, ScriptParser::StatementContext& statement) = 0;
-protected:
-	~CommandDelegate() {}
-};
+typedef void (*CommandDelegate_Execute) (void* parentParam, ScriptParser::StatementContext& statement);
 
 struct CommandNamePair {
 	const char* name;
-	CommandDelegate* command;
+	CommandDelegate_Execute command;
 };
 
 struct CommandNameCompare {
@@ -37,7 +32,7 @@ struct CommandNameCompare {
 
 class Helper {
 public:
-	static CommandDelegate* FindCommand(CommandNamePair cmdMap[],
+	static CommandDelegate_Execute FindCommand(CommandNamePair cmdMap[],
 			size_t arraySize, const String& name);
 };
 

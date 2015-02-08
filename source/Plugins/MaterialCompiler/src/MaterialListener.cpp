@@ -11,16 +11,12 @@
 
 namespace MaterialCompiler {
 
-OptionsCmd OptionsCmd::command;
-ShaderCmd ShaderCmd::command;
-ParamValueCmd ParamValueCmd::command;
-LayerCmd LayerCmd::command;
 CommandNamePair MaterialListener::commands[] = {
 //{ "AutoParam", &AutoParamCmd::command },
-		{ _SS(CMD_ENABLE_OPTIONS), &OptionsCmd::command },
-		{ _SS(CMD_LAYER), &LayerCmd::command },
-		{ _SS(CMD_PARAM_VALUE), &ParamValueCmd::command },
-		{ _SS(CMD_SHADER), &ShaderCmd::command },
+		{ _SS(CMD_ENABLE_OPTIONS), &OptionsCmd_Execute },
+		{ _SS(CMD_LAYER), &LayerCmd_Execute },
+		{ _SS(CMD_PARAM_VALUE), &ParamValueCmd_Execute },
+		{ _SS(CMD_SHADER), &ShaderCmd_Execute },
 };
 
 const size_t MaterialListener::commandCount = sizeof(MaterialListener::commands)
@@ -33,15 +29,15 @@ void MaterialListener::EnterBlock(
 
 
 void MaterialListener::EnterStatement(ScriptParser::StatementContext& ctx) {
-	CommandDelegate* cmd = Helper::FindCommand(MaterialListener::commands,
+	CommandDelegate_Execute cmd = Helper::FindCommand(MaterialListener::commands,
 			MaterialListener::commandCount, ctx.GetCommand());
 	if (cmd)
-		cmd->Execute(script, ctx);
+		cmd(script, ctx);
 	// todo else throw error command not supported
 }
 
 
-void ShaderCmd::Execute(void* state,
+void MaterialListener::ShaderCmd_Execute(void* state,
 		ScriptParser::StatementContext& ctx) {
 	MaterialTemplate::StreamRequest* material =
 				(reinterpret_cast<MaterialScript*>(state)->GetRequest());
@@ -62,7 +58,7 @@ void ShaderCmd::Execute(void* state,
 	material->SetShader(id, location);
 }
 
-void OptionsCmd::Execute(void* state,
+void MaterialListener::OptionsCmd_Execute(void* state,
 		ScriptParser::StatementContext& ctx) {
 	MaterialTemplate::StreamRequest* material =
 				(reinterpret_cast<MaterialScript*>(state)->GetRequest());
@@ -70,7 +66,7 @@ void OptionsCmd::Execute(void* state,
 	material->SetCompilationOptions(paramContext);
 }
 
-void ParamValueCmd::Execute(void* state,
+void MaterialListener::ParamValueCmd_Execute(void* state,
 		ScriptParser::StatementContext& ctx) {
 	MaterialTemplate::StreamRequest* material =
 				(reinterpret_cast<MaterialScript*>(state)->GetRequest());
@@ -90,7 +86,7 @@ void ParamValueCmd::Execute(void* state,
 	}
 }
 
-void LayerCmd::Execute(void* state,
+void MaterialListener::LayerCmd_Execute(void* state,
 		ScriptParser::StatementContext& ctx) {
 	MaterialTemplate::StreamRequest* material =
 				(reinterpret_cast<MaterialScript*>(state)->GetRequest());

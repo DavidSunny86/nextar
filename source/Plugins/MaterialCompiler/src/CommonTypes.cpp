@@ -14,12 +14,12 @@
 
 namespace MaterialCompiler {
 
-CommandDelegate* Helper::FindCommand(CommandNamePair cmdMap[], size_t arraySize,
+CommandDelegate_Execute Helper::FindCommand(CommandNamePair cmdMap[], size_t arraySize,
 		const String& name) {
 	CommandNamePair* ptr = std::lower_bound(cmdMap, cmdMap + arraySize, name,
 			CommandNameCompare());
-	if (ptr != cmdMap + arraySize)
-		return static_cast<CommandDelegate*>(ptr->command);
+	if (ptr != cmdMap + arraySize && !(name.compare(ptr->name) < 0))
+		return static_cast<CommandDelegate_Execute>(ptr->command);
 	return 0;
 }
 

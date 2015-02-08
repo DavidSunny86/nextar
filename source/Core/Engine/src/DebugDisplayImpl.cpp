@@ -17,6 +17,10 @@ DebugDisplayImpl::~DebugDisplayImpl() {
 
 }
 
+VisiblePrimitiveList& DebugDisplayImpl::GetPrimitives(CommitContext& context) {
+	return alivePrimitives;
+}
+
 void DebugDisplayImpl::Register(CommitContext& context, const AABox3& box,
 		const Color& color, float expiryTimeInSec) {
 }

@@ -23,7 +23,7 @@ public:
 	ShaderLoaderImplv1_0();
 	virtual ~ShaderLoaderImplv1_0();
 		
-	void ReadPass(ShaderAsset::StreamRequest* request, ChunkInputStream& ser);
+	bool ReadPass(ShaderAsset::StreamRequest* request, ChunkInputStream& ser);
 	virtual void Load(InputStreamPtr&, AssetLoader& loader);
 
 protected:

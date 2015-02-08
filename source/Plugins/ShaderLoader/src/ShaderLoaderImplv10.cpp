@@ -24,6 +24,7 @@ enum ShaderFormatKeys : uint16 {
 	PASS_DEPTH_STATE = 0xde97,
 	PASS_RASTER_STATE = 0x6a57,
 	PASS_TEXTURE_STATE = 0x7e87,
+	PASS_SEMANTIC_MAP = 0x1fde,
 };
 
 struct ShaderHeader {
@@ -39,7 +40,7 @@ ShaderLoaderImplv1_0::ShaderLoaderImplv1_0() : language(RenderManager::SPP_UNKNO
 ShaderLoaderImplv1_0::~ShaderLoaderImplv1_0() {
 }
 
-void ShaderLoaderImplv1_0::ReadPass(ShaderAsset::StreamRequest* request,
+bool ShaderLoaderImplv1_0::ReadPass(ShaderAsset::StreamRequest* request,
 		ChunkInputStream& ser) {
 	ShaderAsset* shader = static_cast<ShaderAsset*>(
 					request->GetStreamedObject());
@@ -51,7 +52,7 @@ void ShaderLoaderImplv1_0::ReadPass(ShaderAsset::StreamRequest* request,
 	ser >> header;
 	if (header != PASS_BLEND_STATE) {
 		Error("Shader does not have a valid blend state: " + request->GetName());
-		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
+		return false;
 	}
 	BlendState blendState;
 	ser >> blendState.enabled;
@@ -84,7 +85,7 @@ void ShaderLoaderImplv1_0::ReadPass(ShaderAsset::StreamRequest* request,
 	ser >> header;
 	if (header != PASS_DEPTH_STATE) {
 		Error("Shader does not have a valid depth state: " + request->GetName());
-		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
+		return false;
 	}
 	DepthStencilState depthStencilState;
 	uint8 depthCompareFunc;
@@ -114,7 +115,7 @@ void ShaderLoaderImplv1_0::ReadPass(ShaderAsset::StreamRequest* request,
 	ser >> header;
 	if (header != PASS_RASTER_STATE) {
 		Error("Shader does not have a valid raster state: " + request->GetName());
-		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
+		return false;
 	}
 	RasterState rasterState;
 	uint8 fill, cull;
@@ -134,7 +135,7 @@ void ShaderLoaderImplv1_0::ReadPass(ShaderAsset::StreamRequest* request,
 	ser >> header;
 	if (header != PASS_TEXTURE_STATE) {
 		Error("Shader does not have a valid texture state: " + request->GetName());
-		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
+		return false;
 	}
 	String unitName;
 	uint32 numUnits;
@@ -142,8 +143,8 @@ void ShaderLoaderImplv1_0::ReadPass(ShaderAsset::StreamRequest* request,
 	for(uint32 i = 0; i < numUnits; ++i) {
 		TextureUnitParams params;
 		uint8 minFilter, magFilter, uAddress, vAddress, wAddress, comparisonFunc, context, unitType;
-		
-		bool defaultTexture;
+		String unitsBound;
+
 		ser >> unitName
 			>> minFilter
 			>> magFilter
@@ -159,7 +160,7 @@ void ShaderLoaderImplv1_0::ReadPass(ShaderAsset::StreamRequest* request,
 			>> params.minLod
 			>> params.maxLod
 			>> params.borderColor
-			>> defaultTexture;
+			>> unitsBound;
 		params.minFilter = (TextureMinFilter)minFilter;
 		params.magFilter = (TextureMagFilter)magFilter;
 		params.uAddress = (TextureAddressMode)uAddress;
@@ -168,14 +169,22 @@ void ShaderLoaderImplv1_0::ReadPass(ShaderAsset::StreamRequest* request,
 		params.comparisonFunc = (TextureComparisonMode)comparisonFunc;
 		params.context = (ParameterContext)context;
 		params.unitType = (TextureUnitType)unitType;
-		TextureAssetPtr texture;
-		if (defaultTexture) {
-			URL locator;
-			TextureAsset::ID id;
-			ser >> id >> locator;
-			texture = TextureAsset::Traits::Instance(id, locator);
-		}
-		request->AddSamplerUnit(params, unitName, texture);
+		request->AddSamplerUnit(params, unitsBound);
+	}
+
+	ser >> header;
+	if (header != PASS_SEMANTIC_MAP) {
+		Error("Shader does not have a valid semantic map: " + request->GetName());
+		return false;
+	}
+
+	uint32 numEntries;
+	ser >> numEntries;
+	for (uint32 i = 0; i < numEntries; ++i) {
+		String varName; uint16 autoVal;
+		ser >> varName
+			>> autoVal;
+		request->AddAutoNameMapping(varName, (AutoParamName)autoVal);
 	}
 
 	std::array<ShaderFormatChunkHeaders, (uint32)RenderManager::SPP_COUNT> 	languageDumps;
@@ -193,7 +202,10 @@ void ShaderLoaderImplv1_0::ReadPass(ShaderAsset::StreamRequest* request,
 			ser >> stage >> source;
 			request->SetProgramSource((Pass::ProgramStage)stage, std::move(source));
 		}
-	}
+	} else
+		return false;
+
+	return true;
 }
 
 void ShaderLoaderImplv1_0::Load(InputStreamPtr& stream,
@@ -216,13 +228,15 @@ void ShaderLoaderImplv1_0::Load(InputStreamPtr& stream,
 		ser >> header.version;
 		if (!TestVersion(NEX_MAKE_VERSION(1,0,0), header.version)) {
 			Error("Shader is of higher version: " + request->GetName());
-			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
+			request->SetCompleted(false);
+			return;
 		}
 
 		ser >> header.numPasses >> header.numUnits >> header.renderFlags;
 	} else {
 		Error("Shader does not have a valid header: " + request->GetName());
-		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
+		request->SetCompleted(false);
+		return;
 	}
 	request->SetRenderQueueFlags(header.renderFlags);
 
@@ -233,7 +247,10 @@ void ShaderLoaderImplv1_0::Load(InputStreamPtr& stream,
 		if (InputSerializer::IsValid(chunk)) {
 			switch (chunk.first.first) {
 			case SHADER_PASS_BLOCK:
-				ReadPass(request, ser);
+				if (!ReadPass(request, ser)) {
+					request->SetCompleted(false);
+					return;
+				}
 				break;
 			case SHADER_UNIT:
 				ser >> name;
@@ -247,14 +264,18 @@ void ShaderLoaderImplv1_0::Load(InputStreamPtr& stream,
 			}
 		} else {
 			Error(String("File is corrupt: ") + request->GetName());
-			NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
+			request->SetCompleted(false);
+			return;
 		}
 	} while (!ser.IsEndOfStream());
 
 	if (!foundUnit) {
 		Error(String("Could not find shader unit in file: ") + request->GetName());
-		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
+		request->SetCompleted(false);
+		return;
 	}
+
+	request->SetCompleted(true);
 }
 
 } /* namespace ShaderLoader */

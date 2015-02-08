@@ -1,11 +1,11 @@
 
-cbuffer ObjectTransforms:OBJECTTRANSFORMS {
-	var mat4 matMvp;
-	var mat4 matMv; // assumed orthogonal
+cbuffer ObjectTransforms:OBJECTTRANSFORM {
+	var mat4x4 matMvp;
+	var mat4x4 matMv; // assumed orthogonal
 };
 
-cbuffer MaterialProperty {
-	update_on new_material;
-	var vec4 diffuseAndGloss DiffuseColorAndGloss;
+cbuffer MaterialProperty context:Material {
+
+	var vec4 diffuseAndGloss ui:ObjectProperties.DiffuseColorAndGloss "desc:Object specific color and gloss factor";
 };
 

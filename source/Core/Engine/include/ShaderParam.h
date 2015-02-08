@@ -70,7 +70,6 @@ public:
 
 	ParameterContext context;
 	static uint32 stride;
-	TextureUnit defaultTexture;
 };
 
 class _NexEngineAPI ParameterGroup: public ShaderParameter {

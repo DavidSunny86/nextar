@@ -9,6 +9,7 @@
 #define SHADERSCRIPT_H_
 
 #include <CommonTypes.h>
+#include <LanguageTranslator.h>
 
 namespace ShaderCompiler {
 
@@ -38,6 +39,9 @@ class ShaderScript: public ScriptParser::RegionListener,
 	StringUtils::WordList cbufferIncludePath;
 	ShaderTemplate::LoadStreamRequest* shader;
 	SourceRegionMap regions;
+	LanguageTranslator translator;
+	bool activeStages[Pass::ProgramStage::STAGE_COUNT];
+
 public:
 
 	ShaderScript(ShaderTemplate::LoadStreamRequest* s);
@@ -46,6 +50,18 @@ public:
 
 	inline ShaderTemplate::LoadStreamRequest* GetRequest() {
 		return shader;
+	}
+
+	inline LanguageTranslator& GetTranslator() {
+		return translator;
+	}
+
+	inline bool IsStageActive(Pass::ProgramStage stage) const {
+		return activeStages[(uint32)stage];
+	}
+
+	inline void SetStageActive(Pass::ProgramStage stage, bool active) {
+		activeStages[(uint32)stage] = active;
 	}
 
 	InputStreamPtr FetchConstBuffer(const String& name);

@@ -43,14 +43,14 @@ bool ScriptParser::ParseScript(ScriptListener* listener,
  */
 ScriptParser::ScriptContext::ScriptContext(const String& _scriptName,
 		StreamLexer& _lexer) :
-		scriptName(_scriptName), lexer(_lexer) {
+		scriptName(_scriptName), lexer(_lexer), blockLevel(0) {
 }
 
 void ScriptParser::ScriptContext::ParseRegions(RegionListener* listener) {
 	RegionContext context(*this);
 
 	/* read individual regions */
-	while (!lexer.IsEndOfStream()) {
+	while (!lexer.IsEndOfStream() && !IsErrorBitSet()) {
 		lexer.SkipWhite();
 		switch (lexer.Current()) {
 		case '@':
@@ -159,7 +159,7 @@ ScriptParser::BlockContext::BlockContext(ScriptContext& _scriptContext) :
 void ScriptParser::BlockContext::ParseStatements(StatementListener* listener) {
 	StatementContext statement(*this, scriptContext);
 
-	while (!scriptContext.lexer.IsEndOfStream()) {
+	while (!scriptContext.lexer.IsEndOfStream() && !IsErrorBitSet()) {
 		scriptContext.lexer.SkipWhite();
 		switch (scriptContext.lexer.Current()) {
 		case ';':
@@ -170,6 +170,7 @@ void ScriptParser::BlockContext::ParseStatements(StatementListener* listener) {
 			break;
 		case '}':
 		case 0:
+			scriptContext.DecLevel();
 			return;
 		case '/': // comment
 			scriptContext.lexer.Forward();
@@ -186,12 +187,14 @@ void ScriptParser::BlockContext::ParseStatements(StatementListener* listener) {
 				scriptContext.Error("expected command name.");
 				break;
 			}
+			bool terminated = false;
 			bool wellFormed = false;
 			while (!scriptContext.lexer.IsEndOfStream()) {
 				// ParameterContext
 				scriptContext.lexer.SkipWhite();
 				switch (scriptContext.lexer.Current()) {
 				case ';':
+					terminated = true;
 					scriptContext.lexer.Forward();
 					/* no break */
 				case '{':
@@ -209,12 +212,29 @@ void ScriptParser::BlockContext::ParseStatements(StatementListener* listener) {
 				}
 				break;
 			}
+
+			uint32 savedLevel = scriptContext.GetLevel();
 			if (!wellFormed) {
 				scriptContext.Error(
 						"malformed statement, expected ';' or '{'.");
-			}
+			} else if (!terminated)
+				scriptContext.IncLevel();
+
+
 			if (listener)
 				listener->EnterStatement(statement);
+
+			uint32 curLevel = scriptContext.GetLevel();
+			while (savedLevel != curLevel &&
+				  !scriptContext.lexer.IsEndOfStream() && !IsErrorBitSet()) {
+				// the listener did not respond well to the statement, we should skip
+				// the parts which did not work and continue parsing
+				scriptContext.lexer.Forward();
+				if (scriptContext.lexer.Current() == '}')
+					--curLevel;
+				else if (scriptContext.lexer.Current() == '{')
+					++curLevel;
+			}
 			continue;
 		}
 		break;
@@ -241,7 +261,7 @@ const StringUtils::WordList& ScriptParser::StatementContext::GetParamList() cons
 void ScriptParser::StatementContext::ParseBlock(BlockListener* listener) {
 	BlockContext blockContext(scriptContext);
 	int openCount = 0;
-	while (!scriptContext.lexer.IsEndOfStream()) {
+	while (!scriptContext.lexer.IsEndOfStream() && !IsErrorBitSet()) {
 		scriptContext.lexer.SkipWhite();
 		switch (scriptContext.lexer.Forward()) {
 		case '{':
@@ -258,6 +278,21 @@ void ScriptParser::StatementContext::ParseBlock(BlockListener* listener) {
 			break;
 		}
 	}
+}
+
+String ScriptParser::StatementContext::GetTaggedParamVal(const String& tag, 
+	StringUtils::TokenIterator it) {
+	String value;
+	while (it != String::npos) {
+		it = StringUtils::NextWord(paramContext, value, it);
+		if (value.length()) {
+			StringPair tagVal = StringUtils::Split(value, ':');
+			if (tagVal.first == tag) {
+				return tagVal.second;
+			}
+		}
+	}
+	return StringUtils::Null;
 }
 
 void ScriptParser::StatementContext::_Clear() {

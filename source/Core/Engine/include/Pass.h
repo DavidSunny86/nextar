@@ -46,16 +46,9 @@ public:
 	};
 
 	struct SamplerDesc {
-		// comma seperated units bound to this sampler
+		// comma/space seperated units bound to this sampler
 		String unitsBound;
 		TextureUnitParams texUnitParams;
-		TextureBase* defaultTexture;
-		~SamplerDesc() {
-			if (defaultTexture && defaultTexture->IsTextureAsset()) {
-				static_cast<TextureAsset*>(defaultTexture)->Release();
-				defaultTexture = nullptr;
-			}
-		}
 	};
 
 	typedef vector<SamplerDesc>::type TextureDescMap;

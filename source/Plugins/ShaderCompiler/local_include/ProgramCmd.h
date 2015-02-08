@@ -12,15 +12,6 @@
 
 namespace ShaderCompiler {
 class ShaderScript;
-class ProgramCmd: public CommandDelegate {
-public:
-	static ProgramCmd command;
-	virtual void Execute(int parentType, void* parentParam,
-			ScriptParser::StatementContext& statement);
-protected:
-	~ProgramCmd() {
-	}
-};
 
 class ProgramListener: public ScriptParser::BlockListener,
 		public ScriptParser::StatementListener {
@@ -31,40 +22,29 @@ public:
 	inline ProgramListener(ShaderScript* s) :
 			shaderScript(s) {
 	}
-	virtual void EnterBlock(ScriptParser::BlockContext& block);
-	virtual void EnterStatement(ScriptParser::StatementContext& statement);
-protected:
-	friend class ProgramCmd;
 	~ProgramListener() {
 	}
-};
+	virtual void EnterBlock(ScriptParser::BlockContext& block);
+	virtual void EnterStatement(ScriptParser::StatementContext& statement);
 
-class ParamCmd: public CommandDelegate {
-public:
-	static ParamCmd command;
-	virtual void Execute(int parentType, void* parentParam,
-			ScriptParser::StatementContext& statement);
-protected:
-	~ParamCmd() {
-	}
-};
+	static void ParamCmd_Execute(int parentType, void* parentParam,
+		ScriptParser::StatementContext& statement);
 
-class ShaderCmd: public CommandDelegate {
-public:
-	ShaderCmd(const char* _shaderName, Pass::ProgramStage _stage) : shaderStageName(_shaderName),
-	stage(_stage) {};
-	static ShaderCmd commandVertex;
-	static ShaderCmd commandFragment;
-	static ShaderCmd commandGeometry;
-	static ShaderCmd commandHull;
-	static ShaderCmd commandDomain;
-	virtual void Execute(int parentType, void* parentParam,
-			ScriptParser::StatementContext& statement);
+	static void DomainCmd_Execute(int parentType, void* parentParam,
+		ScriptParser::StatementContext& statement);
+	static void GeometryCmd_Execute(int parentType, void* parentParam,
+		ScriptParser::StatementContext& statement);
+	static void HullCmd_Execute(int parentType, void* parentParam,
+		ScriptParser::StatementContext& statement);
+	static void FragmentCmd_Execute(int parentType, void* parentParam,
+		ScriptParser::StatementContext& statement);
+	static void VertexCmd_Execute(int parentType, void* parentParam,
+		ScriptParser::StatementContext& statement);
+
+	static void ShaderCmd_Execute(ShaderScript* script, ScriptParser::StatementContext& statement, Pass::ProgramStage stage);
 protected:
-	~ShaderCmd() {
-	}
-	const char* shaderStageName;
-	Pass::ProgramStage stage;
+	friend class ProgramCmd;
+
 };
 
 } /* namespace ShaderCompiler */

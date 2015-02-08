@@ -330,7 +330,6 @@ void FbxMeshLoaderImplv1_0::CreatePrimitiveGroupFrom(FbxSurfaceMaterial* pMtl,
 	int colorCount = pMesh->GetElementVertexColorCount();
 
 	MeshBuffer* pBuffer = NEX_NEW(MeshBuffer(PrimitiveType::PT_TRI_LIST));
-	pBuffer = NEX_NEW(MeshBuffer(PrimitiveType::PT_TRI_LIST));
 	pBuffer->AddVertexChannel(COMP_POSITION, 0, COMP_TYPE_FLOAT3);
 	if (normalCount > 0)
 		pBuffer->AddVertexChannel(COMP_NORMAL, 0, COMP_TYPE_FLOAT3);

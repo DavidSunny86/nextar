@@ -54,26 +54,23 @@ enum FilterType {
 	NFX_LINEAR_MIPMAP_LINEAR
 };
 
-class CommandDelegate {
-public:
-	enum {
-		INVALID_TYPE = -1,
-		SHADER_BLOCK,
-		PASS_BLOCK,
-		DEPTH_STENCIL_BLOCK,
-		BLEND_STATE_BLOCK,
-		RASTER_STATE_BLOCK,
-		TEXTURE_STATE_BLOCK,
-	};
-
-	virtual void Execute(int parentType, void* parentParam,
-			ScriptParser::StatementContext& statement) = 0;
-
+enum CommandDelegateBlock {
+	INVALID_TYPE = -1,
+	SHADER_BLOCK,
+	PASS_BLOCK,
+	DEPTH_STENCIL_BLOCK,
+	BLEND_STATE_BLOCK,
+	RASTER_STATE_BLOCK,
+	TEXTURE_STATE_BLOCK,
 };
+
+typedef void (*CommandDelegate_Execute) (int parentType, void* parentParam,
+			ScriptParser::StatementContext& statement);
+
 
 struct CommandNamePair {
 	const char* name;
-	CommandDelegate* command;
+	CommandDelegate_Execute command;
 };
 
 struct CommandNameCompare {
@@ -88,7 +85,7 @@ struct CommandNameCompare {
 
 class Helper {
 public:
-	static CommandDelegate* FindCommand(CommandNamePair cmdMap[],
+	static CommandDelegate_Execute FindCommand(CommandNamePair cmdMap[],
 			size_t arraySize, const String& name);
 	static ComparisonFunc GetComparisonFunc(const String& val);
 	static StencilOp GetStencilOp(const String& val);

@@ -16,9 +16,9 @@ shader Deferred {
 				address_v clamp;
 			}
 			
-			unit linear_sampler diffuseMap DiffuseMap;
-			unit linear_sampler specularMap SpecularMap;
-			unit linear_sampler normalMap NormalMap;
+			unit linear_sampler diffuseMap ui:Maps.DiffuseMap;
+			unit linear_sampler specularMap ui:Maps.SpecularMap;
+			unit linear_sampler normalMap ui:Maps.NormalMap;
 		}
 
 		depth_stencil_state {
@@ -38,8 +38,8 @@ shader Deferred {
 		
 
 		program {
-			option HAS_DIFFUSE_MAP HasDiffuseMap;
-			define HAS_NORMAL
+			option HAS_DIFFUSE_MAP ui:Options.HasDiffuseMap "desc:Apply diffuse map.";
+			define HAS_NORMAL;
 			vertex_program PreConfig Common PostConfig Deferred;
 			fragment_program Deferred;
 		}

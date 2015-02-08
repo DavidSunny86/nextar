@@ -14,56 +14,33 @@
 
 namespace ShaderCompiler {
 
-RasterStateCmd RasterStateCmd::command;
-AntiAliasingCmd AntiAliasingCmd::command;
-DepthBiasCmd DepthBiasCmd::command;
-DepthClipCmd DepthClipCmd::command;
-RasterCmd RasterCmd::command;
-ScissorCmd ScissorCmd::command;
 
 CommandNamePair RasterStateListener::commands[] = {
-		{ _SS(CMD_ANTI_ALIASING), &AntiAliasingCmd::command },
-		{ _SS(CMD_DEPTH_BIAS), &DepthBiasCmd::command },
-		{ _SS(CMD_DEPTH_CLIP), &DepthClipCmd::command },
-		{ _SS(CMD_RASTER), &RasterCmd::command },
-		{ _SS(CMD_SCISSOR), &ScissorCmd::command },
+	{ _SS(CMD_ANTI_ALIASING), &AntiAliasingCmd_Execute },
+	{ _SS(CMD_DEPTH_BIAS), &DepthBiasCmd_Execute },
+	{ _SS(CMD_DEPTH_CLIP), &DepthClipCmd_Execute },
+	{ _SS(CMD_RASTER), &RasterCmd_Execute },
+	{ _SS(CMD_SCISSOR), &ScissorCmd_Execute },
 };
 
 const size_t RasterStateListener::commandCount =
 		sizeof(RasterStateListener::commands)
 				/ sizeof(RasterStateListener::commands[0]);
-/**************************************************************
- * RasterState
- ***************************************************************/
-void RasterStateCmd::Execute(int parentType, void* parentParam,
-		ScriptParser::StatementContext& ctx) {
-	if (parentType == CommandDelegate::PASS_BLOCK) {
-		RasterStateListener raster;
-		ShaderTemplate::LoadStreamRequest* shader =
-				static_cast<ShaderScript*>(parentParam)->GetRequest();
-		ctx.ParseBlock(&raster);
-		if (!ctx.IsErrorBitSet()) {
-			shader->SetRasterState(raster.state);
-		}
-	} else {
-		ctx.Error("RasterState block needs to be inside Shader declaration.");
-	}
-}
 
 void RasterStateListener::EnterBlock(ScriptParser::BlockContext& ctx) {
 	ctx.ParseStatements(this);
 }
 
 void RasterStateListener::EnterStatement(ScriptParser::StatementContext& ctx) {
-	CommandDelegate* cmd = Helper::FindCommand(RasterStateListener::commands,
+	CommandDelegate_Execute cmd = Helper::FindCommand(RasterStateListener::commands,
 			RasterStateListener::commandCount, ctx.GetCommand());
 	if (cmd)
-		cmd->Execute(CommandDelegate::RASTER_STATE_BLOCK, &this->state, ctx);
+		cmd(CommandDelegateBlock::RASTER_STATE_BLOCK, &this->state, ctx);
 }
 
-void RasterCmd::Execute(int parentType, void* state,
+void RasterStateListener::RasterCmd_Execute(int parentType, void* state,
 		ScriptParser::StatementContext& ctx) {
-	NEX_ASSERT(parentType == CommandDelegate::RASTER_STATE_BLOCK);
+	NEX_ASSERT(parentType == CommandDelegateBlock::RASTER_STATE_BLOCK);
 	RasterState& rasterState = *(static_cast<RasterState*>(state));
 	StringUtils::TokenIterator it = 0;
 	String value;
@@ -82,9 +59,9 @@ void RasterCmd::Execute(int parentType, void* state,
 	}
 }
 
-void ScissorCmd::Execute(int parentType, void* state,
+void RasterStateListener::ScissorCmd_Execute(int parentType, void* state,
 		ScriptParser::StatementContext& ctx) {
-	NEX_ASSERT(parentType == CommandDelegate::RASTER_STATE_BLOCK);
+	NEX_ASSERT(parentType == CommandDelegateBlock::RASTER_STATE_BLOCK);
 	RasterState& rasterState = *(static_cast<RasterState*>(state));
 	StringUtils::TokenIterator it = 0;
 	String value;
@@ -95,9 +72,9 @@ void ScissorCmd::Execute(int parentType, void* state,
 	}
 }
 
-void AntiAliasingCmd::Execute(int parentType, void* state,
+void RasterStateListener::AntiAliasingCmd_Execute(int parentType, void* state,
 		ScriptParser::StatementContext& ctx) {
-	NEX_ASSERT(parentType == CommandDelegate::RASTER_STATE_BLOCK);
+	NEX_ASSERT(parentType == CommandDelegateBlock::RASTER_STATE_BLOCK);
 	RasterState& rasterState = *(static_cast<RasterState*>(state));
 	StringUtils::TokenIterator it = 0;
 	String value;
@@ -112,9 +89,9 @@ void AntiAliasingCmd::Execute(int parentType, void* state,
 	}
 }
 
-void DepthClipCmd::Execute(int parentType, void* state,
+void RasterStateListener::DepthClipCmd_Execute(int parentType, void* state,
 		ScriptParser::StatementContext& ctx) {
-	NEX_ASSERT(parentType == CommandDelegate::RASTER_STATE_BLOCK);
+	NEX_ASSERT(parentType == CommandDelegateBlock::RASTER_STATE_BLOCK);
 	RasterState& rasterState = *(static_cast<RasterState*>(state));
 	StringUtils::TokenIterator it = 0;
 	String value;
@@ -125,9 +102,9 @@ void DepthClipCmd::Execute(int parentType, void* state,
 	}
 }
 
-void DepthBiasCmd::Execute(int parentType, void* state,
+void RasterStateListener::DepthBiasCmd_Execute(int parentType, void* state,
 		ScriptParser::StatementContext& ctx) {
-	NEX_ASSERT(parentType == CommandDelegate::RASTER_STATE_BLOCK);
+	NEX_ASSERT(parentType == CommandDelegateBlock::RASTER_STATE_BLOCK);
 	RasterState& rasterState = *(static_cast<RasterState*>(state));
 	StringUtils::TokenIterator it = 0;
 	String value;

@@ -57,6 +57,14 @@ VersionGL RenderDriverGL::ExtractVersion(uint16 maj, uint16 min) {
 			return RenderOpenGL::GLV_4_0;
 		case 1:
 			return RenderOpenGL::GLV_4_1;
+		case 2:
+			return RenderOpenGL::GLV_4_2;
+		case 3:
+			return RenderOpenGL::GLV_4_3;
+		case 4:
+			return RenderOpenGL::GLV_4_4;
+		case 5:
+			return RenderOpenGL::GLV_4_5;
 		}
 		break;
 	}

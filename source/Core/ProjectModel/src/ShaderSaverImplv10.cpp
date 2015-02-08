@@ -82,7 +82,6 @@ void ShaderSaverImplv1_0::SavePass(const ShaderTemplate::PassUnit& pu,
 	uint32 numUnits = (uint32)tuMap.size();
 	ser << numUnits;
 	for(auto& e : tuMap) {
-		bool defaultTexture = e.second.defaultTexture;
 		ser << e.first
 			<< (uint8)e.second.params.minFilter
 			<< (uint8)e.second.params.magFilter
@@ -98,12 +97,16 @@ void ShaderSaverImplv1_0::SavePass(const ShaderTemplate::PassUnit& pu,
 			<< e.second.params.minLod
 			<< e.second.params.maxLod
 			<< e.second.params.borderColor
-			<< defaultTexture;
-		if (defaultTexture) {
-			TextureAsset::ID id;
-			e.second.defaultTexture->GetID(id);
-			ser << id << e.second.defaultTexturePath;
-		}
+			<< e.second.unitsBound;
+	}
+	
+
+	uint32 numEntries = (uint32)pu.semanticMap.size();
+	ser << (uint16)PASS_SEMANTIC_MAP;
+	ser << numEntries;
+	for (auto& e : pu.semanticMap) {
+		ser << e.first
+			<< (uint16)e.second;
 	}
 
 	auto& srcMap = pu.sourceMap;

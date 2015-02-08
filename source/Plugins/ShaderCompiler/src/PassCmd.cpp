@@ -15,71 +15,124 @@
 #include <ScriptStrings.h>
 #include <ProgramCmd.h>
 #include <PassCmd.h>
-#include <ConstBufferCmd.h>
 
 namespace ShaderCompiler {
-
-PassCmd PassCmd::command;
 
 /**************************************************************
  * Command Map
  **************************************************************/
 CommandNamePair PassListener::commands[] = {
-		{ _SS(CMD_BLEND_STATE), &BlendStateCmd::command },
-		{ _SS(CMD_CBUFFER), &ConstBufferCmd::command },
-		{ _SS(CMD_DEPTH_STENCIL_STATE), &DepthStencilStateCmd::command },
-		{ _SS(CMD_PROGRAM), &ProgramCmd::command },
-		{ _SS(CMD_RASTER_STATE), &RasterStateCmd::command },
-		{ _SS(CMD_TEXTURE_STATE), &TextureUnitStateCmd::command },
+		{ _SS(CMD_BLEND_STATE), &BlendStateCmd_Execute },
+		{ _SS(CMD_CBUFFER), &ConstBufferCmd_Execute },
+		{ _SS(CMD_DEPTH_STENCIL_STATE), &DepthStencilStateCmd_Execute },
+		{ _SS(CMD_PROGRAM), &ProgramCmd_Execute },
+		{ _SS(CMD_RASTER_STATE), &RasterStateCmd_Execute },
+		{ _SS(CMD_TEXTURE_STATE), &TextureUnitStateCmd_Execute },
 };
 
 const size_t PassListener::commandCount = sizeof(PassListener::commands)
 		/ sizeof(PassListener::commands[0]);
 
 /**************************************************************
- * PassCmd
- **************************************************************/
-void PassCmd::Execute(int parentType, void* parentParam,
-		ScriptParser::StatementContext& ctx) {
-	if (parentType == CommandDelegate::SHADER_BLOCK) {
-		String name;
-		StringUtils::NextWord(ctx.GetParamList(), name);
-		auto shaderScript = static_cast<ShaderScript*>(parentParam);
-		PassListener pass(shaderScript, name);
-		ctx.ParseBlock(&pass);
-		// create sources from regions
-		CreateSourcesFromRegions(shaderScript);
+* BlendState
+***************************************************************/
+void PassListener::BlendStateCmd_Execute(int parentType, void* parentParam,
+	ScriptParser::StatementContext& ctx) {
+	if (parentType == CommandDelegateBlock::PASS_BLOCK) {
+		BlendStateListener blend;
+		ShaderTemplate::LoadStreamRequest* shader =
+			static_cast<ShaderScript*>(parentParam)->GetRequest();
+		ctx.ParseBlock(&blend);
+		if (!ctx.IsErrorBitSet()) {
+			shader->SetBlendState(blend.state);
+		}
 	} else {
 		ctx.Error("BlendState block needs to be inside Shader declaration.");
 	}
 }
 
-void PassCmd::CreateSourcesFromRegions(ShaderScript* shaderScript) {
-	String cbuffer = _SS(CMD_CBUFFER);
-	for(uint32 i = 0; i < Pass::STAGE_COUNT; ++i) {
-		StringUtils::WordList words;
-		String src;
 
-		switch((Pass::ProgramStage)i) {
-		case Pass::ProgramStage::STAGE_DOMAIN:
-			src = _SS(CMD_DOMAIN_PROG); break;
-		case Pass::ProgramStage::STAGE_VERTEX:
-			src = _SS(CMD_VERTEX_PROG); break;
-		case Pass::ProgramStage::STAGE_FRAGMENT:
-			src = _SS(CMD_FRAGMENT_PROG); break;
-		case Pass::ProgramStage::STAGE_HULL:
-			src = _SS(CMD_HULL_PROG); break;
-		case Pass::ProgramStage::STAGE_GEOMETRY:
-			src = _SS(CMD_GEOMETRY_PROG); break;
+/**************************************************************
+* ConstBuffer
+**************************************************************/
+void PassListener::ConstBufferCmd_Execute(int parentType, void* parentParam,
+	ScriptParser::StatementContext& ctx) {
 
-		}
-		StringUtils::PushBackWord(words, cbuffer);
-		StringUtils::PushBackWord(words, src);
-		shaderScript->SetRegionsAsSource(Pass::STAGE_VERTEX, words);
-		shaderScript->RemoveRegion(src);
+	ShaderScript* script = static_cast<ShaderScript*>(parentParam);
+	String name;
+	StringUtils::NextWord(ctx.GetParamList(), name);
+
+	InputStreamPtr file = script->FetchConstBuffer(name);
+
+	if (file) {
+		script->GetTranslator().TranslateConstantBuffer(script, name, file);
+	} else {
+		ctx.Error("Could not load cbuffer: " + name);
 	}
+}
 
-	shaderScript->RemoveRegion(cbuffer);
+/**************************************************************
+* DepthStencil
+**************************************************************/
+void PassListener::DepthStencilStateCmd_Execute(int parentType, void* parentParam,
+	ScriptParser::StatementContext& ctx) {
+	if (parentType == CommandDelegateBlock::PASS_BLOCK) {
+		DepthStencilStateListener depthStencil;
+		ShaderTemplate::LoadStreamRequest* shader =
+			static_cast<ShaderScript*>(parentParam)->GetRequest();
+		ctx.ParseBlock(&depthStencil);
+		if (!ctx.IsErrorBitSet()) {
+			shader->SetDepthStencilState(depthStencil.state);
+		}
+	} else {
+		ctx.Error(
+			"DepthStencilState block needs to be inside Shader declaration.");
+	}
+}
+
+/**************************************************************
+* Program
+**************************************************************/
+void PassListener::ProgramCmd_Execute(int parentType, void* parentParam,
+	ScriptParser::StatementContext& ctx) {
+	if (parentType == CommandDelegateBlock::PASS_BLOCK) {
+		ProgramListener programListener(reinterpret_cast<ShaderScript*>(parentParam));
+		ctx.ParseBlock(&programListener);
+	} else {
+		ctx.Error("Program block needs to be inside Shader declaration.");
+	}
+}
+
+/**************************************************************
+* RasterState
+***************************************************************/
+void PassListener::RasterStateCmd_Execute(int parentType, void* parentParam,
+	ScriptParser::StatementContext& ctx) {
+	if (parentType == CommandDelegateBlock::PASS_BLOCK) {
+		RasterStateListener raster;
+		ShaderTemplate::LoadStreamRequest* shader =
+			static_cast<ShaderScript*>(parentParam)->GetRequest();
+		ctx.ParseBlock(&raster);
+		if (!ctx.IsErrorBitSet()) {
+			shader->SetRasterState(raster.state);
+		}
+	} else {
+		ctx.Error("RasterState block needs to be inside Shader declaration.");
+	}
+}
+
+/**************************************************************
+* TextureUnitState
+**************************************************************/
+void PassListener::TextureUnitStateCmd_Execute(int parentType, void* parentParam,
+	ScriptParser::StatementContext& ctx) {
+	if (parentType == CommandDelegateBlock::PASS_BLOCK) {
+		ShaderScript* script = reinterpret_cast<ShaderScript*>(parentParam);
+		TextureUnitStateListener textureUnitState(script->GetRequest());
+		ctx.ParseBlock(&textureUnitState);
+	} else {
+		ctx.Error("TextureState block needs to be inside Shader declaration.");
+	}
 }
 
 /**************************************************************
@@ -95,10 +148,10 @@ void PassListener::EnterBlock(ScriptParser::BlockContext& ctx) {
 }
 
 void PassListener::EnterStatement(ScriptParser::StatementContext& ctx) {
-	CommandDelegate* cmd = Helper::FindCommand(PassListener::commands,
+	CommandDelegate_Execute cmd = Helper::FindCommand(PassListener::commands,
 			PassListener::commandCount, ctx.GetCommand());
 	if (cmd)
-		cmd->Execute(CommandDelegate::PASS_BLOCK, shaderScript, ctx);
+		cmd(CommandDelegateBlock::PASS_BLOCK, shaderScript, ctx);
 	else
 		ctx.Error("Command not supported: " + ctx.GetCommand());
 }

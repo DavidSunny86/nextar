@@ -23,6 +23,9 @@ ShaderScript::ShaderScript(ShaderTemplate::LoadStreamRequest* s) :
 	StringUtils::PushBackWord(programIncludePath, FileSystem::ArchiveEngineData + "/Scripts/Shaders/");
 	StringUtils::PushBackWord(cbufferIncludePath, cbufferPath);
 	StringUtils::PushBackWord(cbufferIncludePath, FileSystem::ArchiveEngineData + "/Scripts/ConstBuffers/");
+
+	for (uint32 i = 0; i < (uint32)Pass::ProgramStage::STAGE_COUNT; ++i)
+		activeStages[i] = false;
 }
 
 void ShaderScript::SetRegionsAsSource(Pass::ProgramStage type,
@@ -32,9 +35,6 @@ void ShaderScript::SetRegionsAsSource(Pass::ProgramStage type,
 	String value[(uint32)RenderManager::ShaderLanguage::SPP_COUNT];
 	while ((regIt = StringUtils::NextWord(regionNames, name, regIt)) != String::npos) {
 		auto it = regions.equal_range(name);
-		if (it.first == regions.end()) {
-			return;
-		}
 		for(; it.first != it.second; ++it.first) {
 			value[(*it.first).second.first] += (*it.first).second.second;
 		}
@@ -99,19 +99,20 @@ InputStreamPtr ShaderScript::FetchConstBuffer(const String& name) {
 			return retFile;
 	}
 
-	Warn("Could not open constant buffer file: " + name);
+	Warn("Could not open constant buffer file: " + name + " @location: " + url.ToString());
 	return retFile;
 }
 
 InputStreamPtr ShaderScript::FetchProgram(const String& name,
 		RenderManager::ShaderLanguage lang,
-		Pass::ProgramStage stage) {
+		Pass::ProgramStage stageType) {
 
 	StringUtils::TokenIterator it = 0;
 	String store;
 	URL url;
 	InputStreamPtr retFile;
-	switch(stage) {
+	const char* stage = 0;
+	switch(stageType) {
 	case Pass::ProgramStage::STAGE_VERTEX:
 		stage = ".vert"; break;
 	case Pass::ProgramStage::STAGE_FRAGMENT:
@@ -128,7 +129,7 @@ InputStreamPtr ShaderScript::FetchProgram(const String& name,
 	}
 
 	while((it = StringUtils::NextWord(programIncludePath, store, it)) != String::npos) {
-		const char* stage = 0;
+		
 		switch (lang) {
 		case RenderManager::SPP_GLSL:
 			url = store + "GLSL/" + name + stage;
@@ -143,7 +144,7 @@ InputStreamPtr ShaderScript::FetchProgram(const String& name,
 			return retFile;
 	}
 
-	Warn("Could not open constant buffer file: " + name);
+	Warn("Could not open program file: " + name + " @location: " + url.ToString());
 	return retFile;
 
 }

@@ -62,7 +62,8 @@ public:
 	public:
 		ContextBase(ScriptContext& scriptContext);
 
-		void Error(const String& error);bool IsErrorBitSet() const;
+		void Error(const String& error);
+		bool IsErrorBitSet() const;
 	protected:
 		ScriptContext& scriptContext;
 	};
@@ -94,6 +95,8 @@ public:
 		const StringUtils::WordList& GetParamList() const;
 
 		void ParseBlock(BlockListener*);
+		String GetTaggedParamVal(const String& tag, StringUtils::TokenIterator startAt = 0);
+
 	protected:
 		void _Clear();
 
@@ -122,10 +125,25 @@ public:
 		ScriptContext(const String& scriptName, StreamLexer& lexer);
 
 		void ParseRegions(RegionListener*);
-		void Error(const String& error);bool IsErrorBitSet() const;
+		void Error(const String& error);
+		bool IsErrorBitSet() const;
 		const String& GetErrors() const;
 
+		inline uint32 IncLevel() {
+			return blockLevel++;
+		}
+
+		inline uint32 DecLevel() {
+			return blockLevel--;
+		}
+
+		inline uint32 GetLevel() {
+			return blockLevel;
+		}
+
 	protected:
+		
+		uint32 blockLevel;
 		StreamLexer& lexer;
 		const String& scriptName;
 		String errorLog;

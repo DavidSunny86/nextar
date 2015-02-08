@@ -25,6 +25,7 @@ FbxMaterialLoaderImplv1_0::~FbxMaterialLoaderImplv1_0() {
 void FbxMaterialLoaderImplv1_0::Load(InputStreamPtr& input,
 		AssetLoader& assetLoader) {
 
+	assetLoader.GetRequestPtr()->SetCompleted(true);
 	NEX_DELETE(this);
 }
 
