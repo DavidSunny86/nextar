@@ -42,6 +42,7 @@ StreamData* MeshServices::CreateSphereMesh(
 		bool normalData,
 		bool uvData) {
 
+	// @todo Remove and use GeometryServices
 	// @optimize Its probably better to use a single vertex buffer for all volumes
 	uint32 width = density;
 	uint32 height = density;

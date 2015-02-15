@@ -22,7 +22,8 @@ public:
 	};
 
 	enum UpdateMessage {
-		MSG_RT_CREATE = 1 << 1, MSG_RT_RESIZE = 1 << 2,
+		MSG_RT_CREATE = 1 << 1,
+		MSG_RT_RESIZE = 1 << 2,
 	};
 
 	typedef array<RenderTargetPtr, MAX_TARGET>::type ColorAttachmentArray;
@@ -64,6 +65,7 @@ public:
 
 	RenderTargetPtr GetAttachment(uint16 index) const;
 	RenderTargetPtr GetDepthAttachment() const;
+
 
 protected:
 

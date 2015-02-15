@@ -34,6 +34,7 @@ public:
 	virtual void SetCurrentTarget(RenderTarget*);
 	virtual void Clear(Color& c, float depth, uint16 stencil, ClearFlags flags);
 	virtual void CloseImpl();
+	virtual void Copy(RenderTarget* src, FrameBuffer srcFb, RenderTarget* dest, FrameBuffer destFb)
 
 	virtual ContextID RegisterObject(ContextObject::Type type, uint32 hint);
 	virtual void UnregisterObject(ContextID);
@@ -82,6 +83,7 @@ public:
 	void WriteTextureLevel(GLenum target, GLint level,
 			const PixelFormatGl& format, GLsizei width, GLsizei height,
 			GLsizei depth, const uint8* data, size_t size);
+	void SpecifyTargetState(bool readOrDraw, bool setUnset, RenderTarget* target, FrameBuffer index);
 
 	void CopyBuffer(GLuint src, GLuint dest, size_t size);
 
@@ -97,9 +99,9 @@ public:
 	inline void EnableVertexAttribute(const GLuint location,
 				const VertexAttribGL& vegl);
 	inline void DisableVertexAttribute(const GLuint location);
-	inline void ReadBuffer(GLenum target, void* dest, size_t offset,
+	inline void SetReadBuffer(GLenum target, void* dest, size_t offset,
 			size_t size);
-	inline void WriteBuffer(GLenum target, size_t totalSize, GLenum usage,
+	inline void SetDrawBuffer(GLenum target, size_t totalSize, GLenum usage,
 			const void* src, size_t offset, size_t size);
 	inline void WriteSubData(GLenum target, const void* src, size_t offset,
 			size_t size);
@@ -112,6 +114,9 @@ public:
 			TextureViewGL* tu);
 	inline Size GetTextureParams(GLenum target);
 	inline void GetTextureData(GLenum target, GLenum format, GLenum type, GLvoid* data);
+
+	inline void SetReadBuffer(GLenum b);
+	inline void SetDrawBuffer(GLenum b);
 
 	// capture
 	void Capture(PixelBox& image, RenderTarget* rt, GLuint *pbo,
@@ -235,7 +240,7 @@ inline void RenderContextGL::DestroyBuffer(GLuint bufferId) {
 	GlDeleteBuffers(1, &bufferId);
 }
 
-inline void RenderContextGL::ReadBuffer(GLenum target, void* dest,
+inline void RenderContextGL::SetReadBuffer(GLenum target, void* dest,
 		size_t offset, size_t size) {
 	void* src = GlMapBuffer(target, GL_READ_ONLY);
 	GL_CHECK();
@@ -244,7 +249,7 @@ inline void RenderContextGL::ReadBuffer(GLenum target, void* dest,
 	GL_CHECK();
 }
 
-inline void RenderContextGL::WriteBuffer(GLenum target, size_t totalSize,
+inline void RenderContextGL::SetDrawBuffer(GLenum target, size_t totalSize,
 		GLenum usage, const void* src, size_t offset, size_t size) {
 	if (!size) {
 		size = totalSize - offset;
@@ -323,6 +328,16 @@ inline Size RenderContextGL::GetTextureParams(GLenum target) {
 
 inline void RenderContextGL::GetTextureData(GLenum target, GLenum format, GLenum type, GLvoid* data) {
 	glGetTexImage(target, 0, format, type, data);
+	GL_CHECK();
+}
+
+inline void RenderContextGL::SetReadBuffer(GLenum b) {
+	glReadBuffer(b);
+	GL_CHECK();
+}
+
+inline void RenderContextGL::SetDrawBuffer(GLenum b) {
+	glDrawBuffer(b);
 	GL_CHECK();
 }
 

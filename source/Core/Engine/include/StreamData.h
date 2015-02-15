@@ -83,7 +83,9 @@ enum PrimitiveType : uint8 {
 	/* Triangle list primitive type.  */
 	PT_TRI_LIST,
 	/* Triangle strip primitive type.  */
-	PT_TRI_STRIP
+	PT_TRI_STRIP,
+	/* Triangle fan primitive type.  */
+	PT_TRI_FAN
 };
 
 class VertexData: public AllocGraphics {
@@ -109,7 +111,6 @@ public:
 
 	IndexData() :
 			start(0), count(0) {
-
 	}
 
 	IndexData(size_t indexStart, size_t indexCount, IndexBufferPtr indexBuffer) :
@@ -131,7 +132,7 @@ public:
 	};
 
 	uint8 flags;
-	/* Indicates if GraphicsStreamData was created */
+	/* Primitive type */
 	/**/
 	PrimitiveType type;
 	/* instance count is usually 1 */

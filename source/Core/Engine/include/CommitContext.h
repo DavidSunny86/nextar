@@ -47,11 +47,12 @@ public:
 	DebugDisplay* debugDisplay;
 	VisibilitySet* visibiles;
 	LightSystem* lightSystem;
-	RenderTarget* renderTarget;
+	//RenderTarget* renderTarget;
 	Viewport* viewport;
 	VisiblePrimitive* primitive;
 	MaterialAsset* material;
 	RenderContext* renderContext;
+	RenderInfo renderTargetInfo;
 
 	const Matrix4x4* viewMatrix;
 	const Matrix4x4* viewProjectionMatrix;

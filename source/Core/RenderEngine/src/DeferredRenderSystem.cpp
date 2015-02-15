@@ -142,6 +142,8 @@ void DeferredRenderSystem::Commit(CommitContext& context) {
 	context.depthMap = gbuffer.depth;
 	context.normalMap = gbuffer.normalMap;
 
+	context.renderContext->BeginRender(&context.renderTargetInfo);
+	context.renderTargetInfo.clearFlags = 0;
 	for(auto& lightPair : ls) {
 		auto light = lightPair.second;
 		switch(light->GetLightType()) {
@@ -149,6 +151,14 @@ void DeferredRenderSystem::Commit(CommitContext& context) {
 			RenderLight(light, (uint32)Light::PassIndex::OMNI, lightPair.first, context);
 			break;
 		}
+	}
+	context.renderContext->EndRender();
+
+	// @urgent This step might be unnecessary once we have a compositor system in place
+	if (context.renderTargetInfo.rt->GetRenderTargetType() == RenderTargetType::BACK_BUFFER) {
+		// transfer the depth buffer to back-buffer-depth
+		context.renderContext->Copy(gbuffer.depth, FrameBuffer::DEPTH,
+				context.renderTargetInfo.rt, FrameBuffer::DEPTH);
 	}
 }
 

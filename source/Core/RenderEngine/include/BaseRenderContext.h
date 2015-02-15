@@ -54,6 +54,10 @@ public:
 	void DestroyAllWindows();
 protected:
 
+	inline RenderTarget* GetCurrentTarget() {
+		return currentTarget;
+	}
+
 	virtual void PreCloseImpl();
 	virtual void PostCloseImpl();
 	virtual void CloseImpl() = 0;

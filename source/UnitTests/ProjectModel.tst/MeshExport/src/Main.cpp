@@ -12,11 +12,14 @@ public:
 		UTApplication::_SetupScene(scene);
 		MeshTemplate::ID id(NamedObject::AsyncStringID("BuggyNew"));
 		URL location(FileSystem::ArchiveEngineData_Name, "Meshes/FBX/BuggyNew/buggy.FBX");
-		
+
 		MeshTemplatePtr mesh =
 				MeshTemplate::Traits::Instance(id,
 						location);
 		mesh->RequestLoad();
+		StreamInfo streamInfo;
+		streamInfo.locator = URL("{EngineData}/Meshes/Buggy.mesh");
+		mesh->RequestSave(streamInfo);
 	}
 };
 

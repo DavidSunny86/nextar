@@ -18,6 +18,8 @@ class DebugRenderSystem: public nextar::RenderSystem {
 public:
 	DebugRenderSystem();
 	virtual ~DebugRenderSystem();
+
+	virtual void Commit(CommitContext& context);
 };
 
 } /* namespace nextar */

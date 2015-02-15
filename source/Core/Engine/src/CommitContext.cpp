@@ -15,7 +15,6 @@ CommitContext::CommitContext() :
 	,debugDisplay(nullptr)
 	,visibiles(nullptr)
 	,lightSystem(nullptr)
-	,renderTarget(nullptr)
 	,viewport(nullptr)
 	,primitive(nullptr)
 	,material(nullptr)
@@ -39,7 +38,6 @@ void CommitContext::_Reset() {
 	debugDisplay = nullptr;
 	visibiles = nullptr;
 	lightSystem = nullptr;
-	renderTarget = nullptr;
 	viewport = nullptr;
 	primitive = nullptr;
 	material = nullptr;

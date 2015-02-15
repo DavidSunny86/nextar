@@ -17,6 +17,13 @@ FbxMeshLoaderImplv1_0::FbxMeshLoaderImplv1_0(FbxManager* pManager,
 }
 
 FbxMeshLoaderImplv1_0::~FbxMeshLoaderImplv1_0() {
+	for(auto& e : mElements) {
+		if (e.mMesh && e.mMesh != mSharedBuffer)
+			NEX_DELETE(e.mMesh);
+	}
+	mElements.clear();
+	if(mSharedBuffer)
+		NEX_DELETE(mSharedBuffer);
 	mScene->Destroy(true);
 }
 

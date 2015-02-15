@@ -25,23 +25,29 @@ public:
 
 	virtual VisiblePrimitiveList& GetPrimitives(CommitContext& context);
 
-	virtual void Register(CommitContext& context, const AABox3& box, const Color& color,
+	virtual uint32 Register(CommitContext& context, const AABox3& box, const Color& color,
 			float expiryTimeInSec = 0.0f);
-	virtual void Register(CommitContext& context, Mat3x4R tform, const Color& color = Color::Black,
+	virtual uint32 Register(CommitContext& context, Mat3x4R tform, const Color& color = Color::Black,
 			float expiryTimeInSec = 0.0f);
-	virtual void Register(CommitContext& context, PlaneF plane, const Color& color,
+	virtual uint32 Register(CommitContext& context, PlaneF plane, const Color& color,
 			float expiryTimeInSec = 0.0f);
-	virtual void Register(CommitContext& context, const Frustum& frustum, const Color& color,
+	virtual uint32 Register(CommitContext& context, const Frustum& frustum, const Color& color,
 			float expiryTimeInSec = 0.0f);
-	virtual void Register(CommitContext& context, const Box2D& rect, const Color& color,
+	virtual uint32 Register(CommitContext& context, const Polygon& triList, const Color& color,
+					float expiryTimeInSec = 0.0f);
+	virtual uint32 Register(CommitContext& context, const Box2D& rect, const Color& color,
 			TextureBase* textured = 0, bool border = true,
 			float expiryTimeInSec = 0.0f);
+
+	virtual void RemovePrimitive(uint32 id);
 
 protected:
 
 	void LoadMaterials() {}
-	void CreateAxisSystemData() {}
+	Polygon CreateAxisSystem();
 
+	StreamData boxData;
+	StreamData planeData;
 	StreamData axisData;
 	VisiblePrimitiveList alivePrimitives;
 };

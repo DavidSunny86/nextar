@@ -157,7 +157,7 @@ bool Asset::AsyncSetSaveInfo(const StreamInfo& request) {
 		if (request.externalRequest)
 			_savedRequestPtr = request.externalRequest;
 		else if (!_savedRequestPtr)
-			_savedRequestPtr = CreateStreamRequestImpl(true);
+			_savedRequestPtr = CreateStreamRequestImpl(false);
 
 		if (_savedRequestPtr->flags & StreamRequest::ASSET_STREAM_REQUEST) {
 			AssetStreamRequest* assetRequest = static_cast<AssetStreamRequest*>(_savedRequestPtr);

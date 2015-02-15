@@ -41,6 +41,9 @@ public:
 				frameBufferObject);
 	}
 
+	void BindNamed(bool readBuffer, FrameBuffer fb, RenderContextGL* gl);
+	void UnbindNamed(bool readBuffer, FrameBuffer fb, RenderContextGL* gl);
+
 	static void Unbind(bool readBuffer, RenderContextGL* gl) {
 		gl->GlBindFramebuffer(readBuffer ?
 		GL_READ_FRAMEBUFFER :
@@ -61,6 +64,8 @@ public:
 
 protected:
 
+	friend class RenderContextGL;
+	static GLenum attachment[FrameBuffer::FBTYPE_COUNT];
 	GLuint frameBufferObject;
 };
 

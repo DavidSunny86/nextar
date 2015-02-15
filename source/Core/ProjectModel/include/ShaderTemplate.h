@@ -60,7 +60,7 @@ public:
 	};
 
 	typedef map<String, SamplerUnit>::type SamplerMap;
-	typedef map<String, ShaderUnit>::type ShaderTable;
+
 	typedef multimap<RenderManager::ShaderLanguage, std::pair<Pass::ProgramStage, String>>::type SourceMap;
 	typedef Pass::VarToAutoParamMap VarToAutoParamMap;
 

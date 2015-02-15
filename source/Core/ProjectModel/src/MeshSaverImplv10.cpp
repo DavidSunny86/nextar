@@ -154,30 +154,38 @@ void MeshSaverImplv1_0::WriteBoundsInfo(const BoundsInfo& bounds,
 
 void MeshSaverImplv1_0::Save(OutputStreamPtr& out,
 		AssetSaver& saver) {
-	MeshTemplate* mesh = static_cast<MeshTemplate*>(
-				saver.GetRequestPtr()->GetStreamedObject());
 
-	WriteVersion(out);
+	try {
+		MeshTemplate* mesh = static_cast<MeshTemplate*>(
+					saver.GetRequestPtr()->GetStreamedObject());
 
-	ChunkOutputStream stream(out);
-	WriteMeshHeader(mesh, stream);
-	WriteBoundsInfo(mesh->GetBounds(), stream);
-	MeshBuffer* buffer = mesh->GetSharedMeshBuffer();
-	MaterialTemplatePtr material = mesh->GetSharedMaterial();
-	if (buffer) {
-		WriteVertexData(buffer, stream);
-		WriteIndexData(buffer, stream);
+		WriteVersion(out);
+
+		ChunkOutputStream stream(out);
+		WriteMeshHeader(mesh, stream);
+		WriteBoundsInfo(mesh->GetBounds(), stream);
+		MeshBuffer* buffer = mesh->GetSharedMeshBuffer();
+		MaterialTemplatePtr material = mesh->GetSharedMaterial();
+		if (buffer) {
+			WriteVertexData(buffer, stream);
+			WriteIndexData(buffer, stream);
+		}
+
+		if (material) {
+			WriteMaterialData(material, stream);
+		}
+
+		OutputSerializer& ser = stream.BeginChunk(MCID_SUBMESH_DATA);
+		uint32 numPrim = mesh->GetNumPrimitiveGroups();
+		for (uint32 i = 0; i < numPrim; ++i)
+			WriteSubMeshData(mesh, mesh->GetPrimitive(i), stream);
+		stream.EndChunk();
+	} catch (const GracefulErrorExcept& e) {
+		saver.GetRequestPtr()->SetCompleted(false);
+		NEX_THROW(e);
 	}
 
-	if (material) {
-		WriteMaterialData(material, stream);
-	}
-
-	OutputSerializer& ser = stream.BeginChunk(MCID_SUBMESH_DATA);
-	uint32 numPrim = mesh->GetNumPrimitiveGroups();
-	for (uint32 i = 0; i < numPrim; ++i)
-		WriteSubMeshData(mesh, mesh->GetPrimitive(i), stream);
-	stream.EndChunk();
+	saver.GetRequestPtr()->SetCompleted(true);
 }
 
 void MeshSaverImplv1_0::WriteSubMeshData(MeshTemplate* templ,

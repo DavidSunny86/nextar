@@ -73,6 +73,7 @@ void Viewport::CommitPrimitives(RenderContext* renderCtx, uint32 frameNumber) {
 
 	visibleSet.SortSet();
 
+	// @todo A lot of redundancy here
 	commitContext.viewMatrix = &camera->GetViewMatrix();
 	commitContext.viewProjectionMatrix = &camera->GetViewProjectionMatrix();
 	commitContext.projectionMatrix = &camera->GetProjectionMatrix();
@@ -83,6 +84,11 @@ void Viewport::CommitPrimitives(RenderContext* renderCtx, uint32 frameNumber) {
 	commitContext.visibiles = &visibleSet;
 	commitContext.lightSystem = traversal.lightSystem;
 	commitContext.targetDimension = renderTarget->GetDimensions();
+	commitContext.renderTargetInfo.rt = renderTarget;
+	commitContext.renderTargetInfo.clearColor = Color::Black;
+	commitContext.renderTargetInfo.clearFlags = ClearFlags::CLEAR_ALL;
+	commitContext.renderTargetInfo.clearStencil = 0;
+	commitContext.renderTargetInfo.clearDepth = 1.0f;
 	
 
 	for (auto &r : renderSystems) {

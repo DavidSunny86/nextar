@@ -12,7 +12,7 @@ namespace nextar {
 
 RenderTexture::RenderTexture() :
 		TextureBase(IS_RENDER_TEXTURE, ContextObject::TYPE_RENDER_TEXTURE), RenderTarget(
-				RenderTargetType::RENDER_TEXTURE) {
+				RenderTargetType::TEXTURE) {
 	numMipMaps = 1;
 }
 

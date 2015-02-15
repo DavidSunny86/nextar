@@ -15,19 +15,37 @@
 
 namespace nextar {
 
-enum class FrameBuffer {
-	FRONT_LEFT,
+enum class FrameBuffer : uint32 {
+	NONE = 0,
+	FRONT_LEFT = 1,
 	FRONT_RIGHT,
 	BACK_LEFT,
 	BACK_RIGHT,
 	DEPTH,
+
+	COLOR_0,
+	COLOR_1,
+	COLOR_2,
+	COLOR_3,
+	COLOR_4,
+	COLOR_5,
+	COLOR_6,
+	COLOR_7,
+
+	STENCIL,
+	FBTYPE_COUNT,
+
 	FRONT = FRONT_LEFT,
-	BACK = BACK_LEFT
+	BACK = BACK_LEFT,
 };
+
 
 enum class RenderTargetType
 	: uint16 {
-		RENDER_TEXTURE, RENDER_BUFFER, RENDER_WINDOW, MULTI_RENDER_TARGET,
+	TEXTURE,
+	RENDER_BUFFER,
+	BACK_BUFFER,
+	MULTI_RENDER_TARGET,
 };
 
 // @remarks
@@ -60,6 +78,8 @@ public:
 	virtual Size GetDimensions() const = 0;
 	/* Capture render target from a single context */
 	virtual void Capture(RenderContext* rc, PixelBox& image, FrameBuffer);
+	/* Transfer contents to another render texture	 */
+	virtual void CopyTo(RenderContext* rc, FrameBuffer srcFb, RenderTarget* dest, FrameBuffer destFb);
 	// virtual void Reset(RenderContext* rc, Size size, PixelFormat format) = 0;
 	// todo This call should be replaced by the view->Present, may be a list of views
 	// should be maintaned instead of targets.

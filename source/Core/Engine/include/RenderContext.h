@@ -17,6 +17,7 @@ struct FrameStats {
 };
 
 enum class ClearFlags {
+	CLEAR_NONE = 0,
 	CLEAR_COLOR = 1 << 0,
 	CLEAR_DEPTH = 1 << 1,
 	CLEAR_STENCIL = 1 << 2,
@@ -31,6 +32,8 @@ struct RenderInfo {
 	Color clearColor;
 	float clearDepth;
 	uint16 clearStencil;
+
+	RenderInfo() : rt(0), clearFlags(ClearFlags::CLEAR_NONE), clearDepth(1.0f), clearStencil(0) {}
 };
 
 typedef list<RenderTargetPtr>::type RenderTargetList;
@@ -63,14 +66,15 @@ public:
 	virtual FrameStats GetFrameStats() = 0;
 	virtual void BeginRender(RenderInfo*) = 0;
 	virtual void EndRender() = 0;
+	virtual void Copy(RenderTarget* src, FrameBuffer srcFb, RenderTarget* dest, FrameBuffer destFb);
 
 	virtual void SwitchPass(CommitContext&, Pass::View*) = 0;
 	virtual void Draw(StreamData*, CommitContext&) = 0;
-
 	virtual ContextID RegisterObject(ContextObject::Type type, uint32 hint) = 0;
 	virtual void UnregisterObject(ContextID) = 0;
 	virtual void UpdateObject(ContextObject*, uint32 updateMsg,
 			ContextObject::ContextParamPtr) = 0;
+
 #if NEX_MULTIGPU_BUILD
 	virtual ContextObject::View* GetView(const ContextObject*) = 0;
 #else

@@ -703,12 +703,6 @@ void RenderContextGL::Capture(PixelBox& image, RenderTarget* rt, GLuint *pbo,
 		FrameBuffer frameBuffer) {
 	/* todo Expand this function for frame buffer,
 	 * depth map capture etc. */
-	GLenum readTargets[] = {
-	GL_FRONT_LEFT,
-	GL_FRONT_RIGHT,
-	GL_BACK_LEFT,
-	GL_BACK_RIGHT };
-
 	Size size = rt->GetDimensions();
 	// assuming color buffer capture
 	size_t dataSize = size.dx * size.dy * 4;
@@ -721,7 +715,8 @@ void RenderContextGL::Capture(PixelBox& image, RenderTarget* rt, GLuint *pbo,
 	bool asyncCapture =
 			RenderManager::Instance().GetRenderSettings().asyncCapture;
 
-	glReadBuffer(readTargets[(uint32)frameBuffer]);
+	glReadBuffer(FrameBufferObjectGL::attachment[(uint32)frameBuffer]);
+	GL_CHECK();
 	if (asyncCapture) {
 		uint32 next = RenderConstants::MAX_FRAME_PRE_CAPTURE - 1;
 		if (!pbo[0]) {
@@ -822,6 +817,9 @@ void RenderContextGL::Draw(StreamData* streamData, CommitContext& ctx) {
 	case PT_TRI_STRIP:
 		primtype = GL_TRIANGLE_STRIP;
 		break;
+	case PT_TRI_FAN:
+		primtype = GL_TRIANGLE_FAN;
+		break;
 	}
 
 	IndexBuffer* ibuffer = streamData->indices.indices.GetPtr();
@@ -870,7 +868,7 @@ void RenderContextGL::SetCurrentTarget(RenderTarget* canvas) {
 		SetCurrentWindow(nullptr);
 	else {
 		switch (canvas->GetRenderTargetType()) {
-		case RenderTargetType::RENDER_TEXTURE: {
+		case RenderTargetType::TEXTURE: {
 			RenderTextureViewGL* textureView =
 					static_cast<RenderTextureViewGL*>(GetView(
 							static_cast<RenderTexture*>(canvas)));
@@ -890,7 +888,7 @@ void RenderContextGL::SetCurrentTarget(RenderTarget* canvas) {
 			fbo.Bind(false, this);
 		}
 			break;
-		case RenderTargetType::RENDER_WINDOW:
+		case RenderTargetType::BACK_BUFFER:
 			SetCurrentWindow(canvas);
 			break;
 		case RenderTargetType::MULTI_RENDER_TARGET: {
@@ -900,7 +898,7 @@ void RenderContextGL::SetCurrentTarget(RenderTarget* canvas) {
 			FrameBufferObjectGL& fbo = textureView->GetFBO();
 			NEX_ASSERT(fbo.IsValid());
 			fbo.Bind(false, this);
-		}
+			}
 			break;
 		}
 	}
@@ -923,6 +921,106 @@ void RenderContextGL::Clear(Color& c, float depth, uint16 stencil,
 	}
 	glClear(mask);
 	GL_CHECK();
+}
+
+void RenderContextGL::Copy(
+		RenderTarget* source, FrameBuffer src,
+		RenderTarget* dest, FrameBuffer dst) {
+
+	NEX_ASSERT(source->GetDimensions() == dest->GetDimensions());
+	Size s = source->GetDimensions();
+	Size d = dest->GetDimensions();
+	SpecifyTargetState(true, true, source, src);
+	SpecifyTargetState(false, true, dest, dst);
+	GLbitfield mask = GL_COLOR_BUFFER_BIT;
+	switch(src) {
+	case FrameBuffer::DEPTH:
+		mask = GL_DEPTH_BUFFER_BIT; break;
+	case FrameBuffer::STENCIL:
+		mask = GL_STENCIL_BUFFER_BIT; break;
+	}
+	GlBlitFramebuffer(0, 0, s.dx, s.dy, 0, 0, d.dx, d.dy, mask, GL_NEAREST);
+	GL_CHECK();
+
+	SpecifyTargetState(false, false, dest, dst);
+	SpecifyTargetState(true, false, source, src);
+	SetCurrentTarget(GetCurrentTarget());
+}
+
+void RenderContextGL::SpecifyTargetState(
+bool readOrDraw, bool setUnset, RenderTarget* canvas, FrameBuffer src) {
+	// setup read
+	switch (canvas->GetRenderTargetType()) {
+	case RenderTargetType::TEXTURE: {
+		RenderTextureViewGL* textureView =
+				static_cast<RenderTextureViewGL*>(GetView(
+						static_cast<RenderTexture*>(canvas)));
+		FrameBufferObjectGL& fbo = textureView->GetFBO();
+		if (!fbo.IsValid())
+			textureView->CreateFBO(this);
+		if (setUnset) {
+			if (src >= FrameBuffer::COLOR_0 && src <= FrameBuffer::COLOR_7)
+				fbo.BindNamed(readOrDraw, src, this);
+			else
+				fbo.Bind(readOrDraw, this);
+		} else {
+			if (src >= FrameBuffer::COLOR_0 && src <= FrameBuffer::COLOR_7)
+				fbo.UnbindNamed(readOrDraw, src, this);
+			else
+				fbo.Unbind(readOrDraw, this);
+		}
+	}
+		break;
+	case RenderTargetType::RENDER_BUFFER: {
+		RenderBufferViewGL* textureView =
+				static_cast<RenderBufferViewGL*>(GetView(
+						static_cast<RenderBuffer*>(canvas)));
+		FrameBufferObjectGL& fbo = textureView->GetFBO();
+		if (!fbo.IsValid())
+			textureView->CreateFBO(this);
+		if (setUnset) {
+			if (src >= FrameBuffer::COLOR_0 && src <= FrameBuffer::COLOR_7)
+				fbo.BindNamed(readOrDraw, src, this);
+			else
+				fbo.Bind(readOrDraw, this);
+		} else {
+			if (src >= FrameBuffer::COLOR_0 && src <= FrameBuffer::COLOR_7)
+				fbo.UnbindNamed(readOrDraw, src, this);
+			else
+				fbo.Unbind(readOrDraw, this);
+		}
+
+	}
+		break;
+	case RenderTargetType::BACK_BUFFER:
+		SetCurrentWindow (canvas);
+		if (setUnset) {
+			if (readOrDraw)
+				SetReadBuffer(GL_BACK);
+			else
+				SetDrawBuffer(GL_BACK);
+		}
+		break;
+	case RenderTargetType::MULTI_RENDER_TARGET: {
+		MultiRenderTargetViewGL* textureView =
+				static_cast<MultiRenderTargetViewGL*>(GetView(
+						static_cast<MultiRenderTarget*>(canvas)));
+		FrameBufferObjectGL& fbo = textureView->GetFBO();
+		NEX_ASSERT(fbo.IsValid());
+		if (setUnset) {
+			if (src >= FrameBuffer::COLOR_0 && src <= FrameBuffer::COLOR_7)
+				fbo.BindNamed(readOrDraw, src, this);
+			else
+				fbo.Bind(readOrDraw, this);
+		} else {
+			if (src >= FrameBuffer::COLOR_0 && src <= FrameBuffer::COLOR_7)
+				fbo.UnbindNamed(readOrDraw, src, this);
+			else
+				fbo.Unbind(readOrDraw, this);
+		}
+		break;
+	}
+	}
 }
 
 GLuint RenderContextGL::CreateBuffer(size_t size, GLenum usage, GLenum type) {

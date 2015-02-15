@@ -11,7 +11,7 @@
 #include <NexBase.h>
 #include <StreamData.h>
 #include <Color.h>
-#include <MathBase.h>
+#include <NexMath.h>
 #include <MaterialAsset.h>
 
 namespace nextar {

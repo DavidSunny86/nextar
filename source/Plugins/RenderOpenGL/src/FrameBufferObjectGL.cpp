@@ -13,7 +13,61 @@
 
 namespace RenderOpenGL {
 
+GLenum FrameBufferObjectGL::attachment[] = {
+		GL_NONE,
+		GL_FRONT_LEFT,
+		GL_FRONT_RIGHT,
+		GL_BACK_LEFT,
+		GL_BACK_RIGHT,
+		GL_DEPTH,
+		GL_COLOR_ATTACHMENT0,
+		GL_COLOR_ATTACHMENT1,
+		GL_COLOR_ATTACHMENT2,
+		GL_COLOR_ATTACHMENT3,
+		GL_COLOR_ATTACHMENT4,
+		GL_COLOR_ATTACHMENT5,
+		GL_COLOR_ATTACHMENT6,
+		GL_COLOR_ATTACHMENT7,
+		GL_STENCIL_ATTACHMENT,
+};
+
 FrameBufferObjectGL::~FrameBufferObjectGL() {
+}
+
+void FrameBufferObjectGL::BindNamed(bool readBuffer, FrameBuffer fb, RenderContextGL* gl) {
+	NEX_ASSERT(fb >= FrameBuffer::COLOR_0 && fb <= FrameBuffer::COLOR_7);
+	if (readBuffer) {
+		if (gl->GlNamedFramebufferReadBuffer)
+			gl->GlNamedFramebufferReadBuffer(frameBufferObject, attachment[fb]);
+		else {
+			Bind(true, gl);
+			gl->SetReadBuffer(attachment[fb]);
+		}
+	}
+	else {
+		if (gl->GlNamedFramebufferDrawBuffer)
+			gl->GlNamedFramebufferDrawBuffer(frameBufferObject, attachment[fb]);
+		else {
+			Bind(false, gl);
+			gl->SetDrawBuffer(attachment[fb]);
+		}
+	}
+	GL_CHECK();
+}
+
+void FrameBufferObjectGL::UnbindNamed(bool readBuffer, FrameBuffer fb, RenderContextGL* gl) {
+	NEX_ASSERT(fb >= FrameBuffer::COLOR_0 && fb <= FrameBuffer::COLOR_7);
+	if (readBuffer) {
+		if (!gl->GlNamedFramebufferReadBuffer)
+			Unbind(true, gl);
+		gl->SetReadBuffer(GL_BACK);
+	}
+	else {
+		if (!gl->GlNamedFramebufferDrawBuffer)
+			Unbind(false, gl);
+		gl->SetDrawBuffer(GL_BACK);
+	}
+	GL_CHECK();
 }
 
 void FrameBufferObjectGL::Attach(RenderContextGL* gl, GLenum attachmentType,

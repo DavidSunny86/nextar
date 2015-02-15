@@ -18,6 +18,7 @@ DebugDisplayImpl::~DebugDisplayImpl() {
 }
 
 VisiblePrimitiveList& DebugDisplayImpl::GetPrimitives(CommitContext& context) {
+	DetermineVisiblePrimitives();
 	return alivePrimitives;
 }
 
