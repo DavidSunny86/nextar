@@ -7,7 +7,6 @@
 
 ## Configure paths
 #============================================================
-
+add_unit_test(AutoCompileMaterials)
 add_unit_test(MaterialAndShader)
 add_unit_test(MeshExport)
-

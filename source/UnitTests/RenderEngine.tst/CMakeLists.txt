@@ -10,3 +10,4 @@
 
 add_unit_test(WindowCreation)
 add_unit_test(Mesh)
+add_unit_test(DebugRenderSystem)

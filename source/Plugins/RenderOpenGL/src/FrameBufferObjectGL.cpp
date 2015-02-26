@@ -38,18 +38,18 @@ void FrameBufferObjectGL::BindNamed(bool readBuffer, FrameBuffer fb, RenderConte
 	NEX_ASSERT(fb >= FrameBuffer::COLOR_0 && fb <= FrameBuffer::COLOR_7);
 	if (readBuffer) {
 		if (gl->GlNamedFramebufferReadBuffer)
-			gl->GlNamedFramebufferReadBuffer(frameBufferObject, attachment[fb]);
+			gl->GlNamedFramebufferReadBuffer(frameBufferObject, attachment[(uint32)fb]);
 		else {
 			Bind(true, gl);
-			gl->SetReadBuffer(attachment[fb]);
+			gl->SetReadBuffer(attachment[(uint32)fb]);
 		}
 	}
 	else {
 		if (gl->GlNamedFramebufferDrawBuffer)
-			gl->GlNamedFramebufferDrawBuffer(frameBufferObject, attachment[fb]);
+			gl->GlNamedFramebufferDrawBuffer(frameBufferObject, attachment[(uint32)fb]);
 		else {
 			Bind(false, gl);
-			gl->SetDrawBuffer(attachment[fb]);
+			gl->SetDrawBuffer(attachment[(uint32)fb]);
 		}
 	}
 	GL_CHECK();
@@ -87,11 +87,11 @@ void FrameBufferObjectGL::Attach(RenderContextGL* gl, GLenum type,
 		gl->GlFramebufferTexture2D(GL_FRAMEBUFFER, type, GL_TEXTURE_2D,
 				texture->GetTexture(), 0);
 		break;
-	case TextureBase::TEXTURE_3D:
-	case TextureBase::TEXTURE_1D_ARRAY:
-	case TextureBase::TEXTURE_2D_ARRAY:
-	case TextureBase::TEXTURE_CUBE_MAP:
-	case TextureBase::TEXTURE_CUBE_MAP_ARRAY:
+	case GL_TEXTURE_3D:
+	case GL_TEXTURE_1D_ARRAY:
+	case GL_TEXTURE_2D_ARRAY:
+	case GL_TEXTURE_CUBE_MAP:
+	case GL_TEXTURE_CUBE_MAP_ARRAY:
 		// attach all levels
 		NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
 	}

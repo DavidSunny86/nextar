@@ -47,8 +47,8 @@ public:
 		return videoModes[currentVideoMode];
 	}
 
-	virtual void BeginFrame(uint32 frame);
-	virtual void EndFrame();
+	virtual void BeginFrame(const FrameTimer& frameTimer) override;
+	virtual void EndFrame() override;
 	virtual FrameStats GetFrameStats();
 
 	void DestroyAllWindows();

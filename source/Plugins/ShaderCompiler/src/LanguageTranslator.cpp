@@ -7,6 +7,7 @@
 
 #include <LanguageTranslator.h>
 #include <ScriptStrings.h>
+#include <ShaderScript.h>
 #include <TranslatorGLSL.h>
 #include <TranslatorHLSL.h>
 

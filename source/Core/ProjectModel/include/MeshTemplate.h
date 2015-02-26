@@ -5,6 +5,7 @@
 #include <NexProjectModel.h>
 #include <AssetTemplate.h>
 #include <MeshBuffer.h>
+#include <MaterialTemplate.h>
 
 namespace nextar {
 

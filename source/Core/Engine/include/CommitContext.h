@@ -15,6 +15,24 @@
 
 namespace nextar {
 
+enum class ClearFlags {
+	CLEAR_NONE = 0,
+	CLEAR_COLOR = 1 << 0,
+	CLEAR_DEPTH = 1 << 1,
+	CLEAR_STENCIL = 1 << 2,
+	CLEAR_ALL = CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL
+};
+
+struct RenderInfo {
+	RenderTarget* rt;
+	ClearFlags clearFlags;
+	Color clearColor;
+	float clearDepth;
+	uint16 clearStencil;
+
+	RenderInfo() : rt(0), clearFlags(ClearFlags::CLEAR_NONE), clearDepth(1.0f), clearStencil(0) {}
+};
+
 class CommitContext: public AllocGeneral {
 public:
 
@@ -29,13 +47,17 @@ public:
 	uint32 viewNumber;
 	uint32 passNumber;
 	uint32 materialNumber;
+	float frameTime;
 	Size targetDimension;
+
+	Color color;
 
 	const ParameterBuffer* paramBuffers[(uint32) ParameterContext::CTX_COUNT];
 	// rename the
 	ParamContext paramContext;
 	ParameterGroup* paramGroup;
 	void* groupDataPtr;
+	const FrameTimer* frameTimer;
 		
 	TextureBase* albedoAndGlossMap;
 	TextureBase* depthMap;
@@ -44,7 +66,6 @@ public:
 	Light* light; // for deferred
 	Pass::View* pass;
 	ShaderAsset* shader;
-	DebugDisplay* debugDisplay;
 	VisibilitySet* visibiles;
 	LightSystem* lightSystem;
 	//RenderTarget* renderTarget;

@@ -10,6 +10,7 @@
 
 namespace nextar {
 
+NEX_DEFINE_SINGLETON_PTR(DebugDisplay);
 DebugDisplay::DebugDisplay() {
 	// TODO Auto-generated constructor stub
 

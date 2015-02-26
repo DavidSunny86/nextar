@@ -39,8 +39,8 @@ public:
 
 	virtual void Commit(CommitContext& context);
 
-	static void DestroyBuffers(void* renderSystem);
-	static void CreateMaterials(void* renderSystem);
+	static void DestroyResources(void* renderSystem);
+	static void CreateResources(void* renderSystem);
 
 	inline void DestroyBuffer() {
 		gbufferRI.rt = nullptr;

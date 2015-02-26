@@ -37,7 +37,7 @@ protected:
 	StreamRequest* WaitAndPopRequest();
 	void AsyncAddResponse(StreamRequest* request);
 
-	virtual void EndFrame(uint32 timeElapsed);
+	virtual void Execute(const FrameTimer& frameTimer) override;
 
 	typedef array<std::thread, (uint32) Constants::MAX_LOADER_THREAD>::type ThreadList;
 	typedef vector<StreamRequest*>::type StreamRequestList;

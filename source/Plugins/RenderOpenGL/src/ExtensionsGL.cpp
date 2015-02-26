@@ -16,12 +16,9 @@ namespace RenderOpenGL {
 #define DECL_EXT_NAME(Pref,W)  NEX_MAKE_TEXT(Pref##W)
 
 ExtensionsGL::ExtensionsGL() {
-	GLE_ARB_multisample = false;
-	GLE_ARB_depth_clamp = false;
+	
 	GLE_version = GLV_INVALID;
 
-	GlBlendEquationSeparate = 0;
-	GlBlendFuncSeparate = 0;
 
 #define DECL_COND_START_VERSION(what)
 #define DECL_COND_END_VERSION(what)
@@ -64,6 +61,7 @@ void ExtensionsGL::_ReadyExtensions(uint16 major, uint16 minor) {
 
 	VersionGL minimum = RenderDriverGL::ExtractVersion(major, minor);
 	const char* version = (const char*) glGetString(GL_VERSION);
+	GL_CHECK();
 	// extract version info
 	GLE_version = RenderDriverGL::ExtractVersion(version);
 	if (GLE_version == GLV_INVALID || GLE_version < minimum) {
@@ -71,9 +69,39 @@ void ExtensionsGL::_ReadyExtensions(uint16 major, uint16 minor) {
 		NEX_THROW_FatalError(EXCEPT_APPINIT_FAILED);
 	}
 
-	// get extensions
-	const char* extensions = (const char*) glGetString(GL_EXTENSIONS);
+	glGetStringi = (PFNGLGETSTRINGIPROC)RenderDriverGL::GetExtension("glGetStringi");
+	if (!glGetStringi) {
+		Error("Unable to retrieve extensions as glGetStringi was not found!");
+		return;
+	}
 
+	//********************************************************************
+	// Determine supported extensions
+	//********************************************************************
+#define DECL_COND_START_VERSION(what)
+#define DECL_COND_END_VERSION(what)
+#define DECL_COND_START_EXT(pref, what)   if(!std::strcmp(DECL_EXT_NAME(pref, what), extensions)) NEX_TOKEN_PASTE(GLE_, what) = true;
+#define DECL_COND_END_EXT(what)
+#define DECL_EXTENSION(a, b)
+	
+	GLint n;
+	glGetIntegerv(GL_NUM_EXTENSIONS, &n);
+	GL_CHECK();
+	for (GLint i = 0; i < n; ++i) {
+		const char* extensions = (const char*)glGetStringi(GL_EXTENSIONS, i);
+		GL_CHECK();
+#include <ExtListGL.h>
+		
+	}
+
+#undef DECL_COND_START_VERSION
+#undef DECL_COND_END_VERSION
+#undef DECL_COND_START_EXT
+#undef DECL_COND_END_EXT
+#undef DECL_EXTENSION
+	//********************************************************************
+	// Retrieve function pointers
+	//********************************************************************
 #define DECL_COND_START_VERSION(what) if(GLE_version >= what) { \
 		bool failed = false;
 
@@ -85,7 +113,7 @@ void ExtensionsGL::_ReadyExtensions(uint16 major, uint16 minor) {
 		}
 
 #define DECL_COND_START_EXT(pref, what)   \
-		if (IsSupported(DECL_EXT_NAME(pref, what), extensions)) {   \
+		if (NEX_TOKEN_PASTE(GLE_, what)) {   \
 			bool failed = false;\
 
 

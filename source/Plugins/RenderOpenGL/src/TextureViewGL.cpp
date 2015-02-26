@@ -42,7 +42,7 @@ void TextureViewGL::ReadPixels(RenderContextGL* gl, TextureBase::ReadPixelUpdate
 	pixels->back = 1;
 	pixels->format = pixelFormat.textureFormat;
 	pixels->deleteData = true;
-	gl->GetTextureData(target, pixelFormat.internalFormat, pixelFormat.dataType, pixels->data);
+	gl->GetTextureData(target, pixelFormat.sourceFormat, pixelFormat.dataType, pixels->data);
 	pixels->CalculatePitches();
 }
 

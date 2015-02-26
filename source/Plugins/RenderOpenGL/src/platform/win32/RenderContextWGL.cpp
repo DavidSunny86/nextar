@@ -161,8 +161,8 @@ RenderContextWGL::DummyContext RenderContextWGL::CreateDummyContext() {
 void RenderContextWGL::DestroyDummyContext(const RenderContextWGL::DummyContext& dc) {
 	wglMakeCurrent (NULL, NULL);
 	// Failed
-	wglDeleteContext (dc.hRC);
-	GL_CHECK();
+	if(!wglDeleteContext (dc.hRC))
+		Error("Failed to delete dummy context!");
 	ReleaseDC (dc.hWnd, dc.hDC);
 	DestroyWindow (dc.hWnd);
 }
@@ -311,11 +311,11 @@ void RenderContextWGL::SetCurrentWindow(RenderTarget* canvas) {
 	if (canvas) {
 		WindowWGL::Impl* impl = static_cast<WindowWGL::Impl*>(canvas);
 		if (impl->GetWindowDC() != currentDC) {
-			wglMakeCurrent(currentDC = impl->GetWindowDC(), context);
+			if(!wglMakeCurrent(currentDC = impl->GetWindowDC(), context))
+				Error("Failed to set context!");
 		}
 	} else
 		wglMakeCurrent(0, 0);
-	GL_CHECK();
 }
 
 void RenderContextWGL::SetVideoModeImpl(const VideoMode& mode) {

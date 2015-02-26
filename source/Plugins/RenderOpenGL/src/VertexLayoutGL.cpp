@@ -126,15 +126,15 @@ void VertexLayoutStaticGL::Enable(VertexBufferBinding& binding,
 	}
 	uint32 numPairs = (uint32)passVertexArrayPairs.size();
 	uint32 count = 0;
-	for (; count < numPairs; cachedIndex = (cachedIndex+1)%numPairs, count++) {
-		if (passVertexArrayPairs[cachedIndex].first == id) {
-			break;
-		}
-	}
+	for (;
+		count < numPairs && passVertexArrayPairs[cachedIndex].first != id;
+		cachedIndex = (cachedIndex + 1) % numPairs, count++);
+
 	if (count == numPairs) {
 		GLuint layout = CreateLayout(rc, binding, pass->GetInputSemantics());
 		cachedIndex = numPairs;
 		passVertexArrayPairs.push_back(PassLayoutVertexArrayPair(id, layout));
+		rc->DisableVertexArrayObject();
 	}
 
 	rc->EnableVertexArrayObject(passVertexArrayPairs[cachedIndex].second);
@@ -160,7 +160,7 @@ GLuint VertexLayoutStaticGL::CreateLayout(RenderContextGL* gl,
 		GLuint vao;
 		gl->GlGenVertexArrays(1, &vao);
 		GL_CHECK();
-		gl->GlBindVertexArray(vao);
+		gl->EnableVertexArrayObject(vao);
 		GL_CHECK();
 
 		for (uint32 j = 0; j < numMapped; ++j) {
@@ -216,28 +216,30 @@ void VertexLayoutFlexibleGL::Update(nextar::RenderContext* rc, uint32 msg,
 void VertexLayoutFlexibleGL::Enable(VertexBufferBinding& binding,
 		PassViewGL* pass, RenderContextGL* rc) {
 	numSyncRequired = 0;
-	for(uint32 stream = 0; stream < binding.GetBufferCount(); ++stream) {
+	uint32 id = pass->GetInputLayoutID();
+	uint32 numPairs = (uint32)passVertexArrayPairs.size();
+	uint32 count = 0;
+	for (; 
+		count < numPairs && passVertexArrayPairs[cachedIndex].first != id; 
+		cachedIndex = (cachedIndex + 1) % numPairs, count++);
+
+	if (count == numPairs) {
+		GLuint layout = CreateLayout(rc, pass->GetInputSemantics());
+		cachedIndex = numPairs;
+		passVertexArrayPairs.push_back(PassLayoutVertexArrayPair(id, layout));
+		rc->DisableVertexArrayObject();
+	} 
+
+	rc->EnableVertexArrayObject(passVertexArrayPairs[cachedIndex].second);
+	for (uint32 stream = 0; stream < binding.GetBufferCount(); ++stream) {
 		GpuBufferViewGL* buffer = static_cast<GpuBufferViewGL*>(
-							rc->GetView(binding.GetBufferPtr(stream)));
+			rc->GetView(binding.GetBufferPtr(stream)));
 		rc->GlBindVertexBuffer(stream, buffer->GetBufferId(), 0, buffer->GetStride());
 		if (buffer->IsSyncRequired())
 			transients[numSyncRequired++] = buffer;
 		GL_CHECK();
 	}
-	uint32 id = pass->GetInputLayoutID();
-	uint32 numPairs = (uint32)passVertexArrayPairs.size();
-	uint32 count = 0;
-	for (; count < numPairs; cachedIndex = (cachedIndex+1)%numPairs, count++) {
-		if (passVertexArrayPairs[cachedIndex].first == id) {
-			break;
-		}
-	}
-	if (count == numPairs) {
-		GLuint layout = CreateLayout(rc, pass->GetInputSemantics());
-		cachedIndex = numPairs;
-		passVertexArrayPairs.push_back(PassLayoutVertexArrayPair(id, layout));
-	}
-	rc->EnableVertexArrayObject(passVertexArrayPairs[cachedIndex].second);
+
 }
 
 void VertexLayoutFlexibleGL::Disable(RenderContextGL* rc) {
@@ -259,7 +261,7 @@ GLuint VertexLayoutFlexibleGL::CreateLayout(RenderContextGL* gl,
 		GLuint vao;
 		gl->GlGenVertexArrays(1, &vao);
 		GL_CHECK();
-		gl->GlBindVertexArray(vao);
+		gl->EnableVertexArrayObject(vao);
 		GL_CHECK();
 		for (uint32 j = 0; j < numMapped; ++j) {
 			NEX_ASSERT(semantics[j].index < (uint16 )-1);

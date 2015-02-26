@@ -52,6 +52,28 @@ void WindowManager::UnregisterWindow(RenderWindow* winPtr) {
 		_Unregister(winPtr);
 }
 
+void WindowManager::Quit() {
+	processing = true;
+	for(auto& e : registeredWindows) {
+		e->Destroy();
+	}
+	processing = false;
+	_ProcessRemovedItems();
+}
+
+void WindowManager::_ProcessRemovedItems() {
+	if (removedWindows.size()) {
+		WindowList::iterator rwit = removedWindows.begin();
+		WindowList::iterator rwend = removedWindows.end();
+		while (rwit != rwend) {
+			RenderWindow* wp = (*rwit);
+			_Unregister(wp);
+			++rwit;
+		}
+		removedWindows.clear();
+	}
+}
+
 void WindowManager::ProcessMessages() {
 	processing = true;
 #if defined(NEX_WINDOWS)
@@ -88,17 +110,7 @@ void WindowManager::ProcessMessages() {
 #error Not supported
 #endif
 	processing = false;
-	if (removedWindows.size()) {
-		WindowList::iterator rwit = removedWindows.begin();
-		WindowList::iterator rwend = removedWindows.end();
-		while (rwit != rwend) {
-			RenderWindow* wp = (*rwit);
-			_Unregister(wp);
-			++rwit;
-		}
-		removedWindows.clear();
-	}
-
+	_ProcessRemovedItems();
 }
 
 }

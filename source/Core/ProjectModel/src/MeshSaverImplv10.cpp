@@ -6,6 +6,7 @@
  */
 #include <NexProjectModel.h>
 #include <MeshSaverImplv10.h>
+#include <MaterialTemplate.h>
 
 namespace nextar {
 

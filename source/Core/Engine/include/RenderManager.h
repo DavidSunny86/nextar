@@ -91,7 +91,7 @@ public:
 
 	/* Render a single frame for a specific window, should be called
 	 from the thread this window was created in */
-	virtual void RenderFrame(uint32 frameNumber) = 0;
+	virtual void RenderFrame(const FrameTimer& frameTimer) = 0;
 
 protected:
 

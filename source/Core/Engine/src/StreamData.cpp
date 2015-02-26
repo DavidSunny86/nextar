@@ -10,13 +10,13 @@ namespace nextar {
 StreamData::StreamData() :
 		flags(0),
 		type(PT_TRI_LIST),
-		instanceCount(0) {
+		instanceCount(1) {
 }
 
 StreamData::~StreamData() {
-	if (flags & DELETE_BINDING)
+	if ((flags & DELETE_BINDING) && vertices.binding)
 		NEX_DELETE(vertices.binding);
-	if (flags & DELETE_LAYOUT)
+	if ((flags & DELETE_LAYOUT) && vertices.layout)
 		NEX_DELETE(vertices.layout);
 }
 

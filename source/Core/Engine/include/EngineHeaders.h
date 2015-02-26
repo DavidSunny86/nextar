@@ -23,5 +23,6 @@
 #include <RenderDriver.h>
 #include <RenderContext.h>
 #include <RenderManager.h>
+#include <DebugDisplay.h>
 
 #endif //ENGINEHEADERS_H_

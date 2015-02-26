@@ -34,11 +34,12 @@ namespace nextar {
 		static const uint32 arraySize = sizeof(paramTypeNameTable) / sizeof(paramTypeNameTable[0]);
 		ParamTypeNamePair* last = paramTypeNameTable + arraySize;
 		ParamTypeNamePair* ptr = std::lower_bound(paramTypeNameTable, last, typeName,
-				[] (const ParamTypeNamePair& p1, const String& searchText) -> int {
-					return searchText.compare(p1.first);
+				[] (const ParamTypeNamePair& p1, const String& searchText) -> bool {
+					return searchText.compare(p1.first) > 0;
 		});
 
-		if (ptr && ptr != last) {
+		
+		if (ptr && ptr != last && !(typeName.compare(ptr->first) < 0)) {
 			return ptr->second;
 		}
 

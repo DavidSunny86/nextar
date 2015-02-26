@@ -17,11 +17,29 @@ namespace nextar {
 void ObjectTransformsApply(CommitContext& context, const ShaderParameter* d) {
 	NEX_ASSERT(context.primitive);
 	const Matrix4x4* m = context.primitive->GetWorldMatrices();
-	context.paramGroup->WriteRawData(context.renderContext, m);
+	context.paramGroup->WriteRawData(context.renderContext, m, 0, 16 * 4);
 	Matrix4x4 modelView = Mat4x4Mul(*m, *context.viewMatrix);
-	context.paramGroup->WriteRawData(context.renderContext, &modelView, 16*4);
+	context.paramGroup->WriteRawData(context.renderContext, &modelView, 16 * 4, 16 * 4);
 }
 
+void ModelViewProjectionApply(CommitContext& context, const ShaderParameter* d) {
+	NEX_ASSERT(context.primitive);
+	const Matrix4x4* m = context.primitive->GetWorldMatrices();
+	const Matrix4x4* vp = context.viewProjectionMatrix;
+	Matrix4x4 mvp = Mat4x4Mul(*m, *vp);
+	const ConstantParameter* constParam =
+		reinterpret_cast<const ConstantParameter*>(d);
+	context.paramGroup->SetRawBuffer(context.renderContext, *constParam,
+		&mvp);
+}
+
+void DiffuseColorApply(CommitContext& context, const ShaderParameter* d) {
+	NEX_ASSERT(context.primitive);
+	const ConstantParameter* constParam =
+		reinterpret_cast<const ConstantParameter*>(d);
+	context.paramGroup->SetRawBuffer(context.renderContext, *constParam,
+		&context.color);
+}
 
 void InvProjectionTransformApply(CommitContext& context, const ShaderParameter* param) {
 	NEX_ASSERT(context.primitive);
@@ -72,6 +90,10 @@ void NormalMapApply(CommitContext& context, const ShaderParameter* param) {
 
 void BaseRenderManager::RegisterAutoParams() {
 
+	MAKE_AUTO_PARAM(ModelViewProjection, AutoParamName::AUTO_MODEL_VIEW_PROJECTION, PDT_MAT4x4,
+		ParameterContext::CTX_OBJECT, "Model view projection matrix.");
+	MAKE_AUTO_PARAM(DiffuseColor, AutoParamName::AUTO_DIFFUSE_COLOR, PDT_VEC4,
+		ParameterContext::CTX_OBJECT, "Diffuse color.");
 	MAKE_AUTO_PARAM(ObjectTransforms, AutoParamName::AUTO_OBJECT_TRANSFORM, PDT_STRUCT,
 		ParameterContext::CTX_OBJECT, "Model view projection and model view matrix.");
 	MAKE_AUTO_PARAM(InvProjectionTransform, AutoParamName::AUTO_INV_PROJECTION, PDT_MAT4x4,

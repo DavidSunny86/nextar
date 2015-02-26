@@ -12,7 +12,6 @@ namespace nextar {
 CommitContext::CommitContext() :
 	frameNumber(0)
 	,targetDimension(0, 0)
-	,debugDisplay(nullptr)
 	,visibiles(nullptr)
 	,lightSystem(nullptr)
 	,viewport(nullptr)
@@ -23,7 +22,9 @@ CommitContext::CommitContext() :
 	,projectionMatrix(nullptr)
 	,albedoAndGlossMap(nullptr)
 	,depthMap(nullptr)
-	,normalMap(nullptr) {
+	,normalMap(nullptr)
+	,frameTime(0.0f)
+	,frameTimer(nullptr) {
 	invProjectionMatrix = NEX_NEW(Matrix4x4());
 }
 
@@ -32,10 +33,9 @@ CommitContext::~CommitContext() {
 }
 
 void CommitContext::_Reset() {
-
+	
 	frameNumber = 0;
 	targetDimension.combined = 0;
-	debugDisplay = nullptr;
 	visibiles = nullptr;
 	lightSystem = nullptr;
 	viewport = nullptr;
@@ -45,6 +45,8 @@ void CommitContext::_Reset() {
 	albedoAndGlossMap = nullptr;
 	normalMap = nullptr;
 	depthMap = nullptr;
+	frameTime = 0.0f;
+	frameTimer = nullptr;
 }
 
 } /* namespace nextar */

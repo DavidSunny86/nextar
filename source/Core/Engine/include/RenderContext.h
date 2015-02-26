@@ -4,6 +4,7 @@
 #include <NexEngine.h>
 #include <RenderDriver.h>
 #include <Pass.h>
+#include <CommitContext.h>
 
 namespace nextar {
 
@@ -16,25 +17,32 @@ struct FrameStats {
 	uint32 elapsedMilliSeconds;
 };
 
-enum class ClearFlags {
-	CLEAR_NONE = 0,
-	CLEAR_COLOR = 1 << 0,
-	CLEAR_DEPTH = 1 << 1,
-	CLEAR_STENCIL = 1 << 2,
-	CLEAR_ALL = CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL
+enum class FrameBuffer : uint32 {
+	NONE = 0,
+	FRONT_LEFT = 1,
+	FRONT_RIGHT,
+	BACK_LEFT,
+	BACK_RIGHT,
+	DEPTH,
+
+	COLOR_0,
+	COLOR_1,
+	COLOR_2,
+	COLOR_3,
+	COLOR_4,
+	COLOR_5,
+	COLOR_6,
+	COLOR_7,
+
+	STENCIL,
+	FBTYPE_COUNT,
+
+	FRONT = FRONT_LEFT,
+	BACK = BACK_LEFT,
 };
 
 NEX_ENUM_FLAGS(ClearFlags, uint16);
 
-struct RenderInfo {
-	RenderTarget* rt;
-	ClearFlags clearFlags;
-	Color clearColor;
-	float clearDepth;
-	uint16 clearStencil;
-
-	RenderInfo() : rt(0), clearFlags(ClearFlags::CLEAR_NONE), clearDepth(1.0f), clearStencil(0) {}
-};
 
 typedef list<RenderTargetPtr>::type RenderTargetList;
 
@@ -61,12 +69,12 @@ public:
 	virtual void DestroyedRenderWindow(RenderWindow*) = 0;
 	virtual RenderTargetList& GetRenderTargetList() = 0;
 	virtual void SetVideoMode(uint32 videoModeIndex) = 0;
-	virtual void BeginFrame(uint32 frame) = 0;
+	virtual void BeginFrame(const FrameTimer& frameTimer) = 0;
 	virtual void EndFrame() = 0;
 	virtual FrameStats GetFrameStats() = 0;
 	virtual void BeginRender(RenderInfo*) = 0;
 	virtual void EndRender() = 0;
-	virtual void Copy(RenderTarget* src, FrameBuffer srcFb, RenderTarget* dest, FrameBuffer destFb);
+	virtual void Copy(RenderTarget* src, FrameBuffer srcFb, RenderTarget* dest, FrameBuffer destFb) = 0;
 
 	virtual void SwitchPass(CommitContext&, Pass::View*) = 0;
 	virtual void Draw(StreamData*, CommitContext&) = 0;

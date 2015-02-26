@@ -104,7 +104,7 @@ void BackgroundStreamerImpl::AsyncAddResponse(StreamRequest* request) {
 	// responseProcessed.clear(std::memory_order_relaxed);
 }
 
-void BackgroundStreamerImpl::EndFrame(uint32 timeElapsed) {
+void BackgroundStreamerImpl::Execute(const FrameTimer& frameTimer) {
 	// @note We can control the frequency of calls here by the timeElapsed
 	// parameter.
 	if (!responseProcessed.test_and_set(std::memory_order_relaxed)) {

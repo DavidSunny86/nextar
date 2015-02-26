@@ -36,7 +36,8 @@ void MultiRenderTargetViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 				reinterpret_cast<const MultiRenderTarget*>(params);
 
 		uint32 numColorTargets = rt->GetColorTargetsCount();
-		fbo.CreateAndBind(gl);
+		fbo.Create(gl);
+		fbo.Bind(false, gl);
 		for (uint32 i = 0; i < numColorTargets; ++i) {
 			RenderTarget* colorTarget = rt->GetAttachment(i).GetPtr();
 			switch (colorTarget->GetRenderTargetType()) {
@@ -46,7 +47,7 @@ void MultiRenderTargetViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 								static_cast<RenderBuffer*>(colorTarget))));
 				break;
 			case RenderTargetType::TEXTURE:
-				fbo.Attach(gl, i,
+				fbo.Attach(gl, GL_COLOR_ATTACHMENT0 + i,
 						static_cast<RenderTextureViewGL*>(gl->GetView(
 								static_cast<RenderTexture*>(colorTarget))));
 				break;

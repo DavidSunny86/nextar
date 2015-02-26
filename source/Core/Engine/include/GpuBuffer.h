@@ -12,7 +12,7 @@ public:
 	enum RelocationPolicy
 		: uint32 {
 		INVALID_POLICY,
-			// Forever: Static meshes, immutable
+		// Forever: Static meshes, immutable
 		NEVER_RELEASED,
 		// Long Lived: Characters, default
 		SELDOM_RELEASED,

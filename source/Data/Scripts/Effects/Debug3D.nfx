@@ -13,7 +13,7 @@ shader Debug3D {
 		
 		blend_state {
 			blend true;
-			target true src_alpha inv_src_alpha;
+			target 0 true src_alpha inv_src_alpha add;
 		}
 		
 		raster_state {

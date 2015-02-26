@@ -72,6 +72,7 @@ void BlendStateListener::BlendTargetCmd_Execute(int parentType, void* state,
 			ctx.Error(
 					"Target index is out of bounds. "
 							"Please use Blend command to specify correct target index.");
+			return;
 		}
 	}
 	RenderTargetBlendOp& blendOp = blendState.blendOp[targetIndex];

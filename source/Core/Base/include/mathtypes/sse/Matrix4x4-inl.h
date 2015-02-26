@@ -246,6 +246,67 @@ inline Matrix4x4 Mat4x4FromScaleRotPos(float scale, QuatF rot, Vec3AF pos) {
 	return ret;
 }
 
+inline Matrix4x4 Mat4x4FromScale(Vec3AF scale) {
+	Matrix4x4 ret;
+	ret.r[0] = _mm_and_ps(scale, N3D_F00O.v);
+	ret.r[1] = _mm_and_ps(scale, N3D_0F0O.v);
+	ret.r[2] = _mm_and_ps(scale, N3D_00FO.v);
+	ret.r[3] = N3D_0001.v;
+	return ret;
+}
+
+inline Matrix4x4 Mat4x4FromRot(QuatF rot) {
+	Matrix4x4 ret;
+	Quad r0, r1, r2;
+	Quad q0, q1;
+	Quad v0, v1, v2;
+
+	q0 = _mm_add_ps(rot, rot);
+	q1 = _mm_mul_ps(rot, q0);
+
+	v0 = _mm_shuffle_ps(q1, q1, _MM_SHUFFLE(3, 0, 0, 1));
+	v0 = _mm_and_ps(v0, N3D_FFFO.v);
+	v1 = _mm_shuffle_ps(q1, q1, _MM_SHUFFLE(3, 1, 2, 2));
+	v1 = _mm_and_ps(v1, N3D_FFFO.v);
+	r0 = _mm_sub_ps(N3D_1110.v, v0);
+	r0 = _mm_sub_ps(r0, v1);
+
+	v0 = _mm_shuffle_ps(rot, rot, _MM_SHUFFLE(3, 1, 0, 0));
+	v1 = _mm_shuffle_ps(q0, q0, _MM_SHUFFLE(3, 2, 1, 2));
+	v0 = _mm_mul_ps(v0, v1);
+
+	v1 = _mm_shuffle_ps(rot, rot, _MM_SHUFFLE(3, 3, 3, 3));
+	v2 = _mm_shuffle_ps(q0, q0, _MM_SHUFFLE(3, 0, 2, 1));
+	v1 = _mm_mul_ps(v1, v2);
+
+	r1 = _mm_add_ps(v0, v1);
+	r2 = _mm_sub_ps(v0, v1);
+
+	v0 = _mm_shuffle_ps(r1, r2, _MM_SHUFFLE(1, 0, 2, 1));
+	v0 = _mm_shuffle_ps(v0, v0, _MM_SHUFFLE(1, 3, 2, 0));
+	v1 = _mm_shuffle_ps(r1, r2, _MM_SHUFFLE(2, 2, 0, 0));
+	v1 = _mm_shuffle_ps(v1, v1, _MM_SHUFFLE(2, 0, 2, 0));
+
+	q1 = _mm_shuffle_ps(r0, v0, _MM_SHUFFLE(1, 0, 3, 0));
+	q1 = _mm_shuffle_ps(q1, q1, _MM_SHUFFLE(1, 3, 2, 0));
+	ret.r[0] = q1;
+	q1 = _mm_shuffle_ps(r0, v0, _MM_SHUFFLE(3, 2, 3, 1));
+	q1 = _mm_shuffle_ps(q1, q1, _MM_SHUFFLE(1, 3, 0, 2));
+	ret.r[1] = q1;
+	q1 = _mm_shuffle_ps(v1, r0, _MM_SHUFFLE(3, 2, 1, 0));
+	ret.r[2] = q1;
+	ret.r[3] = N3D_0001.v;
+	return ret;
+}
+
+inline Matrix4x4 Mat4x4FromPos(Vec3AF pos) {
+	Matrix4x4 ret;
+	ret.r[0] = N3D_1000.v;
+	ret.r[1] = N3D_0100.v;
+	ret.r[2] = N3D_0010.v;
+	ret.r[3] = _mm_or_ps(_mm_and_ps(pos, N3D_FFFO.v), N3D_0001.v);
+	return ret;
+}
 
 inline Matrix4x4 Mat4x4Scale(float scale, Mat4x4F m) {
 	Matrix4x4 ret;

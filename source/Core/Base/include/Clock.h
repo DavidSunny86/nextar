@@ -28,7 +28,7 @@ class Clock;
  * @date	11/27/2009
  **/
 class _NexBaseAPI Clock: public AllocGeneral, public ClockImpl {
-	friend class Application;
+	friend class ApplicationContext;
 
 public:
 

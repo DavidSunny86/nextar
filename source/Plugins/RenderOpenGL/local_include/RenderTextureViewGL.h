@@ -23,9 +23,11 @@ public:
 	virtual void Destroy(RenderContext*);
 
 	inline void CreateFBO(RenderContextGL* gl) {
-		fbo.CreateAndBind(gl);
+		fbo.Create(gl);
+		fbo.Bind(false, gl);
 		fbo.Attach(gl, pixelFormat.attachmentType + 0, this);
 		FrameBufferObjectGL::Validate(gl);
+		fbo.Unbind(false, gl);
 	}
 
 	inline void DestroyFBO(RenderContextGL* gl) {

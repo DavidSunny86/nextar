@@ -55,7 +55,7 @@ public:
 	}
 
 	/** @remarks Binds the buffer to the specified index */
-	void BindBuffer(size_t index, VertexBuffer& vb) {
+	void BindBuffer(size_t index, VertexBuffer&& vb) {
 		if (bufferList[index].IsTransientBuffer())
 			--transientBufferCount;
 		bufferList[index] = std::move(vb);
@@ -115,6 +115,11 @@ public:
 
 	IndexData(size_t indexStart, size_t indexCount, IndexBufferPtr indexBuffer) :
 		start((uint32)indexStart), count((uint32)indexCount), indices(indexBuffer) {
+	}
+
+	void Clear() {
+		count = start = 0;
+		indices.Clear();
 	}
 };
 

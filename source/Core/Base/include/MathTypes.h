@@ -48,7 +48,6 @@ class AABox3;
 class AxisAngle;
 class EularAngles;
 class Box2D;
-class Polygon;
 
 }
 
@@ -69,7 +68,7 @@ namespace nextar {
 #include <mathtypes/PolarSys.h>
 #include <mathtypes/Vector3-inl.h>
 #include <mathtypes/Matrix3x3-inl.h>
-#include <mathtypes/Polygon.h>
+
 }
 
 #include <mathtypes/VectorTypes-inl.h>

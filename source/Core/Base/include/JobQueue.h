@@ -2,6 +2,8 @@
 #define NEXTAR_JOBQUEUE_H
 
 #include <NexBase.h>
+#include <NexThread.h>
+#include <FrameListener.h>
 
 namespace nextar {
 
@@ -107,7 +109,7 @@ class GenericJobQueue: public JobQueue, public syncop::Runnable {
 		~JQFrameListener();
 
 		/* Called to mark the end of a frame, timeElapsed in milliseconds */
-		virtual void EndFrame(uint32 timeElapsed);
+		virtual void Execute(const FrameTimer& frameTimer);
 	};
 
 	friend class JQFrameListener;

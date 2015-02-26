@@ -34,6 +34,18 @@ public:
 		return false;
 		return true;
 	}
+
+	inline Vector3A GetCenter() const {
+		return Vec3ASet((min.x + max.x) * .5f,
+			(min.y + max.y) * .5f,
+			(min.z + max.z) * .5f);
+	}
+
+	inline Vector3A GetSize() const {
+		return Vec3ASet((max.x - min.x),
+			(max.y - min.y),
+			(max.z - min.z));
+	}
 };
 
 #endif //NEXTAR_AABB3_H

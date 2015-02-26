@@ -54,9 +54,11 @@ void RenderContextGL::PostWindowCreation(RenderWindow* gw) {
 		if (!AreExtensionsReady()) {
 			_ReadyExtensions(contextCreationParams.reqOpenGLVersionMajor,
 					contextCreationParams.reqOpenGLVersionMinor);
-			GL_CHECK();
 			DetermineShaderTarget();
 			contextFlags |= EXTENSIONS_READY;
+			SetCurrentWindow(static_cast<RenderWindowImpl*>(gw->GetImpl()));
+			currentWindow = static_cast<RenderWindowImpl*>(gw->GetImpl());
+			GL_CHECK();
 		}
 	}
 }
@@ -68,7 +70,6 @@ void RenderContextGL::PostWindowDestruction(RenderWindow* gw) {
 void RenderContextGL::CreateImpl(
 		const RenderDriver::ContextCreationParams& ctxParams) {
 	SetCreationParams(ctxParams);
-	GL_CHECK();
 }
 
 void RenderContextGL::DetermineShaderTarget() {
@@ -119,7 +120,6 @@ GLuint RenderContextGL::CreateShader(GLenum type, const char* preDef,
 	sourceBuff[0] = shaderTarget.c_str();
 	sourceBuff[1] = static_cast<const GLchar*>(preDef ? preDef : "");
 	sourceBuff[2] = static_cast<const GLchar*>(source);
-	GL_CHECK();
 	GLuint shaderObject = GlCreateShader(type);
 	GL_CHECK();
 	GlShaderSource(shaderObject, 3, sourceBuff, NULL);
@@ -863,9 +863,18 @@ void RenderContextGL::Draw(StreamData* streamData, CommitContext& ctx) {
 	layout->Disable(this);
 }
 
+void RenderContextGL::EndRender() {
+	if (contextFlags & CURRENT_TARGET_FBO) {
+		FrameBufferObjectGL::Unbind(false, this);
+		contextFlags &= ~CURRENT_TARGET_FBO;
+	} 
+	currentTarget = currentWindow;
+}
+
 void RenderContextGL::SetCurrentTarget(RenderTarget* canvas) {
-	if (canvas == nullptr)
+	if (canvas == nullptr) {
 		SetCurrentWindow(nullptr);
+	}
 	else {
 		switch (canvas->GetRenderTargetType()) {
 		case RenderTargetType::TEXTURE: {
@@ -876,6 +885,7 @@ void RenderContextGL::SetCurrentTarget(RenderTarget* canvas) {
 			if (!fbo.IsValid())
 				textureView->CreateFBO(this);
 			fbo.Bind(false, this);
+			contextFlags |= CURRENT_TARGET_FBO;
 		}
 			break;
 		case RenderTargetType::RENDER_BUFFER: {
@@ -886,9 +896,11 @@ void RenderContextGL::SetCurrentTarget(RenderTarget* canvas) {
 			if (!fbo.IsValid())
 				textureView->CreateFBO(this);
 			fbo.Bind(false, this);
+			contextFlags |= CURRENT_TARGET_FBO;
 		}
 			break;
 		case RenderTargetType::BACK_BUFFER:
+			currentWindow = canvas;
 			SetCurrentWindow(canvas);
 			break;
 		case RenderTargetType::MULTI_RENDER_TARGET: {
@@ -898,6 +910,7 @@ void RenderContextGL::SetCurrentTarget(RenderTarget* canvas) {
 			FrameBufferObjectGL& fbo = textureView->GetFBO();
 			NEX_ASSERT(fbo.IsValid());
 			fbo.Bind(false, this);
+			contextFlags |= CURRENT_TARGET_FBO;
 			}
 			break;
 		}
@@ -1474,14 +1487,15 @@ ContextID RenderContextGL::RegisterObject(ContextObject::Type type, uint32 hint)
 		view = (NEX_NEW(RenderBufferViewGL()));
 		break;
 	case ContextObject::TYPE_INDEX_BUFFER:
-		view = (NEX_NEW(GpuBufferViewGL(GL_ARRAY_BUFFER)));
+		view = (NEX_NEW(GpuBufferViewGL(GL_ELEMENT_ARRAY_BUFFER)));
 		break;
 	case ContextObject::TYPE_VERTEX_BUFFER:
 		if (hint == (uint32)GpuBuffer::REGULARLY_RELEASED ||
-				hint == (uint32)GpuBuffer::IMMEDIATELY_RELEASED)
-			view = (NEX_NEW(GpuTransientBufferViewGL(GL_ELEMENT_ARRAY_BUFFER)));
+			hint == (uint32)GpuBuffer::IMMEDIATELY_RELEASED)
+			//@ todo Use transient buffer pool to reduce footprint
+			view = (NEX_NEW(GpuTransientBufferViewGL(GL_ARRAY_BUFFER)));
 		else
-			view = (NEX_NEW(GpuBufferViewGL(GL_ELEMENT_ARRAY_BUFFER)));
+			view = (NEX_NEW(GpuBufferViewGL(GL_ARRAY_BUFFER)));
 		break;
 	case ContextObject::TYPE_VERTEX_LAYOUT:
 		if (hint & dynamicLayoutHint) {

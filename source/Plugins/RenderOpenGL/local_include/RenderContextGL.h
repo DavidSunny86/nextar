@@ -34,7 +34,8 @@ public:
 	virtual void SetCurrentTarget(RenderTarget*);
 	virtual void Clear(Color& c, float depth, uint16 stencil, ClearFlags flags);
 	virtual void CloseImpl();
-	virtual void Copy(RenderTarget* src, FrameBuffer srcFb, RenderTarget* dest, FrameBuffer destFb)
+	virtual void Copy(RenderTarget* src, FrameBuffer srcFb, RenderTarget* dest, FrameBuffer destFb);
+	virtual void EndRender();
 
 	virtual ContextID RegisterObject(ContextObject::Type type, uint32 hint);
 	virtual void UnregisterObject(ContextID);
@@ -99,9 +100,9 @@ public:
 	inline void EnableVertexAttribute(const GLuint location,
 				const VertexAttribGL& vegl);
 	inline void DisableVertexAttribute(const GLuint location);
-	inline void SetReadBuffer(GLenum target, void* dest, size_t offset,
+	inline void ReadBuffer(GLenum target, void* dest, size_t offset,
 			size_t size);
-	inline void SetDrawBuffer(GLenum target, size_t totalSize, GLenum usage,
+	inline void WriteBuffer(GLenum target, size_t totalSize, GLenum usage,
 			const void* src, size_t offset, size_t size);
 	inline void WriteSubData(GLenum target, const void* src, size_t offset,
 			size_t size);
@@ -152,6 +153,7 @@ protected:
 	enum {
 		CONTEXT_READY = 1 << 0, 
 		EXTENSIONS_READY = 1 << 1,
+		CURRENT_TARGET_FBO = 1 << 2,
 	};
 
 	bool IsContextReady() {
@@ -177,6 +179,7 @@ protected:
 
 	UniformBufferMap uniformBufferMap;
 	RenderDriver::ContextCreationParams contextCreationParams;
+	RenderTarget* currentWindow;
 };
 
 inline void RenderContextGL::EnableVertexArrayObject(GLuint vao) {
@@ -240,7 +243,7 @@ inline void RenderContextGL::DestroyBuffer(GLuint bufferId) {
 	GlDeleteBuffers(1, &bufferId);
 }
 
-inline void RenderContextGL::SetReadBuffer(GLenum target, void* dest,
+inline void RenderContextGL::ReadBuffer(GLenum target, void* dest,
 		size_t offset, size_t size) {
 	void* src = GlMapBuffer(target, GL_READ_ONLY);
 	GL_CHECK();
@@ -249,7 +252,7 @@ inline void RenderContextGL::SetReadBuffer(GLenum target, void* dest,
 	GL_CHECK();
 }
 
-inline void RenderContextGL::SetDrawBuffer(GLenum target, size_t totalSize,
+inline void RenderContextGL::WriteBuffer(GLenum target, size_t totalSize,
 		GLenum usage, const void* src, size_t offset, size_t size) {
 	if (!size) {
 		size = totalSize - offset;
@@ -311,6 +314,7 @@ inline void RenderContextGL::DestroyTexture(GLuint tex) {
 }
 
 inline void RenderContextGL::ActivateTexture(GLenum target, GLuint texture) {
+	GL_CHECK();
 	glBindTexture(target, texture);
 	GL_CHECK();
 }

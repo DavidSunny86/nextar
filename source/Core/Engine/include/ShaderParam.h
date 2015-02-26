@@ -85,7 +85,7 @@ public:
 	virtual void Unmap(RenderContext* rc) = 0;
 
 	virtual void WriteRawData(RenderContext* rc, const void* data,
-			size_t offset = 0, size_t size = 0) = 0;
+			size_t offset, size_t size) = 0;
 
 	uint32 lastUpdateId;
 	ParameterContext context;

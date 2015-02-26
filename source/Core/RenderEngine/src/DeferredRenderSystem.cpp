@@ -58,8 +58,8 @@ void GBuffer::Setup(Size dimensions) {
 /* DeferredRenderSystem                                                 */
 /************************************************************************/
 DeferredRenderSystem::DeferredRenderSystem() {
-	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_INIT_RESOURCES, CreateMaterials, this);
-	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyBuffers, this);
+	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_INIT_RESOURCES, CreateResources, this);
+	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyResources, this);
 }
 
 DeferredRenderSystem::~DeferredRenderSystem() {
@@ -75,7 +75,7 @@ void DeferredRenderSystem::PrepareGeometryBuffer() {
 
 void DeferredRenderSystem::PrepareMaterials() {
 	if (!lightMaterial) {
-		URL lightMaterialPath(FileSystem::ArchiveEngineData_Name, "Materials/DeferredLights.mtl");
+		URL lightMaterialPath(FileSystem::ArchiveEngineData_Name, "Materials/Assets/DeferredLights.mtl");
 		lightMaterial = Asset::AssetLoad(lightMaterialPath);
 	}
 }
@@ -131,11 +131,11 @@ void DeferredRenderSystem::Commit(CommitContext& context) {
 	gbuffer.normalMap->Capture(context.renderContext, image, FrameBuffer::FRONT);
 	Image imageObj(std::move(image));
 	/* Display Image */
-	if (context.debugDisplay) {
+	if (DebugDisplay::InstancePtr()) {
 		Box2D box(0, 0, 0.25f, 0.25f);
-		context.debugDisplay->Register(context, box, Color::Red, gbuffer.normalMap);
+		DebugDisplay::Instance().Register(box, Color::Red, gbuffer.normalMap);
 		Box2D box2(0.25, 0, 0.5f, 0.25f);
-		context.debugDisplay->Register(context, box2, Color::Red, gbuffer.albedoSpecular);
+		DebugDisplay::Instance().Register(box2, Color::Red, gbuffer.albedoSpecular);
 	}
 
 	context.albedoAndGlossMap = gbuffer.albedoSpecular;
@@ -143,7 +143,7 @@ void DeferredRenderSystem::Commit(CommitContext& context) {
 	context.normalMap = gbuffer.normalMap;
 
 	context.renderContext->BeginRender(&context.renderTargetInfo);
-	context.renderTargetInfo.clearFlags = 0;
+	context.renderTargetInfo.clearFlags = ClearFlags::CLEAR_NONE;
 	for(auto& lightPair : ls) {
 		auto light = lightPair.second;
 		switch(light->GetLightType()) {
@@ -196,14 +196,14 @@ void DeferredRenderSystem::RenderLight(Light* light, uint32 passIdx, uint32 upda
 	context.primitive = nullptr;
 }
 
-void DeferredRenderSystem::DestroyBuffers(void* renderSystem) {
+void DeferredRenderSystem::DestroyResources(void* renderSystem) {
 	DeferredRenderSystem* pRenderSys = reinterpret_cast<DeferredRenderSystem*>(renderSystem);
 	if (pRenderSys)
 		pRenderSys->DestroyBuffer();
 }
 
 
-void DeferredRenderSystem::CreateMaterials(void* renderSystem) {
+void DeferredRenderSystem::CreateResources(void* renderSystem) {
 	DeferredRenderSystem* pRenderSys = reinterpret_cast<DeferredRenderSystem*>(renderSystem);
 	if (pRenderSys)
 		pRenderSys->PrepareMaterials();

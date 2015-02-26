@@ -56,6 +56,10 @@ enum AutoParamName
 	AUTO_NORMAL_MAP,
 	// Albedo and gloss map
 	AUTO_ALBEDO_AND_GLOSS,
+	// Model view projection matrix
+	AUTO_MODEL_VIEW_PROJECTION,
+	// Diffuse color
+	AUTO_DIFFUSE_COLOR,
 	// Custom generic parameter, could be texture or constant
 	// accessed from property buffer.
 	AUTO_CUSTOM_CONSTANT,

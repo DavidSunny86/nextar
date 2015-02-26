@@ -4,6 +4,7 @@
 #include <RenderManager.h>
 #include <DefaultLightSystem.h>
 #include <RenderTarget.h>
+#include <ApplicationContext.h>
 
 namespace nextar {
 
@@ -64,7 +65,7 @@ void Viewport::PushPrimitives(uint32 frameNumber) {
 	}
 }
 
-void Viewport::CommitPrimitives(RenderContext* renderCtx, uint32 frameNumber) {
+void Viewport::CommitPrimitives(RenderContext* renderCtx, const FrameTimer&  frameNumber) {
 
 	// if we had offscreen vp lets commit them first
 	for (auto &s : offscreen) {
@@ -80,7 +81,9 @@ void Viewport::CommitPrimitives(RenderContext* renderCtx, uint32 frameNumber) {
 	*commitContext.invProjectionMatrix = Mat4x4Inverse(*commitContext.projectionMatrix);
 	commitContext.renderContext = renderCtx;
 	commitContext.viewport = this;
-	commitContext.frameNumber = frameNumber;
+	commitContext.frameNumber = frameNumber.GetFrameNumber();
+	commitContext.frameTimer = &frameNumber;
+	commitContext.frameTime = frameNumber.GetFrameTime();
 	commitContext.visibiles = &visibleSet;
 	commitContext.lightSystem = traversal.lightSystem;
 	commitContext.targetDimension = renderTarget->GetDimensions();
@@ -96,10 +99,10 @@ void Viewport::CommitPrimitives(RenderContext* renderCtx, uint32 frameNumber) {
 	}
 }
 
-void Viewport::Render(RenderContext* renderCtx, uint32 frameNumber) {
+void Viewport::Render(RenderContext* renderCtx, const FrameTimer& frameNumber) {
 	RenderManager& rm = RenderManager::Instance();
 	visibleSet.Prepare();
-	PushPrimitives(frameNumber);
+	PushPrimitives(frameNumber.GetFrameNumber());
 	FirePreupdate();
 	CommitPrimitives(renderCtx, frameNumber);
 	FirePostupdate();

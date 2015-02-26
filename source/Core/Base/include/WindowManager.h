@@ -25,9 +25,11 @@ public:
 
 	/* Returns false to quit */
 	void ProcessMessages();
+	void Quit();
 protected:
 
 	void _Unregister(RenderWindow*);
+	void _ProcessRemovedItems();
 
 	bool processing;
 	typedef list<RenderWindow*>::type WindowList;

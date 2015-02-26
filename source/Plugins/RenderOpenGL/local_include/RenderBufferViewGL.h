@@ -35,9 +35,11 @@ public:
 	}
 
 	inline void CreateFBO(RenderContextGL* gl) {
-		fbo.CreateAndBind(gl);
+		fbo.Create(gl);
+		fbo.Bind(false, gl);
 		fbo.Attach(gl, attachmentType + 0, this);
 		FrameBufferObjectGL::Validate(gl);
+		fbo.Unbind(false, gl);
 	}
 
 	inline void DestroyFBO(RenderContextGL* gl) {

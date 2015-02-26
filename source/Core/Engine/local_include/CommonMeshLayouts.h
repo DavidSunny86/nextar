@@ -29,6 +29,11 @@ const VertexElement Layout_POSITION_0_NORMAL_UV_1[] = {
 	VertexElement(VertexDesc( VertexSemantic(COMP_TEXTURE_COORDINATE, 0, COMP_TYPE_FLOAT2), 12 ), 1, 0)
 };
 
+const VertexElement Layout_POSITION_COLOR_0[] = {
+	VertexElement(VertexDesc(VertexSemantic(COMP_POSITION, 0, COMP_TYPE_FLOAT3), 0), 0, 0),
+	VertexElement(VertexDesc(VertexSemantic(COMP_COLOR, 0, COMP_TYPE_COLOR), 12), 0, 0)
+};
+
 VertexLayout::CommonVertexElement
 VertexLayout::commonElementLayout[VertexLayoutType::VERTEX_LAYOUT_COUNT] = {
 	{
@@ -50,6 +55,10 @@ VertexLayout::commonElementLayout[VertexLayoutType::VERTEX_LAYOUT_COUNT] = {
 	{
 		3,
 		Layout_POSITION_0_NORMAL_UV_1
+	},
+	{
+		2,
+		Layout_POSITION_COLOR_0
 	}
 };
 

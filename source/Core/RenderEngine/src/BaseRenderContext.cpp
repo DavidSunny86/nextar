@@ -96,8 +96,8 @@ void BaseRenderContext::SetVideoMode(uint32 vidMod) {
 	}
 }
 
-void BaseRenderContext::BeginFrame(uint32 frame) {
-	frameStats.frameID = frame;
+void BaseRenderContext::BeginFrame(const FrameTimer& frameTimer) {
+	frameStats.frameID = frameTimer.GetFrameNumber();
 	frameStats.renderTargetsUsed = 0;
 	frameStats.polygonCount = 0;
 	frameStats.shaderSwitches = 0;
@@ -121,7 +121,8 @@ void BaseRenderContext::BeginRender(RenderInfo* ri) {
 }
 
 void BaseRenderContext::EndRender() {
-	// todo Set a flag marking the current render target is pending a reset?
+	SetCurrentTarget(0);
+	currentTarget = nullptr;
 }
 
 void BaseRenderContext::UpdateObject(ContextObject* object,

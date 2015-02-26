@@ -21,6 +21,7 @@ class FrameBufferObjectGL {
 	NEX_LOG_HELPER(FrameBufferObjectGL)
 	;
 public:
+
 	FrameBufferObjectGL() : frameBufferObject(0) {};
 	virtual ~FrameBufferObjectGL();
 
@@ -28,16 +29,14 @@ public:
 		return frameBufferObject != 0;
 	}
 
-	void CreateAndBind(RenderContextGL* gl) {
+	void Create(RenderContextGL* gl) {
 		if (!frameBufferObject)
 			gl->GlGenFramebuffers(1, &frameBufferObject);
-		Bind(false, gl);
 	}
 
 	void Bind(bool readBuffer, RenderContextGL* gl) {
 		gl->GlBindFramebuffer(readBuffer ?
-		GL_READ_FRAMEBUFFER :
-											GL_DRAW_FRAMEBUFFER,
+		GL_READ_FRAMEBUFFER : GL_DRAW_FRAMEBUFFER,
 				frameBufferObject);
 	}
 
@@ -46,8 +45,7 @@ public:
 
 	static void Unbind(bool readBuffer, RenderContextGL* gl) {
 		gl->GlBindFramebuffer(readBuffer ?
-		GL_READ_FRAMEBUFFER :
-											GL_DRAW_FRAMEBUFFER, 0);
+		GL_READ_FRAMEBUFFER : GL_DRAW_FRAMEBUFFER, 0);
 	}
 
 	void Destroy(RenderContextGL* gl) {
@@ -65,7 +63,7 @@ public:
 protected:
 
 	friend class RenderContextGL;
-	static GLenum attachment[FrameBuffer::FBTYPE_COUNT];
+	static GLenum attachment[(uint32)FrameBuffer::FBTYPE_COUNT];
 	GLuint frameBufferObject;
 };
 

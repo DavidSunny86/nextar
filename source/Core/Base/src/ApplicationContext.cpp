@@ -131,17 +131,21 @@ void ApplicationContext::SetQuitting(bool value) {
 	quitting = value;
 }
 
+void ApplicationContext::QuitApplication() {
+	quitting = true;
+	WindowManager::Instance().Quit();
+}
+
 void ApplicationContext::Run() {
 
 	frameClock.StartClock();
 
 	while (!quitting) {
-		frameClock.Tick();
-
+		
 		if (frameListenersToAdd.size()) {
 			// process any add requests
 			frameListeners.insert(frameListenersToAdd.begin(),
-					frameListenersToAdd.end());
+				frameListenersToAdd.end());
 			frameListenersToAdd.clear();
 		}
 		{
@@ -149,17 +153,10 @@ void ApplicationContext::Run() {
 			frameTimer.BeginFrame();
 			WindowManager::Instance().ProcessMessages();
 			// run the frame listeners
-			FrameListenerSet::iterator it = frameListeners.begin();
-			FrameListenerSet::iterator en = frameListeners.end();
-			for (; it != en; ++it)
-				(*it).frameListener->BeginFrame(frameTimer.GetFrameNumber());
+			for (auto& p : frameListeners)
+				p.frameListener->Execute(frameTimer);
 
-			uint32 elapsedMilSec = frameClock.Tick();
-
-			it = frameListeners.begin();
-			for (; it != en; ++it)
-				(*it).frameListener->EndFrame(elapsedMilSec);
-			frameTimer.EndFrame(elapsedMilSec);
+			frameTimer.EndFrame(frameClock.Tick());
 			runningLoop = false;
 		}
 

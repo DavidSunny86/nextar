@@ -41,6 +41,12 @@ inline Vector4A Mat4x4TransVec3A(Vec3AF v, Mat4x4F m2);
 inline Vector4A Mat4x4TransBoundRadius(Vec3AF v, Mat4x4F m);
 /** @brief	Matrix4x4 from rotation and postion. **/
 inline Matrix4x4 Mat4x4FromScaleRotPos(float scale, QuatF rot, Vec3AF pos);
+/** @brief	Matrix4x4 from scaling. **/
+inline Matrix4x4 Mat4x4FromScale(Vec3AF scale);
+/** @brief	Matrix4x4 from quaternion. **/
+inline Matrix4x4 Mat4x4FromRot(QuatF rot);
+/** @brief	Matrix4x4 from translation. **/
+inline Matrix4x4 Mat4x4FromPos(Vec3AF rot);
 /** @brief	Scale a Matrix4x4 uniformly. **/
 inline Matrix4x4 Mat4x4Scale(float scale, Mat4x4F m);
 /** @brief Matrix4x4 transpose **/

@@ -59,6 +59,10 @@ union Size {
 	inline Size(uint16 a, uint16 b) :
 			dx(a), dy(b) {
 	}
+
+	friend bool operator == (const Size& s1, const Size& s2) {
+		return (s1.combined == s2.combined) != 0;
+	}
 };
 
 union Point {

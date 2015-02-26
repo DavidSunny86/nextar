@@ -141,8 +141,14 @@ namespace nextar {
 		StringVector pathstack;
 		StringUtils::TokenIterator it = 0;
 		String path;
+		String subPath;
+		size_t p = pattern.find_last_of('/');
+		if (p != String::npos) {
+			subPath = pattern.substr(0, p);
+		}
+
 		while ((it = StringUtils::NextWord(paths, path, it)) != String::npos) {
-			_VisitDirectory(path, pattern, StringUtils::Null, callback, recursive);
+			_VisitDirectory(path, pattern, subPath, callback, recursive);
 		}
 	}
 

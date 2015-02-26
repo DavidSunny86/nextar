@@ -157,7 +157,7 @@ public:
 	}
 
 	/* Update viewport */
-	virtual void Render(RenderContext* renderCtx, uint32 frameNumber);
+	virtual void Render(RenderContext* renderCtx, const FrameTimer&);
 
 	/* @remarks Add new callback */
 	virtual void AddCallback(ViewportCallback*);
@@ -170,7 +170,7 @@ public:
 
 	/* */
 	virtual void PushPrimitives(uint32 frameNumber);
-	virtual void CommitPrimitives(RenderContext* renderCtx, uint32 frameNumber);
+	virtual void CommitPrimitives(RenderContext* renderCtx, const FrameTimer& frameNumber);
 
 protected:
 

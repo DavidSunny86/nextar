@@ -258,10 +258,6 @@ void WindowWGL::Impl::Destroy() {
     parent->SetWindowHandle(0);
     parent->SetWindowDC(0);
 	hDC = 0;
-    if (parent->IsMainWindow()) {
-        // post quit message
-        PostQuitMessage(0);
-    }
 	context->DestroyedRenderWindow(parent);
 }
 

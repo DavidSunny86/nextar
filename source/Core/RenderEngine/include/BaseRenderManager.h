@@ -10,6 +10,7 @@
 
 #include <NexRenderEngine.h>
 #include <RenderManager.h>
+#include <FrameTimer.h>
 
 namespace nextar {
 
@@ -35,13 +36,13 @@ public:
 
 	virtual void RegisterRenderContext(RenderContextPtr&);
 
-	virtual void RenderFrame(uint32 frameNumber);
+	virtual void RenderFrame(const FrameTimer&) override;
 
 protected:
 
 	virtual void CloseImpl() = 0;
 
-	void RenderAllTargets(RenderContext* rc, uint32 frame, bool callPresent);
+	void RenderAllTargets(RenderContext* rc, const FrameTimer& frameTimer, bool callPresent);
 	void PresentSwapChains(RenderContext* rc);
 	void CreateRenderSystems();
 	void CreateRenderQueues();

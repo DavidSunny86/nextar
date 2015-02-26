@@ -1,15 +1,15 @@
 /*
- * GeometryServices.cpp
+ * Geometry.cpp
  *
  *  Created on: 14-Feb-2015
  *      Author: obhi
  */
 
-#include <GeometryServices.h>
+#include <Geometry.h>
 
 namespace nextar {
 
-Polygon GeometryServices::CreateSphere(uint32 density, float radius,
+Geometry Geometry::CreateSphere(uint32 density, float radius,
 		bool normalData, bool colorData, const Color& color) {
 	// @optimize Its probably better to use a single vertex buffer for all volumes
 	uint32 width = density;
@@ -19,10 +19,10 @@ Polygon GeometryServices::CreateSphere(uint32 density, float radius,
 	uint32 vbsize = normalData ? nvec * 2 : nvec;
 	uint32 ibsize = ntri * 3;
 
-	Polygon::PointList points;
-	Polygon::PointList normals;
-	Polygon::PointList colors;
-	Polygon::IndexList indices;
+	Geometry::PointList points;
+	Geometry::PointList normals;
+	Geometry::ColorList colors;
+	Geometry::IndexList indices;
 	points.reserve(vbsize);
 	indices.reserve(ibsize);
 
@@ -73,14 +73,13 @@ Polygon GeometryServices::CreateSphere(uint32 density, float radius,
 
 	if (colorData) {
 		colors.reserve(points.size());
-		Vector3 c(color.red, color.green, color.blue);
 		for(uint32 i = 0; i < points.size(); ++i)
-			colors.push_back(c);
+			colors.push_back(color);
 	}
-	return Polygon(std::move(points), std::move(normals), std::move(colors), std::move(indices));
+	return Geometry(std::move(points), std::move(normals), std::move(colors), std::move(indices));
 }
 
-Polygon GeometryServices::CreateCone(uint32 density,
+Geometry Geometry::CreateCone(uint32 density,
 		float baseRadius, float topRadius, float height,
 		bool normalData, bool colorData, const Color& topColor,
 		const Color& bottomColor) {
@@ -93,10 +92,10 @@ Polygon GeometryServices::CreateCone(uint32 density,
 		topRadius = 0.0f;
 	float heightCap = height * topRadius / baseRadius;
 	uint32 ibsize = ntri*3;
-	Polygon::PointList points;
-	Polygon::PointList normals;
-	Polygon::PointList colors;
-	Polygon::IndexList indices;
+	Geometry::PointList points;
+	Geometry::PointList normals;
+	Geometry::ColorList colors;
+	Geometry::IndexList indices;
 	points.reserve(vbsize);
 	indices.reserve(ibsize);
 
@@ -131,15 +130,14 @@ Polygon GeometryServices::CreateCone(uint32 density,
 	}
 
 	if (colorData) {
-		Vector3 topCol(topColor.red, topColor.green, topColor.blue);
-		Vector3 botCol(bottomColor.red, bottomColor.green, bottomColor.blue);
+		
 		colors.reserve(points.size());
-		colors.push_back(topCol);
-		colors.push_back(botCol);
+		colors.push_back(topColor);
+		colors.push_back(bottomColor);
 		for(uint32 i = 0; i < density; ++i)
-			colors.push_back(topCol);
+			colors.push_back(topColor);
 		for(uint32 i = 0; i < density; ++i)
-			colors.push_back(botCol);
+			colors.push_back(bottomColor);
 	}
 
 	if (normalData) {
@@ -195,10 +193,10 @@ Polygon GeometryServices::CreateCone(uint32 density,
 		}
 	}
 
-	return Polygon(std::move(points), std::move(normals), std::move(colors), std::move(indices));
+	return Geometry(std::move(points), std::move(normals), std::move(colors), std::move(indices));
 }
 
-Polygon GeometryServices::CreateCylinder(
+Geometry Geometry::CreateCylinder(
 		uint32 density, float radius,
 		float height, bool normalData,
 		bool colorData, const Color& topColor,
@@ -207,9 +205,9 @@ Polygon GeometryServices::CreateCylinder(
 			colorData, topColor, bottomColor);
 }
 
-Polygon GeometryServices::CreateCube(float dx, float dy, float dz,
+Geometry Geometry::CreateCube(float dx, float dy, float dz,
 		bool normalData, bool colorData, const Color& color) {
-	Polygon::PointList positions = {
+	Geometry::PointList positions = {
 		Vector3(-1.0f,-1.0f,-1.0f), // triangle 1 : begin
 		Vector3(-1.0f,-1.0f, 1.0f),
 		Vector3(-1.0f, 1.0f, 1.0f), // triangle 1 : end
@@ -259,7 +257,7 @@ Polygon GeometryServices::CreateCube(float dx, float dy, float dz,
 		positions[i].z *= dz;
 	}
 
-	Polygon::PointList normals;
+	Geometry::PointList normals;
 	if (normalData) {
 
 		Vector3 normalV[] = {
@@ -277,22 +275,21 @@ Polygon GeometryServices::CreateCube(float dx, float dy, float dz,
 		}
 	}
 
-	Polygon::PointList colors;
+	Geometry::ColorList colors;
 	if (colorData) {
-		Vector3 c(color.red, color.green, color.blue);
 		colors.reserve(positions.size());
 		for(uint32 i = 0; i < 36; ++i) {
-			colors.push_back(c);
+			colors.push_back(color);
 		}
 	}
 
-	return Polygon(std::move(positions), std::move(normals), std::move(colors));
+	return Geometry(std::move(positions), std::move(normals), std::move(colors));
 }
 
-Polygon GeometryServices::CreateBox(float width, float height, float depth,
+Geometry Geometry::CreateBox(float width, float height, float depth,
 		bool colorData, const Color& color) {
 
-	Polygon::PointList points = {
+	Geometry::PointList points = {
 		Vector3(-width, -height, -depth ), // 0
 		Vector3(width, -height, -depth  ), // 1
 		Vector3(width,  height, -depth  ), // 2
@@ -312,15 +309,14 @@ Polygon GeometryServices::CreateBox(float width, float height, float depth,
 	 *  |/      |/
 	 *  0-------1
 	 */
-	Polygon::PointList colors;
+	Geometry::ColorList colors;
 	if (colorData) {
-		Vector3 c(color.red, color.green, color.blue);
 		for(uint32 i = 0; i < 8; ++i) {
-			colors.push_back(c);
+			colors.push_back(color);
 		}
 	}
 
-	Polygon::IndexList indices = {
+	Geometry::IndexList indices = {
 			0,1,
 			1,2,
 			2,3,
@@ -335,11 +331,11 @@ Polygon GeometryServices::CreateBox(float width, float height, float depth,
 			2,6
 	};
 
-	Polygon p;
+	Geometry p;
 	p.points = std::move(points);
 	p.colors = std::move(colors);
 	p.topology = std::move(indices);
-	p.type = Polygon::LINES;
+	p.type = Geometry::LINES;
 
 	return p;
 }

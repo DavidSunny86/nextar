@@ -103,7 +103,7 @@ StreamData* MeshServices::CreateSphereMesh(
 	stream->vertices.layout = VertexLayout::GetCommonLayout(VertexLayoutType::POSITION_0).GetPtr();
 	stream->vertices.binding = NEX_NEW(VertexBufferBinding());
 	stream->vertices.binding->SetBufferCount(1);
-	stream->vertices.binding->BindBuffer(0, vertexBuffer);
+	stream->vertices.binding->BindBuffer(0, std::move(vertexBuffer));
 	stream->indices.start = 0;
 	stream->indices.count = ntri*3;
 	stream->indices.indices = std::move(indexBuffer);

@@ -35,6 +35,8 @@ public:
 
 #include <ExtListGL.h>
 
+	PFNGLGETSTRINGIPROC glGetStringi;
+
 #undef DECL_COND_START_VERSION
 #undef DECL_COND_END_VERSION
 #undef DECL_COND_START_EXT

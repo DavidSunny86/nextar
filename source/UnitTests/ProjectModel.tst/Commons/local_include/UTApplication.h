@@ -15,9 +15,8 @@ public:
 	virtual void ConfigureExtendedInterfacesImpl();
 
 	virtual void ReleaseResourcesImpl();
-	virtual void BeginFrame(uint32 frameNumber);
-	virtual void EndFrame(uint32 timeElapsed);
-
+	virtual void Execute(const FrameTimer& frameTimer);
+	
 	static void SetupScene(void* callback);
 protected:
 
@@ -26,6 +25,7 @@ protected:
 	virtual void _SetupRenderDriver();
 	virtual SceneAssetPtr _CreateDefaultScene();
 
+	Size windowDimensions;
 	SceneAssetPtr scene;
 	RenderTargetPtr window;
 };

@@ -12,6 +12,8 @@
 #include <ShaderTemplate.h>
 #include <MaterialTemplate.h>
 #include <MeshTemplate.h>
+#include <MaterialSaverImplv10.h>
+#include <MeshSaverImplv10.h>
 
 namespace nextar {
 

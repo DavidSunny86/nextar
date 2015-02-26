@@ -5,6 +5,8 @@
  *      Author: obhi
  */
 #include <LanguageTranslator.h>
+#include <ScriptStrings.h>
+#include <ShaderScript.h>
 #include <TranslatorHLSL.h>
 
 namespace ShaderCompiler {

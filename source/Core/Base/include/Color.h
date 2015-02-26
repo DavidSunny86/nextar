@@ -44,6 +44,8 @@ public:
 		ser >> c.red >> c.green >> c.blue >> c.alpha;
 		return ser;
 	}
+
+	inline uint32 ToRgba() const;
 };
 
 // a 32bit color component
@@ -69,6 +71,10 @@ public:
 
 	inline Color32(float a, float r, float g, float b) :
 		red((uint8)(r*255.f)), green((uint8)(g*255.f)), blue((uint8)(b*255.f)), alpha((uint8)(a*255.f)) {
+	}
+
+	inline Color32(const Color& c) :
+		red((uint8)(c.red*255.f)), green((uint8)(c.green*255.f)), blue((uint8)(c.blue*255.f)), alpha((uint8)(c.alpha*255.f)) {
 	}
 
 	inline
@@ -102,5 +108,12 @@ public:
 		return ser;
 	}
 };
+
+inline 
+uint32 Color::ToRgba() const {
+	uint8 _red((uint8)(red*255.f)), _green((uint8)(green*255.f)), _blue((uint8)(blue*255.f)), _alpha((uint8)(alpha*255.f));
+	return (_red << 24) | (_green << 16) | (_blue << 8) | _alpha;
+}
+
 }
 #endif //NEXTAR_COLOR_H

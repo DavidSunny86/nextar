@@ -27,7 +27,10 @@ public:
 	};
 
 	enum ListnerPriority {
-		PRIORITY_LOW = 999999, PRIORITY_NORMAL = 500000, PRIORITY_HIGH = 100000,
+		PRIORITY_HIGH = 10000,
+		PRIORITY_NORMAL = 50000,
+		PRIORITY_LOW = 100000, 
+		
 	};
 
 	class ErrorHandler {
@@ -38,15 +41,25 @@ public:
 	};
 
 	struct Listener {
-		FrameListener* frameListener;
+
 		uint32 priority;
+		FrameListener* frameListener;
+		
+		static uint32 BeginFramePriority(uint32 subPriority) {
+			return PRIORITY_HIGH + subPriority;
+		}
+
+		static uint32 EndFramePriority(uint32 subPriority) {
+			return PRIORITY_LOW + subPriority;
+		}
 
 		Listener(FrameListener* listener, uint32 listenerPriority) :
 				frameListener(listener), priority(listenerPriority) {
 		}
-
+		
 		inline bool operator <(const Listener& other) const {
-			return priority < other.priority;
+			return (priority < other.priority) || 
+				(priority == other.priority && frameListener < other.frameListener);
 		}
 	};
 
@@ -69,6 +82,9 @@ public:
 		return config;
 	}
 
+	/* This function should be called to exit the running application */
+	void QuitApplication();
+	/* @nodoc */
 	void SetQuitting(bool value);
 	
 	void ParseCommandLineParaqms(int argc, char* argv[]);

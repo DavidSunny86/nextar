@@ -3,6 +3,7 @@
 #include <Viewport.h>
 #include <RenderTarget.h>
 #include <DeferredRenderSystem.h>
+#include <DebugRenderSystem.h>
 
 namespace nextar {
 
@@ -125,7 +126,7 @@ RenderDriverPtr BaseRenderManager::AsyncGetDriver(uint32 params) {
 #endif
 }
 
-void BaseRenderManager::RenderFrame(uint32 frameNumber) {
+void BaseRenderManager::RenderFrame(const FrameTimer& frameTimer) {
 	/**
 	 * Handle culling step followed by rendering step.
 	 */
@@ -138,7 +139,7 @@ void BaseRenderManager::RenderFrame(uint32 frameNumber) {
 #else
 	if (!primaryContext) 
 		return;
-	RenderAllTargets(primaryContext, frameNumber,
+	RenderAllTargets(primaryContext, frameTimer,
 						!renderSettings.syncPresent);
 	
 #endif
@@ -156,7 +157,7 @@ void BaseRenderManager::RenderFrame(uint32 frameNumber) {
 	}
 }
 
-void BaseRenderManager::RenderAllTargets(RenderContext* rc, uint32 frame,
+void BaseRenderManager::RenderAllTargets(RenderContext* rc, const FrameTimer& frame,
 		bool callPresent) {
 #if NEX_MULTIGPU_BUILD
 #error Not implemented
@@ -186,6 +187,7 @@ void BaseRenderManager::PresentSwapChains(RenderContext* rc) {
 
 void BaseRenderManager::CreateRenderSystems() {
 	AddRenderSystem(NEX_NEW(DeferredRenderSystem));
+	AddRenderSystem(NEX_NEW(DebugRenderSystem));
 }
 
 void BaseRenderManager::CreateRenderQueues() {

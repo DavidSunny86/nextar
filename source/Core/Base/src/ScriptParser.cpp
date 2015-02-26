@@ -30,12 +30,13 @@ bool ScriptParser::ParseScript(ScriptListener* listener,
 	StreamLexer lexer(static_cast<const char*>(readOnlyBuffer), readSize);
 	ScriptContext context(scriptName, lexer);
 	listener->EnterScript(context);
+	input->ReleaseBuffer(readOnlyBuffer);
 
 	if (context.IsErrorBitSet()) {
 		Error("Errors in script: " + scriptName + ": " + context.GetErrors());
 		return false;
 	}
-	input->ReleaseBuffer(readOnlyBuffer);
+	
 	return true;
 }
 /***************************************************

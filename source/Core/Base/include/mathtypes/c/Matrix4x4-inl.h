@@ -199,6 +199,59 @@ inline Matrix4x4 Mat4x4FromScaleRotPos(float scale, QuatF rot, Vec3AF pos) {
 	return ret;
 }
 
+inline Matrix4x4 Mat4x4FromScale(Vec3AF scale) {
+	Matrix4x4 ret;
+	ret.m00 = scale.x; ret.m01 = 0; ret.m02 = 0; ret.m03 = 0;
+	ret.m10 = 0; ret.m11 = scale.y; ret.m12 = 0; ret.m13 = 0;
+	ret.m20 = 0; ret.m21 = 0; ret.m22 = scale.z; ret.m23 = 0;
+	ret.m30 = 0; ret.m31 = 0; ret.m32 = 0; ret.m33 = 1;
+	return ret;
+}
+
+inline Matrix4x4 Mat4x4FromPos(Vec3AF pos) {
+	Matrix4x4 ret;
+	ret.m00 = 1; ret.m01 = 0; ret.m02 = 0; ret.m03 = 0;
+	ret.m10 = 0; ret.m11 = 1; ret.m12 = 0; ret.m13 = 0;
+	ret.m20 = 0; ret.m21 = 0; ret.m22 = 1; ret.m23 = 0;
+	ret.m30 = pos.x; ret.m31 = pos.y; ret.m32 = pos.z; ret.m33 = 1;
+	return ret;
+}
+
+inline Matrix4x4 Mat4x4FromRot(QuatF rot) {
+	Matrix4x4 ret;
+	float xx = rot.x * rot.x;
+	float yy = rot.y * rot.y;
+	float zz = rot.z * rot.z;
+	float xy = rot.x * rot.y;
+	float xz = rot.x * rot.z;
+	float yz = rot.y * rot.z;
+	float wx = rot.w * rot.x;
+	float wy = rot.w * rot.y;
+	float wz = rot.w * rot.z;
+
+	ret.m00 = (1 - 2 * (yy + zz));
+	ret.m01 = (2 * (xy + wz));
+	ret.m02 = (2 * (xz - wy));
+	ret.m03 = 0;
+
+	ret.m10 = (2 * (xy - wz));
+	ret.m11 = (1 - 2 * (xx + zz));
+	ret.m12 = (2 * (yz + wx));
+	ret.m13 = 0;
+
+	ret.m20 = (2 * (xz + wy));
+	ret.m21 = (2 * (yz - wx));
+	ret.m22 = (1 - 2 * (xx + yy));
+	ret.m23 = 0;
+		
+	ret.m30 = 0;
+	ret.m31 = 0;
+	ret.m32 = 0;
+	ret.m33 = 1.0f;
+
+	return ret;
+}
+
 inline Matrix4x4 Mat4x4Scale(float scale, Mat4x4F m) {
 	Matrix4x4 ret = m;
 	ret.m00 *= scale;

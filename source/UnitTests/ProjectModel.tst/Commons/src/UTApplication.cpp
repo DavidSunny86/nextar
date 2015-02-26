@@ -2,7 +2,7 @@
 #include <UTApplication.h>
 
 UTApplication::UTApplication() :
-	ProjectApplicationContext("UTApplication") {
+	ProjectApplicationContext("UTApplication"), windowDimensions(800, 600) {
 }
 
 UTApplication::~UTApplication() {
@@ -42,11 +42,8 @@ void UTApplication::ConfigureExtendedInterfacesImpl() {
 	Subscribe(ApplicationContext::EVENT_INIT_RESOURCES, SetupScene, this);
 }
 
-void UTApplication::BeginFrame(uint32 frameNumber) {
-	RenderManager::Instance().RenderFrame(frameNumber);
-}
-
-void UTApplication::EndFrame(uint32 elapsedTime) {
+void UTApplication::Execute(const FrameTimer& frameTimer) {
+	RenderManager::Instance().RenderFrame(frameTimer);
 }
 
 void UTApplication::ReleaseResourcesImpl() {
@@ -61,8 +58,8 @@ void UTApplication::_SetupRenderDriver() {
 	dcp.createDefaultContext = true;
 	dcp.defaultContextParams.deferredContext = false;
 	dcp.defaultContextParams.createDefaultWindow = true;
-	dcp.defaultContextParams.defaultWindowWidth = 800;
-	dcp.defaultContextParams.defaultWindowHeight = 600;
+	dcp.defaultContextParams.defaultWindowWidth = windowDimensions.dx;
+	dcp.defaultContextParams.defaultWindowHeight = windowDimensions.dy;
 	dcp.defaultContextParams.depthBits = 24;
 	dcp.defaultContextParams.stencilBits = 8;
 	dcp.defaultContextParams.fullScreen = false;
