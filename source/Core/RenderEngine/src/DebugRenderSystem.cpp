@@ -158,6 +158,8 @@ void DebugRenderSystem::RemovePrimitive(uint32 id) {
 void DebugRenderSystem::Commit(CommitContext& context) {
 
 	DetermineVisiblePrimitives(context.frameTime);
+	context.renderTargetInfo.clearColor = Color::White;
+	context.renderTargetInfo.clearFlags = ClearFlags::CLEAR_COLOR;
 	context.renderContext->BeginRender(&context.renderTargetInfo);
 	for (auto &prim : alivePrimitives) {
 		MaterialAsset* material = prim->GetMaterial();

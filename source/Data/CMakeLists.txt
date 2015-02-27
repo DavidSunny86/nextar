@@ -75,5 +75,5 @@ copy_data(Materials)
 copy_data("Materials/Assets")
 copy_data(Scripts)
 
-add_custom_command(TARGET NE_Data POST_BUILD
-	COMMAND ${NEX_INSTALL}/Bin/NE_UnitTests.ProjectModel_AutoCompileMaterials.tst)
+# add_custom_command(TARGET NE_Data POST_BUILD
+#	COMMAND ${NEX_INSTALL}/Bin/NE_UnitTests.ProjectModel_AutoCompileMaterials.tst)
