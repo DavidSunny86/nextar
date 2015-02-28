@@ -31,10 +31,10 @@ public:
 
 	inline void Present(HDC hDC) {
 #ifdef NEX_DEBUG
-		BOOL ret = 
+		BOOL ret =
 #endif
-			wglSwapLayerBuffers(hDC,
-			WGL_SWAP_MAIN_PLANE);
+			SwapBuffers(hDC);
+			//wglSwapLayerBuffers(hDC,	WGL_SWAP_MAIN_PLANE);
 
 #ifdef NEX_DEBUG
 		if (!ret) {
@@ -79,6 +79,7 @@ protected:
 	/* GLX Extensions */
 	PFNWGLCHOOSEPIXELFORMATARBPROC WglChoosePixelFormatARB;
 	PFNWGLCREATECONTEXTATTRIBSARBPROC WglCreateContextAttribsARB;
+	
 	HDC currentDC;
 	HGLRC context;
 	int pixelFormat;

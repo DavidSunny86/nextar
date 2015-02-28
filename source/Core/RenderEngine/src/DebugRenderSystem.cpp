@@ -48,7 +48,19 @@ void DebugRenderSystem::CreateResources(void* renderSystem) {
 
 void DebugRenderSystem::CreateMaterials() {
 	URL debugMaterialPath(FileSystem::ArchiveEngineData_Name, "Materials/Assets/Debug3D.mtl");
-	debugMaterial = Asset::AssetLoad(debugMaterialPath);
+	URL debugQuadMaterialPath(FileSystem::ArchiveEngineData_Name, "Materials/Assets/DebugQuad.mtl");
+	try {
+		debugMaterial = Asset::AssetLoad(debugMaterialPath);
+	} catch (const GracefulErrorExcept& e) {
+		Error(e.GetMsg());
+	}
+
+	try {
+		debugQuadMaterial = Asset::AssetLoad(debugQuadMaterialPath);
+	} catch (const GracefulErrorExcept& e) {
+		Error(e.GetMsg());
+	}
+
 }
 
 void DebugRenderSystem::ReleaseObjects() {
@@ -60,6 +72,7 @@ void DebugRenderSystem::ReleaseObjects() {
 	});
 	alivePrimitives.clear();
 	debugMaterial.Clear();
+	debugQuadMaterial.Clear();
 	ClearStreamData(boxDataStream);
 	boxDataGenerated = false;
 }
@@ -81,12 +94,50 @@ uint32 DebugRenderSystem::Register(const AABox3& box,
 	if (!boxDataGenerated) {
 		GenerateStreamDataForBox();
 	}
-
-	DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
+	DebugPrimitive* primitive = nullptr;
+	/*
+	primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
 	primitive->SetStreamData(&boxDataStream);
 	primitive->SetMaterial(debugMaterial);
 	primitive->SetTransform(box.GetSize(), QuatIdentity(), box.GetCenter());
 	alivePrimitives.push_back(primitive);
+	*/
+	// generate a triangle
+	
+	VertexBuffer vertexBuffer(GpuBuffer::NEVER_RELEASED);
+
+	uint32 stride = (sizeof(float) * 2);
+	uint32 vbsize = 3 * stride;
+
+	void* pVData = NEX_ALLOC(vbsize, MEMCAT_GENERAL);
+	float* pos = (float*)pVData;
+	pos[0] = 0;
+	pos[1] = 0.5f;
+	pos[2] = -0.25f;
+	pos[3] = 0;
+	pos[4] = 0.25f;
+	pos[5] = 0;
+	vertexBuffer.CreateBuffer(vbsize, stride, reinterpret_cast<const uint8*>(pVData));
+	
+	StreamData* stream = &axisData;
+	stream->flags = StreamData::DELETE_BINDING;
+	stream->type = PrimitiveType::PT_TRI_LIST;
+	stream->vertices.count = 3;
+	stream->vertices.start = 0;
+	stream->vertices.layout = VertexLayout::GetCommonLayout(VertexLayoutType::POSITION_COLOR_0).GetPtr();
+	stream->vertices.binding = NEX_NEW(VertexBufferBinding());
+	stream->vertices.binding->SetBufferCount(1);
+	stream->vertices.binding->BindBuffer(0, std::move(vertexBuffer));
+	stream->indices.start = 0;
+	stream->indices.count = 0;
+	stream->instanceCount = 1;
+
+	NEX_FREE(pVData, MEMCAT_GENERAL);
+	primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
+	primitive->SetStreamData(stream);
+	primitive->SetMaterial(debugQuadMaterial);
+	alivePrimitives.push_back(primitive);
+
 	return idCounter;
 }
 

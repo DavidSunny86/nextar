@@ -1,0 +1,5 @@
+
+material Default:Default.DebugQuad {	
+	shader "{EngineData}/Scripts/Effects/DebugQuad.nfx" Default:Default.DebugQuad;
+	layer normal;
+}

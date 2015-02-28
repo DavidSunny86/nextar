@@ -57,6 +57,8 @@ class DebugRenderSystem:
 	public DebugDisplay,
 	public nextar::RenderSystem {
 
+	NEX_LOG_HELPER(DebugRenderSystem);
+
 public:
 	DebugRenderSystem();
 	virtual ~DebugRenderSystem();
@@ -94,6 +96,7 @@ protected:
 	void ReleaseObjects();
 	void GenerateStreamDataForBox();
 
+	MaterialAssetPtr debugQuadMaterial;
 	MaterialAssetPtr debugMaterial;
 	uint32 idCounter;
 	bool boxDataGenerated;

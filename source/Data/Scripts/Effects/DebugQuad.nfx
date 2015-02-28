@@ -1,5 +1,5 @@
 
-shader Debug3D {
+shader DebugQuad {
 
 	flags debug;
 	pass Main {
@@ -13,7 +13,6 @@ shader Debug3D {
 		
 		blend_state {
 			blend false;
-			target 0 true src_alpha inv_src_alpha add;
 		}
 		
 		raster_state {
@@ -23,9 +22,9 @@ shader Debug3D {
 		}
 		
 		program {
-			define HAS_COLOR;
-			vertex_program Common Debug3D;
-			fragment_program Debug3D;
+			define HAS_2DVERT;
+			vertex_program Common Quad;
+			fragment_program DebugQuad;
 		}
 
 	}

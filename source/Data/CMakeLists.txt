@@ -63,7 +63,10 @@ prepare_data(Textures)
 prepare_data(Meshes)
 prepare_data(Materials)
 prepare_data("Materials/Assets")
-prepare_data(Scripts)
+prepare_data(Scripts/Materials)
+prepare_data(Scripts/Shaders)
+prepare_data(Scripts/Effects)
+prepare_data(Scripts/ConstBuffers)
 
 add_custom_target(NE_Data ALL SOURCES ${DATA_SRC_LIST})
 
