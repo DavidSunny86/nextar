@@ -34,6 +34,10 @@ const VertexElement Layout_POSITION_COLOR_0[] = {
 	VertexElement(VertexDesc(VertexSemantic(COMP_COLOR, 0, COMP_TYPE_COLOR), 12), 0, 0)
 };
 
+const VertexElement Layout_POSITION2D_0[] = {
+	VertexElement(VertexDesc(VertexSemantic(COMP_2D_POSITION, 0, COMP_TYPE_FLOAT2), 0), 0, 0)
+};
+
 VertexLayout::CommonVertexElement
 VertexLayout::commonElementLayout[VertexLayoutType::VERTEX_LAYOUT_COUNT] = {
 	{
@@ -59,6 +63,10 @@ VertexLayout::commonElementLayout[VertexLayoutType::VERTEX_LAYOUT_COUNT] = {
 	{
 		2,
 		Layout_POSITION_COLOR_0
+	},
+	{
+		1,
+		Layout_POSITION2D_0
 	}
 };
 

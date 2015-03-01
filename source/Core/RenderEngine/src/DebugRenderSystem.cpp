@@ -124,7 +124,7 @@ uint32 DebugRenderSystem::Register(const AABox3& box,
 	stream->type = PrimitiveType::PT_TRI_LIST;
 	stream->vertices.count = 3;
 	stream->vertices.start = 0;
-	stream->vertices.layout = VertexLayout::GetCommonLayout(VertexLayoutType::POSITION_COLOR_0).GetPtr();
+	stream->vertices.layout = VertexLayout::GetCommonLayout(VertexLayoutType::POSITION2D_0).GetPtr();
 	stream->vertices.binding = NEX_NEW(VertexBufferBinding());
 	stream->vertices.binding->SetBufferCount(1);
 	stream->vertices.binding->BindBuffer(0, std::move(vertexBuffer));
