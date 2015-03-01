@@ -95,13 +95,13 @@ uint32 DebugRenderSystem::Register(const AABox3& box,
 		GenerateStreamDataForBox();
 	}
 	DebugPrimitive* primitive = nullptr;
-	/*
+	
 	primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
 	primitive->SetStreamData(&boxDataStream);
 	primitive->SetMaterial(debugMaterial);
 	primitive->SetTransform(box.GetSize(), QuatIdentity(), box.GetCenter());
 	alivePrimitives.push_back(primitive);
-	*/
+	
 	// generate a triangle
 	
 	VertexBuffer vertexBuffer(GpuBuffer::NEVER_RELEASED);
