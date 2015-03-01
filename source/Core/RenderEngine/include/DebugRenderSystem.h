@@ -103,6 +103,7 @@ protected:
 	StreamData boxDataStream;
 	StreamData planeData;
 	StreamData axisData;
+	StreamData lineData;
 	VisiblePrimitiveList alivePrimitives;
 };
 
