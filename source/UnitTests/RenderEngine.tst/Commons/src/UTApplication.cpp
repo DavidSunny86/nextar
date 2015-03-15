@@ -35,8 +35,8 @@ void UTApplication::_SetupScene(SceneAssetPtr& scene) {
 	EntityPtr camera = entityManager->AsyncCreateCameraEntity(
 			NamedObject::AsyncStringID("Main"));
 	// A camera at 50,0,50 looking at 0,0,0
-	Quaternion rotation = QuatFromAxisAng(Vector3::ZAxis, 0);
-	camera->SetTransform(Vec3ASet(50, 0, 50), rotation, 1);
+	Quaternion rotation = QuatFromAxisAng(Vector3::XAxis, Math::PI_BY_4);
+	camera->SetTransform(Vec3ASet(0, 50,-50), rotation, 1);
 	Camera::PerspectiveParams params;
 
 	Size s = window->GetDimensions();

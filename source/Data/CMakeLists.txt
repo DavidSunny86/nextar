@@ -52,7 +52,8 @@ macro(copy_data subDir)
 	add_custom_command(TARGET NE_Data POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_directory
 			"${NEX_DATA}/${ARGV0}"
-			${NEX_INSTALL}/Data/${ARGV0})
+			${NEX_INSTALL}/Data/${ARGV0}
+		COMMENT "Copied ${NEX_INSTALL}/Data/${ARGV0}.")
 endmacro(copy_data)
 
 # Add library
@@ -68,7 +69,8 @@ prepare_data(Scripts/Shaders)
 prepare_data(Scripts/Effects)
 prepare_data(Scripts/ConstBuffers)
 
-add_custom_target(NE_Data ALL SOURCES ${DATA_SRC_LIST})
+add_custom_target(NE_Data ALL 
+	SOURCES ${DATA_SRC_LIST})
 
 copy_data(Shaders)
 copy_data(Configs)
@@ -77,6 +79,5 @@ copy_data(Meshes)
 copy_data(Materials)
 copy_data("Materials/Assets")
 copy_data(Scripts)
-
-# add_custom_command(TARGET NE_Data POST_BUILD
-#	COMMAND ${NEX_INSTALL}/Bin/NE_UnitTests.ProjectModel_AutoCompileMaterials.tst)
+add_custom_command(TARGET NE_Data POST_BUILD
+	COMMAND ${NEX_INSTALL}/Bin/NE_UnitTests.ProjectModel_AutoCompileMaterials.tst )

@@ -351,9 +351,9 @@ inline Matrix4x4 Mat4x4ViewFromWorld(Mat4x4F m) {
 	ret.r[2] = _mm_shuffle_ps(m.r[0], m.r[1], _MM_SHUFFLE(3, 2, 3, 2));
 	ret.r[2] = _mm_shuffle_ps(ret.r[2], m.r[2], _MM_SHUFFLE(3, 2, 2, 0));
 
-	ret.r[3] = _mm_shuffle_ps(m.r[3], m.r[3], _MM_SHUFFLE(0, 0, 0, 0));
-	ret.r[3] = _mm_mul_ps(ret.r[3], ret.r[0]);
-	Quad vTemp = _mm_shuffle_ps(m.r[3], m.r[3], _MM_SHUFFLE(1, 1, 1, 1));
+	Quad vTemp = _mm_shuffle_ps(m.r[3], m.r[3], _MM_SHUFFLE(0, 0, 0, 0));
+	ret.r[3] = _mm_mul_ps(vTemp, ret.r[0]);
+	vTemp = _mm_shuffle_ps(m.r[3], m.r[3], _MM_SHUFFLE(1, 1, 1, 1));
 	vTemp = _mm_mul_ps(vTemp, ret.r[1]);
 	ret.r[3] = _mm_add_ps(ret.r[3], vTemp);
 	vTemp = _mm_shuffle_ps(m.r[3], m.r[3], _MM_SHUFFLE(2, 2, 2, 2));
@@ -370,15 +370,23 @@ inline Matrix4x4 Mat4x4ViewFromWorld(Mat4x4F m) {
 }
 
 inline Matrix4x4 Mat4x4FromCameraLookAt(Vec3AF eye, Vec3AF lookat, Vec3AF vup) {
-	Matrix4x4 ret;
-	Vector3A up;
-	Vector3A dir = Vec3ASub(lookat, eye);
-	ret.r[2] = Vec3ANormalize(dir);
-	up = Vec3ACross(vup, dir);
-	ret.r[1] = Vec3ANormalize(up);
-	ret.r[0] = Vec3ACross(ret.r[2], ret.r[1]);
-	ret.r[3] = eye;
-	return ret;
+
+	Vector3A zaxis, yaxis, xaxis;
+	Matrix4x4 m;
+	zaxis = m.r[2] = Vec3ANormalize(Vec3ASub(lookat, eye));
+	xaxis = m.r[0] = Vec3ANormalize(Vec3ACross(vup, m.r[2]));
+	yaxis = m.r[1] = Vec3ACross(m.r[2], m.r[0]);
+	m.r[3] = Matrix4x4::IdentityMatrix.r[3];
+	m = Mat4x4Transpose(m);
+
+	Vector3A negEye = Vec3ANegate(eye);
+	m.r[3] = Vec4ASet(
+		Vec3ADot(xaxis, negEye),
+		Vec3ADot(yaxis, negEye),
+		Vec3ADot(zaxis, negEye),
+		1);
+
+	return m;
 }
 
 inline Matrix4x4 Mat4x4FromOrtho(float w, float h, float zn, float zf) {

@@ -299,9 +299,11 @@ inline Matrix4x4 Mat4x4FromCameraLookAt(Vec3AF eye, Vec3AF lookat, Vec3AF vup) {
 	Vector3A zaxis = Vec3ANormalize(Vec3ASub(lookat, eye));
 	Vector3A xaxis = Vec3ANormalize(Vec3ACross(vup, zaxis));
 	Vector3A yaxis = Vec3ACross(zaxis, xaxis);
-	return Matrix4x4(xaxis.x, yaxis.x, zaxis.x, 0, xaxis.y, yaxis.y, zaxis.y, 0,
-			xaxis.z, yaxis.z, zaxis.z, 0, -Vec3ADot(xaxis, eye),
-			-Vec3ADot(yaxis, eye), -Vec3ADot(zaxis, eye), 1);
+	return Matrix4x4(
+		xaxis.x, yaxis.x, zaxis.x, 0, 
+		xaxis.y, yaxis.y, zaxis.y, 0,
+		xaxis.z, yaxis.z, zaxis.z, 0, 
+		-Vec3ADot(xaxis, eye), -Vec3ADot(yaxis, eye), -Vec3ADot(zaxis, eye), 1);
 }
 
 inline Matrix4x4 Mat4x4FromOrtho(float w, float h, float zn, float zf) {
