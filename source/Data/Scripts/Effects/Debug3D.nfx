@@ -12,7 +12,7 @@ shader Debug3D {
 		}
 		
 		blend_state {
-			blend false;
+			blend true;
 			target 0 true src_alpha inv_src_alpha add;
 		}
 		

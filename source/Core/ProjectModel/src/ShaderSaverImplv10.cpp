@@ -55,7 +55,8 @@ void ShaderSaverImplv1_0::SavePass(const ShaderTemplate::PassUnit& pu,
 	if (pu.depthStencilState.stencilTest) {
 		const StencilFaceOp* op[2] = { &pu.depthStencilState.front, &pu.depthStencilState.back };
 		for(uint32 i = 0; i < 2; ++i) {
-			ser << (uint8)op[i]->stencilMask
+			ser << (uint32)op[i]->stencilMask
+				<< (int32)op[i]->stencilRef
 				<< (uint8)op[i]->stencilFunc
 				<< (uint8)op[i]->stencilFail
 				<< (uint8)op[i]->stencilPass

@@ -88,6 +88,10 @@ public:
 
 	void CopyBuffer(GLuint src, GLuint dest, size_t size);
 
+	void SetRasterState(const RasterStateGL&);
+	void SetDepthStencilState(const DepthStencilStateGL&);
+	void SetBlendState(const BlendStateGL&);
+	
 	inline void DestroyVAO(GLuint vao);
 	inline void DestroyBuffer(GLuint vbo);
 	inline void DestroyTexture(GLuint texture);
@@ -129,9 +133,13 @@ public:
 	static bool IsSamplerType(GLint type);
 	static GLint GetGlAddressMode(TextureAddressMode t);
 	static GLenum GetGlCompareFunc(TextureComparisonMode type);
+	static GLenum GetGlCompareFunc(DepthStencilCompare c);
+	static GLenum GetGlStencilOp(StencilOp s);
 	static GLint GetGlMagFilter(TextureMagFilter t);
 	static GLint GetGlMinFilter(TextureMinFilter t);
 	static GLenum GetGlTextureType(TextureBase::TextureType type);
+	static GLenum GetGlBlendDataSource(BlendDataSource type);
+	static GLenum GetGlBlendEquation(BlendOp op);
 	// @optimize Return from a table a const reference rather than the object
 	// and store that in texture view.
 	static PixelFormatGl GetGlPixelFormat(PixelFormat imageFormat,
@@ -140,7 +148,16 @@ public:
 			ParameterContext defaultContext = ParameterContext::CTX_UNKNOWN);
 	static void DestroyResources(void* pThis);
 
+
+	static void ReportError(GLenum source,
+		GLenum type,
+		GLuint id,
+		GLenum severity,
+		GLsizei length,
+		const GLchar* message);
+
 protected:
+
 
 	void DetermineShaderTarget();
 	GLuint CreateSamplerFromParams(const TextureUnitParams& params);
@@ -180,6 +197,10 @@ protected:
 	UniformBufferMap uniformBufferMap;
 	RenderDriver::ContextCreationParams contextCreationParams;
 	RenderTarget* currentWindow;
+
+	BlendStateGL blendState;
+	DepthStencilStateGL depthStencilState;
+	RasterStateGL rasterState;
 };
 
 inline void RenderContextGL::EnableVertexArrayObject(GLuint vao) {

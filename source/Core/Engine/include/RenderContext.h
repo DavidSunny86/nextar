@@ -87,6 +87,7 @@ public:
 	virtual ContextObject::View* GetView(const ContextObject*) = 0;
 #else
 	inline ContextObject::View* GetView(const ContextObject* object) {
+		NEX_ASSERT(object);
 		return reinterpret_cast<ContextObject::View*>(object->GetContextID());
 	}
 #endif

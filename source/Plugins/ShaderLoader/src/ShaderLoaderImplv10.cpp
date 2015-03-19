@@ -96,14 +96,18 @@ bool ShaderLoaderImplv1_0::ReadPass(ShaderAsset::StreamRequest* request,
 	depthStencilState.depthCompareFunc = (DepthStencilCompare)depthCompareFunc;
 	if(depthStencilState.stencilTest) {
 		StencilFaceOp* op[2] = { &depthStencilState.front, &depthStencilState.back };
-		uint8 stencilMask, stencilFunc, stencilFail, stencilPass, depthPass;
+		uint8 stencilFunc, stencilFail, stencilPass, depthPass;
+		uint32 stencilMask;
+		int32 stencilRef;
 		for(uint32 i = 0; i < 2; ++i) {
 			ser >> stencilMask
+				>> stencilRef
 				>> stencilFunc
 				>> stencilFail
 				>> stencilPass
 				>> depthPass;
-			op[i]->stencilMask = (ColorMask)stencilMask;
+			op[i]->stencilMask = stencilMask;
+			op[i]->stencilRef = stencilRef;
 			op[i]->stencilFunc = (DepthStencilCompare)stencilFunc;
 			op[i]->stencilFail = (StencilOp)stencilFail;
 			op[i]->stencilPass = (StencilOp)stencilPass;

@@ -45,7 +45,13 @@ public:
 					type(TRIANGLES) {}
 	inline Geometry(PointList&& v, IndexList&& t, Type y) : points(std::move(v)),
 				topology(std::move(t)), type(y) {}
+	inline Geometry(const Geometry& g) : type(g.type), topology(g.topology),
+		points(g.points), normals(g.normals), uv(g.uv), colors(g.colors) {}
+	inline Geometry(Geometry&& g) : type(g.type), topology(std::move(g.topology)),
+		points(std::move(g.points)), normals(std::move(g.normals)), uv(std::move(g.uv)), colors(std::move(g.colors)) {}
 
+	bool Merge(const Geometry& second);
+	void Transform(Mat4x4R m);
 
 
 	static Geometry CreateSphere(uint32 density, float radius,

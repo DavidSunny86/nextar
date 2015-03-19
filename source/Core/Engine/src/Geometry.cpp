@@ -90,7 +90,7 @@ Geometry Geometry::CreateCone(uint32 density,
 	uint32 ntri = topCapped ? 4*density : 2*density;
 	if (topRadius <= 0.0f)
 		topRadius = 0.0f;
-	float heightCap = height * topRadius / baseRadius;
+	float heightCap = height * ( 1 - (topRadius / baseRadius) );
 	uint32 ibsize = ntri*3;
 	Geometry::PointList points;
 	Geometry::PointList normals;
@@ -99,7 +99,7 @@ Geometry Geometry::CreateCone(uint32 density,
 	points.reserve(vbsize);
 	indices.reserve(ibsize);
 
-	float angleStepper = Math::TWO_PI / (density+1);
+	float angleStepper = Math::TWO_PI / (density);
 
 
 	points.push_back(Vector3(0, heightCap, 0));
@@ -338,6 +338,46 @@ Geometry Geometry::CreateBox(float width, float height, float depth,
 	p.type = Geometry::LINES;
 
 	return p;
+}
+
+void Geometry::Transform(Mat4x4R m) {
+	if (points.size() > 0)
+		Mat4x4TransVec3(points.data(), sizeof(Vector3), (uint32)points.size(), m);
+	if (normals.size() > 0)
+		Mat4x4TransVec3Normals(normals.data(), sizeof(Vector3), (uint32)normals.size(), m);
+}
+
+bool Geometry::Merge(const Geometry& second) {
+	if (type != second.type)
+		return false;
+	if (points.size() && !second.points.size())
+		return false;
+	if (normals.size() && !second.normals.size())
+		return false;
+	if (uv.size() && !second.uv.size())
+		return false;
+	// @todo we shouldnt fail in this case
+	// just assign white to the rest
+	if (colors.size() && !second.colors.size())
+		return false;
+	// @todo we shouldnt fail in this case
+	// we can manage to merge triangle lists
+	if (topology.size() && !second.topology.size())
+		return false;
+
+#define NEX_VAPPEND(v)	v.insert(v.end(), second.v.begin(), second.v.end());
+
+	if (points.size())
+		NEX_VAPPEND(points);
+	if (normals.size())
+		NEX_VAPPEND(normals);
+	if (uv.size())
+		NEX_VAPPEND(uv);
+	if (colors.size())
+		NEX_VAPPEND(colors);
+	if (topology.size())
+		NEX_VAPPEND(topology);
+	return true;
 }
 
 } /* namespace nextar */

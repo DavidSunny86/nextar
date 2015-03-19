@@ -33,6 +33,10 @@ inline void Mat4x4TransVec3(Vector4A* outstream, uint32 outstride,
 /** @brief	Matrix4x4 Transform vertices. **/
 inline void Mat4x4TransVec3(Vector4* outstream, uint32 outstride,
 		const Vector3* inpstream, uint32 inpstride, uint32 count, Mat4x4F m2);
+/** @brief	Matrix4x4 Transform vertices in place for orthogonal matrix. No w divide is done. **/
+inline void Mat4x4TransVec3(Vector3* inpstream, uint32 inpstride, uint32 count, Mat4x4F m2);
+/** @brief	Matrix4x4 Transform normals in place for orthogonal matrix. No w divide is done. **/
+inline void Mat4x4TransVec3Normals(Vector3* inpstream, uint32 inpstride, uint32 count, Mat4x4F m2);
 /** @brief	Matrix4x4 Transform vertex. **/
 inline Vector3A Mat4x4TransAndProjVec3A(Vec3AF v, Mat4x4F m2);
 /** @brief	Matrix4x4 Transform vertex. **/

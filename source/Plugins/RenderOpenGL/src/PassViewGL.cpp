@@ -77,6 +77,111 @@ void PassViewGL::Compile(nextar::RenderContext* rc,
 	this->inputSemantics = layout.second;
 	this->inputLayoutId = layout.first;
 
+	SetupStates(params);
+}
+
+void PassViewGL::SetupStates(const Pass::CompileParams& params) {
+	SetupRasterState(params.rasterState);
+	SetupDepthStencilState(params.depthStencilState);
+	SetupBlendState(params.blendState);
+}
+
+void PassViewGL::SetupBlendState(const BlendState& rs) {
+	blendState.alphaToCoverage = rs.alphaToCoverage;
+	blendState.enabled = rs.enabled;
+	blendState.numRenderTargets = (uint8)rs.numRenderTargets;
+	if (blendState.enabled && blendState.numRenderTargets) {
+		blendState.sameBlendOpAllTarget = true;
+		blendState.sameMaskAllTarget = true;
+		RenderTargetBlendOp rt = rs.blendOp[0];
+		for (uint32 i = 0; i < rs.numRenderTargets; ++i) {
+			auto& src = rs.blendOp[i];
+			if (rt.mask != src.mask)
+				blendState.sameMaskAllTarget = false;
+			auto& dest = blendState.blendOp[i];
+			dest.mask = src.mask;
+			if (rt.alphaOp != src.alphaOp ||
+				rt.colOp != src.colOp ||
+				rt.destAlpha != src.destAlpha ||
+				rt.destCol != src.destCol ||
+				rt.enabled != src.enabled ||
+				rt.srcAlpha != src.srcAlpha ||
+				rt.srcCol != src.srcCol)
+				blendState.sameBlendOpAllTarget = false;
+
+			dest.enabled = src.enabled;
+			dest.alphaOp = RenderContextGL::GetGlBlendEquation(src.alphaOp);
+			dest.colOp = RenderContextGL::GetGlBlendEquation(src.colOp);
+			dest.destAlpha = RenderContextGL::GetGlBlendDataSource(src.destAlpha);
+			dest.destCol = RenderContextGL::GetGlBlendDataSource(src.destCol);
+			dest.srcAlpha = RenderContextGL::GetGlBlendDataSource(src.srcAlpha);
+			dest.srcCol = RenderContextGL::GetGlBlendDataSource(src.srcCol);
+		}
+	}
+}
+
+void PassViewGL::SetupRasterState(const RasterState& rs) {
+	rasterState.constantDepthBias = rs.constantDepthBias;
+	rasterState.depthBiasClamp = rs.depthBiasClamp;
+	rasterState.depthClip = rs.depthClip;
+	rasterState.frontIsCCW = !rs.trianglesAreClockwise;
+	rasterState.slopeScaledDepthBias = rs.slopeScaledDepthBias;
+	rasterState.useScissors = rs.usingScissors;
+	rasterState.usingMultisample = rs.usingMultisample;
+	rasterState.usingLineAA = rs.usingLineAa;
+	
+	switch (rs.fill) {
+	case FillMode::FM_POINT:
+		rasterState.fillMode = GL_POINT; break;
+	case FillMode::FM_SOLID:
+		rasterState.fillMode = GL_FILL; break;
+	case FillMode::FM_WIREFRAME:
+		rasterState.fillMode = GL_LINE; break;
+	}
+	
+	switch (rs.cull) {
+	case CullMode::CULL_ALL:
+		rasterState.cullMode = GL_FRONT_AND_BACK; break;
+	case CullMode::CULL_BACK:
+		rasterState.cullMode = GL_BACK;	break;
+	case CullMode::CULL_FRONT:
+		rasterState.cullMode = GL_FRONT; break;
+	case CullMode::CULL_NONE:
+		rasterState.cullMode = 0; break;
+	}	
+}
+
+void PassViewGL::SetupDepthStencilState(const DepthStencilState& desc) {
+	depthStencilState.depthTest = desc.depthTest;
+	depthStencilState.depthWrite = desc.depthWrite;
+	depthStencilState.stencilTest = desc.stencilTest;
+
+	depthStencilState.stencilFrontMask = desc.front.stencilMask;
+	depthStencilState.stencilBackMask = desc.back.stencilMask;
+	depthStencilState.stencilFrontRef = desc.front.stencilRef;
+	depthStencilState.stencilBackRef = desc.back.stencilRef;
+
+	depthStencilState.stencilFrontFunc = RenderContextGL::GetGlCompareFunc(desc.front.stencilFunc);
+	depthStencilState.stencilBackFunc = RenderContextGL::GetGlCompareFunc(desc.back.stencilFunc);
+
+	depthStencilState.frontStencilFail = RenderContextGL::GetGlStencilOp(desc.front.stencilFail);
+	depthStencilState.frontStencilPass = RenderContextGL::GetGlStencilOp(desc.front.stencilPass);
+	depthStencilState.frontDepthPass = RenderContextGL::GetGlStencilOp(desc.front.depthPass);
+
+	depthStencilState.backStencilFail = RenderContextGL::GetGlStencilOp(desc.back.stencilFail);
+	depthStencilState.backStencilPass = RenderContextGL::GetGlStencilOp(desc.back.stencilPass);
+	depthStencilState.backDepthPass = RenderContextGL::GetGlStencilOp(desc.back.depthPass);
+
+	depthStencilState.depthCompare = RenderContextGL::GetGlCompareFunc(desc.depthCompareFunc);
+	depthStencilState.stencilSeparateOp = false;
+	
+	if (depthStencilState.stencilFrontFunc != depthStencilState.stencilBackFunc ||
+		depthStencilState.frontStencilFail != depthStencilState.backStencilFail ||
+		depthStencilState.frontStencilPass != depthStencilState.backStencilPass ||
+		depthStencilState.frontDepthPass != depthStencilState.backDepthPass ||
+		depthStencilState.stencilFrontMask != depthStencilState.stencilBackMask)
+		depthStencilState.stencilSeparateOp = true;
+	
 }
 
 void PassViewGL::SetTexture(RenderContext* rc, const SamplerParameter& desc,

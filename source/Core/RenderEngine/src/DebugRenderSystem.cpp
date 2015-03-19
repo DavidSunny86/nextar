@@ -24,6 +24,7 @@ DebugPrimitive::~DebugPrimitive() {
 DebugRenderSystem::DebugRenderSystem() {
 	idCounter = 0;
 	boxDataGenerated = false;
+	axisDataGenerated = false;
 	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_INIT_RESOURCES, CreateResources, this);
 	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyResources, this);
 }
@@ -103,92 +104,22 @@ uint32 DebugRenderSystem::Register(const AABox3& box,
 	primitive->SetTransform(box.GetSize(), QuatIdentity(), box.GetCenter());
 	alivePrimitives.push_back(primitive);
 
-	// generate a triangle
-	/*
-	{
-		VertexBuffer vertexBuffer(GpuBuffer::NEVER_RELEASED);
-
-		uint32 stride = (sizeof(float) * 2);
-		uint32 vbsize = 3 * stride;
-
-		void* pVData = NEX_ALLOC(vbsize, MEMCAT_GENERAL);
-		float* pos = (float*)pVData;
-		pos[0] = 0;
-		pos[1] = 0.5f;
-		pos[2] = -0.25f;
-		pos[3] = 0;
-		pos[4] = 0.25f;
-		pos[5] = 0;
-		vertexBuffer.CreateBuffer(vbsize, stride, reinterpret_cast<const uint8*>(pVData));
-
-		StreamData* stream = &axisData;
-		stream->flags = StreamData::DELETE_BINDING;
-		stream->type = PrimitiveType::PT_TRI_LIST;
-		stream->vertices.count = 3;
-		stream->vertices.start = 0;
-		stream->vertices.layout = VertexLayout::GetCommonLayout(VertexLayoutType::POSITION2D_0).GetPtr();
-		stream->vertices.binding = NEX_NEW(VertexBufferBinding());
-		stream->vertices.binding->SetBufferCount(1);
-		stream->vertices.binding->BindBuffer(0, std::move(vertexBuffer));
-		stream->indices.start = 0;
-		stream->indices.count = 0;
-		stream->instanceCount = 1;
-
-		NEX_FREE(pVData, MEMCAT_GENERAL);
-		primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
-		primitive->SetStreamData(stream);
-		primitive->SetMaterial(debugQuadMaterial);
-		alivePrimitives.push_back(primitive);
-	}*/
-	// generate lines
-	{
-		// draw lines
-		VertexBuffer vertexBuffer1(GpuBuffer::NEVER_RELEASED);
-
-		uint32 stride = (sizeof(float) * 4);
-		uint32 vbsize = 2 * stride;
-
-		void* pVData = NEX_ALLOC(vbsize, MEMCAT_GENERAL);
-		float* pos = (float*)pVData;
-		uint32 colorUv = 0x1010feff;
-		float colorVal = *(float*)(&colorUv);
-		pos[0] = -10;
-		pos[1] = -10.5f;
-		pos[2] = -10.25f;
-		pos[3] = colorVal;
-		pos[4] = 10;
-		pos[5] = 10.25f;
-		pos[6] = 10;
-		pos[7] = colorVal;
-		vertexBuffer1.CreateBuffer(vbsize, stride, reinterpret_cast<const uint8*>(pVData));
-
-		StreamData* stream = &lineData;
-		stream->flags = StreamData::DELETE_BINDING;
-		stream->type = PrimitiveType::PT_LINE_LIST;
-		stream->vertices.count = 2;
-		stream->vertices.start = 0;
-		stream->vertices.layout = VertexLayout::GetCommonLayout(VertexLayoutType::POSITION_COLOR_0).GetPtr();
-		stream->vertices.binding = NEX_NEW(VertexBufferBinding());
-		stream->vertices.binding->SetBufferCount(1);
-		stream->vertices.binding->BindBuffer(0, std::move(vertexBuffer1));
-		stream->indices.start = 0;
-		stream->indices.count = 0;
-		stream->instanceCount = 1;
-
-		NEX_FREE(pVData, MEMCAT_GENERAL);
-		primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
-		primitive->SetStreamData(stream);
-		primitive->SetMaterial(debugMaterial);
-		primitive->SetColor(Color(1, 1, 0, 0));
-		alivePrimitives.push_back(primitive);
-	}
 	return idCounter;
 }
 
-uint32 DebugRenderSystem::Register(Mat3x4R tform,
+uint32 DebugRenderSystem::Register(Mat4x4R tform,
 	const Color& color, float expiryTimeInSec) {
-	DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
+	if (!axisDataGenerated) {
+		GenerateStreamDataForAxis();
+	}
+	DebugPrimitive* primitive = nullptr;
+	primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
+	primitive->SetStreamData(&axisData);
+	primitive->SetMaterial(debugMaterial);
+	primitive->SetColor(color);
+	primitive->SetTransform(tform);
 	alivePrimitives.push_back(primitive);
+
 	return idCounter;
 }
 
@@ -285,8 +216,58 @@ void DebugRenderSystem::Commit(CommitContext& context) {
 	context.renderContext->EndRender();
 }
 
+void DebugRenderSystem::GenerateStreamDataForAxis() {
+
+	float alpha = 1;
+	//Geometry cone = Geometry::CreateCone(10, 0.2f, 0, 1.3f, false, true, Color(alpha, 0.3f, 0, 0), Color(alpha, 1.0f, 0, 0));
+	Geometry cone = Geometry::CreateCone(10, 1.5f, 2.0f, 16.3f, false, true, Color(alpha, 0.3f, 0, 0), Color(alpha, 1.0f, 0, 0));
+	Matrix4x4 m;
+	Quaternion q = QuatFromAxisAng(Vec3ASet(0, 0, 1), Math::PI);
+	m = Mat4x4FromRot(q);
+	cone.Transform(m);
+
+	VertexBuffer vertexBuffer(GpuBuffer::NEVER_RELEASED);
+
+	uint32 stride = ((sizeof(float) * 3) + sizeof(uint32));
+	uint32 vbsize = (uint32)cone.points.size() * stride;
+
+	void* pVData = NEX_ALLOC(vbsize, MEMCAT_GENERAL);
+	float* pos = (float*)pVData;
+	for (uint32 i = 0; i < cone.points.size(); ++i) {
+		auto &p = cone.points[i];
+		auto& c = cone.colors[i];
+
+		*pos++ = p.x;
+		*pos++ = p.y;
+		*pos++ = p.z;
+		*((uint32*)(pos++)) = c.ToRgba();
+	}
+
+	vertexBuffer.CreateBuffer(vbsize, stride, reinterpret_cast<const uint8*>(pVData));
+
+	IndexBufferPtr indexBuffer = Assign(NEX_NEW(IndexBuffer(GpuBuffer::NEVER_RELEASED)));
+	indexBuffer->CreateBuffer(cone.topology.size() * 2, IndexBuffer::Type::TYPE_16BIT,
+		reinterpret_cast<const uint8*>(cone.topology.data()));
+
+	StreamData* stream = &axisData;
+	stream->flags = StreamData::DELETE_BINDING;
+	stream->type = PrimitiveType::PT_TRI_LIST;
+	stream->vertices.count = (uint32)cone.points.size();
+	stream->vertices.start = 0;
+	stream->vertices.layout = VertexLayout::GetCommonLayout(VertexLayoutType::POSITION_COLOR_0).GetPtr();
+	stream->vertices.binding = NEX_NEW(VertexBufferBinding());
+	stream->vertices.binding->SetBufferCount(1);
+	stream->vertices.binding->BindBuffer(0, std::move(vertexBuffer));
+	stream->indices.start = 0;
+	stream->indices.count = (uint32)cone.topology.size();
+	stream->indices.indices = std::move(indexBuffer);
+	stream->instanceCount = 1;
+
+	NEX_FREE(pVData, MEMCAT_GENERAL);
+}
+
 void DebugRenderSystem::GenerateStreamDataForBox() {
-	Geometry boxData = Geometry::CreateBox(1, 1, 1, true, Color::Red);
+	Geometry boxData = Geometry::CreateBox(1, 1, 1, true, Color::White);
 	VertexBuffer vertexBuffer(GpuBuffer::NEVER_RELEASED);
 	
 	uint32 stride = ((sizeof(float) * 3) + sizeof(uint32));

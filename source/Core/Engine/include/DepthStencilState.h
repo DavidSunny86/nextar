@@ -30,16 +30,20 @@ enum StencilOp : uint8 {
 };
 
 struct StencilFaceOp {
-	ColorMask stencilMask;
+	uint32 stencilMask;
+	int32 stencilRef;
 	DepthStencilCompare stencilFunc;
 	StencilOp stencilFail;
 	StencilOp stencilPass;
 	StencilOp depthPass;
 
 	StencilFaceOp() :
-			stencilMask(ColorMask::MASK_ALL), stencilFunc(DSCOMP_NEVER), stencilFail(
-					STENCILOP_ZERO), stencilPass(STENCILOP_ZERO), depthPass(
-					STENCILOP_ZERO) {
+			stencilMask(0xffffffff), 
+			stencilRef(0),
+			stencilFunc(DSCOMP_NEVER), 
+			stencilFail(STENCILOP_ZERO), 
+			stencilPass(STENCILOP_ZERO), 
+			depthPass(STENCILOP_ZERO) {
 	}
 };
 

@@ -30,6 +30,58 @@ inline void Mat4x4TransVec3(Vector4* outstream, uint32 outstride,
 	}
 }
 
+inline void Mat4x4TransVec3(Vector3* inpstream, uint32 inpstride, uint32 count, Mat4x4F m) {
+	NEX_ASSERT(inpstream);
+	uint8* inpVec = (const uint8*)inpstream;
+	
+	Quad v, x, y, z, r;
+
+	for (uint32 i = 0; i < count; i++) {
+
+		v.Load3((float*)inpVec);
+		z = v.SplatZ();
+		y = v.SplatY();
+		x = v.SplatX();
+
+		r = Vec3AMulAdd(z, m.Row(2), m.Row(3));
+		r = Vec3AMulAdd(y, m.Row(1), r);
+		r = Vec3AMulAdd(x, m.Row(0), r);
+
+		((float*)inpVec)[0] = r.x;
+		((float*)inpVec)[1] = r.y;
+		((float*)inpVec)[2] = r.z;
+
+
+		inpVec += inpstride;
+	}
+}
+
+inline void Mat4x4TransVec3Normals(Vector3* inpstream, uint32 inpstride, uint32 count, Mat4x4F m) {
+	NEX_ASSERT(inpstream);
+	uint8* inpVec = (const uint8*)inpstream;
+
+	Quad v, x, y, z, r;
+
+	for (uint32 i = 0; i < count; i++) {
+
+		v.Load3((float*)inpVec);
+		z = v.SplatZ();
+		y = v.SplatY();
+		x = v.SplatX();
+
+		r = Vec3AMul(z, m.Row(2));
+		r = Vec3AMulAdd(y, m.Row(1), r);
+		r = Vec3ANormalize(Vec3AMulAdd(x, m.Row(0), r));
+
+		((float*)inpVec)[0] = r.x;
+		((float*)inpVec)[1] = r.y;
+		((float*)inpVec)[2] = r.z;
+
+
+		inpVec += inpstride;
+	}
+}
+
 inline void Mat4x4TransAndProjVec3(Vector3* outstream, uint32 outstride,
 		const Vector3* inpstream, uint32 inpstride, uint32 count, Mat4x4F m) {
 	NEX_ASSERT(outstream);

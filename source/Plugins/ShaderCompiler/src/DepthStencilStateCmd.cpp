@@ -84,10 +84,7 @@ void DepthStencilStateListener::StencilOpCmd_Execute(int parentType, void* state
 	StringUtils::TokenIterator it = 0;
 	String value;
 	const StringUtils::WordList& paramContext = ctx.GetParamList();
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
-		faceOp->stencilMask = Helper::GetColorMask(value);
-	}
+	
 	it = StringUtils::NextWord(paramContext, value, it);
 	if (it != String::npos) {
 		faceOp->stencilFunc = Helper::GetDepthStencilFunc(value);
@@ -103,6 +100,14 @@ void DepthStencilStateListener::StencilOpCmd_Execute(int parentType, void* state
 	it = StringUtils::NextWord(paramContext, value, it);
 	if (it != String::npos) {
 		faceOp->depthPass = Helper::GetStencilOp(value);
+	}
+	it = StringUtils::NextWord(paramContext, value, it);
+	if (it != String::npos) {
+		faceOp->stencilMask = Convert::ToULong(value);
+	}
+	it = StringUtils::NextWord(paramContext, value, it);
+	if (it != String::npos) {
+		faceOp->stencilRef = Convert::ToULong(value);
 	}
 }
 

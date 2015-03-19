@@ -25,6 +25,56 @@ inline void Mat4x4TransVec3(Vector4* outstream, uint32 outstride,
 	}
 }
 
+inline void Mat4x4TransVec3(Vector3* inpstream, uint32 inpstride, uint32 count, Mat4x4F m) {
+	NEX_ASSERT(inpstream);
+	const uint8* inpVec = (const uint8*)inpstream;
+	uint8* outVec = (uint8*)inpstream;
+
+	for (uint32 i = 0; i < count; i++) {
+		Quad x = _mm_load_ps1(&reinterpret_cast<const Vector3*>(inpVec)->x);
+		Quad y = _mm_load_ps1(&reinterpret_cast<const Vector3*>(inpVec)->y);
+		Quad res = _mm_load_ps1(&reinterpret_cast<const Vector3*>(inpVec)->z);
+		res = _mm_mul_ps(res, m.r[2]);
+		res = _mm_add_ps(res, m.r[3]);
+		y = _mm_mul_ps(y, m.r[1]);
+		res = _mm_add_ps(res, y);
+		x = _mm_mul_ps(x, m.r[0]);
+		res = _mm_add_ps(res, x);
+		float store[4];
+		_mm_storeu_ps(store, res);
+		((float*)inpVec)[0] = store[0];
+		((float*)inpVec)[1] = store[1];
+		((float*)inpVec)[2] = store[2];
+		
+		inpVec += inpstride;
+	}
+}
+
+inline void Mat4x4TransVec3Normals(Vector3* inpstream, uint32 inpstride, uint32 count, Mat4x4F m) {
+	NEX_ASSERT(inpstream);
+	const uint8* inpVec = (const uint8*)inpstream;
+	uint8* outVec = (uint8*)inpstream;
+
+	for (uint32 i = 0; i < count; i++) {
+		Quad x = _mm_load_ps1(&reinterpret_cast<const Vector3*>(inpVec)->x);
+		Quad y = _mm_load_ps1(&reinterpret_cast<const Vector3*>(inpVec)->y);
+		Quad res = _mm_load_ps1(&reinterpret_cast<const Vector3*>(inpVec)->z);
+		res = _mm_mul_ps(res, m.r[2]);
+		y = _mm_mul_ps(y, m.r[1]);
+		res = _mm_add_ps(res, y);
+		x = _mm_mul_ps(x, m.r[0]);
+		res = _mm_add_ps(res, x);
+		res = Vec3ANormalize(res);
+		float store[4];
+		_mm_storeu_ps(store, res);
+		((float*)inpVec)[0] = store[0];
+		((float*)inpVec)[1] = store[1];
+		((float*)inpVec)[2] = store[2];
+
+		inpVec += inpstride;
+	}
+}
+
 inline void Mat4x4TransAndProjVec3(Vector3* outstream, uint32 outstride,
 		const Vector3* inpstream, uint32 inpstride, uint32 count, Mat4x4F m) {
 	NEX_ASSERT(outstream);
@@ -314,6 +364,7 @@ inline Matrix4x4 Mat4x4Scale(float scale, Mat4x4F m) {
 	ret.r[0] = _mm_mul_ps(scaleQ, m.r[0]);
 	ret.r[1] = _mm_mul_ps(scaleQ, m.r[1]);
 	ret.r[2] = _mm_mul_ps(scaleQ, m.r[2]);
+	ret.r[3] = m.r[3];
 	return ret;
 }
 

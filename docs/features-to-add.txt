@@ -6,3 +6,17 @@ Unsynchronized Buffers:
 http://www.seas.upenn.edu/~pcozzi/OpenGLInsights/OpenGLInsights-AsynchronousBufferTransfers.pdf
 Cloth:
 http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/real-time-cloth-simulation-with-b-spline-surfaces-r3814
+
+Check:
+GL_ARB_blend_func_extended
+extended blend operation as in GL_NV_blend_equation_advanced
+
+http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/real-time-cloth-simulation-with-b-spline-surfaces-r3814
+GL Debug change to callback system:
+glDebugMessageCallback
+glPushDebugGroup
+glPopDebugGroup
+GL Shader creation using new API
+glCreateShaderProgramv
+glGenProgramPipelines
+glUseProgramStages

@@ -20,6 +20,16 @@
 
 namespace RenderOpenGL {
 
+static void APIENTRY ReportError(GLenum source,
+	GLenum type,
+	GLuint id,
+	GLenum severity,
+	GLsizei length,
+	const GLchar* message,
+	void* userParam) {
+	reinterpret_cast<RenderContextGL*>(userParam)->ReportError(source, type, id, severity, length, message);
+}
+
 RenderContextGL::RenderContextGL(RenderDriverGL* _driver) :
 		BaseRenderContext(_driver), contextFlags(0) {
 	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyResources, this);
@@ -45,6 +55,49 @@ void RenderContextGL::CloseImpl() {
 	uniformBufferMap.clear();
 }
 
+void RenderContextGL::ReportError(GLenum source,
+	GLenum type,
+	GLuint id,
+	GLenum severity,
+	GLsizei length,
+	const GLchar* message) {
+
+	OutStringStream stream;
+	stream << "OpenGL Error: source=";
+	switch (type) {
+	case GL_DEBUG_SOURCE_API:
+		stream << "GL"; break;
+	case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
+		stream << "Window system"; break;
+	case GL_DEBUG_SOURCE_SHADER_COMPILER:
+		stream << "Shader compiler"; break;
+	case GL_DEBUG_SOURCE_THIRD_PARTY:
+		stream << "Third party"; break;
+	case GL_DEBUG_SOURCE_APPLICATION:
+		stream << "Application"; break;
+	case GL_DEBUG_SOURCE_OTHER:
+	default:
+		stream << "Other"; break;
+	}
+
+	stream << ", severity=";
+	switch (severity) {
+	case GL_DEBUG_SEVERITY_HIGH:
+		stream << "High"; break;
+	case GL_DEBUG_SEVERITY_LOW:
+		stream << "Low"; break;
+	case GL_DEBUG_SEVERITY_NOTIFICATION:
+		stream << "Info"; break;
+	case GL_DEBUG_SEVERITY_MEDIUM:
+	default:
+		stream << "Medium"; break;
+	}
+
+	String msg((const char*)message, length);
+	stream << msg;
+	Error(stream.str());
+}
+
 void RenderContextGL::PostWindowCreation(RenderWindow* gw) {
 	/* check if extensions were initialized or initialize extensions */
 	if (!IsContextReady()) {
@@ -58,6 +111,11 @@ void RenderContextGL::PostWindowCreation(RenderWindow* gw) {
 			contextFlags |= EXTENSIONS_READY;
 			SetCurrentWindow(static_cast<RenderWindowImpl*>(gw->GetImpl()));
 			currentWindow = static_cast<RenderWindowImpl*>(gw->GetImpl());
+#if defined (NEX_DEBUG)
+			// attach debug hook
+			if (GlDebugMessageCallback)
+				GlDebugMessageCallback((GLDEBUGPROC)RenderOpenGL::ReportError, this);
+#endif
 			GL_CHECK();
 		}
 	}
@@ -772,6 +830,11 @@ void RenderContextGL::Capture(PixelBox& image, RenderTarget* rt, GLuint *pbo,
 // @optimize Map all buffers??
 void RenderContextGL::SwitchPass(CommitContext& context, Pass::View* passView) {
 	PassViewGL* passViewGl = static_cast<PassViewGL*>(passView);
+
+	SetRasterState(passViewGl->GetRasterState());
+	SetDepthStencilState(passViewGl->GetDepthStencilState());
+	SetBlendState(passViewGl->blendState);
+
 	GLuint program = passViewGl->GetProgram();
 	GlUseProgram(program);
 	GL_CHECK();
@@ -799,6 +862,7 @@ void RenderContextGL::Draw(StreamData* streamData, CommitContext& ctx) {
 	 */
 	VertexData& vd = streamData->vertices;
 	// bind input layout
+	NEX_ASSERT(vd.layout);
 	VertexLayoutGL* layout = static_cast<VertexLayoutGL*>(GetView(vd.layout));
 	VertexBufferBinding& binding = (*vd.binding);
 	layout->Enable(binding, static_cast<PassViewGL*>(ctx.pass), this);
@@ -1229,6 +1293,26 @@ GLint RenderContextGL::GetGlAddressMode(TextureAddressMode t) {
 	return GL_REPEAT;
 }
 
+GLenum RenderContextGL::GetGlStencilOp(StencilOp type) {
+	switch (type) {
+	case STENCILOP_ZERO:
+		return GL_ZERO;
+	case STENCILOP_REPLACE:
+		return GL_REPLACE;
+	case STENCILOP_INCR_SAT:
+		return GL_INCR_WRAP;
+	case STENCILOP_DECR_SAT:
+		return GL_DECR_WRAP;
+	case STENCILOP_INVERT:
+		return GL_INVERT;
+	case STENCILOP_INCR:
+		return GL_INCR;
+	case STENCILOP_DECR:
+		return GL_DECR;
+	}
+	return GL_KEEP;
+}
+
 GLenum RenderContextGL::GetGlCompareFunc(TextureComparisonMode type) {
 	switch (type) {
 	case TEXCOMP_NONE:
@@ -1248,6 +1332,26 @@ GLenum RenderContextGL::GetGlCompareFunc(TextureComparisonMode type) {
 		return GL_GEQUAL;
 	}
 	return 0;
+}
+
+GLenum RenderContextGL::GetGlCompareFunc(DepthStencilCompare type) {
+	switch (type) {
+	case DSCOMP_NEVER:
+		return GL_NEVER;
+	case DSCOMP_LESS:
+		return GL_LESS;
+	case DSCOMP_EQUAL:
+		return GL_EQUAL;
+	case DSCOMP_LESS_EQUAL:
+		return GL_LEQUAL;
+	case DSCOMP_GREATER:
+		return GL_GREATER;
+	case DSCOMP_NOT_EQUAL:
+		return GL_NOTEQUAL;
+	case DSCOMP_GREATER_EQUAL:
+		return GL_GEQUAL;
+	}
+	return GL_ALWAYS;
 }
 
 VertexComponentType RenderContextGL::GetSemanticType(GLenum e) {
@@ -1346,6 +1450,32 @@ GLenum RenderContextGL::GetGlTextureType(TextureBase::TextureType type) {
 		return GL_TEXTURE_CUBE_MAP_ARRAY;
 	}
 	return 0;
+}
+
+GLenum RenderContextGL::GetGlBlendDataSource(BlendDataSource type) {
+	switch (type) {
+	case BDS_ZERO: return GL_ZERO;
+	case BDS_SRC_ALPHA: return GL_SRC_ALPHA;
+	case BDS_INV_SRC_ALPHA: return GL_ONE_MINUS_SRC_ALPHA;
+	case BDS_SRC_COLOR: return GL_SRC_COLOR;
+	case BDS_INV_SRC_COLOR: return GL_ONE_MINUS_SRC_COLOR;
+	case BDS_DST_ALPHA: return GL_DST_ALPHA;
+	case BDS_INV_DST_ALPHA: return GL_ONE_MINUS_DST_ALPHA;
+	case BDS_DST_COLOR: return GL_DST_COLOR;
+	case BDS_INV_DST_COLOR: return GL_ONE_MINUS_DST_COLOR;
+	}
+	return GL_ONE;
+}
+
+GLenum RenderContextGL::GetGlBlendEquation(BlendOp op) {
+	switch (op) {
+		// for GlBlendEquation or GlBlendEquationSeparate
+	case BOP_SUB: return GL_FUNC_SUBTRACT;
+	case BOP_INV_SUB: return GL_FUNC_REVERSE_SUBTRACT;
+	case BOP_MIN: return GL_MIN;
+	case BOP_MAX: return GL_MAX;
+	}
+	return GL_FUNC_ADD;
 }
 
 PixelFormatGl RenderContextGL::GetGlPixelFormat(PixelFormat imageFormat,
@@ -1519,6 +1649,225 @@ void RenderContextGL::UnregisterObject(ContextID id) {
 		ContextObject::View* view = reinterpret_cast<ContextObject::View*>(id);
 		view->Destroy(this);
 		NEX_DELETE(view);
+	}
+}
+
+
+void RenderContextGL::SetRasterState(const RasterStateGL& state) {
+	if (state.frontIsCCW ^ rasterState.frontIsCCW) {
+		static GLenum face[] = {
+			GL_CW,
+			GL_CCW
+		};
+
+		rasterState.frontIsCCW = state.frontIsCCW;
+		glFrontFace(face[state.frontIsCCW]);
+		GL_CHECK();
+	}
+
+	if (state.cullMode != rasterState.cullMode) {
+
+		if (!state.cullMode) {
+			glDisable(GL_CULL_FACE);
+		} else {
+
+			if (!rasterState.cullMode) {
+				glEnable(GL_CULL_FACE);
+			}
+			glCullFace(state.cullMode);
+			GL_CHECK();
+		}
+		rasterState.cullMode = state.cullMode;
+	}
+
+	if (state.depthClip != rasterState.depthClip && GLE_ARB_depth_clamp) {
+		if (state.depthClip)
+			glEnable(GL_DEPTH_CLAMP);
+		else
+			glDisable(GL_DEPTH_CLAMP);
+		rasterState.depthClip = state.depthClip;
+	}
+	GL_CHECK();
+
+	if (state.useScissors != rasterState.useScissors) {
+		if (state.useScissors)
+			glEnable(GL_SCISSOR_TEST);
+		else
+			glDisable(GL_SCISSOR_TEST);
+		rasterState.useScissors = state.useScissors;
+	}
+	GL_CHECK();
+
+	if (state.usingMultisample != rasterState.usingMultisample) {
+		if (state.usingMultisample)
+			glEnable(GL_MULTISAMPLE);
+		else
+			glDisable(GL_MULTISAMPLE);
+		rasterState.usingMultisample = state.usingMultisample;
+	}
+	GL_CHECK();
+
+	if (state.usingLineAA != rasterState.usingLineAA) {
+		if (state.usingLineAA)
+			glEnable(GL_LINE_SMOOTH);
+		else
+			glDisable(GL_LINE_SMOOTH);
+		rasterState.usingLineAA = state.usingLineAA;
+	}
+	GL_CHECK();
+
+	if (state.fillMode != rasterState.fillMode) {
+		glPolygonMode(GL_FRONT_AND_BACK, state.fillMode);
+		rasterState.fillMode = state.fillMode;
+	}
+	GL_CHECK();
+
+	if (state.constantDepthBias != 0 || state.slopeScaledDepthBias != 0) {
+		
+		if (!rasterState.depthBiasEnabled) {
+			glEnable(GL_POLYGON_OFFSET_FILL);
+			GL_CHECK();
+			glEnable(GL_POLYGON_OFFSET_POINT);
+			GL_CHECK();
+			glEnable(GL_POLYGON_OFFSET_LINE);
+			GL_CHECK();
+			rasterState.depthBiasEnabled = true;
+		}
+
+		if (state.depthBiasClamp && GlPolygonOffsetClampEXT) {
+			GlPolygonOffsetClampEXT(-state.slopeScaledDepthBias, -state.constantDepthBias, state.depthBiasClamp);
+		} else
+			glPolygonOffset(-state.slopeScaledDepthBias, -state.constantDepthBias);
+		GL_CHECK();
+	} else if (rasterState.depthBiasEnabled) {
+		glDisable(GL_POLYGON_OFFSET_FILL);
+		GL_CHECK();
+		glDisable(GL_POLYGON_OFFSET_POINT);
+		GL_CHECK();
+		glDisable(GL_POLYGON_OFFSET_LINE);
+		GL_CHECK();
+		rasterState.depthBiasEnabled = false;
+	}
+}
+
+void RenderContextGL::SetDepthStencilState(const DepthStencilStateGL& state) {
+	if (depthStencilState.depthTest != state.depthTest) {
+		if (state.depthTest) 
+			glEnable(GL_DEPTH_TEST);
+		else
+			glDisable(GL_DEPTH_TEST);
+		depthStencilState.depthTest = state.depthTest;
+	}
+	GL_CHECK();
+
+	if (depthStencilState.depthWrite != state.depthWrite) {
+		if (state.depthWrite)
+			glDepthMask(GL_TRUE);
+		else
+			glDepthMask(GL_FALSE);
+		depthStencilState.depthWrite = state.depthWrite;
+	}
+	GL_CHECK();
+
+	if (depthStencilState.depthTest && depthStencilState.depthCompare != state.depthCompare) {
+		glDepthFunc(state.depthCompare);
+		depthStencilState.depthCompare = state.depthCompare;
+	}
+	GL_CHECK();
+
+	if (depthStencilState.stencilTest != state.stencilTest) {
+		if (state.stencilTest) {
+			glEnable(GL_STENCIL_TEST);
+
+		} else {
+			glDisable(GL_STENCIL_TEST);
+		}
+
+		depthStencilState.stencilTest = state.stencilTest;
+	}
+	GL_CHECK();
+
+	if (depthStencilState.stencilTest) {
+		if (state.stencilSeparateOp) {
+
+			GlStencilMaskSeparate(GL_FRONT, state.stencilFrontMask);
+			GL_CHECK();
+			GlStencilFuncSeparate(GL_FRONT, state.stencilFrontFunc, state.stencilFrontRef,
+				state.stencilFrontMask);
+			GL_CHECK();
+			GlStencilOpSeparate(GL_FRONT, state.frontStencilFail,
+				state.frontStencilPass, state.frontDepthPass);
+			GL_CHECK();
+			GlStencilMaskSeparate(GL_BACK, state.stencilBackMask);
+			GL_CHECK();
+			GlStencilFuncSeparate(GL_BACK, state.stencilBackFunc, state.stencilBackRef,
+				state.stencilBackMask);
+			GL_CHECK();
+			GlStencilOpSeparate(GL_BACK, state.backStencilFail,
+				state.backStencilPass, state.backDepthPass);
+		} else {
+
+			glStencilMask(state.stencilFrontMask);
+			GL_CHECK();
+			glStencilFunc(state.stencilFrontFunc, state.stencilFrontRef,
+				state.stencilFrontMask);
+			GL_CHECK();
+			glStencilOp(state.frontStencilFail,
+				state.frontStencilPass, state.frontDepthPass);
+		}
+	}
+	GL_CHECK();
+}
+
+void RenderContextGL::SetBlendState(const BlendStateGL& state) {
+	if ((blendState.enabled ^ state.enabled)) {
+		if (state.enabled) {
+			glEnable(GL_BLEND);
+			blendState.enabled = true;
+		} else {
+			blendState.enabled = false;
+			glDisable(GL_BLEND);
+		}
+	}
+	if (blendState.enabled) {
+		if (state.sameBlendOpAllTarget) {
+			GlBlendFuncSeparate(state.blendOp[0].srcCol, state.blendOp[0].destCol,
+				state.blendOp[0].srcAlpha, state.blendOp[0].destAlpha);
+			GlBlendEquationSeparate(state.blendOp[0].colOp, state.blendOp[0].alphaOp);
+			
+		} else {
+			for (uint8 i = 0; i < state.numRenderTargets; ++i) {
+				
+				GlBlendFuncSeparatei(i, state.blendOp[i].srcCol, state.blendOp[i].destCol,
+					state.blendOp[i].srcAlpha, state.blendOp[i].destAlpha);
+				GlBlendEquationSeparate(state.blendOp[i].colOp, state.blendOp[i].alphaOp);
+			}
+			if (GLE_EXT_draw_buffers2) {
+				for (uint8 i = 0; i < state.numRenderTargets; ++i) {
+					if (state.blendOp[i].enabled)
+						GlEnableIndexedEXT(GL_BLEND, i);
+					else
+						GlDisableIndexedEXT(GL_BLEND, i);
+				}
+			}
+		}
+
+		if (state.sameMaskAllTarget || !GlColorMaski) {
+			ColorMask m = state.blendOp[0].mask;
+			glColorMask((GLboolean)(m & ColorMask::MASK_RED),
+				(GLboolean)(m & ColorMask::MASK_GREEN),
+				(GLboolean)(m & ColorMask::MASK_BLUE),
+				(GLboolean)(m & ColorMask::MASK_ALPHA));
+		} else {
+			for (uint8 i = 0; i < state.numRenderTargets; ++i) {
+				ColorMask m = state.blendOp[i].mask;
+				GlColorMaski(i,
+					(GLboolean)(m & ColorMask::MASK_RED),
+					(GLboolean)(m & ColorMask::MASK_GREEN),
+					(GLboolean)(m & ColorMask::MASK_BLUE),
+					(GLboolean)(m & ColorMask::MASK_ALPHA));
+			}
+		}
 	}
 }
 

@@ -46,6 +46,10 @@ public:
 			Mat4x4FromPos(loc));
 	}
 
+	inline void SetTransform(Mat4x4R tform) {
+		*worldMatrix = tform;
+	}
+
 protected:
 	Matrix4x4* worldMatrix;
 	Color color;
@@ -70,7 +74,7 @@ public:
 
 	virtual uint32 Register(const AABox3& box, const Color& color,
 		float expiryTimeInSec = 0.0f) override;
-	virtual uint32 Register(Mat3x4R tform, const Color& color = Color::Black,
+	virtual uint32 Register(Mat4x4R tform, const Color& color = Color::Black,
 		float expiryTimeInSec = 0.0f) override;
 	virtual uint32 Register(PlaneF plane, const Color& color,
 		float expiryTimeInSec = 0.0f) override;
@@ -95,11 +99,13 @@ protected:
 	void CreateMaterials();
 	void ReleaseObjects();
 	void GenerateStreamDataForBox();
+	void GenerateStreamDataForAxis();
 
 	MaterialAssetPtr debugQuadMaterial;
 	MaterialAssetPtr debugMaterial;
 	uint32 idCounter;
 	bool boxDataGenerated;
+	bool axisDataGenerated;
 	StreamData boxDataStream;
 	StreamData planeData;
 	StreamData axisData;
