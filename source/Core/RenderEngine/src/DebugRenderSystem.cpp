@@ -210,7 +210,7 @@ void DebugRenderSystem::Commit(CommitContext& context) {
 		context.primitive = prim;
 		context.color = dp->GetColor();
 		context.paramBuffers[(uint32)ParameterContext::CTX_OBJECT] = prim->GetParameters();
-		context.pass->UpdateParams(context, ParameterContext::CTX_OBJECT, (uint32)prim);
+		context.pass->UpdateParams(context, ParameterContext::CTX_OBJECT, (uint32)(ptrdiff_t)prim);
 		context.renderContext->Draw(prim->GetStreamData(), context);
 	}
 	context.renderContext->EndRender();
@@ -220,7 +220,7 @@ void DebugRenderSystem::GenerateStreamDataForAxis() {
 
 	float alpha = 1;
 	//Geometry cone = Geometry::CreateCone(10, 0.2f, 0, 1.3f, false, true, Color(alpha, 0.3f, 0, 0), Color(alpha, 1.0f, 0, 0));
-	Geometry cone = Geometry::CreateCone(10, 1.5f, 2.0f, 16.3f, false, true, Color(alpha, 0.3f, 0, 0), Color(alpha, 1.0f, 0, 0));
+	Geometry cone = Geometry::CreateCone(10, 0.5f, 1.0f, 10.0f, false, true, Color(alpha, 0.3f, 0, 0), Color(alpha, 1.0f, 0, 0));
 	Matrix4x4 m;
 	Quaternion q = QuatFromAxisAng(Vec3ASet(0, 0, 1), Math::PI);
 	m = Mat4x4FromRot(q);

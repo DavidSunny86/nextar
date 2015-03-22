@@ -108,9 +108,10 @@ struct multimap {
 			STDAllocatorType > type;
 };
 
-template<typename T, typename Allocator = AllocatorGeneral>
+template<typename T, typename Allocator = AllocatorGeneral,
+		typename STDAllocatorType = STDAllocator< T, Allocator > >
 struct deque {
-	typedef typename std::deque<T, STDAllocator<T, Allocator> > type;
+	typedef typename std::deque< T, STDAllocatorType > type;
 };
 
 #if defined( NEX_USE_TBB )

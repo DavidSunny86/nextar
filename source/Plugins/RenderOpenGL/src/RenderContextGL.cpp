@@ -83,14 +83,14 @@ void RenderContextGL::ReportError(GLenum source,
 	stream << ", severity=";
 	switch (severity) {
 	case GL_DEBUG_SEVERITY_HIGH:
-		stream << "High"; break;
+		stream << "High, "; break;
 	case GL_DEBUG_SEVERITY_LOW:
-		stream << "Low"; break;
+		stream << "Low, "; break;
 	case GL_DEBUG_SEVERITY_NOTIFICATION:
-		stream << "Info"; break;
+		stream << "Info, "; break;
 	case GL_DEBUG_SEVERITY_MEDIUM:
 	default:
-		stream << "Medium"; break;
+		stream << "Medium, "; break;
 	}
 
 	String msg((const char*)message, length);

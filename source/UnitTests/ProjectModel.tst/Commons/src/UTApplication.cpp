@@ -67,7 +67,7 @@ void UTApplication::_SetupRenderDriver() {
 	dcp.defaultContextParams.multiSamples = 0;
 	dcp.defaultContextParams.stereo = false;
 	dcp.defaultContextParams.reqOpenGLVersionMajor = 4;
-	dcp.defaultContextParams.reqOpenGLVersionMinor = 2;
+	dcp.defaultContextParams.reqOpenGLVersionMinor = 3;
 	dcp.defaultContextParams.sharedContextIndex = -1;
 	dcp.defaultContextParams.extraParams["IsMainWindow"] = "true";
 	dcp.defaultContextParams.extraParams["ExitOnClose"] = "true";

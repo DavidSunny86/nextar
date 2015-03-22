@@ -88,7 +88,8 @@ public:
 		CAT_SCENE = 1 << 6,
 		CAT_CULLING_SYSTEM = 1 << 8,
 		CAT_SPATIAL = 1 << 9,
-		CAT_TEMPLATE = 1 << 10
+		CAT_TEMPLATE = 1 << 10,
+		CAT_BEHAVIOR = 1 << 11,
 	};
 
 	/* specific components implemented in the system */
@@ -111,6 +112,7 @@ public:
 		CLASS_BV_CULLER = COMPONENT_CLASS_ID(CAT_SPATIAL | CAT_CULLING_SYSTEM,
 				0),
 
+		CLASS_FPS_BEHAVIOR = COMPONENT_CLASS_ID(CAT_BEHAVIOR, 0),
 		// templates
 		CLASS_SHADER_TEMPLATE = COMPONENT_CLASS_ID(CAT_ASSET | CAT_TEMPLATE, 0),
 		CLASS_MATERIAL_TEMPLATE = COMPONENT_CLASS_ID(CAT_ASSET | CAT_TEMPLATE, 1),
@@ -209,6 +211,7 @@ public:
 	}
 
 	virtual void Update() {}
+	// @remarks Concrete classes implement this
 	virtual uint32 GetClassID() const = 0;
 
 	virtual void SetParent(Component*);

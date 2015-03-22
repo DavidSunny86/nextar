@@ -142,13 +142,16 @@ namespace nextar {
 		StringUtils::TokenIterator it = 0;
 		String path;
 		String subPath;
+		String subPattern;
 		size_t p = pattern.find_last_of('/');
 		if (p != String::npos) {
 			subPath = pattern.substr(0, p);
-		}
+			subPattern = pattern.substr(p+1);
+		} else
+			subPattern = pattern;
 
 		while ((it = StringUtils::NextWord(paths, path, it)) != String::npos) {
-			_VisitDirectory(path, pattern, subPath, callback, recursive);
+			_VisitDirectory(path, subPattern, subPath, callback, recursive);
 		}
 	}
 
@@ -157,11 +160,14 @@ namespace nextar {
 		FileAttribute attr;
 
 		String fullPath;
-		if (pattern.length())
-			fullPath = URL::GetAppendedPath(path, pattern);
+		fullPath = path;
+		if (subPath.length())
+			fullPath = URL::GetAppendedPath(fullPath, subPath);
 		else
 			fullPath = path;
 #if defined(NEX_MSVC)
+		if (pattern.length())
+			fullPath = URL::GetAppendedPath(fullPath, pattern);
 
 		UniString fullPathUni = StringUtils::ToUtf16(fullPath);
 		intptr_t fileHandle, res;
@@ -195,20 +201,23 @@ namespace nextar {
 		/** todo Fix this */
 		DIR *dp;
 		struct dirent *dirp;
+		fullPath = path + "/" + subPath;
+
 		dp = opendir(fullPath.c_str());
 		if (dp) {
 			while ((dirp = readdir(dp)) != NULL) {
 				if (!pattern.length()
 					|| StringUtils::PatternMatch(pattern.c_str(), dirp->d_name,
 					true)) {
-					String fullPath = URL::GetAppendedPath(path, dirp->d_name);
+					String fullPathName = URL::GetAppendedPath(fullPath, dirp->d_name);
 					attr.fileName = URL(GetName(),
 						URL::GetAppendedPath(subPath, dirp->d_name));
 					attr.flags = 0;
 					struct stat filestat;
-					int ret = stat(fullPath.c_str(), &filestat);
+					int ret = stat(fullPathName.c_str(), &filestat);
 					if (ret == 0)
 						StatToAttribute(filestat, attr);
+					callback->FoundFile(attr, this);
 					if (recursive && (attr.flags & FileAttribute::ATTRIB_DIR)
 						&& !URL::IsReservedPath(dirp->d_name))
 						_VisitDirectory(fullPath, pattern,

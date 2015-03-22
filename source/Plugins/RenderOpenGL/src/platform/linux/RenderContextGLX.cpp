@@ -109,9 +109,15 @@ void RenderContextGLX::SetCreationParams(
 		preferredAttribs[attrib++] = GL_TRUE;
 	}
 
-	int baseAttribs[] = { GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
-	GLX_RENDER_TYPE, GLX_RGBA_BIT, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1,
-			GLX_BLUE_SIZE, 1, None };
+	int baseAttribs[] = {
+			GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
+			GLX_RENDER_TYPE, GLX_RGBA_BIT,
+			GLX_DOUBLEBUFFER, True, /* Request a double-buffered color buffer */
+			GLX_RED_SIZE, 1,
+			GLX_GREEN_SIZE, 1,
+			GLX_BLUE_SIZE, 1,
+			None
+	};
 
 	frameBufferConfig = GetConfig(baseAttribs, preferredAttribs);
 
@@ -162,7 +168,7 @@ void RenderContextGLX::ReadyContext(RenderWindow* gw) {
 		Trace("Creating context");
 
 		context = GlXCreateContextAttribsARB(display, frameBufferConfig, shared,
-		True, contextAttribs);
+				True, contextAttribs);
 	}
 	// Sync to ensure any errors generated are processed.
 	// XSync( display, False );
