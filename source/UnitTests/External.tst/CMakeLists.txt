@@ -11,3 +11,5 @@ add_unit_test(JoystickTest)
 
 # Added test JobSchedular: Sun Mar 22 13:38:08 IST 2015
 add_unit_test(JobSchedular)
+# Added test TaskQueue: Sun Apr  5 18:02:35 IST 2015
+add_unit_test(TaskQueue)
