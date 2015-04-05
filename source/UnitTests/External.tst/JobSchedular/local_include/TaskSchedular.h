@@ -72,6 +72,7 @@ public:
 
 protected:
 
+	atomic_int taskCount;
 	static Runner*& AsyncGetRunner();
 	Task* AsyncPopTask();
 	friend class TaskSchedular;
@@ -98,8 +99,7 @@ public:
 	Task* AsyncWaitForWork(Runner*);
 
 protected:
-
-	bool quitThreads;
+		
 	std::condition_variable requestQueueVar;
 	RunnerList runners;
 	Runner* mainThread;

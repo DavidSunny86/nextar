@@ -62,7 +62,11 @@ void Logger::RemoveListener(nextar::LogListener *listener) {
 
 void Logger::LogMsg(nextar::LogSeverity logSeverity, const String& intf,
 		const nextar::String &msg) {
-
+#ifdef NEX_DEBUG
+	OutStringStream fakestream;
+	std::ostream* old = real_out;
+	real_out = &fakestream;
+#endif
 	bool postInfo = false;
 	if (lastintf != intf) {
 		lastintf = intf;
@@ -93,6 +97,13 @@ void Logger::LogMsg(nextar::LogSeverity logSeverity, const String& intf,
 		(*real_out) << "               ";
 
 	(*real_out) << msg << std::endl;
+#ifdef NEX_DEBUG
+	String rmsg = fakestream.str();
+	real_out = old;
+	(*real_out) << rmsg;
+	(*real_out).flush();
+	Platform::OutputDebug(rmsg.c_str());
+#endif
 	for (size_t i = 0; i < listeners.size(); ++i) {
 		listeners[i]->LogMsg(logSeverity, msg);
 	}

@@ -65,30 +65,34 @@ Runner*& Runner::AsyncGetRunner() {
 }
 
 Task* Runner::AsyncPopTask() {
-	std::unique_lock<Runner::mutex_type> g(queueLock);
-	if (requestQueue.size()) {
-		Task* ret = requestQueue.front();
-		requestQueue.pop_front();
-		return ret;
+	if (taskCount.load(std::memory_order_relaxed) > 0) {
+		taskCount--;
+		std::unique_lock<Runner::mutex_type> g(queueLock);
+		if (requestQueue.size()) {
+			Task* ret = requestQueue.front();
+			requestQueue.pop_front();
+			return ret;
+		}
 	}
 	return nullptr;
 }
 
-TaskSchedular::TaskSchedular() : quitThreads(false) {
+TaskSchedular::TaskSchedular()  {
 
-	unsigned int c = std::thread::hardware_concurrency();
+	unsigned int c = std::max<uint32>(1, std::thread::hardware_concurrency()-1);
 	// @todo might kill performance, we need a way to serialize
 	// in case we dont have the hardware
-	if (c < 2)
-		c = 2;
+	OutStringStream str;
+	str << "Worker Count: " << c;
+	Trace(str.str());
 	runners.reserve(c);
-	for(uint32 i = 0; i < c-1; ++i) {
+	for(uint32 i = 0; i < c; ++i) {
 		runners.push_back(NEX_NEW(Runner(i+1)));
 	}
 
 	for(auto r : runners)
 		r->Start();
-	mainThread = NEX_NEW(Runner(c));
+	mainThread = NEX_NEW(Runner(c+1));
 	mainThread->MakeMain();
 }
 
@@ -117,7 +121,9 @@ void TaskSchedular::AsyncAddChildTask(Task* task) {
 		Runner* runner = Runner::AsyncGetRunner();
 		std::unique_lock<Runner::mutex_type> g(runner->queueLock);
 		runner->requestQueue.push_back(task);
+		runner->taskCount++;
 	}
+
 	requestQueueVar.notify_one();
 }
 
@@ -155,15 +161,23 @@ Task* TaskSchedular::AsyncWaitForWork(Runner* runner) {
 					continue;
 				task = neighbour->AsyncPopTask();
 			}
-			if (task)
+			if (task) {
+#ifdef NEX_DEBUG
+				OutStringStream str;
+				str << "Thread: " << runner->id << ", pushing task: " << task->_name;
+				Trace(str.str());
+#endif
 				runner->requestQueue.push_back(task);
+				runner->taskCount++;
+			}
 			runner->laststeal = i%n;
 		}
 		return !runner->requestQueue.empty() || runner->quitThread;
 	});
 
-	if (quitThreads)
+	if (runner->quitThread)
 		return nullptr;
+	runner->taskCount--;
 	Task* ret = runner->requestQueue.front();
 	runner->requestQueue.pop_front();
 	return ret;
