@@ -30,7 +30,7 @@ enum ControllerType : uint16 {
 	TYPE_UNKNOWN,
 };
 
-struct InputControllerDesc {
+struct _NexEngineAPI InputControllerDesc {
 	String name;
 	ControllerType type;
 	uint16 deviceId;
@@ -64,7 +64,7 @@ struct InputEvent {
 
 typedef std::pair<const InputEvent*, uint32> InputChangeBuffer;
 
-class InputListener {
+class _NexEngineAPI InputListener {
 public:
 	virtual void ProcessEvents(const InputChangeBuffer&) = 0;
 protected:
@@ -76,7 +76,7 @@ class AnalogControls;
 class DigitalControls;
 
 /** @todo Add active/inactive, used/unused support */
-class InputController {
+class _NexEngineAPI InputController {
 public:
 	InputController() {}
 	InputController(const InputControllerDesc& _desc) : desc(_desc) {}

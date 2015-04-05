@@ -30,6 +30,7 @@ void Plugin::LicenseRenewed() {
 }
 
 bool Plugin::LicenseExpired() {
+	return true;
 }
 
 void Plugin::Dispose() {
