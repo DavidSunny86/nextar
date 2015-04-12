@@ -12,7 +12,7 @@ namespace nextar {
 
 NEX_DEFINE_SINGLETON_PTR(TaskSchedular);
 
-#ifdef NEX_DEBUG
+#ifdef NEX_TASK_SCHEDULAR_CHECKS
 const bool TaskSchedular::_doAllowTraces = true;
 #endif
 
@@ -28,7 +28,7 @@ TaskSchedular::TaskSchedular()  {
 	runners.reserve(c);
 	for(uint32 i = 0; i < c; ++i) {
 		TaskRunner* r = NEX_NEW(TaskRunner(i+1));
-#ifdef NEX_DEBUG
+#ifdef NEX_TASK_SCHEDULAR_CHECKS
 		if (TaskSchedular::_doAllowTraces)	{
 			OutStringStream str2;
 			str2 << "Runner" << i;
@@ -41,7 +41,7 @@ TaskSchedular::TaskSchedular()  {
 	mainThread = NEX_NEW(TaskRunner(c+1));
 	mainThread->MakeMain();
 	runners.push_back(mainThread);
-#ifdef NEX_DEBUG
+#ifdef NEX_TASK_SCHEDULAR_CHECKS
 	mainThread->_name = "Main";
 #endif
 	for(uint32 i = 0; i < runners.size()-1; ++i) {
@@ -54,7 +54,7 @@ TaskSchedular::~TaskSchedular() {
 	for(auto runner : runners) {
 		if (runner != mainThread) {
 			runner->Join();
-#ifdef NEX_DEBUG
+#ifdef NEX_TASK_SCHEDULAR_CHECKS
 			if (TaskSchedular::_doAllowTraces)
 				Trace(runner->_name + " died.");
 #endif
@@ -70,7 +70,7 @@ TaskSchedular::~TaskSchedular() {
 void TaskSchedular::AsyncAddChildTask(Task* task) {
 	NEX_ASSERT(task);
 	TaskRunner* runner = TaskRunner::AsyncGetRunner();
-#ifdef NEX_DEBUG
+#ifdef NEX_TASK_SCHEDULAR_CHECKS
 	if (TaskSchedular::_doAllowTraces)	{
 		OutStringStream str;
 		str << "Thread: " << runner->_name << ", task queue: "
@@ -79,7 +79,7 @@ void TaskSchedular::AsyncAddChildTask(Task* task) {
 	}
 #endif
 	runner->AddTask(task);
-#ifdef NEX_DEBUG
+#ifdef NEX_TASK_SCHEDULAR_CHECKS
 	task->meta.state = Task::TASK_QUEUED;
 #endif
 	runner->taskCount++;
@@ -102,7 +102,7 @@ Task* TaskSchedular::AsyncGetWork(TaskRunner* runner, bool repeat) {
 					continue;
 				task = neighbour->requestQueue.AsyncSteal();
 			}
-#ifdef NEX_DEBUG
+#ifdef NEX_TASK_SCHEDULAR_CHECKS
 			if (task) {
 				if (TaskSchedular::_doAllowTraces)	{
 					OutStringStream str;
@@ -120,7 +120,7 @@ Task* TaskSchedular::AsyncGetWork(TaskRunner* runner, bool repeat) {
 				if (submittedTasks.size()) {
 					task = submittedTasks.front();
 					submittedTasks.pop_front();
-#ifdef NEX_DEBUG
+#ifdef NEX_TASK_SCHEDULAR_CHECKS
 					if (task) {
 						if (TaskSchedular::_doAllowTraces)	{
 							OutStringStream str;
@@ -135,13 +135,13 @@ Task* TaskSchedular::AsyncGetWork(TaskRunner* runner, bool repeat) {
 		}
 
 		if (!repeat || task) {
-#ifdef NEX_DEBUG
+#ifdef NEX_TASK_SCHEDULAR_CHECKS
 			if(task)
 				NEX_ASSERT(task->meta.state == Task::TASK_QUEUED);
 #endif
 			return task;
 		}
-#ifdef NEX_DEBUG
+#ifdef NEX_TASK_SCHEDULAR_CHECKS
 		if (TaskSchedular::_doAllowTraces)	{
 			OutStringStream str;
 			str << "Yieldx: " << runner->_name << " is yielding.";
@@ -160,7 +160,7 @@ void TaskSchedular::AsyncResume(Task* waitingOn, uint32 limit) {
 		if (toExec ||
 				(toExec = AsyncGetWork(runner, false))
 			) {
-#ifdef NEX_DEBUG
+#ifdef NEX_TASK_SCHEDULAR_CHECKS
 			if (TaskSchedular::_doAllowTraces)	{
 				OutStringStream str;
 				str << "Waited: " << runner->_name << ", running task: " << toExec->_name;
@@ -172,7 +172,7 @@ void TaskSchedular::AsyncResume(Task* waitingOn, uint32 limit) {
 	}
 
 	if (toExec) {
-#ifdef NEX_DEBUG
+#ifdef NEX_TASK_SCHEDULAR_CHECKS
 		NEX_ASSERT(toExec->meta.state == Task::TASK_QUEUED ||
 				toExec->meta.state == Task::TASK_INIT);
 		toExec->meta.state = Task::TASK_QUEUED;
@@ -186,7 +186,7 @@ void TaskSchedular::AsyncWork(TaskRunner* runner) {
 	TaskRunner::AsyncGetRunner() = runner;
 	runner->id = std::this_thread::get_id();
 	while (toExec || (toExec = AsyncGetWork(runner))) {
-#ifdef NEX_DEBUG
+#ifdef NEX_TASK_SCHEDULAR_CHECKS
 		String lastTask = toExec->_name;
 		if (TaskSchedular::_doAllowTraces)	{
 			OutStringStream str;
@@ -195,7 +195,7 @@ void TaskSchedular::AsyncWork(TaskRunner* runner) {
 		}
 #endif
 		toExec = TaskRunner::Execute(toExec);
-#ifdef NEX_DEBUG
+#ifdef NEX_TASK_SCHEDULAR_CHECKS
 		if (TaskSchedular::_doAllowTraces)	{
 			OutStringStream str;
 			str << "Worker: " << runner->_name << ", finished task: " << lastTask;
@@ -206,7 +206,7 @@ void TaskSchedular::AsyncWork(TaskRunner* runner) {
 	}
 	// reliquish all tasks to someone else
 	runner->Relinquish(this);
-#ifdef NEX_DEBUG
+#ifdef NEX_TASK_SCHEDULAR_CHECKS
 	if (TaskSchedular::_doAllowTraces)	{
 		Trace(runner->_name + " finished.");
 	}
@@ -215,7 +215,7 @@ void TaskSchedular::AsyncWork(TaskRunner* runner) {
 
 void TaskSchedular::AsyncSubmit(Task* singleTask) {
 	std::lock_guard<mutex_type> guard(lock);
-#ifdef NEX_DEBUG
+#ifdef NEX_TASK_SCHEDULAR_CHECKS
 	NEX_ASSERT(singleTask->meta.state == Task::TASK_QUEUED ||
 			singleTask->meta.state == Task::TASK_INIT);
 	singleTask->meta.state = Task::TASK_QUEUED;
@@ -226,7 +226,7 @@ void TaskSchedular::AsyncSubmit(Task* singleTask) {
 
 void TaskSchedular::AsyncSubmit(Task** multipleTasks, uint32 n) {
 	std::lock_guard<mutex_type> guard(lock);
-#ifdef NEX_DEBUG
+#ifdef NEX_TASK_SCHEDULAR_CHECKS
 	if (TaskSchedular::_doAllowTraces)	{
 		OutStringStream str;
 		str << "Submit: tasks " << n;

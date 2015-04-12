@@ -14,4 +14,8 @@
 #	define _NexEngineAPI
 #endif
 
+#ifdef NEX_DEBUG
+#	define NEX_TASK_SCHEDULAR_CHECKS 
+#endif
+
 #endif //NEXTAR_ENGINE_CONFIG_1_01

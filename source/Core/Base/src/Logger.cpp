@@ -102,7 +102,10 @@ void Logger::LogMsg(nextar::LogSeverity logSeverity, const String& intf,
 	real_out = old;
 	(*real_out) << rmsg;
 	(*real_out).flush();
+#ifndef NEX_GCC
 	Platform::OutputDebug(rmsg.c_str());
+#endif
+
 #endif
 	for (size_t i = 0; i < listeners.size(); ++i) {
 		listeners[i]->LogMsg(logSeverity, msg);

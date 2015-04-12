@@ -17,6 +17,7 @@ NEX_IMPLEMENT_PLATFORM_APP();
 
 using namespace nextar;
 
+static unsigned MAX_DEPTH = 20;
 Matrix4x4 RandomMatrix() {
 	Matrix4x4 temp;
 	for(uint32 i = 0; i < 4; ++i)
@@ -44,11 +45,16 @@ public:
 		for(unsigned i = 1; i < count; ++i)
 			*result = Mat4x4Mul(*result, RandomMatrix());
 
-		if (depth < 10) {
+		if (depth < MAX_DEPTH) {
 			next = NEX_NEW(SubTask(_name + "->st" + Convert::ToString((int32)depth+1), depth+1));
-			next->count = count;
+			next->count = (count*2)/3;
+			if (depth%2)
+				return next;
+			else
+				Spawn(next);
 		}
-		return next;
+		WaitForChildren();
+		return nullptr;
 	}
 
 	uint32 depth;
@@ -83,7 +89,7 @@ public:
 		Spawn(task[1]);
 		Spawn(task[2]);
 
-		Wait();
+		WaitForChildren();
 		return nullptr;
 	}
 

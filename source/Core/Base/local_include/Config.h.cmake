@@ -15,6 +15,8 @@
 #	define NEX_COMPILER_NAME	"<Unknown>"
 #endif
 
+#if (__GNUC__ >= 4)
+#else
 #ifndef thread_local
 # if __STDC_VERSION__ >= 201112 && !defined __STDC_NO_THREADS__
 #  define thread_local _Thread_local
@@ -31,6 +33,7 @@
 # else
 #  error "Cannot define thread_local"
 # endif
+#endif
 #endif
 
 /** Predefined architectures */

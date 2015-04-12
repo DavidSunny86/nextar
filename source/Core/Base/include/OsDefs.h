@@ -16,9 +16,9 @@
 	
 
 #if defined(NEX_WINDOWS)
-# include "platform/win32/Win32Defs.h"
+# include "Win32Defs.h"
 #elif defined(NEX_LINUX)
-# include "platform/linux/LinuxDefs.h"
+# include "LinuxDefs.h"
 #else
 #error OS/Dynamic Lib not defined
 #endif

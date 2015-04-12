@@ -40,7 +40,9 @@ typedef std::mutex Mutex;
 typedef std::recursive_mutex RecursiveMutex;
 typedef std::thread::id ThreadID;
 typedef std::atomic_int_fast32_t atomic_int;
+typedef std::atomic_uint_fast32_t atomic_uint;
 typedef std::atomic_flag atomic_flag;
+typedef std::atomic_bool atomic_bool;
 
 }
 
