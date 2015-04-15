@@ -16,6 +16,7 @@ class _NexEngineAPI InputControllerProvider {
 public:
 
 	virtual void Configure(const Config&) = 0;
+	virtual void SetBaseDevId(uint32 base) = 0;
 	virtual void EnumControllers() = 0;
 	virtual uint32 GetNumController() = 0;
 	virtual const InputControllerDesc& GetControllerDesc(uint32 n) = 0;
@@ -34,7 +35,8 @@ public:
 	virtual ~InputManager() {}
 
 	virtual void RegisterProvider(InputControllerProvider*) = 0;
-	virtual void UnregisterProvider() = 0;
+	virtual void UnregisterProvider(InputControllerProvider*) = 0;
+	virtual void UnregisterProviders() = 0;
 
 	virtual uint32 GetNumController() = 0;
 	virtual const InputControllerDesc& GetControllerDesc(uint32 n) = 0;

@@ -25,4 +25,6 @@
 #include <RenderManager.h>
 #include <DebugDisplay.h>
 
+#include <EngineApplicationContext.h>
+
 #endif //ENGINEHEADERS_H_

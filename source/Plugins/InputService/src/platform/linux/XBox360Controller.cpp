@@ -18,6 +18,7 @@ namespace InputService {
 
 XBox360Controller::XBox360Controller(const UxDeviceDesc& desc) :
 	UxInputController(desc) {
+	InitControls();
 }
 
 XBox360Controller::~XBox360Controller() {
@@ -37,6 +38,7 @@ bool XBox360Controller::IsOn(KeyID keyId) {
 }
 
 void XBox360Controller::PollData() {
+
 }
 
 int32 XBox360Controller::GetValue(KeyID keyId) {
@@ -45,6 +47,10 @@ int32 XBox360Controller::GetValue(KeyID keyId) {
 
 InputDir XBox360Controller::GetDir(KeyID keyId) {
 	return InputDir();
+}
+
+void XBox360Controller::InitControls() {
+	// get axes and button count
 }
 
 } /* namespace InputService */

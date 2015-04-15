@@ -10,14 +10,27 @@
 
 #include <InputController.h>
 
+namespace InputService {
+
+using namespace nextar;
 struct UxDeviceDesc {
 	InputControllerDesc info;
 	int fd;
+	uint32 axes;
+	uint32 buttons;
+
+	UxDeviceDesc() : fd(-1), axes(0), buttons(0) {}
+
+	static const UxDeviceDesc Null;
+
+	bool IsValid() const {
+		return fd != Null.fd && info.IsValid();
+	}
 };
 
-namespace InputService {
-
-class UxInputController: public nextar::InputController {
+class UxInputController:
+		public AllocGeneral,
+		public nextar::InputController {
 public:
 	UxInputController(const UxDeviceDesc& desc);
 	virtual ~UxInputController();

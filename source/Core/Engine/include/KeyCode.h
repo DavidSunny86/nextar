@@ -215,6 +215,17 @@ enum StandardKeyCodes {
 	JOY_FSLIDER1, // extra force slider1
 	JOY_FSLIDER2, // extra force slider2
 
+	XBOX_A,
+	XBOX_B,
+	XBOX_X,
+	XBOX_Y,
+	XBOX_UP,
+	XBOX_DOWN,
+	XBOX_LEFT,
+	XBOX_RIGHT,
+	XBOX_START,
+	XBOX_BACK,
+
 	NEX_KEY_INVALID_COOKED_CODE = 0xffff
 };
 

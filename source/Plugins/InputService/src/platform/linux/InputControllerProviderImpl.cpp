@@ -54,27 +54,51 @@ void InputControllerProviderImpl::LookForJoysticks() {
 		ioctl(fd, JSIOCGBUTTONS, &buttons);
 		ioctl(fd, JSIOCGNAME(128), name);
 		desc.info.name = name;
-		desc.info.deviceId = JOYSTICK_DEVID_BASE + index;
-		desc.info.type  = GetJoystickType(desc.info.name);
+		desc.info.deviceId = baseId + JOYSTICK_DEVID_BASE + index;
+		desc.info.type  = GetJoystickType(desc.info.name, axes, buttons, version);
 		desc.fd = fd;
+		desc.axes = axes;
+		desc.buttons = buttons;
 
+		controllers.push_back(desc);
 		index++;
 	} while(true);
 }
 
+const UxDeviceDesc& InputControllerProviderImpl::GetDesc(uint16 deviceId) const {
+	for(auto& c : controllers) {
+		if (c.info.deviceId == deviceId) {
+			return c;
+		}
+	}
+	return UxDeviceDesc::Null;
+}
+
 InputController* InputControllerProviderImpl::CreateController(
 		uint16 deviceId) {
+	const UxDeviceDesc& desc = GetDesc(deviceId);
+	if (desc.IsValid()) {
+		switch(desc.info.type) {
+		case TYPE_XBOX360_CONTROLLER:
+			return nullptr;
+		}
+	}
 	return nullptr;
 }
 
-void InputControllerProviderImpl::DestroyController(InputController*) {
+void InputControllerProviderImpl::DestroyController(InputController* ctrl) {
+	UxInputController* ctrl_ = static_cast<UxInputController*>(ctrl);
+	NEX_DELETE(ctrl_);
 }
 
-ControllerType InputControllerProviderImpl::GetJoystickType(const String& name) {
+ControllerType InputControllerProviderImpl::GetJoystickType(const String& name, uint32 axes,
+		uint32 buttons, uint32 version) {
 	if (name.find("Microsoft") != String::npos &&
 		name.find("X-Box") != String::npos &&
-		name.find("360") != String::npos)
+		name.find("360") != String::npos) {
+
 		return TYPE_XBOX360_CONTROLLER;
+	}
 
 	return TYPE_JOYSTICK;
 }

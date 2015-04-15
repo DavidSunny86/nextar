@@ -25,7 +25,8 @@ public:
 	virtual void Configure(const Config&);
 
 	virtual void RegisterProvider(InputControllerProvider*);
-	virtual void UnregisterProvider();
+	virtual void UnregisterProvider(InputControllerProvider*);
+	virtual void UnregisterProviders();
 
 	virtual void RegisterController(uint16 deviceId);
 	virtual void UnregisterController(uint16 deviceId);
@@ -33,34 +34,34 @@ public:
 	virtual void RegisterListener(InputListener*, uint16 deviceId = -1);
 	virtual void UnregisterListener(InputListener*, uint16 deviceId = -1);
 
-	virtual uint32 GetNumController() {
-		if (provider)
-			provider->GetNumController();
-		return 0;
-	}
-
-	virtual const InputControllerDesc& GetControllerDesc(uint32 n) {
-		if (provider)
-			provider->GetControllerDesc(n);
-		return InputControllerDesc::Null;
-	}
+	virtual uint32 GetNumController();
+	virtual const InputControllerDesc& GetControllerDesc(uint32 n);
 
 	virtual void Execute(const FrameTimer& frameTimer);
+	virtual void Close();
+
 private:
 
+	enum {
+		BASE_DEV_ID = 1024
+	};
+
+	InputControllerProvider* GetProvider(uint16 devId);
 	void ProcessDevices();
 
 	typedef list<InputListener*>::type ListenerList;
+	typedef list<InputControllerProvider*>::type ProviderList;
 
 	struct InputDevice {
 		InputController* controller;
 		ListenerList listeners;
+		InputControllerProvider* provider;
 
 		InputDevice()
-		: controller(0) {
+		: provider(nullptr), controller(nullptr) {
 		}
-		InputDevice(InputController* c)
-		: controller(c) {
+		InputDevice(InputControllerProvider* p, InputController* c)
+		: provider(p), controller(c) {
 		}
 	};
 
@@ -76,10 +77,9 @@ private:
 		(*it).second.listeners.remove(l);
 	}
 
-	virtual void Close();
-	InputControllerProvider* provider;
+	uint32 numController;
+	ProviderList providers;
 	ControllerMap controllerMap;
-
 };
 
 }

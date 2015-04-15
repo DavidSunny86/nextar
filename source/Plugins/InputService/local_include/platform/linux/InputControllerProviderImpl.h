@@ -31,19 +31,20 @@ public:
 		return controllers[n].info;
 	}
 
+	const UxDeviceDesc& GetDesc(uint16 deviceId) const;
 	virtual InputController* CreateController(uint16 deviceId);
 	virtual void DestroyController(InputController*);
 
 private:
 
 	enum {
-		JOYSTICK_DEVID_BASE = 0x0100,
-		KEYBOARD_MOUSE_DEVID_BASE = 0x0200,
+		JOYSTICK_DEVID_BASE = 0x1,
+		KEYBOARD_MOUSE_DEVID_BASE = 0x20,
 	};
 
 	void LookForJoysticks();
 
-	ControllerType GetJoystickType(const String& name);
+	ControllerType GetJoystickType(const String& name, uint32 axes, uint32 buttons, uint32 version);
 
 
 	typedef vector<UxDeviceDesc>::type InputControllerDescList;

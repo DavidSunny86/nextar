@@ -15,7 +15,10 @@
 #endif
 
 #ifdef NEX_DEBUG
+#	define NEX_TASK_SCHEDULAR_TRACES 1
 #	define NEX_TASK_SCHEDULAR_CHECKS 
+#else
+#	define NEX_TASK_SCHEDULAR_TRACES 0
 #endif
 
 #endif //NEXTAR_ENGINE_CONFIG_1_01

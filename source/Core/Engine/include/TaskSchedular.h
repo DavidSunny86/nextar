@@ -29,8 +29,12 @@ public:
 	NEX_LOG_HELPER(TaskSchedular);
 
 	TaskSchedular();
-	virtual ~TaskSchedular();
+	~TaskSchedular();
 
+	void Close();
+	void AsyncSpawn(Task* t) {
+		AsyncAddChildTask(t);
+	}
 	void AsyncSubmit(Task* t);
 	void AsyncSubmit(Task** t, uint32 n);
 
@@ -51,6 +55,7 @@ protected:
 	RunnerList runners;
 	TaskRunner* mainThread;
 
+	friend class TaskRunner;
 	friend class Task;
 };
 

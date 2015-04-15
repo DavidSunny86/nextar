@@ -27,8 +27,8 @@ void Task::WaitForChildren() {
 				meta.waitingForChildrenId != id);
 	meta.waitingForChildrenId = id;
 	meta.waitingForChildren.store(true);
-	NEX_ASSERT(!meta.waiting.load() ||
-			meta.waitingForChildrenId != meta.waitingId);
+//	NEX_ASSERT(!meta.waiting.load() ||
+//			meta.waitingForChildrenId != meta.waitingId);
 #endif
 	uint32 ref = meta.refCount.load(std::memory_order_relaxed);
 	if (ref <= 1)
@@ -44,10 +44,12 @@ void Task::Wait() {
 	std::thread::id id = std::this_thread::get_id();
 	NEX_ASSERT(!meta.waiting.load() ||
 			meta.waitingId != id);
+	NEX_ASSERT(meta.state != TASK_RUNNING ||
+			meta.runId != id);
 	meta.waitingId = id;
 	meta.waiting.store(true);
-	NEX_ASSERT(!meta.waitingForChildren.load() ||
-				meta.waitingForChildrenId != meta.waitingId);
+//	NEX_ASSERT(!meta.waitingForChildren.load() ||
+//				meta.waitingForChildrenId != meta.waitingId);
 #endif
 	uint32 ref = meta.refCount.load(std::memory_order_relaxed);
 	if (!ref)

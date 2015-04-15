@@ -4,7 +4,7 @@
  *  Created on: 22-Mar-2015
  *      Author: obhi
  */
-
+#include <NexEngine.h>
 #include <TaskRunner.h>
 #include <TaskSchedular.h>
 
@@ -13,7 +13,7 @@ namespace nextar {
 NEX_DEFINE_SINGLETON_PTR(TaskSchedular);
 
 #ifdef NEX_TASK_SCHEDULAR_CHECKS
-const bool TaskSchedular::_doAllowTraces = true;
+const bool TaskSchedular::_doAllowTraces = NEX_TASK_SCHEDULAR_TRACES;
 #endif
 
 TaskSchedular::TaskSchedular()  {
@@ -50,21 +50,35 @@ TaskSchedular::TaskSchedular()  {
 }
 
 TaskSchedular::~TaskSchedular() {
-	quit = true;
-	for(auto runner : runners) {
-		if (runner != mainThread) {
-			runner->Join();
-#ifdef NEX_TASK_SCHEDULAR_CHECKS
-			if (TaskSchedular::_doAllowTraces)
-				Trace(runner->_name + " died.");
-#endif
-			NEX_DELETE(runner);
+	Close();
+}
+
+void TaskSchedular::Close() {
+	if (!quit) {
+		quit = true;
+		for(auto runner : runners) {
+			if (runner != mainThread) {
+				runner->Join();
+	#ifdef NEX_TASK_SCHEDULAR_CHECKS
+				if (TaskSchedular::_doAllowTraces)
+					Trace(runner->_name + " died.");
+	#endif
+				NEX_DELETE(runner);
+			}
+		}
+		if (mainThread) {
+			NEX_DELETE(mainThread);
+			mainThread = nullptr;
+		}
+		runners.clear();
+		{
+			std::lock_guard<mutex_type> guard(lock);
+			if (submittedTasks.size()) {
+				Warn("Tasks purged: " + Convert::ToString((uint32)submittedTasks.size()));
+			}
+			submittedTasks.clear();
 		}
 	}
-
-	NEX_DELETE(mainThread);
-
-	runners.clear();
 }
 
 void TaskSchedular::AsyncAddChildTask(Task* task) {
@@ -143,9 +157,9 @@ Task* TaskSchedular::AsyncGetWork(TaskRunner* runner, bool repeat) {
 		}
 #ifdef NEX_TASK_SCHEDULAR_CHECKS
 		if (TaskSchedular::_doAllowTraces)	{
-			OutStringStream str;
-			str << "Yieldx: " << runner->_name << " is yielding.";
-			Trace(str.str());
+			//OutStringStream str;
+			//str << "Yieldx: " << runner->_name << " is yielding.";
+			//Trace(str.str());
 		}
 #endif
 		std::this_thread::yield();

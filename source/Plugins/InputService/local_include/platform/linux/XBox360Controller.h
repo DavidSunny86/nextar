@@ -38,6 +38,8 @@ public:
 	virtual int32 GetValue(KeyID) override;
 	virtual InputDir GetDir(KeyID) override;
 
+	void InitControls();
+
 protected:
     InputEvent inputEvents[32];
 };

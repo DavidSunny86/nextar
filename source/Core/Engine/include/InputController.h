@@ -39,7 +39,7 @@ struct _NexEngineAPI InputControllerDesc {
 	InputControllerDesc(const InputControllerDesc& d) : name(d.name), type(d.type),
 			deviceId(d.deviceId) {}
 
-	bool IsValid() {
+	bool IsValid() const {
 		return (type != TYPE_UNKNOWN) && (deviceId != (uint16)-1);
 	}
 

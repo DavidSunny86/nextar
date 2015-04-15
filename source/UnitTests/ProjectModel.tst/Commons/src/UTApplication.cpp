@@ -2,7 +2,7 @@
 #include <UTApplication.h>
 
 UTApplication::UTApplication() :
-	ProjectApplicationContext("UTApplication"), windowDimensions(800, 600) {
+	ProjectApplicationContext("ProjectModel.tst"), windowDimensions(800, 600) {
 }
 
 UTApplication::~UTApplication() {

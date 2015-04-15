@@ -13,31 +13,57 @@ NEX_DEFINE_SINGLETON_PTR(InputManager);
 
 const InputControllerDesc InputControllerDesc::Null;
 
-InputManagerImpl::InputManagerImpl() : provider(nullptr) {
+InputManagerImpl::InputManagerImpl() : numController(0) {
 }
 
 InputManagerImpl::~InputManagerImpl() {
 }
 
 void InputManagerImpl::Configure(const Config& config) {
-	if (provider)
-		provider->Configure(config);
+	uint32 baseId = BASE_DEV_ID;
+	for(auto p : providers) {
+		p->SetBaseDevId(baseId);
+		baseId <<= 1;
+		p->Configure(config);
+	}
 	ApplicationContext::Listener l(this, ApplicationContext::PRIORITY_HIGH);
 	ApplicationContext::Instance().RegisterListener(l);
 }
 
 void InputManagerImpl::RegisterProvider(InputControllerProvider* provider) {
-	this->provider = provider;
-	this->provider->EnumControllers();
+	this->providers.push_back(provider);
+	provider->EnumControllers();
 }
 
-void InputManagerImpl::UnregisterProvider() {
-	if (provider) {
-		for(auto& c : controllerMap) {
-			provider->DestroyController(c.second.controller);
-		}
+void InputManagerImpl::UnregisterProviders() {
+	for(auto& p : providers) {
+		UnregisterProvider(p);
 	}
-	controllerMap.clear();
+}
+
+void InputManagerImpl::UnregisterProvider(InputControllerProvider* provider) {
+	for(auto it = controllerMap.begin(); it != controllerMap.end(); ) {
+		auto& c = (*it);
+		if (provider == c.second.provider) {
+			c.second.provider->DestroyController(c.second.controller);
+			it = controllerMap.erase(it);
+		} else
+			++it;
+	}
+	providers.remove(provider);
+}
+
+InputControllerProvider* InputManagerImpl::GetProvider(uint16 deviceId) {
+	uint32 baseId = BASE_DEV_ID;
+	for(auto& p : providers) {
+		if (baseId & deviceId) {
+			if (!((baseId << 1) & deviceId)) {
+				return p;
+			}
+		}
+		baseId <<= 1;
+	}
+	return nullptr;
 }
 
 void InputManagerImpl::RegisterController(uint16 deviceId) {
@@ -47,21 +73,36 @@ void InputManagerImpl::RegisterController(uint16 deviceId) {
 		return;
 	}
 
-	if(provider) {
-		InputController* controls = provider->CreateController(deviceId);
-		controllerMap.insert(
-			ControllerMap::value_type(deviceId,
-			InputDevice(controls)));
+	// get provider id
+	InputControllerProvider* p = GetProvider(deviceId);
+	if (p) {
+		InputController* controls = p->CreateController(deviceId);
+		if (controls)
+			controllerMap.insert(
+					ControllerMap::value_type(deviceId,
+							InputDevice(p, controls)));
 	}
 }
 
 void InputManagerImpl::UnregisterController(uint16 deviceId) {
 	ControllerMap::iterator it = controllerMap.find(deviceId);
 	if (it != controllerMap.end()) {
-		if (provider)
-			provider->DestroyController((*it).second.controller);
+		if ((*it).second.provider)
+			(*it).second.provider->DestroyController((*it).second.controller);
 		controllerMap.erase(it);
 	}
+}
+
+const InputControllerDesc& InputManagerImpl::GetControllerDesc(uint32 n) {
+	uint32 runningCount = 0;
+	for(auto p : providers) {
+		uint32 numController = p->GetNumController();
+		if (runningCount + numController > n)
+			return p->GetControllerDesc(runningCount + n);
+		runningCount += numController;
+	}
+
+	return InputControllerDesc::Null;
 }
 
 void InputManagerImpl::ProcessDevices() {
@@ -105,6 +146,15 @@ void InputManagerImpl::Close() {
 
 void InputManagerImpl::Execute(const FrameTimer& frameTimer) {
 	ProcessDevices();
+}
+
+uint32 InputManagerImpl::GetNumController() {
+	if (!numController) {
+		for(auto p : providers) {
+			numController += p->GetNumController();
+		}
+	}
+	return numController;
 }
 
 }

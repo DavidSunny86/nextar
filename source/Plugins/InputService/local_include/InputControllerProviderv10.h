@@ -27,9 +27,12 @@ public:
 	virtual const InputControllerDesc& GetControllerDesc(uint32 n);
 	virtual InputController* CreateController(uint16 deviceId);
 	virtual void DestroyController(InputController*);
+	virtual void SetBaseDevId(uint32 base);
 
 protected:
 	virtual void EnumDevicesImpl() = 0;
+
+	uint32 baseId;
 
 };
 

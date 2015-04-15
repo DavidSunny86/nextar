@@ -31,6 +31,7 @@ protected:
 		atomic_bool waiting;
 		std::thread::id waitingForChildrenId;
 		std::thread::id waitingId;
+		std::thread::id runId;
 #endif
 		Task* parent;
 		atomic_int refCount;

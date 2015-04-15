@@ -16,6 +16,8 @@
 
 namespace InputService {
 
+const UxDeviceDesc UxDeviceDesc::Null;
+
 UxInputController::UxInputController(const UxDeviceDesc& desc) :
 	InputController(desc.info), fd(desc.fd) {
 

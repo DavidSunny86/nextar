@@ -4,7 +4,7 @@
  *  Created on: 22-Mar-2015
  *      Author: obhi
  */
-#include <BaseHeaders.h>
+#include <EngineHeaders.h>
 #include <TaskSchedular.h>
 
 namespace nextar {
@@ -35,6 +35,8 @@ public:
 		this->depth = depth;
 	}
 	~SubTask() {
+		if (result)
+			NEX_DELETE(result);
 		if (next)
 			NEX_DELETE(next);
 	}
@@ -98,14 +100,13 @@ protected:
 };
 
 int NextarMain(int argc, char* argv[]) {
-	nextar::ApplicationContext application("FileSystem");
+	nextar::EngineApplicationContext application("SchedularTest");
 
 	application.InitializeContext(argc, argv);
-	TaskSchedular* schedular = NEX_NEW(TaskSchedular());
+	TaskSchedular* schedular = TaskSchedular::InstancePtr();
 	MyTask task;
-	schedular->AsyncAddChildTask(&task);
+	schedular->AsyncSpawn(&task);
 	task.Wait();
-	NEX_DELETE(schedular);
 	application.DestroyContext();
 
 	std::cin.get();

@@ -9,8 +9,10 @@
 #include <errno.h>
 #include <string.h>
 #include <iostream>
+#include <string>
 
 #include <linux/joystick.h>
+#include <vector>
 
 #define NAME_LENGTH 128
 
@@ -22,7 +24,7 @@ int main (int argc, char **argv)
 	int version = 0x000800;
 	char name[NAME_LENGTH] = "Unknown";
 
-	if ((fd = open("/dev/input/js0", O_RDONLY|O_NONBLOCK)) < 0) {
+	if ((fd = open("/dev/input/js1", O_RDONLY|O_NONBLOCK)) < 0) {
 		exit(1);
 	}
 
@@ -38,19 +40,65 @@ int main (int argc, char **argv)
 	struct js_event js;
 	fcntl(fd, F_SETFL, O_NONBLOCK);
 
+	struct Value {
+		short value;
+		time_t time;
+		Value() : value(0), time(0) {}
+	};
+
+	std::vector<Value> axesVals;
+	std::vector<Value> buttonVals;
+
+	axesVals.resize(axes);
+	buttonVals.resize(buttons);
+
 	while (1) {
 
-		while (read(fd, &js, sizeof(struct js_event)) == sizeof(struct js_event))  {
-			printf("Event: type %d, time %d, number %d, value %d\n",
-					js.type, js.time, js.number, js.value);
+		size_t readSize = 0;
+		while ((readSize = read(fd, &js, sizeof(struct js_event))) == sizeof(struct js_event))  {
+			auto e = errno;
+			if (e && e != EAGAIN) {
+				perror("\njstest: error reading");
+				exit (1);
 			}
 
-		if (errno != EAGAIN) {
-			perror("\njstest: error reading");
-			exit (1);
-		}
+			if (js.type & JS_EVENT_INIT) {
+				if(js.type & JS_EVENT_AXIS) {
+					if(axesVals[js.number].time < js.time) {
+						axesVals[js.number].value = js.value;
+						axesVals[js.number].time = js.time;
+					}
+				}
+				if (js.type & JS_EVENT_BUTTON) {
+					if(buttonVals[js.number].time < js.time) {
+						buttonVals[js.number].value = js.value;
+						buttonVals[js.number].time = js.time;
+					}
+				}
+			} else {
+				bool print = false;
+				if(js.type & JS_EVENT_AXIS) {
+					if(axesVals[js.number].time < js.time) {
+						if(axesVals[js.number].value != js.value) {
+							axesVals[js.number].value = js.value;
+							print = true;
+						}
+					}
+				}
+				if (js.type & JS_EVENT_BUTTON) {
+					if(buttonVals[js.number].time < js.time) {
+						if(buttonVals[js.number].value != js.value) {
+							buttonVals[js.number].value = js.value;
+							print = true;
+						}
+					}
+				}
 
-		std::cin.get();
+				if (print)
+					printf("Event: type %d, time %d, number %d, value %d\n",
+							js.type, js.time, js.number, js.value);
+			}
+		}
 	}
 
 	return 0;

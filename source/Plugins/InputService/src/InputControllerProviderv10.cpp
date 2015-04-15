@@ -9,7 +9,7 @@
 
 namespace InputService {
 
-InputControllerProviderv1_0::InputControllerProviderv1_0() {
+InputControllerProviderv1_0::InputControllerProviderv1_0() : baseId(0) {
 }
 
 InputControllerProviderv1_0::~InputControllerProviderv1_0() {
@@ -38,6 +38,10 @@ InputController* InputControllerProviderv1_0::CreateController(
 
 void InputControllerProviderv1_0::DestroyController(
 		InputController*) {
+}
+
+void InputControllerProviderv1_0::SetBaseDevId(uint32 base) {
+	baseId = base;
 }
 
 } /* namespace InputController */

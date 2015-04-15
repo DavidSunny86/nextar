@@ -12,6 +12,7 @@
 #include <VertexLayout.h>
 #include <MeshServices.h>
 #include <InputManagerImpl.h>
+#include <TaskSchedular.h>
 
 namespace nextar {
 
@@ -24,6 +25,7 @@ EngineApplicationContext::~EngineApplicationContext() {
 }
 
 void EngineApplicationContext::CreateExtendedInterfacesImpl() {
+	NEX_NEW(TaskSchedular());
 	NEX_NEW(InputManagerImpl());
 	NEX_NEW(ComponentFactoryArchive());
 	NEX_NEW(ComponentGroupArchive());
@@ -32,6 +34,7 @@ void EngineApplicationContext::CreateExtendedInterfacesImpl() {
 }
 
 void EngineApplicationContext::ConfigureExtendedInterfacesImpl() {
+	// TaskSchedular::Instance().Configure(GetConfig());
 	InputManager::Instance().Configure(GetConfig());
 	ComponentFactoryArchive::Instance().Configure(GetConfig());
 	ComponentGroupArchive::Instance().Configure(GetConfig());
@@ -43,10 +46,16 @@ void EngineApplicationContext::ConfigureExtendedInterfacesImpl() {
 
 void EngineApplicationContext::ReleaseResourcesImpl() {
 	MeshServices::Instance().Close();
+	if (RenderManager::InstancePtr()) {
+		DispatchEvent(EVENT_RENDERMANAGER_PRE_CLOSE);
+		RenderManager::Instance().Close();
+		DispatchEvent(EVENT_RENDERMANAGER_POST_CLOSE);
+	}
 	ComponentGroupArchive::Instance().AsyncDeleteAll();
 	ComponentFactoryArchive::Instance().AsyncDeleteAll();
 	InputManager::Instance().Close();
 	VertexLayout::ClearCommonLayouts();
+	TaskSchedular::Instance().Close();
 }
 
 void EngineApplicationContext::DestroyExtendedInterfacesImpl() {
@@ -54,11 +63,7 @@ void EngineApplicationContext::DestroyExtendedInterfacesImpl() {
 	NEX_DELETE(ComponentFactoryArchive::InstancePtr());
 	NEX_DELETE(ComponentGroupArchive::InstancePtr());
 	NEX_DELETE(InputManager::InstancePtr());
-	if (RenderManager::InstancePtr()) {
-		DispatchEvent(EVENT_RENDERMANAGER_PRE_CLOSE);
-		RenderManager::Instance().Close();
-		DispatchEvent(EVENT_RENDERMANAGER_POST_CLOSE);
-	}
+	NEX_DELETE(TaskSchedular::InstancePtr());
 }
 
 } /* namespace nextar */

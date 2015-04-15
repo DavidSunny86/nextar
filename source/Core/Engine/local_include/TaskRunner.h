@@ -52,6 +52,7 @@ public:
 		NEX_ASSERT(toExec->meta.state == Task::TASK_QUEUED ||
 				toExec->meta.state == Task::TASK_INIT);
 		toExec->meta.state = Task::TASK_RUNNING;
+		toExec->meta.runId = std::this_thread::get_id();
 #endif
 		Task* nextToExec = toExec->Run();
 #ifdef NEX_TASK_SCHEDULAR_CHECKS
