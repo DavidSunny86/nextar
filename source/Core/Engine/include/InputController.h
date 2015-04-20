@@ -11,16 +11,6 @@
 
 namespace nextar {
 
-enum KeyState {
-	KEY_STATE_UP,
-	KEY_STATE_DOWN
-};
-
-enum KeyAnalogBit {
-	KEY_ANALOG_BIT = 0x8000,
-	KEY_DIRECTION_BIT = 0x4000
-};
-
 typedef uint16 KeyID;
 
 enum ControllerType : uint16 {
@@ -46,9 +36,12 @@ struct _NexEngineAPI InputControllerDesc {
 	static const InputControllerDesc Null;
 };
 
+/* ranges between 0 and max(AnalogValue)*/
+typedef int16 AnalogValue;
+
 struct InputDir {
-	uint16 deltaX;
-	uint16 deltaY;
+	// x and y of delta
+	AnalogValue delta[2];
 };
 
 struct InputEvent {
@@ -57,7 +50,7 @@ struct InputEvent {
 	uint32 timeStamp;
 	union {
 		KeyState keyState;
-		int32 analogValue;
+		AnalogValue analogValue;
 		InputDir analogDir;
 	};
 };
@@ -94,13 +87,12 @@ protected:
 	~InputController() {
 	}
 
-private:
 	InputControllerDesc desc;
 };
 
 class AnalogControls {
 public:
-	virtual int32 GetValue(KeyID) = 0;
+	virtual AnalogValue GetValue(KeyID) = 0;
 	virtual InputDir GetDir(KeyID) = 0;
 protected:
 	~AnalogControls() {

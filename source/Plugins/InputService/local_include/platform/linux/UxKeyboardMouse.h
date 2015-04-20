@@ -17,7 +17,7 @@ class UxKeyboardMouse: public nextar::DigitalControls,
 		public nextar::AnalogControls,
 		public UxInputController {
 public:
-	UxKeyboardMouse();
+	UxKeyboardMouse(const UxDeviceDesc& desc);
 	virtual ~UxKeyboardMouse();
 };
 

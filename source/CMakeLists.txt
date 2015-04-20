@@ -389,6 +389,16 @@ macro(add_framework frameWorkName)
 endmacro(add_framework)
 
 #============================================================
+# For_Platform
+#============================================================
+macro(for_platform platformNames)
+	if( (NOT ("${ARGV0}" MATCHES "All") ) AND
+	    (NOT (";${ARGV0};" MATCHES ";${NEX_OS};") ) )
+	    return()
+	endif()
+endmacro(for_platform)
+
+#============================================================
 # Add_Module
 #============================================================
 macro(add_module moduleName)
@@ -441,6 +451,7 @@ macro(place_bin)
 	endif()
 	set_source_files_properties(${HEADER_GROUP_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 endmacro(place_bin)
+
 #============================================================
 # Create_Module
 #============================================================
@@ -532,3 +543,6 @@ set_property(CACHE NEX_PACKAGE_TYPE PROPERTY STRINGS ${NEX_PACKAGE_LIST})
 ## Build Include
 include(${NEX_ROOT}/CMake/Scripts/BuildConfig_${NEX_PACKAGE_TYPE}.txt)
 
+## @urgent 1. Platform specific build option, a module may or may not be build on certain platform. eg: for_platform
+## @urgent 2. Anything apart from this script should only use macros
+## @todo 3. Files may not use CMakeLists.txt as name, may just be included to remove dep from cmake.

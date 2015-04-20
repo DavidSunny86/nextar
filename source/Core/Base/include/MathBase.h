@@ -91,6 +91,11 @@ inline float Sin(float value) {
 	return std::sin(value);
 }
 
+template <typename T>
+inline T Sign(T x) {
+	return (x > 0) - (x < 0);
+}
+
 inline float Cos(float value) {
 	return std::cos(value);
 }

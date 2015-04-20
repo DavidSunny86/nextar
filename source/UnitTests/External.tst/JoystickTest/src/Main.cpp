@@ -10,6 +10,7 @@
 #include <string.h>
 #include <iostream>
 #include <string>
+#include <cmath>
 
 #include <linux/joystick.h>
 #include <vector>
@@ -54,6 +55,8 @@ int main (int argc, char **argv)
 
 	while (1) {
 
+		float deadzone = 0.3f;
+
 		size_t readSize = 0;
 		while ((readSize = read(fd, &js, sizeof(struct js_event))) == sizeof(struct js_event))  {
 			auto e = errno;
@@ -62,6 +65,8 @@ int main (int argc, char **argv)
 				exit (1);
 			}
 
+			std::string type;
+			float nvalue = 0;
 			if (js.type & JS_EVENT_INIT) {
 				if(js.type & JS_EVENT_AXIS) {
 					if(axesVals[js.number].time < js.time) {
@@ -73,8 +78,10 @@ int main (int argc, char **argv)
 					if(buttonVals[js.number].time < js.time) {
 						buttonVals[js.number].value = js.value;
 						buttonVals[js.number].time = js.time;
+
 					}
 				}
+
 			} else {
 				bool print = false;
 				if(js.type & JS_EVENT_AXIS) {
@@ -82,6 +89,14 @@ int main (int argc, char **argv)
 						if(axesVals[js.number].value != js.value) {
 							axesVals[js.number].value = js.value;
 							print = true;
+							nvalue = std::min(std::max(-1.0f, (float)js.value/32767.0f), 1.0f);
+							float absval = std::fabs(nvalue);
+							if (absval < deadzone && js.number != 6) {
+								nvalue = 0;
+								print = false;
+							} else
+								nvalue = ((absval - deadzone) * (nvalue / absval)) / (1.0f-deadzone);
+							type = "Axis";
 						}
 					}
 				}
@@ -90,13 +105,14 @@ int main (int argc, char **argv)
 						if(buttonVals[js.number].value != js.value) {
 							buttonVals[js.number].value = js.value;
 							print = true;
+							type = "Button";
 						}
 					}
 				}
 
 				if (print)
-					printf("Event: type %d, time %d, number %d, value %d\n",
-							js.type, js.time, js.number, js.value);
+					printf("Event: type %s, time %d, number %d, value %d nvalue %f\n",
+							type.c_str(), js.time, js.number, js.value, nvalue);
 			}
 		}
 	}

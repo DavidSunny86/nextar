@@ -9,11 +9,25 @@
 
 #include <NexEngine.h>
 
+#define NEX_BUTTON_KEY(val) (val & ((~KEY_ANALOG_BIT)&(~KEY_DIRECTION_BIT)))
+#define NEX_ANALOG_KEY(val) (val|KEY_ANALOG_BIT)
+#define NEX_DIRECTION_KEY(val) (val|KEY_DIRECTION_BIT)
+
 namespace nextar {
+
+enum KeyState : uint8 {
+	KEY_STATE_UP,
+	KEY_STATE_DOWN
+};
+
+enum KeyAnalogBit {
+	KEY_ANALOG_BIT = 0x8000,
+	KEY_DIRECTION_BIT = 0x4000
+};
 
 /* Standard key codes, can be directly used without input mapper */
 enum StandardKeyCodes {
-	KEY_ESCAPE = 0x0001,
+	KEY_ESCAPE = NEX_BUTTON_KEY(1),
 #define NEX_KEY_ALPHABETS_START		KEY_A
 	KEY_A,
 	KEY_B,
@@ -162,7 +176,7 @@ enum StandardKeyCodes {
 
 #define NEX_KEYBOARD_KEY_COUNT KEY_UNKNOWN_K+1
 
-	MOUSE_LEFT,
+	MOUSE_LEFT = NEX_BUTTON_KEY(1000),
 	MOUSE_RIGHT,
 	MOUSE_MIDDLE,
 	MOUSE_THUMB1,
@@ -170,14 +184,13 @@ enum StandardKeyCodes {
 
 #define NEX_MOUSE_DIGITAL_BUTTON_COUNT ((MOUSE_THUMB2 - MOUSE_LEFT)+1)
 
-	JOY_BUTTON_0,
-#define NEX_JOY_BUTTON(i) (JOY_BUTTON_0 + i)
-
-	MOUSE_XY_AXIS = 0x4000, /* Direction */
-	MOUSE_WHEEL = 0x8000, /* Analog */
+	MOUSE_XY_AXIS = NEX_DIRECTION_KEY(1100), /* Direction */
+	MOUSE_WHEEL = NEX_ANALOG_KEY(1200), /* Analog */
 
 #define NEX_MOUSE_ANALOG_BUTTON_COUNT 3
-
+/*
+	JOY_BUTTON_0,
+#define NEX_JOY_BUTTON(i) (JOY_BUTTON_0 + i)
 	JOY_XAXIS_POS,
 	JOY_YAXIS_POS,
 	JOY_ZAXIS_POS,
@@ -214,17 +227,26 @@ enum StandardKeyCodes {
 	JOY_TZAXIS, // torque
 	JOY_FSLIDER1, // extra force slider1
 	JOY_FSLIDER2, // extra force slider2
-
-	XBOX_A,
+*/
+#define NEX_XB360_CTRL_BUTTON_START XBOX_A
+	XBOX_A = NEX_BUTTON_KEY(4000),
 	XBOX_B,
 	XBOX_X,
 	XBOX_Y,
-	XBOX_UP,
-	XBOX_DOWN,
 	XBOX_LEFT,
 	XBOX_RIGHT,
+	XBOX_UP,
+	XBOX_DOWN,
 	XBOX_START,
+	XBOX_CONTROLLER_SEL,
 	XBOX_BACK,
+	XBOX_SHOULDER_BUTTON_LEFT,
+	XBOX_SHOULDER_BUTTON_RIGHT,
+#define NEX_XB360_CTRL_BUTTON_END (XBOX_SHOULDER_BUTTON_RIGHT+1)
+	XBOX_TRIG_LEFT = NEX_ANALOG_KEY(4100),
+	XBOX_TRIG_RIGHT,
+	XBOX_AXIS_LEFT = NEX_DIRECTION_KEY(4200),
+	XBOX_AXIS_RIGHT,
 
 	NEX_KEY_INVALID_COOKED_CODE = 0xffff
 };

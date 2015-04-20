@@ -9,13 +9,13 @@
 
 namespace InputService {
 
-UxKeyboardMouse::UxKeyboardMouse() {
-	// TODO Auto-generated constructor stub
+UxKeyboardMouse::UxKeyboardMouse(const UxDeviceDesc& d) :
+	UxInputController(d) {
 
 }
 
 UxKeyboardMouse::~UxKeyboardMouse() {
-	// TODO Auto-generated destructor stub
+
 }
 
 } /* namespace InputService */

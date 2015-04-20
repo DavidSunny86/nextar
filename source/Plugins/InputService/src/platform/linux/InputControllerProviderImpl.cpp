@@ -46,7 +46,7 @@ void InputControllerProviderImpl::LookForJoysticks() {
 		String path = devInpPath + "js" + Convert::ToString(index);
 		int fd;
 
-		if ((fd = open(path.c_str(), O_RDONLY)) < 0) {
+		if ((fd = open(path.c_str(), O_RDONLY|O_NONBLOCK)) < 0) {
 			break;
 		}
 		ioctl(fd, JSIOCGVERSION, &version);
