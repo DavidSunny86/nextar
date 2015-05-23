@@ -51,7 +51,16 @@ void SceneAsset::_RemoveEntity(Entity* entity) {
 			s->_SetCullingSystem(nullptr);
 		}
 	}
-	sceneEntities.remove(Bind(entity));
+	EntityPtr e = Bind(entity);
+	sceneEntities.remove(e);
+	toUpdate.remove(e);
+}
+
+void SceneAsset::Update() {
+	Asset::Update();
+	for(auto& e : toUpdate) {
+		e->Update();
+	}
 }
 
 void SceneAsset::UnloadImpl() {

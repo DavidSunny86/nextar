@@ -25,7 +25,8 @@ class _NexEngineAPI Camera: public Spatial {
 public:
 
 	enum {
-		CLASS_ID = Component::CLASS_CAMERA, CATAGORY = COMPONENT_CAT(CLASS_ID),
+		CLASS_ID = Component::CLASS_CAMERA,
+		CATAGORY = COMPONENT_CAT(CLASS_ID),
 	};
 
 	enum {

@@ -5,6 +5,7 @@
  *      Author: obhi
  */
 
+#include <Behaviour.h>
 #include <NexEngine.h>
 #include <Entity.h>
 #include <Mesh.h>
@@ -102,8 +103,8 @@ void Entity::Factory::_InternalRegisterToArchive() {
  * Entity
  *************************************/
 Entity::Entity(const StringID name, const StringID factory) :
-		SharedComponent(name, factory), moveable(nullptr), spatial(nullptr), scene(
-				nullptr) {
+		SharedComponent(name, factory), moveable(nullptr),
+		spatial(nullptr), scene(nullptr), behaviour(nullptr) {
 }
 
 Entity::~Entity() {
@@ -114,6 +115,7 @@ Entity::~Entity() {
 }
 
 void Entity::AttachComponent(Component* comp) {
+	NEX_ASSERT (comp);
 	uint32 type = comp->GetClassID();
 	uint16 catagory = Component::GetComponentCatagory(type);
 
@@ -136,6 +138,10 @@ void Entity::AttachComponent(Component* comp) {
 			spatial->SetMoveable(moveable);
 	}
 
+	if (catagory & Behaviour::CATAGORY) {
+		behaviour = static_cast<Behaviour*>(comp);
+		// should add this to scene update
+	}
 	comp->SetParent(this);
 	/* todo Fire event */
 }
@@ -197,6 +203,8 @@ void Entity::SetTransform(Vec3AF position, QuatF rotation, float scaling) {
 }
 
 void Entity::Update() {
+	if (behaviour)
+		behaviour->Update();
 	if (moveable && moveable->IsUpdateRequired())
 		moveable->Update();
 	if (spatial && spatial->IsUpdateRequired())

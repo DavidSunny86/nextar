@@ -48,6 +48,7 @@ class Moveable;
 class Camera;
 class Spatial;
 class CullingSystem;
+class Behaviour;
 
 class SceneAsset;
 

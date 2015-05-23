@@ -58,6 +58,8 @@ public:
 	virtual void _AddEntity(Entity* entity);
 	virtual void _RemoveEntity(Entity* entity);
 
+	virtual void Update() override;
+
 protected:
 
 	virtual StreamRequest* CreateStreamRequestImpl(bool load);
@@ -65,6 +67,7 @@ protected:
 
 	SceneParameters parameters;
 	CullingSystem* cullingSystem;
+	EntityList toUpdate;
 	EntityList sceneEntities;
 };
 

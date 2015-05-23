@@ -20,6 +20,7 @@ add_module(ShaderCompiler)
 add_module(MaterialCompiler)
 add_module(FbxMeshImporter)
 add_module(InputService)
+add_module(SimpleBehaviours)
 ## EndAdd
 
 file(APPEND ${NEX_PLUGIN_CONFIG_FILE} "</plugins>\n")

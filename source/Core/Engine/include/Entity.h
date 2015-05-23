@@ -104,6 +104,7 @@ public:
 protected:
 
 	SceneAsset* scene;
+	Behaviour* behaviour;
 	Moveable* moveable;
 	/* Only a single spatial object can be attached to an entity
 	 * at a given time. So camera and renderable cannot be attached to the

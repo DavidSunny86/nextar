@@ -5,8 +5,8 @@
  *      Author: obhi
  */
 
-#ifndef CORE_ENGINE_INCLUDE_BEHAVIOR_H_
-#define CORE_ENGINE_INCLUDE_BEHAVIOR_H_
+#ifndef CORE_ENGINE_INCLUDE_BEHAVIOUR_H_
+#define CORE_ENGINE_INCLUDE_BEHAVIOUR_H_
 
 #include <Component.h>
 
@@ -17,9 +17,12 @@ namespace nextar {
  * events or triggers. Behaviors can define multiple actions, any
  * of which can be triggered based on an event.
  */
-class Behavior: public Component {
+class Behaviour: public Component {
 
 public:
+	enum {
+		CATAGORY = CAT_BEHAVIOR,
+	};
 
 	virtual uint32 GetClassID() const = 0 ;
 	virtual void Update() override {}
@@ -27,4 +30,4 @@ public:
 
 } /* namespace nextar */
 
-#endif /* CORE_ENGINE_INCLUDE_BEHAVIOR_H_ */
+#endif /* CORE_ENGINE_INCLUDE_BEHAVIOUR_H_ */

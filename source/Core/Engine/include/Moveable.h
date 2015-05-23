@@ -23,7 +23,8 @@ class _NexEngineAPI Moveable: public Component {
 	;
 public:
 	enum {
-		CLASS_ID = Component::CLASS_MOVABLE, CATAGORY = COMPONENT_CAT(CLASS_ID),
+		CLASS_ID = Component::CLASS_MOVABLE,
+		CATAGORY = COMPONENT_CAT(CLASS_ID),
 	};
 
 	enum {

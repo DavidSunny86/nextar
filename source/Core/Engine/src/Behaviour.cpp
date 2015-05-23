@@ -5,7 +5,7 @@
  *      Author: obhi
  */
 
-#include <Behavior.h>
+#include <Behaviour.h>
 
 namespace nextar {
 
