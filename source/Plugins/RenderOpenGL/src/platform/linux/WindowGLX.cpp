@@ -38,6 +38,7 @@ bool fullscreen, const NameValueMap* params) {
 			context->GetScreenIndex());
 	parent->SetWindowTitle("NexTech: Render Window");
 	uint32 setVideoMode = -1;
+	bool captureInputEvents = true;
 
 	if (params) {
 		const NameValueMap& paramMap = *params;
@@ -51,6 +52,8 @@ bool fullscreen, const NameValueMap* params) {
 			parent->SetWindowTitle((*attrib).second);
 		if (((attrib = paramMap.find("IsMainWindow")) != end))
 			parent->SetFlag(WINDOW_IS_MAIN, Convert::ToBool((*attrib).second));
+		if (((attrib = paramMap.find("IgnoreInputEvents")) != end))
+			captureInputEvents = !Convert::ToBool((*attrib).second);
 		if (((attrib = paramMap.find("VideoMode")) != end))
 			setVideoMode = context->GetVideoModeIndex(
 					VideoMode::FromString((*attrib).second));
@@ -86,6 +89,11 @@ bool fullscreen, const NameValueMap* params) {
 	swa.border_pixel = 0;
 	swa.event_mask = StructureNotifyMask | VisibilityChangeMask
 			| FocusChangeMask;
+	if (captureInputEvents)
+		swa.event_mask |= (KeyPressMask | KeyReleaseMask |
+				ButtonPressMask | ButtonReleaseMask
+				| PointerMotionMask);
+
 	mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
 
 	Window window = XCreateWindow(display, parentWindow, position.x, position.y,
@@ -101,6 +109,7 @@ bool fullscreen, const NameValueMap* params) {
 	}
 
 	parent->SetWindow(window);
+	parent->SetEventMask(swa.event_mask);
 
 	Atom destroyMsg = XInternAtom(display, "WM_DELETE_WINDOW", False);
 	parent->SetDestroyMsg(destroyMsg);

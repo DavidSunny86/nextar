@@ -9,6 +9,7 @@
 #define PLUGINS_INPUTCONTROLLER_LOCAL_INCLUDE_PLUGIN_H_
 
 #include <EngineHeaders.h>
+#include <InputControllerProviderImpl.h>
 
 using namespace nextar;
 namespace InputService {
@@ -39,6 +40,7 @@ public:
 	virtual void Dispose();
 
 private:
+	InputControllerProviderImpl _impl;
 };
 
 } /* namespace InputService */

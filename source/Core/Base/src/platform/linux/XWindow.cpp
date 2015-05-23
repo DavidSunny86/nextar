@@ -4,12 +4,29 @@
 #if defined(NEX_LINUX)
 
 #include <XWindow.h>
+#include <XWinInputListener.h>
 
 namespace nextar {
 
 void XWindow::ProcessEvent(XWindow* wind, XEvent& event) {
 
 	switch (event.type) {
+	case KeyPress:
+	case KeyRelease:
+		if (XWinInputListener::InstancePtr())
+			XWinInputListener::Instance().ConsumeKeyEvent(wind, event,
+					(event.type == KeyPress) != 0);
+		break;
+	case ButtonPress:
+	case ButtonRelease:
+		if (XWinInputListener::InstancePtr())
+			XWinInputListener::Instance().ConsumeMouseButtonEvent(wind, event,
+					(event.type == ButtonPress) != 0);
+		break;
+	case MotionNotify:
+		if (XWinInputListener::InstancePtr())
+			XWinInputListener::Instance().ConsumeMouseMove(wind, event);
+		break;
 	case ClientMessage:
 		if (wind->GetXDestroyMsg() != event.xclient.data.l[0])
 			break;

@@ -27,6 +27,7 @@ public:
 	URL(const UniString& _path);
 	URL(const String&);
 	URL(const URL&);
+	URL(URL&&);
 	URL(const String& archive, const String& relativePath);
 
 	inline const String& GetArchiveName() const {
@@ -36,6 +37,11 @@ public:
 	inline const String& GetRelativePath() const {
 		return relativePath;
 	}
+
+	const URL& operator =   (const UniString& _path);
+	const URL& operator =   (const String& _path);
+	const URL& operator =   (const URL& _path);
+	const URL& operator =   (URL&& _path);
 
 	/* operator == */
 	bool operator ==(const URL& other) const;

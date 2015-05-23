@@ -58,8 +58,8 @@ LRESULT CALLBACK Win32Window::WndProc(HWND wnd, UINT message, WPARAM wparam,
 			wind->WindowFocusChanged();
 			break;
 		case WM_INPUT:
-			if (WmInputListener::InstancePtr() && wparam == RIM_INPUT)
-				WmInputListener::Instance().OnWmInput(wind, (HRAWINPUT) lparam);
+			if (Win32InputListener::InstancePtr() && wparam == RIM_INPUT)
+				Win32InputListener::Instance().ConsumeEvent(wind, (HRAWINPUT) lparam);
 			break;
 		}
 	}

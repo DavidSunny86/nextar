@@ -4,31 +4,46 @@
 namespace nextar {
 namespace Convert {
 
-_NexBaseAPI String ToString(uint32 num, char fill, std::ios::fmtflags flags) {
+_NexBaseAPI String ToString(uint32 num, char fill, std::ios::fmtflags flags,
+		std::ios::fmtflags mask) {
 	OutStringStream buff;
 	buff.fill(fill);
-	if (flags)
-		buff.setf(flags);
+	if (flags) {
+		if (mask)
+			buff.setf(flags, mask);
+		else
+			buff.setf(flags);
+	}
 	buff << num;
 	return buff.str();
 }
 
-_NexBaseAPI String ToString(int32 num, char fill, std::ios::fmtflags flags) {
+_NexBaseAPI String ToString(int32 num, char fill, std::ios::fmtflags flags,
+		std::ios::fmtflags mask) {
 	OutStringStream buff;
 	buff.fill(fill);
-	if (flags)
-		buff.setf(flags);
+	if (flags) {
+		if (mask)
+			buff.setf(flags, mask);
+		else
+			buff.setf(flags);
+	}
 	buff << num;
 	return buff.str();
 }
 
 _NexBaseAPI String ToString(float num, uint16 prec, char fill,
-		std::ios::fmtflags flags) {
+		std::ios::fmtflags flags,
+		std::ios::fmtflags mask) {
 	OutStringStream buff;
 	buff.precision(prec);
 	buff.fill(fill);
-	if (flags)
-		buff.setf(flags);
+	if (flags) {
+		if (mask)
+			buff.setf(flags, mask);
+		else
+			buff.setf(flags);
+	}
 	buff << num;
 	return buff.str();
 }

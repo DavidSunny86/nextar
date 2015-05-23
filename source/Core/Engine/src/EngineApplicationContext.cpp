@@ -34,7 +34,7 @@ void EngineApplicationContext::CreateExtendedInterfacesImpl() {
 }
 
 void EngineApplicationContext::ConfigureExtendedInterfacesImpl() {
-	// TaskSchedular::Instance().Configure(GetConfig());
+	//TaskSchedular::Instance().Configure(GetConfig());
 	InputManager::Instance().Configure(GetConfig());
 	ComponentFactoryArchive::Instance().Configure(GetConfig());
 	ComponentGroupArchive::Instance().Configure(GetConfig());

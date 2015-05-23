@@ -43,6 +43,7 @@ private:
 	};
 
 	void LookForJoysticks();
+	void CreateKeyboardAndMouseDesc();
 
 	ControllerType GetJoystickType(const String& name, uint32 axes, uint32 buttons, uint32 version);
 

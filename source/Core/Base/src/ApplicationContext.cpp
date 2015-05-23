@@ -170,6 +170,7 @@ void ApplicationContext::Run() {
 		}
 	}
 	frameClock.StopClock();
+	ReleaseResources();
 }
 
 void ApplicationContext::RegisterListener(const Listener& l) {

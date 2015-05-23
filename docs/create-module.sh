@@ -39,7 +39,11 @@ else
 	echo "# Module created" >> ${module_path}/CMakeLists.txt
 	echo "# Dated: $(date)" >> ${module_path}/CMakeLists.txt
 	echo "#-------------------------------" >> ${module_path}/CMakeLists.txt
-	echo "/**\n * Created on: $(date)\n * @author: obhi\n*/" >> ${module_path}/src/${mod_name}.cpp
+	echo "/**" >> ${module_path}/src/${mod_name}.cpp
+	echo " * ${mod_name}.cpp" >> ${module_path}/src/${mod_name}.cpp
+	echo " * Created on: $(date)" >> ${module_path}/src/${mod_name}.cpp
+	echo " * @author: obhi" >> ${module_path}/src/${mod_name}.cpp
+	echo " */" >> ${module_path}/src/${mod_name}.cpp
 fi
 # . gen-eclipse-project-files.sh
 

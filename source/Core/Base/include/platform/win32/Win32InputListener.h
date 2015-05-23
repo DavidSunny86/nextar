@@ -14,13 +14,13 @@
 namespace nextar {
 
 class Win32Window;
-class _NexBaseAPI WmInputListener: public Singleton<WmInputListener> {
+class _NexBaseAPI Win32InputListener: public Singleton<Win32InputListener> {
 public:
-	WmInputListener();
-	virtual ~WmInputListener();
+	Win32InputListener();
+	virtual ~Win32InputListener();
 
 	/* Received only when in foreground */
-	virtual void OnWmInput(Win32Window* window, HRAWINPUT) = 0;
+	virtual void ConsumeEvent(Win32Window* window, HRAWINPUT) = 0;
 };
 }
 

@@ -3,6 +3,7 @@
 
 #include <NexBase.h>
 #include <NameValueMap.h>
+#include <Logger.h>
 
 namespace nextar {
 

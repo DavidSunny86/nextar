@@ -6,6 +6,8 @@
  */
 
 #include <InputControllerProviderImpl.h>
+#include <UxKeyboardMouse.h>
+#include <Ux360Controller.h>
 #include <linux/joystick.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
@@ -33,6 +35,20 @@ void InputControllerProviderImpl::Configure(const Config& config) {
 
 void InputControllerProviderImpl::EnumDevicesImpl() {
 	LookForJoysticks();
+	CreateKeyboardAndMouseDesc();
+}
+
+void InputControllerProviderImpl::CreateKeyboardAndMouseDesc() {
+	UxDeviceDesc desc;
+	// @todo If we have keyboard
+	desc.info.name = "Keyboard and Mouse";
+	desc.info.deviceId = baseId + KEYBOARD_MOUSE_DEVID_BASE + 1;
+	desc.info.type = TYPE_KEYBOARD_AND_MOUSE;
+	desc.fd = -2;
+	// @todo Buttons and Axes count
+	desc.buttons = 0;
+	desc.axes = 0;
+	controllers.push_back(desc);
 }
 
 void InputControllerProviderImpl::LookForJoysticks() {
@@ -41,8 +57,9 @@ void InputControllerProviderImpl::LookForJoysticks() {
 	unsigned char buttons = 2;
 	int version = 0x000800;
 	char name[128] = "Unknown";
+	UxDeviceDesc desc;
 	do {
-		UxDeviceDesc desc;
+
 		String path = devInpPath + "js" + Convert::ToString(index);
 		int fd;
 
@@ -56,7 +73,7 @@ void InputControllerProviderImpl::LookForJoysticks() {
 		desc.info.name = name;
 		desc.info.deviceId = baseId + JOYSTICK_DEVID_BASE + index;
 		desc.info.type  = GetJoystickType(desc.info.name, axes, buttons, version);
-		desc.fd = fd;
+		desc.fd = UxDeviceDesc::NULL_FD;
 		desc.axes = axes;
 		desc.buttons = buttons;
 
@@ -80,7 +97,9 @@ InputController* InputControllerProviderImpl::CreateController(
 	if (desc.IsValid()) {
 		switch(desc.info.type) {
 		case TYPE_XBOX360_CONTROLLER:
-			return nullptr;
+			return NEX_NEW(Ux360Controller(desc));
+		case TYPE_KEYBOARD_AND_MOUSE:
+			return NEX_NEW(UxKeyboardMouse(desc));
 		}
 	}
 	return nullptr;

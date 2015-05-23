@@ -25,14 +25,20 @@ void InputManagerImpl::Configure(const Config& config) {
 		p->SetBaseDevId(baseId);
 		baseId <<= 1;
 		p->Configure(config);
+		p->EnumControllers();
 	}
 	ApplicationContext::Listener l(this, ApplicationContext::PRIORITY_HIGH);
 	ApplicationContext::Instance().RegisterListener(l);
+	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES,
+			ReleaseControllers, this);
+}
+
+void InputManagerImpl::ReleaseControllers(void* me) {
+	reinterpret_cast<InputManagerImpl*>(me)->UnregisterProviders();
 }
 
 void InputManagerImpl::RegisterProvider(InputControllerProvider* provider) {
 	this->providers.push_back(provider);
-	provider->EnumControllers();
 }
 
 void InputManagerImpl::UnregisterProviders() {

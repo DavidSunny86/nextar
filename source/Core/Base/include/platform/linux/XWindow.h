@@ -9,6 +9,7 @@
 #define	GRAPHICSWINDOWX_H
 
 #include <LinuxDefs.h>
+#include <RenderWindow.h>
 
 namespace nextar {
 
@@ -18,7 +19,7 @@ class XWindow: public RenderWindow {
 public:
 
 	XWindow(Impl* imp) :
-			RenderWindow(imp), display(0), window(0), msgDestroy(0) {
+			RenderWindow(imp), display(0), window(0), msgDestroy(0), eventMask(0) {
 	}
 
 	inline Atom GetXDestroyMsg() const {
@@ -34,8 +35,17 @@ public:
 		return window;
 	}
 
+	void SetEventMask(long mask) {
+		eventMask = mask;
+	}
+
+	long GetEventMask() {
+		return eventMask;
+	}
+
 	static void ProcessEvent(XWindow* wind, XEvent& event);
 protected:
+	long eventMask;
 	Display* display;
 	Window window;
 	Atom msgDestroy;

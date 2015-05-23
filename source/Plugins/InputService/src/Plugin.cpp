@@ -6,6 +6,7 @@
  */
 
 #include <Plugin.h>
+#include <InputManager.h>
 
 namespace InputService {
 
@@ -27,9 +28,13 @@ void Plugin::Close() {
 }
 
 void Plugin::LicenseRenewed() {
+	if (InputManager::InstancePtr())
+		InputManager::Instance().RegisterProvider(&_impl);
 }
 
 bool Plugin::LicenseExpired() {
+	if (InputManager::InstancePtr())
+		InputManager::Instance().UnregisterProvider(&_impl);
 	return true;
 }
 

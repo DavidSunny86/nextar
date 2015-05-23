@@ -10,6 +10,7 @@
 
 #include <UxInputController.h>
 #include <InputControllerProviderImpl.h>
+#include <TaskSchedular.h>
 
 struct js_event;
 using namespace nextar;
@@ -32,7 +33,6 @@ public:
 	}
 
 	virtual InputChangeBuffer UpdateSettings() override;
-	virtual void PollData() override;
 
 	virtual bool IsDown(KeyID) override;
 	virtual bool IsOn(KeyID) override;
@@ -43,6 +43,28 @@ public:
 
 protected:
 
+	class PollTask : public Task {
+	public:
+		PollTask();
+
+		inline bool TryLock() {
+			return !lock_.test_and_set(std::memory_order_relaxed);
+		}
+		inline void Unlock() {
+			lock_.clear();
+		}
+		inline void SetDevice(Ux360Controller* dev) {
+			device_ = dev;
+		}
+
+		virtual Task* Run();
+
+	protected:
+		Ux360Controller* device_;
+		atomic_flag lock_;
+	};
+
+	void PollData();
 	void ParseAxis(const js_event& ev, bool init);
 	void ParseButton(const js_event& ev, bool init);
 	void ParseData(const js_event& ev, bool init);
@@ -66,6 +88,8 @@ protected:
 	array<KeyID, 9>::type reverseButtonMap;
 	array<KeyID, 8>::type reverseAxisMap;
 
+	bool currBuffer;
+	PollTask pollTask;
 	KeyStateType buttonStates[NEX_XB360_CTRL_BUTTON_END-NEX_XB360_CTRL_BUTTON_START];
 	AnalogValueType trigValues[2];
 	InputDirType axes[2];
@@ -75,7 +99,7 @@ protected:
 	AnalogValue triggerDeadZone;
 
 	uint32 changeCount;
-    array<InputEvent, MAX_CHANGE_BUFFER>::type inputEvents;
+    array<InputEvent, MAX_CHANGE_BUFFER>::type inputEvents[2];
 };
 
 } /* namespace InputService */

@@ -42,7 +42,7 @@ void RenderWindow::Destroy() {
 
 	if (IsMainWindow()) {
 		// we will post quit message, so release all resources
-		ApplicationContext::Instance().ReleaseResources();
+		ApplicationContext::Instance().QuitApplication();
 	}
 
 	WindowManager::Instance().UnregisterWindow(this);

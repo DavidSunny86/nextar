@@ -6,6 +6,7 @@
  */
 
 #include <Task.h>
+#include <TaskSchedular.h>
 
 namespace nextar {
 

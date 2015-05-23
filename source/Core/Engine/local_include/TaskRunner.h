@@ -73,7 +73,7 @@ protected:
 
 	atomic_int taskCount;
 	static TaskRunner*& AsyncGetRunner();
-	Task* AsyncPopTask();
+
 	friend class TaskSchedular;
 
 	TaskQueue requestQueue;

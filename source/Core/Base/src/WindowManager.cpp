@@ -53,6 +53,8 @@ void WindowManager::UnregisterWindow(RenderWindow* winPtr) {
 }
 
 void WindowManager::Quit() {
+	if (processing)
+		return;
 	processing = true;
 	for(auto& e : registeredWindows) {
 		e->Destroy();
@@ -96,7 +98,7 @@ void WindowManager::ProcessMessages() {
 		Display* disp = wind->GetDisplay();
 		Window w = wind->GetWindow();
 		while (XCheckWindowEvent(disp, w,
-		StructureNotifyMask | VisibilityChangeMask | FocusChangeMask, &event)) {
+				wind->GetEventMask(), &event)) {
 			XWindow::ProcessEvent(wind, event);
 		}
 

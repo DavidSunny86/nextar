@@ -41,7 +41,7 @@ typedef int16 AnalogValue;
 
 struct InputDir {
 	// x and y of delta
-	AnalogValue delta[2];
+	AnalogValue xy[2];
 };
 
 struct InputEvent {

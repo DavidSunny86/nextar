@@ -4,7 +4,7 @@
  * 
  * Created on May 8, 2011, 2:23 AM
  */
-
+#include <FbxMeshImporter.h>
 #include <Plugin.h>
 #include <MeshTemplate.h>
 #include <FbxMeshLoaderImplBase.h>

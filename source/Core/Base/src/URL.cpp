@@ -22,9 +22,36 @@ URL::URL(const URL& _url) :
 		archiveName(_url.archiveName), relativePath(_url.relativePath) {
 }
 
+URL::URL(URL&& _url) :
+		archiveName(std::move(_url.archiveName)),
+		relativePath(std::move(_url.relativePath)) {
+}
+
 URL::URL(const String& _url_archiveName,
 		const String& _url_relativePath) :
 		archiveName(_url_archiveName), relativePath(_url_relativePath) {
+}
+
+const URL& URL::operator =(const UniString& _path) {
+	_Parse(StringUtils::ToUtf8(_path));
+	return *this;
+}
+
+const URL& URL::operator =(const String& _path) {
+	_Parse(_path);
+	return *this;
+}
+
+const URL& URL::operator =(const URL& _path) {
+	archiveName = _path.archiveName;
+	relativePath = _path.relativePath;
+	return *this;
+}
+
+const URL& URL::operator =(URL&& _path) {
+	archiveName = std::move(_path.archiveName);
+	relativePath = std::move(_path.relativePath);
+	return *this;
 }
 
 void URL::_Parse(const String& descriptor) {
@@ -143,5 +170,3 @@ _NexBaseAPI InputSerializer& operator >> (InputSerializer& ser, URL& url) {
 }
 
 }
-
-

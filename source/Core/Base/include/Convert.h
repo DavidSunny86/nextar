@@ -10,21 +10,26 @@ namespace nextar {
 //! Generic conversion routines.
 namespace Convert {
 _NexBaseAPI String ToString(uint32 num, char fill = ' ',
-		std::ios::fmtflags flags = std::ios::fmtflags(0));
+		std::ios::fmtflags flags = std::ios::fmtflags(0),
+		std::ios::fmtflags mask = std::ios::fmtflags(0));
 _NexBaseAPI String ToString(int32 num, char fill = ' ',
-		std::ios::fmtflags flags = std::ios::fmtflags(0));
+		std::ios::fmtflags flags = std::ios::fmtflags(0),
+		std::ios::fmtflags mask = std::ios::fmtflags(0));
 
 _NexInline String ToString(uint16 num, char fill = ' ',
-		std::ios::fmtflags flags = std::ios::fmtflags(0)) {
-	return ToString((uint32) num, fill, flags);
+		std::ios::fmtflags flags = std::ios::fmtflags(0),
+		std::ios::fmtflags mask = std::ios::fmtflags(0)) {
+	return ToString((uint32) num, fill, flags, mask);
 }
 
 _NexInline String ToString(int16 num, char fill = ' ',
-		std::ios::fmtflags flags = std::ios::fmtflags(0)) {
-	return ToString((int32) num, fill, flags);
+		std::ios::fmtflags flags = std::ios::fmtflags(0),
+		std::ios::fmtflags mask = std::ios::fmtflags(0)) {
+	return ToString((int32) num, fill, flags, mask);
 }
 _NexBaseAPI String ToString(float num, uint16 prec = 6, char fill = ' ',
-		std::ios::fmtflags flags = std::ios::fmtflags(0));
+		std::ios::fmtflags flags = std::ios::fmtflags(0),
+		std::ios::fmtflags mask = std::ios::fmtflags(0));
 _NexBaseAPI String ToString(bool val, bool yesno = false);
 _NexBaseAPI String ToVersionString(VersionID);
 _NexBaseAPI String ToString(Vec4AF mat);

@@ -42,6 +42,8 @@ public:
 
 private:
 
+	static void ReleaseControllers(void* me);
+
 	enum {
 		BASE_DEV_ID = 1024
 	};

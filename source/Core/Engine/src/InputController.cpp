@@ -72,7 +72,7 @@ static const char asciiForKey[NEX_KEY_CONVERTABLE_COUNT] = {
 		'^', // KEY_CIRCUMFLEX,
 		':', // KEY_COLON,
 		'_' // KEY_UNDERLINE,
-		};
+};
 
 /**********************************************
  ./ Lookup table for shifting ascii codes as per numeric keys
@@ -87,21 +87,21 @@ static const char shiftOtherKeys[] = { '~', '_', '+', '|', '{', '}', ':', '"',
 		'<', '>', '?' };
 
 _NexEngineAPI int32 GetCookedCode(KeyID k, bool shift, bool numlock) {
-	if (k >= 0 && k < NEX_KEY_CONVERTABLE_COUNT) {
+	if (k >= NEX_KEY_CONVERTABLE_START && k <= NEX_KEY_CONVERTABLE_END) {
 		if (shift) {
-			if (k >= KEY_A && k <= KEY_Z)
-				return (int32)('A' + (k - KEY_A));
-			else if (k >= KEY_0 && k <= KEY_9)
-				return (int32) shiftNumKeys[k - KEY_0];
-			else if (k >= KEY_GRAVE && k <= KEY_SLASH)
-				return (int32) shiftOtherKeys[k - KEY_GRAVE];
+			if (k >= Key::KB_A && k <= Key::KB_Z)
+				return (int32)('A' + (k - Key::KB_A));
+			else if (k >= Key::KB_0 && k <= Key::KB_9)
+				return (int32) shiftNumKeys[k - Key::KB_0];
+			else if (k >= Key::KB_GRAVE && k <= Key::KB_SLASH)
+				return (int32) shiftOtherKeys[k - Key::KB_GRAVE];
 		}
 
 		return asciiForKey[k];
 	} else if (numlock
 			&& (k >= NEX_KEY_PADKEYS_START && k < NEX_KEY_PADKEYS_END))
 		return (int32)('0' + (k - NEX_KEY_PADKEYS_START));
-	return (int32) NEX_KEY_INVALID_COOKED_CODE;
+	return (int32) KEY_INVALID_CODE;
 }
 
 }

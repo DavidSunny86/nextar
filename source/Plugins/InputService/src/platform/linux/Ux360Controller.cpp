@@ -18,16 +18,36 @@
 
 namespace InputService {
 
+Ux360Controller::PollTask::PollTask() : device_(nullptr),
+	lock_(ATOMIC_FLAG_INIT) {
+	lock_.clear();
+}
+
+Task* Ux360Controller::PollTask::Run() {
+	device_->PollData();
+	Unlock();
+}
+
 Ux360Controller::Ux360Controller(const UxDeviceDesc& desc) :
-	UxInputController(desc), changeCount(0) {
+	UxInputController(desc), changeCount(0), currBuffer(0) {
 	InitControls();
+	pollTask.SetDevice(this);
+	TaskSchedular::Instance().AsyncSubmit(&pollTask);
 }
 
 Ux360Controller::~Ux360Controller() {
 }
 
 InputChangeBuffer Ux360Controller::UpdateSettings() {
-	InputChangeBuffer buffer;
+	// see if task was executed
+	InputChangeBuffer buffer(0, 0);
+	if (pollTask.TryLock()) {
+		buffer.first = inputEvents[currBuffer].data();
+		buffer.second = changeCount;
+		currBuffer = !currBuffer;
+		pollTask.Unlock();
+		TaskSchedular::Instance().AsyncSubmit(&pollTask);
+	}
 	return buffer;
 }
 
@@ -74,12 +94,12 @@ void Ux360Controller::ParseAxis(const js_event& js, bool init) {
 			int32 deadzone = thumbDeadZone[hand];
 			AnalogValue absVal = std::abs(js.value);
 			if (absVal < deadzone) {
-				axes[hand].value.delta[axis] = 0;
+				axes[hand].value.xy[axis] = 0;
 				init = true;
 			} else {
 				int32 value = (absVal - deadzone) * Math::Sign<int16>(js.value) *
 						VAL_MAX;
-				axes[hand].value.delta[axis] = value / (VAL_MAX-deadzone);
+				axes[hand].value.xy[axis] = value / (VAL_MAX-deadzone);
 			}
 
 			axes[hand].timeStamp = js.time;

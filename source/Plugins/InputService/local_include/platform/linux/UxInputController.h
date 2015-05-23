@@ -14,6 +14,8 @@ namespace InputService {
 
 using namespace nextar;
 struct UxDeviceDesc {
+	static const int NULL_FD = -2;
+
 	InputControllerDesc info;
 	int fd;
 	uint32 axes;
@@ -35,11 +37,12 @@ public:
 	UxInputController(const UxDeviceDesc& desc);
 	virtual ~UxInputController();
 
-	virtual void PollData() = 0;
+	virtual InputChangeBuffer UpdateSettings() = 0;
 
 protected:
+	uint32 axes;
+	uint32 buttons;
 	int fd;
-
 };
 
 } /* namespace InputService */

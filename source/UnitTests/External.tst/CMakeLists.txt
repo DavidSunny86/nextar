@@ -9,3 +9,5 @@
 #============================================================
 add_unit_test(JoystickTest)
 
+# Added test UxGenSymToKeyMap: Mon May 11 15:47:54 IST 2015
+add_unit_test(UxGenSymToKeyMap)
