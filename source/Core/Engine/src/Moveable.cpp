@@ -35,7 +35,7 @@ uint32 Moveable::GetClassID() const {
 	return CLASS_ID;
 }
 
-void Moveable::Update() {
+void Moveable::Update(const FrameTimer& frameTimer) {
 	if (transform->IsMatrixDirty())
 		transform->UpdateMatrix();
 	SetUpdateRequired(false);

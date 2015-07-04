@@ -99,7 +99,8 @@ protected:
 	AnalogValue triggerDeadZone;
 
 	uint32 changeCount;
-    array<InputEvent, MAX_CHANGE_BUFFER>::type inputEvents[2];
+	typedef array<InputEvent, MAX_CHANGE_BUFFER>::type InputEventList;
+	InputEventList inputEvents[2];
 };
 
 } /* namespace InputService */

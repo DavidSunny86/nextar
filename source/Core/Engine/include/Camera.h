@@ -126,7 +126,7 @@ public:
 	/** @remarks Called to update the render queue with renderable data. */
 	virtual void Visit(SceneTraversal & traversal) override;
 	/** @remarks Update camera */
-	virtual void Update();
+	virtual void Update(const FrameTimer& frameTimer);
 
 	/** @brief Get node type */
 	virtual uint32 GetClassID() const override;

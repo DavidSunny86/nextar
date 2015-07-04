@@ -38,7 +38,6 @@ void Light::SetLightRange(float range) {
 	Moveable* moveable = GetMoveable();
 	if (moveable) {
 		moveable->SetScaling(range);
-		moveable->Update();
 	} else {
 		float ratio = range / lightRange;
 		Matrix4x4& m = GetWorldMatrix();
@@ -53,7 +52,6 @@ void Light::SetMoveable(Moveable* ptr) {
 	Moveable* moveable = GetMoveable();
 	if (moveable) {
 		moveable->SetScaling(lightRange);
-		moveable->Update();
 	}
 	// pointer might change
 	lightVolume.SetWorldMatrices(&GetWorldMatrix(), 1);

@@ -17,6 +17,7 @@ ApplicationContext::ApplicationContext(const String& name) :
 		appName(name), quitting(false), runningLoop(false), errorHandler(nullptr),
 		resourcesDestroyed(false) {
 	NEX_NEW(LogManager());
+	// initialize the pools
 #ifdef NEX_DEBUG
 	// add a default logger
 	static Logger logger("Debug");

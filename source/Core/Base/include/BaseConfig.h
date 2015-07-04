@@ -92,15 +92,18 @@
 #if defined(_MSC_VER)
 #	define _NexExportSym			__declspec(dllexport)
 #	define _NexImportSym			__declspec(dllimport)
+#	define _NexTemplateExtern		
 #elif defined(__MINGW32__)
 #	define _NexExportSym			__attribute__ ((visibility("default")))
 #	define _NexImportSym			__attribute__ ((visibility("default")))
+#	define _NexTemplateExtern		
 #elif defined(NEX_GCC)
 #   if (__GNUC__ >= 4)
 #	define _NexExportSym			__attribute__ ((visibility("default")))
 #	define _NexImportSym			__attribute__ ((visibility("default")))
+#	define _NexTemplateExtern		extern
 #   else
-#	error Dont know how to define _NexExportSym,_NexImportSym and NEX_EXPORT_TEMPLATE!!
+#	error Dont know how to define _NexExportSym,_NexImportSym and _NexTemplateExtern!!
 #   endif
 #endif
 

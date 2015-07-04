@@ -29,8 +29,8 @@ public:
 				NamedObject::AsyncStringID("OmniLightEntity"), Color::White, 100);
 		lightEnt->SetTransform(Vec3ASet(10,100,10), QuatIdentity(), 1);
 		meshEnt->SetTransform(Vec3ASet(0,0,0), QuatIdentity(), 20);
-		lightEnt->Update();
-		meshEnt->Update();
+		lightEnt->Update(this->frameTimer);
+		meshEnt->Update(this->frameTimer);
 		lightEnt->AddToScene(scene);
 		meshEnt->AddToScene(scene);
 	}

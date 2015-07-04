@@ -17,7 +17,7 @@ SceneTraversal::SceneTraversal(Camera* cam, VisibilitySet* visList,
 		,visibleBoundsInfo(vol)
 		,distanceInView(65000)
 		,recipDistanceInView(1 / 65000.f)
-		,frameNumber(0)
+		,frameTimer(nullptr)
 		,moveable(nullptr)
 		,frustum(nullptr)
 		,lightSystem(nullptr)
@@ -28,7 +28,6 @@ SceneTraversal::SceneTraversal(Camera* cam, VisibilitySet* visList,
 }
 
 SceneTraversal::~SceneTraversal() {
-	// TODO Auto-generated destructor stub
 }
 
 } /* namespace nextar */

@@ -56,10 +56,10 @@ void SceneAsset::_RemoveEntity(Entity* entity) {
 	toUpdate.remove(e);
 }
 
-void SceneAsset::Update() {
-	Asset::Update();
+void SceneAsset::Update(const FrameTimer& frameTimer) {
+	Asset::Update(frameTimer);
 	for(auto& e : toUpdate) {
-		e->Update();
+		e->Update(frameTimer);
 	}
 }
 

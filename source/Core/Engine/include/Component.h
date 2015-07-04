@@ -23,6 +23,11 @@ namespace nextar {
  * Scene nodes, meshes, textures, sounds, fonts, widgets etc.
  * Components may depend on multiple components and will issue load/save calls using
  * dependency order.
+ *
+ * @todo
+ * Need AttachTo and Detach methods. AttachTo will attach based on if this component
+ * can be attached to the other component. Components may override this behaviour and
+ * thus disallow attachment to specific components.
  */
 class _NexEngineAPI Component: public NamedObject, public AllocComponent {
 	NEX_LOG_HELPER(Component)
@@ -47,8 +52,9 @@ public:
 
 		template <typename CastFrom>
 		inline static ComponentType* Cast(CastFrom* anyComponent) {
-			NEX_ASSERT(COMPONENT_CAT(anyComponent->GetClassID()) == COMPONENT_CAT(GetClassID()));
-			return static_cast<ComponentType*>(anyComponent);
+			if(COMPONENT_CAT(anyComponent->GetClassID()) == COMPONENT_CAT(GetClassID()))
+				return static_cast<ComponentType*>(anyComponent);
+			return nullptr;
 		}
 	};
 
@@ -193,6 +199,9 @@ public:
 		return parent;
 	}
 
+	// get the connected entity
+	Entity* GetEntity();
+
 	inline uint32 GetComponentCatagory() const {
 		return COMPONENT_CAT(GetClassID());
 	}
@@ -210,7 +219,7 @@ public:
 		id.factory = factory;
 	}
 
-	virtual void Update() {}
+	virtual void Update(const FrameTimer& frameTimer) {}
 	// @remarks Concrete classes implement this
 	virtual uint32 GetClassID() const = 0;
 

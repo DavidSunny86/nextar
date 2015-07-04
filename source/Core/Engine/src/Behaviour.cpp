@@ -9,4 +9,8 @@
 
 namespace nextar {
 
+Behaviour::Behaviour(const StringID name, const StringID factory,
+		Component* parent) : Component(name, factory, parent) {
+}
+
 } /* namespace nextar */

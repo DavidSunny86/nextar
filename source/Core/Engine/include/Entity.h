@@ -28,7 +28,8 @@ public nextar::SharedComponent {
 	;
 public:
 	enum {
-		CLASS_ID = Component::CLASS_ENTITY, CATAGORY = COMPONENT_CAT(CLASS_ID),
+		CLASS_ID = Component::CLASS_ENTITY,
+		CATAGORY = COMPONENT_CAT(CLASS_ID),
 	};
 
 	enum {
@@ -97,7 +98,7 @@ public:
 	 * The actual deletion of the entity from memory is not determined. */
 	virtual void RemoveFromScene(bool removeFromGroup = true);
 
-	virtual void Update();
+	virtual void Update(const FrameTimer& frameTimer);
 
 	void SetTransform(Vec3AF position, QuatF rotation, float scaling);
 

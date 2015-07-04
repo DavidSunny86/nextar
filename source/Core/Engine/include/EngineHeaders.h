@@ -10,6 +10,7 @@
 #include <Camera.h>
 #include <Light.h>
 #include <Mesh.h>
+#include <Behaviour.h>
 #include <Entity.h>
 
 #include <Asset.h>
@@ -24,6 +25,9 @@
 #include <RenderContext.h>
 #include <RenderManager.h>
 #include <DebugDisplay.h>
+
+#include <InputController.h>
+#include <InputManager.h>
 
 #include <EngineApplicationContext.h>
 

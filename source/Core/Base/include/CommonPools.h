@@ -70,13 +70,21 @@ class PooledAllocator {
 	typedef T ObjectType;
 	typedef PoolProvider<sizeof(T), NumPerBlock, Catagory> ProviderSpecialization;
 public:
+	typedef ProviderSpecialization Provider;
 	typedef PooledAllocator<T, NumPerBlock, Catagory> Type;
 
 	PooledAllocator() {
 	}
 	~PooledAllocator() {
 	}
-
+#ifdef NEX_EXTENSIVE_MEM_TRACKER
+	static inline void* Alloc(size_t size,
+			const char* func,
+			const char* file,
+			long line) {
+		return Alloc(size);
+	}
+#endif
 	/* generic */
 	inline static void* Alloc(size_t amount) {
 		if (amount == sizeof(T))

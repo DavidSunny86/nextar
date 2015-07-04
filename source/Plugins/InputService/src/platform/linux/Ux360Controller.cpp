@@ -84,6 +84,7 @@ InputDir Ux360Controller::GetDir(KeyID keyId) {
 }
 
 void Ux360Controller::ParseAxis(const js_event& js, bool init) {
+	InputEventList& iel = inputEvents[currBuffer];
 	if (js.number >= 0 && js.number < reverseAxisMap.size()) {
 		KeyID k = reverseAxisMap[js.number];
 		switch(k) {
@@ -104,9 +105,9 @@ void Ux360Controller::ParseAxis(const js_event& js, bool init) {
 
 			axes[hand].timeStamp = js.time;
 			if (!init) {
-				inputEvents[changeCount].analogDir = axes[hand].value;
-				inputEvents[changeCount].timeStamp = js.time;
-				inputEvents[changeCount].key = k;
+				iel[changeCount].analogDir = axes[hand].value;
+				iel[changeCount].timeStamp = js.time;
+				iel[changeCount].key = k;
 				changeCount++;
 			}
 		}
@@ -126,9 +127,9 @@ void Ux360Controller::ParseAxis(const js_event& js, bool init) {
 
 			axes[hand].timeStamp = js.time;
 			if (!init) {
-				inputEvents[changeCount].analogValue = trigValues[hand].value;
-				inputEvents[changeCount].timeStamp = js.time;
-				inputEvents[changeCount].key = k;
+				iel[changeCount].analogValue = trigValues[hand].value;
+				iel[changeCount].timeStamp = js.time;
+				iel[changeCount].key = k;
 				changeCount++;
 			}
 		}
@@ -150,9 +151,9 @@ void Ux360Controller::ParseAxis(const js_event& js, bool init) {
 			}
 
 			if (!init) {
-				inputEvents[changeCount].keyState = state;
-				inputEvents[changeCount].timeStamp = js.time;
-				inputEvents[changeCount].key = key;
+				iel[changeCount].keyState = state;
+				iel[changeCount].timeStamp = js.time;
+				iel[changeCount].key = key;
 				changeCount++;
 			}
 			prevDirButtonState[axis] = js.value;
@@ -163,15 +164,16 @@ void Ux360Controller::ParseAxis(const js_event& js, bool init) {
 }
 
 void Ux360Controller::ParseButton(const js_event& js, bool init) {
+	InputEventList& iel = inputEvents[currBuffer];
 	if (js.number >= 0 && js.number < reverseButtonMap.size()) {
 		KeyID k = reverseButtonMap[js.number];
 		KeyState state = js.value == 0? KeyState::KEY_STATE_UP : KeyState::KEY_STATE_DOWN;
 		buttonStates[k - NEX_XB360_CTRL_BUTTON_START].value = state;
 		buttonStates[k - NEX_XB360_CTRL_BUTTON_START].timeStamp = js.time;
 		if (!init) {
-			inputEvents[changeCount].keyState = state;
-			inputEvents[changeCount].timeStamp = js.time;
-			inputEvents[changeCount].key = k;
+			iel[changeCount].keyState = state;
+			iel[changeCount].timeStamp = js.time;
+			iel[changeCount].key = k;
 			changeCount++;
 		}
 	}
@@ -211,9 +213,12 @@ void Ux360Controller::InitControls() {
 	thumbDeadZone[1] = 8689;
 	triggerDeadZone = 30;
 
-	for(auto& e : inputEvents) {
-		e.deviceId = desc.deviceId;
-		e.timeStamp = 0;
+	for(uint i = 0; i < 2; ++ i) {
+		auto& events = inputEvents[i];
+		for(auto& e : events) {
+			e.deviceId = desc.deviceId;
+			e.timeStamp = 0;
+		}
 	}
 	size_t readSize = 0;
 	js_event js;

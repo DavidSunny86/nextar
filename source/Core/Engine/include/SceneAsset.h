@@ -58,7 +58,7 @@ public:
 	virtual void _AddEntity(Entity* entity);
 	virtual void _RemoveEntity(Entity* entity);
 
-	virtual void Update() override;
+	virtual void Update(const FrameTimer& frameTimer) override;
 
 protected:
 

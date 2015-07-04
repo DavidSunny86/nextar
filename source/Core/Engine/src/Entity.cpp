@@ -202,13 +202,13 @@ void Entity::SetTransform(Vec3AF position, QuatF rotation, float scaling) {
 	SetUpdateRequired(true);
 }
 
-void Entity::Update() {
+void Entity::Update(const FrameTimer& frameTimer) {
 	if (behaviour)
-		behaviour->Update();
+		behaviour->Update(frameTimer);
 	if (moveable && moveable->IsUpdateRequired())
-		moveable->Update();
+		moveable->Update(frameTimer);
 	if (spatial && spatial->IsUpdateRequired())
-		spatial->Update();
+		spatial->Update(frameTimer);
 	SetUpdateRequired(false);
 }
 

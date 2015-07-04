@@ -119,6 +119,10 @@ protected:
 	virtual void ParseCommandLine(const NameValueMap& params) {
 	}
 
+protected:
+
+	FrameTimer frameTimer;
+
 private:
 
 	NEX_THREAD_RECURSIVE_MUTEX(appLock);
@@ -128,8 +132,6 @@ private:
 	bool quitting;
 
 	Clock frameClock;
-	FrameTimer frameTimer;
-
 	/* configuration */
 	Config config;
 	/** Application specific information */

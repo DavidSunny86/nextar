@@ -118,6 +118,12 @@ typedef AllocatorBase<MEMCAT_BUFFER_DATA> AllocatorBufferData;
 //! basic deallocator for objects not using AllocObjectBase
 #define NEX_FREE_T(T,catagory,ptr)			DestroyObject<T>(ptr); NEX_FREE(ptr,catagory)
 //! basic allocator for objects not using AllocObjectBase
+#define NEX_ALLOCATOR_ALLOC_T(T,allocator)	(ConstructObject<T>((T*)NEX_ALLOCATOR_ALLOC(sizeof(T),allocator)))
+//! basic allocator for objects not using AllocObjectBase
+#define NEX_ALLOCATOR_ALLOC_INIT_T(T,allocator,...)	(ConstructObject<T>((T*)NEX_ALLOCATOR_ALLOC(sizeof(T),allocator), ##__VA_ARGS__))
+//! basic deallocator for objects not using AllocObjectBase
+#define NEX_ALLOCATOR_FREE_T(T,allocator,ptr)			DestroyObject<T>(ptr); NEX_ALLOCATOR_FREE(ptr,allocator)
+//! basic allocator for objects not using AllocObjectBase
 #define NEX_ALLOC_ARRAY_T(T,catagory,num)     (ConstructObjects<T>((T*)NEX_ALLOC_ARRAY(sizeof(T)*num,catagory), num))
 //! basic deallocator for objects not using AllocObjectBase
 #define NEX_FREE_ARRAY_T(T,catagory,num,ptr)  DestroyObjects<T>(ptr,num); NEX_FREE_ARRAY(ptr, sizeof(T)*num, catagory)

@@ -39,10 +39,11 @@ public:
 	SceneAsset* scene;
 	/* Layer mask */
 	VisibilityMask visibilityMask;
-	uint32 frameNumber;
 	/** scene parameter */
 	float distanceInView;
 	float recipDistanceInView;
+	/** Frame properties */
+	const FrameTimer* frameTimer;
 };
 } /* namespace nextar */
 #endif /* SCENETRAVERSAL_H_ */

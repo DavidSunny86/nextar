@@ -32,6 +32,14 @@ void Component::SetParent(Component* c) {
 	parent = c;
 }
 
+Entity* Component::GetEntity() {
+	Component* p = this;
+	while (p && p->GetClassID() != Entity::CLASS_ID) {
+		p = p->GetParent();
+	}
+	return static_cast<Entity*>(p);
+}
+
 Component* Component::FindComponent(const StringID name) {
 	return 0;
 }
