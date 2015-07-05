@@ -9,6 +9,7 @@
 #define CORE_ENGINE_INCLUDE_BEHAVIOUR_H_
 
 #include <Component.h>
+#include <PropertyInterface.h>
 
 namespace nextar {
 
@@ -17,15 +18,21 @@ namespace nextar {
  * events or triggers. Behaviors can define multiple actions, any
  * of which can be triggered based on an event.
  */
-class Behaviour: public Component {
+class Behaviour: public PropertyInterface,
+	public Component {
 
 public:
+
+	Behaviour(const StringID name = StringUtils::NullID,
+				const StringID factory = StringUtils::DefaultID,
+				Component* parent = nullptr);
+
 	enum {
 		CATAGORY = CAT_BEHAVIOR,
 	};
 
 	virtual uint32 GetClassID() const = 0 ;
-	virtual void Update() override {}
+	virtual void Update(const FrameTimer& frameTimer) override {}
 };
 
 } /* namespace nextar */

@@ -15,6 +15,7 @@ using namespace nextar;
 namespace SimpleBehaviours {
 
 class Plugin: public FactoryPlugin {
+	NEX_LOG_HELPER(Plugin);
 public:
 	NEX_DECLARE_PLUGIN(Plugin);
 

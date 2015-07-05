@@ -108,7 +108,12 @@ public:
 		SetUpdateRequired(true);
 	}
 
-	virtual void Update();
+	inline void TranslateBy(Vec3AF t) {
+		transform->SetTranslation(Vec3AAdd(t, transform->GetTranslation()));
+		SetUpdateRequired(true);
+	}
+
+	virtual void Update(const FrameTimer& frameTimer);
 	/** @brief Initialize position, rotation and scaling values to identity */
 	void SetIdentityTransforms();
 	/* child notifications, received by regions or parent regions */

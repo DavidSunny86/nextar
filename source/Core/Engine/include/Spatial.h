@@ -103,7 +103,7 @@ public:
 	}
 
 	/** @remarks Update world volume */
-	virtual void Update();
+	virtual void Update(const FrameTimer& frameTimer);
 	virtual void SetMoveable(Moveable* ptr);
 	virtual void Visit(SceneTraversal& traversal) = 0;
 

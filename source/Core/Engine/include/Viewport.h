@@ -169,7 +169,7 @@ public:
 	virtual void FirePostupdate();
 
 	/* */
-	virtual void PushPrimitives(uint32 frameNumber);
+	virtual void PushPrimitives(const FrameTimer& frameTimer);
 	virtual void CommitPrimitives(RenderContext* renderCtx, const FrameTimer& frameNumber);
 
 protected:

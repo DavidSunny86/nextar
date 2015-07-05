@@ -10,7 +10,7 @@
 
 
 #include <EngineHeaders.h>
-
+#include <FPSControlBehaviour.h>
 using namespace nextar;
 
 

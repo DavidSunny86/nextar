@@ -51,9 +51,9 @@ void Viewport::FirePostupdate() {
 		(*i)->PostUpdate(this);
 }
 
-void Viewport::PushPrimitives(uint32 frameNumber) {
+void Viewport::PushPrimitives(const FrameTimer& frameTimer) {
 		
-	traversal.frameNumber = frameNumber;
+	traversal.frameTimer = &frameTimer;
 	traversal.lightSystem = lightSystem;
 	//traversal.visibleBoundsInfo = &(camera->GetBoundsInfo());
 	//traversal.visibilityMask = camera->GetVisibilityMask();
@@ -61,7 +61,7 @@ void Viewport::PushPrimitives(uint32 frameNumber) {
 	camera->Visit(traversal);
 	// if we registered any offscreen viewports, lets call push on those
 	for (auto &s : offscreen) {
-		s->PushPrimitives(frameNumber);
+		s->PushPrimitives(frameTimer);
 	}
 }
 
@@ -102,7 +102,7 @@ void Viewport::CommitPrimitives(RenderContext* renderCtx, const FrameTimer&  fra
 void Viewport::Render(RenderContext* renderCtx, const FrameTimer& frameNumber) {
 	RenderManager& rm = RenderManager::Instance();
 	visibleSet.Prepare();
-	PushPrimitives(frameNumber.GetFrameNumber());
+	PushPrimitives(frameNumber);
 	FirePreupdate();
 	CommitPrimitives(renderCtx, frameNumber);
 	FirePostupdate();

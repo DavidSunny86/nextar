@@ -169,7 +169,7 @@ void Camera::UpdateProjection() {
 
 void Camera::Visit(SceneTraversal & traversal) {
 	// @todo Figure out when to update camera
-	Update();
+	Update(*traversal.frameTimer);
 	Camera* oldCamera = traversal.camera;
 	Frustum* oldFrustum = traversal.frustum;
 	VisibilityMask oldMask = visibilityMask;
@@ -187,8 +187,8 @@ uint32 Camera::GetClassID() const {
 	return CLASS_ID;
 }
 
-void Camera::Update() {
-	Spatial::Update();
+void Camera::Update(const FrameTimer& frameTimer) {
+	Spatial::Update(frameTimer);
 	UpdateFrustum();
 }
 

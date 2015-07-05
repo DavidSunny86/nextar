@@ -10,6 +10,13 @@ NEX_MATH_RANDOM_SEED
 #endif
 
 namespace nextar {
+
+template class PooledAllocator< _Matrix3x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE >;
+template class PooledAllocator< _Matrix4x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE >;
+template class PooledAllocator<Vector3A, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;
+//template class PooledAllocator<Vector4A, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;
+//template class PooledAllocator<Quaternion, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;
+
 const Vector3 Vector3::XAxis(1, 0, 0);
 const Vector3 Vector3::YAxis(0, 1, 0);
 const Vector3 Vector3::ZAxis(0, 0, 1);

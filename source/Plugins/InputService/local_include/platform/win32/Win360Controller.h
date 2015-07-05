@@ -5,10 +5,10 @@
  *      Author: obhi
  */
 
-#ifndef PLUGINS_INPUTSERVICE_LOCAL_INCLUDE_XBOX360CONTROLLER_H_
-#define PLUGINS_INPUTSERVICE_LOCAL_INCLUDE_XBOX360CONTROLLER_H_
+#ifndef PLUGINS_INPUTSERVICE_LOCAL_INCLUDE_WIN360CONTROLLER_H_
+#define PLUGINS_INPUTSERVICE_LOCAL_INCLUDE_WIN360CONTROLLER_H_
 
-#include <UxInputController.h>
+#include <WinInputController.h>
 #include <InputControllerProviderImpl.h>
 #include <TaskSchedular.h>
 
@@ -16,13 +16,13 @@ struct js_event;
 using namespace nextar;
 namespace InputService {
 
-class Ux360Controller:
+class Win360Controller:
 		public nextar::DigitalControls,
 		public nextar::AnalogControls,
-		public UxInputController {
+		public WinInputController {
 public:
-	Ux360Controller(const UxDeviceDesc& desc);
-	virtual ~Ux360Controller();
+	Win360Controller(const WinDeviceDesc& desc);
+	virtual ~Win360Controller();
 
 	virtual DigitalControls* GetDigitalSettings() override {
 		return this;
@@ -53,14 +53,14 @@ protected:
 		inline void Unlock() {
 			lock_.clear();
 		}
-		inline void SetDevice(Ux360Controller* dev) {
+		inline void SetDevice(Win360Controller* dev) {
 			device_ = dev;
 		}
 
 		virtual Task* Run();
 
 	protected:
-		Ux360Controller* device_;
+		Win360Controller* device_;
 		atomic_flag lock_;
 	};
 
@@ -99,10 +99,9 @@ protected:
 	AnalogValue triggerDeadZone;
 
 	uint32 changeCount;
-	typedef array<InputEvent, MAX_CHANGE_BUFFER>::type InputEventList;
-	InputEventList inputEvents[2];
+    array<InputEvent, MAX_CHANGE_BUFFER>::type inputEvents[2];
 };
 
 } /* namespace InputService */
 
-#endif /* PLUGINS_INPUTSERVICE_LOCAL_INCLUDE_XBOX360CONTROLLER_H_ */
+#endif /* PLUGINS_INPUTSERVICE_LOCAL_INCLUDE_WIN360CONTROLLER_H_ */

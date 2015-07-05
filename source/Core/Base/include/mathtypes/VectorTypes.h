@@ -15,6 +15,7 @@
 #else
 #endif
 #include <NexBase.h>
+#include <CommonPools.h>
 namespace nextar {
 
 struct _Matrix3x4;
@@ -34,7 +35,16 @@ using Matrix4x4 alignas(16) = _Matrix4x4;
 using Matrix3x4 = _Matrix3x4;
 using Matrix4x4 = _Matrix4x4;
 #endif
-struct _NexBaseAPI _Matrix3x4 : public AllocMathCore {
+
+typedef AllocMathPool< _Matrix3x4, NEX_MATRIX_POOL_NUM_PER_BLOCK > AllocMatrix3x4;
+typedef AllocMathPool< _Matrix4x4, NEX_MATRIX_POOL_NUM_PER_BLOCK > AllocMatrix4x4;
+typedef PooledAllocator< _Matrix3x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE > AllocatorMatrix3x4;
+typedef PooledAllocator< _Matrix4x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE > AllocatorMatrix4x4;
+typedef PooledAllocator<Vector3A, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE> AllocatorVector3A;
+typedef PooledAllocator<Vector4A, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE> AllocatorVector4A;
+typedef PooledAllocator<Quaternion, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE> AllocatorQuaternion;
+
+struct _NexBaseAPI _Matrix3x4 : public AllocMatrix3x4 {
 
 	union {
 		struct {
@@ -74,8 +84,7 @@ struct _NexBaseAPI _Matrix3x4 : public AllocMathCore {
 	inline _Matrix3x4& operator =(const Matrix3x4&);
 };
 
-struct _NexBaseAPI _Matrix4x4: public AllocMathPool<_Matrix4x4,
-		NEX_MATRIX_POOL_NUM_PER_BLOCK> {
+struct _NexBaseAPI _Matrix4x4: public AllocMatrix4x4 {
 	static const Matrix4x4 IdentityMatrix;
 
 	union {
@@ -133,4 +142,15 @@ typedef const Matrix4x4& Mat4x4R;
 #include <mathtypes/Matrix3x4.h>
 #include <mathtypes/Matrix4x4.h>
 
+namespace nextar {
+
+
+_NexTemplateExtern template class _NexBaseAPI PooledAllocator< _Matrix3x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE >;
+_NexTemplateExtern template class _NexBaseAPI PooledAllocator< _Matrix4x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE >;
+_NexTemplateExtern template class _NexBaseAPI PooledAllocator<Vector3A, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;
+//_NexTemplateExtern template class _NexBaseAPI PooledAllocator<Vector4A, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;
+//_NexTemplateExtern template class _NexBaseAPI PooledAllocator<Quaternion, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;
+
+
+}
 #endif /* VECTORTYPES_H_ */

@@ -39,7 +39,7 @@ void Spatial::SetMoveable(Moveable* moveable) {
 	this->moveable = moveable;
 }
 
-void Spatial::Update() {
+void Spatial::Update(const FrameTimer& frameTimer) {
 	uint32 oldMatrixState =  matrixState;
 	if (!moveable || matrixState != (oldMatrixState=moveable->GetMatrixState()) ) {
 		matrixState = oldMatrixState;
