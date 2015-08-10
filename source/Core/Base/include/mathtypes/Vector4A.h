@@ -36,7 +36,9 @@ inline Vector4A Vec4ANegate(Vec4AF vec3);
 /** @brief	Vector 4 Add. **/
 inline Vector4A Vec4AAdd(Vec4AF q1, Vec4AF q2);
 /** @brief	Vector 4 Sub. **/
-inline Vector3A Vec4ASub(Vec4AF q1, Vec4AF q2);
+inline Vector4A Vec4ASub(Vec4AF q1, Vec4AF q2);
+/** @brief	Vector 4 Scalar. **/
+inline Vector4A Vec4AMulScalar(Vec4AF q1, float scalar);
 /** @brief	Vector 4 Multiply and Add. **/
 inline Vector4A Vec4AMulAdd(Vec4AF q1, Vec4AF q2, Vec4AF q3);
 /** @brief	Vector 4 Replicate a value. **/
@@ -63,6 +65,8 @@ inline float Vec4ADistance(Vec4AF vec1, Vec4AF vec2);
 inline float Vec4ASqDistance(Vec4AF vec1, Vec4AF vec2);
 /** @brief	Vector 4  Multiply **/
 inline Vector4A Vec4AMul(Vec4AF vec1, Vec4AF vec2);
+/** @brief Vector matrix multiplication without any optimization/trickery */
+inline Vector4A Vec4AMulMat4x4(Vec4AF v, Mat4x4F m);
 
 }
 

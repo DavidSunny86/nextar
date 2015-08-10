@@ -24,8 +24,9 @@ CommitContext::CommitContext() :
 	,depthMap(nullptr)
 	,normalMap(nullptr)
 	,frameTime(0.0f)
-	,frameTimer(nullptr) {
-	invProjectionMatrix = NEX_NEW(Matrix4x4());
+	,frameTimer(nullptr)
+	,invProjectionMatrix(nullptr)
+	,invViewProjectionMatrix(nullptr) {
 }
 
 CommitContext::~CommitContext() {

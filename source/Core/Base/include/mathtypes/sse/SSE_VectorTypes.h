@@ -93,6 +93,8 @@ inline Quad QuadInvSqrt(QuadPF);
 inline Quad QuadSelect(QuadPF q1, QuadPF q2);
 /* Quad/Vec4 dot product */
 inline Quad QuadDot(QuadPF q1, QuadPF q2);
+/* Redundant */
+inline Quad QuadRet(QuadPF q);
 
 }
 
@@ -114,7 +116,7 @@ inline Quad QuadDot(QuadPF q1, QuadPF q2);
 #define Vec3AMulAdd		QuadMulAdd
 #define Vec3AMulMat4x4  Mat4x4TransVec3
 #define Vec3AMul        QuadMul
-
+#define Vec3AFromVec4A  QuadRet
 /**
  * @remarks Vec3 functions. Rename those already defined.
  **/
@@ -139,11 +141,13 @@ inline Quad QuadDot(QuadPF q1, QuadPF q2);
 #define Vec4AGreaterAll         QuadGreaterAll
 #define Vec4ALesserAny          QuadLesserAny
 #define Vec4ALesserAll          QuadLesserAll
+#define Vec4AMulScalar	QuadMulScalar
 
 #define QuatSet QuadSet
 #define QuatGetX QuadGetX
 #define QuatGetY QuadGetY
 #define QuatGetZ QuadGetZ
 #define QuatGetW QuadGetW
-
+#define QuatMulScalar	QuadMulScalar
+#define QuatNormalize Vec4ANormalize
 #endif /* SSE_VECTORTYPES_H_ */

@@ -25,6 +25,7 @@ Component* FPSControlBehaviour::Factory::AsyncCreate(uint32 classId, const Strin
 /******* Factory ***********/
 /******* Property Accessors ***********/
 
+FPSControlBehaviour::ControllerDeviceAccessor FPSControlBehaviour::ControllerDeviceAccessor::_accessor;
 void FPSControlBehaviour::ControllerDeviceAccessor::SetStringValue(
 		PropertyInterface* intf, const String& value) {
 	static_cast<FPSControlBehaviour*>(intf)->SetControllerID(Convert::ToULong(value));
@@ -38,26 +39,22 @@ const String FPSControlBehaviour::ControllerDeviceAccessor::GetStringValue(
 
 /******* Property Accessors ***********/
 FPSControlBehaviour::FPSControlBehaviour(const StringID name, const StringID factory) :
-	Behaviour(name, factory),
-	movementSpeed(2.0f), rotationSpeed(0.1f) {
+	Behaviour(name, factory), moveSpeedXZ(0, 0), rotateSpeedXY(0, 0),
+	movementSpeedFactor(50.1f), rotationSpeedFactor(1.5f) {
 
 	if (OverrideDictionary("ControllerProperties")) {
 		Populate(GetDictionary());
 	}
-	deltaStrafe = NEX_ALLOCATOR_ALLOC_T(Vector3A, AllocatorVector3A);
-	deltaForward = NEX_ALLOCATOR_ALLOC_T(Vector3A, AllocatorVector3A);
-	deltaRotation = NEX_ALLOCATOR_ALLOC_T(Quaternion, AllocatorQuaternion);
+
 }
 
 FPSControlBehaviour::~FPSControlBehaviour() {
-	NEX_ALLOCATOR_FREE_T(Vector3A, AllocatorVector3A, deltaStrafe);
-	NEX_ALLOCATOR_FREE_T(Vector3A, AllocatorVector3A, deltaStrafe);
-	NEX_ALLOCATOR_FREE_T(Quaternion, AllocatorVector3A, deltaRotation);
 }
 
 void FPSControlBehaviour::Populate(PropertyDictionary* dic) {
 	dic->AddParam("device_id", &FPSControlBehaviour::ControllerDeviceAccessor::_accessor,
 			PropertyType::PROP_TYPE_UINT);
+	// @todo Params for movement_speed_factor, rotate_speed_factor
 }
 
 uint32 FPSControlBehaviour::GetClassID() const {
@@ -70,8 +67,12 @@ void FPSControlBehaviour::Update(const FrameTimer& frameTimer) {
 		Moveable* m = attached->GetMoveable();
 		if (m) {
 			// @todo We need the timer here
-			Vector3A v = Vec3AMulScalar(*deltaStrafe, movementSpeed*frameTimer.GetElapsedTime());
-			m->TranslateBy(v);
+			float timeDelta = frameTimer.GetFrameTime();
+			Vector2 movement(movementSpeedFactor * moveSpeedXZ.x * timeDelta,
+				-movementSpeedFactor * moveSpeedXZ.y * timeDelta);
+			Vector2 rotation(rotationSpeedFactor * rotateSpeedXY.x * timeDelta, 
+				rotationSpeedFactor * rotateSpeedXY.y * timeDelta);
+			m->LocalApplyCameraMotion(movement, rotation);
 		}
 	}
 }
@@ -86,21 +87,16 @@ void FPSControlBehaviour::ProcessEvents(const InputChangeBuffer& events) {
 		switch(ie.key)	{
 		// control camera movement
 		case Key::XBOX_AXIS_LEFT:
-			if(ie.analogDir.xy[0] < 0)
-				strafeX =-movementSpeed;
-			else if (ie.analogDir.xy[0] > 0)
-				strafeX = movementSpeed;
-			if(ie.analogDir.xy[1] < 0)
-				strafeZ =-movementSpeed;
-			else if (ie.analogDir.xy[1] > 0)
-				strafeZ = movementSpeed;
+			moveSpeedXZ.x = ie.analogDir.xy[0];
+			moveSpeedXZ.y = ie.analogDir.xy[1];
 			break;
 		// control camera look-at
 		case Key::XBOX_AXIS_RIGHT:
+			rotateSpeedXY.x = -ie.analogDir.xy[1];
+			rotateSpeedXY.y = ie.analogDir.xy[0];
 			break;
 		}
 	}
-	*deltaStrafe = Vec3ASet(strafeX, 0, strafeZ);
 }
 
 void FPSControlBehaviour::SetControllerID(uint32 deviceId) {

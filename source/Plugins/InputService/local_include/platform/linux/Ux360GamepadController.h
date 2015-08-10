@@ -16,13 +16,13 @@ struct js_event;
 using namespace nextar;
 namespace InputService {
 
-class Ux360Controller:
+class Ux360GamepadController:
 		public nextar::DigitalControls,
 		public nextar::AnalogControls,
 		public UxInputController {
 public:
-	Ux360Controller(const UxDeviceDesc& desc);
-	virtual ~Ux360Controller();
+	Ux360GamepadController(const UxDeviceDesc& desc);
+	virtual ~Ux360GamepadController();
 
 	virtual DigitalControls* GetDigitalSettings() override {
 		return this;
@@ -47,20 +47,24 @@ protected:
 	public:
 		PollTask();
 
+		inline void Lock() {
+			while (lock_.test_and_set(std::memory_order_relaxed));
+		}
+
 		inline bool TryLock() {
 			return !lock_.test_and_set(std::memory_order_relaxed);
 		}
 		inline void Unlock() {
 			lock_.clear();
 		}
-		inline void SetDevice(Ux360Controller* dev) {
+		inline void SetDevice(Ux360GamepadController* dev) {
 			device_ = dev;
 		}
 
 		virtual Task* Run();
 
 	protected:
-		Ux360Controller* device_;
+		Ux360GamepadController* device_;
 		atomic_flag lock_;
 	};
 
@@ -95,8 +99,8 @@ protected:
 	InputDirType axes[2];
 	AnalogValue prevDirButtonState[2];
 
-	AnalogValue thumbDeadZone[2];
-	AnalogValue triggerDeadZone;
+	int32 thumbDeadZone[2];
+	int32 triggerDeadZone;
 
 	uint32 changeCount;
 	typedef array<InputEvent, MAX_CHANGE_BUFFER>::type InputEventList;

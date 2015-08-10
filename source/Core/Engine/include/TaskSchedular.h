@@ -20,7 +20,8 @@ class Task;
 class TaskRunner;
 
 typedef vector<TaskRunner*>::type RunnerList;
-typedef deque<Task*>::type TaskList;
+// deque has a serious issue
+typedef vector<Task*>::type TaskList;
 
 class _NexEngineAPI TaskSchedular :
 		public Singleton<TaskSchedular>,

@@ -120,6 +120,7 @@ protected:
 
 	void _Free(void* const chunk) {
 		_Next(chunk) = freeChunk;
+		NEX_ASSERT(_Next(chunk) != chunk); // cyclic
 		freeChunk = chunk;
 		_TotalChunksFreed++;
 		_CurrentTotalChunks--;
@@ -173,6 +174,7 @@ protected:
 
 	inline void _AddToFreeChunks(void* const chunk) {
 		_Next(chunk) = freeChunk;
+		NEX_ASSERT(_Next(chunk) != chunk); // cyclic
 		freeChunk = chunk;
 	}
 
@@ -190,10 +192,13 @@ protected:
 	void _UpdateFreeChunks(void * const block, void* const end) {
 		uint8* last = (static_cast<uint8*>(block) + (_BlockSize - _ChunkSize));
 		_Next(last) = end;
+		NEX_ASSERT(_Next(last) != last); // cyclic
 		/**todo Pointer comparison, might cause portability issue! */
 		for (uint8* it = last - _ChunkSize; it >= block; last = it, it -=
-				_ChunkSize)
+			_ChunkSize) {
 			_Next(it) = last;
+			NEX_ASSERT(_Next(it) != it); // cyclic
+		}
 	}
 
 #ifdef NEX_DEBUG

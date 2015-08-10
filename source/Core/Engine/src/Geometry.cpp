@@ -134,8 +134,10 @@ Geometry Geometry::CreateCone(uint32 density,
 		colors.reserve(points.size());
 		colors.push_back(topColor);
 		colors.push_back(bottomColor);
-		for(uint32 i = 0; i < density; ++i)
-			colors.push_back(topColor);
+		if (topCapped) {
+			for (uint32 i = 0; i < density; ++i)
+				colors.push_back(topColor);
+		}
 		for(uint32 i = 0; i < density; ++i)
 			colors.push_back(bottomColor);
 	}
@@ -367,16 +369,26 @@ bool Geometry::Merge(const Geometry& second) {
 
 #define NEX_VAPPEND(v)	v.insert(v.end(), second.v.begin(), second.v.end());
 
-	if (points.size())
-		NEX_VAPPEND(points);
-	if (normals.size())
-		NEX_VAPPEND(normals);
-	if (uv.size())
-		NEX_VAPPEND(uv);
-	if (colors.size())
-		NEX_VAPPEND(colors);
-	if (topology.size())
-		NEX_VAPPEND(topology);
+	if (second.topology.size()) {
+
+		// offset each one
+		uint16 offset = (uint16)points.size();
+
+		if (second.points.size())
+			NEX_VAPPEND(points);
+		if (second.normals.size())
+			NEX_VAPPEND(normals);
+		if (second.uv.size())
+			NEX_VAPPEND(uv);
+		if (second.colors.size())
+			NEX_VAPPEND(colors);
+	
+		
+		topology.reserve(second.topology.size() + topology.size());
+		std::for_each(second.topology.begin(), second.topology.end(), [this, offset] (uint16 i) {
+			topology.push_back(i + offset);
+		});
+	}
 	return true;
 }
 

@@ -59,22 +59,23 @@ public:
 
 	static void ClearCommonLayouts();
 	static const VertexLayoutPtr& GetCommonLayout(VertexLayoutType type);
-	static void GetCustomLayoutElements(VertexLayoutType type,
+	static void GetCommonLayoutElements(VertexLayoutType type,
 			const VertexElement*& elements, uint32& numElements) {
-		elements = commonElementLayout[type].elements;
-		numElements = commonElementLayout[type].numElements;
+		elements = commonLayouts[type].elements;
+		numElements = commonLayouts[type].numElements;
 	}
 
 protected:
 	uint32 flags;
 
-	struct CommonVertexElement {
+	struct CommonVertexLayoutData {
 		uint32 numElements;
 		const VertexElement* elements;
+		VertexLayoutPtr layout;
+		uint32 defaultFlags;
 	};
 
-	static CommonVertexElement commonElementLayout[VertexLayoutType::VERTEX_LAYOUT_COUNT];
-	static VertexLayoutPtr commonLayouts[VertexLayoutType::VERTEX_LAYOUT_COUNT];
+	static CommonVertexLayoutData commonLayouts[VertexLayoutType::VERTEX_LAYOUT_COUNT];
 
 };
 

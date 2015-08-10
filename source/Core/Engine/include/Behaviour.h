@@ -18,7 +18,7 @@ namespace nextar {
  * events or triggers. Behaviors can define multiple actions, any
  * of which can be triggered based on an event.
  */
-class Behaviour: public PropertyInterface,
+class _NexEngineAPI Behaviour: public PropertyInterface,
 	public Component {
 
 public:

@@ -37,6 +37,10 @@ bool Equals(float a, float b) {
 	return NEX_FLOAT_TOLERANCE_EQUAL(a, b, TEST_TOLERANCE);
 }
 
+Vector4A ToVector4A(DirectX::XMVECTOR v) {
+	return Vec4ASet(DirectX::XMVectorGetX(v), DirectX::XMVectorGetY(v), DirectX::XMVectorGetZ(v), DirectX::XMVectorGetW(v));
+}
+
 bool Equals(Vec4AF a, Vec4AF b) {
 	return Equals(Vec4AGetX(a), Vec4AGetX(b)) && 
 		Equals(Vec4AGetY(a), Vec4AGetY(b)) &&
@@ -143,7 +147,61 @@ void TestVec4A() {
 /* TestQuat
 *******************************************/
 void TestQuat() {
-	// @todo Write further tests
+
+	float ang;
+#ifdef NEX_WINDOWS
+	ang = RandomGen::RangeFloat(-Math::PI, Math::PI);
+	DirectX::XMVECTOR Axis = { 0, 1, 0 };
+	DirectX::XMVECTOR Axis2 = { 1, 0, 0 };
+	Quaternion q1 = QuatFromAxisAng(Vec3ASet(0, 1, 0), ang);
+	DirectX::XMVECTOR q2 = DirectX::XMQuaternionRotationAxis(Axis, ang);
+	NEX_ASSERT(Equals(q1, ToVector4A(q2)));
+
+	ang = RandomGen::RangeFloat(-Math::PI, Math::PI);
+	
+	Quaternion qm1 = QuatFromAxisAng(Vec3ASet(0, 1, 0), ang);
+	DirectX::XMVECTOR vqm1 = DirectX::XMQuaternionRotationAxis(Axis, ang);
+
+	NEX_ASSERT(Equals(qm1, ToVector4A(vqm1)));
+
+	ang = RandomGen::RangeFloat(-Math::PI, Math::PI);
+
+	Quaternion qm2 = QuatFromAxisAng(Vec3ASet(1, 0, 0), ang);
+	DirectX::XMVECTOR vqm2 = DirectX::XMQuaternionRotationAxis(Axis2, ang);
+
+	NEX_ASSERT(Equals(qm2, ToVector4A(vqm2)));
+
+	Quaternion r1 = QuatMul(qm1, qm2);
+	DirectX::XMVECTOR r2 = DirectX::XMQuaternionMultiply(vqm1, vqm2);
+	NEX_ASSERT(Equals(r1, ToVector4A(r2)));
+
+	Quaternion n1 = QuatNormalize(r1);
+	DirectX::XMVECTOR n2 = DirectX::XMQuaternionNormalize(r2);
+	NEX_ASSERT(Equals(n1, ToVector4A(n2)));
+
+	// test quat mul accumulation
+	ang = RandomGen::RangeFloat(-Math::PI, Math::PI);
+	Quaternion qmc = QuatFromAxisAng(Vec3ASet(1, 0, 0), ang);
+	DirectX::XMVECTOR vqmc = DirectX::XMQuaternionRotationAxis(Axis2, ang);
+
+	ang = RandomGen::RangeFloat(-Math::PI, Math::PI);
+	Quaternion accq = QuatFromAxisAng(Vec3ASet(0, 1, 0), ang);
+	DirectX::XMVECTOR vaccq = DirectX::XMQuaternionRotationAxis(Axis, ang);
+
+	for (int i = 0; i < 20; ++i) {
+		accq = QuatMul(qmc, accq);
+		vaccq = DirectX::XMQuaternionMultiply(vqmc, vaccq);
+	}
+
+	NEX_ASSERT(Equals(accq, ToVector4A(vaccq)));
+
+	for (int i = 0; i < 20; ++i) {
+		accq = QuatMul(accq, qmc);
+		vaccq = DirectX::XMQuaternionMultiply(vaccq, vqmc);
+	}
+
+	NEX_ASSERT(Equals(accq, ToVector4A(vaccq)));
+#endif
 }
 
 void TestMatrix3x4() {
@@ -152,7 +210,7 @@ void TestMatrix3x4() {
 
 void TestPerspectiveMatrix() {
 	
-	RandomGen::Seed(std::time(nullptr));
+	RandomGen::Seed((uint32)std::time(nullptr));
 	float fov = RandomGen::RangeFloat(0, Math::PI);
 	float aspect = RandomGen::RangeFloat(1.0f, 1.4f);
 	float zn = RandomGen::RangeFloat(0.0f, 10.0f);

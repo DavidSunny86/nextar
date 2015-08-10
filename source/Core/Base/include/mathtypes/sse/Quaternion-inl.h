@@ -177,12 +177,12 @@ inline Quaternion QuatMul(QuatF q1, QuatF q2) {
 	Q2Y = _mm_mul_ps(Q2Y, Q1Shuffle);
 	Q1Shuffle = _mm_shuffle_ps(Q1Shuffle, Q1Shuffle, _MM_SHUFFLE(0, 1, 2, 3));
 	// Flip the signs on z and w
-	Q2Y = _mm_mul_ps(Q2Y, (N3D_OOXX.v));
+	Q2Y = _mm_xor_ps(Q2Y, (N3D_OOXX.v));
 	// Mul by Q1YXWZ
 	Q2Z = _mm_mul_ps(Q2Z, Q1Shuffle);
 	vResult = _mm_add_ps(vResult, Q2X);
 	// Flip the signs on x and w
-	Q2Z = _mm_mul_ps(Q2Z, (N3D_XOOX.v));
+	Q2Z = _mm_xor_ps(Q2Z, (N3D_XOOX.v));
 	Q2Y = _mm_add_ps(Q2Y, Q2Z);
 	vResult = _mm_add_ps(vResult, Q2Y);
 	return vResult;

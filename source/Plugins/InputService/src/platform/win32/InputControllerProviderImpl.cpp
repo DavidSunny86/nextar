@@ -7,6 +7,15 @@
 
 #include <IncWnds.h>
 #include <InputControllerProviderImpl.h>
+#include <Win360GamepadController.h>
+
+
+// link to x-input
+#if (MSC_VER < 1700) //pre 2012
+#	pragma comment(lib,"Xinput.lib")
+#else
+#	pragma comment(lib,"Xinput9_1_0.lib")
+#endif
 
 namespace InputService {
 
@@ -24,7 +33,7 @@ void InputControllerProviderImpl::Configure(const Config& config) {
 }
 
 void InputControllerProviderImpl::EnumDevicesImpl() {
-
+		
 	UINT nDevices;
 	PRAWINPUTDEVICELIST pRawInputDeviceList;
 	if (GetRawInputDeviceList(NULL, &nDevices, sizeof(RAWINPUTDEVICELIST)) != 0) { 
@@ -39,90 +48,78 @@ void InputControllerProviderImpl::EnumDevicesImpl() {
 		NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 	}
 	// do the job...
+	HANDLE keyboard = 0;
+	HANDLE mouse = 0;
+	for (uint32 i = 0; i < nDevices; ++i) {
+		if (pRawInputDeviceList[i].dwType == RIM_TYPEKEYBOARD)
+			keyboard = pRawInputDeviceList[i].hDevice;
+		else if (pRawInputDeviceList[i].dwType == RIM_TYPEMOUSE)
+			mouse = pRawInputDeviceList[i].hDevice;
+		else
+			LookForJoysticks(pRawInputDeviceList[i].hDevice);
+	}
+
+	// check xbox 360 controllers
+	for (DWORD index = 0; index < 4; ++index) {
+		FindAndRegisterX360Controller(index);
+	}
+	
+	if (keyboard && mouse)
+		CreateKeyboardAndMouseDesc(keyboard, mouse);
+
+	NEX_FREE(pRawInputDeviceList, MEMCAT_GENERAL);
 }
 
-void InputControllerProviderImpl::CreateKeyboardAndMouseDesc() {
-	UxDeviceDesc desc;
-	// @todo If we have keyboard
-	desc.info.name = "Keyboard and Mouse";
-	desc.info.deviceId = baseId + KEYBOARD_MOUSE_DEVID_BASE + 1;
-	desc.info.type = TYPE_KEYBOARD_AND_MOUSE;
-	desc.fd = -2;
-	// @todo Buttons and Axes count
-	desc.buttons = 0;
-	desc.axes = 0;
-	controllers.push_back(desc);
-}
-
-void InputControllerProviderImpl::LookForJoysticks() {
-	uint32 index = 0;
-	unsigned char axes = 2;
-	unsigned char buttons = 2;
-	int version = 0x000800;
-	char name[128] = "Unknown";
-	UxDeviceDesc desc;
-	do {
-
-		String path = devInpPath + "js" + Convert::ToString(index);
-		int fd;
-
-		if ((fd = open(path.c_str(), O_RDONLY|O_NONBLOCK)) < 0) {
-			break;
-		}
-		ioctl(fd, JSIOCGVERSION, &version);
-		ioctl(fd, JSIOCGAXES, &axes);
-		ioctl(fd, JSIOCGBUTTONS, &buttons);
-		ioctl(fd, JSIOCGNAME(128), name);
-		desc.info.name = name;
-		desc.info.deviceId = baseId + JOYSTICK_DEVID_BASE + index;
-		desc.info.type  = GetJoystickType(desc.info.name, axes, buttons, version);
-		desc.fd = UxDeviceDesc::NULL_FD;
-		desc.axes = axes;
-		desc.buttons = buttons;
-
-		controllers.push_back(desc);
-		index++;
-	} while(true);
-}
-
-const UxDeviceDesc& InputControllerProviderImpl::GetDesc(uint16 deviceId) const {
-	for(auto& c : controllers) {
-		if (c.info.deviceId == deviceId) {
-			return c;
+void InputControllerProviderImpl::FindAndRegisterX360Controller(DWORD index) {
+	XINPUT_CAPABILITIES caps;
+	if (XInputGetCapabilities(index, 0, &caps) == ERROR_SUCCESS) {
+		if (caps.Type == XINPUT_DEVTYPE_GAMEPAD &&
+			caps.SubType == XINPUT_DEVSUBTYPE_GAMEPAD) {
+			// xbox360 gamepad
+			String name = "XBox 360 Gamepad Controller: " + Convert::ToString((uint32)index);
+			controllers.push_back(WinDeviceDesc(index, name, (uint16)controllers.size() + baseId, ControllerType::TYPE_XBOX360_CONTROLLER));
 		}
 	}
-	return UxDeviceDesc::Null;
+}
+
+void InputControllerProviderImpl::CreateKeyboardAndMouseDesc(HANDLE keyboard,
+	HANDLE mouse) {
+	LookForJoysticks(keyboard);
+	LookForJoysticks(mouse);
+	this->controllers.push_back(WinDeviceDesc(keyboard, mouse, "Keyboard & Mouse", (uint16)controllers.size() + baseId));
+}
+
+void InputControllerProviderImpl::LookForJoysticks(HANDLE hand) {
+	/*char deviceName[512];
+	UINT nameLen = 512;
+	RID_DEVICE_INFO deviceInfo;
+
+	GetRawInputDeviceInfo(hand, RIDI_DEVICENAME, deviceName, &nameLen);
+	nameLen = sizeof(deviceInfo);
+	GetRawInputDeviceInfo(hand, RIDI_DEVICEINFO, &deviceInfo, &nameLen);*/
+}
+
+const WinDeviceDesc& InputControllerProviderImpl::GetDesc(uint16 deviceId) const {
+	for (auto& e : controllers) {
+		if (e._info.deviceId == deviceId)
+			return e;
+	}
+	return WinDeviceDesc::Null;
 }
 
 InputController* InputControllerProviderImpl::CreateController(
 		uint16 deviceId) {
-	const UxDeviceDesc& desc = GetDesc(deviceId);
-	if (desc.IsValid()) {
-		switch(desc.info.type) {
-		case TYPE_XBOX360_CONTROLLER:
-			return NEX_NEW(Ux360Controller(desc));
-		case TYPE_KEYBOARD_AND_MOUSE:
-			return NEX_NEW(UxKeyboardMouse(desc));
-		}
+	const WinDeviceDesc& d = GetDesc(deviceId);
+	switch (d._info.type) {
+	case ControllerType::TYPE_XBOX360_CONTROLLER:
+		return NEX_NEW(Win360GamepadController(d));
 	}
 	return nullptr;
 }
 
 void InputControllerProviderImpl::DestroyController(InputController* ctrl) {
-	UxInputController* ctrl_ = static_cast<UxInputController*>(ctrl);
-	NEX_DELETE(ctrl_);
-}
-
-ControllerType InputControllerProviderImpl::GetJoystickType(const String& name, uint32 axes,
-		uint32 buttons, uint32 version) {
-	if (name.find("Microsoft") != String::npos &&
-		name.find("X-Box") != String::npos &&
-		name.find("360") != String::npos) {
-
-		return TYPE_XBOX360_CONTROLLER;
-	}
-
-	return TYPE_JOYSTICK;
+	WinInputController* c = static_cast<WinInputController*>(ctrl);
+	NEX_DELETE(c);
 }
 
 

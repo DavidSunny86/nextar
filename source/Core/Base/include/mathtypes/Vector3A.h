@@ -27,6 +27,8 @@ inline float Vec3AGetZ(Vec3AF q);
 inline float Vec3ADot(Vec3AF vec1, Vec3AF vec2);
 /** @brief	Vector3A from Vector3. **/
 inline Vector3A Vec3AFromVec3(const Vector3& vec3);
+/** @brief	Vector3A from Vector4A. **/
+inline Vector3A Vec3AFromVec4A(Vec4AF vec4);
 /** @brief	Vector3A Add. **/
 inline Vector3A Vec3AAdd(Vec3AF q1, Vec3AF q2);
 /** @brief	Vector3A Sub. **/

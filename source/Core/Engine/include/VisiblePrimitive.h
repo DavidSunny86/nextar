@@ -28,6 +28,8 @@ public:
 		,parameters(nullptr) {
 	}
 
+	virtual ~VisiblePrimitive() {}
+
 	StreamData* GetStreamData() {
 		return streamData;
 	}
@@ -63,6 +65,11 @@ public:
 
 	const ParameterBuffer* GetParameters() const {
 		return parameters;
+	}
+
+	// Overrides
+	virtual float GetConstantSize() const {
+		return 0.0f;
 	}
 
 protected:

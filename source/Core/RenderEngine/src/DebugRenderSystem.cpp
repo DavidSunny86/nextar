@@ -12,7 +12,7 @@
 namespace nextar {
 
 DebugPrimitive::DebugPrimitive(uint32 primId, 
-	float timeToExpiry) : id(primId), timeToDeath(timeToExpiry), color(Color::White), worldMatrix(NEX_NEW(Matrix4x4)) {
+	float timeToExpiry) : id(primId), timeToDeath(timeToExpiry), color(Color::White), worldMatrix(NEX_NEW(Matrix4x4)), constantSize(0.0f) {
 	this->worldMatrices = worldMatrix;
 	*(worldMatrix) = Matrix4x4::IdentityMatrix;
 }
@@ -108,6 +108,7 @@ uint32 DebugRenderSystem::Register(const AABox3& box,
 }
 
 uint32 DebugRenderSystem::Register(Mat4x4R tform,
+	float screenSpaceFactor,
 	const Color& color, float expiryTimeInSec) {
 	if (!axisDataGenerated) {
 		GenerateStreamDataForAxis();
@@ -118,6 +119,7 @@ uint32 DebugRenderSystem::Register(Mat4x4R tform,
 	primitive->SetMaterial(debugMaterial);
 	primitive->SetColor(color);
 	primitive->SetTransform(tform);
+	primitive->SetConstantSize(screenSpaceFactor);
 	alivePrimitives.push_back(primitive);
 
 	return idCounter;
@@ -216,52 +218,91 @@ void DebugRenderSystem::Commit(CommitContext& context) {
 	context.renderContext->EndRender();
 }
 
+Geometry GenerateAxis(float radius, float alpha, int color) {
+	Quaternion q;
+	Matrix4x4 m;
+	Color baseColor(alpha, 0.1f, 0.1f, 0.1f);
+	Color fullColor(alpha, 0.1f, 0.1f, 0.1f);
+	Color halfColor(alpha, 0.1f, 0.1f, 0.1f);
+	baseColor[color] = 0.8f;
+	fullColor[color] = 1;
+	halfColor[color] = 0.6f;
+
+	Geometry cone = Geometry::CreateCone(10, radius, 0, radius * 6, false, true, baseColor, fullColor);
+	Geometry coneHandle = Geometry::CreateCone(4, radius*.4f, radius*0.01f, radius * 20, false, true, halfColor, baseColor);
+
+	q = QuatFromAxisAng(Vec3ASet(0, 0, 1), Math::PI);
+	m = Mat4x4FromScaleRotPos(1, q, Vec3ASet(0, -radius*0.2f, 0));
+	coneHandle.Transform(m);
+	cone.Merge(coneHandle);
+	m = Mat4x4FromPos(Vec3ASet(0, radius * 21.2f, 0));
+	cone.Transform(m);
+	return cone;
+}
+
 void DebugRenderSystem::GenerateStreamDataForAxis() {
 
-	float alpha = 1;
-	//Geometry cone = Geometry::CreateCone(10, 0.2f, 0, 1.3f, false, true, Color(alpha, 0.3f, 0, 0), Color(alpha, 1.0f, 0, 0));
-	Geometry cone = Geometry::CreateCone(10, 0.5f, 1.0f, 10.0f, false, true, Color(alpha, 0.3f, 0, 0), Color(alpha, 1.0f, 0, 0));
+	float alpha = 0.7f;
+	float radius = 2.0f;
+	Quaternion q;
 	Matrix4x4 m;
-	Quaternion q = QuatFromAxisAng(Vec3ASet(0, 0, 1), Math::PI);
+
+	Geometry yAxis = GenerateAxis(radius, alpha, 1);
+	Geometry xAxis = GenerateAxis(radius, alpha, 0);
+	q = QuatFromAxisAng(Vec3ASet(0, 0, 1), -Math::PI_BY_2);
 	m = Mat4x4FromRot(q);
-	cone.Transform(m);
+	xAxis.Transform(m);
+	Geometry zAxis = GenerateAxis(radius, alpha, 2);
+	q = QuatFromAxisAng(Vec3ASet(1, 0, 0), Math::PI_BY_2);
+	m = Mat4x4FromRot(q);
+	zAxis.Transform(m);
+	
+	Geometry main = Geometry::CreateSphere(10, radius/1.5f, false, true, Color(alpha, 0.7f, 0.7f, 0.7f));
+
+	//cone2.Transform(m);
+	main.Merge(xAxis);
+	main.Merge(yAxis);
+	main.Merge(zAxis);
+	//cone.Merge(cone2);
 
 	VertexBuffer vertexBuffer(GpuBuffer::NEVER_RELEASED);
 
 	uint32 stride = ((sizeof(float) * 3) + sizeof(uint32));
-	uint32 vbsize = (uint32)cone.points.size() * stride;
+	uint32 vbsize = (uint32)main.points.size() * stride;
 
 	void* pVData = NEX_ALLOC(vbsize, MEMCAT_GENERAL);
 	float* pos = (float*)pVData;
-	for (uint32 i = 0; i < cone.points.size(); ++i) {
-		auto &p = cone.points[i];
-		auto& c = cone.colors[i];
+	for (uint32 i = 0; i < main.points.size(); ++i) {
+		auto &p = main.points[i];
+		auto& c = main.colors[i];
 
 		*pos++ = p.x;
 		*pos++ = p.y;
 		*pos++ = p.z;
-		*((uint32*)(pos++)) = c.ToRgba();
+		*((uint32*)(pos++)) = c.ToAbgr();
 	}
 
 	vertexBuffer.CreateBuffer(vbsize, stride, reinterpret_cast<const uint8*>(pVData));
 
 	IndexBufferPtr indexBuffer = Assign(NEX_NEW(IndexBuffer(GpuBuffer::NEVER_RELEASED)));
-	indexBuffer->CreateBuffer(cone.topology.size() * 2, IndexBuffer::Type::TYPE_16BIT,
-		reinterpret_cast<const uint8*>(cone.topology.data()));
+	indexBuffer->CreateBuffer(main.topology.size() * 2, IndexBuffer::Type::TYPE_16BIT,
+		reinterpret_cast<const uint8*>(main.topology.data()));
 
 	StreamData* stream = &axisData;
 	stream->flags = StreamData::DELETE_BINDING;
 	stream->type = PrimitiveType::PT_TRI_LIST;
-	stream->vertices.count = (uint32)cone.points.size();
+	stream->vertices.count = (uint32)main.points.size();
 	stream->vertices.start = 0;
 	stream->vertices.layout = VertexLayout::GetCommonLayout(VertexLayoutType::POSITION_COLOR_0).GetPtr();
 	stream->vertices.binding = NEX_NEW(VertexBufferBinding());
 	stream->vertices.binding->SetBufferCount(1);
 	stream->vertices.binding->BindBuffer(0, std::move(vertexBuffer));
 	stream->indices.start = 0;
-	stream->indices.count = (uint32)cone.topology.size();
+	stream->indices.count = (uint32)main.topology.size();
 	stream->indices.indices = std::move(indexBuffer);
 	stream->instanceCount = 1;
+
+
 
 	NEX_FREE(pVData, MEMCAT_GENERAL);
 }
@@ -282,7 +323,7 @@ void DebugRenderSystem::GenerateStreamDataForBox() {
 		*pos++ = p.x;
 		*pos++ = p.y;
 		*pos++ = p.z;
-		*((uint32*)(pos++)) = c.ToRgba();
+		*((uint32*)(pos++)) = c.ToAbgr();
 	}
 
 	vertexBuffer.CreateBuffer(vbsize, stride, reinterpret_cast<const uint8*>(pVData));

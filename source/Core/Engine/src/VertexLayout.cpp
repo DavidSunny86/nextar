@@ -25,18 +25,20 @@ void VertexLayout::Create(uint32 numElements, const VertexElement* elements) {
 }
 
 const VertexLayoutPtr& VertexLayout::GetCommonLayout(VertexLayoutType layoutType) {
-	if (!commonLayouts[layoutType]) {
-		commonLayouts[layoutType] = Assign( NEX_NEW(VertexLayout()) );
-		commonLayouts[layoutType]->Create(
-				commonElementLayout[layoutType].numElements,
-				commonElementLayout[layoutType].elements);
+	NEX_ASSERT(layoutType >= 0 && layoutType < VertexLayoutType::VERTEX_LAYOUT_COUNT);
+	CommonVertexLayoutData& data = commonLayouts[layoutType];
+	if (!data.layout) {
+		data.layout = Assign(NEX_NEW(VertexLayout(data.defaultFlags)));
+		data.layout->Create(
+			data.numElements,
+			data.elements);
 	}
-	return commonLayouts[layoutType];
+	return data.layout;
 }
 
 void VertexLayout::ClearCommonLayouts() {
 	for(uint32 i = 0; i < VertexLayoutType::VERTEX_LAYOUT_COUNT; ++i)
-		commonLayouts[i].Clear();
+		commonLayouts[i].layout.Clear();
 }
 
 } /* namespace nextar */

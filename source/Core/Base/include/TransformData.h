@@ -85,7 +85,7 @@ public:
 	}
 
 	inline void SetTranslation(Vec3AF t) {
-		rotation = t;
+		translation = t;
 	}
 
 	inline void SetScaling(float value) {

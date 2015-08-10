@@ -199,7 +199,7 @@ endmacro(target_to_var)
 #============================================================
 macro(add_dependency frameWorkName dependency)
 	if (${NEX_CONFIG_VERBOSE})
-	    message("-->> Dependency..: ${NEXTAR_TARGET} ->  ${ARGV0}.${ARGV1}")
+		message("-->> Dependency..: ${NEXTAR_TARGET} ->  ${ARGV0}.${ARGV1}")
 	endif()
 	set(DEP_INC_PATH ${NEX_ROOT}/${ARGV0}/${ARGV1}/include)
 	if(EXISTS "${DEP_INC_PATH}/platform")
@@ -383,9 +383,9 @@ endmacro(config_src)
 # Add_Framework
 #============================================================
 macro(add_framework frameWorkName)
-    set(NEXTAR_FRAMEWORK ${ARGV0})
+	set(NEXTAR_FRAMEWORK ${ARGV0})
 	set(NEXTAR_PACKAGE_LIST "${ARGN}")
-    add_subdirectory("${NEX_ROOT}/${ARGV0}")
+	add_subdirectory("${NEX_ROOT}/${ARGV0}")
 endmacro(add_framework)
 
 #============================================================
@@ -393,8 +393,8 @@ endmacro(add_framework)
 #============================================================
 macro(for_platform platformNames)
 	if( (NOT ("${ARGV0}" MATCHES "All") ) AND
-	    (NOT (";${ARGV0};" MATCHES ";${NEX_OS};") ) )
-	    return()
+		(NOT (";${ARGV0};" MATCHES ";${NEX_OS};") ) )
+		return()
 	endif()
 endmacro(for_platform)
 
@@ -439,10 +439,10 @@ macro(place_bin)
 	#		$<TARGET_FILE_DIR:${NEXTAR_TARGET}>
 	#		"${NEX_INSTALL_DIR}")
 	set_target_properties(${NEXTAR_TARGET} PROPERTIES
-                      RUNTIME_OUTPUT_DIRECTORY_DEBUG ${NEX_INSTALL_DIR}
-                      RUNTIME_OUTPUT_DIRECTORY_RELEASE ${NEX_INSTALL_DIR}
-		      LIBRARY_OUTPUT_DIRECTORY_DEBUG ${NEX_INSTALL_DIR}
-                      LIBRARY_OUTPUT_DIRECTORY_RELEASE ${NEX_INSTALL_DIR})
+					  RUNTIME_OUTPUT_DIRECTORY_DEBUG ${NEX_INSTALL_DIR}
+					  RUNTIME_OUTPUT_DIRECTORY_RELEASE ${NEX_INSTALL_DIR}
+			  LIBRARY_OUTPUT_DIRECTORY_DEBUG ${NEX_INSTALL_DIR}
+					  LIBRARY_OUTPUT_DIRECTORY_RELEASE ${NEX_INSTALL_DIR})
 	
 	source_group("[Sources]" FILES ${SOURCE_GROUP_FILES})
 	source_group("[Headers]" FILES ${HEADER_GROUP_FILES})

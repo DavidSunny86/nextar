@@ -28,16 +28,18 @@ public:
 	virtual void EnumDevicesImpl() override;
 
 	virtual uint32 GetNumController() override {
-		return controllers.size();
+		return (uint32)controllers.size();
 	}
 
 	virtual const InputControllerDesc& GetControllerDesc(uint32 n) {
-		return controllers[n].info;
+		return controllers[n]._info;
 	}
 
 	const WinDeviceDesc& GetDesc(uint16 deviceId) const;
 	virtual InputController* CreateController(uint16 deviceId);
 	virtual void DestroyController(InputController*);
+
+	virtual void ConsumeEvent(Win32Window* window, HRAWINPUT) {}
 
 private:
 
@@ -46,12 +48,10 @@ private:
 		KEYBOARD_MOUSE_DEVID_BASE = 0x20,
 	};
 
-	void LookForJoysticks();
-	void CreateKeyboardAndMouseDesc();
-
-	ControllerType GetJoystickType(const String& name, uint32 axes, uint32 buttons, uint32 version);
-
-
+	void FindAndRegisterX360Controller(DWORD index);
+	void LookForJoysticks(HANDLE handle);
+	void CreateKeyboardAndMouseDesc(HANDLE keyboard, HANDLE mouse);
+	
 	typedef vector<WinDeviceDesc>::type InputControllerDescList;
 
 	InputControllerDescList controllers;

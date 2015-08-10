@@ -108,11 +108,14 @@ struct multimap {
 			STDAllocatorType > type;
 };
 
-template<typename T, typename Allocator = AllocatorGeneral,
-		typename STDAllocatorType = STDAllocator< T, Allocator > >
-struct deque {
-	typedef typename std::deque< T, STDAllocatorType > type;
-};
+// deque has a serious issue with pointer types (T*). The issue is, Wrap_Alloc with T** (for the deque map) 
+// never intializes the map elements to nullptr, which is required for the VC++ implementation of deque.
+// This cannot be expected either.
+// template<typename T, typename Allocator = AllocatorGeneral,
+//		typename STDAllocatorType = STDAllocator< T, Allocator > >
+// struct deque {
+//	typedef typename std::deque< T, STDAllocatorType > type;
+// };
 
 #if defined( NEX_USE_TBB )
 #define NEX_HAS_CONCURRENT_CONTAINERS

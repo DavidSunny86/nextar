@@ -27,6 +27,8 @@ inline float QuatGetY(QuatF q);
 inline float QuatGetZ(QuatF q);
 /** @brief Quaternion get w coordinate. **/
 inline float QuatGetW(QuatF q);
+/** @brief	Vector 4 Scalar. **/
+inline Quaternion QuatMulScalar(QuatF q1, float scalar);
 /** @brief Quaternion from axis angle. **/
 inline Quaternion QuatFromAxisAng(const Vector3& axis, float ang);
 /** @brief Quaternion from axis angle. **/
@@ -35,7 +37,10 @@ inline Quaternion QuatFromAxisAng(Vec3AF axis, float ang);
 inline Quaternion QuatFromMat4x4(Mat4x4F m);
 /** @brief Quaternion from rotation matrix */
 inline Quaternion QuatFromMat3x4(Mat3x4F m);
-/** Multiply two quaternions */
+/** Multiply two quaternions 
+ *  To rotate about local axis use: QuatMul(local_rotation, original_world_rotation)
+ *  To rotate about world axis use: QuatMul(original_world_rotation, local_rotation)
+ */
 inline Quaternion QuatMul(QuatF q1, QuatF q2);
 /** Rotate/Transform a vector using a quaternion */
 inline Vector3A QuatTransVec3A(QuatF q, Vec3AF v);

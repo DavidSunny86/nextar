@@ -48,12 +48,12 @@ public:
 		return transform->GetTranslation();
 	}
 
-	/** @remarks Returns the local position for parent */
+	/** @remarks Returns the local rotation for parent */
 	inline Vec3AF GetRotation() const {
 		return transform->GetRotation();
 	}
 
-	/** @remarks Returns the local position for parent */
+	/** @remarks Returns the local scaling for parent */
 	inline float GetScaling() const {
 		return transform->GetScaling();
 	}
@@ -105,13 +105,20 @@ public:
 		transform->SetTranslation(t);
 		transform->SetRotation(q);
 		transform->SetScaling(scale);
+		transform->SetMatrixDirty(true);
 		SetUpdateRequired(true);
 	}
 
 	inline void TranslateBy(Vec3AF t) {
 		transform->SetTranslation(Vec3AAdd(t, transform->GetTranslation()));
+		transform->SetMatrixDirty(true);
 		SetUpdateRequired(true);
 	}
+
+	/** @todo Test this function */
+	void LocalApplyCameraMotion(const Vector2& moveXZ, const Vector2& rotateXY);
+	/** @todo Test this function */
+	void LocalApplyDeltaTransform(Vec3AF t, QuatF q);
 
 	virtual void Update(const FrameTimer& frameTimer);
 	/** @brief Initialize position, rotation and scaling values to identity */

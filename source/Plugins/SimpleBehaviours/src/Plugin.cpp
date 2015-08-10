@@ -27,12 +27,14 @@ void Plugin::Close() {
 }
 
 void Plugin::LicenseRenewed() {
-	ComponentFactoryArchive::Instance().AsyncAddFactory(FPSControlBehaviour::CLASS_ID,
+	if (ComponentFactoryArchive::InstancePtr())
+		ComponentFactoryArchive::Instance().AsyncAddFactory(FPSControlBehaviour::CLASS_ID,
 			NEX_NEW(FPSControlBehaviour::Factory(StringUtils::DefaultID)));
 }
 
 bool Plugin::LicenseExpired() {
-	ComponentFactoryArchive::Instance().AsyncRemoveFactory(FPSControlBehaviour::CLASS_ID,
+	if (ComponentFactoryArchive::InstancePtr())
+		ComponentFactoryArchive::Instance().AsyncRemoveFactory(FPSControlBehaviour::CLASS_ID,
 			StringUtils::DefaultID, true);
 	return true;
 }

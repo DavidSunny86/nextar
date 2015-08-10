@@ -7,7 +7,7 @@
 
 #include <InputControllerProviderImpl.h>
 #include <UxKeyboardMouse.h>
-#include <Ux360Controller.h>
+#include <Ux360GamepadController.h>
 #include <linux/joystick.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
@@ -97,7 +97,7 @@ InputController* InputControllerProviderImpl::CreateController(
 	if (desc.IsValid()) {
 		switch(desc.info.type) {
 		case TYPE_XBOX360_CONTROLLER:
-			return NEX_NEW(Ux360Controller(desc));
+			return NEX_NEW(Ux360GamepadController(desc));
 		case TYPE_KEYBOARD_AND_MOUSE:
 			return NEX_NEW(UxKeyboardMouse(desc));
 		}

@@ -152,6 +152,11 @@ public:
 
 	static Component* Instance(uint32 classId, StringID name,
 			Component::Factory* factory = nullptr);
+
+	template <typename Comp>
+	static Comp* Instance(StringID name, Component::Factory* factory = nullptr) {
+		return static_cast<Comp*>(Instance(Comp::CLASS_ID, name, factory));
+	}
 	// factory:group.name
 	static ID ParseID(const String&);
 

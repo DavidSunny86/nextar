@@ -88,4 +88,20 @@ inline float Vec4ASqDistance(Vec4AF vec1, Vec4AF vec2) {
 	return Vec4ASqLength(Vec4ASub(vec1, vec2));
 }
 
+inline Vector4A Vec4AMulMat4x4(Vec4AF v, Mat4x4F m) {
+	Quad ret, vTemp;
+	ret = _mm_shuffle_ps(v, v, _MM_SHUFFLE(0, 0, 0, 0));
+	ret = _mm_mul_ps(ret, m.r[0]);
+	vTemp = _mm_shuffle_ps(v, v, _MM_SHUFFLE(1, 1, 1, 1));
+	vTemp = _mm_mul_ps(vTemp, m.r[1]);
+	ret = _mm_add_ps(ret, vTemp);
+	vTemp = _mm_shuffle_ps(v, v, _MM_SHUFFLE(2, 2, 2, 2));
+	vTemp = _mm_mul_ps(vTemp, m.r[2]);
+	ret = _mm_add_ps(ret, vTemp);
+	vTemp = _mm_shuffle_ps(v, v, _MM_SHUFFLE(3, 3, 3, 3));
+	vTemp = _mm_mul_ps(vTemp, m.r[3]);
+	ret = _mm_add_ps(ret, vTemp);
+	return ret;
+}
+
 }

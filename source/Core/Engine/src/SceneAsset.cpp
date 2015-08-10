@@ -63,6 +63,14 @@ void SceneAsset::Update(const FrameTimer& frameTimer) {
 	}
 }
 
+Component* SceneAsset::FindComponent(const StringID name) {
+	for (auto& e : sceneEntities) {
+		if (e->GetID() == name)
+			return e;
+	}
+	return nullptr;
+}
+
 void SceneAsset::UnloadImpl() {
 	EntityList emptyList;
 	std::swap(sceneEntities, emptyList);

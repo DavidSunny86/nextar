@@ -21,6 +21,7 @@ add_module(MaterialCompiler)
 add_module(FbxMeshImporter)
 add_module(InputService)
 add_module(SimpleBehaviours)
+add_module(PBRenderEngine)
 ## EndAdd
 
 file(APPEND ${NEX_PLUGIN_CONFIG_FILE} "</plugins>\n")

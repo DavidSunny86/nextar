@@ -56,7 +56,6 @@ public:
 		meta.parent = nullptr;
 		meta.refCount.store(1, std::memory_order_relaxed);
 	}
-
 	// entry point
 	virtual Task* Run() = 0;
 	// spawn a child task
@@ -71,6 +70,13 @@ protected:
 	~Task() {}
 
 private:
+
+	inline void PrepareSubmit() {
+#ifdef NEX_TASK_SCHEDULAR_CHECKS
+		meta.state = Task::TASK_INIT;
+#endif
+		meta.refCount.store(1, std::memory_order_relaxed);
+	}
 
 	friend class TaskSchedular;
 	friend class TaskRunner;

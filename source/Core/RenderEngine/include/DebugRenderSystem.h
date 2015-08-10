@@ -50,8 +50,17 @@ public:
 		*worldMatrix = tform;
 	}
 
+	inline void SetConstantSize(float size) {
+		constantSize = size;
+	}
+
+	virtual float GetConstantSize() const {
+		return constantSize;
+	}
+
 protected:
 	Matrix4x4* worldMatrix;
+	float constantSize;
 	Color color;
 	uint32 id;
 	float timeToDeath;
@@ -74,7 +83,7 @@ public:
 
 	virtual uint32 Register(const AABox3& box, const Color& color,
 		float expiryTimeInSec = 0.0f) override;
-	virtual uint32 Register(Mat4x4R tform, const Color& color = Color::Black,
+	virtual uint32 Register(Mat4x4R tform, float screenSpaceFactor, const Color& color = Color::Black,
 		float expiryTimeInSec = 0.0f) override;
 	virtual uint32 Register(PlaneF plane, const Color& color,
 		float expiryTimeInSec = 0.0f) override;

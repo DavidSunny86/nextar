@@ -96,6 +96,10 @@ inline Quad QuadSetW(QuadPF q, float val) {
 	return Quad(q.x, q.y, q.z, val);
 }
 
+inline Quad QuadRet(QuadPF q) {
+	return q;
+}
+
 /** definitions come here */
 #define Vec4AGetX		QuadGetX
 #define Vec4AGetY		QuadGetY
@@ -115,6 +119,7 @@ inline Quad QuadSetW(QuadPF q, float val) {
 #define Vec3ASetY		QuadSetY
 #define Vec3ASetZ		QuadSetZ
 #define Vec3AMulMat4x4  Mat4x4TransVec3A
+#define Vec3AFromVec4A  QuadRet
 
 #define PlaneNormalize		Vec3ANormalize
 #define PlaneNormalDotVec3A     Vec3ADot
@@ -130,6 +135,7 @@ inline Quad QuadSetW(QuadPF q, float val) {
 #define QuatGreaterAll Vec4AGreaterAll
 #define QuatLesserAny Vec4ALesserAny
 #define QuatLesserAll Vec4ALesserAll
+#define QuatMulScalar Vec4AMulScalar
 
 }
 

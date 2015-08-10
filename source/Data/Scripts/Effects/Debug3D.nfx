@@ -7,7 +7,7 @@ shader Debug3D {
 		cbuffer DebugTransforms;
 		
 		depth_stencil_state {
-			depth_state true true lessEq;
+			depth_state true true less_equal;
 			stencil_test false;
 		}
 		

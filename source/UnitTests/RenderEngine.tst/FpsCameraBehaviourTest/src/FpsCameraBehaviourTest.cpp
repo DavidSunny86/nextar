@@ -29,7 +29,7 @@ public:
 		DebugDisplay::Instance().Register(box, Color::Blue);
 		Matrix4x4 m = Matrix4x4::IdentityMatrix;
 		m = Mat4x4Scale(4, m);
-		DebugDisplay::Instance().Register(m, Color::White);
+		DebugDisplay::Instance().Register(m);
 		entity = scene->FindComponent(NamedObject::AsyncStringID("MainCamera"));
 		if (entity) {
 			Entity* e = static_cast<Entity*>(entity);
@@ -40,15 +40,18 @@ public:
 				if (desc.type == ControllerType::TYPE_XBOX360_CONTROLLER) {
 					InputManager::Instance().RegisterController(desc.deviceId);
 					deviceId = Convert::ToString(desc.deviceId);
+					break;
 				}
 			}
 			Behaviour* b = static_cast<Behaviour*>(Component::Instance(
-					Component::CLASS_FPS_BEHAVIOR,
-					NamedObject::AsyncStringID("FPSBehaviour")));
-			Component* mv = Component::Instance(Moveable::CLASS_ID, NamedObject::AsyncStringID("CameraTransform"));
+				Component::CLASS_FPS_BEHAVIOR,
+				NamedObject::AsyncStringID("FPSBehaviour")));
+			Moveable* mv = Component::Instance<Moveable>(NamedObject::AsyncStringID("CameraTransform"));
+			Quaternion rotation = QuatFromAxisAng(Vector3::XAxis, Math::PI_BY_4);
+			mv->SetTransform(Vec3ASet(0, 50, -50), rotation, 1);
 			e->AttachComponent(mv);
 			e->AttachComponent(b);
-			b->SetParamValue("DeviceID", deviceId);
+			b->SetParamValue("device_id", deviceId);
 		}
 	}
 };

@@ -77,24 +77,24 @@ void Logger::LogMsg(nextar::LogSeverity logSeverity, const String& intf,
 		postInfo = true;
 	}
 
-	if (lastsev != logSeverity || postInfo) {
-		switch (logSeverity) {
-		case LOG_ERROR:
-			(*real_out) << "[Error]        ";
-			break;
-		case LOG_WARNING:
-			(*real_out) << "[Warning]      ";
-			break;
-		case LOG_MESSAGE:
-			(*real_out) << "[Information]  ";
-			break;
-		case LOG_DEBUG:
-			(*real_out) << "[Debug]        ";
-			break;
-		}
-		lastsev = logSeverity;
-	} else
-		(*real_out) << "               ";
+	//if (lastsev != logSeverity || postInfo) {
+	switch (logSeverity) {
+	case LOG_ERROR:
+		(*real_out) << "[Error]        ";
+		break;
+	case LOG_WARNING:
+		(*real_out) << "[Warning]      ";
+		break;
+	case LOG_MESSAGE:
+		(*real_out) << "[Information]  ";
+		break;
+	case LOG_DEBUG:
+		(*real_out) << "[Debug]        ";
+		break;
+	}
+	lastsev = logSeverity;
+	//} else
+	//	(*real_out) << "               ";
 
 	(*real_out) << msg << std::endl;
 #ifdef NEX_DEBUG

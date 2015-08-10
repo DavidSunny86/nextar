@@ -113,8 +113,7 @@ void DeferredRenderSystem::Commit(CommitContext& context) {
 					context.paramBuffers[(uint32)ParameterContext::CTX_MATERIAL] = context.material->GetParameters();
 					context.pass->UpdateParams(context, ParameterContext::CTX_MATERIAL, context.materialNumber);
 				}
-
-				context.primitive = prim.second;
+								
 				context.paramBuffers[(uint32)ParameterContext::CTX_OBJECT] = prim.second->GetParameters();
 				context.pass->UpdateParams(context, ParameterContext::CTX_OBJECT, prim.first);
 				context.renderContext->Draw(prim.second->GetStreamData(), context);

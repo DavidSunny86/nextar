@@ -8,21 +8,21 @@
 #ifndef PLUGINS_INPUTSERVICE_LOCAL_INCLUDE_WIN360CONTROLLER_H_
 #define PLUGINS_INPUTSERVICE_LOCAL_INCLUDE_WIN360CONTROLLER_H_
 
+#include <Xinput.h>
 #include <WinInputController.h>
 #include <InputControllerProviderImpl.h>
 #include <TaskSchedular.h>
 
-struct js_event;
 using namespace nextar;
 namespace InputService {
 
-class Win360Controller:
+class Win360GamepadController:
 		public nextar::DigitalControls,
 		public nextar::AnalogControls,
 		public WinInputController {
 public:
-	Win360Controller(const WinDeviceDesc& desc);
-	virtual ~Win360Controller();
+	Win360GamepadController(const WinDeviceDesc& desc);
+	virtual ~Win360GamepadController();
 
 	virtual DigitalControls* GetDigitalSettings() override {
 		return this;
@@ -41,65 +41,65 @@ public:
 
 	void InitControls();
 
+	void PollData();
+
 protected:
+
+	static InputDir GetCircular(int32 x, int32 y, int32 deadZone);
 
 	class PollTask : public Task {
 	public:
 		PollTask();
 
+		
+		inline void Lock() {
+			while (lock_.test_and_set(std::memory_order_relaxed));
+		}
 		inline bool TryLock() {
 			return !lock_.test_and_set(std::memory_order_relaxed);
 		}
 		inline void Unlock() {
 			lock_.clear();
 		}
-		inline void SetDevice(Win360Controller* dev) {
+		inline void SetDevice(Win360GamepadController* dev) {
 			device_ = dev;
 		}
 
 		virtual Task* Run();
 
 	protected:
-		Win360Controller* device_;
+		Win360GamepadController* device_;
 		atomic_flag lock_;
 	};
 
-	void PollData();
-	void ParseAxis(const js_event& ev, bool init);
-	void ParseButton(const js_event& ev, bool init);
-	void ParseData(const js_event& ev, bool init);
-
-	typedef vector<KeyID>::type KeyMap;
 	template <typename T>
 	struct KeyValue {
 		T value;
-		uint32 timeStamp;
-	};
-
-	enum Constants : int16 {
-		MAX_CHANGE_BUFFER = 32,
-		VAL_MAX = 32767
 	};
 
 	typedef KeyValue<KeyState> KeyStateType;
-	typedef KeyValue<AnalogValue> AnalogValueType;
+	typedef KeyValue<AnalogValue>	AnalogValueType;
 	typedef KeyValue<InputDir> InputDirType;
+	typedef array<InputEvent, MAX_CHANGE_BUFFER>::type InputEventList;
 
-	array<KeyID, 9>::type reverseButtonMap;
-	array<KeyID, 8>::type reverseAxisMap;
-
+	bool enabled;
 	bool currBuffer;
-	PollTask pollTask;
-	KeyStateType buttonStates[NEX_XB360_CTRL_BUTTON_END-NEX_XB360_CTRL_BUTTON_START];
+
+	KeyStateType buttonStates[NEX_XB360_CTRL_BUTTON_END - NEX_XB360_CTRL_BUTTON_START];
 	AnalogValueType trigValues[2];
 	InputDirType axes[2];
 	AnalogValue prevDirButtonState[2];
 
-	AnalogValue thumbDeadZone[2];
-	AnalogValue triggerDeadZone;
-
+	XINPUT_STATE prevState;
+	PollTask pollTask;
+	DWORD index;
 	uint32 changeCount;
-    array<InputEvent, MAX_CHANGE_BUFFER>::type inputEvents[2];
+	InputEventList inputEvents[2];
+
+	int32 thumbDeadZone[2];
+	int32 triggerDeadZone;
+
+	static Key buttonMap[16];
 };
 
 } /* namespace InputService */
