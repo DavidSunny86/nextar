@@ -1,22 +1,11 @@
-/* 
- * File:   GenImageLoader.h
- * Author: obhi
- *
- * Created on May 8, 2011, 2:23 AM
- */
 
-#ifndef GENIMAGELOADER_PLUGIN_H
-#define	GENIMAGELOADER_PLUGIN_H
+#ifndef PBRENDERENGINE_PLUGIN_H
+#define	PBRENDERENGINE_PLUGIN_H
 
 #include <EngineHeaders.h>
-#include <Image.h>
-#include <JPEGImageCodec.h>
-#include <PNGImageCodec.h>
-#include <DDSImageCodec.h>
-
 using namespace nextar;
 
-namespace ImageLoader {
+namespace PBRenderEngine {
 
 class Plugin: public FactoryPlugin {
 public:
@@ -46,5 +35,5 @@ private:
 
 }
 
-#endif	/* GENIMAGELOADER_PLUGIN_H */
+#endif	/* PBRENDERENGINE_PLUGIN_H */
 
