@@ -41,6 +41,7 @@ public:
 		this->frameTime = frameTime;
 	}
 
+	/* Returns the total elapsed time from the start of the frame */
 	float GetFrameTime() const {
 		return frameTime;
 	}
@@ -49,6 +50,7 @@ public:
 		this->elapsedTime = elapsedTime;
 	}
 
+	/* Returns the total elapsed time from the start of the application */
 	float GetElapsedTime() const {
 		return elapsedTime;
 	}

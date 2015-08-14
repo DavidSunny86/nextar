@@ -112,6 +112,8 @@ Entity::~Entity() {
 		NEX_DELETE(moveable);
 	if (spatial)
 		NEX_DELETE(spatial);
+	if (behaviour)
+		NEX_DELETE(behaviour);
 }
 
 void Entity::AttachComponent(Component* comp) {

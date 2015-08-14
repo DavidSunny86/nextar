@@ -31,6 +31,14 @@ public:
 	red(r), green(g), blue(b) {
 	}
 
+	inline float& operator [] (int i) {
+		return AsFloatArray()[i];
+	}
+
+	float* AsFloatArray() {
+		return &red;
+	}
+
 	const float* AsFloatArray() const {
 		return &red;
 	}
@@ -46,6 +54,8 @@ public:
 	}
 
 	inline uint32 ToRgba() const;
+	inline uint32 ToArgb() const;
+	inline uint32 ToAbgr() const;
 };
 
 // a 32bit color component
@@ -113,6 +123,18 @@ inline
 uint32 Color::ToRgba() const {
 	uint8 _red((uint8)(red*255.f)), _green((uint8)(green*255.f)), _blue((uint8)(blue*255.f)), _alpha((uint8)(alpha*255.f));
 	return (_red << 24) | (_green << 16) | (_blue << 8) | _alpha;
+}
+
+inline
+uint32 Color::ToArgb() const {
+	uint8 _red((uint8)(red*255.f)), _green((uint8)(green*255.f)), _blue((uint8)(blue*255.f)), _alpha((uint8)(alpha*255.f));
+	return (_alpha << 24) | (_red << 16) | (_green << 8) | _blue;
+}
+
+inline
+uint32 Color::ToAbgr() const {
+	uint8 _red((uint8)(red*255.f)), _green((uint8)(green*255.f)), _blue((uint8)(blue*255.f)), _alpha((uint8)(alpha*255.f));
+	return (_alpha << 24) | (_blue << 16) | (_green << 8) | _red;
 }
 
 }

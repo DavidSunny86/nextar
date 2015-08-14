@@ -30,7 +30,7 @@ public:
 	 ** @returns Returns the primitive id, can be used to remove it */
 	virtual uint32 Register(const AABox3& box, const Color& color,
 		float expiryTimeInSec = 0.0f) = 0;
-	virtual uint32 Register(Mat4x4R tform, const Color& color = Color::Black,
+	virtual uint32 Register(Mat4x4R tform, float screenSpaceFactor = 0.8f, const Color& color = Color::White,
 		float expiryTimeInSec = 0.0f) = 0;
 	virtual uint32 Register(PlaneF plane, const Color& color,
 		float expiryTimeInSec = 0.0f) = 0;

@@ -16,7 +16,7 @@ public:
 		//DebugDisplay::Instance().Register(box, Color::Blue);
 		Matrix4x4 m = Matrix4x4::IdentityMatrix;
 		m = Mat4x4Scale(4, m);
-		DebugDisplay::Instance().Register(m, Color::White);
+		DebugDisplay::Instance().Register(m);
 	}
 };
 

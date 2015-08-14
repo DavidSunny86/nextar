@@ -60,6 +60,8 @@ enum AutoParamName
 	AUTO_MODEL_VIEW_PROJECTION,
 	// Diffuse color
 	AUTO_DIFFUSE_COLOR,
+	// Constant scale factor
+	AUTO_CONSTANT_SCALE_FACTOR,
 	// Custom generic parameter, could be texture or constant
 	// accessed from property buffer.
 	AUTO_CUSTOM_CONSTANT,

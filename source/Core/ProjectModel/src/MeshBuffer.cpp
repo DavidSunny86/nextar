@@ -336,7 +336,7 @@ void MeshBuffer::GetVertexLayout(VertexLayoutInfo& layout) const {
 	for(uint32 i = 0; i < layoutCount; ++i) {
 		const VertexElement* elements = nullptr;
 		uint32 numElements = 0;
-		VertexLayout::GetCustomLayoutElements((VertexLayoutType)i, elements, numElements);
+		VertexLayout::GetCommonLayoutElements((VertexLayoutType)i, elements, numElements);
 		if (numElements == channels.size()) {
 			int32 found = (int32)i;
 			for (uint32 j = 0; j < channels.size(); ++j) {

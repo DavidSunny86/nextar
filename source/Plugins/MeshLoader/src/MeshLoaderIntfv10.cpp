@@ -142,7 +142,7 @@ void MeshLoaderIntfv1_0::ReadVertexBufferData(MeshAsset::StreamRequest* request,
 		uint32 numVertexElements = vertexData->numVertexElements;
 		const VertexElement* start, *end;
 		if (vertexData->layoutType != VertexLayoutType::CUSTOM_LAYOUT) {
-			VertexLayout::GetCustomLayoutElements(vertexData->layoutType,
+			VertexLayout::GetCommonLayoutElements(vertexData->layoutType,
 					vertexElements, numVertexElements);
 		}
 		FindStreamVertexElements(request, start, end, streamIndex,

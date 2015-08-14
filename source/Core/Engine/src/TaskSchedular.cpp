@@ -83,6 +83,7 @@ void TaskSchedular::Close() {
 
 void TaskSchedular::AsyncAddChildTask(Task* task) {
 	NEX_ASSERT(task);
+	task->PrepareSubmit();
 	TaskRunner* runner = TaskRunner::AsyncGetRunner();
 #ifdef NEX_TASK_SCHEDULAR_CHECKS
 	if (TaskSchedular::_doAllowTraces)	{
@@ -132,8 +133,8 @@ Task* TaskSchedular::AsyncGetWork(TaskRunner* runner, bool repeat) {
 			// try to work on a submitted task
 			if(lock.try_lock()) {
 				if (submittedTasks.size()) {
-					task = submittedTasks.front();
-					submittedTasks.pop_front();
+					task = submittedTasks.back();
+					submittedTasks.pop_back();
 #ifdef NEX_TASK_SCHEDULAR_CHECKS
 					if (task) {
 						if (TaskSchedular::_doAllowTraces)	{
@@ -170,7 +171,7 @@ Task* TaskSchedular::AsyncGetWork(TaskRunner* runner, bool repeat) {
 void TaskSchedular::AsyncResume(Task* waitingOn, uint32 limit) {
 	Task* toExec = nullptr;
 	TaskRunner* runner = TaskRunner::AsyncGetRunner();
-	while(waitingOn->meta.refCount.load(std::memory_order_relaxed) > limit) {
+	while(waitingOn->meta.refCount.load(std::memory_order_relaxed) > (int)limit) {
 		if (toExec ||
 				(toExec = AsyncGetWork(runner, false))
 			) {
@@ -228,11 +229,17 @@ void TaskSchedular::AsyncWork(TaskRunner* runner) {
 }
 
 void TaskSchedular::AsyncSubmit(Task* singleTask) {
+	singleTask->PrepareSubmit();
 	std::lock_guard<mutex_type> guard(lock);
 #ifdef NEX_TASK_SCHEDULAR_CHECKS
 	NEX_ASSERT(singleTask->meta.state == Task::TASK_QUEUED ||
 			singleTask->meta.state == Task::TASK_INIT);
 	singleTask->meta.state = Task::TASK_QUEUED;
+	if (TaskSchedular::_doAllowTraces)	{
+		OutStringStream str;
+		str << "Submit to queue: " <<  "task: " << singleTask->_name;
+		Trace(str.str());
+	}
 #endif
 
 	submittedTasks.push_back(singleTask);
@@ -252,6 +259,9 @@ void TaskSchedular::AsyncSubmit(Task** multipleTasks, uint32 n) {
 				singleTask->meta.state = Task::TASK_QUEUED;
 	});
 #endif
+	std::for_each(multipleTasks, multipleTasks + n, [](Task* singleTask) {
+		singleTask->PrepareSubmit();
+	});
 	submittedTasks.insert(submittedTasks.end(), multipleTasks, multipleTasks+n);
 }
 

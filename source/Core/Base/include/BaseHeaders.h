@@ -3,6 +3,7 @@
 
 #include <StdHeaders.h>
 #include <NexBase.h>
+#include <BaseUtils.h>
 #include <OsDefs.h>
 #include <AppImpl.h>
 #include <FactoryPlugin.h>

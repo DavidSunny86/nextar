@@ -42,8 +42,8 @@ void InputManagerImpl::RegisterProvider(InputControllerProvider* provider) {
 }
 
 void InputManagerImpl::UnregisterProviders() {
-	for(auto& p : providers) {
-		UnregisterProvider(p);
+	while(providers.size()) {
+		UnregisterProvider(providers.back());
 	}
 }
 

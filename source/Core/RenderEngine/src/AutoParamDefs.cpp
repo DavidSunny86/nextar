@@ -34,7 +34,6 @@ void ModelViewProjectionApply(CommitContext& context, const ShaderParameter* d) 
 }
 
 void DiffuseColorApply(CommitContext& context, const ShaderParameter* d) {
-	NEX_ASSERT(context.primitive);
 	const ConstantParameter* constParam =
 		reinterpret_cast<const ConstantParameter*>(d);
 	context.paramGroup->SetRawBuffer(context.renderContext, *constParam,
@@ -42,7 +41,6 @@ void DiffuseColorApply(CommitContext& context, const ShaderParameter* d) {
 }
 
 void InvProjectionTransformApply(CommitContext& context, const ShaderParameter* param) {
-	NEX_ASSERT(context.primitive);
 	const Matrix4x4* m = context.invProjectionMatrix;
 	const ConstantParameter* constParam =
 		static_cast<const ConstantParameter*>(param);
@@ -88,6 +86,25 @@ void NormalMapApply(CommitContext& context, const ShaderParameter* param) {
 		&tu);
 }
 
+void ConstantScaleFactorApply(CommitContext& context, const ShaderParameter* param) {
+	NEX_ASSERT(context.primitive);
+	const ConstantParameter* constParam =
+		static_cast<const ConstantParameter*>(param);
+
+	const Matrix4x4* m = context.primitive->GetWorldMatrices();
+	float constantSize = context.primitive->GetConstantSize();
+	if (m && constantSize > 0.0f && context.camera) {
+		Vector3A first = Vec3AFromVec4A(Mat4x4Row(*m, 3));
+		Vector3A second = context.camera->GetTranslation();
+		float distance = Vec3ADistance(second, first);
+		float distanceScale = constantSize * distance * 0.001f;
+		context.paramGroup->SetRawBuffer(context.renderContext, *constParam, &distanceScale);
+	} else {
+		constantSize = 1.0f;
+		context.paramGroup->SetRawBuffer(context.renderContext, *constParam, &constantSize);
+	}
+}
+
 void BaseRenderManager::RegisterAutoParams() {
 
 	MAKE_AUTO_PARAM(ModelViewProjection, AutoParamName::AUTO_MODEL_VIEW_PROJECTION, PDT_MAT4x4,
@@ -106,6 +123,8 @@ void BaseRenderManager::RegisterAutoParams() {
 		ParameterContext::CTX_PASS, "GBuffer normal map.");
 	MAKE_AUTO_PARAM(DepthMap, AutoParamName::AUTO_DEPTH_MAP, PDT_TEXTURE,
 		ParameterContext::CTX_PASS, "GBuffer depth map.");
+	MAKE_AUTO_PARAM(ConstantScaleFactor, AutoParamName::AUTO_CONSTANT_SCALE_FACTOR, PDT_FLOAT,
+		ParameterContext::CTX_OBJECT, "Constant scale factor.");
 }
 
 }

@@ -36,8 +36,8 @@ struct _NexEngineAPI InputControllerDesc {
 	static const InputControllerDesc Null;
 };
 
-/* ranges between 0 and max(AnalogValue)*/
-typedef int16 AnalogValue;
+/* ranges between 0 and 1*/
+typedef float AnalogValue;
 
 struct InputDir {
 	// x and y of delta

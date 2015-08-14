@@ -63,11 +63,10 @@ public:
 
 protected:
 
-	float movementSpeed;
-	float rotationSpeed;
-	Vector3A* deltaStrafe;
-	Vector3A* deltaForward;
-	Quaternion* deltaRotation;
+	float movementSpeedFactor;
+	float rotationSpeedFactor;
+	Vector2 moveSpeedXZ;
+	Vector2 rotateSpeedXY;
 };
 
 } /* namespace SimpleBehaviours */

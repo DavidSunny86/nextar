@@ -33,7 +33,7 @@ void UTApplication::_SetupScene(SceneAssetPtr& scene) {
 		entityManager->AsyncCreate(Component::CLASS_BV_CULLER, NamedObject::AsyncStringID("MainCuller")));
 	scene->SetCullingSystem(culler);
 	EntityPtr camera = entityManager->AsyncCreateCameraEntity(
-			NamedObject::AsyncStringID("Main"));
+			NamedObject::AsyncStringID("MainCamera"));
 	// A camera at 50,0,50 looking at 0,0,0
 	Quaternion rotation = QuatFromAxisAng(Vector3::XAxis, Math::PI_BY_4);
 	camera->SetTransform(Vec3ASet(0, 50,-50), rotation, 1);

@@ -68,6 +68,7 @@ void Camera::UpdateFrustum() {
 
 	if (updateFrustum) {
 		m->viewProjection = Mat4x4Mul(m->view, m->projection);
+		m->invViewProjection = Mat4x4Inverse(m->viewProjection);
 		viewFrustum.ConstructFrom(m->viewProjection);
 	}
 
@@ -164,6 +165,7 @@ void Camera::UpdateProjection() {
 	case ASYMMETRIC:
 		break;
 	}
+	matrixData->invProjection = Mat4x4Inverse(matrixData->projection);
 	UnsetFlag(PROJECTION_DIRTY);
 }
 

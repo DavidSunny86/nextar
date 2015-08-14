@@ -4,7 +4,11 @@
 #if defined(NEX_WINDOWS)
 
 #include <Win32Window.h>
+<<<<<<< HEAD
 #include <WmInputListener.h>
+=======
+#include <Win32InputListener.h>
+>>>>>>> 14d8c5bb1272811606af0c2487b2480748153031
 
 namespace nextar {
 

@@ -287,6 +287,9 @@ inline Quad QuadDot(QuadPF vec1, QuadPF vec2) {
 #endif
 }
 
+inline Quad QuadRet(QuadPF vec1) {
+	return vec1;
+}
 
 }
 

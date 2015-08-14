@@ -287,6 +287,7 @@ uint32 Helper::GetShaderFlag(const String& val) {
 AutoParamName Helper::GetAutoParam(const String& val) {
 	static EnumNamePair names[] = {
 		{ AutoParamName::AUTO_ALBEDO_AND_GLOSS, _SS(ARG_ALBEDO_AND_GLOSS) },
+		{ AutoParamName::AUTO_CONSTANT_SCALE_FACTOR, _SS(ARG_CONSTANT_SCALE_FACTOR) },
 		{ AutoParamName::AUTO_DEPTH_MAP, _SS(ARG_DEPTH_MAP) },
 		{ AutoParamName::AUTO_DIFFUSE_COLOR, _SS(ARG_DIFFUSE_COLOR) },
 		{ AutoParamName::AUTO_INV_PROJECTION, _SS(ARG_INV_PROJECTION) },

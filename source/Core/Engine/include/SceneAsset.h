@@ -60,6 +60,7 @@ public:
 
 	virtual void Update(const FrameTimer& frameTimer) override;
 
+	virtual Component* FindComponent(const StringID entity) override;
 protected:
 
 	virtual StreamRequest* CreateStreamRequestImpl(bool load);

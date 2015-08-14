@@ -75,10 +75,14 @@ public:
 	RenderContext* renderContext;
 	RenderInfo renderTargetInfo;
 
+	// camera and planes
+	Camera* camera;
+
 	const Matrix4x4* viewMatrix;
 	const Matrix4x4* viewProjectionMatrix;
 	const Matrix4x4* projectionMatrix;
-	Matrix4x4* invProjectionMatrix;
+	const Matrix4x4* invProjectionMatrix;
+	const Matrix4x4* invViewProjectionMatrix;
 };
 
 } /* namespace nextar */

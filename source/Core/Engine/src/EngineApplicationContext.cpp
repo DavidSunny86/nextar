@@ -45,6 +45,7 @@ void EngineApplicationContext::ConfigureExtendedInterfacesImpl() {
 }
 
 void EngineApplicationContext::ReleaseResourcesImpl() {
+	TaskSchedular::Instance().Close();
 	MeshServices::Instance().Close();
 	if (RenderManager::InstancePtr()) {
 		DispatchEvent(EVENT_RENDERMANAGER_PRE_CLOSE);
@@ -55,7 +56,6 @@ void EngineApplicationContext::ReleaseResourcesImpl() {
 	ComponentFactoryArchive::Instance().AsyncDeleteAll();
 	InputManager::Instance().Close();
 	VertexLayout::ClearCommonLayouts();
-	TaskSchedular::Instance().Close();
 }
 
 void EngineApplicationContext::DestroyExtendedInterfacesImpl() {

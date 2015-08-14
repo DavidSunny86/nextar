@@ -42,7 +42,7 @@ public:
 	}
 
 	virtual Task* Run() {
-		RandomGen::Seed(std::time(nullptr));
+		RandomGen::Seed((uint32)std::time(nullptr));
 
 		for(unsigned i = 1; i < count; ++i)
 			*result = Mat4x4Mul(*result, RandomMatrix());

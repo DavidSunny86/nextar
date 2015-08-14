@@ -58,7 +58,7 @@ inline Quad QuadSetX(QuadPF q, float val);
 inline Quad QuadSetY(QuadPF q, float val);
 inline Quad QuadSetZ(QuadPF q, float val);
 inline Quad QuadSetW(QuadPF q, float val);
-
+inline Quad QuadRet(QuadPF q);
 }
 
 #endif //NEXTAR_MATH_SSETYPES_H
