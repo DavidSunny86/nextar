@@ -199,11 +199,7 @@ endmacro(target_to_var)
 #============================================================
 macro(add_dependency frameWorkName dependency)
 	if (${NEX_CONFIG_VERBOSE})
-<<<<<<< HEAD
-	    message("-->> Dependency..: ${NEXTAR_TARGET} ->  ${ARGV0}.${ARGV1}")
-=======
 		message("-->> Dependency..: ${NEXTAR_TARGET} ->  ${ARGV0}.${ARGV1}")
->>>>>>> 14d8c5bb1272811606af0c2487b2480748153031
 	endif()
 	set(DEP_INC_PATH ${NEX_ROOT}/${ARGV0}/${ARGV1}/include)
 	if(EXISTS "${DEP_INC_PATH}/platform")
@@ -387,15 +383,9 @@ endmacro(config_src)
 # Add_Framework
 #============================================================
 macro(add_framework frameWorkName)
-<<<<<<< HEAD
-    set(NEXTAR_FRAMEWORK ${ARGV0})
-	set(NEXTAR_PACKAGE_LIST "${ARGN}")
-    add_subdirectory("${NEX_ROOT}/${ARGV0}")
-=======
 	set(NEXTAR_FRAMEWORK ${ARGV0})
 	set(NEXTAR_PACKAGE_LIST "${ARGN}")
 	add_subdirectory("${NEX_ROOT}/${ARGV0}")
->>>>>>> 14d8c5bb1272811606af0c2487b2480748153031
 endmacro(add_framework)
 
 #============================================================
@@ -403,13 +393,8 @@ endmacro(add_framework)
 #============================================================
 macro(for_platform platformNames)
 	if( (NOT ("${ARGV0}" MATCHES "All") ) AND
-<<<<<<< HEAD
-	    (NOT (";${ARGV0};" MATCHES ";${NEX_OS};") ) )
-	    return()
-=======
 		(NOT (";${ARGV0};" MATCHES ";${NEX_OS};") ) )
 		return()
->>>>>>> 14d8c5bb1272811606af0c2487b2480748153031
 	endif()
 endmacro(for_platform)
 
@@ -454,17 +439,10 @@ macro(place_bin)
 	#		$<TARGET_FILE_DIR:${NEXTAR_TARGET}>
 	#		"${NEX_INSTALL_DIR}")
 	set_target_properties(${NEXTAR_TARGET} PROPERTIES
-<<<<<<< HEAD
-                      RUNTIME_OUTPUT_DIRECTORY_DEBUG ${NEX_INSTALL_DIR}
-                      RUNTIME_OUTPUT_DIRECTORY_RELEASE ${NEX_INSTALL_DIR}
-		      LIBRARY_OUTPUT_DIRECTORY_DEBUG ${NEX_INSTALL_DIR}
-                      LIBRARY_OUTPUT_DIRECTORY_RELEASE ${NEX_INSTALL_DIR})
-=======
 					  RUNTIME_OUTPUT_DIRECTORY_DEBUG ${NEX_INSTALL_DIR}
 					  RUNTIME_OUTPUT_DIRECTORY_RELEASE ${NEX_INSTALL_DIR}
 			  LIBRARY_OUTPUT_DIRECTORY_DEBUG ${NEX_INSTALL_DIR}
 					  LIBRARY_OUTPUT_DIRECTORY_RELEASE ${NEX_INSTALL_DIR})
->>>>>>> 14d8c5bb1272811606af0c2487b2480748153031
 	
 	source_group("[Sources]" FILES ${SOURCE_GROUP_FILES})
 	source_group("[Headers]" FILES ${HEADER_GROUP_FILES})
