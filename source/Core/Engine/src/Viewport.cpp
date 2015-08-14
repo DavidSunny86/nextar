@@ -75,12 +75,6 @@ void Viewport::CommitPrimitives(RenderContext* renderCtx, const FrameTimer&  fra
 	visibleSet.SortSet();
 
 	// @todo A lot of redundancy here
-<<<<<<< HEAD
-	commitContext.viewMatrix = &camera->GetViewMatrix();
-	commitContext.viewProjectionMatrix = &camera->GetViewProjectionMatrix();
-	commitContext.projectionMatrix = &camera->GetProjectionMatrix();
-	*commitContext.invProjectionMatrix = Mat4x4Inverse(*commitContext.projectionMatrix);
-=======
 	commitContext.camera = camera;
 	commitContext.viewMatrix = &camera->GetViewMatrix();
 	commitContext.viewProjectionMatrix = &camera->GetViewProjectionMatrix();
@@ -88,7 +82,6 @@ void Viewport::CommitPrimitives(RenderContext* renderCtx, const FrameTimer&  fra
 	commitContext.invProjectionMatrix = &camera->GetInvProjectionMatrix();
 	commitContext.invViewProjectionMatrix = &camera->GetInvViewProjectionMatrix();
 
->>>>>>> 14d8c5bb1272811606af0c2487b2480748153031
 	commitContext.renderContext = renderCtx;
 	commitContext.viewport = this;
 	commitContext.frameNumber = frameNumber.GetFrameNumber();

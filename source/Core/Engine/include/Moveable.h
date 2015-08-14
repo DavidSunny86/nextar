@@ -48,20 +48,12 @@ public:
 		return transform->GetTranslation();
 	}
 
-<<<<<<< HEAD
-	/** @remarks Returns the local position for parent */
-=======
 	/** @remarks Returns the local rotation for parent */
->>>>>>> 14d8c5bb1272811606af0c2487b2480748153031
 	inline Vec3AF GetRotation() const {
 		return transform->GetRotation();
 	}
 
-<<<<<<< HEAD
-	/** @remarks Returns the local position for parent */
-=======
 	/** @remarks Returns the local scaling for parent */
->>>>>>> 14d8c5bb1272811606af0c2487b2480748153031
 	inline float GetScaling() const {
 		return transform->GetScaling();
 	}
@@ -113,20 +105,12 @@ public:
 		transform->SetTranslation(t);
 		transform->SetRotation(q);
 		transform->SetScaling(scale);
-<<<<<<< HEAD
-=======
 		transform->SetMatrixDirty(true);
->>>>>>> 14d8c5bb1272811606af0c2487b2480748153031
 		SetUpdateRequired(true);
 	}
 
 	inline void TranslateBy(Vec3AF t) {
 		transform->SetTranslation(Vec3AAdd(t, transform->GetTranslation()));
-<<<<<<< HEAD
-		SetUpdateRequired(true);
-	}
-
-=======
 		transform->SetMatrixDirty(true);
 		SetUpdateRequired(true);
 	}
@@ -136,7 +120,6 @@ public:
 	/** @todo Test this function */
 	void LocalApplyDeltaTransform(Vec3AF t, QuatF q);
 
->>>>>>> 14d8c5bb1272811606af0c2487b2480748153031
 	virtual void Update(const FrameTimer& frameTimer);
 	/** @brief Initialize position, rotation and scaling values to identity */
 	void SetIdentityTransforms();

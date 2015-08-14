@@ -7,10 +7,7 @@
 #include <NexEngine.h>
 #include <Component.h>
 #include <ComponentFactoryArchive.h>
-<<<<<<< HEAD
-=======
 #include <Entity.h>
->>>>>>> 14d8c5bb1272811606af0c2487b2480748153031
 
 namespace nextar {
 
