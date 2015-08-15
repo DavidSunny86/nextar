@@ -32,7 +32,8 @@ enum PropertyType {
  * Objects deriving from property should initialize
  * accessors into the mutator object supporting it.
  */
-struct PropertyAccessor {
+class PropertyAccessor {
+public:
 	/**
 	 * Set a value as a string
 	 * @param intf The property interface
@@ -49,6 +50,8 @@ struct PropertyAccessor {
 	 */
 	virtual const String GetStringValue(
 			const PropertyInterface* intf) const = 0;
+protected:
+	~PropertyAccessor() {}
 };
 
 typedef unordered_map<String, PropertyAccessor*>::type PropertyAccessorMap;

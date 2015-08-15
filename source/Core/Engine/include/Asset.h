@@ -113,7 +113,8 @@ public:
 		LAST_FLAG = Component::LAST_FLAG << 1,
 	};
 
-	struct AssetLocatorAccessor: public PropertyAccessor {
+	class AssetLocatorAccessor: public PropertyAccessor {
+	public:
 		static AssetLocatorAccessor assetLocatorAccessor;
 
 		virtual void SetStringValue(PropertyInterface*, const String&);

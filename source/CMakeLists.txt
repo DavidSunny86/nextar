@@ -16,15 +16,16 @@ project(NextarEngine)
 
 ## Root variables
 #============================================================
-set(NEX_ROOT ${PROJECT_SOURCE_DIR})
-#set(NEX_BIN_BASE  ${NEX_ROOT}/../build/bin)
+set(NEX_ROOT ${CMAKE_CURRENT_LIST_DIR})
+message("We are at: ${NEX_ROOT}")
 set(NEX_BUILD_DIR ${NEX_ROOT}/../build)
 set(NEX_INSTALL ${NEX_ROOT}/../install)
 set(NEX_LIB ${NEX_ROOT}/../lib)
 set(NEX_DEPENDENCIES ${NEX_ROOT}/../dependencies)
 set(NEX_DATA ${NEX_ROOT}/Data)
 set(NEX_PLUGINS ${NEX_ROOT}/Plugins)
-set(NEX_UNIT_TESTS ${PROJECT_SOURCE_DIR}/UnitTests)
+set(NEX_UNIT_TESTS ${NEX_ROOT}/UnitTests)
+set(NEX_BASE_ROOT ${NEX_ROOT}/Core/Base)
 
 ## Module path
 if(NOT NEX_CONFIG_VERBOSE)
@@ -112,11 +113,6 @@ set(NEX_VER_MINOR 0)
 set(NEX_VER_REVISION 3)
 
 set(NEX_VERSION "${NEX_VER_MAJOR}.${NEX_VER_MINOR}.${NEX_VER_REVISION}")
-
-## Plugin dependecy on Base
-#============================================================
-set(NEX_BASE_ROOT ${PROJECT_SOURCE_DIR}/Core/Base)
-set(NEX_BASE_INCLUDE ${NEX_BASE_ROOT}/include)
 
 ## Common link directories
 #============================================================

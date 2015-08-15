@@ -24,7 +24,6 @@ Ux360GamepadController::PollTask::PollTask() : device_(nullptr),
 }
 
 Task* Ux360GamepadController::PollTask::Run() {
-	Lock();
 	device_->PollData();
 	Unlock();
 	return nullptr;
@@ -38,6 +37,8 @@ Ux360GamepadController::Ux360GamepadController(const UxDeviceDesc& desc) :
 }
 
 Ux360GamepadController::~Ux360GamepadController() {
+	pollTask.Wait();
+	close(fd);
 }
 
 InputChangeBuffer Ux360GamepadController::UpdateSettings() {
@@ -47,7 +48,6 @@ InputChangeBuffer Ux360GamepadController::UpdateSettings() {
 		buffer.first = inputEvents[currBuffer].data();
 		buffer.second = changeCount;
 		currBuffer = !currBuffer;
-		pollTask.Unlock();
 		TaskSchedular::Instance().AsyncSubmit(&pollTask);
 	}
 	return buffer;

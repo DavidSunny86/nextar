@@ -37,9 +37,11 @@ bool Equals(float a, float b) {
 	return NEX_FLOAT_TOLERANCE_EQUAL(a, b, TEST_TOLERANCE);
 }
 
+#ifdef NEX_WINDOWS
 Vector4A ToVector4A(DirectX::XMVECTOR v) {
 	return Vec4ASet(DirectX::XMVectorGetX(v), DirectX::XMVectorGetY(v), DirectX::XMVectorGetZ(v), DirectX::XMVectorGetW(v));
 }
+#endif
 
 bool Equals(Vec4AF a, Vec4AF b) {
 	return Equals(Vec4AGetX(a), Vec4AGetX(b)) && 

@@ -73,7 +73,7 @@ void InputControllerProviderImpl::LookForJoysticks() {
 		desc.info.name = name;
 		desc.info.deviceId = baseId + JOYSTICK_DEVID_BASE + index;
 		desc.info.type  = GetJoystickType(desc.info.name, axes, buttons, version);
-		desc.fd = UxDeviceDesc::NULL_FD;
+		desc.fd = fd;
 		desc.axes = axes;
 		desc.buttons = buttons;
 

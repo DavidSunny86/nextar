@@ -84,7 +84,6 @@ VertexLayout::commonLayouts[VertexLayoutType::VERTEX_LAYOUT_COUNT] = {
 	}
 };
 
-VertexLayoutPtr VertexLayout::commonLayouts[VertexLayoutType::VERTEX_LAYOUT_COUNT];
 
 }
 

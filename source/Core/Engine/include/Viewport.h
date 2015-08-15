@@ -10,7 +10,7 @@
 #include <LightSystem.h>
 
 namespace nextar {
-struct ViewportCallback;
+class ViewportCallback;
 class Viewport;
 typedef list<Viewport*>::type ViewportList;
 
@@ -19,9 +19,12 @@ typedef list<Viewport*>::type ViewportList;
  *
  * @remarks Interface to receive viewport messages.
  **/
-struct _NexNoVtable ViewportCallback {
+class _NexNoVtable ViewportCallback {
+public:
 	virtual void PreUpdate(Viewport*) = 0;
 	virtual void PostUpdate(Viewport*) = 0;
+protected:
+	~ViewportCallback() {}
 };
 
 /**
