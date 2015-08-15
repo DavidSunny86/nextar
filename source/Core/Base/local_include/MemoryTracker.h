@@ -21,9 +21,10 @@ namespace nextar {
 class MemoryTracker {
 
 	struct Node {
-		long function;
-		long srcfile;
-		long line;
+		int function;
+		int srcfile;
+		int line;
+		void* address;
 		size_t size;
 		Node* next;
 		Node* prev;

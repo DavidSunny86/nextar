@@ -38,8 +38,10 @@ public:
 
 	inline pointer allocate(size_type cnt,
 			typename std::allocator<void>::const_pointer = 0) const {
-		return reinterpret_cast<pointer>(NEX_ALLOCATOR_ALLOC(sizeof(T) * cnt,
+		size_t s = sizeof(T) * cnt;
+		pointer ret = reinterpret_cast<pointer>(NEX_ALLOCATOR_ALLOC(s,
 				_NexAllocator));
+		return ret;
 	}
 
 	inline void deallocate(pointer p, size_type) const {

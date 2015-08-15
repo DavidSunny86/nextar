@@ -30,6 +30,8 @@ FileSystem::FileSystem() {
 }
 
 FileSystem::~FileSystem() {
+	NameValueMap nvm;
+	nvm.swap(URL::_macroTable);
 }
 
 void FileSystem::Configure(const Config& config) {

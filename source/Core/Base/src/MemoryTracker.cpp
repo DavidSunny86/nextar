@@ -54,6 +54,7 @@ void* MemoryTracker::OnNewDbg(void* block, size_t size, const char* functiOn, co
 	nodeAdd->size = size;
 	nodeAdd->srcfile = GetTicket(filemap, revfilemap, file);
 	nodeAdd->prev = nullptr;
+	nodeAdd->address = (blockAdd + blockSize);
 	LockGuard guard(_lock);
 	if(_head)
 		_head->prev = nodeAdd;
@@ -106,8 +107,10 @@ void MemoryTracker::DumpLeaks() {
 			std::ostringstream stream;
 			stream << "\nLeak:>>\n  file: " << (*src).second
 						 <<  "\n  function: " << (*fn).second
-						 <<  "\n  line: " << _head->line
-						 <<  "\n  size: " << _head->size;
+						 <<  ",  line: " << _head->line
+						 <<  "\n  size: " << _head->size
+						 <<  ",  address: " << _head->address
+						 <<  ", content: " << (const char*)_head->address;
 			Platform::OutputDebug(stream.str().c_str());
 			_head = _head->next;
 		}

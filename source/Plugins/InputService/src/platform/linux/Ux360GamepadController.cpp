@@ -49,6 +49,7 @@ InputChangeBuffer Ux360GamepadController::UpdateSettings() {
 		buffer.second = changeCount;
 		currBuffer = !currBuffer;
 		TaskSchedular::Instance().AsyncSubmit(&pollTask);
+		//pollTask.Run();
 	}
 	return buffer;
 }
@@ -69,8 +70,8 @@ void Ux360GamepadController::PollData() {
 	changeCount = 0;
 	while ((readSize = read(fd, &js, sizeof(struct js_event)))
 			== sizeof(struct js_event))  {
-		if (!(js.type & JS_EVENT_INIT)) {
-			ParseData(js, changeCount < MAX_CHANGE_BUFFER);
+		if (!(js.type & JS_EVENT_INIT) && changeCount < MAX_CHANGE_BUFFER) {
+			ParseData(js, false);
 		}
 	}
 }
@@ -92,15 +93,23 @@ void Ux360GamepadController::ParseAxis(const js_event& js, bool init) {
 		switch(k) {
 		case XBOX_AXIS_RIGHT:
 		case XBOX_AXIS_LEFT: {
-			int hand = (k == XBOX_AXIS_RIGHT);
-			int axis = js.number & 2;
+			int hand = 0;
+			int axis = (js.number % 2);
+			int sign = 1;
+			if (k == XBOX_AXIS_RIGHT) {
+				hand = 1;
+				axis = !axis;
+			}
+
+			if ( axis )
+				sign = -1;
+
 			int32 deadzone = thumbDeadZone[hand];
 			int32 absVal = std::abs(js.value);
 			if (absVal < deadzone) {
 				axes[hand].value.xy[axis] = 0;
-				init = true;
 			} else {
-				int32 value = (absVal - deadzone) * Math::Sign<int16>(js.value);
+				int32 value = (absVal - deadzone) * Math::Sign<int16>(js.value) * sign;
 				axes[hand].value.xy[axis] = (float)value / (float)(VAL_MAX - deadzone);
 			}
 
