@@ -15,11 +15,13 @@ BoundingBox::BoundingBox() {
 }
 
 void BoundingBox::UpdateBounds(Mat4x4F m) {
+	//@todo test which is tighter avro's bound transform or this one
 	center = Mat4x4TransVec3A(origCenter, m);
 	extends = Mat4x4TransBoundRadius(origExtends, m);
 }
 
 void BoundingBox::UpdateBounds(float scale, QuatF rot, Vec3AF pos) {
+	//@todo test which is tighter avro's bound transform or this one
 	center = Vec3AAdd(QuatTransVec3A(rot, origCenter), pos);
 	extends = QuatTransBoundRadius(Vec3AMulScalar(origExtends, scale), rot);
 }

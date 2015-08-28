@@ -13,11 +13,6 @@ struct Quad {
 		float v[4];
 	};
 
-	Quad();
-	Quad(const Quad& q);
-	Quad(float vx, float vy, float vz);
-	Quad(float vx, float vy, float vz, float vw);
-
 	void Load(float val);
 	void Load3(const float* vals);
 	void Store3(float* vals) const;
@@ -29,6 +24,10 @@ struct Quad {
 	Quad SplatW() const;
 
 };
+
+inline Quad QuadInit(const Quad& q);
+inline Quad QuadInit(float vx, float vy, float vz);
+inline Quad QuadInit(float vx, float vy, float vz, float vw);
 
 typedef Quad Vector3A;
 typedef Quad Vector4A;
@@ -60,5 +59,42 @@ inline Quad QuadSetZ(QuadPF q, float val);
 inline Quad QuadSetW(QuadPF q, float val);
 inline Quad QuadRet(QuadPF q);
 }
+
+/** definitions come here */
+#define Vec4AGetX		QuadGetX
+#define Vec4AGetY		QuadGetY
+#define Vec4AGetZ		QuadGetZ
+#define Vec4AGetW		QuadGetW
+#define Vec4ASetX		QuadSetX
+#define Vec4ASetY		QuadSetY
+#define Vec4ASetZ		QuadSetZ
+#define Vec4ASetW		QuadSetW
+/**
+ * @remarks Vec3 functions
+ **/
+#define Vec3AGetX		QuadGetX
+#define Vec3AGetY		QuadGetY
+#define Vec3AGetZ		QuadGetZ
+#define Vec3ASetX		QuadSetX
+#define Vec3ASetY		QuadSetY
+#define Vec3ASetZ		QuadSetZ
+#define Vec3AMulMat4x4  Mat4x4TransVec3A
+#define Vec3AFromVec4A  QuadRet
+
+#define PlaneNormalize		Vec3ANormalize
+#define PlaneNormalDotVec3A     Vec3ADot
+#define PlaneAbsNormal          QuadAbs
+
+#define QuatGetX QuadGetX
+#define QuatGetY QuadGetY
+#define QuatGetZ QuadGetZ
+#define QuatGetW QuadGetW
+#define QuatNormalize Vec4ANormalize
+#define QuatDot Vec4ADot
+#define QuatGreaterAny Vec4AGreaterAny
+#define QuatGreaterAll Vec4AGreaterAll
+#define QuatLesserAny Vec4ALesserAny
+#define QuatLesserAll Vec4ALesserAll
+#define QuatMulScalar Vec4AMulScalar
 
 #endif //NEXTAR_MATH_SSETYPES_H

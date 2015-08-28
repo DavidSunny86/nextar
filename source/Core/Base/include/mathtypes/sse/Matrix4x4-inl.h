@@ -2,6 +2,34 @@
 
 namespace nextar {
 
+//@todo Test this function @Mat4x4TransAABox
+inline AxisAlignedBox Mat4x4TransAABox(AABoxF box, Mat4x4F m) {
+	AxisAlignedBox ret;
+	Quad max0 = _mm_shuffle_ps(box.maxPoint, box.maxPoint, _MM_SHUFFLE(0, 0, 0, 0));
+	max0 = _mm_mul_ps(max0, m.r[0]);
+	Quad min0 = _mm_shuffle_ps(box.minPoint, box.minPoint, _MM_SHUFFLE(0, 0, 0, 0));
+	min0 = _mm_mul_ps(min0, m.r[0]);
+	Quad max1 = _mm_shuffle_ps(box.maxPoint, box.maxPoint, _MM_SHUFFLE(1, 1, 1, 1));
+	max1 = _mm_mul_ps(max0, m.r[1]);
+	Quad min1 = _mm_shuffle_ps(box.minPoint, box.minPoint, _MM_SHUFFLE(1, 1, 1, 1));
+	min1 = _mm_mul_ps(min0, m.r[1]);
+	Quad max2 = _mm_shuffle_ps(box.maxPoint, box.maxPoint, _MM_SHUFFLE(2, 2, 2, 2));
+	max2 = _mm_mul_ps(max0, m.r[2]);
+	Quad min2 = _mm_shuffle_ps(box.minPoint, box.minPoint, _MM_SHUFFLE(2, 2, 2, 2));
+	min2 = _mm_mul_ps(min0, m.r[2]);
+
+	min0 = _mm_min_ps(max0, min0); // and add
+	min1 = _mm_min_ps(max1, min1);
+	min2 = _mm_min_ps(max2, min2);
+	ret.minPoint = _mm_add_ps(_mm_add_ps(min0, _mm_add_ps(min1, min2)), m.r[3]);
+
+	max0 = _mm_max_ps(max0, min0); // and add
+	max1 = _mm_max_ps(max1, min1);
+	max2 = _mm_max_ps(max2, min2);
+	ret.maxPoint = _mm_add_ps(_mm_add_ps(max0, _mm_add_ps(max1, max2)), m.r[3]);
+	return ret;
+}
+
 inline void Mat4x4TransVec3(Vector4* outstream, uint32 outstride,
 		const Vector3* inpstream, uint32 inpstride, uint32 count, Mat4x4F m) {
 	NEX_ASSERT(outstream);

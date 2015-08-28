@@ -1,6 +1,5 @@
 namespace nextar {
 
-#include <NexGenericTypes.h>
 
 inline void Mat4x4TransVec3(Vector4* outstream, uint32 outstride,
 		const Vector3* inpstream, uint32 inpstride, uint32 count, Mat4x4F m) {
@@ -32,7 +31,7 @@ inline void Mat4x4TransVec3(Vector4* outstream, uint32 outstride,
 
 inline void Mat4x4TransVec3(Vector3* inpstream, uint32 inpstride, uint32 count, Mat4x4F m) {
 	NEX_ASSERT(inpstream);
-	uint8* inpVec = (const uint8*)inpstream;
+	const uint8* inpVec = (const uint8*)inpstream;
 	
 	Quad v, x, y, z, r;
 
@@ -58,7 +57,7 @@ inline void Mat4x4TransVec3(Vector3* inpstream, uint32 inpstride, uint32 count, 
 
 inline void Mat4x4TransVec3Normals(Vector3* inpstream, uint32 inpstride, uint32 count, Mat4x4F m) {
 	NEX_ASSERT(inpstream);
-	uint8* inpVec = (const uint8*)inpstream;
+	const uint8* inpVec = (const uint8*)inpstream;
 
 	Quad v, x, y, z, r;
 
@@ -160,6 +159,23 @@ inline Vector4A Mat4x4TransBoundRadius(Vec3AF v, Mat4x4F m) {
 	return ret;
 }
 
+inline AxisAlignedBox Mat4x4TransAABox(AABoxF box, Mat4x4F m) {
+	AxisAlignedBox ret;
+	for (int i = 0; i < 3; i++) {
+		ret.minPoint.v[i] = std::min(box.minPoint.v[0] * m.m[i + 0 * 4], box.maxPoint.v[0] * m.m[i + 0 * 4]) +
+				std::min(box.minPoint.v[1] * m.m[i + 1 * 4], box.maxPoint.v[1] * m.m[i + 1 * 4]) +
+				std::min(box.minPoint.v[2] * m.m[i + 2 * 4], box.maxPoint.v[2] * m.m[i + 2 * 4]) +
+				m.m[i + 3 * 4];
+	}
+	for (int i = 0; i < 3; i++) {
+		ret.maxPoint.v[i] = std::max(box.minPoint.v[0] * m.m[i + 0 * 4], box.maxPoint.v[0] * m.m[i + 0 * 4]) +
+				std::max(box.minPoint.v[1] * m.m[i + 1 * 4], box.maxPoint.v[1] * m.m[i + 1 * 4]) +
+				std::max(box.minPoint.v[2] * m.m[i + 2 * 4], box.maxPoint.v[2] * m.m[i + 2 * 4]) +
+				m.m[i + 3 * 4];
+	}
+	return ret;
+}
+
 inline Matrix4x4 Mat4x4FromVectorMapping(const Vector3& axis1,
 		const Vector3& axis2) {
 	Matrix3x4 m = Mat3x4FromVectorMapping(axis1, axis2);
@@ -190,32 +206,6 @@ inline Matrix4x4 Mat4x4Mul(Mat4x4F m1, Mat4x4F m2) {
 	}
 
 	return res;
-}
-
-Matrix4x4::Matrix4x4(const Matrix3x4& m, const Vector4A& v) {
-
-	Row(0) = m.Row(0);
-	Row(1) = m.Row(1);
-	Row(2) = m.Row(2);
-	Row(3) = v;
-}
-
-Matrix4x4::Matrix4x4(float m00, float m01, float m02, float m03, float m10,
-		float m11, float m12, float m13, float m20, float m21, float m22,
-		float m23, float m30, float m31, float m32, float m33) {
-	Row(0) = Vec4ASet(m00, m01, m02, m03);
-	Row(1) = Vec4ASet(m10, m11, m12, m13);
-	Row(2) = Vec4ASet(m20, m21, m22, m23);
-	Row(3) = Vec4ASet(m30, m31, m32, m33);
-}
-
-/** C++ operators and functions **/
-Matrix4x4& Matrix4x4::operator=(const Matrix4x4& m) {
-	Row(0) = m.Row(0);
-	Row(1) = m.Row(1);
-	Row(2) = m.Row(2);
-	Row(3) = m.Row(3);
-	return *this;
 }
 
 inline Matrix4x4 Mat4x4FromScaleRotPos(float scale, QuatF rot, Vec3AF pos) {
@@ -494,7 +484,7 @@ inline Matrix4x4 Mat4x4Inverse(Mat4x4F m) {
 	float det = m.m[0] * inv.m[0] + m.m[1] * inv.m[4] + m.m[2] * inv.m[8] + m.m[3] * inv.m[12];
 
 	if (det == 0)
-		return ret;
+		return inv;
 
 	det = 1.0 / det;
 

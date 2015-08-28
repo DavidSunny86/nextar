@@ -326,7 +326,7 @@ typedef unsigned short wchar_t;
 #	define NEX_SOURCEFILE_NAME		__FILE__
 #	define NEX_SOURCEFILE_LINE		__LINE__
 #elif defined( NEX_GCC )
-#	define NEX_FUNCTION_NAME		__PRETTY_FUNCTION__
+#	define NEX_FUNCTION_NAME		__FUNCTION__
 #	define NEX_SOURCEFILE_NAME		__FILE__
 #	define NEX_SOURCEFILE_LINE		__LINE__
 #else

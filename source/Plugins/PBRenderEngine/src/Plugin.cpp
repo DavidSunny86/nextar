@@ -4,7 +4,6 @@
  */
 
 #include <Plugin.h>
-#include <Image.h>
 
 NEX_IMPLEMENT_PLUGIN(PBRenderEngine, PBRenderEngine::Plugin);
 

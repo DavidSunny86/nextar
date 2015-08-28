@@ -67,6 +67,9 @@ inline float Vec3ASqLength(Vec3AF vec);
 inline float Vec3ADistance(Vec3AF vec1, Vec3AF vec2);
 /** @brief	Vector 3  sqlength(vec1-vec2)**/
 inline float Vec3ASqDistance(Vec3AF vec1, Vec3AF vec2);
+/** @todo coordinate system from vector, the third should be v3 = cross(v1, v2) */
+//inline Vector3A Vec3AGetOrtho(Vec3AF vec1);
+
 }
 
 #endif /* VECTOR3A_H_ */

@@ -20,24 +20,30 @@ namespace nextar {
 
 struct _Matrix3x4;
 struct _Matrix4x4;
+struct _AxisAlignedBox;
 
 #if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE
 
 #ifdef _MSC_VER
 typedef __declspec(align(16)) _Matrix3x4 Matrix3x4;
 typedef __declspec(align(16)) _Matrix4x4 Matrix4x4;
+typedef __declspec(align(16)) _AxisAlignedBox AxisAlignedBox;
 #else
 using Matrix3x4 alignas(16) = _Matrix3x4;
 using Matrix4x4 alignas(16) = _Matrix4x4;
+using AxisAlignedBox alignas(16) = _AxisAlignedBox;
 #endif
 
 #else
 using Matrix3x4 = _Matrix3x4;
 using Matrix4x4 = _Matrix4x4;
+using AxisAlignedBox = _AxisAlignedBox;
 #endif
 
 typedef AllocMathPool< _Matrix3x4, NEX_MATRIX_POOL_NUM_PER_BLOCK > AllocMatrix3x4;
 typedef AllocMathPool< _Matrix4x4, NEX_MATRIX_POOL_NUM_PER_BLOCK > AllocMatrix4x4;
+typedef AllocMathPool< _AxisAlignedBox, NEX_MATRIX_POOL_NUM_PER_BLOCK > AllocAABox;
+typedef PooledAllocator< _AxisAlignedBox, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE > AllocatorAABox;
 typedef PooledAllocator< _Matrix3x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE > AllocatorMatrix3x4;
 typedef PooledAllocator< _Matrix4x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE > AllocatorMatrix4x4;
 typedef PooledAllocator<Vector3A, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE> AllocatorVector3A;
@@ -75,6 +81,14 @@ struct _NexBaseAPI _Matrix3x4 : public AllocMatrix3x4 {
 
 	inline float& operator ()(int i, int j) {
 		return m[i * 4 + j];
+	}
+
+	inline Vector3A& Row(int i) {
+		return r[i];
+	}
+
+	inline Vector3A Row(int i) const {
+		return r[i];
 	}
 
 	inline float operator ()(int i, int j) const {
@@ -124,8 +138,29 @@ struct _NexBaseAPI _Matrix4x4: public AllocMatrix4x4 {
 		return m[i * 4 + j];
 	}
 
+	inline Vector3A& Row(int i) {
+		return r[i];
+	}
+
+	inline Vector3A Row(int i) const {
+		return r[i];
+	}
+
 	inline Matrix4x4 & operator =(const Matrix4x4&);
 };
+
+struct _NexBaseAPI _AxisAlignedBox : public AllocAABox {
+	union {
+		struct {
+			Vector3A minPoint;
+			Vector3A maxPoint;
+		};
+		Vector3A extremes[2];
+	};
+};
+
+typedef const AxisAlignedBox& AABoxF;
+typedef const AxisAlignedBox& AABoxR;
 
 typedef const Matrix3x4& Mat3x4F;
 typedef const Matrix3x4& Mat3x4R;
@@ -148,6 +183,7 @@ namespace nextar {
 _NexTemplateExtern template class _NexBaseAPI PooledAllocator< _Matrix3x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE >;
 _NexTemplateExtern template class _NexBaseAPI PooledAllocator< _Matrix4x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE >;
 _NexTemplateExtern template class _NexBaseAPI PooledAllocator<Vector3A, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;
+_NexTemplateExtern template class _NexBaseAPI PooledAllocator<_AxisAlignedBox, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;
 //_NexTemplateExtern template class _NexBaseAPI PooledAllocator<Vector4A, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;
 //_NexTemplateExtern template class _NexBaseAPI PooledAllocator<Quaternion, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;
 

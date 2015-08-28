@@ -7,7 +7,7 @@ module_path=${src_dir}/${fw_name}/${mod_name}
 
 if [ $# -lt 1 ]; then
   echo "Usage: create-module <framework-name> [sub-module-name] <module-name>"
-  echo "[sub-module-name] is only valid when framework is 'UnitTests'"
+  echo "[sub-module-name] is only valid when framework is 'UnitTests', in which case do not use '.tst', just the first name should suffice."
 else
 
 	if [ "${fw_name}" = "UnitTests" ]; then

@@ -1,44 +1,47 @@
 /**
  * @remarks Vec3 functions. Rename those already defined.
  **/
+namespace nextar {
+
+
 inline Vector3A Vec3ASet(float x, float y, float z) {
-	return Quad(x, y, z);
+	return QuadInit(x, y, z);
 }
 
 inline Vector3A Vec3AAbs(Vec3AF q) {
-	return Quad(fabsf(q.x), fabsf(q.y), fabsf(q.z));
+	return QuadInit(fabsf(q.x), fabsf(q.y), fabsf(q.z));
 }
 
 inline Vector3A Vec3ANegate(Vec3AF q) {
-	return Quad(-(q.x), -(q.y), -(q.z));
+	return QuadInit(-(q.x), -(q.y), -(q.z));
 }
 
 inline Vector3A Vec3AZero() {
-	return Quad(0, 0, 0);
+	return QuadInit(0, 0, 0);
 }
 
 inline Vector3A Vec3AFromVec3(const Vector3& vec3) {
-	return Quad(vec3.x, vec3.y, vec3.z);
+	return QuadInit(vec3.x, vec3.y, vec3.z);
 }
 
 inline Vector3A Vec3AMulScalar(Vec3AF v, float val) {
-	return Quad(v.x * val, v.y * val, v.z * val);
+	return QuadInit(v.x * val, v.y * val, v.z * val);
 }
 
 inline Vector3A Vec3AAdd(Vec3AF a, Vec3AF b) {
-	return Vector3A(a.x + b.x, a.y + b.y, a.z + b.z);
+	return QuadInit(a.x + b.x, a.y + b.y, a.z + b.z);
 }
 
 inline Vector3A Vec3ASub(Vec3AF a, Vec3AF b) {
-	return Vector3A(a.x - b.x, a.y - b.y, a.z - b.z);
+	return QuadInit(a.x - b.x, a.y - b.y, a.z - b.z);
 }
 
 inline Vector3A Vec3AMulAdd(Vec3AF a, Vec3AF f, Vec3AF b) {
-	return Quad(a.x * f.x + b.x, a.y * f.y + b.y, a.z * f.z + b.z);
+	return QuadInit(a.x * f.x + b.x, a.y * f.y + b.y, a.z * f.z + b.z);
 }
 
 inline Vector3A Vec3AMul(Vec3AF a, Vec3AF b) {
-	return Vector3A(a.x * b.x, a.y * b.y, a.z * b.z);
+	return QuadInit(a.x * b.x, a.y * b.y, a.z * b.z);
 }
 
 inline float Vec3ADot(Vec3AF vec1, Vec3AF vec2) {
@@ -69,7 +72,7 @@ inline bool Vec3ALesserAll(Vec4AF q1, Vec4AF q2) {
 }
 
 inline Vector3A Vec3ACross(Vec3AF v1, Vec3AF v2) {
-	return Vector3A(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z,
+	return QuadInit(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z,
 			v1.x * v2.y - v1.y * v2.x);
 
 }
@@ -98,4 +101,6 @@ inline float Vec3ADistance(Vec3AF vec1, Vec3AF vec2) {
 /** @brief **/
 inline float Vec3ASqDistance(Vec3AF vec1, Vec3AF vec2) {
 	return Vec3ASqLength(Vec3ASub(vec1, vec2));
+}
+
 }

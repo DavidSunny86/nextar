@@ -1,7 +1,7 @@
 namespace nextar {
 
 inline Quaternion QuatSet(float x, float y, float z, float w) {
-	return Quad(x, y, z, w);
+	return QuadInit(x, y, z, w);
 }
 
 /** @remarks Quat from Axis Angle (Unoptimized causing Load/Store hits) **/
@@ -13,7 +13,7 @@ inline Quaternion QuatFromAxisAng(const Vector3& axis, float ang) {
 #endif
 	float f, c;
 	Math::SinCos(ang * .5f, f, c);
-	return Quad(f * axis.x, f * axis.y, f * axis.z, c);
+	return QuadInit(f * axis.x, f * axis.y, f * axis.z, c);
 }
 
 inline Quaternion QuatFromAxisAng(Vec3AF axis, float ang) {
@@ -23,7 +23,7 @@ inline Quaternion QuatFromAxisAng(Vec3AF axis, float ang) {
 #endif
 	float s, c;
 	Math::SinCos(ang * .5f, s, c);
-	return Quad(s * axis.x, s * axis.y, s * axis.z, c);
+	return QuadInit(s * axis.x, s * axis.y, s * axis.z, c);
 }
 
 inline Quaternion QuatFromMat4x4(Mat4x4F m) {
@@ -36,7 +36,7 @@ inline Quaternion QuatFromMat3x4(Mat3x4F m) {
 
 	trace = m.m00 + m.m11 + m.m22 + 1.0f;
 	if (trace > 0.0f) {
-		return Quaternion((m.m12 - m.m21) / (2.0f * sqrt(trace)),
+		return QuadInit((m.m12 - m.m21) / (2.0f * sqrt(trace)),
 				(m.m20 - m.m02) / (2.0f * sqrt(trace)),
 				(m.m01 - m.m10) / (2.0f * sqrt(trace)), sqrt(trace) / 2.0f);
 	}
@@ -58,25 +58,25 @@ inline Quaternion QuatFromMat3x4(Mat3x4F m) {
 	case 0:
 		s = 2.0f * sqrt(1.0f + m.m00 - m.m11 - m.m22);
 		invS = 1 / s;
-		return Quaternion(0.25f * s, (m.m01 + m.m10) * invS,
+		return QuadInit(0.25f * s, (m.m01 + m.m10) * invS,
 				(m.m02 + m.m20) * invS, (m.m12 - m.m21) * invS);
 
 	case 1:
 		s = 2.0f * sqrt(1.0f + m.m11 - m.m00 - m.m22);
 		invS = 1 / s;
-		return Quaternion((m.m01 + m.m10) * invS, 0.25f * s,
+		return QuadInit((m.m01 + m.m10) * invS, 0.25f * s,
 				(m.m12 + m.m21) * invS, (m.m20 - m.m02) * invS);
 	case 2:
 	default:
 		s = 2.0f * sqrt(1.0f + m.m22 - m.m00 - m.m11);
 		invS = 1 / s;
-		return Quaternion((m.m02 + m.m20) * invS, (m.m12 + m.m21) * invS,
+		return QuadInit((m.m02 + m.m20) * invS, (m.m12 + m.m21) * invS,
 				0.25f * s, (m.m01 - m.m10) * invS);
 	}
 }
 
 inline Quaternion QuatMul(QuatF q1, QuatF q2) {
-	return Quad(q1.w * q2.x + q1.x * q2.w + q1.y * q2.z - q1.z * q2.y,
+	return QuadInit(q1.w * q2.x + q1.x * q2.w + q1.y * q2.z - q1.z * q2.y,
 			q1.w * q2.y - q1.x * q2.z + q1.y * q2.w + q1.z * q2.x,
 			q1.w * q2.z + q1.x * q2.y - q1.y * q2.x + q1.z * q2.w,
 			q1.w * q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z);
@@ -99,7 +99,7 @@ inline Vector4A QuatTransBoundRadius(QuatF q, Vec3AF v) {
 }
 
 inline Quaternion QuatIdentity() {
-	return Quad(0, 0, 0, 1);
+	return QuadInit(0, 0, 0, 1);
 }
 
 inline Quaternion QuatSlerp(QuatF from, QuatF to, float t) {
@@ -138,10 +138,9 @@ inline Quaternion QuatLerp(QuatF from, QuatF to, float t) {
 	result.y = scale0 * from.y + scale1 * to.y;
 	result.z = scale0 * from.z + scale1 * to.z;
 	result.w = scale0 * from.w + scale1 * to.w;
-	s = 1.0f
-			/ sqrt(
-					result.x * result.x + result.y * result.y
-							+ result.z * result.z + result.w * result.w);
+	s = 1.0f / sqrt(
+				result.x * result.x + result.y * result.y
+				+ result.z * result.z + result.w * result.w);
 	result.x *= s;
 	result.y *= s;
 	result.z *= s;
@@ -150,7 +149,7 @@ inline Quaternion QuatLerp(QuatF from, QuatF to, float t) {
 
 inline Quaternion QuatInverse(QuatF q) {
 	// invert the axis
-	return Quad(-q.x, -q.y, -q.z, q.w);
+	return QuadInit(-q.x, -q.y, -q.z, q.w);
 }
 
 }  // namespace nextar

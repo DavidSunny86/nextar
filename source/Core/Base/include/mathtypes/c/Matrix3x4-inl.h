@@ -34,11 +34,11 @@ inline Matrix3x4 Mat3x4FromVectorMapping(const Vector3& axis1,
 		yz1C = axis.y * axis.z * _1_c;
 	}
 
-	m.Row(0) = Quad(cs + mstr.x, xy1C - xyzs.z, xz1C + xyzs.y, 0);
+	m.Row(0) = QuadInit(cs + mstr.x, xy1C - xyzs.z, xz1C + xyzs.y, 0);
 
-	m.Row(1) = Quad(xy1C + xyzs.z, cs + mstr.y, yz1C - xyzs.x, 0);
+	m.Row(1) = QuadInit(xy1C + xyzs.z, cs + mstr.y, yz1C - xyzs.x, 0);
 
-	m.Row(2) = Quad(xz1C - xyzs.y, yz1C + xyzs.x, cs + mstr.z, 0);
+	m.Row(2) = QuadInit(xz1C - xyzs.y, yz1C + xyzs.x, cs + mstr.z, 0);
 
 	return m;
 }

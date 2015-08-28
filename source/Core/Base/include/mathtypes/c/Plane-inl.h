@@ -15,7 +15,7 @@ inline float PlaneDotVec3A(PlaneF p, Vec3AF v) {
 }
 
 inline Vector3A PlaneAbsNormal(PlaneF p) {
-	return Vector3A(Math::Abs(p.x), Math::Abs(p.y), Math::Abs(p.z));
+	return QuadInit(Math::Abs(p.x), Math::Abs(p.y), Math::Abs(p.z));
 }
 
 }
