@@ -8,7 +8,7 @@
 #ifndef SSE_VECTORTYPES_INL_H_
 #define SSE_VECTORTYPES_INL_H_
 
-#include <mathtypes/sse/SSE_Constants.h>
+#include <math/sse/SSE_Constants.h>
 
 namespace nextar {
 /**
@@ -293,12 +293,12 @@ inline Quad QuadRet(QuadPF vec1) {
 
 }
 
-#include <mathtypes/sse/Vector3A-inl.h>
-#include <mathtypes/sse/Vector4A-inl.h>
-#include <mathtypes/sse/Quaternion-inl.h>
-#include <mathtypes/sse/Plane-inl.h>
-#include <mathtypes/sse/Matrix3x4-inl.h>
-#include <mathtypes/sse/Matrix4x4-inl.h>
-#include <mathtypes/sse/Random-inl.h>
+#include <math/sse/Vector3A-inl.h>
+#include <math/sse/Vector4A-inl.h>
+#include <math/sse/Quaternion-inl.h>
+#include <math/sse/Plane-inl.h>
+#include <math/sse/Matrix3x4-inl.h>
+#include <math/sse/Matrix4x4-inl.h>
+#include <math/sse/Random-inl.h>
 
 #endif /* SSE_VECTORTYPES_INL_H_ */

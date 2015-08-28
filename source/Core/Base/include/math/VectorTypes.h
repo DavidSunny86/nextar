@@ -9,9 +9,9 @@
 #define VECTORTYPES_H_
 
 #if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE
-#	include "mathtypes/sse/SSE_VectorTypes.h"
+#	include "math/sse/SSE_VectorTypes.h"
 #elif NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_FALLBACK
-#	include "mathtypes/c/C_VectorTypes.h"
+#	include "math/c/C_VectorTypes.h"
 #else
 #endif
 #include <NexBase.h>
@@ -170,12 +170,12 @@ typedef const Matrix4x4& Mat4x4R;
 
 }
 
-#include <mathtypes/Vector3A.h>
-#include <mathtypes/Vector4A.h>
-#include <mathtypes/Quaternion.h>
-#include <mathtypes/Plane.h>
-#include <mathtypes/Matrix3x4.h>
-#include <mathtypes/Matrix4x4.h>
+#include <math/Vector3A.h>
+#include <math/Vector4A.h>
+#include <math/Quaternion.h>
+#include <math/Plane.h>
+#include <math/Matrix3x4.h>
+#include <math/Matrix4x4.h>
 
 namespace nextar {
 

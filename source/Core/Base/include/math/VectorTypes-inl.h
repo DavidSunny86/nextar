@@ -1,9 +1,9 @@
 #pragma once
 
 #if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE
-#	include "mathtypes/sse/SSE_VectorTypes-inl.h"
+#	include "math/sse/SSE_VectorTypes-inl.h"
 #elif NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_FALLBACK
-#	include "mathtypes/c/C_VectorTypes-inl.h"
+#	include "math/c/C_VectorTypes-inl.h"
 #else
 #endif
 

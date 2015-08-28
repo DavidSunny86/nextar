@@ -52,26 +52,26 @@ class Box2D;
 }
 
 /* depends on platform and implementation */
-#include <mathtypes/VectorTypes.h>
+#include <math/VectorTypes.h>
 /**
  * Simple types, definitions separated to avoid inter-dependecy
  */
 namespace nextar {
-#include <mathtypes/Vector3.h>
-#include <mathtypes/Vector2.h>
-#include <mathtypes/Vector4.h>
-#include <mathtypes/Matrix3x3.h>
-#include <mathtypes/Box2D.h>
-#include <mathtypes/AABox3.h>
-#include <mathtypes/AxisAngle.h>
-#include <mathtypes/EularAngles.h>
-#include <mathtypes/PolarSys.h>
-#include <mathtypes/Vector3-inl.h>
-#include <mathtypes/Matrix3x3-inl.h>
+#include <math/Vector3.h>
+#include <math/Vector2.h>
+#include <math/Vector4.h>
+#include <math/Matrix3x3.h>
+#include <math/Box2D.h>
+#include <math/AABox3.h>
+#include <math/AxisAngle.h>
+#include <math/EularAngles.h>
+#include <math/PolarSys.h>
+#include <math/Vector3-inl.h>
+#include <math/Matrix3x3-inl.h>
 
 }
 
-#include <mathtypes/VectorTypes-inl.h>
+#include <math/VectorTypes-inl.h>
 
 namespace nextar {
 #ifdef NEX_MATH_RANDOMIZER_DEFINED

@@ -101,10 +101,10 @@ inline Quad QuadRet(QuadPF q) {
 
 }
 
-#include <mathtypes/c/Vector4A-inl.h>
-#include <mathtypes/c/Vector3A-inl.h>
-#include <mathtypes/c/Plane-inl.h>
-#include <mathtypes/c/Quaternion-inl.h>
-#include <mathtypes/c/Matrix3x4-inl.h>
-#include <mathtypes/c/Matrix4x4-inl.h>
+#include <math/c/Vector4A-inl.h>
+#include <math/c/Vector3A-inl.h>
+#include <math/c/Plane-inl.h>
+#include <math/c/Quaternion-inl.h>
+#include <math/c/Matrix3x4-inl.h>
+#include <math/c/Matrix4x4-inl.h>
 
