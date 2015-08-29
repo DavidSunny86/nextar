@@ -3,8 +3,9 @@
 
 #include <cmath>
 #include <NexBase.h>
-#include <CommonPools.h>
 #include <MathConfig.h>
+#include <CommonPools.h>
+
 
 //@ include proper files
 #if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE

@@ -31,8 +31,8 @@ inline float PlaneDotVec3A(PlaneF p, Vec3AF v) {
 	// Get the reciprocal
 	_mm_store_ss(&ret,q);
 #else
-	Quad q = _mm_and_ps(v, N3D_FFFO);
-	q = _mm_or_ps(q, N3D_0001);
+	Quad q = _mm_and_ps(v, N3D_FFFO.v);
+	q = _mm_or_ps(q, N3D_0001.v);
 	q = _mm_mul_ps(q, p);
 	Quad temp = _mm_shuffle_ps(q, q, _MM_SHUFFLE(3, 2, 3, 2));
 	q = _mm_add_ps(q, temp);

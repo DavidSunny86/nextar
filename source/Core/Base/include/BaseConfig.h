@@ -145,6 +145,9 @@
 #define NEX_SUPPORT_MULTITHREADING 
 /* Use thread building blocks. */
 /* #undef NEX_USE_TBB */
+/* Use vector instructions for math library. */
+/* #undef NEX_USE_VECTOR_INSTRUCTIONS */
+
 
 /* Endianness */
 #define NEX_ENDIAN_LITTLE   0

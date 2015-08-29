@@ -25,6 +25,8 @@ const Vector2 Vector2::Origin(0, 0);
 const Vector4 Vector4::Origin(0, 0, 0, 0);
 _NexBaseAPI const Matrix4x4 Matrix4x4::IdentityMatrix(1, 0, 0, 0, 0, 1, 0, 0, 0,
 		0, 1, 0, 0, 0, 0, 1);
+_NexBaseAPI const AxisAlignedBox AxisAlignedBox::LargestBox(-Math::SCALAR_MAX, -Math::SCALAR_MAX, -Math::SCALAR_MAX, Math::SCALAR_MAX,  Math::SCALAR_MAX,  Math::SCALAR_MAX);
+_NexBaseAPI const AxisAlignedBox AxisAlignedBox::InvalidBox( Math::SCALAR_MAX,  Math::SCALAR_MAX,  Math::SCALAR_MAX,-Math::SCALAR_MAX, -Math::SCALAR_MAX, -Math::SCALAR_MAX);
 
 namespace Math {
 

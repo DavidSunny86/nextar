@@ -150,6 +150,9 @@ struct _NexBaseAPI _Matrix4x4: public AllocMatrix4x4 {
 };
 
 struct _NexBaseAPI _AxisAlignedBox : public AllocAABox {
+	static const AxisAlignedBox LargestBox;
+	static const AxisAlignedBox InvalidBox;
+
 	union {
 		struct {
 			Vector3A minPoint;
@@ -157,6 +160,17 @@ struct _NexBaseAPI _AxisAlignedBox : public AllocAABox {
 		};
 		Vector3A extremes[2];
 	};
+
+	inline _AxisAlignedBox() {}
+	inline _AxisAlignedBox(float minX, float minY, float minZ, float maxX, float maxY, float maxZ);
+	_AxisAlignedBox(const Vector3A& minPoint, const Vector3A& maxPoint) {
+		this->minPoint = minPoint;
+		this->maxPoint = maxPoint;
+	}
+	_AxisAlignedBox(const Vector3A& point) {
+		this->minPoint = point;
+		this->maxPoint = point;
+	}
 };
 
 typedef const AxisAlignedBox& AABoxF;
@@ -176,6 +190,7 @@ typedef const Matrix4x4& Mat4x4R;
 #include <math/Plane.h>
 #include <math/Matrix3x4.h>
 #include <math/Matrix4x4.h>
+#include <math/AxisAlignedBox.h>
 
 namespace nextar {
 

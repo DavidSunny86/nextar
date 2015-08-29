@@ -23,9 +23,7 @@ public:
 
 	virtual void _SetupScene(SceneAssetPtr& scene) {
 		UTApplication::_SetupScene(scene);
-		AABox3 box;
-		box.min.Set(-10, -10, -10);
-		box.max.Set( 10,  10,  10);
+		AxisAlignedBox box = AxisAlignedBox(-10, -10, -10, 10, 10, 10);
 		DebugDisplay::Instance().Register(box, Color::Blue);
 		Matrix4x4 m = Matrix4x4::IdentityMatrix;
 		m = Mat4x4Scale(4, m);

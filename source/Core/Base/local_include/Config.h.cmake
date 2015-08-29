@@ -145,6 +145,9 @@
 #cmakedefine NEX_SUPPORT_MULTITHREADING 
 /* Use thread building blocks. */
 #cmakedefine NEX_USE_TBB
+/* Use vector instructions for math library. */
+#cmakedefine NEX_USE_VECTOR_INSTRUCTIONS
+
 
 /* Endianness */
 #define NEX_ENDIAN_LITTLE   0

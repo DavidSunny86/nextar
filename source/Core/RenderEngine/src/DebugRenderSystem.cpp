@@ -90,7 +90,7 @@ VisiblePrimitiveList& DebugRenderSystem::GetPrimitives(CommitContext& context) {
 	return alivePrimitives;
 }
 
-uint32 DebugRenderSystem::Register(const AABox3& box,
+uint32 DebugRenderSystem::Register(AABoxF box,
 	const Color& color, float expiryTimeInSec) {
 	if (!boxDataGenerated) {
 		GenerateStreamDataForBox();
@@ -101,7 +101,7 @@ uint32 DebugRenderSystem::Register(const AABox3& box,
 	primitive->SetStreamData(&boxDataStream);
 	primitive->SetMaterial(debugMaterial);
 	primitive->SetColor(color);
-	primitive->SetTransform(box.GetSize(), QuatIdentity(), box.GetCenter());
+	primitive->SetTransform(AABoxGetSize(box), QuatIdentity(), AABoxGetCenter(box));
 	alivePrimitives.push_back(primitive);
 
 	return idCounter;

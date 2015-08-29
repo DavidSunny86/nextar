@@ -107,4 +107,5 @@ inline Quad QuadRet(QuadPF q) {
 #include <math/c/Quaternion-inl.h>
 #include <math/c/Matrix3x4-inl.h>
 #include <math/c/Matrix4x4-inl.h>
+#include <math/c/AxisAlignedBox-inl.h>
 

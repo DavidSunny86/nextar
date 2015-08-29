@@ -81,7 +81,7 @@ public:
 
 	virtual VisiblePrimitiveList& GetPrimitives(CommitContext& context);
 
-	virtual uint32 Register(const AABox3& box, const Color& color,
+	virtual uint32 Register(AABoxF box, const Color& color,
 		float expiryTimeInSec = 0.0f) override;
 	virtual uint32 Register(Mat4x4R tform, float screenSpaceFactor, const Color& color = Color::Black,
 		float expiryTimeInSec = 0.0f) override;

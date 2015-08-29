@@ -300,5 +300,6 @@ inline Quad QuadRet(QuadPF vec1) {
 #include <math/sse/Matrix3x4-inl.h>
 #include <math/sse/Matrix4x4-inl.h>
 #include <math/sse/Random-inl.h>
+#include <math/sse/AxisAlignedBox-inl.h>
 
 #endif /* SSE_VECTORTYPES_INL_H_ */

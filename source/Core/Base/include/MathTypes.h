@@ -44,7 +44,6 @@ class Vector3;
 class Vector4;
 class Matrix3x3;
 class PolarSys;
-class AABox3;
 class AxisAngle;
 class EularAngles;
 class Box2D;
@@ -62,7 +61,6 @@ namespace nextar {
 #include <math/Vector4.h>
 #include <math/Matrix3x3.h>
 #include <math/Box2D.h>
-#include <math/AABox3.h>
 #include <math/AxisAngle.h>
 #include <math/EularAngles.h>
 #include <math/PolarSys.h>
@@ -236,8 +234,7 @@ typedef std::array<int32, 4> IVector4;
 //   Transform3x4  :  Trans3x4
 //   AxisAngle     :  AxisAng
 //   EularAngles   :  Eular
-//   AABox2        :  AABox2
-//   AABox3        :  AABox3
+//   AxisAlignedBox:  AABox
 //  $ operations
 //   Multiplication                              :  Mul
 //   Division                                    :  Div

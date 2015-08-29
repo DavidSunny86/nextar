@@ -91,7 +91,7 @@ inline void Mat4x4TransAndProjVec3(Vector3* outstream, uint32 outstride,
 	const uint8* inpVec = (const uint8*) inpstream;
 	uint8* outVec = (uint8*) outstream;
 
-	Quad v, x, y, z, r, w;
+	Quad v, x, y, z, r;
 
 	for (uint32 i = 0; i < count; i++) {
 
@@ -167,12 +167,14 @@ inline AxisAlignedBox Mat4x4TransAABox(AABoxF box, Mat4x4F m) {
 				std::min(box.minPoint.v[2] * m.m[i + 2 * 4], box.maxPoint.v[2] * m.m[i + 2 * 4]) +
 				m.m[i + 3 * 4];
 	}
+	ret.minPoint.v[3] = 0;
 	for (int i = 0; i < 3; i++) {
 		ret.maxPoint.v[i] = std::max(box.minPoint.v[0] * m.m[i + 0 * 4], box.maxPoint.v[0] * m.m[i + 0 * 4]) +
 				std::max(box.minPoint.v[1] * m.m[i + 1 * 4], box.maxPoint.v[1] * m.m[i + 1 * 4]) +
 				std::max(box.minPoint.v[2] * m.m[i + 2 * 4], box.maxPoint.v[2] * m.m[i + 2 * 4]) +
 				m.m[i + 3 * 4];
 	}
+	ret.maxPoint.v[3] = 0;
 	return ret;
 }
 
@@ -486,7 +488,7 @@ inline Matrix4x4 Mat4x4Inverse(Mat4x4F m) {
 	if (det == 0)
 		return inv;
 
-	det = 1.0 / det;
+	det = 1.0f / det;
 
 	for (int i = 0; i < 16; i++)
 		inv.m[i] = inv.m[i] * det;

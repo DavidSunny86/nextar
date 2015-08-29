@@ -6,6 +6,7 @@
 #define NEXTAR_MATH_H_
 
 #include <NexCore.h>
+#include <MathConfig.h>
 
 #undef max
 #undef min
