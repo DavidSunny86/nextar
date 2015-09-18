@@ -41,8 +41,6 @@ enum class FrameBuffer : uint32 {
 	BACK = BACK_LEFT,
 };
 
-NEX_ENUM_FLAGS(ClearFlags, uint16);
-
 
 typedef list<RenderTargetPtr>::type RenderTargetList;
 

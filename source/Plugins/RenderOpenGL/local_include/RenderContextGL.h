@@ -17,6 +17,9 @@ class GpuBufferViewGL;
 class RenderContextGL: public nextar::BaseRenderContext, public ExtensionsGL {
 	NEX_LOG_HELPER(RenderContextGL)
 	;
+	// Constants to fetch
+	// @GL_MAX_COLOR_ATTACHMENTS
+
 public:
 
 	//typedef vector<GpuObject*>::type GpuObjectTable;
@@ -32,7 +35,7 @@ public:
 	virtual void PostWindowDestruction(RenderWindow* windowGl);
 	virtual void Draw(StreamData*, CommitContext&);
 	virtual void SetCurrentTarget(RenderTarget*);
-	virtual void Clear(Color& c, float depth, uint16 stencil, ClearFlags flags);
+	virtual void Clear(const ClearBufferInfo&);
 	virtual void CloseImpl();
 	virtual void Copy(RenderTarget* src, FrameBuffer srcFb, RenderTarget* dest, FrameBuffer destFb);
 	virtual void EndRender();
@@ -187,6 +190,8 @@ protected:
 	virtual RenderWindow* CreateWindowImpl() = 0;
 	virtual void ReadyContext(RenderWindow*) = 0;
 	virtual void SetCurrentWindow(RenderTarget* rt) = 0;
+
+	uint32 currentCountOfColorAttachments;
 
 	uint32 contextFlags;
 	String shaderTarget;

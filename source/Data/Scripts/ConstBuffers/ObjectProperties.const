@@ -6,6 +6,8 @@ cbuffer ObjectTransforms:OBJECTTRANSFORM {
 
 cbuffer MaterialProperty context:Material {
 
-	var vec4 diffuseAndGloss ui:ObjectProperties.DiffuseColorAndGloss "desc:Object specific color and gloss factor";
+	var vec4 diffuseColor ui:ObjectProperties.DiffuseColor "desc:Object specific diffuse color.";
+	var float specularIntensity ui:ObjectProperties.SpecularIntensity;
+	var float gloss ui:ObjectProperties.Gloss;
 };
 

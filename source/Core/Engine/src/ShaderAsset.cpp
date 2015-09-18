@@ -125,7 +125,7 @@ void ShaderAsset::_BuildParameterTable(StreamPassList& spl) {
 	uint32 offset = 0;
 	auto en = paramLookup.end();
 	for (uint32 ctx = 0; ctx < (uint32)ParameterContext::CTX_COUNT; ++ctx) {
-		paramsPerContext[ctx].beginIt = 
+		paramsPerContext[ctx].beginIt =
 		paramsPerContext[ctx].endIt = en;
 		paramsPerContext[ctx].totalParamBufferSize = 0;
 	}
@@ -230,7 +230,7 @@ void ShaderAsset::StreamRequest::AddPass(StringID name) {
 	currentPass = passes.rbegin();
 }
 
-void ShaderAsset::StreamRequest::SetParamterBuffer(ParameterBuffer&& data) {
+void ShaderAsset::StreamRequest::SetParameterBuffer(ParameterBuffer&& data) {
 	ShaderAsset* shader = static_cast<ShaderAsset*>(streamedObject);
 	shader->passParamData = std::move(data);
 }

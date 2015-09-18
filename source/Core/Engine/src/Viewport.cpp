@@ -52,7 +52,7 @@ void Viewport::FirePostupdate() {
 }
 
 void Viewport::PushPrimitives(const FrameTimer& frameTimer) {
-		
+
 	traversal.frameTimer = &frameTimer;
 	traversal.lightSystem = lightSystem;
 	//traversal.visibleBoundsInfo = &(camera->GetBoundsInfo());
@@ -91,11 +91,12 @@ void Viewport::CommitPrimitives(RenderContext* renderCtx, const FrameTimer&  fra
 	commitContext.lightSystem = traversal.lightSystem;
 	commitContext.targetDimension = renderTarget->GetDimensions();
 	commitContext.renderTargetInfo.rt = renderTarget;
-	commitContext.renderTargetInfo.clearColor = Color::Black;
-	commitContext.renderTargetInfo.clearFlags = ClearFlags::CLEAR_ALL;
-	commitContext.renderTargetInfo.clearStencil = 0;
-	commitContext.renderTargetInfo.clearDepth = 1.0f;
-	
+	// @todo If we have a multi-render target attached we might have to
+	// initialize the clearColor array properly.
+	commitContext.renderTargetInfo.info.clearColor[0] = Color::Black;
+	commitContext.renderTargetInfo.info.clearFlags = ClearFlags::CLEAR_ALL;
+	commitContext.renderTargetInfo.info.clearStencil = 0;
+	commitContext.renderTargetInfo.info.clearDepth = 1.0f;
 
 	for (auto &r : renderSystems) {
 		r->Commit(commitContext);

@@ -12,25 +12,37 @@
 #include <ShaderParam.h>
 #include <ParameterBuffer.h>
 #include <Pass.h>
+#include <RenderConstants.h>
 
 namespace nextar {
 
-enum class ClearFlags {
+enum class ClearFlags : uint16 {
 	CLEAR_NONE = 0,
-	CLEAR_COLOR = 1 << 0,
-	CLEAR_DEPTH = 1 << 1,
-	CLEAR_STENCIL = 1 << 2,
+	CLEAR_COLOR_0 = 1 << 0,
+	CLEAR_COLOR_1 = 1 << 1,
+	CLEAR_COLOR_2 = 1 << 2,
+	CLEAR_COLOR_3 = 1 << 3,
+	CLEAR_COLOR_4 = 1 << 4,
+	CLEAR_COLOR_5 = 1 << 5,
+	CLEAR_DEPTH = 1 << 6,
+	CLEAR_STENCIL = 1 << 7,
+	CLEAR_COLOR = CLEAR_COLOR_0|CLEAR_COLOR_1|CLEAR_COLOR_2|CLEAR_COLOR_3|CLEAR_COLOR_4|CLEAR_COLOR_5,
 	CLEAR_ALL = CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL
+};
+NEX_ENUM_FLAGS(ClearFlags, uint16);
+
+struct ClearBufferInfo {
+	ClearFlags clearFlags;
+	uint16 clearStencil;
+	float clearDepth;
+	Color clearColor[RenderConstants::MAX_COLOR_TARGETS];
+	ClearBufferInfo() : clearFlags(ClearFlags::CLEAR_NONE), clearDepth(1.0f), clearStencil(0) {}
 };
 
 struct RenderInfo {
 	RenderTarget* rt;
-	ClearFlags clearFlags;
-	Color clearColor;
-	float clearDepth;
-	uint16 clearStencil;
-
-	RenderInfo() : rt(0), clearFlags(ClearFlags::CLEAR_NONE), clearDepth(1.0f), clearStencil(0) {}
+	ClearBufferInfo info;
+	RenderInfo() : rt(0) {}
 };
 
 class CommitContext: public AllocGeneral {
@@ -59,9 +71,10 @@ public:
 	void* groupDataPtr;
 	const FrameTimer* frameTimer;
 		
-	TextureBase* albedoAndGlossMap;
-	TextureBase* depthMap;
+	TextureBase* albedoMap;
 	TextureBase* normalMap;
+	TextureBase* specularMap;
+	TextureBase* depthMap;
 
 	Light* light; // for deferred
 	Pass::View* pass;

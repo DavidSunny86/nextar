@@ -18,7 +18,8 @@ class _NexEngineAPI MultiRenderTarget: public nextar::RenderTarget,
 public:
 
 	enum {
-		CO_TYPE = TYPE_MULTI_RENDER_TARGET, MAX_TARGET = 4
+		CO_TYPE = TYPE_MULTI_RENDER_TARGET,
+		MAX_COLOR_TARGET = 4
 	};
 
 	enum UpdateMessage {
@@ -26,7 +27,7 @@ public:
 		MSG_RT_RESIZE = 1 << 2,
 	};
 
-	typedef array<RenderTargetPtr, MAX_TARGET>::type ColorAttachmentArray;
+	typedef array<RenderTargetPtr, MAX_COLOR_TARGET>::type ColorAttachmentArray;
 
 	struct TargetParam {
 		bool useAsTexture;
@@ -34,7 +35,7 @@ public:
 		RenderTargetPtr useTarget;
 	};
 
-	typedef array<TargetParam, MAX_TARGET>::type TargetParamArray;
+	typedef array<TargetParam, MAX_COLOR_TARGET>::type TargetParamArray;
 
 	struct CreateParam {
 		bool useDepth;

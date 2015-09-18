@@ -67,6 +67,9 @@ public:
 		return parameters;
 	}
 
+	ParameterBuffer* GetParameters() {
+		return parameters;
+	}
 	// Overrides
 	virtual float GetConstantSize() const {
 		return 0.0f;

@@ -17,6 +17,14 @@ public:
 
 	inline Box2D(const Box2D & b) : min(b.min), max(b.max) {
 	}
+
+	Vector2 GetSize() const {
+		return max - min;
+	}
+
+	Vector2 GetCenter() const {
+		return (max + min) * 0.5f;
+	}
 };
 
 #endif //NEXTAR_AABB2_H

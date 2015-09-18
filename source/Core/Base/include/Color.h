@@ -27,6 +27,9 @@ public:
 	inline Color() : red(0), green(0), blue(0), alpha(1) {
 	}
 
+	inline Color(float a) : alpha(a), red(a), green(a), blue(a) {
+	}
+
 	inline Color(float a, float r, float g, float b) : alpha(a),
 	red(r), green(g), blue(b) {
 	}

@@ -30,9 +30,19 @@ static void APIENTRY ReportError(GLenum source,
 	reinterpret_cast<RenderContextGL*>(userParam)->ReportError(source, type, id, severity, length, message);
 }
 
+static GLenum s_colorAttachments[RenderConstants::MAX_COLOR_TARGETS] = { 0 };
+
 RenderContextGL::RenderContextGL(RenderDriverGL* _driver) :
-		BaseRenderContext(_driver), contextFlags(0) {
+		BaseRenderContext(_driver)
+,currentWindow(0)
+,currentCountOfColorAttachments(0)
+,contextFlags(0) {
 	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyResources, this);
+	if (!s_colorAttachments[0]) {
+		for(uint32 i = 0; i < RenderConstants::MAX_COLOR_TARGETS; ++i) {
+			s_colorAttachments[i] = GL_COLOR_ATTACHMENT0 + i;
+		}
+	}
 }
 
 RenderContextGL::~RenderContextGL() {
@@ -582,7 +592,7 @@ UniformBufferGL* RenderContextGL::CreateUniformBuffer(PassViewGL* pass,
 							second.autoName) != 0;
 				});
 	}
-	
+
 	NEX_FREE(tempBuffer, MEMCAT_GENERAL);
 
 	return &u;
@@ -674,7 +684,7 @@ void RenderContextGL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 	uint32 startParamIndex = -1;
 	if (paramTable) {
 		startParamIndex = (uint32)paramTable->size();
-		paramTable->reserve(numUni + startParamIndex);
+		paramTable->reserve(numSamplers + startParamIndex);
 	}
 	GlUseProgram(program);
 	for (GLuint i = 0; i < (GLuint) numUni; ++i) {
@@ -931,7 +941,7 @@ void RenderContextGL::EndRender() {
 	if (contextFlags & CURRENT_TARGET_FBO) {
 		FrameBufferObjectGL::Unbind(false, this);
 		contextFlags &= ~CURRENT_TARGET_FBO;
-	} 
+	}
 	currentTarget = currentWindow;
 }
 
@@ -950,8 +960,10 @@ void RenderContextGL::SetCurrentTarget(RenderTarget* canvas) {
 				textureView->CreateFBO(this);
 			fbo.Bind(false, this);
 			contextFlags |= CURRENT_TARGET_FBO;
+			currentCountOfColorAttachments = textureView->IsColorTarget();
 		}
 			break;
+
 		case RenderTargetType::RENDER_BUFFER: {
 			RenderBufferViewGL* textureView =
 					static_cast<RenderBufferViewGL*>(
@@ -961,12 +973,16 @@ void RenderContextGL::SetCurrentTarget(RenderTarget* canvas) {
 				textureView->CreateFBO(this);
 			fbo.Bind(false, this);
 			contextFlags |= CURRENT_TARGET_FBO;
+			currentCountOfColorAttachments = textureView->IsColorTarget();
 		}
 			break;
+
 		case RenderTargetType::BACK_BUFFER:
 			currentWindow = canvas;
 			SetCurrentWindow(canvas);
+			currentCountOfColorAttachments = 0;
 			break;
+
 		case RenderTargetType::MULTI_RENDER_TARGET: {
 			MultiRenderTargetViewGL* textureView =
 					static_cast<MultiRenderTargetViewGL*>(GetView(
@@ -974,6 +990,9 @@ void RenderContextGL::SetCurrentTarget(RenderTarget* canvas) {
 			FrameBufferObjectGL& fbo = textureView->GetFBO();
 			NEX_ASSERT(fbo.IsValid());
 			fbo.Bind(false, this);
+			// set the individual draw buffers
+			if ( (currentCountOfColorAttachments = textureView->GetColorAttachmentCount()) )
+				GlDrawBuffers(currentCountOfColorAttachments, s_colorAttachments);
 			contextFlags |= CURRENT_TARGET_FBO;
 			}
 			break;
@@ -981,22 +1000,27 @@ void RenderContextGL::SetCurrentTarget(RenderTarget* canvas) {
 	}
 }
 
-void RenderContextGL::Clear(Color& c, float depth, uint16 stencil,
-		ClearFlags flags) {
-	GLbitfield mask = 0;
-	if (Test(flags & ClearFlags::CLEAR_COLOR)) {
-		mask |= GL_COLOR_BUFFER_BIT;
-		glClearColor(c.red, c.green, c.blue, c.alpha);
+void RenderContextGL::Clear(const ClearBufferInfo& info) {
+	if (Test(info.clearFlags & ClearFlags::CLEAR_COLOR)) {
+		if (currentCountOfColorAttachments) {
+			for(uint32 i = 0; i < currentCountOfColorAttachments; ++i) {
+				ClearFlags cf = (ClearFlags)((uint16)ClearFlags::CLEAR_COLOR_0 << (uint16)i);
+				if (Test(info.clearFlags & cf))
+					GlClearBufferfv(GL_COLOR, i, info.clearColor[i].AsFloatArray());
+			}
+		} else {
+			GlClearBufferfv(GL_BACK, 0, info.clearColor[0].AsFloatArray());
+		}
 	}
-	if (Test(flags & ClearFlags::CLEAR_DEPTH)) {
-		mask |= GL_DEPTH_BUFFER_BIT;
-		glClearDepth(depth);
+	if (Test(info.clearFlags & ClearFlags::CLEAR_DEPTH) &&
+		Test(info.clearFlags & ClearFlags::CLEAR_STENCIL)) {
+		GlClearBufferfi(GL_DEPTH_STENCIL, 0, info.clearDepth, info.clearStencil);
+	} else if (Test(info.clearFlags & ClearFlags::CLEAR_DEPTH)) {
+		GlClearBufferfv(GL_DEPTH, 0, &info.clearDepth);
+	} else if (Test(info.clearFlags & ClearFlags::CLEAR_STENCIL)) {
+		GLint stencil = info.clearStencil;
+		GlClearBufferiv(GL_STENCIL, 0, &stencil);
 	}
-	if (Test(flags & ClearFlags::CLEAR_STENCIL)) {
-		mask |= GL_STENCIL_BUFFER_BIT;
-		glClearStencil(stencil);
-	}
-	glClear(mask);
 	GL_CHECK();
 }
 
@@ -1723,7 +1747,7 @@ void RenderContextGL::SetRasterState(const RasterStateGL& state) {
 	GL_CHECK();
 
 	if (state.constantDepthBias != 0 || state.slopeScaledDepthBias != 0) {
-		
+
 		if (!rasterState.depthBiasEnabled) {
 			glEnable(GL_POLYGON_OFFSET_FILL);
 			GL_CHECK();
@@ -1752,7 +1776,7 @@ void RenderContextGL::SetRasterState(const RasterStateGL& state) {
 
 void RenderContextGL::SetDepthStencilState(const DepthStencilStateGL& state) {
 	if (depthStencilState.depthTest != state.depthTest) {
-		if (state.depthTest) 
+		if (state.depthTest)
 			glEnable(GL_DEPTH_TEST);
 		else
 			glDisable(GL_DEPTH_TEST);
@@ -1834,10 +1858,10 @@ void RenderContextGL::SetBlendState(const BlendStateGL& state) {
 			GlBlendFuncSeparate(state.blendOp[0].srcCol, state.blendOp[0].destCol,
 				state.blendOp[0].srcAlpha, state.blendOp[0].destAlpha);
 			GlBlendEquationSeparate(state.blendOp[0].colOp, state.blendOp[0].alphaOp);
-			
+
 		} else {
 			for (uint8 i = 0; i < state.numRenderTargets; ++i) {
-				
+
 				GlBlendFuncSeparatei(i, state.blendOp[i].srcCol, state.blendOp[i].destCol,
 					state.blendOp[i].srcAlpha, state.blendOp[i].destAlpha);
 				GlBlendEquationSeparate(state.blendOp[i].colOp, state.blendOp[i].alphaOp);
@@ -1872,4 +1896,3 @@ void RenderContextGL::SetBlendState(const BlendStateGL& state) {
 }
 
 }
-

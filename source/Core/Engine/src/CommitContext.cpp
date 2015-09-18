@@ -20,7 +20,8 @@ CommitContext::CommitContext() :
 	,viewMatrix(nullptr)
 	,viewProjectionMatrix(nullptr)
 	,projectionMatrix(nullptr)
-	,albedoAndGlossMap(nullptr)
+	,albedoMap(nullptr)
+	,specularMap(nullptr)
 	,depthMap(nullptr)
 	,normalMap(nullptr)
 	,frameTime(0.0f)
@@ -34,7 +35,7 @@ CommitContext::~CommitContext() {
 }
 
 void CommitContext::_Reset() {
-	
+
 	frameNumber = 0;
 	targetDimension.combined = 0;
 	visibiles = nullptr;
@@ -43,7 +44,8 @@ void CommitContext::_Reset() {
 	primitive = nullptr;
 	material = nullptr;
 	light = nullptr;
-	albedoAndGlossMap = nullptr;
+	albedoMap = nullptr;
+	specularMap = nullptr;
 	normalMap = nullptr;
 	depthMap = nullptr;
 	frameTime = 0.0f;

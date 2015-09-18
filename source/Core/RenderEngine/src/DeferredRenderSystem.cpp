@@ -25,8 +25,9 @@ GBuffer::~GBuffer() {
 void GBuffer::Destroy() {
 
 	depth.Clear();
-	albedoSpecular.Clear();
+	albedoMap.Clear();
 	normalMap.Clear();
+	specularAndGlossMap.Clear();
 	renderTarget.Clear();
 }
 
@@ -36,13 +37,16 @@ void GBuffer::Setup(Size dimensions) {
 		MultiRenderTarget::CreateParam params;
 		params.dimensions = dimensions;
 		params.useDepth = true;
-		params.numColorTargets = 2;
-		/* normal & gloss */
+		params.numColorTargets = 3;
+		/* albedo & alpha */
 		params.targets[0].useAsTexture = true;
 		params.targets[0].format = PixelFormat::RGBA8;
-		/* albedo & specular */
+		/* normal map */
 		params.targets[1].useAsTexture = true;
 		params.targets[1].format = PixelFormat::RG16;
+		/* specular map */
+		params.targets[2].useAsTexture = true;
+		params.targets[2].format = PixelFormat::RGBA8;
 		/* depth */
 		params.depth.useAsTexture = true;
 		params.depth.format = PixelFormat::D24S8;
@@ -50,7 +54,8 @@ void GBuffer::Setup(Size dimensions) {
 
 		depth = renderTarget->GetDepthAttachment();
 		normalMap = renderTarget->GetAttachment(0);
-		albedoSpecular = renderTarget->GetAttachment(1);
+		albedoMap = renderTarget->GetAttachment(1);
+		specularAndGlossMap = renderTarget->GetAttachment(2);
 	}
 }
 
@@ -67,10 +72,12 @@ DeferredRenderSystem::~DeferredRenderSystem() {
 
 void DeferredRenderSystem::PrepareGeometryBuffer() {
 	gbufferRI.rt = gbuffer.renderTarget;
-	gbufferRI.clearColor = Color::Black;
-	gbufferRI.clearStencil = 0;
-	gbufferRI.clearDepth = 1.0f;
-	gbufferRI.clearFlags = ClearFlags::CLEAR_ALL;
+	gbufferRI.info.clearColor[0] = Color::Black;
+	gbufferRI.info.clearColor[1] = Color(0.5f);
+	gbufferRI.info.clearColor[2] = Color::Black;
+	gbufferRI.info.clearStencil = 0;
+	gbufferRI.info.clearDepth = 1.0f;
+	gbufferRI.info.clearFlags = ClearFlags::CLEAR_ALL;
 }
 
 void DeferredRenderSystem::PrepareMaterials() {
@@ -113,7 +120,7 @@ void DeferredRenderSystem::Commit(CommitContext& context) {
 					context.paramBuffers[(uint32)ParameterContext::CTX_MATERIAL] = context.material->GetParameters();
 					context.pass->UpdateParams(context, ParameterContext::CTX_MATERIAL, context.materialNumber);
 				}
-								
+
 				context.paramBuffers[(uint32)ParameterContext::CTX_OBJECT] = prim.second->GetParameters();
 				context.pass->UpdateParams(context, ParameterContext::CTX_OBJECT, prim.first);
 				context.renderContext->Draw(prim.second->GetStreamData(), context);
@@ -133,16 +140,19 @@ void DeferredRenderSystem::Commit(CommitContext& context) {
 	if (DebugDisplay::InstancePtr()) {
 		Box2D box(0, 0, 0.25f, 0.25f);
 		DebugDisplay::Instance().Register(box, Color::Red, gbuffer.normalMap);
-		Box2D box2(0.25, 0, 0.5f, 0.25f);
-		DebugDisplay::Instance().Register(box2, Color::Red, gbuffer.albedoSpecular);
+		Box2D box2(0.25f, 0, 0.5f, 0.25f);
+		DebugDisplay::Instance().Register(box2, Color::Red, gbuffer.albedoMap);
+		Box2D box3(0.0f, 0.25f, 0.25f, 0.5f);
+		DebugDisplay::Instance().Register(box3, Color::Red, gbuffer.albedoMap);
 	}
 
-	context.albedoAndGlossMap = gbuffer.albedoSpecular;
-	context.depthMap = gbuffer.depth;
+	context.albedoMap = gbuffer.albedoMap;
 	context.normalMap = gbuffer.normalMap;
+	context.specularMap = gbuffer.specularAndGlossMap;
+	context.depthMap = gbuffer.depth;
 
 	context.renderContext->BeginRender(&context.renderTargetInfo);
-	context.renderTargetInfo.clearFlags = ClearFlags::CLEAR_NONE;
+	context.renderTargetInfo.info.clearFlags = ClearFlags::CLEAR_NONE;
 	for(auto& lightPair : ls) {
 		auto light = lightPair.second;
 		switch(light->GetLightType()) {

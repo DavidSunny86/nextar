@@ -52,16 +52,25 @@ void OmniLightPropertiesApply(CommitContext& context, const ShaderParameter* par
 	Vector4A params[2];
 	const Color& color = context.light->GetLightColor();
 	params[0] = Vec4ASet(color.red, color.green, color.blue, color.alpha);
-	params[1] = Vec4ASetW(context.light->GetTranslation(), 
+	params[1] = Vec4ASetW(context.light->GetTranslation(),
 		context.light->GetRadius());
 	const ConstantParameter* constParam =
 		static_cast<const ConstantParameter*>(param);
 	context.paramGroup->SetRawBuffer(context.renderContext, *constParam, params);
 }
 
-void AlbedoAndGlossMapApply(CommitContext& context, const ShaderParameter* param) {
+void AlbedoMapApply(CommitContext& context, const ShaderParameter* param) {
 	TextureUnit tu;
-	tu.texture = context.albedoAndGlossMap;
+	tu.texture = context.albedoMap;
+	const SamplerParameter* samplerParam =
+		static_cast<const SamplerParameter*>(param);
+	context.pass->SetTexture(context.renderContext, *samplerParam,
+		&tu);
+}
+
+void SpecularAndGlossMapApply(CommitContext& context, const ShaderParameter* param) {
+	TextureUnit tu;
+	tu.texture = context.specularMap;
 	const SamplerParameter* samplerParam =
 		static_cast<const SamplerParameter*>(param);
 	context.pass->SetTexture(context.renderContext, *samplerParam,
@@ -117,8 +126,10 @@ void BaseRenderManager::RegisterAutoParams() {
 		ParameterContext::CTX_VIEW, "Inverse projection matrix.");
 	MAKE_AUTO_PARAM(OmniLightProperties, AutoParamName::AUTO_OMNI_LIGHT_PROPERTIES, PDT_STRUCT,
 		ParameterContext::CTX_OBJECT, "Omni light properties.");
-	MAKE_AUTO_PARAM(AlbedoAndGlossMap, AutoParamName::AUTO_ALBEDO_AND_GLOSS, PDT_TEXTURE,
-		ParameterContext::CTX_PASS, "GBuffer albedo and gloss.");
+	MAKE_AUTO_PARAM(AlbedoMap, AutoParamName::AUTO_ALBEDO_MAP, PDT_TEXTURE,
+		ParameterContext::CTX_PASS, "GBuffer albedo map.");
+		MAKE_AUTO_PARAM(SpecularAndGlossMap, AutoParamName::AUTO_SPECULAR_AND_GLOSS_MAP, PDT_TEXTURE,
+			ParameterContext::CTX_PASS, "GBuffer specular map.");
 	MAKE_AUTO_PARAM(NormalMap, AutoParamName::AUTO_NORMAL_MAP, PDT_TEXTURE,
 		ParameterContext::CTX_PASS, "GBuffer normal map.");
 	MAKE_AUTO_PARAM(DepthMap, AutoParamName::AUTO_DEPTH_MAP, PDT_TEXTURE,

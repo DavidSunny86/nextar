@@ -15,7 +15,7 @@
 namespace RenderOpenGL {
 
 MultiRenderTargetViewGL::MultiRenderTargetViewGL() :
-		MultiRenderTarget::View() {
+		MultiRenderTarget::View(), colorAttachmentCount(0) {
 }
 
 MultiRenderTargetViewGL::~MultiRenderTargetViewGL() {
@@ -36,6 +36,7 @@ void MultiRenderTargetViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 				reinterpret_cast<const MultiRenderTarget*>(params);
 
 		uint32 numColorTargets = rt->GetColorTargetsCount();
+		colorAttachmentCount = numColorTargets;
 		fbo.Create(gl);
 		fbo.Bind(false, gl);
 		for (uint32 i = 0; i < numColorTargets; ++i) {

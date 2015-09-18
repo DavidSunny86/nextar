@@ -115,8 +115,8 @@ void BaseRenderContext::BeginRender(RenderInfo* ri) {
 		SetCurrentTarget(ri->rt);
 		frameStats.renderTargetsUsed++;
 	}
-	if (Test(ri->clearFlags)) {
-		Clear(ri->clearColor, ri->clearDepth, ri->clearStencil, ri->clearFlags);
+	if (Test(ri->info.clearFlags)) {
+		Clear(ri->info);
 	}
 }
 

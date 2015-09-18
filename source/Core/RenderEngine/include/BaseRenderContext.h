@@ -38,8 +38,7 @@ public:
 	virtual void SetVideoModeImpl(const VideoMode& videoMode) = 0;
 	virtual void Draw(StreamData*, CommitContext&) override = 0;
 	virtual void SetCurrentTarget(RenderTarget*) = 0;
-	virtual void Clear(Color& c, float depth, uint16 stencil,
-			ClearFlags flags) = 0;
+	virtual void Clear(const ClearBufferInfo&) = 0;
 
 	/* helpers */
 	uint32 GetVideoModeIndex(const VideoMode& vm) const;

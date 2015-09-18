@@ -31,9 +31,13 @@ public:
 		return fbo;
 	}
 
+	uint32 GetColorAttachmentCount() const {
+		return colorAttachmentCount;
+	}
+
 protected:
 
-
+	uint32 colorAttachmentCount;
 	FrameBufferObjectGL fbo;
 };
 

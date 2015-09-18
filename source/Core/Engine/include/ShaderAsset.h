@@ -80,7 +80,7 @@ public:
 		/* Add Pass */
 		void AddPass(StringID name);
 		/* Set pass paramter buffer data */
-		void SetParamterBuffer(ParameterBuffer&& data);
+		void SetParameterBuffer(ParameterBuffer&& data);
 
 		/* Pass related */
 		void SetCompilationOptions(const String& options);
@@ -126,7 +126,7 @@ public:
 	}
 
 	virtual uint32 GetClassID() const override;
-	
+
 
 	const ParamEntryTableItem& GetParamTableItem(ParameterContext context) {
 		return paramsPerContext[(uint32)context];

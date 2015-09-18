@@ -53,6 +53,7 @@ public:
 
 	void SetData(const void* data, size_t offset, size_t size);
 	void SetData(const TextureUnit* data, size_t offset);
+	size_t GetOffset(const String& name) const;
 
 	ParameterBuffer& operator =(const ParameterBuffer& pb);
 	ParameterBuffer& operator =(ParameterBuffer&& pb);

@@ -26,8 +26,9 @@ public:
 	void Destroy();
 
 	RenderTexturePtr depth;
-	RenderTexturePtr albedoSpecular;
+	RenderTexturePtr albedoMap;
 	RenderTexturePtr normalMap;
+	RenderTexturePtr specularAndGlossMap;
 	MultiRenderTargetPtr renderTarget;
 };
 

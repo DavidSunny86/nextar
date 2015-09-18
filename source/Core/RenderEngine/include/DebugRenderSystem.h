@@ -40,9 +40,9 @@ public:
 			return true;
 		return false;
 	}
-	
+
 	inline void SetTransform(Vec3AF scale, QuatF rot, Vec3AF loc) {
-		*worldMatrix = Mat4x4Mul(Mat4x4Mul(Mat4x4FromScale(scale), Mat4x4FromRot(rot)), 
+		*worldMatrix = Mat4x4Mul(Mat4x4Mul(Mat4x4FromScale(scale), Mat4x4FromRot(rot)),
 			Mat4x4FromPos(loc));
 	}
 
@@ -58,7 +58,10 @@ public:
 		return constantSize;
 	}
 
+	void SetDebugMaterial(MaterialAssetPtr& m);
+
 protected:
+	ParameterBuffer _parameters;
 	Matrix4x4* worldMatrix;
 	float constantSize;
 	Color color;
@@ -66,7 +69,7 @@ protected:
 	float timeToDeath;
 };
 
-class DebugRenderSystem: 
+class DebugRenderSystem:
 	public DebugDisplay,
 	public nextar::RenderSystem {
 
@@ -100,7 +103,7 @@ public:
 	static void DestroyResources(void* renderSystem);
 	static void CreateResources(void* renderSystem);
 
-	
+
 protected:
 
 	void ClearStreamData(StreamData&);

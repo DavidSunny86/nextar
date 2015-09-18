@@ -50,6 +50,15 @@ public:
 		return fbo;
 	}
 
+	bool IsColorTarget() const {
+		return attachmentType != GL_DEPTH_ATTACHMENT &&
+			attachmentType != GL_DEPTH_STENCIL_ATTACHMENT;
+	}
+
+	bool IsDepthStencilTarget() const {
+		return !IsColorTarget();
+	}
+
 protected:
 	FrameBufferObjectGL fbo;
 	GLenum attachmentType;

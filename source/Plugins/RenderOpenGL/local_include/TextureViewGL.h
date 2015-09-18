@@ -53,6 +53,14 @@ public:
 		return texture != 0;
 	}
 
+	bool IsColorTarget() const {
+		return !pixelFormat.isDepthSencil;
+	}
+
+	bool IsDepthStencilTarget() const {
+		return pixelFormat.isDepthSencil;
+	}
+
 	void ReadPixels(RenderContextGL*, TextureBase::ReadPixelUpdateParams& box);
 protected:
 

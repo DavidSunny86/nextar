@@ -1,0 +1,4 @@
+Shader fx:
+1. Parameters are stored in contagious fashion in parameter buffers, samplers appear at the end of the list.
+2. Uniform/Constant buffers appear at the start of parameter buffers and in the order as declared in fx.
+3. Samplers can have object as context.

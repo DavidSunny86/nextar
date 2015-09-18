@@ -146,7 +146,7 @@
 /* Use thread building blocks. */
 /* #undef NEX_USE_TBB */
 /* Use vector instructions for math library. */
-/* #undef NEX_USE_VECTOR_INSTRUCTIONS */
+#define NEX_USE_VECTOR_INSTRUCTIONS
 
 
 /* Endianness */

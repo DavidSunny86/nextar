@@ -54,8 +54,10 @@ enum AutoParamName
 	AUTO_DEPTH_MAP,
 	// Normal map
 	AUTO_NORMAL_MAP,
-	// Albedo and gloss map
-	AUTO_ALBEDO_AND_GLOSS,
+	// Albedo  map
+	AUTO_ALBEDO_MAP,
+	// Specular and gloss map
+	AUTO_SPECULAR_AND_GLOSS_MAP,
 	// Model view projection matrix
 	AUTO_MODEL_VIEW_PROJECTION,
 	// Diffuse color

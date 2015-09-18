@@ -56,6 +56,17 @@ void ParameterBuffer::Prepare(BufferPtr&& data, size_t size) {
 	this->data = std::move(data);
 }
 
+size_t ParameterBuffer::GetOffset(const String& name) const {
+	size_t offset = 0;
+	auto it = paramTable.beginIt;
+	while (it != paramTable.endIt) {
+		if ((*it).name == name)
+			return offset;
+			offset += (*it).maxSize;
+	}
+	return -1;
+}
+
 const ParamEntry* ParameterBuffer::_GetParameter(const String& name) const {
 	auto it = paramTable.beginIt;
 	while (it != paramTable.endIt) {

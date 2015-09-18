@@ -3,25 +3,37 @@ shader DebugQuad {
 
 	flags debug;
 	pass Main {
-	
-		cbuffer DebugTransforms;
-		
+
+		cbuffer DebugQuad;
+
+		texture_state {
+			sampler linear_sampler {
+				min_filter linear_mip_linear;
+				mag_filter linear;
+				address_u clamp;
+				address_v clamp;
+			}
+
+			unit linear_sampler textureMap ui:Maps.TextureMap context:Object;
+		}
+
 		depth_stencil_state {
-			depth_state true true lessEq;
+			depth_state true true less_equal;
 			stencil_test false;
 		}
-		
+
 		blend_state {
 			blend false;
 		}
-		
+
 		raster_state {
 			raster solid back true;
 			scissor false;
 			anti_aliasing false false;
 		}
-		
+
 		program {
+			option HAS_DIFFUSE_MAP ui:Options.HasTextureMap "desc:Apply texture map.";
 			define HAS_2DVERT;
 			vertex_program Common Quad;
 			fragment_program DebugQuad;

@@ -11,14 +11,23 @@
 
 namespace nextar {
 
-DebugPrimitive::DebugPrimitive(uint32 primId, 
+DebugPrimitive::DebugPrimitive(uint32 primId,
 	float timeToExpiry) : id(primId), timeToDeath(timeToExpiry), color(Color::White), worldMatrix(NEX_NEW(Matrix4x4)), constantSize(0.0f) {
 	this->worldMatrices = worldMatrix;
 	*(worldMatrix) = Matrix4x4::IdentityMatrix;
+	parameters = &_parameters;
 }
 
 DebugPrimitive::~DebugPrimitive() {
 	NEX_DELETE(worldMatrix);
+}
+
+void DebugPrimitive::SetDebugMaterial(MaterialAssetPtr& m) {
+	SetMaterial(m);
+	ShaderAssetPtr s = m->GetShader();
+	if (s) {
+		parameters->Prepare(s->GetParamTableItem(ParameterContext::CTX_OBJECT));
+	}
 }
 
 DebugRenderSystem::DebugRenderSystem() {
@@ -66,7 +75,7 @@ void DebugRenderSystem::CreateMaterials() {
 
 void DebugRenderSystem::ReleaseObjects() {
 
-	std::for_each(alivePrimitives.begin(), alivePrimitives.end(), 
+	std::for_each(alivePrimitives.begin(), alivePrimitives.end(),
 		[] (VisiblePrimitive* o) {
 		DebugPrimitive* db = static_cast<DebugPrimitive*>(o);
 		NEX_DELETE(db);
@@ -96,10 +105,10 @@ uint32 DebugRenderSystem::Register(AABoxF box,
 		GenerateStreamDataForBox();
 	}
 	DebugPrimitive* primitive = nullptr;
-	
+
 	primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
 	primitive->SetStreamData(&boxDataStream);
-	primitive->SetMaterial(debugMaterial);
+	primitive->SetDebugMaterial(debugMaterial);
 	primitive->SetColor(color);
 	primitive->SetTransform(AABoxGetSize(box), QuatIdentity(), AABoxGetCenter(box));
 	alivePrimitives.push_back(primitive);
@@ -116,7 +125,7 @@ uint32 DebugRenderSystem::Register(Mat4x4R tform,
 	DebugPrimitive* primitive = nullptr;
 	primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
 	primitive->SetStreamData(&axisData);
-	primitive->SetMaterial(debugMaterial);
+	primitive->SetDebugMaterial(debugMaterial);
 	primitive->SetColor(color);
 	primitive->SetTransform(tform);
 	primitive->SetConstantSize(screenSpaceFactor);
@@ -142,8 +151,21 @@ uint32 DebugRenderSystem::Register(const Frustum& frustum,
 uint32 DebugRenderSystem::Register(const Box2D& rect,
 	const Color& color, TextureBase* textured, bool border,
 	float expiryTimeInSec) {
-	//DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
-	//alivePrimitives.push_back(primitive);
+	DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
+	primitive->SetDebugMaterial(debugQuadMaterial);
+	ParameterBuffer* b = primitive->GetParameters();
+	Vector2 size = rect.GetSize();
+	Vector2 center = rect.GetCenter();
+
+	Vector4A translationAndScale[2] = {
+		Vec4ASet(	center.x, center.y, size.x, size.y	),
+		Vec4ASet(	color.red, color.green, color.blue, color.alpha	)
+	};
+	TextureUnit textureData;
+	textureData.texture = textured;
+	b->SetData(translationAndScale, 0, sizeof(Vector4A)*2);
+	b->SetData(&textureData, sizeof(Vector4A)*2);
+	alivePrimitives.push_back(primitive);
 	return idCounter;
 }
 
@@ -155,12 +177,12 @@ uint32 DebugRenderSystem::Register(const Geometry& triList, const Color& color,
 }
 
 void DebugRenderSystem::DetermineVisiblePrimitives(float frameTime) {
-	
+
 	for (uint32 i = 0; i < alivePrimitives.size(); ) {
 		auto p = alivePrimitives[i];
 		DebugPrimitive* dp = static_cast<DebugPrimitive*>(p);
 		if (dp->IsDead(frameTime)) {
-			
+
 			if (alivePrimitives.size() > 1) {
 				alivePrimitives[i] = *alivePrimitives.rbegin();
 				alivePrimitives.pop_back();
@@ -186,8 +208,8 @@ void DebugRenderSystem::RemovePrimitive(uint32 id) {
 void DebugRenderSystem::Commit(CommitContext& context) {
 
 	DetermineVisiblePrimitives(context.frameTime);
-	context.renderTargetInfo.clearColor = Color::White;
-	context.renderTargetInfo.clearFlags = ClearFlags::CLEAR_COLOR;
+	context.renderTargetInfo.info.clearColor[0] = Color::Black;
+	context.renderTargetInfo.info.clearFlags = ClearFlags::CLEAR_COLOR;
 	context.renderContext->BeginRender(&context.renderTargetInfo);
 	for (auto &prim : alivePrimitives) {
 		MaterialAsset* material = prim->GetMaterial();
@@ -256,7 +278,7 @@ void DebugRenderSystem::GenerateStreamDataForAxis() {
 	q = QuatFromAxisAng(Vec3ASet(1, 0, 0), Math::PI_BY_2);
 	m = Mat4x4FromRot(q);
 	zAxis.Transform(m);
-	
+
 	Geometry main = Geometry::CreateSphere(10, radius/1.5f, false, true, Color(alpha, 0.7f, 0.7f, 0.7f));
 
 	//cone2.Transform(m);
@@ -310,7 +332,7 @@ void DebugRenderSystem::GenerateStreamDataForAxis() {
 void DebugRenderSystem::GenerateStreamDataForBox() {
 	Geometry boxData = Geometry::CreateBox(1, 1, 1, true, Color::White);
 	VertexBuffer vertexBuffer(GpuBuffer::NEVER_RELEASED);
-	
+
 	uint32 stride = ((sizeof(float) * 3) + sizeof(uint32));
 	uint32 vbsize = (uint32)boxData.points.size() * stride;
 
@@ -319,7 +341,7 @@ void DebugRenderSystem::GenerateStreamDataForBox() {
 	for (uint32 i = 0; i < boxData.points.size(); ++i) {
 		auto &p = boxData.points[i];
 		auto& c = boxData.colors[i];
-		
+
 		*pos++ = p.x;
 		*pos++ = p.y;
 		*pos++ = p.z;
@@ -329,7 +351,7 @@ void DebugRenderSystem::GenerateStreamDataForBox() {
 	vertexBuffer.CreateBuffer(vbsize, stride, reinterpret_cast<const uint8*>(pVData));
 
 	IndexBufferPtr indexBuffer = Assign(NEX_NEW(IndexBuffer(GpuBuffer::NEVER_RELEASED)));
-	indexBuffer->CreateBuffer(boxData.topology.size()*2, IndexBuffer::Type::TYPE_16BIT, 
+	indexBuffer->CreateBuffer(boxData.topology.size()*2, IndexBuffer::Type::TYPE_16BIT,
 		reinterpret_cast<const uint8*>(boxData.topology.data()));
 
 	StreamData* stream = &boxDataStream;
