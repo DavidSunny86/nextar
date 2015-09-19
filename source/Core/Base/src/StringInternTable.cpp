@@ -62,8 +62,10 @@ void StringInternTable::_LoadFromCache() {
 	reverseMap.emplace(std::cref((*it).second), (*it).first);
 	it = forwardMap.insert(
 			ForwardMap::value_type(StringUtils::DefaultID,
-					StringUtils::Default)).first;
+					StringUtils::DefaultSymbol)).first;
 	reverseMap.emplace(std::cref((*it).second), (*it).first);
+	// also place _ as default symbol ref
+	reverseMap.emplace(std::cref(StringUtils::Default), (*it).first);
 
 	// @todo Read from project folder if present 
 	InputStreamPtr input = FileSystem::Instance().OpenRead(_GetURL());

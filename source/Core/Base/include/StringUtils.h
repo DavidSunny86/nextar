@@ -31,6 +31,7 @@ enum {
 NEX_EXTERN_SYM _NexBaseAPI const String Null;
 NEX_EXTERN_SYM _NexBaseAPI const String Default;
 NEX_EXTERN_SYM _NexBaseAPI const String Unknown;
+NEX_EXTERN_SYM _NexBaseAPI const String DefaultSymbol;
 NEX_EXTERN_SYM _NexBaseAPI const UniString UniNull;
 NEX_EXTERN_SYM _NexBaseAPI const StringID NullID;
 NEX_EXTERN_SYM _NexBaseAPI const StringID DefaultID;

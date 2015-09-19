@@ -4,7 +4,7 @@ shader DebugQuad {
 	flags debug;
 	pass Main {
 
-		cbuffer DebugQuad;
+		cbuffer Quad;
 
 		texture_state {
 			sampler linear_sampler {

@@ -136,22 +136,22 @@ uint32 DebugRenderSystem::Register(Mat4x4R tform,
 
 uint32 DebugRenderSystem::Register(PlaneF plane,
 	const Color& color, float expiryTimeInSec) {
-	DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
-	alivePrimitives.push_back(primitive);
+	//DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
+	//alivePrimitives.push_back(primitive);
 	return idCounter;
 }
 
 uint32 DebugRenderSystem::Register(const Frustum& frustum,
 	const Color& color, float expiryTimeInSec) {
-	DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
-	alivePrimitives.push_back(primitive);
+	//DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
+	//alivePrimitives.push_back(primitive);
 	return idCounter;
 }
 
 uint32 DebugRenderSystem::Register(const Box2D& rect,
 	const Color& color, TextureBase* textured, bool border,
 	float expiryTimeInSec) {
-	DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
+	/*DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
 	primitive->SetDebugMaterial(debugQuadMaterial);
 	ParameterBuffer* b = primitive->GetParameters();
 	Vector2 size = rect.GetSize();
@@ -166,13 +166,14 @@ uint32 DebugRenderSystem::Register(const Box2D& rect,
 	b->SetData(translationAndScale, 0, sizeof(Vector4A)*2);
 	b->SetData(&textureData, sizeof(Vector4A)*2);
 	alivePrimitives.push_back(primitive);
+	*/
 	return idCounter;
 }
 
 uint32 DebugRenderSystem::Register(const Geometry& triList, const Color& color,
 	float expiryTimeInSec) {
-	DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
-	alivePrimitives.push_back(primitive);
+	//DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
+	//alivePrimitives.push_back(primitive);
 	return idCounter;
 }
 

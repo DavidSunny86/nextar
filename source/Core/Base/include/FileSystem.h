@@ -36,7 +36,7 @@ public:
 	void AddFactory(uint32 type, Archive::Factory*);
 	void RemoveFactory(uint32 type);
 	// open file for reading
-	InputStreamPtr OpenRead(const URL&);
+	InputStreamPtr OpenRead(const URL&, bool lookInEngineDataIfNotFound = true);
 	// open file for writing
 	OutputStreamPtr OpenWrite(const URL&, bool append = false);
 

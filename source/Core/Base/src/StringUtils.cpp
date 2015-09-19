@@ -6,6 +6,7 @@ namespace nextar {
 namespace StringUtils {
 const String Null;
 const String Default("Default");
+const String DefaultSymbol("#");
 const UniString UniNull;
 const String Unknown("<?>");
 const StringID NullID(0);

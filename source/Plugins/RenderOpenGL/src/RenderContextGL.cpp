@@ -859,6 +859,7 @@ void RenderContextGL::SwitchPass(CommitContext& context, Pass::View* passView) {
 }
 
 void RenderContextGL::Draw(StreamData* streamData, CommitContext& ctx) {
+	NEX_ASSERT(streamData);
 	/**
 	 * Note on functions/extensions used:
 	 * + GlBindBuffer - to bind the VBO
@@ -1009,7 +1010,11 @@ void RenderContextGL::Clear(const ClearBufferInfo& info) {
 					GlClearBufferfv(GL_COLOR, i, info.clearColor[i].AsFloatArray());
 			}
 		} else {
-			GlClearBufferfv(GL_BACK, 0, info.clearColor[0].AsFloatArray());
+			//GLbitfield mask = 0;
+			const Color& c = info.clearColor[0];
+			glClearColor(c.red, c.green, c.blue, c.alpha);
+			//GlClearBufferfv(GL_BACK, 0, info.clearColor[0].AsFloatArray());
+			glClear(GL_COLOR_BUFFER_BIT);
 		}
 	}
 	if (Test(info.clearFlags & ClearFlags::CLEAR_DEPTH) &&
