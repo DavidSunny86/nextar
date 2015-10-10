@@ -34,7 +34,7 @@ public:
 		return renderBuffer;
 	}
 
-	inline void CreateFBO(RenderContextGL* gl) {
+/*	inline void CreateFBO(RenderContextGL* gl) {
 		fbo.Create(gl);
 		fbo.Bind(false, gl);
 		fbo.Attach(gl, attachmentType + 0, this);
@@ -45,7 +45,7 @@ public:
 	inline void DestroyFBO(RenderContextGL* gl) {
 		fbo.Destroy(gl);
 	}
-
+*/
 	FrameBufferObjectGL& GetFBO() {
 		return fbo;
 	}
@@ -60,6 +60,7 @@ public:
 	}
 
 protected:
+	friend class RenderContext_Base_GL;
 	FrameBufferObjectGL fbo;
 	GLenum attachmentType;
 	GLuint renderBuffer;

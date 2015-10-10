@@ -1,6 +1,6 @@
 #include <RenderOpenGL.h>
 #include <PassViewGL.h>
-#include <RenderContextGL.h>
+#include <RenderContext_Base_GL.h>
 #include <TextureViewGL.h>
 
 namespace RenderOpenGL {
@@ -29,7 +29,7 @@ PassViewGL::~PassViewGL() {
 
 void PassViewGL::Compile(nextar::RenderContext* rc,
 		const Pass::CompileParams& params) {
-	RenderContextGL* ctx = static_cast<RenderContextGL*>(rc);
+	RenderContext_Base_GL* ctx = static_cast<RenderContext_Base_GL*>(rc);
 	GLuint programStages[Pass::STAGE_COUNT] = { 0 };
 	for (nextar::uint32 i = 0; i < Pass::STAGE_COUNT; ++i) {
 		if (params.programSources[i].length() > 1) {
@@ -110,12 +110,12 @@ void PassViewGL::SetupBlendState(const BlendState& rs) {
 				blendState.sameBlendOpAllTarget = false;
 
 			dest.enabled = src.enabled;
-			dest.alphaOp = RenderContextGL::GetGlBlendEquation(src.alphaOp);
-			dest.colOp = RenderContextGL::GetGlBlendEquation(src.colOp);
-			dest.destAlpha = RenderContextGL::GetGlBlendDataSource(src.destAlpha);
-			dest.destCol = RenderContextGL::GetGlBlendDataSource(src.destCol);
-			dest.srcAlpha = RenderContextGL::GetGlBlendDataSource(src.srcAlpha);
-			dest.srcCol = RenderContextGL::GetGlBlendDataSource(src.srcCol);
+			dest.alphaOp = RenderContext_Base_GL::GetGlBlendEquation(src.alphaOp);
+			dest.colOp = RenderContext_Base_GL::GetGlBlendEquation(src.colOp);
+			dest.destAlpha = RenderContext_Base_GL::GetGlBlendDataSource(src.destAlpha);
+			dest.destCol = RenderContext_Base_GL::GetGlBlendDataSource(src.destCol);
+			dest.srcAlpha = RenderContext_Base_GL::GetGlBlendDataSource(src.srcAlpha);
+			dest.srcCol = RenderContext_Base_GL::GetGlBlendDataSource(src.srcCol);
 		}
 	}
 }
@@ -129,7 +129,7 @@ void PassViewGL::SetupRasterState(const RasterState& rs) {
 	rasterState.useScissors = rs.usingScissors;
 	rasterState.usingMultisample = rs.usingMultisample;
 	rasterState.usingLineAA = rs.usingLineAa;
-	
+
 	switch (rs.fill) {
 	case FillMode::FM_POINT:
 		rasterState.fillMode = GL_POINT; break;
@@ -138,7 +138,7 @@ void PassViewGL::SetupRasterState(const RasterState& rs) {
 	case FillMode::FM_WIREFRAME:
 		rasterState.fillMode = GL_LINE; break;
 	}
-	
+
 	switch (rs.cull) {
 	case CullMode::CULL_ALL:
 		rasterState.cullMode = GL_FRONT_AND_BACK; break;
@@ -148,7 +148,7 @@ void PassViewGL::SetupRasterState(const RasterState& rs) {
 		rasterState.cullMode = GL_FRONT; break;
 	case CullMode::CULL_NONE:
 		rasterState.cullMode = 0; break;
-	}	
+	}
 }
 
 void PassViewGL::SetupDepthStencilState(const DepthStencilState& desc) {
@@ -161,32 +161,32 @@ void PassViewGL::SetupDepthStencilState(const DepthStencilState& desc) {
 	depthStencilState.stencilFrontRef = desc.front.stencilRef;
 	depthStencilState.stencilBackRef = desc.back.stencilRef;
 
-	depthStencilState.stencilFrontFunc = RenderContextGL::GetGlCompareFunc(desc.front.stencilFunc);
-	depthStencilState.stencilBackFunc = RenderContextGL::GetGlCompareFunc(desc.back.stencilFunc);
+	depthStencilState.stencilFrontFunc = RenderContext_Base_GL::GetGlCompareFunc(desc.front.stencilFunc);
+	depthStencilState.stencilBackFunc = RenderContext_Base_GL::GetGlCompareFunc(desc.back.stencilFunc);
 
-	depthStencilState.frontStencilFail = RenderContextGL::GetGlStencilOp(desc.front.stencilFail);
-	depthStencilState.frontStencilPass = RenderContextGL::GetGlStencilOp(desc.front.stencilPass);
-	depthStencilState.frontDepthPass = RenderContextGL::GetGlStencilOp(desc.front.depthPass);
+	depthStencilState.frontStencilFail = RenderContext_Base_GL::GetGlStencilOp(desc.front.stencilFail);
+	depthStencilState.frontStencilPass = RenderContext_Base_GL::GetGlStencilOp(desc.front.stencilPass);
+	depthStencilState.frontDepthPass = RenderContext_Base_GL::GetGlStencilOp(desc.front.depthPass);
 
-	depthStencilState.backStencilFail = RenderContextGL::GetGlStencilOp(desc.back.stencilFail);
-	depthStencilState.backStencilPass = RenderContextGL::GetGlStencilOp(desc.back.stencilPass);
-	depthStencilState.backDepthPass = RenderContextGL::GetGlStencilOp(desc.back.depthPass);
+	depthStencilState.backStencilFail = RenderContext_Base_GL::GetGlStencilOp(desc.back.stencilFail);
+	depthStencilState.backStencilPass = RenderContext_Base_GL::GetGlStencilOp(desc.back.stencilPass);
+	depthStencilState.backDepthPass = RenderContext_Base_GL::GetGlStencilOp(desc.back.depthPass);
 
-	depthStencilState.depthCompare = RenderContextGL::GetGlCompareFunc(desc.depthCompareFunc);
+	depthStencilState.depthCompare = RenderContext_Base_GL::GetGlCompareFunc(desc.depthCompareFunc);
 	depthStencilState.stencilSeparateOp = false;
-	
+
 	if (depthStencilState.stencilFrontFunc != depthStencilState.stencilBackFunc ||
 		depthStencilState.frontStencilFail != depthStencilState.backStencilFail ||
 		depthStencilState.frontStencilPass != depthStencilState.backStencilPass ||
 		depthStencilState.frontDepthPass != depthStencilState.backDepthPass ||
 		depthStencilState.stencilFrontMask != depthStencilState.stencilBackMask)
 		depthStencilState.stencilSeparateOp = true;
-	
+
 }
 
 void PassViewGL::SetTexture(RenderContext* rc, const SamplerParameter& desc,
 		const TextureUnit* tu) {
-	RenderContextGL* ctx = static_cast<RenderContextGL*>(rc);
+	RenderContext_Base_GL* ctx = static_cast<RenderContext_Base_GL*>(rc);
 	const SamplerState* samplerState = static_cast<const SamplerState*>(&desc);
 	TextureViewGL* texture = static_cast<TextureViewGL*>(ctx->GetView(
 			tu->texture));
@@ -198,7 +198,7 @@ void PassViewGL::Destroy(RenderContext* _ctx) {
 		programs[i].Destroy(_ctx);
 	}
 
-	RenderContextGL* ctx = static_cast<RenderContextGL*>(_ctx);
+	RenderContext_Base_GL* ctx = static_cast<RenderContext_Base_GL*>(_ctx);
 	ctx->DestroyProgram(iGlProgram);
 }
 

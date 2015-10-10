@@ -22,6 +22,7 @@ public:
 	virtual void Update(RenderContext*, uint32, ContextObject::ContextParamPtr);
 	virtual void Destroy(RenderContext*);
 
+/*
 	inline void CreateFBO(RenderContextGL* gl) {
 		fbo.Create(gl);
 		fbo.Bind(false, gl);
@@ -33,7 +34,7 @@ public:
 	inline void DestroyFBO(RenderContextGL* gl) {
 		fbo.Destroy(gl);
 	}
-
+*/
 	FrameBufferObjectGL& GetFBO() {
 		return fbo;
 	}

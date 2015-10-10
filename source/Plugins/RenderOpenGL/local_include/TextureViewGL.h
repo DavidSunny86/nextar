@@ -61,7 +61,7 @@ public:
 		return pixelFormat.isDepthSencil;
 	}
 
-	void ReadPixels(RenderContextGL*, TextureBase::ReadPixelUpdateParams& box);
+	void ReadPixels(RenderContext_Base_GL*, TextureBase::ReadPixelUpdateParams& box);
 protected:
 
 	PixelFormatGl pixelFormat;

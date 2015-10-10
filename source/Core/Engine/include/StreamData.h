@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   StreamData.h
  * Author: obhi
  *
@@ -9,71 +9,11 @@
 #define	StreamData_H
 
 #include <RenderConstants.h>
-#include <VertexBuffer.h>
+#include <VertexBufferBinding.h>
 #include <IndexBuffer.h>
 #include <VertexLayout.h>
 
 namespace nextar {
-
-// @optimize Most pointers are of few bytes size. Can be taken as object.
-// Need better data structures to account for small object pointers here.
-class _NexEngineAPI VertexBufferBinding: public AllocGraphics {
-public:
-
-	VertexBufferBinding();
-	~VertexBufferBinding() {
-	}
-
-	inline uint16 GetBindingNumber() const {
-		return bindingNumber;
-	}
-
-	/** @remarks Returns the count of vertex buffers */
-	inline uint32 GetBufferCount() const {
-		return (uint32)bufferList.size();
-	}
-
-	/** @remarks Returns the buffer stored at a specified index */
-	VertexBuffer& GetBuffer(size_t i) {
-		return bufferList[i];
-	}
-
-	const VertexBuffer* GetBufferPtr(size_t i) const {
-		return &bufferList.at(i);
-	}
-
-	VertexBuffer* GetBufferPtr(size_t i) {
-		return &bufferList.at(i);
-	}
-
-	/** @remarks Set buffer count, this must be called before binding
-	 * Use VertexLayout::GetBufferCount to find the number of seperate
-	 * buffers.
-	 **/
-	void SetBufferCount(size_t num) {
-		bufferList.resize(num);
-	}
-
-	/** @remarks Binds the buffer to the specified index */
-	void BindBuffer(size_t index, VertexBuffer&& vb) {
-		if (bufferList[index].IsTransientBuffer())
-			--transientBufferCount;
-		bufferList[index] = std::move(vb);
-		if (bufferList[index].IsTransientBuffer())
-			transientBufferCount++;
-		bindingNumber++;
-	}
-
-	inline bool HasTransientBuffers() {
-		return transientBufferCount != 0;
-	}
-
-protected:
-	typedef vector<VertexBuffer>::type VertexBufferList;
-	uint16 transientBufferCount;
-	uint16 bindingNumber;
-	VertexBufferList bufferList;
-};
 
 enum PrimitiveType : uint8 {
 	/* Point list primitive type.  */
@@ -153,4 +93,3 @@ public:
 
 }
 #endif	/* StreamData_H */
-

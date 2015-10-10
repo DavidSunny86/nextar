@@ -6,7 +6,7 @@
  */
 #include <RenderOpenGL.h>
 #include <VertexLayoutGL.h>
-#include <RenderContextGL.h>
+#include <RenderContext_Base_GL.h>
 
 namespace RenderOpenGL {
 
@@ -90,14 +90,14 @@ VertexLayoutStaticGL::~VertexLayoutStaticGL() {
 }
 
 void VertexLayoutStaticGL::Destroy(nextar::RenderContext* rc) {
-	RenderContextGL* rcGL = static_cast<RenderContextGL*>(rc);
+	RenderContext_Base_GL* rcGL = static_cast<RenderContext_Base_GL*>(rc);
 	for (auto &p : passVertexArrayPairs) {
 		rcGL->DestroyVAO(p.second);
 	}
 	passVertexArrayPairs.clear();
 }
 
-void VertexLayoutStaticGL::ClearAllVAO(RenderContextGL* rcGL) {
+void VertexLayoutStaticGL::ClearAllVAO(RenderContext_Base_GL* rcGL) {
 	for (auto &p : passVertexArrayPairs) {
 		rcGL->DestroyVAO(p.second);
 	}
@@ -108,7 +108,7 @@ void VertexLayoutStaticGL::Update(nextar::RenderContext* rc, uint32 msg,
 		ContextObject::ContextParamPtr param) {
 	if (msg == VertexLayout::MSG_CREATE) {
 		VertexLayoutGL::Update(rc, msg, param);
-		RenderContextGL* rcGL = static_cast<RenderContextGL*>(rc);
+		RenderContext_Base_GL* rcGL = static_cast<RenderContext_Base_GL*>(rc);
 		ClearAllVAO(rcGL);
 		cachedIndex = 0;
 		bindingNumber = -1;
@@ -116,7 +116,7 @@ void VertexLayoutStaticGL::Update(nextar::RenderContext* rc, uint32 msg,
 }
 
 void VertexLayoutStaticGL::Enable(VertexBufferBinding& binding,
-		PassViewGL* pass, RenderContextGL* rc) {
+		PassViewGL* pass, RenderContext_Base_GL* rc) {
 	uint32 id = pass->GetInputLayoutID();
 	if (binding.GetBindingNumber() != bindingNumber) {
 		bindingNumber = binding.GetBindingNumber();
@@ -140,11 +140,11 @@ void VertexLayoutStaticGL::Enable(VertexBufferBinding& binding,
 	rc->EnableVertexArrayObject(passVertexArrayPairs[cachedIndex].second);
 }
 
-void VertexLayoutStaticGL::Disable(RenderContextGL* rc) {
+void VertexLayoutStaticGL::Disable(RenderContext_Base_GL* rc) {
 	rc->DisableVertexArrayObject();
 }
 
-GLuint VertexLayoutStaticGL::CreateLayout(RenderContextGL* gl,
+GLuint VertexLayoutStaticGL::CreateLayout(RenderContext_Base_GL* gl,
 		VertexBufferBinding& binding,
 		const VertexSemanticListGL& semantics) {
 
@@ -157,11 +157,8 @@ GLuint VertexLayoutStaticGL::CreateLayout(RenderContextGL* gl,
 	if (numMapped) {
 		uint32 stream = -1;
 		uint32 stride = 0;
-		GLuint vao;
-		gl->GlGenVertexArrays(1, &vao);
-		GL_CHECK();
+		GLuint vao = gl->CreateVAO();
 		gl->EnableVertexArrayObject(vao);
-		GL_CHECK();
 
 		for (uint32 j = 0; j < numMapped; ++j) {
 			NEX_ASSERT(semantics[j].index < (uint16 )-1);
@@ -189,14 +186,14 @@ VertexLayoutFlexibleGL::~VertexLayoutFlexibleGL() {
 }
 
 void VertexLayoutFlexibleGL::Destroy(nextar::RenderContext* rc) {
-	RenderContextGL* rcGL = static_cast<RenderContextGL*>(rc);
+	RenderContext_Base_GL* rcGL = static_cast<RenderContext_Base_GL*>(rc);
 	for (auto &p : passVertexArrayPairs) {
 		rcGL->DestroyVAO(p.second);
 	}
 	passVertexArrayPairs.clear();
 }
 
-void VertexLayoutFlexibleGL::ClearAllVAO(RenderContextGL* rcGL) {
+void VertexLayoutFlexibleGL::ClearAllVAO(RenderContext_Base_GL* rcGL) {
 	for (auto &p : passVertexArrayPairs) {
 		rcGL->DestroyVAO(p.second);
 	}
@@ -207,20 +204,20 @@ void VertexLayoutFlexibleGL::Update(nextar::RenderContext* rc, uint32 msg,
 		ContextObject::ContextParamPtr param) {
 	if (msg == VertexLayout::MSG_CREATE) {
 		VertexLayoutGL::Update(rc, msg, param);
-		RenderContextGL* rcGL = static_cast<RenderContextGL*>(rc);
+		RenderContext_Base_GL* rcGL = static_cast<RenderContext_Base_GL*>(rc);
 		ClearAllVAO(rcGL);
 		cachedIndex = 0;
 	}
 }
 
 void VertexLayoutFlexibleGL::Enable(VertexBufferBinding& binding,
-		PassViewGL* pass, RenderContextGL* rc) {
+		PassViewGL* pass, RenderContext_Base_GL* rc) {
 	numSyncRequired = 0;
 	uint32 id = pass->GetInputLayoutID();
 	uint32 numPairs = (uint32)passVertexArrayPairs.size();
 	uint32 count = 0;
-	for (; 
-		count < numPairs && passVertexArrayPairs[cachedIndex].first != id; 
+	for (;
+		count < numPairs && passVertexArrayPairs[cachedIndex].first != id;
 		cachedIndex = (cachedIndex + 1) % numPairs, count++);
 
 	if (count == numPairs) {
@@ -228,28 +225,27 @@ void VertexLayoutFlexibleGL::Enable(VertexBufferBinding& binding,
 		cachedIndex = numPairs;
 		passVertexArrayPairs.push_back(PassLayoutVertexArrayPair(id, layout));
 		rc->DisableVertexArrayObject();
-	} 
+	}
 
 	rc->EnableVertexArrayObject(passVertexArrayPairs[cachedIndex].second);
 	for (uint32 stream = 0; stream < binding.GetBufferCount(); ++stream) {
 		GpuBufferViewGL* buffer = static_cast<GpuBufferViewGL*>(
 			rc->GetView(binding.GetBufferPtr(stream)));
-		rc->GlBindVertexBuffer(stream, buffer->GetBufferId(), 0, buffer->GetStride());
+		rc->BindVertexBuffer(stream, binding.GetBufferOffset(stream), buffer);
 		if (buffer->IsSyncRequired())
 			transients[numSyncRequired++] = buffer;
-		GL_CHECK();
 	}
 
 }
 
-void VertexLayoutFlexibleGL::Disable(RenderContextGL* rc) {
+void VertexLayoutFlexibleGL::Disable(RenderContext_Base_GL* rc) {
 	rc->DisableVertexArrayObject();
 	for (uint32 i  = 0; i < numSyncRequired; ++i) {
 		static_cast<GpuTransientBufferViewGL*>(transients[i])->Sync(rc);
 	}
 }
 
-GLuint VertexLayoutFlexibleGL::CreateLayout(RenderContextGL* gl,
+GLuint VertexLayoutFlexibleGL::CreateLayout(RenderContext_Base_GL* gl,
 		const VertexSemanticListGL& semantics) {
 	uint16 outElements[RenderConstants::MAX_VERTEX_ELEMENT];
 	uint32 numMapped = VertexSemantic::MapSignatureToSemantics(
@@ -258,15 +254,13 @@ GLuint VertexLayoutFlexibleGL::CreateLayout(RenderContextGL* gl,
 				outElements);
 	if (numMapped) {
 		uint16 stream = -1;
-		GLuint vao;
-		gl->GlGenVertexArrays(1, &vao);
-		GL_CHECK();
+		GLuint vao = gl->CreateVAO();
 		gl->EnableVertexArrayObject(vao);
-		GL_CHECK();
+
 		for (uint32 j = 0; j < numMapped; ++j) {
 			NEX_ASSERT(semantics[j].index < (uint16 )-1);
 			VertexAttribGL& vegl = attributes[outElements[j]];
-			gl->GlVertexAttribBinding(semantics[j].index, vegl.element.streamIndex);
+			gl->VertexAttribBinding(semantics[j].index, vegl.element.streamIndex);
 			gl->EnableVertexAttribute(semantics[j].index, vegl);
 		}
 		return vao;
@@ -283,7 +277,7 @@ VertexLayoutDynamicGL::~VertexLayoutDynamicGL() {
 }
 
 void VertexLayoutDynamicGL::Enable(VertexBufferBinding& binding,
-		PassViewGL* pass, RenderContextGL* rc) {
+		PassViewGL* pass, RenderContext_Base_GL* rc) {
 
 	uint16 id = pass->GetInputLayoutID();
 
@@ -350,7 +344,7 @@ void VertexLayoutDynamicGL::Enable(VertexBufferBinding& binding,
 	}
 }
 
-void VertexLayoutDynamicGL::Disable(RenderContextGL* rc) {
+void VertexLayoutDynamicGL::Disable(RenderContext_Base_GL* rc) {
 	NEX_ASSERT(cached);
 	uint16 numAttributes = cached->numAttributes;
 	for (uint16 s = 0; s < numAttributes; ++s) {

@@ -1,21 +1,21 @@
-#pragma once
+#ifndef RENDER_CONTEXT_IMPL_WGL_H_
+#define RENDER_CONTEXT_IMPL_WGL_H_
 
 #include <RenderOpenGL.h>
-#include <RenderContextGL.h>
+#include <RenderContext_Base_GL.h>
 #include <WindowWGL.h>
 
 namespace RenderOpenGL {
 
 class RenderDriverWGL;
 
-class RenderContextWGL: public RenderContextGL {
+class RenderContextImplWGL: public RenderContext_Base_GL::PlatformImpl {
 
-	NEX_LOG_HELPER(RenderContextWGL)
-	;
+	NEX_LOG_HELPER(RenderContextWGL);
 
 public:
-	RenderContextWGL(RenderDriverWGL* driver);
-	virtual ~RenderContextWGL();
+	RenderContextImplWGL(RenderContext_Base_GL* pParent);
+	virtual ~RenderContextImplWGL();
 
 	int GetPixelFormat() const {
 		return pixelFormat;
@@ -68,7 +68,7 @@ private:
 
 	int GetFormat(const DummyContext&, float fAttribs[], int iAttribs[]);
 	void UnreadyContext();
-	void EnumVideoModes();
+	void EnumVideoModes(VideoModeList& videModes);
 	void ReadyWglExtensions();
 	DummyContext CreateDummyContext();
 	void DestroyDummyContext(const DummyContext&);
@@ -79,7 +79,7 @@ protected:
 	/* GLX Extensions */
 	PFNWGLCHOOSEPIXELFORMATARBPROC WglChoosePixelFormatARB;
 	PFNWGLCREATECONTEXTATTRIBSARBPROC WglCreateContextAttribsARB;
-	
+
 	HDC currentDC;
 	HGLRC context;
 	int pixelFormat;
@@ -88,3 +88,5 @@ protected:
 
 
 }
+
+#endif // RENDER_CONTEXT_IMPL_WGL_H_

@@ -1,5 +1,5 @@
 /*
- * RenderContextWGL.cpp
+ * RenderContextImplWGL.cpp
  *
  *  Created on: 11-Aug-2013
  *      Author: obhi
@@ -7,25 +7,24 @@
 #include <RenderOpenGL.h>
 #include <RenderDriverGL.h>
 #include <RenderDriverWGL.h>
-#include <RenderContextWGL.h>
+#include <RenderContextImplWGL.h>
 #include <WindowWGL.h>
 
 namespace RenderOpenGL {
 
-RenderContextWGL::RenderContextWGL(RenderDriverWGL* _driver) :
-		RenderContextGL(_driver), context(0)
+RenderContextImplWGL::RenderContextImplWGL(RenderContext_Base_GL* baseContext) :
+		RenderContext_Base_GL::PlatformImpl(baseContext), context(0)
 		,WglCreateContextAttribsARB(0) {
 }
 
-RenderContextWGL::~RenderContextWGL() {
+RenderContextImplWGL::~RenderContextImplWGL() {
 }
 
-void RenderContextWGL::PostCloseImpl() {
+void RenderContextImplWGL::PostCloseImpl() {
 	UnreadyContext();
-	RenderContextGL::PostCloseImpl();
 }
 
-void RenderContextWGL::UnreadyContext() {
+void RenderContextImplWGL::UnreadyContext() {
 	if (context) {
 		SetCurrentTarget(0);
 		Trace("Destroying render context.");
@@ -34,7 +33,7 @@ void RenderContextWGL::UnreadyContext() {
 	}
 }
 
-void RenderContextWGL::SetCreationParams(
+void RenderContextImplWGL::SetCreationParams(
 		const RenderDriver::ContextCreationParams& ctxParams) {
 	// lets check for glx extensions
 	bool failed = false;
@@ -57,23 +56,25 @@ void RenderContextWGL::SetCreationParams(
 
 	DummyContext dc = CreateDummyContext();
 	ReadyWglExtensions();
-	EnumVideoModes();
-	
+	VideoModeList modes;
+	EnumVideoModes(modes);
+	baseContext->SetVideoModes(modes);
+
 	// choose fbconfig
-	int iAttribs[] = { 
+	int iAttribs[] = {
 		WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
 		WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
 		WGL_ACCELERATION_ARB, WGL_FULL_ACCELERATION_ARB,
 		WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
 		WGL_STENCIL_BITS_ARB, contextCreationParams.stencilBits,
-		WGL_DEPTH_BITS_ARB, contextCreationParams.depthBits, 
-		WGL_RED_BITS_ARB, 8, 
-		WGL_GREEN_BITS_ARB, 8, 
-		WGL_BLUE_BITS_ARB, 8, 
+		WGL_DEPTH_BITS_ARB, contextCreationParams.depthBits,
+		WGL_RED_BITS_ARB, 8,
+		WGL_GREEN_BITS_ARB, 8,
+		WGL_BLUE_BITS_ARB, 8,
 		0, 0,
 		0, 0,
 		0, 0,
-		0, 0 
+		0, 0
 	};
 
 	int attrib = 18;
@@ -87,9 +88,9 @@ void RenderContextWGL::SetCreationParams(
 		iAttribs[attrib++] = WGL_STEREO_ARB;
 		iAttribs[attrib++] = GL_TRUE;
 	}
-	
+
 	pixelFormat = GetFormat(dc, fAttribs, iAttribs);
-	DescribePixelFormat(dc.hDC, pixelFormat, 
+	DescribePixelFormat(dc.hDC, pixelFormat,
 		sizeof(PIXELFORMATDESCRIPTOR), &pixelDescriptor);
 	DestroyDummyContext(dc);
 	// create context
@@ -98,7 +99,7 @@ void RenderContextWGL::SetCreationParams(
 		NEX_THROW_FatalError(EXCEPT_DEVICE_CREATION_FAILED);
 }
 
-RenderContextWGL::DummyContext RenderContextWGL::CreateDummyContext() {
+RenderContextImplWGL::DummyContext RenderContextImplWGL::CreateDummyContext() {
 	WindowWGL::InitializeWindowClass();
 	DWORD windowStyle = WS_OVERLAPPEDWINDOW;
 	DWORD windowExtendedStyle = WS_EX_APPWINDOW;
@@ -131,7 +132,7 @@ RenderContextWGL::DummyContext RenderContextWGL::CreateDummyContext() {
 	int pixelFormat = ChoosePixelFormat (hDC, &pixelDescriptor);
 
 	if (pixelFormat == 0 ||
-		(SetPixelFormat (hDC, pixelFormat, 
+		(SetPixelFormat (hDC, pixelFormat,
 		&pixelDescriptor) == FALSE) ||
 		!(hRC = wglCreateContext (hDC))) {
 		// Failed
@@ -141,7 +142,7 @@ RenderContextWGL::DummyContext RenderContextWGL::CreateDummyContext() {
 		Error("Failed to get proper pixel format or create dummy context!");
 		NEX_THROW_FatalError(EXCEPT_FAILED_TO_CREATE_OBJECT);
 	}
-	
+
 	if (wglMakeCurrent (hDC, hRC) == FALSE) {
 		// Failed
 		wglDeleteContext (hRC);
@@ -158,7 +159,7 @@ RenderContextWGL::DummyContext RenderContextWGL::CreateDummyContext() {
 	return r;
 }
 
-void RenderContextWGL::DestroyDummyContext(const RenderContextWGL::DummyContext& dc) {
+void RenderContextImplWGL::DestroyDummyContext(const RenderContextImplWGL::DummyContext& dc) {
 	wglMakeCurrent (NULL, NULL);
 	// Failed
 	if(!wglDeleteContext (dc.hRC))
@@ -167,31 +168,31 @@ void RenderContextWGL::DestroyDummyContext(const RenderContextWGL::DummyContext&
 	DestroyWindow (dc.hWnd);
 }
 
-void RenderContextWGL::ReadyWglExtensions() {
+void RenderContextImplWGL::ReadyWglExtensions() {
 	const char *supported = NULL;
- 
+
 	// Try To Use wglGetExtensionStringARB On Current DC, If Possible
 	PROC wglGetExtString = wglGetProcAddress("wglGetExtensionsStringARB");
- 
+
 	if (wglGetExtString)
 		supported = ((char*(__stdcall*)(HDC))wglGetExtString)(wglGetCurrentDC());
- 
+
 	// If That Failed, Try Standard Opengl Extensions String
 	if (supported == NULL)
 		supported = (char*)glGetString(GL_EXTENSIONS);
 
 	if (IsSupported("WGL_ARB_create_context", supported))
 		WglCreateContextAttribsARB =
-				(PFNWGLCREATECONTEXTATTRIBSARBPROC) 
-				RenderDriverGL::GetExtension("wglCreateContextAttribsARB");
+				(PFNWGLCREATECONTEXTATTRIBSARBPROC)
+				RenderContext_Base_GL::GetExtension("wglCreateContextAttribsARB");
 
 	if (IsSupported("WGL_ARB_pixel_format", supported))
 		WglChoosePixelFormatARB =
 		(PFNWGLCHOOSEPIXELFORMATARBPROC)
-		RenderDriverGL::GetExtension("wglChoosePixelFormatARB");
+		RenderContext_Base_GL::GetExtension("wglChoosePixelFormatARB");
 }
 
-void RenderContextWGL::ReadyContext(RenderWindow* gw) {
+void RenderContextImplWGL::ReadyContext(RenderWindow* gw) {
 	// create context based of fbConfig and set as current
 	// do we have a shared context?
 	WindowWGL* wglWnd = static_cast<WindowWGL*>(gw);
@@ -200,7 +201,7 @@ void RenderContextWGL::ReadyContext(RenderWindow* gw) {
 		RenderContextPtr ptr = driver->AsyncGetContext(
 				contextCreationParams.sharedContextIndex);
 		if (ptr) {
-			shared = (static_cast<RenderContextWGL*>(ptr.GetPtr()))->context;
+			shared = (static_cast<RenderContextImplWGL*>(ptr.GetPtr()))->context;
 		}
 	}
 
@@ -210,7 +211,7 @@ void RenderContextWGL::ReadyContext(RenderWindow* gw) {
 		Trace("Creating old style context");
 		context = wglCreateContext(wglWnd->GetWindowDC());
 	} else {
-		int contextAttribs[] = { 
+		int contextAttribs[] = {
 			WGL_CONTEXT_MAJOR_VERSION_ARB,
 			contextCreationParams.reqOpenGLVersionMajor,
 			WGL_CONTEXT_MINOR_VERSION_ARB,
@@ -234,16 +235,16 @@ void RenderContextWGL::ReadyContext(RenderWindow* gw) {
 		NEX_THROW_FatalError(EXCEPT_DEVICE_CREATION_FAILED);
 	}
 
-	SetCurrentTarget(static_cast<RenderWindowImpl*>(gw->GetImpl()));
+	baseContext->SetCurrentTarget(static_cast<RenderWindowImpl*>(gw->GetImpl()));
 	GL_CHECK();
 }
 
-nextar::RenderWindow* RenderContextWGL::CreateWindowImpl() {
+nextar::RenderWindow* RenderContextImplWGL::CreateWindowImpl() {
 	return NEX_NEW(WindowWGL(this));
 }
 
 
-void RenderContextWGL::EnumVideoModes() {
+void RenderContextImplWGL::EnumVideoModes(VideoModeList& videModes) {
 	videoModes.clear();
 	DEVMODE dmi;
 
@@ -262,7 +263,7 @@ void RenderContextWGL::EnumVideoModes() {
 			VideoMode vm((uint16) dmi.dmPelsWidth,
 				(uint16) dmi.dmPelsHeight,
 				(uint16) dmi.dmDisplayFrequency);
-			if (vm.IsValid() && 
+			if (vm.IsValid() &&
 				std::find(videoModes.begin(), videoModes.end(), vm) == videoModes.end())
 				videoModes.push_back(vm);
 			ZeroMemory(&dmi, sizeof(dmi));
@@ -292,22 +293,22 @@ void RenderContextWGL::EnumVideoModes() {
 	}
 }
 
-int RenderContextWGL::GetFormat(const DummyContext& dc, float fAttribs[], int iAttribs[]) {
-	
+int RenderContextImplWGL::GetFormat(const DummyContext& dc, float fAttribs[], int iAttribs[]) {
+
 	int pixelFormat = 0;
 	UINT numFormats = 0;
-	
+
 	if ( !WglChoosePixelFormatARB ||
-		!WglChoosePixelFormatARB( dc.hDC, 
+		!WglChoosePixelFormatARB( dc.hDC,
 		iAttribs, fAttribs, 1, &pixelFormat, &numFormats) ||
 		numFormats == 0) {
 		return ChoosePixelFormat (dc.hDC, &pixelDescriptor);
-	} 
+	}
 
 	return pixelFormat;
 }
 
-void RenderContextWGL::SetCurrentWindow(RenderTarget* canvas) {
+void RenderContextImplWGL::SetCurrentWindow(RenderTarget* canvas) {
 	if (canvas) {
 		WindowWGL::Impl* impl = static_cast<WindowWGL::Impl*>(canvas);
 		if (impl->GetWindowDC() != currentDC) {
@@ -318,7 +319,7 @@ void RenderContextWGL::SetCurrentWindow(RenderTarget* canvas) {
 		wglMakeCurrent(0, 0);
 }
 
-void RenderContextWGL::SetVideoModeImpl(const VideoMode& mode) {
+void RenderContextImplWGL::SetVideoModeImpl(const VideoMode& mode) {
 	DEVMODE dm = {0};
 	dm.dmPelsWidth = mode.width;
 	dm.dmPelsHeight = mode.height;
@@ -326,7 +327,7 @@ void RenderContextWGL::SetVideoModeImpl(const VideoMode& mode) {
 	dm.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
 	if(mode.refreshRate)
 		dm.dmFields |= DM_DISPLAYFREQUENCY;
-	
+
 	dm.dmSize = sizeof (DEVMODE);
 	if (DISP_CHANGE_SUCCESSFUL == ChangeDisplaySettings(&dm, CDS_TEST)) {
 		ChangeDisplaySettings(&dm, CDS_FULLSCREEN);
@@ -336,5 +337,15 @@ void RenderContextWGL::SetVideoModeImpl(const VideoMode& mode) {
 	}
 }
 
+RenderContext_Base_GL::PlatformImpl* RenderContext_Base_GL::CreatePlatformImpl() {
+		return NEX_NEW(RenderContextImplWGL(this));
 }
 
+void* RenderContext_Base_GL::GetExtension(const char* name) {
+	size_t len = std::strlen(name);
+	if (len > 3 && !std::strcmp((name + len - 3), "ARB"))
+		return (void*)wglGetProcAddress((LPCSTR) name);
+	return (void*) wglGetProcAddress((LPCSTR) name);
+}
+
+}

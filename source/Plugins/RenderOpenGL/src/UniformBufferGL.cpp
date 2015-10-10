@@ -5,7 +5,7 @@
  *      Author: obhi
  */
 #include <RenderOpenGL.h>
-#include <RenderContextGL.h>
+#include <RenderContext_Base_GL.h>
 #include <UniformBufferGL.h>
 
 namespace RenderOpenGL {
@@ -20,15 +20,15 @@ UniformBufferGL::~UniformBufferGL() {
 		UniformGL* parameters = static_cast<UniformGL*>(parameter);
 		NEX_DELETE_ARRAY(parameters);
 	}
-		
+
 }
 
-void UniformBufferGL::Destroy(RenderContextGL* rc) {
+void UniformBufferGL::Destroy(RenderContext_Base_GL* rc) {
 	rc->DestroyBuffer(ubNameGl);
 }
 
 void* UniformBufferGL::Map(RenderContext* rc) {
-	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
+	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	gl->Bind(GL_UNIFORM_BUFFER, ubNameGl);
 	// map unmap if necessary
 	return (mappedMem = static_cast<uint8*>(gl->MapRange(GL_UNIFORM_BUFFER, 0,
@@ -36,14 +36,14 @@ void* UniformBufferGL::Map(RenderContext* rc) {
 }
 
 void UniformBufferGL::Unmap(RenderContext* rc) {
-	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
+	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	gl->Unmap(GL_UNIFORM_BUFFER);
 	mappedMem = nullptr;
 }
 
 void UniformBufferGL::WriteRawData(RenderContext* rc, const void *src, size_t offset,
 		size_t size) {
-	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
+	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	if (mappedMem) {
 		std::memcpy(mappedMem + offset, src, size);
 	} else {
@@ -54,7 +54,7 @@ void UniformBufferGL::WriteRawData(RenderContext* rc, const void *src, size_t of
 void UniformBufferGL::SetRawBuffer(RenderContext* rc, const ConstantParameter& desc,
 		const void* data) {
 
-	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
+	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	if (mappedMem) {
 		std::memcpy(mappedMem + desc.bufferOffset, data, desc.size);
 	} else {

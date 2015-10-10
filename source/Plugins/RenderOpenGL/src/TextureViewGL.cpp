@@ -7,7 +7,7 @@
 
 #include <RenderOpenGL.h>
 #include <TextureViewGL.h>
-#include <RenderContextGL.h>
+#include <RenderContext_Base_GL.h>
 
 namespace RenderOpenGL {
 
@@ -20,12 +20,12 @@ TextureViewGL::~TextureViewGL() {
 }
 
 void TextureViewGL::Destroy(nextar::RenderContext* rc) {
-	auto gl = static_cast<RenderContextGL*>(rc);
+	auto gl = static_cast<RenderContext_Base_GL*>(rc);
 	gl->DestroyTexture(texture);
 	texture = 0;
 }
 
-void TextureViewGL::ReadPixels(RenderContextGL* gl, TextureBase::ReadPixelUpdateParams& params) {
+void TextureViewGL::ReadPixels(RenderContext_Base_GL* gl, TextureBase::ReadPixelUpdateParams& params) {
 	if (params.lock.test_and_set(std::memory_order_release))
 		return;
 	PixelBox* pixels = params.box;
@@ -49,7 +49,7 @@ void TextureViewGL::ReadPixels(RenderContextGL* gl, TextureBase::ReadPixelUpdate
 void TextureViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 		ContextObject::ContextParamPtr params) {
 
-	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
+	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	if (msg & TextureBase::MSG_TEX_READ) {
 		ReadPixels(gl, *const_cast<TextureBase::ReadPixelUpdateParams*>(
 			reinterpret_cast<const TextureBase::ReadPixelUpdateParams*>(params)));
@@ -65,7 +65,7 @@ void TextureViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 		imageFormat = textureParams.image->GetFormat();
 
 	if (!IsCreated()) {
-		pixelFormat = RenderContextGL::GetGlPixelFormat(imageFormat,
+		pixelFormat = RenderContext_Base_GL::GetGlPixelFormat(imageFormat,
 				textureParams.textureFormat);
 
 		if (pixelFormat.internalFormat == GL_NONE) {
@@ -75,7 +75,7 @@ void TextureViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 		}
 
 		texture = gl->CreateTexture();
-		target = RenderContextGL::GetGlTextureType(textureParams.type);
+		target = RenderContext_Base_GL::GetGlTextureType(textureParams.type);
 		gl->ActivateTexture(target, texture);
 
 		if (textureParams.textureFlags & TextureBase::PRE_ALLOCATE_STORAGE) {

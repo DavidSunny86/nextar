@@ -1,5 +1,5 @@
 /*
- * RenderContextGLX.cpp
+ * RenderContextImplGLX.cpp
  *
  *  Created on: 11-Aug-2013
  *      Author: obhi
@@ -7,29 +7,28 @@
 #include <RenderOpenGL.h>
 #include <RenderDriverGL.h>
 #include <RenderDriverGLX.h>
-#include <RenderContextGLX.h>
+#include <RenderContextImplGLX.h>
 #include <WindowGLX.h>
 #include <X11/extensions/Xrandr.h>
 
 namespace RenderOpenGL {
 
-RenderContextGLX::RenderContextGLX(RenderDriverGLX* _driver) :
-		RenderContextGL(_driver), display(0), context(0), screenIndex(0), motif(
+RenderContextImplGLX::RenderContextImplGLX(RenderContext_Base_GL* _driver) :
+		RenderContext_Base_GL::PlatformImpl(_driver), display(0), context(0), screenIndex(0), motif(
 				0), wmState(0), fullScreen(0), frameBufferConfig(0), GlXCreateContextAttribsARB(
 				0), currentDrawable(0), xrandrSupported(false) {
 }
 
-RenderContextGLX::~RenderContextGLX() {
+RenderContextImplGLX::~RenderContextImplGLX() {
 }
 
-void RenderContextGLX::PostCloseImpl() {
+void RenderContextImplGLX::PostCloseImpl() {
 	UnreadyContext();
-	RenderContextGL::PostCloseImpl();
 }
 
-void RenderContextGLX::UnreadyContext() {
+void RenderContextImplGLX::UnreadyContext() {
 	if (context) {
-		SetCurrentTarget(0);
+		baseContext->SetCurrentTarget(0);
 		Trace("Destroying render context.");
 		glXDestroyContext(display, context);
 		context = 0;
@@ -37,12 +36,12 @@ void RenderContextGLX::UnreadyContext() {
 	CloseDisplay();
 }
 
-void RenderContextGLX::CloseDisplay() {
+void RenderContextImplGLX::CloseDisplay() {
 	XCloseDisplay(display);
 	display = 0;
 }
 
-void RenderContextGLX::SetCreationParams(
+void RenderContextImplGLX::SetCreationParams(
 		const RenderDriver::ContextCreationParams& ctxParams) {
 	bool failed = true;
 	contextCreationParams = ctxParams;
@@ -67,7 +66,9 @@ void RenderContextGLX::SetCreationParams(
 						screenIndex = DefaultScreen(display);
 				}
 
-				EnumVideoModes();
+				VideoModeList vidModes;
+				EnumVideoModes(vidModes);
+				baseContext->SetVideoModes(vidModes);
 				// check atoms
 
 				fullScreen = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN",
@@ -89,18 +90,18 @@ void RenderContextGLX::SetCreationParams(
 	}
 
 	// choose fbconfig
-	int preferredAttribs[] = { 
+	int preferredAttribs[] = {
 		GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
-		GLX_RENDER_TYPE, GLX_RGBA_BIT, 
+		GLX_RENDER_TYPE, GLX_RGBA_BIT,
 		GLX_DOUBLEBUFFER, True, /* Request a double-buffered color buffer */
 		GLX_SAMPLES, contextCreationParams.multiSamples,
 		GLX_STENCIL_SIZE, contextCreationParams.stencilBits,
-		GLX_DEPTH_SIZE, contextCreationParams.depthBits, 
+		GLX_DEPTH_SIZE, contextCreationParams.depthBits,
 		GLX_RED_SIZE, 8, /* the maximum number of bits per component    */
-		GLX_GREEN_SIZE, 8, 
-		GLX_BLUE_SIZE, 8, 
+		GLX_GREEN_SIZE, 8,
+		GLX_BLUE_SIZE, 8,
 		None, None,
-		None 
+		None
 	};
 
 	int attrib = 18;
@@ -128,16 +129,16 @@ void RenderContextGLX::SetCreationParams(
 		NEX_THROW_FatalError(EXCEPT_DEVICE_CREATION_FAILED);
 }
 
-void RenderContextGLX::ReadyGlxExtensions() {
+void RenderContextImplGLX::ReadyGlxExtensions() {
 	const char *glxExts = glXQueryExtensionsString(display, screenIndex);
 
 	if (IsSupported("GLX_ARB_create_context", glxExts))
 		GlXCreateContextAttribsARB =
-				(PFNGLXCREATECONTEXTATTRIBSARB) RenderDriverGL::GetExtension(
+				(PFNGLXCREATECONTEXTATTRIBSARB) RenderContext_Base_GL::GetExtension(
 						"glXCreateContextAttribsARB");
 }
 
-void RenderContextGLX::ReadyContext(RenderWindow* gw) {
+void RenderContextImplGLX::ReadyContext(RenderWindow* gw) {
 	// create context based of fbConfig and set as current
 	// do we have a shared context?
 	GLXContext shared = 0;
@@ -145,7 +146,7 @@ void RenderContextGLX::ReadyContext(RenderWindow* gw) {
 		RenderContextPtr ptr = driver->AsyncGetContext(
 				contextCreationParams.sharedContextIndex);
 		if (ptr) {
-			shared = (static_cast<RenderContextGLX*>(ptr.GetPtr()))->context;
+			shared = (static_cast<RenderContextImplGLX*>(ptr.GetPtr()))->context;
 		}
 	}
 
@@ -182,14 +183,14 @@ void RenderContextGLX::ReadyContext(RenderWindow* gw) {
 	else
 		Trace("Indirect GLX rendering context created!");
 
-	SetCurrentTarget(static_cast<RenderWindowImpl*>(gw->GetImpl()));
+	baseContext->SetCurrentTarget(static_cast<RenderWindowImpl*>(gw->GetImpl()));
 }
 
-nextar::RenderWindow* RenderContextGLX::CreateWindowImpl() {
+nextar::RenderWindow* RenderContextImplGLX::CreateWindowImpl() {
 	return NEX_NEW(WindowGLX(this));
 }
 
-Display* RenderContextGLX::OpenDisplay(int gpuIndex) {
+Display* RenderContextImplGLX::OpenDisplay(int gpuIndex) {
 	// assume that x-server index is same as gpu index
 	if (gpuIndex < 0)
 		gpuIndex = 0;
@@ -202,7 +203,7 @@ Display* RenderContextGLX::OpenDisplay(int gpuIndex) {
 	return display;
 }
 
-bool RenderContextGLX::IsXRandrSupported() {
+bool RenderContextImplGLX::IsXRandrSupported() {
 	int dummy;
 	if (XQueryExtension(display, "RANDR", &dummy, &dummy, &dummy)
 			&& XRRQueryVersion(display, &dummy, &dummy))
@@ -210,7 +211,7 @@ bool RenderContextGLX::IsXRandrSupported() {
 	return false;
 }
 
-void RenderContextGLX::EnumVideoModes() {
+void RenderContextImplGLX::EnumVideoModes(VideoModeList& videoModes) {
 	// check for xrandr support
 	videoModes.clear();
 	bool fallback = false;
@@ -255,7 +256,7 @@ void RenderContextGLX::EnumVideoModes() {
 	}
 }
 
-GLXFBConfig RenderContextGLX::GetConfig(int baseAttribs[], int maxAttribs[]) {
+GLXFBConfig RenderContextImplGLX::GetConfig(int baseAttribs[], int maxAttribs[]) {
 
 	int fbcount = 0;
 	GLXFBConfig *fbconfigs = glXChooseFBConfig(display, screenIndex,
@@ -307,7 +308,7 @@ GLXFBConfig RenderContextGLX::GetConfig(int baseAttribs[], int maxAttribs[]) {
 	return chosenFb;
 }
 
-void RenderContextGLX::SetCurrentWindow(RenderTarget* canvas) {
+void RenderContextImplGLX::SetCurrentWindow(RenderTarget* canvas) {
 	if (canvas) {
 		currentDrawable = static_cast<WindowGLX::Impl*>(canvas)->GetDrawable();
 		glXMakeCurrent(display, currentDrawable, context);
@@ -315,7 +316,7 @@ void RenderContextGLX::SetCurrentWindow(RenderTarget* canvas) {
 		glXMakeCurrent(display, 0, 0);
 }
 
-void RenderContextGLX::SetVideoModeImpl(const VideoMode& mode) {
+void RenderContextImplGLX::SetVideoModeImpl(const VideoMode& mode) {
 	if (xrandrSupported) {
 		Window rootWnd = RootWindow(display, screenIndex);
 		XRRScreenConfiguration *screenConfig = XRRGetScreenInfo(display,
@@ -346,7 +347,7 @@ void RenderContextGLX::SetVideoModeImpl(const VideoMode& mode) {
 	}
 }
 
-void RenderContextGLX::SwitchToFullScreen(Window win, bool toggle) {
+void RenderContextImplGLX::SwitchToFullScreen(Window win, bool toggle) {
 	if (wmState != None) {
 		// send the _NET_WM_STATE_FULLSCREEN msg
 		XClientMessageEvent msg;
@@ -379,5 +380,16 @@ void RenderContextGLX::SwitchToFullScreen(Window win, bool toggle) {
 	} else
 		Warn("Window manager is outdated, cannot switch to fullscreen");
 }
+
+void* RenderContext_Base_GL::GetExtension(const char* name) {
+	size_t len = std::strlen(name);
+	if (len > 3 && !std::strcmp((name + len - 3), "ARB"))
+		return (void*) glXGetProcAddressARB((const GLubyte *) name);
+	return (void*) glXGetProcAddress((const GLubyte *) name);
 }
 
+RenderContext_Base_GL::PlatformImpl* RenderContext_Base_GL::CreatePlatformImpl() {
+		return NEX_NEW(RenderContextImplGLX(this));
+}
+
+}

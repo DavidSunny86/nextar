@@ -94,7 +94,7 @@ public:
 	void SetRasterState(const RasterStateGL&);
 	void SetDepthStencilState(const DepthStencilStateGL&);
 	void SetBlendState(const BlendStateGL&);
-	
+
 	inline void DestroyVAO(GLuint vao);
 	inline void DestroyBuffer(GLuint vbo);
 	inline void DestroyTexture(GLuint texture);
@@ -129,6 +129,13 @@ public:
 	// capture
 	void Capture(PixelBox& image, RenderTarget* rt, GLuint *pbo,
 			FrameBuffer frameBuffer);
+		
+	void ReportError(GLenum source,
+					GLenum type,
+					GLuint id,
+					GLenum severity,
+					GLsizei length,
+					const GLchar* message);
 
 	static ParamDataType GetShaderParamType(GLuint type);
 	static uint16 GetShaderParamSize(GLuint type);
@@ -151,14 +158,6 @@ public:
 			ParameterContext defaultContext = ParameterContext::CTX_UNKNOWN);
 	static void DestroyResources(void* pThis);
 
-
-	static void ReportError(GLenum source,
-		GLenum type,
-		GLuint id,
-		GLenum severity,
-		GLsizei length,
-		const GLchar* message);
-
 protected:
 
 
@@ -171,7 +170,7 @@ protected:
 			ParamEntryTable* paramTable);
 
 	enum {
-		CONTEXT_READY = 1 << 0, 
+		CONTEXT_READY = 1 << 0,
 		EXTENSIONS_READY = 1 << 1,
 		CURRENT_TARGET_FBO = 1 << 2,
 	};

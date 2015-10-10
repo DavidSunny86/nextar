@@ -65,12 +65,12 @@ public:
 			const void* dataPtr, GpuBuffer::RelocationPolicy policy);
 	virtual GpuBuffer::MapResult Map(RenderContext* rc, size_t offset = 0, size_t size = 0);
 	virtual void Destroy(RenderContext* rc);
-	void Sync(RenderContextGL* rc);
+	void Sync(RenderContext_Base_GL* rc);
 
 protected:
 	struct Buffer;
 
-	GLuint GetWritable(RenderContextGL* rc);
+	GLuint GetWritable(RenderContext_Base_GL* rc);
 
 	struct Buffer {
 		GLsync fence;

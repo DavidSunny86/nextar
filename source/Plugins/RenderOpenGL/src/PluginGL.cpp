@@ -11,7 +11,12 @@ NEX_IMPLEMENT_PLUGIN(RenderOpenGL, RenderOpenGL::PluginGL);
 
 namespace RenderOpenGL {
 
+#if defined (NEX_DEBUG)
+
+bool DebugGL::s_Enabled = true;
 void DebugGL::CheckGL(const char* function, long line) {
+	if (!s_Enabled)
+		return;
 	GLenum error;
 	if ((error = glGetError()) == GL_NO_ERROR)
 		return;
@@ -19,6 +24,8 @@ void DebugGL::CheckGL(const char* function, long line) {
 	errorStr << "OpenGl error code: " << Convert::ToString((uint32) error) << " In: " << function << " Line: " << line;
 	Warn(errorStr.str());
 }
+
+#endif
 
 void PluginGL::Open() {
 

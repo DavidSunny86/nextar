@@ -6,7 +6,7 @@
  */
 
 #include <RenderBufferViewGL.h>
-#include <RenderContextGL.h>
+#include <RenderContext_Base_GL.h>
 
 namespace RenderOpenGL {
 
@@ -19,24 +19,19 @@ RenderBufferViewGL::~RenderBufferViewGL() {
 
 void RenderBufferViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 		ContextObject::ContextParamPtr param) {
-	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
+	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	if (msg == RenderBuffer::MSG_RB_CREATE) {
 		const RenderBuffer::CreateParams* createParams =
 				static_cast<const RenderBuffer::CreateParams*>(param);
-		gl->GlGenRenderbuffers(1, &renderBuffer);
-		gl->GlBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
-		PixelFormatGl format = RenderContextGL::GetGlPixelFormat(
+		PixelFormatGl format = RenderContext_Base_GL::GetGlPixelFormat(
 				createParams->format, createParams->format);
 		attachmentType = format.attachmentType;
-		gl->GlRenderbufferStorageMultisample(GL_RENDERBUFFER,
-				createParams->samples, format.internalFormat,
-				createParams->width, createParams->height);
-		gl->GlBindRenderbuffer(GL_RENDERBUFFER, 0);
+		renderBuffer = gl->CreateRenderBuffer(createParams, format);
 	}
 }
 
 void RenderBufferViewGL::Destroy(RenderContext* rc) {
-	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
-	gl->GlDeleteRenderbuffers(1, &renderBuffer);
+	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
+	gl->DestroyRenderBuffer(1, &renderBuffer);
 }
 } /* namespace RenderOpenGL */

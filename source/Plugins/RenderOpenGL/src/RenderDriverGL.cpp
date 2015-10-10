@@ -1,6 +1,6 @@
 #include <RenderOpenGL.h>
 #include <RenderDriverGL.h>
-#include <RenderContextGL.h>
+#include <RenderContext_AllHeaders.h>
 
 namespace RenderOpenGL {
 
@@ -9,6 +9,7 @@ RenderDriverGL::RenderDriverGL(int32 _gpuIndex) :
 }
 
 RenderDriverGL::~RenderDriverGL() {
+	renderContexts.clear();
 }
 
 VersionGL RenderDriverGL::ExtractVersion(const char* version) {
@@ -17,6 +18,10 @@ VersionGL RenderDriverGL::ExtractVersion(const char* version) {
 	char dot;
 	strm >> maj >> dot >> min;
 	return ExtractVersion((uint16) maj, (uint16) min);
+}
+
+RenderDriverGL* RenderDriverGL::CreateDriverGL(int32 gpuIndex) {
+	return NEX_NEW(RenderDriverGL(gpuIndex));
 }
 
 VersionGL RenderDriverGL::ExtractVersion(uint16 maj, uint16 min) {
@@ -76,8 +81,23 @@ VersionGL RenderDriverGL::ExtractVersion(uint16 maj, uint16 min) {
 
 RenderContextPtr RenderDriverGL::CreateContextImpl(
 		const RenderDriver::ContextCreationParams& params) {
-	RenderContextGL* rcGL = CreateContextImpl();
-
+	//@todo Determine context version and create opengl context.
+	RenderContext_Base_GL* rcGL = nullptr;
+	VersionGL version = ExtractVersion(params.reqOpenGLVersionMajor, params.reqOpenGLVersionMinor);
+	switch(version) {
+	case RenderOpenGL::GLV_3_3:
+		rcGL = NEX_NEW(RenderContext_3_3_GL(this)); break;
+	case RenderOpenGL::GLV_4_0:
+		rcGL = NEX_NEW(RenderContext_4_0_GL(this)); break;
+	case RenderOpenGL::GLV_4_1:
+		rcGL = NEX_NEW(RenderContext_4_1_GL(this)); break;
+	case RenderOpenGL::GLV_4_2:
+		rcGL = NEX_NEW(RenderContext_4_2_GL(this)); break;
+	case RenderOpenGL::GLV_4_3:
+		rcGL = NEX_NEW(RenderContext_4_3_GL(this)); break;
+	case RenderOpenGL::GLV_4_4:
+		rcGL = NEX_NEW(RenderContext_4_4_GL(this)); break;
+	}
 	return Assign(rcGL);
 }
 }

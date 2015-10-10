@@ -37,12 +37,21 @@ enum VersionGL {
 	GLV_MAX_VERSION
 };
 
+#if defined (NEX_DEBUG)
 class DebugGL {
-	NEX_LOG_HELPER(DebugGL)
-	;
+	NEX_LOG_HELPER(DebugGL);
+	static bool s_Enabled;
 public:
+	static void Enable() {
+		s_Enabled = true;
+	}
+	static void Disable() {
+		s_Enabled = false;
+	}
 	static void CheckGL(const char* function, long line);
 };
+#endif
+
 }
 
 #endif //_RENDEROPENGL_H_

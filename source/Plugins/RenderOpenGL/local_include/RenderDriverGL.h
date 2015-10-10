@@ -22,16 +22,13 @@ public:
 
 	/* */
 	static RenderDriverGL* CreateDriverGL(int32 gpuIndex);
-	static void* GetExtension(const char* name);
-
+	
 	/* */
 	virtual void ConfigureImpl(const NameValueMap& params) {
 		/* todo configure driver */
 	}
 
 protected:
-
-	virtual RenderContextGL* CreateContextImpl() = 0;
 
 	int32 gpuIndex;
 };

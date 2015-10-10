@@ -5,7 +5,7 @@
  *      Author: obhi
  */
 #include <RenderOpenGL.h>
-#include <RenderContextGL.h>
+#include <RenderContext_Base_GL.h>
 #include <GpuBufferViewGL.h>
 
 namespace RenderOpenGL {
@@ -23,14 +23,14 @@ GpuBufferViewGL::~GpuBufferViewGL() {
 }
 
 void GpuBufferViewGL::Destroy(RenderContext* rc) {
-	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
+	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	gl->DestroyBuffer(bufferId);
 }
 
 void GpuBufferViewGL::Create(RenderContext* rc, size_t size,
 		uint32 elementStride,
 		const void* dataPtr, GpuBuffer::RelocationPolicy policy) {
-	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
+	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	usage = GL_STATIC_DRAW;
 	if (policy == GpuBuffer::REGULARLY_RELEASED)
 		usage = GL_STREAM_DRAW;
@@ -47,27 +47,27 @@ void GpuBufferViewGL::Create(RenderContext* rc, size_t size,
 
 void GpuBufferViewGL::Read(RenderContext* rc, void *dest, size_t offset,
 		size_t size) {
-	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
+	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
 }
 
 void GpuBufferViewGL::Write(RenderContext* rc, const void *src, size_t offset,
 		size_t size) {
-	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
+	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	gl->Bind(type, bufferId);
 	gl->WriteBuffer(type, totalSize, usage, src, offset, size);
 }
 
 GpuBuffer::MapResult GpuBufferViewGL::Map(RenderContext* rc,
 		size_t offset, size_t size) {
-	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
+	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	GpuBuffer::MapResult result;
 	result.data = static_cast<uint8*>(gl->MapRange(type, offset, size, GL_MAP_WRITE_BIT));
 	return result;
 }
 
 void GpuBufferViewGL::Unmap(RenderContext* rc) {
-	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
+	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	gl->Unmap(type);
 }
 
@@ -83,7 +83,7 @@ void GpuTransientBufferViewGL::Create(RenderContext* rc, size_t size,
 		const void* dataPtr, GpuBuffer::RelocationPolicy policy) {
 	NEX_ASSERT (policy == GpuBuffer::REGULARLY_RELEASED ||
 			policy == GpuBuffer::IMMEDIATELY_RELEASED);
-	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
+	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	if (policy == GpuBuffer::REGULARLY_RELEASED)
 		usage = GL_STREAM_DRAW;
 	else if (policy != GpuBuffer::NEVER_RELEASED)
@@ -103,7 +103,7 @@ void GpuTransientBufferViewGL::Create(RenderContext* rc, size_t size,
 GpuBuffer::MapResult GpuTransientBufferViewGL::Map(RenderContext* rc,
 		size_t offset, size_t size) {
 	NEX_ASSERT(!syncRequired);
-	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
+	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	bufferId = GetWritable(gl);
 	gl->Bind(type, bufferId);
 	GpuBuffer::MapResult result;
@@ -112,15 +112,15 @@ GpuBuffer::MapResult GpuTransientBufferViewGL::Map(RenderContext* rc,
 	return result;
 }
 
-GLuint GpuTransientBufferViewGL::GetWritable(RenderContextGL* rc) {
+GLuint GpuTransientBufferViewGL::GetWritable(RenderContext_Base_GL* rc) {
 	if (allocatedList.size()) {
 		// @optimize If more than one is free probably release the memory,
 		auto& i = allocatedList.front();
-		GLenum result = rc->GlClientWaitSync(i.fence, 0, 0);
-		GL_CHECK();
+		GLenum result = rc->ClientWaitSync(i.fence, 0, 0);
+
 		if (result == GL_ALREADY_SIGNALED || result == GL_CONDITION_SATISFIED) {
-			rc->GlDeleteSync(i.fence);
-			GL_CHECK();
+			rc->DeleteSync(i.fence);
+
 			GLuint bufferRet = i.buffer;
 			allocatedList.pop_front();
 			return bufferRet;
@@ -138,26 +138,24 @@ GLuint GpuTransientBufferViewGL::GetWritable(RenderContextGL* rc) {
 		auto& i = allocatedList.front();
 		GLenum result;
 		do {
-			result = rc->GlClientWaitSync(i.fence, 0, 100);
-			GL_CHECK();
+			result = rc->ClientWaitSync(i.fence, 0, 100);
 		} while (result == GL_TIMEOUT_EXPIRED || result == GL_WAIT_FAILED);
-		rc->GlDeleteSync(i.fence);
-		GL_CHECK();
+		rc->DeleteSync(i.fence);
+
 		GLuint bufferRet = i.buffer;
 		allocatedList.pop_front();
 		return bufferRet;
 	}
 }
 
-void GpuTransientBufferViewGL::Sync(RenderContextGL* rc) {
-	GLsync sync = rc->GlFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-	GL_CHECK();
+void GpuTransientBufferViewGL::Sync(RenderContext_Base_GL* rc) {
+	GLsync sync = rc->FenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 	allocatedList.push_back(Buffer(sync, bufferId));
 	bufferId = 0;
 }
 
 void GpuTransientBufferViewGL::Destroy(RenderContext* rc) {
-	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
+	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	if (syncRequired) {
 		Sync(gl);
 	}
@@ -168,10 +166,9 @@ void GpuTransientBufferViewGL::Destroy(RenderContext* rc) {
 	for(auto &i : allocatedList) {
 		GLenum result;
 		do {
-			result = gl->GlClientWaitSync(i.fence, 0, 100);
-			GL_CHECK();
-		} while (result == GL_TIMEOUT_EXPIRED || result == GL_WAIT_FAILED);		
-		gl->GlDeleteSync(i.fence);
+			result = gl->ClientWaitSync(i.fence, 0, 100);
+		} while (result == GL_TIMEOUT_EXPIRED || result == GL_WAIT_FAILED);
+		gl->DeleteSync(i.fence);
 		gl->DestroyBuffer(i.buffer);
 	}
 	allocatedList.clear();
