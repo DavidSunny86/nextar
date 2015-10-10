@@ -5,6 +5,7 @@ shader DeferredLights {
 	pass OmniLight {
 	
 		cbuffer OmniLight;
+		cbuffer Quad;
 	
 		depth_stencil_state {
 			depth_state false;

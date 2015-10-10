@@ -1,0 +1,17 @@
+
+command: IDENTIFIER parameters.0.N block.0.1 SEMICOLON  { $$ = b.MakeCommand($1, $2, $3); }
+	   ;
+
+command.0.N: { $$ = 0; }
+		   | command { $$ = b.MakeCommandList($1); }
+		   | command.0.N command { $$ = b.AppendCommand($1, $2); }
+		   ;
+
+parameters: PARAMVAL { $$ = $1; }
+		  | '"' STRING '"' { $$ = $2; }
+		  | list { $$ = $1; }
+		  ;
+
+list: '[' parameters.0.N ']' { $$ = b.MakeList($1); }
+
+block: '{' command.0.N '}' { $$ = b.MakeBlock($1); }

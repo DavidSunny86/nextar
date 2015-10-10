@@ -39,6 +39,8 @@ shader Deferred {
 
 		program {
 			option HAS_DIFFUSE_MAP ui:Options.HasDiffuseMap "desc:Apply diffuse map.";
+			option HAS_NORMAL_MAP ui:Options.HasNormalMap "desc:Apply normal map.";
+			option HAS_SPECULAR_AND_GLOSS_MAP ui:Options.HasSpecularAndGloss "desc:Apply specular and gloss map.";
 			define HAS_NORMAL;
 			vertex_program PreConfig Common PostConfig Deferred;
 			fragment_program Deferred;

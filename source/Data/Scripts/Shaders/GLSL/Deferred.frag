@@ -2,7 +2,7 @@
 
 layout(location = 0) out vec4 oAlbedoMap;
 layout(location = 1) out vec4 oNormalMap;
-layout(location = 1) out vec4 oSpecularAndGlossMap;
+layout(location = 2) out vec4 oSpecularAndGlossMap;
 
 #ifdef HAS_TCOORD0
 	smooth in vec2 varyingUV;
@@ -49,13 +49,13 @@ vec2 getEncodedNormal(vec3 n) {
 	return enc;
 }
 
-vec2 getNormal() {
+vec2 getEncodedNormal() {
 	return getEncodedNormal(normalize(varyingNormal.xyz));
 }
 
 void main(void) {
 	oAlbedoMap = vec4(getDiffuseColor().rgb, 0);
-	oNormalMap = vec4(getNormal(), 0, 0);
+	oNormalMap = vec4(getEncodedNormal(), 0, 0);
 	oSpecularAndGlossMap = vec4(getSpecularAndGloss(), vec2(0, 0));
 }
 

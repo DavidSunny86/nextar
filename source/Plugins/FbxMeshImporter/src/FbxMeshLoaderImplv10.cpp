@@ -477,8 +477,9 @@ void FbxMeshLoaderImplv1_0::BuildMesh(MeshTemplate::MeshBuilder* pMesh) {
 }
 
 MaterialTemplatePtr FbxMeshLoaderImplv1_0::CreateMaterial(FbxSurfaceMaterial* pFbxMat, const URL& kAssetLoc) {
+	String name = pFbxMat->GetName();
 	MaterialTemplate::ID id(
-		NamedObject::AsyncStringID(pFbxMat->GetName()),
+		NamedObject::AsyncStringID(name),
 		StringUtils::DefaultID,
 		StringUtils::DefaultID);
 	MaterialTemplatePtr material;
@@ -490,7 +491,11 @@ MaterialTemplatePtr FbxMeshLoaderImplv1_0::CreateMaterial(FbxSurfaceMaterial* pF
 		material = MaterialTemplate::Traits::Instance(id, path);
 		return material;
 	} else {
-		material = MaterialTemplate::Traits::Instance(id);
+		String path = "Materials/";
+		path += name;
+		path += ".mtl";
+		URL url = URL(FileSystem::ArchiveProjectData_Name, path);
+		material = MaterialTemplate::Traits::Instance(id, url);
 	}
 
 	if (material->AsyncIsCreated()) {

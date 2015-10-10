@@ -77,17 +77,24 @@ void FileSystem::RemoveFactory(uint32 type) {
 	factories.erase(type);
 }
 
-InputStreamPtr FileSystem::OpenRead(const URL& url) {
+InputStreamPtr FileSystem::OpenRead(const URL& url, bool lookin) {
 	NEX_THREAD_LOCK_GUARD_RECURSIVE_MUTEX(accessLock);
+	lookin = lookin && (url.GetArchiveName() != FileSystem::ArchiveEngineData_Name);
 	ArchiveDescriptorMap::iterator it = descriptorMap.find(
 			url.GetArchiveName());
 	if (it != descriptorMap.end()) {
 		if (!(*it).second.openArchive)
 			(*it).second.Open(url.GetArchiveName(), this);
 		NEX_ASSERT((*it).second.openArchive);
-		return (*it).second.openArchive->OpenRead(url.GetRelativePath());
+		InputStreamPtr istr = (*it).second.openArchive->OpenRead(url.GetRelativePath());
+		if (istr || !lookin)
+			return istr;
 	} else {
 		Warn("archive is invalid: " + url.GetArchiveName());
+	}
+	if (lookin) {
+		URL belly(FileSystem::ArchiveEngineData_Name, url.GetRelativePath());
+		return OpenRead(belly, false);
 	}
 	return InputStreamPtr();
 }

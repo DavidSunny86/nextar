@@ -1,14 +1,14 @@
 
-material Default:Default.Box {	
-	shader "{EngineData}/Scripts/Effects/Deferred.nfx" Default:Default.Deferred;
+material #:#.Box {	
+	shader "{EngineData}/Scripts/Effects/Deferred.nfx" #:#.Deferred;
 	layer normal;
 	param_value diffuseAndGloss ".3 .3 .3 .5";
 }
 
-material Default:Default.BoxTextured {
+material #:#.BoxTextured {
 	shader "{EngineData}/Scripts/Effects/Deferred.nfx";
 	layer normal;
-	enable_options USE_DIFFUSE_SAMPLER;
+	enable_options HAS_DIFFUSE_MAP;
 	param_value diffuseAndGloss ".3 .3 .3 .5";
 	param_value diffuseMap {Data}/Textures/Box.jpg BoxTexture; 
 }
