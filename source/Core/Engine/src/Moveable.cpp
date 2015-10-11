@@ -1,6 +1,6 @@
 #include <NexEngine.h>
 #include <Moveable.h>
-#include <CommonPools.h>
+#include <PooledAllocator.h>
 
 namespace nextar {
 

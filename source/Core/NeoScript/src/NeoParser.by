@@ -1,0 +1,59 @@
+%name NeoParser
+
+%start script
+
+%union{
+  ASTParameter* _parameter;
+  ASTParameterList* _parameters;
+  ASTCommand*   _command;
+  ASTBlock*     _block;
+  ASTRegion*    _region;
+  ASTDocument*  _document;
+}
+
+%destructor { b.Delete($$); } _region _document
+
+// Types
+%type <_document> script  regions.1.N
+%type <_region> region
+%type <_block> commands.0.N
+%type <_command> command
+%type <_parameters> parameters.0.N
+%type <_parameter> parameter list
+%%
+
+script: EOF           { $$ = nullptr; }
+      | regions.1.N   { $$ = $1; }
+      ;
+
+regions.1.N: region             { $$ = b.MakeDocument($1); }
+           | regions.1.N region { $$ = $1.AddRegion($2); }
+           ;
+
+region: REGION_ID commands.0.N        { $$ = b.MakeBlockRegion($1, $2); }
+      | TEXT_REGION_ID TEXT_CONTENTS  { $$ = b.MakeTextRegion($1, $2); }
+      ;
+
+commands.0.N:                         { $$ = nullptr; }
+            | command                 { $$ = b.MakeBlock($1); }
+            | commands.0.N command    { $$ = $1.AddCommand($1); }
+            ;
+
+command: COMMAND parameters.0.N ';'   { $$ = b.MakeCommand($1, $2); }
+       | COMMAND parameters.0.N '{' commands.0.N '}' { $$ = b.MakeBlock($1, $2, $4); /* returns $4 if its not null with appropriate stuff */ }
+       ;
+
+parameters.0.N:                           { $$ = nullptr; }
+              | parameter                 { $$ = b.MakeParameterList($1); }
+              | parameters.0.N parameter  { $$ = $1.Append($2); }
+              ;
+
+
+parameter: STRING_LITERAL                 { $$ = $1; }
+         | COMMAND                        { $$ = $1; }
+         | '{' list '}'                   { $$ = $2; }
+         ;
+
+list:  parameter                          { $$ = $1; }
+    |  list ',' parameter                 { $$ = $1.Append($2); }
+    ;

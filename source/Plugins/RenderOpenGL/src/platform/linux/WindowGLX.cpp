@@ -6,11 +6,11 @@
  */
 
 #include <RenderOpenGL.h>
-#include <RenderContextGLX.h>
+#include <RenderContextImplGLX.h>
 
 namespace RenderOpenGL {
 
-WindowGLX::WindowGLX(RenderContextGLX* ctx) :
+WindowGLX::WindowGLX(RenderContextImplGLX* ctx) :
 context(ctx), nextar::XWindow(NEX_NEW( WindowGLX::Impl(this))) {
 	static_cast<WindowGLX::Impl*>(impl)->AddRef();
 }
@@ -27,7 +27,7 @@ WindowGLX::Impl::Impl(WindowGLX* _parent) :
 void WindowGLX::Impl::Create(uint32 width, uint32 height,
 bool fullscreen, const NameValueMap* params) {
 
-	RenderContextGLX* context = parent->GetContext();
+	RenderContextImplGLX* context = parent->GetContext();
 	position.x = 0;
 	position.y = 0;
 
@@ -131,7 +131,7 @@ bool fullscreen, const NameValueMap* params) {
 }
 
 void WindowGLX::Impl::SetToFullScreen(bool fullScreen) {
-	RenderContextGLX* context = parent->GetContext();
+	RenderContextImplGLX* context = parent->GetContext();
 	Display* display = parent->GetDisplay();
 	Window window = parent->GetWindow();
 	if (fullScreen) {
@@ -159,10 +159,10 @@ void WindowGLX::Impl::SetToFullScreen(bool fullScreen) {
 }
 
 void WindowGLX::Impl::Destroy() {
-	RenderContextGLX* context = parent->GetContext();
+	RenderContextImplGLX* context = parent->GetContext();
 	Display* display = parent->GetDisplay();
 	Window window = parent->GetWindow();
-	
+
 
 	if (context->IsCurrentDrawable(drawable))
 		context->SetCurrentTarget(nullptr);
@@ -187,7 +187,7 @@ PixelFormat WindowGLX::Impl::GetPixelFormat() const {
 
 void WindowGLX::Impl::Capture(RenderContext* rc, PixelBox& image,
 		FrameBuffer frameBuffer) {
-	RenderContextGLX* context = parent->GetContext();
+	RenderContextImplGLX* context = parent->GetContext();
 	if (rc != (RenderContext*)context) {
 		Error("Window created using a different context");
 		return;
@@ -199,7 +199,7 @@ void WindowGLX::Impl::Capture(RenderContext* rc, PixelBox& image,
 }
 
 void WindowGLX::Impl::Reset(RenderContext* rc, Size size, PixelFormat format) {
-	RenderContextGLX* context = parent->GetContext();
+	RenderContextImplGLX* context = parent->GetContext();
 	Display* display = parent->GetDisplay();
 	Window window = parent->GetWindow();
 	if (parent->IsFullScreen())
@@ -211,7 +211,7 @@ void WindowGLX::Impl::Reset(RenderContext* rc, Size size, PixelFormat format) {
 }
 
 void WindowGLX::Impl::Present(RenderContext* rc) {
-	RenderContextGLX* context = parent->GetContext();
+	RenderContextImplGLX* context = parent->GetContext();
 	if (rc != context) {
 		Error("Window created using a different context");
 		return;

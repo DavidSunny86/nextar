@@ -2,7 +2,7 @@
 #include <MathBase.h>
 #include <TransformData.h>
 #include <BoundingVolume.h>
-#include <CommonPools.h>
+#include <PooledAllocator.h>
 
 namespace nextar {
 

@@ -1,7 +1,7 @@
 #include <NexEngine.h>
 #include <Spatial.h>
 #include <NexMath.h>
-#include <CommonPools.h>
+#include <PooledAllocator.h>
 #include <Moveable.h>
 
 namespace nextar {

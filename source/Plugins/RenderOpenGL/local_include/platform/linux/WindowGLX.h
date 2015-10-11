@@ -14,7 +14,7 @@
 
 namespace RenderOpenGL {
 
-class RenderContextGLX;
+class RenderContextImplGLX;
 
 class WindowGLX: public nextar::XWindow {
 
@@ -60,10 +60,10 @@ public:
 
 public:
 
-	WindowGLX(RenderContextGLX* binding);
+	WindowGLX(RenderContextImplGLX* binding);
 	virtual ~WindowGLX();
 
-	RenderContextGLX* GetContext() {
+	RenderContextImplGLX* GetContext() {
 		return context;
 	}
 
@@ -85,7 +85,7 @@ public:
 
 protected:
 
-	RenderContextGLX* context;
+	RenderContextImplGLX* context;
 };
 
 }

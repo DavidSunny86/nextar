@@ -9,7 +9,7 @@
 #define EVENTDISPATCHER_H_
 
 #include <NexBase.h>
-#include <CommonPools.h>
+#include <PooledAllocator.h>
 
 namespace nextar {
 

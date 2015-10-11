@@ -15,7 +15,7 @@
 #else
 #endif
 #include <NexBase.h>
-#include <CommonPools.h>
+#include <PooledAllocator.h>
 namespace nextar {
 
 struct _Matrix3x4;

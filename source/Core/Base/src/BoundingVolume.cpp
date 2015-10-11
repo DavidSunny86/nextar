@@ -1,12 +1,12 @@
 #include <NexBase.h>
 #include <BaseHeaders.h>
 #include <BoundingVolume.h>
-#include <CommonPools.h>
+#include <PooledAllocator.h>
 
 namespace nextar {
 
 /*********************************
- * BoundingBox 
+ * BoundingBox
  *********************************/
 BoundingBox::BoundingBox() {
 	// largest bv

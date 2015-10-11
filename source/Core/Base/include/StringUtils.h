@@ -46,7 +46,7 @@ struct Less { // functor for operator <
 };
 
 enum {
-	SEPARATOR_CHAR = -1,
+	SEPARATOR_CHAR = 4, // EOT
 };
 
 /**
@@ -66,7 +66,7 @@ struct NotAsciiTest: public std::unary_function<int, bool > {
 	}
 };
 /**
- * Change the delimeter for each word in this string to 
+ * Change the delimeter for each word in this string to
  * compatible string array type.
  */
 template<typename StringType>
@@ -148,6 +148,7 @@ StringType GetWord(size_t num, const StringType& arr) {
 		if (i == num)
 			return arr.substr(offset, pos - offset);
 		offset = pos + 1;
+		i++;
 	}
 	return StringType();
 }
@@ -172,6 +173,7 @@ void SetWord(size_t num, StringType& arr, const StringType& what) {
 			break;
 		}
 		offset = pos + 1;
+		i++;
 	}
 }
 

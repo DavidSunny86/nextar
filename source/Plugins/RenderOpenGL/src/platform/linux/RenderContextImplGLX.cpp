@@ -42,9 +42,9 @@ void RenderContextImplGLX::CloseDisplay() {
 }
 
 void RenderContextImplGLX::SetCreationParams(
-		const RenderDriver::ContextCreationParams& ctxParams) {
+		const RenderDriver::ContextCreationParams& contextCreationParams) {
 	bool failed = true;
-	contextCreationParams = ctxParams;
+	baseContext->SetContextParams(contextCreationParams);
 	display = OpenDisplay(((RenderDriverGLX*) driver)->GetGpuIndex());
 	if (display) {
 

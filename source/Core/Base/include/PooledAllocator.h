@@ -2,7 +2,7 @@
 #define MATRIXPOOL_H_
 
 #include <NexAlloc.h>
-#include <MemPool.h>
+#include <MemoryPool.h>
 #include <NexThread.h>
 
 namespace nextar {
@@ -13,7 +13,7 @@ namespace nextar {
 template<const size_t ObjectSize, const size_t NumPerBlock, enum MemoryCategory Catagory>
 class PoolProvider {
 	typedef AllocatorBase<Catagory> BaseAllocator;
-	typedef MemPool<NumPerBlock, Mutex, BaseAllocator> MPool;
+	typedef MemoryPool<NumPerBlock, Mutex, BaseAllocator> MPool;
 	MPool pool;
 public:
 	typedef PoolProvider<ObjectSize, NumPerBlock, Catagory> Type;

@@ -6,15 +6,41 @@
 #include <NexThread.h>
 
 namespace nextar {
-/*** 
+/***
  * @todo Need more diagonistic infos regarding pool data, like average allocations for a specific type,
  * total number of allocations per run of experience.
  */
 template<const size_t _NumChunkPerBlock, typename Allocator>
 class Pool {
 
-public:
+private:
+	Pool(const Pool& p);
 
+public:
+	Pool(Pool&& p) {
+	#ifdef NEX_DEBUG
+		_TotalBlockAllocations = p._TotalBlockAllocations;
+		_TotalChunksAskedFor = p._TotalChunksAskedFor;
+		_TotalChunksFreed = p._TotalChunksFreed;
+		_CurrentTotalChunks = p._CurrentTotalChunks;
+		_MaxActiveChunks = p._MaxActiveChunks;
+		p._TotalBlockAllocations = 0;
+		p._TotalChunksAskedFor = 0;
+		p._TotalChunksFreed = 0;
+		p._CurrentTotalChunks = 0;
+		p._MaxActiveChunks = 0;
+	#endif
+		_ChunkSize = p._ChunkSize;
+		_BlockSize = p._BlockSize;
+		freeBlock = p.freeBlock;
+		usedBlock = p.usedBlock;
+		freeChunk = p.freeChunk;
+		p._ChunkSize = 0;
+		p._BlockSize = 0;
+		p.freeBlock = 0;
+		p.usedBlock = 0;
+		p.freeChunk = 0;
+	}
 	/** */
 	Pool(const size_t chunkSize, size_t numInitialBlocks = 0) :
 			freeBlock(nullptr), usedBlock(nullptr), freeChunk(nullptr) {
@@ -268,7 +294,7 @@ protected:
 #define NEX_ENABLE_MEMORY_POOLS 1
 
 template<const size_t NumPerBlock, typename Mutex, typename Allocator>
-class MemPool {
+class MemoryPool {
 	typedef Pool<NumPerBlock, Allocator> TPool;
 
 	struct PoolType: public TPool, public Mutex {
@@ -279,14 +305,25 @@ class MemPool {
 
 #if NEX_ENABLE_MEMORY_POOLS
 	PoolType pool;
-#else 
+#else
 	size_t _objectSize;
 #endif
 
+	MemoryPool(const MemoryPool& p);
+
 public:
-	MemPool(size_t objectSize) :
+	MemoryPool(MemoryPool&& p)
 #if NEX_ENABLE_MEMORY_POOLS
-		pool(objectSize) 
+		pool(std::move(p.pool))
+#else
+		_objectSize(p.objectSize)
+#endif
+	{
+	}
+
+	MemoryPool(size_t objectSize) :
+#if NEX_ENABLE_MEMORY_POOLS
+		pool(objectSize)
 #else
 		_objectSize(objectSize)
 #endif
