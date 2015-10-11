@@ -288,7 +288,7 @@ void DebugRenderSystem::GenerateStreamDataForAxis() {
 	main.Merge(zAxis);
 	//cone.Merge(cone2);
 
-	VertexBuffer vertexBuffer(GpuBuffer::NEVER_RELEASED);
+	VertexBufferPtr vertexBuffer = VertexBuffer::Create(GpuBuffer::NEVER_RELEASED);
 
 	uint32 stride = ((sizeof(float) * 3) + sizeof(uint32));
 	uint32 vbsize = (uint32)main.points.size() * stride;
@@ -305,7 +305,7 @@ void DebugRenderSystem::GenerateStreamDataForAxis() {
 		*((uint32*)(pos++)) = c.ToAbgr();
 	}
 
-	vertexBuffer.CreateBuffer(vbsize, stride, reinterpret_cast<const uint8*>(pVData));
+	vertexBuffer->CreateBuffer(vbsize, stride, reinterpret_cast<const uint8*>(pVData));
 
 	IndexBufferPtr indexBuffer = Assign(NEX_NEW(IndexBuffer(GpuBuffer::NEVER_RELEASED)));
 	indexBuffer->CreateBuffer(main.topology.size() * 2, IndexBuffer::Type::TYPE_16BIT,
@@ -319,7 +319,7 @@ void DebugRenderSystem::GenerateStreamDataForAxis() {
 	stream->vertices.layout = VertexLayout::GetCommonLayout(VertexLayoutType::POSITION_COLOR_0).GetPtr();
 	stream->vertices.binding = NEX_NEW(VertexBufferBinding());
 	stream->vertices.binding->SetBufferCount(1);
-	stream->vertices.binding->BindBuffer(0, std::move(vertexBuffer));
+	stream->vertices.binding->BindBuffer(0, vertexBuffer, 0);
 	stream->indices.start = 0;
 	stream->indices.count = (uint32)main.topology.size();
 	stream->indices.indices = std::move(indexBuffer);
@@ -332,7 +332,7 @@ void DebugRenderSystem::GenerateStreamDataForAxis() {
 
 void DebugRenderSystem::GenerateStreamDataForBox() {
 	Geometry boxData = Geometry::CreateBox(1, 1, 1, true, Color::White);
-	VertexBuffer vertexBuffer(GpuBuffer::NEVER_RELEASED);
+	VertexBufferPtr vertexBuffer = Assign(NEX_NEW(VertexBuffer(GpuBuffer::NEVER_RELEASED)));
 
 	uint32 stride = ((sizeof(float) * 3) + sizeof(uint32));
 	uint32 vbsize = (uint32)boxData.points.size() * stride;
@@ -349,7 +349,7 @@ void DebugRenderSystem::GenerateStreamDataForBox() {
 		*((uint32*)(pos++)) = c.ToAbgr();
 	}
 
-	vertexBuffer.CreateBuffer(vbsize, stride, reinterpret_cast<const uint8*>(pVData));
+	vertexBuffer->CreateBuffer(vbsize, stride, reinterpret_cast<const uint8*>(pVData));
 
 	IndexBufferPtr indexBuffer = Assign(NEX_NEW(IndexBuffer(GpuBuffer::NEVER_RELEASED)));
 	indexBuffer->CreateBuffer(boxData.topology.size()*2, IndexBuffer::Type::TYPE_16BIT,
@@ -363,7 +363,7 @@ void DebugRenderSystem::GenerateStreamDataForBox() {
 	stream->vertices.layout = VertexLayout::GetCommonLayout(VertexLayoutType::POSITION_COLOR_0).GetPtr();
 	stream->vertices.binding = NEX_NEW(VertexBufferBinding());
 	stream->vertices.binding->SetBufferCount(1);
-	stream->vertices.binding->BindBuffer(0, std::move(vertexBuffer));
+	stream->vertices.binding->BindBuffer(0, vertexBuffer, 0);
 	stream->indices.start = 0;
 	stream->indices.count = (uint32)boxData.topology.size();
 	stream->indices.indices = std::move(indexBuffer);

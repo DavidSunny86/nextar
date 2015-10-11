@@ -2,8 +2,8 @@
  * Created on: 5th Oct 15
  * @author: obhi
 **/
-#ifndef RENDERCONTEXTGL42_H_
-#define RENDERCONTEXTGL42_H_
+#ifndef RenderContext_Base_GL43_H_
+#define RenderContext_Base_GL43_H_
 
 #include <RenderOpenGL.h>
 #include <RenderContext_4_2_GL.h>
@@ -18,6 +18,7 @@ public:
   RenderContext_4_3_GL(RenderDriverGL*);
   virtual VersionGL GetContextVersion();
 
+  virtual void PostWindowCreation(RenderWindow* gw) override;
 protected:
 
   virtual void InitializeExtensions();
@@ -25,4 +26,4 @@ protected:
 
 }
 
-#endif // RENDERCONTEXTGL40_H_
+#endif // RenderContext_Base_GL43_H_

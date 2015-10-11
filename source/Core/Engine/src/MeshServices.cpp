@@ -91,9 +91,9 @@ StreamData* MeshServices::CreateSphereMesh(
 	}
 
 
-	VertexBuffer vertexBuffer(GpuBuffer::NEVER_RELEASED);
+	VertexBufferPtr vertexBuffer = VertexBuffer::Create(GpuBuffer::NEVER_RELEASED);
 	IndexBufferPtr indexBuffer = Assign(NEX_NEW(IndexBuffer(GpuBuffer::NEVER_RELEASED)));
-	vertexBuffer.CreateBuffer(vbsize, sizeof(float)* 3, reinterpret_cast<const uint8*>(dat));
+	vertexBuffer->CreateBuffer(vbsize, sizeof(float)* 3, reinterpret_cast<const uint8*>(dat));
 	indexBuffer->CreateBuffer(ibsize, IndexBuffer::Type::TYPE_16BIT, reinterpret_cast<const uint8*>(idx));
 
 	StreamData* stream = NEX_NEW(StreamData());
@@ -103,7 +103,7 @@ StreamData* MeshServices::CreateSphereMesh(
 	stream->vertices.layout = VertexLayout::GetCommonLayout(VertexLayoutType::POSITION_0).GetPtr();
 	stream->vertices.binding = NEX_NEW(VertexBufferBinding());
 	stream->vertices.binding->SetBufferCount(1);
-	stream->vertices.binding->BindBuffer(0, std::move(vertexBuffer));
+	stream->vertices.binding->BindBuffer(0, vertexBuffer, 0);
 	stream->indices.start = 0;
 	stream->indices.count = ntri*3;
 	stream->indices.indices = std::move(indexBuffer);

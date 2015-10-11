@@ -20,7 +20,7 @@ namespace RenderOpenGL {
 
 #define DECL_COND_START_VERSION(maj, min, prevmaj, prevmin) \
 	class DECL_FUNC_TABLE_NAME(maj, min) { \
-		NEX_LOG_HELPER(CoreFuncTableVersion##maj##min);
+		NEX_LOG_HELPER(CoreFuncTableVersion##maj##min); \
 	protected:
 #define DECL_CORE_EXTENSION(funcptr, fucnname) \
 	    	DECL_FUNC_TYPE(funcptr) DECL_FUNC_NAME(fucnname);
@@ -43,17 +43,20 @@ namespace RenderOpenGL {
 #undef DECL_CORE_EXTENSION
 
 class ExtensionHelper {
+	NEX_LOG_HELPER(ExtensionHelper);
 public:
 	static bool IsSupported(const char* ext_name, const char* p);
 	static void RequiredExtensionNotFound(const char* what);
-}
+};
 
 class BaseExtensionsGL {
 	NEX_LOG_HELPER(BaseExtensionsGL);
 protected:
 
+public:
 	void InitializeFunctionPointers();
 	BaseExtensionsGL();
+
 
 #define DECL_COND_START_VERSION(maj, min, prevmaj, prevmin)
 #define DECL_CORE_EXTENSION(funcptr, fucnname)

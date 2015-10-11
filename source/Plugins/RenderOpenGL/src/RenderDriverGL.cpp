@@ -85,8 +85,7 @@ RenderContextPtr RenderDriverGL::CreateContextImpl(
 	RenderContext_Base_GL* rcGL = nullptr;
 	VersionGL version = ExtractVersion(params.reqOpenGLVersionMajor, params.reqOpenGLVersionMinor);
 	switch(version) {
-	case RenderOpenGL::GLV_3_3:
-		rcGL = NEX_NEW(RenderContext_3_3_GL(this)); break;
+	default:
 	case RenderOpenGL::GLV_4_0:
 		rcGL = NEX_NEW(RenderContext_4_0_GL(this)); break;
 	case RenderOpenGL::GLV_4_1:
@@ -97,6 +96,8 @@ RenderContextPtr RenderDriverGL::CreateContextImpl(
 		rcGL = NEX_NEW(RenderContext_4_3_GL(this)); break;
 	case RenderOpenGL::GLV_4_4:
 		rcGL = NEX_NEW(RenderContext_4_4_GL(this)); break;
+	case RenderOpenGL::GLV_4_5:
+		rcGL = NEX_NEW(RenderContext_4_5_GL(this)); break;
 	}
 	return Assign(rcGL);
 }

@@ -35,7 +35,7 @@ public:
 //		return ubBindingGl;
 //	}
 
-	void Destroy(RenderContextGL* rc);
+	void Destroy(RenderContext_Base_GL* rc);
 
 	virtual void* Map(RenderContext* rc);
 	virtual void SetRawBuffer(RenderContext* rc, const ConstantParameter& desc,
@@ -52,7 +52,7 @@ protected:
 
 	uint8* mappedMem;
 	friend class PassViewGL;
-	friend class RenderContextGL;
+	friend class RenderContext_Base_GL;
 };
 
 typedef std::reference_wrapper<UniformBufferGL> UniformBufferGLRef;

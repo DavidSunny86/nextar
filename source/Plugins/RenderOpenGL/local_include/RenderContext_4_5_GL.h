@@ -2,8 +2,8 @@
  * Created on: 5th Oct 15
  * @author: obhi
 **/
-#ifndef RENDERCONTEXTGL42_H_
-#define RENDERCONTEXTGL42_H_
+#ifndef RenderContext_Base_GL45_H_
+#define RenderContext_Base_GL45_H_
 
 #include <RenderOpenGL.h>
 #include <RenderContext_4_4_GL.h>
@@ -27,4 +27,4 @@ protected:
 
 }
 
-#endif // RENDERCONTEXTGL40_H_
+#endif // RenderContext_Base_GL45_H_

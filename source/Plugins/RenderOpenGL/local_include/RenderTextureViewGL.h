@@ -23,7 +23,7 @@ public:
 	virtual void Destroy(RenderContext*);
 
 /*
-	inline void CreateFBO(RenderContextGL* gl) {
+	inline void CreateFBO(RenderContext_Base_GL* gl) {
 		fbo.Create(gl);
 		fbo.Bind(false, gl);
 		fbo.Attach(gl, pixelFormat.attachmentType + 0, this);
@@ -31,7 +31,7 @@ public:
 		fbo.Unbind(false, gl);
 	}
 
-	inline void DestroyFBO(RenderContextGL* gl) {
+	inline void DestroyFBO(RenderContext_Base_GL* gl) {
 		fbo.Destroy(gl);
 	}
 */

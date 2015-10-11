@@ -34,7 +34,7 @@ public:
 		return renderBuffer;
 	}
 
-/*	inline void CreateFBO(RenderContextGL* gl) {
+/*	inline void CreateFBO(RenderContext_Base_GL* gl) {
 		fbo.Create(gl);
 		fbo.Bind(false, gl);
 		fbo.Attach(gl, attachmentType + 0, this);
@@ -42,7 +42,7 @@ public:
 		fbo.Unbind(false, gl);
 	}
 
-	inline void DestroyFBO(RenderContextGL* gl) {
+	inline void DestroyFBO(RenderContext_Base_GL* gl) {
 		fbo.Destroy(gl);
 	}
 */
@@ -68,4 +68,4 @@ protected:
 
 } /* namespace RenderOpenGL */
 
-#endif /* RENDERBUFFERVIEWGL_H_ */
+#endif /* RENDERBUFFERVIEWGL_H_  */

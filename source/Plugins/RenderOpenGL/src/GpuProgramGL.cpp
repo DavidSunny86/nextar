@@ -6,7 +6,7 @@
  */
 #include <RenderOpenGL.h>
 #include <GpuProgramGL.h>
-#include <RenderContextGL.h>
+#include <RenderContext_Base_GL.h>
 
 namespace RenderOpenGL {
 
@@ -31,14 +31,14 @@ bool GpuProgramGL::Compile(GLenum shaderType, RenderContext* ctx,
 
 	macroStr += "\n";
 	/* todo append global options */
-	iGlShader = static_cast<RenderContextGL*>(ctx)->CreateShader(shaderType,
+	iGlShader = static_cast<RenderContext_Base_GL*>(ctx)->CreateShader(shaderType,
 			macroStr.c_str(), src);
 	return (iGlShader != 0);
 }
 
 void GpuProgramGL::Destroy(RenderContext* ctx) {
 	if (iGlShader)
-		static_cast<RenderContextGL*>(ctx)->DestroyShader(iGlShader);
+		static_cast<RenderContext_Base_GL*>(ctx)->DestroyShader(iGlShader);
 }
 
 } /* namespace RenderOpenGL */

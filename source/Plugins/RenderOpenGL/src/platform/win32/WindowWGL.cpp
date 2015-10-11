@@ -6,7 +6,7 @@
  */
 
 #include <RenderOpenGL.h>
-#include <RenderContextWGL.h>
+#include <RenderContextImplWGL.h>
 #include <WindowWGL.h>
 
 namespace RenderOpenGL {
@@ -43,7 +43,7 @@ void WindowWGL::InitializeWindowClass() {
 	wndClass = RegisterClassEx(&wcx);
 }
 
-WindowWGL::WindowWGL(RenderContextWGL* ctx) :
+WindowWGL::WindowWGL(RenderContextImplWGL* ctx) :
 context(ctx), nextar::Win32Window(NEX_NEW( WindowWGL::Impl(this))) {
 	static_cast<WindowWGL::Impl*>(impl)->AddRef();
 }
@@ -61,7 +61,7 @@ WindowWGL::Impl::Impl(WindowWGL* _parent) :
 void WindowWGL::Impl::Create(uint32 width, uint32 height,
 bool fullscreen, const NameValueMap* params) {
 
-	RenderContextWGL* context = parent->GetContext();
+	RenderContextImplWGL* context = parent->GetContext();
 	position.x = 0;
 	position.y = 0;
 		
@@ -171,7 +171,7 @@ void WindowWGL::Impl::SetToFullScreen(bool fullScreen) {
 	if (fullScreen == parent->IsFullScreen())
 		return;
 
-	RenderContextWGL* context = parent->GetContext();
+	RenderContextImplWGL* context = parent->GetContext();
 	
 	RECT windowRect;
 
@@ -237,7 +237,7 @@ void WindowWGL::Impl::SetToFullScreen(bool fullScreen) {
 }
 
 void WindowWGL::Impl::Destroy() {
-	RenderContextWGL* context = parent->GetContext();
+	RenderContextImplWGL* context = parent->GetContext();
 	
 	if (parent->IsFullScreen())
 		SetToFullScreen(false);
@@ -275,7 +275,7 @@ PixelFormat WindowWGL::Impl::GetPixelFormat() const {
 
 void WindowWGL::Impl::Capture(RenderContext* rc, PixelBox& image,
 		FrameBuffer frameBuffer) {
-	RenderContextWGL* context = parent->GetContext();
+	RenderContextImplWGL* context = parent->GetContext();
 	if (rc != (RenderContext*)context) {
 		Error("Window created using a different context");
 		return;
@@ -283,11 +283,11 @@ void WindowWGL::Impl::Capture(RenderContext* rc, PixelBox& image,
 	if (!context->IsCurrentDC(hDC))
 		context->SetCurrentTarget(this);
 
-	context->Capture(image, this, pbo, frameBuffer);
+	context->GetContext()->Capture(image, this, pbo, frameBuffer);
 }
 
 void WindowWGL::Impl::Reset(RenderContext* rc, Size size, PixelFormat format) {
-	RenderContextWGL* context = parent->GetContext();
+	RenderContextImplWGL* context = parent->GetContext();
 	if (parent->IsFullScreen())
 		SetToFullScreen(false);
 	RECT windowRect;
@@ -315,8 +315,8 @@ void WindowWGL::Impl::Reset(RenderContext* rc, Size size, PixelFormat format) {
 }
 
 void WindowWGL::Impl::Present(RenderContext* rc) {
-	RenderContextWGL* context = parent->GetContext();
-	if (rc != context) {
+	RenderContextImplWGL* context = parent->GetContext();
+	if (rc != context->GetContext()) {
 		Error("Window created using a different context");
 		return;
 	}

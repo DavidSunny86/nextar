@@ -4,11 +4,11 @@
 namespace nextar {
 
 VertexBuffer::VertexBuffer(VertexBuffer&& other) :
-	GpuBuffer(std::move(other)), policy(other.policy) {
+GpuBuffer(std::move(other)), policy(other.policy) {
 }
 
 VertexBuffer::VertexBuffer(RelocationPolicy _policy) :
-		GpuBuffer(TYPE_VERTEX_BUFFER, policy), policy(_policy) {
+GpuBuffer(TYPE_VERTEX_BUFFER, policy), policy(_policy) {
 }
 
 void VertexBuffer::CreateBuffer(size_t bufferSize, uint32 stride, const uint8* dataPtr) {
@@ -18,7 +18,12 @@ void VertexBuffer::CreateBuffer(size_t bufferSize, uint32 stride, const uint8* d
 	params.policy = policy;
 	params.elementStride = stride;
 	RequestUpdate(MSG_CREATE,
-			static_cast<ContextObject::ContextParamPtr>(&params));
+				  static_cast<ContextObject::ContextParamPtr>(&params));
+}
+
+VertexBufferPtr VertexBuffer::Create(RelocationPolicy _policy) {
+	VertexBufferPtr ret = Assign(NEX_NEW(VertexBuffer(_policy)));
+	return ret;
 }
 
 }

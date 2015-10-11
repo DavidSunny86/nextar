@@ -1,55 +1,54 @@
 /**
  * Created on: 4th Oct 15
  * @author: obhi
-**/
-#include "BaseRenderContext.h"
-#include "RenderContext_Base_GL.h"
+ **/
+#include <BaseRenderContext.h>
+#include <RenderContext_Base_GL.h>
+#include <VertexElementGL.h>
+#include <PassViewGL.h>
+#include <UniformBufferGL.h>
+#include <GpuBufferViewGL.h>
+#include <VertexLayoutGL.h>
 
 namespace RenderOpenGL {
 
-static GLenum RenderContextGL_Base_GL_Base_GL::s_colorAttachments[RenderConstants::MAX_COLOR_TARGETS] = { 0 };
-static GLenum RenderContextGL_Base_GL_Base_GL::s_attachmentMap[] = {
-  GL_NONE,
-  GL_FRONT_LEFT,
-  GL_FRONT_RIGHT,
-  GL_BACK_LEFT,
-  GL_BACK_RIGHT,
-  GL_DEPTH,
-  GL_COLOR_ATTACHMENT0,
-  GL_COLOR_ATTACHMENT1,
-  GL_COLOR_ATTACHMENT2,
-  GL_COLOR_ATTACHMENT3,
-  GL_COLOR_ATTACHMENT4,
-  GL_COLOR_ATTACHMENT5,
-  GL_COLOR_ATTACHMENT6,
-  GL_COLOR_ATTACHMENT7,
-  GL_STENCIL_ATTACHMENT,
+GLenum RenderContext_Base_GL::s_attachmentMap[] = {
+	GL_NONE,
+	GL_FRONT_LEFT,
+	GL_FRONT_RIGHT,
+	GL_BACK_LEFT,
+	GL_BACK_RIGHT,
+	GL_DEPTH,
+	GL_COLOR_ATTACHMENT0,
+	GL_COLOR_ATTACHMENT1,
+	GL_COLOR_ATTACHMENT2,
+	GL_COLOR_ATTACHMENT3,
+	GL_COLOR_ATTACHMENT4,
+	GL_COLOR_ATTACHMENT5,
+	GL_COLOR_ATTACHMENT6,
+	GL_COLOR_ATTACHMENT7,
+	GL_STENCIL_ATTACHMENT,
 };
 
-RenderContextGL_Base_GL_Base_GL::RenderContextGL_Base_GL_Base_GL(RenderDriverGL* _driver) :
+RenderContext_Base_GL::RenderContext_Base_GL(RenderDriverGL* _driver) :
 BaseRenderContext(_driver)
-,currentWindow(0)
-,currentCountOfColorAttachments(0)
-,contextFlags(0) {
-  ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyResources, this);
-	if (!s_colorAttachments[0]) {
-		for(uint32 i = 0; i < RenderConstants::MAX_COLOR_TARGETS; ++i) {
-			s_colorAttachments[i] = GL_COLOR_ATTACHMENT0 + i;
-		}
-	}
-  pImpl = CreatePlatformImpl();
+, currentWindow(0)
+, currentCountOfColorAttachments(0)
+, contextFlags(0) {
+	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyResources, this);
+	pImpl = CreatePlatformImpl();
 }
 
 RenderContext_Base_GL::~RenderContext_Base_GL() {
-  NEX_DELETE(pImpl);
+	NEX_DELETE(GetImpl());
 }
 
-void RenderContextGL_Base_GL_Base_GL::CreateImpl(
-		const RenderDriver::ContextCreationParams& ctxParams) {
+void RenderContext_Base_GL::CreateImpl(
+	const RenderDriver::ContextCreationParams& ctxParams) {
 	SetCreationParams(ctxParams);
 }
 
-void RenderContextGL_Base_GL_Base_GL::PostWindowCreation(RenderWindow* gw) {
+void RenderContext_Base_GL::PostWindowCreation(RenderWindow* gw) {
 	/* check if extensions were initialized or initialize extensions */
 	if (!IsContextReady()) {
 		ReadyContext(gw);
@@ -66,20 +65,20 @@ void RenderContextGL_Base_GL_Base_GL::PostWindowCreation(RenderWindow* gw) {
 	}
 }
 
-void RenderContextGL_Base_GL_Base_GL::PostWindowDestruction(RenderWindow* gw) {
+void RenderContext_Base_GL::PostWindowDestruction(RenderWindow* gw) {
 	/* do nothing */
 }
 
-void  RenderContextGL_Base_GL_Base_GL::PostCloseImpl() {
-  pImpl->PostCloseImpl();
-  BaseRenderContext::PostCloseImpl();
+void  RenderContext_Base_GL::PostCloseImpl() {
+	GetImpl()->PostCloseImpl();
+	BaseRenderContext::PostCloseImpl();
 }
 
-void RenderContextGL_Base_GL_Base_GL::SetVideoModeImpl(const VideoMode& videoMode) {
-  pImpl->SetVideoModeImpl(videoMode);
+void RenderContext_Base_GL::SetVideoModeImpl(const VideoMode& videoMode) {
+	GetImpl()->SetVideoModeImpl(videoMode);
 }
 
-void RenderContextGL_Base_GL_Base_GL::Draw(StreamData* streamData, CommitContext& ctx) {
+void RenderContext_Base_GL::Draw(StreamData* streamData, CommitContext& ctx) {
 	/**
 	 * Note on functions/extensions used:
 	 * + GlBindBuffer - to bind the VBO
@@ -129,66 +128,65 @@ void RenderContextGL_Base_GL_Base_GL::Draw(StreamData* streamData, CommitContext
 		if (vd.start == 0) {
 			if (streamData->instanceCount == 1)
 				glDrawElements(primtype, streamData->indices.count, indextype,
-						reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start));
+				reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start));
 			else
 				GlDrawElementsInstanced(primtype, streamData->indices.count,
-						indextype,
-						reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start),
-						streamData->instanceCount);
+				indextype,
+				reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start),
+				streamData->instanceCount);
 		} else {
 			if (streamData->instanceCount == 1)
 				GlDrawElementsBaseVertex(primtype, streamData->indices.count,
-						indextype,
-						reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start),
-						vd.start);
+				indextype,
+				reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start),
+				vd.start);
 			else
 				GlDrawElementsInstancedBaseVertex(primtype,
-						streamData->indices.count, indextype,
-						reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start),
-						streamData->instanceCount, vd.start);
+				streamData->indices.count, indextype,
+				reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start),
+				streamData->instanceCount, vd.start);
 		}
 	} else {
 		if (streamData->instanceCount == 1)
 			glDrawArrays(primtype, vd.start, vd.count);
 		else
 			GlDrawArraysInstanced(primtype, vd.start, vd.count,
-					streamData->instanceCount);
+			streamData->instanceCount);
 	}
 	GL_CHECK();
 	layout->Disable(this);
 }
 
-void RenderContextGL_Base_GL_Base_GL::SetCurrentTarget(RenderTarget* canvas) {
+void RenderContext_Base_GL::SetCurrentTarget(RenderTarget* canvas) {
 	if (canvas == nullptr) {
 		SetCurrentWindow(nullptr);
-	}
-	else {
+	} else {
 		switch (canvas->GetRenderTargetType()) {
 		case RenderTargetType::TEXTURE: {
 			RenderTextureViewGL* textureView =
-					static_cast<RenderTextureViewGL*>(GetView(
-							static_cast<RenderTexture*>(canvas)));
+				static_cast<RenderTextureViewGL*>(GetView(
+				static_cast<RenderTexture*>(canvas)));
 			FrameBufferObjectGL& fbo = textureView->GetFBO();
 			if (!fbo.IsValid())
-				textureView->CreateFBO(this);
+				CreateFBO(textureView);
 			BindWriteFBO(fbo);
 			contextFlags |= CURRENT_TARGET_FBO;
 			currentCountOfColorAttachments = textureView->IsColorTarget();
 		}
-			break;
+										break;
 
 		case RenderTargetType::RENDER_BUFFER: {
 			RenderBufferViewGL* textureView =
-					static_cast<RenderBufferViewGL*>(
-							GetView(static_cast<RenderBuffer*>(canvas)));
+				static_cast<RenderBufferViewGL*>(
+				GetView(static_cast<RenderBuffer*>(canvas)));
 			FrameBufferObjectGL& fbo = textureView->GetFBO();
 			if (!fbo.IsValid())
-				textureView->CreateFBO(this);
+				CreateFBO(textureView);
 			BindWriteFBO(fbo);
 			contextFlags |= CURRENT_TARGET_FBO;
 			currentCountOfColorAttachments = textureView->IsColorTarget();
 		}
-			break;
+											  break;
 
 		case RenderTargetType::BACK_BUFFER:
 			currentWindow = canvas;
@@ -198,25 +196,25 @@ void RenderContextGL_Base_GL_Base_GL::SetCurrentTarget(RenderTarget* canvas) {
 
 		case RenderTargetType::MULTI_RENDER_TARGET: {
 			MultiRenderTargetViewGL* textureView =
-					static_cast<MultiRenderTargetViewGL*>(GetView(
-							static_cast<MultiRenderTarget*>(canvas)));
+				static_cast<MultiRenderTargetViewGL*>(GetView(
+				static_cast<MultiRenderTarget*>(canvas)));
 			FrameBufferObjectGL& fbo = textureView->GetFBO();
 			NEX_ASSERT(fbo.IsValid());
 			BindWriteFBO(fbo);
 			// set the individual draw buffers
-			if ( (currentCountOfColorAttachments = textureView->GetColorAttachmentCount()) )
-				GlDrawBuffers(currentCountOfColorAttachments, s_colorAttachments);
+			if ((currentCountOfColorAttachments = textureView->GetColorAttachmentCount()))
+				GlDrawBuffers(currentCountOfColorAttachments, s_attachmentMap + 6);
 			contextFlags |= CURRENT_TARGET_FBO;
-			}
-			break;
+		}
+													break;
 		}
 	}
 }
 
-void RenderContextGL_Base_GL_Base_GL::Clear(const ClearBufferInfo& info) {
+void RenderContext_Base_GL::Clear(const ClearBufferInfo& info) {
 	if (Test(info.clearFlags & ClearFlags::CLEAR_COLOR)) {
 		if (currentCountOfColorAttachments) {
-			for(uint32 i = 0; i < currentCountOfColorAttachments; ++i) {
+			for (uint32 i = 0; i < currentCountOfColorAttachments; ++i) {
 				ClearFlags cf = (ClearFlags)((uint16)ClearFlags::CLEAR_COLOR_0 << (uint16)i);
 				if (Test(info.clearFlags & cf))
 					GlClearBufferfv(GL_COLOR, i, info.clearColor[i].AsFloatArray());
@@ -237,9 +235,9 @@ void RenderContextGL_Base_GL_Base_GL::Clear(const ClearBufferInfo& info) {
 	GL_CHECK();
 }
 
-void RenderContextGL_Base_GL::Copy(
-		RenderTarget* source, FrameBuffer src,
-		RenderTarget* dest, FrameBuffer dst) {
+void RenderContext_Base_GL::Copy(
+	RenderTarget* source, FrameBuffer src,
+	RenderTarget* dest, FrameBuffer dst) {
 
 	NEX_ASSERT(source->GetDimensions() == dest->GetDimensions());
 	Size s = source->GetDimensions();
@@ -247,7 +245,7 @@ void RenderContextGL_Base_GL::Copy(
 	SpecifyTargetState(true, true, source, src);
 	SpecifyTargetState(false, true, dest, dst);
 	GLbitfield mask = GL_COLOR_BUFFER_BIT;
-	switch(src) {
+	switch (src) {
 	case FrameBuffer::DEPTH:
 		mask = GL_DEPTH_BUFFER_BIT; break;
 	case FrameBuffer::STENCIL:
@@ -261,15 +259,15 @@ void RenderContextGL_Base_GL::Copy(
 	SetCurrentTarget(GetCurrentTarget());
 }
 
-void RenderContextGL_Base_GL_Base_GL::SpecifyTargetState(
-  bool readOrDraw, bool setUnset,
-  RenderTarget* canvas, FrameBuffer src) {
+void RenderContext_Base_GL::SpecifyTargetState(
+	bool readOrDraw, bool setUnset,
+	RenderTarget* canvas, FrameBuffer src) {
 	// setup read
 	switch (canvas->GetRenderTargetType()) {
 	case RenderTargetType::TEXTURE: {
 		RenderTextureViewGL* textureView =
-				static_cast<RenderTextureViewGL*>(GetView(
-						static_cast<RenderTexture*>(canvas)));
+			static_cast<RenderTextureViewGL*>(GetView(
+			static_cast<RenderTexture*>(canvas)));
 		FrameBufferObjectGL& fbo = textureView->GetFBO();
 		if (!fbo.IsValid())
 			CreateFBO(textureView);
@@ -280,16 +278,16 @@ void RenderContextGL_Base_GL_Base_GL::SpecifyTargetState(
 				BindFBO(fbo, readOrDraw);
 		} else {
 			if (src >= FrameBuffer::COLOR_0 && src <= FrameBuffer::COLOR_7)
-				UnbindNamedFBO(readOrDraw, src);
+				UnbindNamedFBO(readOrDraw);
 			else
 				UnbindFBO(readOrDraw);
 		}
 	}
-		break;
+									break;
 	case RenderTargetType::RENDER_BUFFER: {
 		RenderBufferViewGL* textureView =
-				static_cast<RenderBufferViewGL*>(GetView(
-						static_cast<RenderBuffer*>(canvas)));
+			static_cast<RenderBufferViewGL*>(GetView(
+			static_cast<RenderBuffer*>(canvas)));
 		FrameBufferObjectGL& fbo = textureView->GetFBO();
 		if (!fbo.IsValid())
 			CreateFBO(textureView);
@@ -300,15 +298,15 @@ void RenderContextGL_Base_GL_Base_GL::SpecifyTargetState(
 				BindFBO(fbo, readOrDraw);
 		} else {
 			if (src >= FrameBuffer::COLOR_0 && src <= FrameBuffer::COLOR_7)
-				UnbindNamedFBO(fbo, readOrDraw, src);
+				UnbindNamedFBO(readOrDraw);
 			else
-				UnbindFBO(fbo, readOrDraw);
+				UnbindFBO(readOrDraw);
 		}
 
 	}
-		break;
+										  break;
 	case RenderTargetType::BACK_BUFFER:
-		SetCurrentWindow (canvas);
+		SetCurrentWindow(canvas);
 		if (setUnset) {
 			if (readOrDraw)
 				SetReadBuffer(GL_BACK);
@@ -318,8 +316,8 @@ void RenderContextGL_Base_GL_Base_GL::SpecifyTargetState(
 		break;
 	case RenderTargetType::MULTI_RENDER_TARGET: {
 		MultiRenderTargetViewGL* textureView =
-				static_cast<MultiRenderTargetViewGL*>(GetView(
-						static_cast<MultiRenderTarget*>(canvas)));
+			static_cast<MultiRenderTargetViewGL*>(GetView(
+			static_cast<MultiRenderTarget*>(canvas)));
 		FrameBufferObjectGL& fbo = textureView->GetFBO();
 		NEX_ASSERT(fbo.IsValid());
 		if (setUnset) {
@@ -329,51 +327,49 @@ void RenderContextGL_Base_GL_Base_GL::SpecifyTargetState(
 				BindFBO(fbo, readOrDraw);
 		} else {
 			if (src >= FrameBuffer::COLOR_0 && src <= FrameBuffer::COLOR_7)
-        UnbindNamedFBO(fbo, readOrDraw, src);
+				UnbindNamedFBO(readOrDraw);
 			else
-				UnbindFBO(fbo, readOrDraw);
+				UnbindFBO(readOrDraw);
 		}
 		break;
 	}
 	}
 }
 
-void RenderContextGL_Base_GL_Base_GL::BindNamedFBO(FrameBufferObjectGL& fbo,
-  bool readBuffer, FrameBuffer fb) {
-  NEX_ASSERT(fb >= FrameBuffer::COLOR_0 && fb <= FrameBuffer::COLOR_7);
+void RenderContext_Base_GL::BindNamedFBO(FrameBufferObjectGL& fbo,
+										 bool readBuffer, FrameBuffer fb) {
+	NEX_ASSERT(fb >= FrameBuffer::COLOR_0 && fb <= FrameBuffer::COLOR_7);
 	if (readBuffer) {
 		BindFBO(fbo, true);
 		SetReadBuffer(s_attachmentMap[(uint32)fb]);
-	}	else {
+	} else {
 		BindFBO(fbo, false);
 		SetDrawBuffer(s_attachmentMap[(uint32)fb]);
 	}
 	GL_CHECK();
 }
 
-void RenderContextGL_Base_GL_Base_GL::UnbindNamedFBO(
-  bool readBuffer, FrameBuffer fb) {
-	NEX_ASSERT(fb >= FrameBuffer::COLOR_0 && fb <= FrameBuffer::COLOR_7);
+void RenderContext_Base_GL::UnbindNamedFBO(
+	bool readBuffer) {
 	if (readBuffer) {
-    UnbindFBO(true);
+		UnbindFBO(true);
 		SetReadBuffer(GL_BACK);
-	}
-	else {
+	} else {
 		UnbindFBO(false);
 		SetDrawBuffer(GL_BACK);
 	}
 	GL_CHECK();
 }
 
-void RenderContextGL_Base_GL_Base_GL::AttachToFBO(RenderTextureViewGL* texture, GLenum type) {
-  switch (texture->GetType()) {
+void RenderContext_Base_GL::AttachToFBO(RenderTextureViewGL* texture, GLenum type) {
+	switch (texture->GetType()) {
 	case GL_TEXTURE_1D:
 		GlFramebufferTexture1D(GL_FRAMEBUFFER, type, GL_TEXTURE_1D,
-				texture->GetTexture(), 0);
+							   texture->GetTexture(), 0);
 		break;
 	case GL_TEXTURE_2D:
 		GlFramebufferTexture2D(GL_FRAMEBUFFER, type, GL_TEXTURE_2D,
-				texture->GetTexture(), 0);
+							   texture->GetTexture(), 0);
 		break;
 	case GL_TEXTURE_3D:
 	case GL_TEXTURE_1D_ARRAY:
@@ -385,39 +381,39 @@ void RenderContextGL_Base_GL_Base_GL::AttachToFBO(RenderTextureViewGL* texture, 
 	}
 }
 
-void RenderContextGL_Base_GL_Base_GL::AttachToFBO(RenderBufferViewGL* rt, GLenum attachmentType) {
-  GlFramebufferRenderbuffer(GL_FRAMEBUFFER, attachmentType,
-    GL_RENDERBUFFER, rt->GetRenderBuffer());
+void RenderContext_Base_GL::AttachToFBO(RenderBufferViewGL* rt, GLenum attachmentType) {
+	GlFramebufferRenderbuffer(GL_FRAMEBUFFER, attachmentType,
+							  GL_RENDERBUFFER, rt->GetRenderBuffer());
 }
 
-bool RenderContextGL_Base_GL_Base_GL::ValidateFBO() {
-  #define LOG_CASE(x) case x: Error( #x ); return false
+bool RenderContext_Base_GL::ValidateFBO() {
+#define LOG_CASE(x) case x: Error( #x ); return false
 	switch (GlCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER)) {
-  LOG_CASE(GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT);
-	LOG_CASE( GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT );
-	LOG_CASE( GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER );
-	LOG_CASE( GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER );
-	LOG_CASE( GL_FRAMEBUFFER_UNSUPPORTED );
-	LOG_CASE( GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE );
-	LOG_CASE( GL_TEXTURE_FIXED_SAMPLE_LOCATIONS );
-	LOG_CASE( GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS );
+		LOG_CASE(GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT);
+		LOG_CASE(GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT);
+		LOG_CASE(GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER);
+		LOG_CASE(GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER);
+		LOG_CASE(GL_FRAMEBUFFER_UNSUPPORTED);
+		LOG_CASE(GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE);
+		LOG_CASE(GL_TEXTURE_FIXED_SAMPLE_LOCATIONS);
+		LOG_CASE(GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS);
 	case GL_FRAMEBUFFER_COMPLETE:
 		return true;
 	}
 	return false;
-  #undef LOG_CASE
+#undef LOG_CASE
 }
 
-void RenderContextGL_Base_GL_Base_GL::EndRender() {
-  if (contextFlags & CURRENT_TARGET_FBO) {
-    UnbindFBO(false);
-    contextFlags &= ~CURRENT_TARGET_FBO;
-  }
-  currentTarget = currentWindow;
+void RenderContext_Base_GL::EndRender() {
+	if (contextFlags & CURRENT_TARGET_FBO) {
+		UnbindFBO(false);
+		contextFlags &= ~CURRENT_TARGET_FBO;
+	}
+	currentTarget = currentWindow;
 }
 
 
-void RenderContextGL_Base_GL::DetermineShaderTarget() {
+void RenderContext_Base_GL::DetermineShaderTarget() {
 	VersionGL ver = GetContextVersion();
 	String target;
 	switch (ver) {
@@ -457,8 +453,8 @@ void RenderContextGL_Base_GL::DetermineShaderTarget() {
 	shaderTarget += "\n";
 }
 
-GLuint RenderContextGL_Base_GL::CreateShader(GLenum type, const char* preDef,
-		const char* source) {
+GLuint RenderContext_Base_GL::CreateShader(GLenum type, const char* preDef,
+										   const char* source) {
 	const GLchar* sourceBuff[3] = { 0 };
 	// determine shader version
 
@@ -481,7 +477,7 @@ GLuint RenderContextGL_Base_GL::CreateShader(GLenum type, const char* preDef,
 		GlGetShaderiv(shaderObject, GL_INFO_LOG_LENGTH, &infoLogLength);
 		GL_CHECK();
 		GLchar* infoLog = static_cast<GLchar*>(NEX_ALLOC(infoLogLength + 2,
-				MEMCAT_GENERAL));
+			MEMCAT_GENERAL));
 		GlGetShaderInfoLog(shaderObject, infoLogLength + 1, NULL, infoLog);
 		GL_CHECK();
 		Error(String("Shader compilation failed: ") + infoLog);
@@ -492,12 +488,12 @@ GLuint RenderContextGL_Base_GL::CreateShader(GLenum type, const char* preDef,
 	return shaderObject;
 }
 
-void RenderContextGL_Base_GL::DestroyShader(GLuint sh) {
+void RenderContext_Base_GL::DestroyShader(GLuint sh) {
 	GlDeleteShader(sh);
 	GL_CHECK();
 }
 
-GLuint RenderContextGL_Base_GL::CreateProgram(GLuint shaders[]) {
+GLuint RenderContext_Base_GL::CreateProgram(GLuint shaders[]) {
 	/* create the program object */
 	GLuint program = GlCreateProgram();
 	for (nextar::uint32 i = 0; i < Pass::STAGE_COUNT; ++i) {
@@ -538,7 +534,7 @@ GLuint RenderContextGL_Base_GL::CreateProgram(GLuint shaders[]) {
 		GlGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLen);
 		if (infoLogLen > 0) {
 			infoLog = static_cast<GLchar*>(NEX_ALLOC(
-					sizeof(GLchar) * infoLogLen, MEMCAT_GENERAL));
+				sizeof(GLchar) * infoLogLen, MEMCAT_GENERAL));
 			GlGetProgramInfoLog(program, infoLogLen, &infoLogLen, infoLog);
 			GL_CHECK();
 			Error(String("Shader linking failed: ") + infoLog);
@@ -553,13 +549,13 @@ GLuint RenderContextGL_Base_GL::CreateProgram(GLuint shaders[]) {
 
 }
 
-void RenderContextGL_Base_GL::DestroyProgram(GLuint program) {
+void RenderContext_Base_GL::DestroyProgram(GLuint program) {
 	GlDeleteProgram(program);
 	GL_CHECK();
 }
 
-uint32 RenderContextGL_Base_GL::ReadProgramSemantics(GLuint program,
-		VertexSemanticGL* inpComp) {
+uint32 RenderContext_Base_GL::ReadProgramSemantics(GLuint program,
+												   VertexSemanticGL* inpComp) {
 
 	GLint numAttribs = 0;
 	// outputSignature = 0;
@@ -575,7 +571,7 @@ uint32 RenderContextGL_Base_GL::ReadProgramSemantics(GLuint program,
 		GLint attribSize = 0;
 		GLenum attribType = 0;
 		GlGetActiveAttrib(program, i, 128, NULL, &attribSize, &attribType,
-				attribName);
+						  attribName);
 		// map this to a matching semantic
 		// if no match is found, we have a problem
 		SemanticDef semantic = VertexSemantic::MapSemantic(attribName);
@@ -609,10 +605,10 @@ uint32 RenderContextGL_Base_GL::ReadProgramSemantics(GLuint program,
 	return (uint32)inpCount;
 }
 
-void RenderContextGL_Base_GL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
-	GLuint program,
-	const Pass::VarToAutoParamMap& remapParams,
-	ParamEntryTable* paramTable) {
+void RenderContext_Base_GL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
+										 GLuint program,
+										 const Pass::VarToAutoParamMap& remapParams,
+										 ParamEntryTable* paramTable) {
 	GLint numBlocks = 0;
 	GlGetProgramiv(program, GL_ACTIVE_UNIFORM_BLOCKS, &numBlocks);
 	GL_CHECK();
@@ -625,10 +621,10 @@ void RenderContextGL_Base_GL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
 		GlGetActiveUniformBlockName(program, i, 128, NULL, name);
 		GL_CHECK();
 		GlGetActiveUniformBlockiv(program, i, GL_UNIFORM_BLOCK_DATA_SIZE,
-			&size);
+								  &size);
 		GL_CHECK();
 		GlGetActiveUniformBlockiv(program, i,
-			GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &numParams);
+								  GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &numParams);
 		GL_CHECK();
 		//NEX_ASSERT(numParams < MAX_PARAMS);
 		if (numParams == 0) {
@@ -655,7 +651,7 @@ void RenderContextGL_Base_GL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
 		if (!ubPtr) {
 			// create a new uniform buffer
 			ubPtr = CreateUniformBuffer(pass, passIndex, uniName, i, program,
-				numParams, size, remapParams, paramTable);
+										numParams, size, remapParams, paramTable);
 			GL_CHECK();
 			//ubPtr->SetBinding((GLuint) uniformBufferMap.size()-1);
 		}
@@ -673,10 +669,10 @@ void RenderContextGL_Base_GL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
 	});
 }
 
-UniformBufferGL* RenderContextGL_Base_GL::CreateUniformBuffer(PassViewGL* pass,
-		uint32 passIndex, const String& name, GLint blockIndex, GLuint prog,
-		GLuint numParams, uint32 size, const Pass::VarToAutoParamMap& remapParams,
-		ParamEntryTable* table) {
+UniformBufferGL* RenderContext_Base_GL::CreateUniformBuffer(PassViewGL* pass,
+															uint32 passIndex, const String& name, GLint blockIndex, GLuint prog,
+															GLuint numParams, uint32 size, const Pass::VarToAutoParamMap& remapParams,
+															ParamEntryTable* table) {
 
 	NEX_ASSERT(size > 0);
 	uint16 numUnmappedParams = 0;
@@ -733,21 +729,21 @@ UniformBufferGL* RenderContextGL_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 		return &u;
 
 	void* tempBuffer = NEX_ALLOC(sizeof(GLint) * numParams * 7 + 128,
-			MEMCAT_GENERAL);
-	GLint *indices = static_cast<GLint*>(tempBuffer) + numParams * 0;
-	GLint *type = static_cast<GLint*>(tempBuffer) + numParams * 1;
-	GLint *offset = static_cast<GLint*>(tempBuffer) + numParams * 2;
-	GLint *arraynum = static_cast<GLint*>(tempBuffer) + numParams * 3;
-	GLint *rowMaj = static_cast<GLint*>(tempBuffer) + numParams * 4;
-	GLint *matStride = static_cast<GLint*>(tempBuffer) + numParams * 5;
-	GLint *arrayStride = static_cast<GLint*>(tempBuffer) + numParams * 6;
+								 MEMCAT_GENERAL);
+	GLint *indices = static_cast<GLint*>(tempBuffer)+numParams * 0;
+	GLint *type = static_cast<GLint*>(tempBuffer)+numParams * 1;
+	GLint *offset = static_cast<GLint*>(tempBuffer)+numParams * 2;
+	GLint *arraynum = static_cast<GLint*>(tempBuffer)+numParams * 3;
+	GLint *rowMaj = static_cast<GLint*>(tempBuffer)+numParams * 4;
+	GLint *matStride = static_cast<GLint*>(tempBuffer)+numParams * 5;
+	GLint *arrayStride = static_cast<GLint*>(tempBuffer)+numParams * 6;
 	char *uniName = reinterpret_cast<char*>(static_cast<GLint*>(tempBuffer)
-			+ numParams * 7);
+											+numParams * 7);
 
-	const GLuint* uindices = (GLuint*) indices;
+	const GLuint* uindices = (GLuint*)indices;
 	//GLuint blockIndex = GlGetUniformBlockIndex(prog, (const GLchar*)name.c_str());
 	GlGetActiveUniformBlockiv(prog, blockIndex,
-			GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES, indices);
+							  GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES, indices);
 	GL_CHECK();
 	GlGetActiveUniformsiv(prog, numParams, uindices, GL_UNIFORM_TYPE, type);
 	GL_CHECK();
@@ -756,13 +752,13 @@ UniformBufferGL* RenderContextGL_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 	GlGetActiveUniformsiv(prog, numParams, uindices, GL_UNIFORM_SIZE, arraynum);
 	GL_CHECK();
 	GlGetActiveUniformsiv(prog, numParams, uindices, GL_UNIFORM_IS_ROW_MAJOR,
-			rowMaj);
+						  rowMaj);
 	GL_CHECK();
 	GlGetActiveUniformsiv(prog, numParams, uindices, GL_UNIFORM_MATRIX_STRIDE,
-			matStride);
+						  matStride);
 	GL_CHECK();
 	GlGetActiveUniformsiv(prog, numParams, uindices, GL_UNIFORM_ARRAY_STRIDE,
-			arrayStride);
+						  arrayStride);
 	GL_CHECK();
 
 	// First we determine the context of the auto-param.
@@ -783,7 +779,7 @@ UniformBufferGL* RenderContextGL_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 		startParamIndex = (uint32)table->size();
 		table->reserve(startParamIndex + numParams);
 	}
-	for (GLint i = 0; i < (GLint) numParams; ++i) {
+	for (GLint i = 0; i < (GLint)numParams; ++i) {
 		UniformGL& uform = uniforms[i];
 		GlGetActiveUniformName(prog, indices[i], 128, 0, uniName);
 		GL_CHECK();
@@ -797,10 +793,10 @@ UniformBufferGL* RenderContextGL_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 			if (chosen == ParameterContext::CTX_UNKNOWN)
 				chosen = paramDef->context;
 			else if (chosen != paramDef->context
-					&& paramDef->context != ParameterContext::CTX_UNKNOWN) {
+					 && paramDef->context != ParameterContext::CTX_UNKNOWN) {
 				Warn(
-						"Parameters from different contexts cannot be mixed for buffer: "
-								+ name + "with parameter: " + paramName);
+					"Parameters from different contexts cannot be mixed for buffer: "
+					+ name + "with parameter: " + paramName);
 				// discard??
 			}
 			uform.autoName = paramDef->autoName;
@@ -835,8 +831,8 @@ UniformBufferGL* RenderContextGL_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 		chosen = GuessContextByName(name);
 	if (chosen == ParameterContext::CTX_UNKNOWN) {
 		Warn(
-				"Buffer context could not be determined, assigning material context: "
-						+ name);
+			"Buffer context could not be determined, assigning material context: "
+			+ name);
 		chosen = ParameterContext::CTX_MATERIAL;
 	}
 	u.context = chosen;
@@ -848,8 +844,8 @@ UniformBufferGL* RenderContextGL_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 	}
 
 	if ((!autoParamCount && chosen != ParameterContext::CTX_VIEW
-			&& chosen != ParameterContext::CTX_FRAME)
-			|| !parseIndividualParams) {
+		&& chosen != ParameterContext::CTX_FRAME)
+		|| !parseIndividualParams) {
 		// lets look for the struct processor
 		if (!u.processor)
 			u.processor = Pass::GetStructProcessor();
@@ -860,14 +856,14 @@ UniformBufferGL* RenderContextGL_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 		// sort the resulting uniforms such that auto params come first
 		// followed by unmapped params. Unmapped params are sorted by name.
 		std::sort(uniforms, uniforms + numParams,
-				[] (const UniformGL& first, const UniformGL& second) {
-					if (first.autoName == second.autoName) {
-						NEX_ASSERT(first.autoName == AutoParamName::AUTO_CUSTOM_CONSTANT);
-						return first.bufferOffset < first.bufferOffset;
-					}
-					return (first.autoName <
-							second.autoName) != 0;
-				});
+				  [](const UniformGL& first, const UniformGL& second) {
+			if (first.autoName == second.autoName) {
+				NEX_ASSERT(first.autoName == AutoParamName::AUTO_CUSTOM_CONSTANT);
+				return first.bufferOffset < first.bufferOffset;
+			}
+			return (first.autoName <
+					second.autoName) != 0;
+		});
 	}
 
 	NEX_FREE(tempBuffer, MEMCAT_GENERAL);
@@ -875,59 +871,59 @@ UniformBufferGL* RenderContextGL_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 	return &u;
 }
 
-GLuint RenderContextGL_Base_GL::CreateSamplerFromParams(const TextureUnitParams& params) {
+GLuint RenderContext_Base_GL::CreateSamplerFromParams(const TextureUnitParams& params) {
 	GLuint sampler;
 	GlGenSamplers(1, &sampler);
 	GL_CHECK();
 	if (sampler) {
 		GlSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER,
-				GetGlMinFilter(params.minFilter));
+							GetGlMinFilter(params.minFilter));
 		GL_CHECK();
 		GlSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER,
-				GetGlMagFilter(params.magFilter));
+							GetGlMagFilter(params.magFilter));
 		GL_CHECK();
 		GlSamplerParameteri(sampler, GL_TEXTURE_WRAP_S,
-				GetGlAddressMode(params.uAddress));
+							GetGlAddressMode(params.uAddress));
 		GL_CHECK();
 		GlSamplerParameteri(sampler, GL_TEXTURE_WRAP_T,
-				GetGlAddressMode(params.vAddress));
+							GetGlAddressMode(params.vAddress));
 		GL_CHECK();
 		GlSamplerParameteri(sampler, GL_TEXTURE_WRAP_R,
-				GetGlAddressMode(params.wAddress));
+							GetGlAddressMode(params.wAddress));
 		GL_CHECK();
 	}
 	if (params.comparisonFunc != TEXCOMP_NONE) {
 		GlSamplerParameteri(sampler, GL_TEXTURE_COMPARE_FUNC,
-				GetGlCompareFunc(params.comparisonFunc));
+							GetGlCompareFunc(params.comparisonFunc));
 		GL_CHECK();
 		GlSamplerParameteri(sampler, GL_TEXTURE_COMPARE_MODE,
-				GL_COMPARE_REF_TO_TEXTURE);
+							GL_COMPARE_REF_TO_TEXTURE);
 		GL_CHECK();
 	} else {
 		GlSamplerParameteri(sampler, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 		GL_CHECK();
 	}
 	GlSamplerParameterf(sampler, GL_TEXTURE_LOD_BIAS,
-			params.lodBias);
+						params.lodBias);
 	GL_CHECK();
 	GlSamplerParameterf(sampler, GL_TEXTURE_MIN_LOD, params.minLod);
 	GL_CHECK();
 	GlSamplerParameterf(sampler, GL_TEXTURE_MAX_LOD, params.maxLod);
 	GL_CHECK();
 	GlSamplerParameteri(sampler, GL_TEXTURE_MAX_ANISOTROPY_EXT,
-			params.maxAnisotropy);
+						params.maxAnisotropy);
 	GL_CHECK();
 	GlSamplerParameterfv(sampler, GL_TEXTURE_BORDER_COLOR,
-			params.borderColor.AsFloatArray());
+						 params.borderColor.AsFloatArray());
 	GL_CHECK();
 	return sampler;
 }
 
-void RenderContextGL_Base_GL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
-		GLuint program,
-		const Pass::VarToAutoParamMap& remapParams,
-		ParamEntryTable* paramTable,
-		const Pass::TextureDescMap& texMap) {
+void RenderContext_Base_GL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
+										 GLuint program,
+										 const Pass::VarToAutoParamMap& remapParams,
+										 ParamEntryTable* paramTable,
+										 const Pass::TextureDescMap& texMap) {
 	/** todo Massive work left for sampler arrays */
 	GLint numUni = 0;
 	uint32 numSamplers = 0;
@@ -936,7 +932,7 @@ void RenderContextGL_Base_GL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 	GlGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numUni);
 	vector<GLuint>::type samplerList;
 
-	for(auto& s : texMap) {
+	for (auto& s : texMap) {
 		samplerList.push_back(CreateSamplerFromParams(s.texUnitParams));
 	}
 
@@ -964,7 +960,7 @@ void RenderContextGL_Base_GL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 		paramTable->reserve(numSamplers + startParamIndex);
 	}
 	GlUseProgram(program);
-	for (GLuint i = 0; i < (GLuint) numUni; ++i) {
+	for (GLuint i = 0; i < (GLuint)numUni; ++i) {
 
 		GLint type;
 		GlGetActiveUniformsiv(program, 1, &i, GL_UNIFORM_TYPE, &type);
@@ -984,12 +980,12 @@ void RenderContextGL_Base_GL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 			ss.index = mapped++;
 			ss.arrayCount = 1;
 			uint32 tu = Pass::MapSamplerParams(unitName,
-					texMap);
+											   texMap);
 			if (tu >= samplerList.size()) {
 				Error(
-						String(
-								"Overflowing/Unspecified texture unit index for ")
-								+ name);
+					String(
+					"Overflowing/Unspecified texture unit index for ")
+					+ name);
 				continue;
 			}
 			const AutoParam* paramDef = nullptr;
@@ -1002,7 +998,7 @@ void RenderContextGL_Base_GL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 				ss.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
 				if (texMap[tu].texUnitParams.context == ParameterContext::CTX_UNKNOWN)
 					ss.context = GuessContextByName(unitName,
-						ParameterContext::CTX_MATERIAL);
+					ParameterContext::CTX_MATERIAL);
 				else
 					ss.context = texMap[tu].texUnitParams.context;
 				ss.processor = Pass::GetTextureProcessor();
@@ -1037,15 +1033,15 @@ void RenderContextGL_Base_GL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 	pass->samplers = samplers;
 	pass->numSamplerCount = mapped;
 	std::sort(samplers, samplers + mapped,
-			[](const SamplerState& s1, const SamplerState& s2) {
-				return s1.autoName == s2.autoName ? s1.index < s2.index :
-				(s1.autoName < s2.autoName);
-			});
+			  [](const SamplerState& s1, const SamplerState& s2) {
+		return s1.autoName == s2.autoName ? s1.index < s2.index :
+			(s1.autoName < s2.autoName);
+	});
 	GlUseProgram(0);
 }
 
-void RenderContextGL_Base_GL::Capture(PixelBox& image, RenderTarget* rt, GLuint *pbo,
-		FrameBuffer frameBuffer) {
+void RenderContext_Base_GL::Capture(PixelBox& image, RenderTarget* rt, GLuint *pbo,
+									FrameBuffer frameBuffer) {
 	/* todo Expand this function for frame buffer,
 	 * depth map capture etc. */
 	Size size = rt->GetDimensions();
@@ -1058,7 +1054,7 @@ void RenderContextGL_Base_GL::Capture(PixelBox& image, RenderTarget* rt, GLuint 
 	}
 
 	bool asyncCapture =
-			RenderManager::Instance().GetRenderSettings().asyncCapture;
+		RenderManager::Instance().GetRenderSettings().asyncCapture;
 
 	glReadBuffer(FrameBufferObjectGL::attachment[(uint32)frameBuffer]);
 	GL_CHECK();
@@ -1070,7 +1066,7 @@ void RenderContextGL_Base_GL::Capture(PixelBox& image, RenderTarget* rt, GLuint 
 			GlGenBuffers(RenderConstants::MAX_FRAME_PRE_CAPTURE, pbo);
 			GL_CHECK();
 			for (uint32 i = 0; i < RenderConstants::MAX_FRAME_PRE_CAPTURE;
-					++i) {
+				 ++i) {
 				GlBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[0]);
 				GL_CHECK();
 				GlBufferData(GL_PIXEL_PACK_BUFFER, dataSize, 0, GL_STREAM_READ);
@@ -1115,17 +1111,17 @@ void RenderContextGL_Base_GL::Capture(PixelBox& image, RenderTarget* rt, GLuint 
 }
 
 // @optimize Map all buffers??
-void RenderContextGL_Base_GL::SwitchPass(CommitContext& context, Pass::View* passView) {
+void RenderContext_Base_GL::SwitchPass(CommitContext& context, Pass::View* passView) {
 	PassViewGL* passViewGl = static_cast<PassViewGL*>(passView);
 
 	SetRasterState(passViewGl->GetRasterState());
 	SetDepthStencilState(passViewGl->GetDepthStencilState());
-	SetBlendState(passViewGl->blendState);
+	SetBlendState(passViewGl->GetBlendState());
 
 	GLuint program = passViewGl->GetProgram();
 	GlUseProgram(program);
 	GL_CHECK();
-	ParameterGroupList& paramList = passViewGl->sharedParameters;
+	ParameterGroupList& paramList = passViewGl->GetSharedParameters();
 	for (uint32 i = 0; i < paramList.size(); ++i) {
 		UniformBufferGL* ubPtr = static_cast<UniformBufferGL*>(paramList[i]);
 		GlBindBufferBase(GL_UNIFORM_BUFFER, i, ubPtr->ubNameGl);
@@ -1135,7 +1131,7 @@ void RenderContextGL_Base_GL::SwitchPass(CommitContext& context, Pass::View* pas
 	}
 }
 
-GLuint RenderContextGL_Base_GL::CreateBuffer(size_t size, GLenum usage, GLenum type) {
+GLuint RenderContext_Base_GL::CreateBuffer(size_t size, GLenum usage, GLenum type) {
 	GLuint bufferId = 0;
 	GlGenBuffers(1, &bufferId);
 	if (!bufferId) {
@@ -1148,48 +1144,50 @@ GLuint RenderContextGL_Base_GL::CreateBuffer(size_t size, GLenum usage, GLenum t
 	return bufferId;
 }
 
-void RenderContextGL_Base_GL::CopyBuffer(GLuint src, GLuint dest, size_t size) {
+void RenderContext_Base_GL::CopyBuffer(GLuint src, GLuint dest, size_t size) {
 	GlBindBuffer(GL_COPY_READ_BUFFER, src);
 	GlBindBuffer(GL_COPY_WRITE_BUFFER, dest);
 	GlCopyBufferSubData(GL_COPY_READ_BUFFER,
-	GL_COPY_WRITE_BUFFER, 0, 0, size);
+						GL_COPY_WRITE_BUFFER, 0, 0, size);
 	GL_CHECK();
 	GlBindBuffer(GL_COPY_READ_BUFFER, 0);
 	GlBindBuffer(GL_COPY_WRITE_BUFFER, 0);
 }
 
-void RenderContextGL_Base_GL::AllocateTexture(GLenum target, GLint levels,
-		GLenum format, GLsizei width, GLsizei height, GLsizei depth) {
+void RenderContext_Base_GL::AllocateTexture(GLenum target, GLint levels,
+											GLenum format, GLsizei width, GLsizei height, GLsizei depth) {
+	if (!extensions.GLE_ARB_texture_storage)
+		return;
 	switch (target) {
 	case GL_TEXTURE_1D:
-		GlTexStorage1D(target, levels, format, width);
+		extensions.GlTexStorage1D(target, levels, format, width);
 		break;
 	case GL_TEXTURE_2D:
 	case GL_TEXTURE_RECTANGLE:
 	case GL_TEXTURE_CUBE_MAP:
 	case GL_TEXTURE_1D_ARRAY:
-		GlTexStorage2D(target, levels, format, width, height);
+		extensions.GlTexStorage2D(target, levels, format, width, height);
 		break;
 	case GL_TEXTURE_3D:
 	case GL_TEXTURE_2D_ARRAY:
 	case GL_TEXTURE_CUBE_MAP_ARRAY:
-		GlTexStorage3D(target, levels, format, width, height, depth);
+		extensions.GlTexStorage3D(target, levels, format, width, height, depth);
 		break;
 	}
 	GL_CHECK();
 }
 
-void RenderContextGL_Base_GL::AllocateTextureLevel(GLenum target, GLint level,
-		const PixelFormatGl& format, GLsizei width, GLsizei height,
-		GLsizei depth, const uint8* data, size_t size) {
+void RenderContext_Base_GL::AllocateTextureLevel(GLenum target, GLint level,
+												 const PixelFormatGl& format, GLsizei width, GLsizei height,
+												 GLsizei depth, const uint8* data, size_t size) {
 	switch (target) {
 	case GL_TEXTURE_1D:
 		if (format.isCompressed)
 			GlCompressedTexImage1D(target, level, format.internalFormat, width,
-					0, (GLsizei)size, data);
+			0, (GLsizei)size, data);
 		else
 			glTexImage1D(target, level, format.internalFormat, width, 0,
-					format.sourceFormat, format.dataType, data);
+			format.sourceFormat, format.dataType, data);
 		break;
 	case GL_TEXTURE_2D:
 	case GL_TEXTURE_RECTANGLE:
@@ -1200,7 +1198,7 @@ void RenderContextGL_Base_GL::AllocateTextureLevel(GLenum target, GLint level,
 			height, 0, (GLsizei)size, data);
 		else
 			glTexImage2D(target, level, format.internalFormat, width, height, 0,
-					format.sourceFormat, format.dataType, data);
+			format.sourceFormat, format.dataType, data);
 		break;
 	case GL_TEXTURE_3D:
 	case GL_TEXTURE_2D_ARRAY:
@@ -1210,40 +1208,40 @@ void RenderContextGL_Base_GL::AllocateTextureLevel(GLenum target, GLint level,
 			height, depth, 0, (GLsizei)size, data);
 		else
 			GlTexImage3D(target, level, format.internalFormat, width, height,
-					depth, 0, format.sourceFormat, format.dataType, data);
+			depth, 0, format.sourceFormat, format.dataType, data);
 		break;
 	}
 	GL_CHECK();
 }
 
-void RenderContextGL_Base_GL::WriteTextureLevel(GLenum target, GLint level,
-		const PixelFormatGl& format, GLsizei width, GLsizei height,
-		GLsizei depth, const uint8* data, size_t size) {
+void RenderContext_Base_GL::WriteTextureLevel(GLenum target, GLint level,
+											  const PixelFormatGl& format, GLsizei width, GLsizei height,
+											  GLsizei depth, const uint8* data, size_t size) {
 	// todo Not sure if it will work for compressed formats
 	switch (target) {
 	case GL_TEXTURE_1D:
 		glTexSubImage1D(target, level, 0, width, format.sourceFormat,
-				format.dataType, data);
+						format.dataType, data);
 		break;
 	case GL_TEXTURE_2D:
 	case GL_TEXTURE_RECTANGLE:
 	case GL_TEXTURE_CUBE_MAP:
 	case GL_TEXTURE_1D_ARRAY:
 		glTexSubImage2D(target, level, 0, 0, width, height, format.sourceFormat,
-				format.dataType, data);
+						format.dataType, data);
 		break;
 	case GL_TEXTURE_3D:
 	case GL_TEXTURE_2D_ARRAY:
 	case GL_TEXTURE_CUBE_MAP_ARRAY:
 		GlTexSubImage3D(target, level, 0, 0, 0, width, height, depth,
-				format.sourceFormat, format.dataType, data);
+						format.sourceFormat, format.dataType, data);
 		break;
 	}
 	GL_CHECK();
 
 }
 
-bool RenderContextGL_Base_GL::IsSamplerType(GLint type) {
+bool RenderContext_Base_GL::IsSamplerType(GLint type) {
 	switch (type) {
 	case GL_SAMPLER_1D: //sampler1D
 	case GL_SAMPLER_2D: //sampler2D
@@ -1286,7 +1284,7 @@ bool RenderContextGL_Base_GL::IsSamplerType(GLint type) {
 	return false;
 }
 
-GLint RenderContextGL_Base_GL::GetGlMinFilter(TextureMinFilter t) {
+GLint RenderContext_Base_GL::GetGlMinFilter(TextureMinFilter t) {
 	switch (t) {
 	case TF_MIN_NEAREST:
 		return GL_NEAREST;
@@ -1304,7 +1302,7 @@ GLint RenderContextGL_Base_GL::GetGlMinFilter(TextureMinFilter t) {
 	return GL_LINEAR;
 }
 
-GLint RenderContextGL_Base_GL::GetGlMagFilter(TextureMagFilter t) {
+GLint RenderContext_Base_GL::GetGlMagFilter(TextureMagFilter t) {
 	switch (t) {
 	case TF_MAG_NEAREST:
 		return GL_NEAREST;
@@ -1314,7 +1312,7 @@ GLint RenderContextGL_Base_GL::GetGlMagFilter(TextureMagFilter t) {
 	return GL_LINEAR;
 }
 
-GLint RenderContextGL_Base_GL::GetGlAddressMode(TextureAddressMode t) {
+GLint RenderContext_Base_GL::GetGlAddressMode(TextureAddressMode t) {
 	switch (t) {
 	case TAM_BORDER:
 		return GL_CLAMP_TO_BORDER;
@@ -1328,7 +1326,7 @@ GLint RenderContextGL_Base_GL::GetGlAddressMode(TextureAddressMode t) {
 	return GL_REPEAT;
 }
 
-GLenum RenderContextGL_Base_GL::GetGlStencilOp(StencilOp type) {
+GLenum RenderContext_Base_GL::GetGlStencilOp(StencilOp type) {
 	switch (type) {
 	case STENCILOP_ZERO:
 		return GL_ZERO;
@@ -1348,7 +1346,7 @@ GLenum RenderContextGL_Base_GL::GetGlStencilOp(StencilOp type) {
 	return GL_KEEP;
 }
 
-GLenum RenderContextGL_Base_GL::GetGlCompareFunc(TextureComparisonMode type) {
+GLenum RenderContext_Base_GL::GetGlCompareFunc(TextureComparisonMode type) {
 	switch (type) {
 	case TEXCOMP_NONE:
 	case TEXCOMP_NEVER:
@@ -1369,7 +1367,7 @@ GLenum RenderContextGL_Base_GL::GetGlCompareFunc(TextureComparisonMode type) {
 	return 0;
 }
 
-GLenum RenderContextGL_Base_GL::GetGlCompareFunc(DepthStencilCompare type) {
+GLenum RenderContext_Base_GL::GetGlCompareFunc(DepthStencilCompare type) {
 	switch (type) {
 	case DSCOMP_NEVER:
 		return GL_NEVER;
@@ -1389,7 +1387,7 @@ GLenum RenderContextGL_Base_GL::GetGlCompareFunc(DepthStencilCompare type) {
 	return GL_ALWAYS;
 }
 
-VertexComponentType RenderContextGL_Base_GL::GetSemanticType(GLenum e) {
+VertexComponentType RenderContext_Base_GL::GetSemanticType(GLenum e) {
 	switch (e) {
 	case GL_FLOAT:
 		return COMP_TYPE_FLOAT1;
@@ -1407,10 +1405,10 @@ VertexComponentType RenderContextGL_Base_GL::GetSemanticType(GLenum e) {
 	return COMP_TYPE_INVALID;
 }
 
-uint16 RenderContextGL_Base_GL::GetShaderParamSize(GLuint type) {
+uint16 RenderContext_Base_GL::GetShaderParamSize(GLuint type) {
 	switch (type) {
 	case GL_BOOL:
-		return (uint16) 1;
+		return (uint16)1;
 	case GL_UNSIGNED_INT:
 		return (uint16) sizeof(uint32);
 	case GL_INT:
@@ -1434,10 +1432,10 @@ uint16 RenderContextGL_Base_GL::GetShaderParamSize(GLuint type) {
 	case GL_FLOAT_MAT4:
 		return (uint16) sizeof(float) * 16;
 	}
-	return (uint16) 0;
+	return (uint16)0;
 }
 
-ParamDataType RenderContextGL_Base_GL::GetShaderParamType(GLuint type) {
+ParamDataType RenderContext_Base_GL::GetShaderParamType(GLuint type) {
 	switch (type) {
 	case GL_BOOL:
 		return  ParamDataType::PDT_BOOL;
@@ -1467,7 +1465,7 @@ ParamDataType RenderContextGL_Base_GL::GetShaderParamType(GLuint type) {
 	return  ParamDataType::PDT_UNKNOWN;
 }
 
-GLenum RenderContextGL_Base_GL::GetGlTextureType(TextureBase::TextureType type) {
+GLenum RenderContext_Base_GL::GetGlTextureType(TextureBase::TextureType type) {
 	switch (type) {
 	case TextureBase::TEXTURE_1D:
 		return GL_TEXTURE_1D;
@@ -1487,7 +1485,7 @@ GLenum RenderContextGL_Base_GL::GetGlTextureType(TextureBase::TextureType type) 
 	return 0;
 }
 
-GLenum RenderContextGL_Base_GL::GetGlBlendDataSource(BlendDataSource type) {
+GLenum RenderContext_Base_GL::GetGlBlendDataSource(BlendDataSource type) {
 	switch (type) {
 	case BDS_ZERO: return GL_ZERO;
 	case BDS_SRC_ALPHA: return GL_SRC_ALPHA;
@@ -1502,7 +1500,7 @@ GLenum RenderContextGL_Base_GL::GetGlBlendDataSource(BlendDataSource type) {
 	return GL_ONE;
 }
 
-GLenum RenderContextGL_Base_GL::GetGlBlendEquation(BlendOp op) {
+GLenum RenderContext_Base_GL::GetGlBlendEquation(BlendOp op) {
 	switch (op) {
 		// for GlBlendEquation or GlBlendEquationSeparate
 	case BOP_SUB: return GL_FUNC_SUBTRACT;
@@ -1513,8 +1511,8 @@ GLenum RenderContextGL_Base_GL::GetGlBlendEquation(BlendOp op) {
 	return GL_FUNC_ADD;
 }
 
-PixelFormatGl RenderContextGL_Base_GL::GetGlPixelFormat(PixelFormat imageFormat,
-		PixelFormat textureFormat) {
+PixelFormatGl RenderContext_Base_GL::GetGlPixelFormat(PixelFormat imageFormat,
+													  PixelFormat textureFormat) {
 	NEX_ASSERT(PixelUtils::IsValidTextureFormat(textureFormat));
 	PixelFormatGl pft;
 	// todo Check for floating point components
@@ -1544,11 +1542,11 @@ PixelFormatGl RenderContextGL_Base_GL::GetGlPixelFormat(PixelFormat imageFormat,
 		break;
 	case PixelFormat::RGBA8:
 		NEX_ASSERT(
-				imageFormat == PixelFormat::RGBA8
-						|| imageFormat == PixelFormat::BGRA8);
+			imageFormat == PixelFormat::RGBA8
+			|| imageFormat == PixelFormat::BGRA8);
 		pft.internalFormat = GL_RGBA8;
 		pft.sourceFormat =
-				imageFormat == PixelFormat::RGBA8 ? GL_RGBA : GL_BGRA;
+			imageFormat == PixelFormat::RGBA8 ? GL_RGBA : GL_BGRA;
 #if (NEX_ENDIANNESS == NEX_ENDIAN_LITTLE)
 		pft.dataType = GL_UNSIGNED_INT_8_8_8_8_REV;
 #else
@@ -1617,8 +1615,8 @@ PixelFormatGl RenderContextGL_Base_GL::GetGlPixelFormat(PixelFormat imageFormat,
 	return pft;
 }
 
-ParameterContext RenderContextGL_Base_GL::GuessContextByName(const String& name,
-		ParameterContext defaultContex) {
+ParameterContext RenderContext_Base_GL::GuessContextByName(const String& name,
+														   ParameterContext defaultContex) {
 	String lowerName = name;
 	StringUtils::ToLower(lowerName);
 	if (lowerName.find("__frame") != String::npos)
@@ -1634,11 +1632,11 @@ ParameterContext RenderContextGL_Base_GL::GuessContextByName(const String& name,
 	return defaultContex;
 }
 
-ContextID RenderContextGL_Base_GL::RegisterObject(ContextObject::Type type, uint32 hint) {
-	const uint32 dynamicLayoutHint = (VertexLayout::HAS_TRANSIENT_BUFFERS|
-			VertexLayout::LOOSE_BUFFER_BINDING|VertexLayout::SHARED_VERTEX_LAYOUT);
+ContextID RenderContext_Base_GL::RegisterObject(ContextObject::Type type, uint32 hint) {
+	const uint32 dynamicLayoutHint = (VertexLayout::HAS_TRANSIENT_BUFFERS |
+									  VertexLayout::LOOSE_BUFFER_BINDING | VertexLayout::SHARED_VERTEX_LAYOUT);
 	ContextObject::View* view = nullptr;
-	switch(type) {
+	switch (type) {
 	case ContextObject::TYPE_TEXTURE:
 		view = (NEX_NEW(TextureViewGL()));
 		break;
@@ -1679,7 +1677,7 @@ ContextID RenderContextGL_Base_GL::RegisterObject(ContextObject::Type type, uint
 	return reinterpret_cast<ContextID>(view);
 }
 
-void RenderContextGL_Base_GL::UnregisterObject(ContextID id) {
+void RenderContext_Base_GL::UnregisterObject(ContextID id) {
 	if (id) {
 		ContextObject::View* view = reinterpret_cast<ContextObject::View*>(id);
 		view->Destroy(this);
@@ -1687,7 +1685,7 @@ void RenderContextGL_Base_GL::UnregisterObject(ContextID id) {
 	}
 }
 
-void RenderContextGL_Base_GL::SetRasterState(const RasterStateGL& state) {
+void RenderContext_Base_GL::SetRasterState(const RasterStateGL& state) {
 	if (state.frontIsCCW ^ rasterState.frontIsCCW) {
 		static GLenum face[] = {
 			GL_CW,
@@ -1714,7 +1712,7 @@ void RenderContextGL_Base_GL::SetRasterState(const RasterStateGL& state) {
 		rasterState.cullMode = state.cullMode;
 	}
 
-	if (state.depthClip != rasterState.depthClip && GLE_ARB_depth_clamp) {
+	if (state.depthClip != rasterState.depthClip && extensions.GLE_ARB_depth_clamp) {
 		if (state.depthClip)
 			glEnable(GL_DEPTH_CLAMP);
 		else
@@ -1768,8 +1766,8 @@ void RenderContextGL_Base_GL::SetRasterState(const RasterStateGL& state) {
 			rasterState.depthBiasEnabled = true;
 		}
 
-		if (state.depthBiasClamp && GlPolygonOffsetClampEXT) {
-			GlPolygonOffsetClampEXT(-state.slopeScaledDepthBias, -state.constantDepthBias, state.depthBiasClamp);
+		if (state.depthBiasClamp && extensions.GlPolygonOffsetClampEXT) {
+			extensions.GlPolygonOffsetClampEXT(-state.slopeScaledDepthBias, -state.constantDepthBias, state.depthBiasClamp);
 		} else
 			glPolygonOffset(-state.slopeScaledDepthBias, -state.constantDepthBias);
 		GL_CHECK();
@@ -1784,7 +1782,7 @@ void RenderContextGL_Base_GL::SetRasterState(const RasterStateGL& state) {
 	}
 }
 
-void RenderContextGL_Base_GL::SetDepthStencilState(const DepthStencilStateGL& state) {
+void RenderContext_Base_GL::SetDepthStencilState(const DepthStencilStateGL& state) {
 	if (depthStencilState.depthTest != state.depthTest) {
 		if (state.depthTest)
 			glEnable(GL_DEPTH_TEST);
@@ -1827,33 +1825,33 @@ void RenderContextGL_Base_GL::SetDepthStencilState(const DepthStencilStateGL& st
 			GlStencilMaskSeparate(GL_FRONT, state.stencilFrontMask);
 			GL_CHECK();
 			GlStencilFuncSeparate(GL_FRONT, state.stencilFrontFunc, state.stencilFrontRef,
-				state.stencilFrontMask);
+								  state.stencilFrontMask);
 			GL_CHECK();
 			GlStencilOpSeparate(GL_FRONT, state.frontStencilFail,
-				state.frontStencilPass, state.frontDepthPass);
+								state.frontStencilPass, state.frontDepthPass);
 			GL_CHECK();
 			GlStencilMaskSeparate(GL_BACK, state.stencilBackMask);
 			GL_CHECK();
 			GlStencilFuncSeparate(GL_BACK, state.stencilBackFunc, state.stencilBackRef,
-				state.stencilBackMask);
+								  state.stencilBackMask);
 			GL_CHECK();
 			GlStencilOpSeparate(GL_BACK, state.backStencilFail,
-				state.backStencilPass, state.backDepthPass);
+								state.backStencilPass, state.backDepthPass);
 		} else {
 
 			glStencilMask(state.stencilFrontMask);
 			GL_CHECK();
 			glStencilFunc(state.stencilFrontFunc, state.stencilFrontRef,
-				state.stencilFrontMask);
+						  state.stencilFrontMask);
 			GL_CHECK();
 			glStencilOp(state.frontStencilFail,
-				state.frontStencilPass, state.frontDepthPass);
+						state.frontStencilPass, state.frontDepthPass);
 		}
 	}
 	GL_CHECK();
 }
 
-void RenderContextGL_Base_GL::SetBlendState(const BlendStateGL& state) {
+void RenderContext_Base_GL::SetBlendState(const BlendStateGL& state) {
 	if ((blendState.enabled ^ state.enabled)) {
 		if (state.enabled) {
 			glEnable(GL_BLEND);
@@ -1866,22 +1864,22 @@ void RenderContextGL_Base_GL::SetBlendState(const BlendStateGL& state) {
 	if (blendState.enabled) {
 		if (state.sameBlendOpAllTarget) {
 			GlBlendFuncSeparate(state.blendOp[0].srcCol, state.blendOp[0].destCol,
-				state.blendOp[0].srcAlpha, state.blendOp[0].destAlpha);
+								state.blendOp[0].srcAlpha, state.blendOp[0].destAlpha);
 			GlBlendEquationSeparate(state.blendOp[0].colOp, state.blendOp[0].alphaOp);
 
 		} else {
 			for (uint8 i = 0; i < state.numRenderTargets; ++i) {
 
 				GlBlendFuncSeparatei(i, state.blendOp[i].srcCol, state.blendOp[i].destCol,
-					state.blendOp[i].srcAlpha, state.blendOp[i].destAlpha);
+									 state.blendOp[i].srcAlpha, state.blendOp[i].destAlpha);
 				GlBlendEquationSeparate(state.blendOp[i].colOp, state.blendOp[i].alphaOp);
 			}
-			if (GLE_EXT_draw_buffers2) {
+			if (extensions.GLE_EXT_draw_buffers2) {
 				for (uint8 i = 0; i < state.numRenderTargets; ++i) {
 					if (state.blendOp[i].enabled)
-						GlEnableIndexedEXT(GL_BLEND, i);
+						extensions.GlEnableIndexedEXT(GL_BLEND, i);
 					else
-						GlDisableIndexedEXT(GL_BLEND, i);
+						extensions.GlDisableIndexedEXT(GL_BLEND, i);
 				}
 			}
 		}
@@ -1889,40 +1887,86 @@ void RenderContextGL_Base_GL::SetBlendState(const BlendStateGL& state) {
 		if (state.sameMaskAllTarget || !GlColorMaski) {
 			ColorMask m = state.blendOp[0].mask;
 			glColorMask((GLboolean)(m & ColorMask::MASK_RED),
-				(GLboolean)(m & ColorMask::MASK_GREEN),
-				(GLboolean)(m & ColorMask::MASK_BLUE),
-				(GLboolean)(m & ColorMask::MASK_ALPHA));
+						(GLboolean)(m & ColorMask::MASK_GREEN),
+						(GLboolean)(m & ColorMask::MASK_BLUE),
+						(GLboolean)(m & ColorMask::MASK_ALPHA));
 		} else {
 			for (uint8 i = 0; i < state.numRenderTargets; ++i) {
 				ColorMask m = state.blendOp[i].mask;
 				GlColorMaski(i,
-					(GLboolean)(m & ColorMask::MASK_RED),
-					(GLboolean)(m & ColorMask::MASK_GREEN),
-					(GLboolean)(m & ColorMask::MASK_BLUE),
-					(GLboolean)(m & ColorMask::MASK_ALPHA));
+							 (GLboolean)(m & ColorMask::MASK_RED),
+							 (GLboolean)(m & ColorMask::MASK_GREEN),
+							 (GLboolean)(m & ColorMask::MASK_BLUE),
+							 (GLboolean)(m & ColorMask::MASK_ALPHA));
 			}
 		}
 	}
 }
 
-void RenderContextGL_Base_GL_Base_GL::InitializeExtensions() {
-  extensions.InitializeFunctionPointers();
-  FunctionTable::InitializeFunctionPointers();
+void RenderContext_Base_GL::InitializeExtensions() {
+	extensions.InitializeFunctionPointers();
+	FunctionTable::InitializeFunctionPointers();
 }
 
-void RenderContextGL_Base_GL_Base_GL::CloseImpl() {
+void RenderContext_Base_GL::CloseImpl() {
 	uniformBufferMap.clear();
 }
 
-void RenderContextGL_Base_GL_Base_GL::DestroyResources(void* pThis) {
-	reinterpret_cast<RenderContextGL_Base_GL_Base_GL*>(pThis)->DestroyResources();
+void RenderContext_Base_GL::DestroyResources(void* pThis) {
+	reinterpret_cast<RenderContext_Base_GL*>(pThis)->DestroyResources();
 }
 
-void RenderContextGL_Base_GL_Base_GL::DestroyResources() {}
-  auto& ubMap = uniformBufferMap;
-  for (auto& e : ubMap) {
-    e.second.Destroy(this);
-  }
+void RenderContext_Base_GL::DestroyResources() {
+	auto& ubMap = uniformBufferMap;
+	for (auto& e : ubMap) {
+		e.second.Destroy(this);
+	}
+}
+
+RenderWindow* RenderContext_Base_GL::CreateRenderWindowImpl() {
+	return GetImpl()->CreateWindowImpl();
+}
+
+void RenderContext_Base_GL::ReportError(GLenum source,
+										GLenum type,
+										GLuint id,
+										GLenum severity,
+										GLsizei length,
+										const GLchar* message) {
+	OutStringStream stream;
+	stream << "OpenGL Error: source=";
+	switch (type) {
+	case GL_DEBUG_SOURCE_API:
+		stream << "GL"; break;
+	case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
+		stream << "Window system"; break;
+	case GL_DEBUG_SOURCE_SHADER_COMPILER:
+		stream << "Shader compiler"; break;
+	case GL_DEBUG_SOURCE_THIRD_PARTY:
+		stream << "Third party"; break;
+	case GL_DEBUG_SOURCE_APPLICATION:
+		stream << "Application"; break;
+	case GL_DEBUG_SOURCE_OTHER:
+	default:
+		stream << "Other"; break;
+	}
+
+	stream << ", severity=";
+	switch (severity) {
+	case GL_DEBUG_SEVERITY_HIGH:
+		stream << "High, "; break;
+	case GL_DEBUG_SEVERITY_LOW:
+		stream << "Low, "; break;
+	case GL_DEBUG_SEVERITY_NOTIFICATION:
+		stream << "Info, "; break;
+	case GL_DEBUG_SEVERITY_MEDIUM:
+	default:
+		stream << "Medium, "; break;
+	}
+
+	String msg((const char*)message, length);
+	stream << msg;
+	Error(stream.str());
 }
 
 }

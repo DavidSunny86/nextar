@@ -14,7 +14,7 @@
 
 namespace RenderOpenGL {
 
-class RenderContextWGL;
+class RenderContextImplWGL;
 
 class WindowWGL: public nextar::Win32Window {
 
@@ -47,6 +47,7 @@ public:
 		inline HDC GetWindowDC() {
 			return hDC;
 		}
+
 		// Helpers
 	private:
 		
@@ -60,10 +61,10 @@ public:
 
 public:
 
-	WindowWGL(RenderContextWGL* binding);
+	WindowWGL(RenderContextImplWGL* binding);
 	virtual ~WindowWGL();
 
-	RenderContextWGL* GetContext() {
+	RenderContextImplWGL* GetContext() {
 		return context;
 	}
 
@@ -79,7 +80,7 @@ public:
 protected:
 	
 	HGLRC hGL;
-	RenderContextWGL* context;
+	RenderContextImplWGL* context;
 
 	static ATOM wndClass;
 };

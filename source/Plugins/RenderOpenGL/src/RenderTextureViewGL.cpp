@@ -11,20 +11,20 @@
 namespace RenderOpenGL {
 
 RenderTextureViewGL::RenderTextureViewGL() :
-		fbo() {
+fbo() {
 }
 
 RenderTextureViewGL::~RenderTextureViewGL() {
 }
 
 void RenderTextureViewGL::Update(RenderContext* rc, uint32 msg,
-		ContextObject::ContextParamPtr cb) {
+								 ContextObject::ContextParamPtr cb) {
 	TextureViewGL::Update(rc, msg, cb);
 }
 
 void RenderTextureViewGL::Destroy(RenderContext* rc) {
-	RenderContextGL* gl = static_cast<RenderContextGL*>(rc);
-	fbo.Destroy(gl);
+	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
+	gl->DestroyFBO(fbo);
 	TextureViewGL::Destroy(rc);
 }
 } /* namespace nextar */

@@ -76,9 +76,9 @@ void MeshAsset::_FillVertexData(MeshVertexData* data,
 	for (uint32 stream = 0; stream < numVertexBuffers;
 			++stream, ++vertexBufferIt) {
 		MeshBufferData::Stream& byteData = (*vertexBufferIt);
-		VertexBuffer buffer(GpuBuffer::RelocationPolicy::NEVER_RELEASED);
-		buffer.CreateBuffer(byteData.buffer.size(), byteData.stride, byteData.buffer.data());
-		data->binding.BindBuffer(stream, std::move(buffer));
+		VertexBufferPtr buffer = VertexBuffer::Create(GpuBuffer::RelocationPolicy::NEVER_RELEASED);
+		buffer->CreateBuffer(byteData.buffer.size(), byteData.stride, byteData.buffer.data());
+		data->binding.BindBuffer(stream, buffer, 0);
 	}
 
 	data->SetLayoutFromType();

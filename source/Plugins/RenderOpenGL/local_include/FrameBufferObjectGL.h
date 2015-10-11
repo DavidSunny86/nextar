@@ -29,6 +29,10 @@ public:
 		return frameBufferObject != 0;
 	}
 
+	inline GLuint GetFBO() {
+		return frameBufferObject;
+	}
+
 protected:
 
 	friend class RenderContext_Base_GL;

@@ -1,19 +1,23 @@
 /**
  * Created on: 4th Oct 15
  * @author: obhi
-**/
-#include "BaseRenderContext.h"
-#include "RenderContext_4_0_GL.h"
+ **/
+#include <BaseRenderContext.h>
+#include <RenderContext_4_0_GL.h>
 
 namespace RenderOpenGL {
 
 
-RenderContextGL_4_0_GL::RenderContextGL_4_0_GL(RenderDriverGL*) {
+RenderContext_4_0_GL::RenderContext_4_0_GL(RenderDriverGL* d) : ParentContext(d) {
 }
 
-void RenderContextGL_4_0_GL::InitializeExtensions() {
-  ParentContext::InitializeFunctionPointers();
-  FunctionTable::InitializeFunctionPointers();
+void RenderContext_4_0_GL::InitializeExtensions() {
+	ParentContext::InitializeFunctionPointers();
+	FunctionTable::InitializeFunctionPointers();
+}
+
+VersionGL RenderContext_4_0_GL::GetContextVersion() {
+	return GLV_4_0;
 }
 
 }

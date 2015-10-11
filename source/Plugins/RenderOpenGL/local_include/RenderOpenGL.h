@@ -9,8 +9,24 @@ using namespace ::nextar;
 
 namespace RenderOpenGL {
 
-class RenderContextGL;
+class RenderContext_Base_GL;
 class RenderDriverGL;
+
+class UniformBufferGL;
+class GpuBufferViewGL;
+class TextureViewGL;
+class PassViewGL;
+class RenderBufferViewGL;
+class RenderTextureViewGL;
+class MultiRenderTargetViewGL;
+
+struct RasterStateGL;
+struct BlendStateGL;
+struct DepthStencilStateGL;
+struct VertexSemanticGL;
+struct VertexAttribGL;
+struct PixelFormatGl;
+
 
 /** These are the supported GLE Versions,
  *  the system may cap to a version and set a minimum

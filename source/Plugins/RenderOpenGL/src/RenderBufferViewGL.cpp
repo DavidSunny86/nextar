@@ -32,6 +32,6 @@ void RenderBufferViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 
 void RenderBufferViewGL::Destroy(RenderContext* rc) {
 	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
-	gl->DestroyRenderBuffer(1, &renderBuffer);
+	gl->DestroyRenderBuffer(renderBuffer);
 }
 } /* namespace RenderOpenGL */

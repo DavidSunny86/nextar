@@ -27,8 +27,8 @@ public:
 	virtual void Update(nextar::RenderContext*, uint32 msg,
 			ContextObject::ContextParamPtr);
 	virtual void Enable(VertexBufferBinding& binding, PassViewGL* pass,
-			RenderContextGL* rc) = 0;
-	virtual void Disable(RenderContextGL* rc) = 0;
+			RenderContext_Base_GL* rc) = 0;
+	virtual void Disable(RenderContext_Base_GL* rc) = 0;
 
 	static uint16 GetFromGlType(GLenum);
 	static void Populate(VertexAttribGL& a);
@@ -53,11 +53,11 @@ public:
 	virtual void Destroy(nextar::RenderContext*);
 
 	virtual void Enable(VertexBufferBinding& binding, PassViewGL* pass,
-			RenderContextGL* rc);
-	virtual void Disable(RenderContextGL* rc);
+			RenderContext_Base_GL* rc);
+	virtual void Disable(RenderContext_Base_GL* rc);
 
-	void ClearAllVAO(RenderContextGL*);
-	GLuint CreateLayout(RenderContextGL*, VertexBufferBinding& binding, const VertexSemanticListGL& semantics);
+	void ClearAllVAO(RenderContext_Base_GL*);
+	GLuint CreateLayout(RenderContext_Base_GL*, VertexBufferBinding& binding, const VertexSemanticListGL& semantics);
 };
 
 // implement VAO + loose binding
@@ -75,13 +75,13 @@ public:
 	virtual void Destroy(nextar::RenderContext*);
 
 	virtual void Enable(VertexBufferBinding& binding, PassViewGL* pass,
-			RenderContextGL* rc);
-	virtual void Disable(RenderContextGL* rc);
+			RenderContext_Base_GL* rc);
+	virtual void Disable(RenderContext_Base_GL* rc);
 
-	void ClearAllVAO(RenderContextGL*);
+	void ClearAllVAO(RenderContext_Base_GL*);
 
 protected:
-	GLuint CreateLayout(RenderContextGL*, const VertexSemanticListGL& semantics);
+	GLuint CreateLayout(RenderContext_Base_GL*, const VertexSemanticListGL& semantics);
 };
 
 class VertexLayoutDynamicGL: public VertexLayoutGL {
@@ -100,10 +100,10 @@ public:
 	~VertexLayoutDynamicGL();
 
 	virtual void Enable(VertexBufferBinding& binding, PassViewGL* pass,
-			RenderContextGL* rc);
-	virtual void Disable(RenderContextGL* rc);
+			RenderContext_Base_GL* rc);
+	virtual void Disable(RenderContext_Base_GL* rc);
 
-	// const PassLayoutVertexArrayPair& GetVertexLayoutForPass(nextar::Pass* pass, RenderContextGL* rc);
+	// const PassLayoutVertexArrayPair& GetVertexLayoutForPass(nextar::Pass* pass, RenderContext_Base_GL* rc);
 };
 
 } /* namespace RenderOpenGL */

@@ -8,6 +8,7 @@
 #include <RenderOpenGL.h>
 #include <BaseExtensionsGL.h>
 #include <RenderDriverGL.h>
+#include <RenderContext_Base_GL.h>
 
 namespace RenderOpenGL {
 
@@ -72,7 +73,7 @@ BaseExtensionsGL::BaseExtensionsGL() {
 
 }
 
-void BaseExtensionsGL::InitializeFunctionPointers(uint16 major, uint16 minor) {
+void BaseExtensionsGL::InitializeFunctionPointers() {
 
 	glGetStringi = (PFNGLGETSTRINGIPROC)RenderContext_Base_GL::GetExtension("glGetStringi");
 	if (!glGetStringi) {
@@ -106,9 +107,9 @@ void BaseExtensionsGL::InitializeFunctionPointers(uint16 major, uint16 minor) {
 #undef DECL_COND_END_EXT
 #undef DECL_EXTENSION
 #undef DECL_CORE_EXTENSION
-//********************************************************************
-// Retrieve function pointers
-//********************************************************************
+	//********************************************************************
+	// Retrieve function pointers
+	//********************************************************************
 #define DECL_COND_START_VERSION(ma, mi, pma, pmi)
 #define DECL_COND_END_VERSION(ma, mi)
 #define DECL_CORE_EXTENSION(a, b)
@@ -121,16 +122,16 @@ void BaseExtensionsGL::InitializeFunctionPointers(uint16 major, uint16 minor) {
 #define DECL_COND_END_EXT(what) \
 		if(failed)                  \
 			ExtensionHelper::RequiredExtensionNotFound("GL Extension: " NEX_MAKE_TEXT(what));\
-		} else { \
+				} else { \
 			Trace("OpenGL extension: " NEX_MAKE_TEXT(what) " not supported!");\
-		}
+				}
 
 #define DECL_EXTENSION(a, b) \
 		DECL_FUNC_NAME(b) = (DECL_FUNC_TYPE(a)) \
 		RenderContext_Base_GL::GetExtension(DECL_FUNC_GL_STRING(b)); \
 		if(!DECL_FUNC_NAME(b)) {                              \
 			failed = true;                                    \
-		}
+				}
 
 #include <ExtListGL.h>
 
@@ -147,7 +148,7 @@ void BaseExtensionsGL::InitializeFunctionPointers(uint16 major, uint16 minor) {
 #define DECL_COND_END_EXT(what)
 #define DECL_EXTENSION(a, b)
 #define DECL_COND_START_VERSION(ma, mi, pma, pmi)  \
-	void DECL_FUNC_TABLE_NAME(maj, min)::InitializeFunctionPointers() { \
+	void DECL_FUNC_TABLE_NAME(ma, mi)::InitializeFunctionPointers() { \
 		bool failed = false;
 #define DECL_COND_END_VERSION(ma, mi)         \
 		if(failed)                              \
@@ -158,7 +159,9 @@ void BaseExtensionsGL::InitializeFunctionPointers(uint16 major, uint16 minor) {
 		RenderContext_Base_GL::GetExtension(DECL_FUNC_GL_STRING(b)); \
 		if(!DECL_FUNC_NAME(b)) {                              \
 			failed = true;                                    \
-		}
+				}
+
+#include <ExtListGL.h>
 
 #undef DECL_COND_START_VERSION
 #undef DECL_COND_END_VERSION

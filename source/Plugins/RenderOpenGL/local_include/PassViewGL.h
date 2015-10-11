@@ -163,7 +163,7 @@ protected:
 
 	GpuProgramGL programs[Pass::STAGE_COUNT];
 	static GLenum stagesMap[Pass::STAGE_COUNT];
-	friend class RenderContextGL;
+	friend class RenderContext_Base_GL;
 };
 
 }

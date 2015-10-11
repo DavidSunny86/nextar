@@ -7,7 +7,6 @@
 
 #include <RenderOpenGL.h>
 #include <FrameBufferObjectGL.h>
-#include <RenderContextGL.h>
 #include <RenderBufferViewGL.h>
 #include <RenderTextureViewGL.h>
 

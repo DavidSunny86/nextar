@@ -22,14 +22,14 @@ MultiRenderTargetViewGL::~MultiRenderTargetViewGL() {
 }
 
 void MultiRenderTargetViewGL::Destroy(nextar::RenderContext* rc) {
-	auto gl = static_cast<RenderContextGL*>(rc);
-	fbo.Destroy(gl);
+	auto gl = static_cast<RenderContext_Base_GL*>(rc);
+	gl->DestroyFBO(fbo);
 }
 
 void MultiRenderTargetViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 		ContextObject::ContextParamPtr params) {
 
-	auto gl = static_cast<RenderContextGL*>(rc);
+	auto gl = static_cast<RenderContext_Base_GL*>(rc);
 	switch (msg) {
 	case MultiRenderTarget::MSG_RT_CREATE: {
 		const MultiRenderTarget* rt =
@@ -37,20 +37,18 @@ void MultiRenderTargetViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 
 		uint32 numColorTargets = rt->GetColorTargetsCount();
 		colorAttachmentCount = numColorTargets;
-		fbo.Create(gl);
-		fbo.Bind(false, gl);
+		gl->CreateFBO(fbo);
+		gl->BindFBO(fbo, false);
 		for (uint32 i = 0; i < numColorTargets; ++i) {
 			RenderTarget* colorTarget = rt->GetAttachment(i).GetPtr();
 			switch (colorTarget->GetRenderTargetType()) {
 			case RenderTargetType::RENDER_BUFFER:
-				fbo.Attach(gl, GL_COLOR_ATTACHMENT0 + i,
-						static_cast<RenderBufferViewGL*>(gl->GetView(
-								static_cast<RenderBuffer*>(colorTarget))));
+				gl->AttachToFBO(static_cast<RenderBufferViewGL*>(gl->GetView(
+					static_cast<RenderBuffer*>(colorTarget))), GL_COLOR_ATTACHMENT0 + i);
 				break;
 			case RenderTargetType::TEXTURE:
-				fbo.Attach(gl, GL_COLOR_ATTACHMENT0 + i,
-						static_cast<RenderTextureViewGL*>(gl->GetView(
-								static_cast<RenderTexture*>(colorTarget))));
+				gl->AttachToFBO(static_cast<RenderTextureViewGL*>(gl->GetView(
+					static_cast<RenderTexture*>(colorTarget))), GL_COLOR_ATTACHMENT0 + i);
 				break;
 			}
 		}
@@ -61,19 +59,19 @@ void MultiRenderTargetViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 			RenderBufferViewGL* textureView =
 					static_cast<RenderBufferViewGL*>(gl->GetView(
 							static_cast<RenderBuffer*>(depthTarget)));
-			fbo.Attach(gl, textureView->GetAttachment(), textureView);
+			gl->AttachToFBO(textureView, textureView->GetAttachment());
 			break;
 		}
 		case RenderTargetType::TEXTURE: {
 			RenderTextureViewGL* textureView =
 					static_cast<RenderTextureViewGL*>(gl->GetView(
 							static_cast<RenderTexture*>(depthTarget)));
-			fbo.Attach(gl, textureView->GetAttachment(), textureView);
+			gl->AttachToFBO(textureView, textureView->GetAttachment());
 		}
 			break;
 		}
-		fbo.Validate(gl);
-		fbo.Unbind(false, gl);
+		gl->ValidateFBO();
+		gl->UnbindFBO(false);
 		break;
 	}
 	default:

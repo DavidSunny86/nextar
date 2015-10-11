@@ -106,6 +106,10 @@ public:
 			return Pass::MapParam(name);
 		}
 
+		inline ParameterGroupList& GetSharedParameters() {
+			return sharedParameters;
+		}
+
 	protected:
 
 		ParameterGroupList sharedParameters;

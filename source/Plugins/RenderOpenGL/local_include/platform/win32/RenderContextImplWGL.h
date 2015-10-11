@@ -51,7 +51,27 @@ public:
 	virtual void SetCurrentWindow(RenderTarget* rt);
 	virtual void PostCloseImpl();
 	/* Helpers */
+	inline uint32 GetVideoModeIndex(const VideoMode& m) {
+		return baseContext->GetVideoModeIndex(m);
+	}
 
+	inline void SetVideoMode(uint32 m) {
+		baseContext->SetVideoMode(m);
+	}
+
+	inline const VideoMode& GetCurrentMode() const {
+		return baseContext->GetCurrentMode();
+	}
+
+	inline void SetCurrentTarget(RenderTarget* t) {
+		baseContext->SetCurrentTarget(t);
+	}
+
+	inline void DestroyedRenderWindow(RenderWindow* w) {
+		baseContext->DestroyedRenderWindow(w);
+	}
+
+	
 protected:
 
 	virtual void SetCreationParams(const RenderDriver::ContextCreationParams& ctxParams);

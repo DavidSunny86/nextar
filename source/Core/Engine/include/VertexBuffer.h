@@ -14,6 +14,8 @@ public:
 	VertexBuffer(VertexBuffer&& other);
 	VertexBuffer(RelocationPolicy _policy);
 
+	static VertexBufferPtr Create(RelocationPolicy _policy);
+
 	inline bool IsTransientBuffer() const {
 		return (policy == GpuBuffer::RelocationPolicy::REGULARLY_RELEASED ||
 				policy == GpuBuffer::RelocationPolicy::IMMEDIATELY_RELEASED);

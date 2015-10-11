@@ -48,6 +48,7 @@ public:
 		if (arch) {
 			arch->Scan(this, "Scripts/Materials/*.mtl");
 		}
+		this->QuitApplication();
 	}
 
 	virtual void _SetupScene(SceneAssetPtr& scene) {
