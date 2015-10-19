@@ -1,14 +1,13 @@
 #pragma once
 
 #include <RenderOpenGL.h>
-#include <RenderContextGL.h>
 #include <WindowGLX.h>
 
 namespace RenderOpenGL {
 
 class RenderDriverGLX;
 
-class RenderContextImplGLX: public RenderContextGL {
+class RenderContextImplGLX: public RenderContext_Base_GL::PlatformImpl {
 
 	NEX_LOG_HELPER(RenderContextImplGLX)
 	;

@@ -11,6 +11,7 @@
 #include <RenderTexture.h>
 #include <RenderBufferViewGL.h>
 #include <RenderTextureViewGL.h>
+#include <RenderContext_Base_GL.h>
 
 namespace RenderOpenGL {
 

@@ -55,7 +55,7 @@ bool fullscreen, const NameValueMap* params) {
 		if (((attrib = paramMap.find("IgnoreInputEvents")) != end))
 			captureInputEvents = !Convert::ToBool((*attrib).second);
 		if (((attrib = paramMap.find("VideoMode")) != end))
-			setVideoMode = context->GetVideoModeIndex(
+			setVideoMode = context->GetContext()->GetVideoModeIndex(
 					VideoMode::FromString((*attrib).second));
 		if (((attrib = paramMap.find("ExitOnClose")) != end))
 			parent->SetFlag(WINDOW_EXIT_ON_CLOSE,
@@ -74,7 +74,7 @@ bool fullscreen, const NameValueMap* params) {
 	this->dimensions.dy = height;
 
 	if (fullscreen && setVideoMode != -1) {
-		context->SetVideoMode(setVideoMode);
+		context->GetContext()->SetVideoMode(setVideoMode);
 	}
 
 	GLXFBConfig fbconfig = context->GetFrameBufferConfig();
@@ -143,7 +143,7 @@ void WindowGLX::Impl::SetToFullScreen(bool fullScreen) {
 		parent->SetFlag(WINDOW_FULLSCREEN, true);
 		// keep the current mode and switch
 		// update the client area
-		VideoMode mode = context->GetCurrentMode();
+		VideoMode mode = context->GetContext()->GetCurrentMode();
 		dimensions.height = mode.height;
 		dimensions.width = mode.width;
 		context->SwitchToFullScreen(window, true);
@@ -165,12 +165,12 @@ void WindowGLX::Impl::Destroy() {
 
 
 	if (context->IsCurrentDrawable(drawable))
-		context->SetCurrentTarget(nullptr);
+		context->GetContext()->SetCurrentTarget(nullptr);
 	XDestroyWindow(display, window);
 	window = 0;
 	XFreeColormap(display, cmap);
 	cmap = 0;
-	context->DestroyedRenderWindow(parent);
+	context->GetContext()->DestroyedRenderWindow(parent);
 }
 
 void WindowGLX::Impl::ApplyChangedAttributes() {
@@ -193,9 +193,9 @@ void WindowGLX::Impl::Capture(RenderContext* rc, PixelBox& image,
 		return;
 	}
 	if (!context->IsCurrentDrawable(drawable))
-		context->SetCurrentTarget(this);
+		context->GetContext()->SetCurrentTarget(this);
 
-	context->Capture(image, this, pbo, frameBuffer);
+	context->GetContext()->Capture(image, this, pbo, frameBuffer);
 }
 
 void WindowGLX::Impl::Reset(RenderContext* rc, Size size, PixelFormat format) {
@@ -212,7 +212,7 @@ void WindowGLX::Impl::Reset(RenderContext* rc, Size size, PixelFormat format) {
 
 void WindowGLX::Impl::Present(RenderContext* rc) {
 	RenderContextImplGLX* context = parent->GetContext();
-	if (rc != context) {
+	if (rc != context->GetContext()) {
 		Error("Window created using a different context");
 		return;
 	}

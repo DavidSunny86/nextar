@@ -150,9 +150,9 @@ public:
 	inline void SetReadBuffer(GLenum b);
 	inline void SetDrawBuffer(GLenum b);
 
-	inline GLenum ClientWaitSync(GLsync sync​, GLbitfield flags​, GLuint64 timeout​);
+	inline GLenum ClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout);
 	inline void DeleteSync(GLsync sync);
-	inline GLsync FenceSync(GLenum condition​, GLbitfield flags​);
+	inline GLsync FenceSync(GLenum condition, GLbitfield flags);
 
 	inline GLuint CreateRenderBuffer(
 		const RenderBuffer::CreateParams*  createParams,
@@ -487,9 +487,8 @@ inline void RenderContext_Base_GL::SetDrawBuffer(GLenum b) {
 	GL_CHECK();
 }
 
-inline GLenum RenderContext_Base_GL::ClientWaitSync(GLsync sync​, GLbitfield flags​,
-												  GLuint64 timeout​) {
-	GLenum result = GlClientWaitSync(sync​, flags​, timeout​);
+inline GLenum RenderContext_Base_GL::ClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout) {
+	GLenum result = GlClientWaitSync(sync, flags, timeout);
 	GL_CHECK();
 	return result;
 }
@@ -499,9 +498,8 @@ inline void RenderContext_Base_GL::DeleteSync(GLsync sync) {
 	GL_CHECK();
 }
 
-inline GLsync RenderContext_Base_GL::FenceSync(GLenum condition​,
-											   GLbitfield flags​) {
-	GLsync sync = GlFenceSync(condition​, flags​);
+inline GLsync RenderContext_Base_GL::FenceSync(GLenum condition, GLbitfield flags) {
+	GLsync sync = GlFenceSync(condition, flags);
 	GL_CHECK();
 	return sync;
 }

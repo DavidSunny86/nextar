@@ -42,19 +42,16 @@ void RasterStateListener::RasterCmd_Execute(int parentType, void* state,
 		ScriptParser::StatementContext& ctx) {
 	NEX_ASSERT(parentType == CommandDelegateBlock::RASTER_STATE_BLOCK);
 	RasterState& rasterState = *(static_cast<RasterState*>(state));
-	StringUtils::TokenIterator it = 0;
 	String value;
 	const StringUtils::WordList& paramContext = ctx.GetParamList();
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	StringUtils::TokenIterator it = ConstMultiStringHelper::It(paramContext);
+	if (it.HasNext(value)) {
 		rasterState.fill = Helper::GetFillMode(value);
 	}
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	if (it.HasNext(value)) {
 		rasterState.cull = Helper::GetCullMode(value);
 	}
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	if (it.HasNext(value)) {
 		rasterState.trianglesAreClockwise = Convert::ToBool(value);
 	}
 }
@@ -63,11 +60,9 @@ void RasterStateListener::ScissorCmd_Execute(int parentType, void* state,
 		ScriptParser::StatementContext& ctx) {
 	NEX_ASSERT(parentType == CommandDelegateBlock::RASTER_STATE_BLOCK);
 	RasterState& rasterState = *(static_cast<RasterState*>(state));
-	StringUtils::TokenIterator it = 0;
-	String value;
-	const StringUtils::WordList& paramContext = ctx.GetParamList();
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	ConstMultiStringHelper h(ctx.GetParamList());
+	String value = h.Get(0);
+	if (value.length()) {
 		rasterState.usingScissors = Convert::ToBool(value);
 	}
 }
@@ -76,15 +71,12 @@ void RasterStateListener::AntiAliasingCmd_Execute(int parentType, void* state,
 		ScriptParser::StatementContext& ctx) {
 	NEX_ASSERT(parentType == CommandDelegateBlock::RASTER_STATE_BLOCK);
 	RasterState& rasterState = *(static_cast<RasterState*>(state));
-	StringUtils::TokenIterator it = 0;
 	String value;
-	const StringUtils::WordList& paramContext = ctx.GetParamList();
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	ConstMultiStringHelper::Iterator it = ConstMultiStringHelper::It(ctx.GetParamList());
+	if (it.HasNext(value)) {
 		rasterState.usingMultisample = Convert::ToBool(value);
 	}
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	if (it.HasNext(value)) {
 		rasterState.usingLineAa = Convert::ToBool(value);
 	}
 }
@@ -93,11 +85,9 @@ void RasterStateListener::DepthClipCmd_Execute(int parentType, void* state,
 		ScriptParser::StatementContext& ctx) {
 	NEX_ASSERT(parentType == CommandDelegateBlock::RASTER_STATE_BLOCK);
 	RasterState& rasterState = *(static_cast<RasterState*>(state));
-	StringUtils::TokenIterator it = 0;
 	String value;
-	const StringUtils::WordList& paramContext = ctx.GetParamList();
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	ConstMultiStringHelper::Iterator it = ConstMultiStringHelper::It(ctx.GetParamList());
+	if (it.HasNext(value)) {
 		rasterState.depthClip = Convert::ToBool(value);
 	}
 }
@@ -106,19 +96,16 @@ void RasterStateListener::DepthBiasCmd_Execute(int parentType, void* state,
 		ScriptParser::StatementContext& ctx) {
 	NEX_ASSERT(parentType == CommandDelegateBlock::RASTER_STATE_BLOCK);
 	RasterState& rasterState = *(static_cast<RasterState*>(state));
-	StringUtils::TokenIterator it = 0;
+
 	String value;
-	const StringUtils::WordList& paramContext = ctx.GetParamList();
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	ConstMultiStringHelper::Iterator it = ConstMultiStringHelper::It(ctx.GetParamList());
+	if (it.HasNext(value)) {
 		rasterState.constantDepthBias = Convert::ToFloat(value);
 	}
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	if (it.HasNext(value)) {
 		rasterState.slopeScaledDepthBias = Convert::ToFloat(value);
 	}
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	if (it.HasNext(value)) {
 		rasterState.depthBiasClamp = Convert::ToFloat(value);
 	}
 }

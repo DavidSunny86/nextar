@@ -30,10 +30,10 @@ ShaderScript::ShaderScript(ShaderTemplate::LoadStreamRequest* s) :
 
 void ShaderScript::SetRegionsAsSource(Pass::ProgramStage type,
 		const StringUtils::WordList& regionNames) {
-	StringUtils::TokenIterator regIt = 0;
+	StringUtils::TokenIterator regIt = ConstMultiStringHelper::It(regionNames);
 	String name;
 	String value[(uint32)RenderManager::ShaderLanguage::SPP_COUNT];
-	while ((regIt = StringUtils::NextWord(regionNames, name, regIt)) != String::npos) {
+	while ((regIt = StringUtils::NextWord(regionNames, name, regIt))) {
 		auto it = regions.equal_range(name);
 		for(; it.first != it.second; ++it.first) {
 			value[(*it.first).second.first] += (*it.first).second.second;
@@ -80,19 +80,18 @@ void ShaderScript::EnterRegion(ScriptParser::RegionContext& ctx) {
 
 void ShaderScript::EnterStatement(ScriptParser::StatementContext& ctx) {
 	if (ctx.GetCommand() == _SS(CMD_SHADER)) {
-		String name;
-		StringUtils::NextWord(ctx.GetParamList(), name);
+		String name = ConstMultiStringHelper(ctx.GetParamList()).Get(0);
 		ShaderListener sl(this, name);
 		ctx.ParseBlock(&sl);
 	}
 }
 
 InputStreamPtr ShaderScript::FetchConstBuffer(const String& name) {
-	StringUtils::TokenIterator it = 0;
+	StringUtils::TokenIterator it = ConstMultiStringHelper::It(cbufferIncludePath);
 	String store;
 	URL url;
 	InputStreamPtr retFile;
-	while((it = StringUtils::NextWord(cbufferIncludePath, store, it)) != String::npos) {
+	while(it.HasNext(store)) {
 		url = store + name + ".const";
 		retFile = FileSystem::Instance().OpenRead(url);
 		if (retFile)
@@ -107,7 +106,7 @@ InputStreamPtr ShaderScript::FetchProgram(const String& name,
 		RenderManager::ShaderLanguage lang,
 		Pass::ProgramStage stageType) {
 
-	StringUtils::TokenIterator it = 0;
+	StringUtils::TokenIterator it = ConstMultiStringHelper::It(programIncludePath);
 	String store;
 	URL url;
 	InputStreamPtr retFile;
@@ -128,7 +127,7 @@ InputStreamPtr ShaderScript::FetchProgram(const String& name,
 		return retFile;
 	}
 
-	while((it = StringUtils::NextWord(programIncludePath, store, it)) != String::npos) {
+	while((it = StringUtils::NextWord(programIncludePath, store, it))) {
 		
 		switch (lang) {
 		case RenderManager::SPP_GLSL:

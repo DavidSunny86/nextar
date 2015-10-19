@@ -61,10 +61,10 @@ void TextureUnitStateListener::SamplerCmd_Execute(int parentType, void* parentPa
 	ShaderTemplate::LoadStreamRequest* shader =
 		reinterpret_cast<ShaderTemplate::LoadStreamRequest*>(parentParam);
 
-	String name;
 	const StringUtils::WordList& paramContext = ctx.GetParamList();
-	StringUtils::NextWord(paramContext, name, 0);
-	
+	ConstMultiStringHelper helper(paramContext);
+	String name = helper.Get(0);
+
 	ctx.ParseBlock(&sampler);
 	if (!ctx.IsErrorBitSet()) {
 		shader->AddSampler(name, sampler.params);
@@ -79,31 +79,35 @@ void TextureUnitStateListener::UnitCmd_Execute(int parentType, void* parentParam
 
 	String samplerName;
 	String unitName;
-	StringUtils::TokenIterator it = 0;
+
 	const StringUtils::WordList& paramContext = ctx.GetParamList();
-	it = StringUtils::NextWord(paramContext, samplerName, it);
-
-	it = StringUtils::NextWord(paramContext, unitName, it);
-	if (it != String::npos) {
-		StringPair nameSemantic = StringUtils::Split(unitName, ':');
-		AutoParamName apn = AutoParamName::AUTO_INVALID_PARAM;
-		if (nameSemantic.second != StringUtils::Null)
-			apn = Helper::GetAutoParam(nameSemantic.second);
-
-		unitName = std::move(nameSemantic.first);
-
-		if (apn != AutoParamName::AUTO_INVALID_PARAM)
-			shader->AddSemanticBinding(unitName,
-				Helper::GetAutoParam(nameSemantic.second)
-			);
-		else {
-			String uiName = ctx.GetTaggedParamVal(_SS(TAG_UI));
-			String desc = ctx.GetTaggedParamVal(_SS(TAG_DESC));
-			shader->AddParam(unitName, uiName, desc, ParamDataType::PDT_TEXTURE);
-		}
-
-		shader->AddTextureUnit(unitName, samplerName);
+	ConstMultiStringHelper::Iterator it = ConstMultiStringHelper::It(paramContext);
+	if(!it.HasNext(samplerName)) {
+		Error("Missing sampler name!");
+		return;
 	}
+	if(!it.HasNext(unitName)) {
+		Error("Missing unit name!");
+		return;
+	}
+	StringPair nameSemantic = StringUtils::Split(unitName, ':');
+	AutoParamName apn = AutoParamName::AUTO_INVALID_PARAM;
+	if (nameSemantic.second != StringUtils::Null)
+		apn = Helper::GetAutoParam(nameSemantic.second);
+
+	unitName = std::move(nameSemantic.first);
+
+	if (apn != AutoParamName::AUTO_INVALID_PARAM)
+		shader->AddSemanticBinding(unitName,
+			Helper::GetAutoParam(nameSemantic.second)
+		);
+	else {
+		String uiName = ctx.GetTaggedParamVal(_SS(TAG_UI), it);
+		String desc = ctx.GetTaggedParamVal(_SS(TAG_DESC), it);
+		shader->AddParam(unitName, uiName, desc, ParamDataType::PDT_TEXTURE);
+	}
+
+	shader->AddTextureUnit(unitName, samplerName);
 }
 
 
@@ -126,11 +130,9 @@ void SamplerListener::AddressUCmd_Execute(int parentType, void* parentParam,
 	ScriptParser::StatementContext& statement) {
 
 	TextureUnitParams& texUnitParams = *(static_cast<TextureUnitParams*>(parentParam));
-	const StringUtils::WordList& paramContext = statement.GetParamList();
-	String value;
-	StringUtils::TokenIterator it = 0;
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+
+	String value = ConstMultiStringHelper(statement.GetParamList()).Get(0);
+	if (value.length()) {
 		texUnitParams.uAddress = Helper::GetTextureAddressMode(value);
 	}
 }
@@ -139,11 +141,8 @@ void SamplerListener::AddressVCmd_Execute(int parentType, void* parentParam,
 	ScriptParser::StatementContext& statement) {
 
 	TextureUnitParams& texUnitParams = *(static_cast<TextureUnitParams*>(parentParam));
-	const StringUtils::WordList& paramContext = statement.GetParamList();
-	String value;
-	StringUtils::TokenIterator it = 0;
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	String value = ConstMultiStringHelper(statement.GetParamList()).Get(0);
+	if (value.length()) {
 		texUnitParams.vAddress = Helper::GetTextureAddressMode(value);
 	}
 }
@@ -152,11 +151,8 @@ void SamplerListener::AddressWCmd_Execute(int parentType, void* parentParam,
 	ScriptParser::StatementContext& statement) {
 
 	TextureUnitParams& texUnitParams = *(static_cast<TextureUnitParams*>(parentParam));
-	const StringUtils::WordList& paramContext = statement.GetParamList();
-	String value;
-	StringUtils::TokenIterator it = 0;
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	String value = ConstMultiStringHelper(statement.GetParamList()).Get(0);
+	if (value.length()) {
 		texUnitParams.wAddress = Helper::GetTextureAddressMode(value);
 	}
 }
@@ -165,11 +161,8 @@ void SamplerListener::AnisotropyCmd_Execute(int parentType, void* parentParam,
 	ScriptParser::StatementContext& statement) {
 
 	TextureUnitParams& texUnitParams = *(static_cast<TextureUnitParams*>(parentParam));
-	const StringUtils::WordList& paramContext = statement.GetParamList();
-	String value;
-	StringUtils::TokenIterator it = 0;
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	String value = ConstMultiStringHelper(statement.GetParamList()).Get(0);
+	if (value.length()) {
 		texUnitParams.maxAnisotropy = (uint32)Convert::ToULong(value);
 	}
 }
@@ -178,11 +171,8 @@ void SamplerListener::BorderColorCmd_Execute(int parentType, void* parentParam,
 	ScriptParser::StatementContext& statement) {
 
 	TextureUnitParams& texUnitParams = *(static_cast<TextureUnitParams*>(parentParam));
-	const StringUtils::WordList& paramContext = statement.GetParamList();
-	String value;
-	StringUtils::TokenIterator it = 0;
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	String value = ConstMultiStringHelper(statement.GetParamList()).Get(0);
+	if (value.length()) {
 		texUnitParams.borderColor = Convert::ToColor(value);
 	}
 }
@@ -191,11 +181,8 @@ void SamplerListener::LodBiasCmd_Execute(int parentType, void* parentParam,
 	ScriptParser::StatementContext& statement) {
 
 	TextureUnitParams& texUnitParams = *(static_cast<TextureUnitParams*>(parentParam));
-	const StringUtils::WordList& paramContext = statement.GetParamList();
-	String value;
-	StringUtils::TokenIterator it = 0;
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	String value = ConstMultiStringHelper(statement.GetParamList()).Get(0);
+	if (value.length()) {
 		texUnitParams.lodBias = Convert::ToFloat(value);
 	}
 }
@@ -204,11 +191,8 @@ void SamplerListener::MagFilterCmd_Execute(int parentType, void* parentParam,
 	ScriptParser::StatementContext& statement) {
 
 	TextureUnitParams& texUnitParams = *(static_cast<TextureUnitParams*>(parentParam));
-	const StringUtils::WordList& paramContext = statement.GetParamList();
-	String value;
-	StringUtils::TokenIterator it = 0;
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	String value = ConstMultiStringHelper(statement.GetParamList()).Get(0);
+	if (value.length()) {
 		texUnitParams.magFilter = Helper::GetMagFilter(value);
 	}
 }
@@ -217,11 +201,8 @@ void SamplerListener::MaxLodCmd_Execute(int parentType, void* parentParam,
 	ScriptParser::StatementContext& statement) {
 
 	TextureUnitParams& texUnitParams = *(static_cast<TextureUnitParams*>(parentParam));
-	const StringUtils::WordList& paramContext = statement.GetParamList();
-	String value;
-	StringUtils::TokenIterator it = 0;
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	String value = ConstMultiStringHelper(statement.GetParamList()).Get(0);
+	if (value.length()) {
 		texUnitParams.maxLod = Convert::ToFloat(value);
 	}
 }
@@ -230,11 +211,8 @@ void SamplerListener::MinFilterCmd_Execute(int parentType, void* parentParam,
 	ScriptParser::StatementContext& statement) {
 
 	TextureUnitParams& texUnitParams = *(static_cast<TextureUnitParams*>(parentParam));
-	const StringUtils::WordList& paramContext = statement.GetParamList();
-	String value;
-	StringUtils::TokenIterator it = 0;
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	String value = ConstMultiStringHelper(statement.GetParamList()).Get(0);
+	if (value.length()) {
 		texUnitParams.minFilter = Helper::GetMinFilter(value);
 	}
 }
@@ -243,11 +221,8 @@ void SamplerListener::MinLodCmd_Execute(int parentType, void* parentParam,
 	ScriptParser::StatementContext& statement) {
 
 	TextureUnitParams& texUnitParams = *(static_cast<TextureUnitParams*>(parentParam));
-	const StringUtils::WordList& paramContext = statement.GetParamList();
-	String value;
-	StringUtils::TokenIterator it = 0;
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	String value = ConstMultiStringHelper(statement.GetParamList()).Get(0);
+	if (value.length()) {
 		texUnitParams.minLod = Convert::ToFloat(value);
 	}
 }
@@ -256,11 +231,8 @@ void SamplerListener::CompareCmd_Execute(int parentType, void* parentParam,
 	ScriptParser::StatementContext& statement) {
 
 	TextureUnitParams& texUnitParams = *(static_cast<TextureUnitParams*>(parentParam));
-	const StringUtils::WordList& paramContext = statement.GetParamList();
-	String value;
-	StringUtils::TokenIterator it = 0;
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	String value = ConstMultiStringHelper(statement.GetParamList()).Get(0);
+	if (value.length()) {
 		texUnitParams.comparisonFunc = Helper::GetTextureCompareFunc(value);
 	}
 }

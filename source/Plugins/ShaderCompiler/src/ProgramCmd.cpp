@@ -77,14 +77,14 @@ void ProgramListener::ParamCmd_Execute(int parentType, void* state,
 	ShaderScript* script = reinterpret_cast<ShaderScript*>(state);
 	ShaderTemplate::LoadStreamRequest* shader =
 			(script->GetRequest());
-	StringUtils::TokenIterator it = 0;
 	String value;
 	String name, uiName, desc;
 	
 	const StringUtils::WordList& paramContext = ctx.GetParamList();
-	StringUtils::NextWord(paramContext, name);
-	uiName = ctx.GetTaggedParamVal(_SS(TAG_UI));
-	desc = ctx.GetTaggedParamVal(_SS(TAG_DESC));
+	StringUtils::TokenIterator it = ConstMultiStringHelper::It(paramContext);
+	StringUtils::NextWord(paramContext, name, it);
+	uiName = ctx.GetTaggedParamVal(_SS(TAG_UI), it);
+	desc = ctx.GetTaggedParamVal(_SS(TAG_DESC), it);
 
 	if (ctx.GetCommand() == _SS(CMD_OPTION))
 		shader->AddMacro(name, uiName, desc);
@@ -99,9 +99,8 @@ void ProgramListener::ShaderCmd_Execute(ShaderScript* script,
 	
 	String programName;
 	const StringUtils::WordList& words = statement.GetParamList();
-	StringUtils::TokenIterator prev = 0;
-	while (	(prev = StringUtils::NextWord(words, programName, prev))
-			!= String::npos ) {
+	StringUtils::TokenIterator prev = ConstMultiStringHelper::It(words);
+	while (	(prev = StringUtils::NextWord(words, programName, prev)) ) {
 		for(int i = 0; i < RenderManager::ShaderLanguage::SPP_COUNT; ++i) {
 			InputStreamPtr program =
 					script->FetchProgram(programName, (RenderManager::ShaderLanguage)i, stage);

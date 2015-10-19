@@ -60,7 +60,8 @@ void PassListener::ConstBufferCmd_Execute(int parentType, void* parentParam,
 
 	ShaderScript* script = static_cast<ShaderScript*>(parentParam);
 	String name;
-	StringUtils::NextWord(ctx.GetParamList(), name);
+	ConstMultiStringHelper h(ctx.GetParamList());
+	name = h.Get(0);
 
 	InputStreamPtr file = script->FetchConstBuffer(name);
 

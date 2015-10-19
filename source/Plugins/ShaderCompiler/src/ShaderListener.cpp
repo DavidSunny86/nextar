@@ -49,7 +49,8 @@ void ShaderListener::PassCmd_Execute(int parentType, void* parentParam,
 	ScriptParser::StatementContext& ctx) {
 	if (parentType == CommandDelegateBlock::SHADER_BLOCK) {
 		String name;
-		StringUtils::NextWord(ctx.GetParamList(), name);
+		ConstMultiStringHelper h(ctx.GetParamList());
+		name = h.Get(0);
 		auto shaderScript = static_cast<ShaderScript*>(parentParam);
 		PassListener pass(shaderScript, name);
 		ctx.ParseBlock(&pass);
@@ -68,7 +69,7 @@ void ShaderListener::FlagsCmd_Execute(int parentType, void* parentParam,
 	if (parentType == CommandDelegateBlock::SHADER_BLOCK) {
 		const StringUtils::WordList& wl = ctx.GetParamList();
 		String value;
-		StringUtils::TokenIterator prev = 0;
+		StringUtils::TokenIterator prev = ConstMultiStringHelper::It(wl);
 		uint32 flags = 0;
 		while (	(prev = StringUtils::NextWord(wl, value, prev)) != String::npos ) {
 			flags |= Helper::GetShaderFlag(value);

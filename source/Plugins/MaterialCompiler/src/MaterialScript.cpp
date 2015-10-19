@@ -27,8 +27,8 @@ void MaterialScript::EnterScript(ScriptParser::ScriptContext& block) {
 
 void MaterialScript::EnterStatement(ScriptParser::StatementContext& ctx) {
 	if (ctx.GetCommand() == _SS(CMD_MATERIAL)) {
-		String name;
-		StringUtils::NextWord(ctx.GetParamList(), name);
+		ConstMultiStringHelper h(ctx.GetParamList());
+		String name = h.Get(0);
 		SharedComponent::ID id = SharedComponent::ToID(name);
 		if (id.name == this->materialId.name &&
 			id.group == this->materialId.group) {

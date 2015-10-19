@@ -83,7 +83,7 @@ void LanguageTranslator::ConstBufferListener::EnterStatement(ScriptParser::State
 		String name;
 		bool determineContext = true;
 		const StringUtils::WordList& words = ctx.GetParamList();
-		StringUtils::TokenIterator it = 0;
+		StringUtils::TokenIterator it = ConstMultiStringHelper::It(words);
 		it = StringUtils::NextWord(words, name, it);
 		StringPair semantic = StringUtils::Split(name, ':');
 		if (semantic.second != StringUtils::Null) {
@@ -125,21 +125,19 @@ void LanguageTranslator::ConstBufferCommandListener::EnterBlock(
 void LanguageTranslator::ConstBufferCommandListener::EnterStatement(
 		ScriptParser::StatementContext& ctx) {
 	if (ctx.GetCommand() == _SS(CMD_VAR)) {
-		StringUtils::TokenIterator it = 0;
+
 
 		ParamDataType dataType;
 		String value;
 
 		const StringUtils::WordList& paramContext = ctx.GetParamList();
-		it = StringUtils::NextWord(paramContext, value, it);
-		if (it != String::npos) {
+		StringUtils::TokenIterator it = ConstMultiStringHelper::It(paramContext);
+		if (it.HasNext(value)) {
 			dataType = ShaderParameter::MapParamType(value);
 		}
 		if (dataType == ParamDataType::PDT_UNKNOWN)
 			ctx.Error(value + " is unknown data type.");
-
-		it = StringUtils::NextWord(paramContext, value, it);
-		if (it != String::npos) {
+		if (it.HasNext(value)) {
 			StringPair nameSemantic = StringUtils::Split(value, ':');
 			
 			
@@ -180,8 +178,8 @@ void LanguageTranslator::ConstBufferCommandListener::EnterStatement(
 
 			translator->AddParam(dataType, name, arrayCount);
 			if (apn == AutoParamName::AUTO_INVALID_PARAM && !cbIsAutoParam) {
-				String uiName = ctx.GetTaggedParamVal(_SS(TAG_UI));
-				String desc = ctx.GetTaggedParamVal(_SS(TAG_DESC));
+				String uiName = ctx.GetTaggedParamVal(_SS(TAG_UI), it);
+				String desc = ctx.GetTaggedParamVal(_SS(TAG_DESC), it);
 				script->GetRequest()->AddParam(name, uiName, desc, dataType);
 			}
 			

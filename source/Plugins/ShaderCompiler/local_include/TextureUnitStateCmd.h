@@ -17,6 +17,7 @@ namespace ShaderCompiler {
 
 class TextureUnitStateListener: public ScriptParser::BlockListener,
 		public ScriptParser::StatementListener {
+	NEX_LOG_HELPER(TextureUnitStateListener);
 public:
 	static CommandNamePair commands[];
 	static const size_t commandCount;

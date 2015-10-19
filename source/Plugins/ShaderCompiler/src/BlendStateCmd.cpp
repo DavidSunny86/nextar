@@ -40,19 +40,17 @@ void BlendStateListener::BlendCmd_Execute(int parentType, void* state,
 		ScriptParser::StatementContext& ctx) {
 	NEX_ASSERT(parentType == CommandDelegateBlock::BLEND_STATE_BLOCK);
 	BlendState& blendState = *(static_cast<BlendState*>(state));
-	StringUtils::TokenIterator it = 0;
+
 	String value;
 	const StringUtils::WordList& paramContext = ctx.GetParamList();
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	StringUtils::TokenIterator it = ConstMultiStringHelper::It(paramContext);
+	if (it.HasNext(value)) {
 		blendState.enabled = Convert::ToBool(value);
 	}
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	if (it.HasNext(value)) {
 		blendState.alphaToCoverage = Convert::ToBool(value);
 	}
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	if (it.HasNext(value)) {
 		blendState.numRenderTargets = (uint16) Convert::ToULong(value);
 	}
 }
@@ -62,11 +60,11 @@ void BlendStateListener::BlendTargetCmd_Execute(int parentType, void* state,
 	NEX_ASSERT(parentType == CommandDelegateBlock::BLEND_STATE_BLOCK);
 	BlendState& blendState = *(static_cast<BlendState*>(state));
 	uint32 targetIndex = 0;
-	StringUtils::TokenIterator it = 0;
+
 	String value;
 	const StringUtils::WordList& paramContext = ctx.GetParamList();
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	StringUtils::TokenIterator it = ConstMultiStringHelper::It(paramContext);
+	if (it.HasNext(value)) {
 		targetIndex = (uint32)Convert::ToULong(value);
 		if (targetIndex >= blendState.numRenderTargets) {
 			ctx.Error(
@@ -76,36 +74,28 @@ void BlendStateListener::BlendTargetCmd_Execute(int parentType, void* state,
 		}
 	}
 	RenderTargetBlendOp& blendOp = blendState.blendOp[targetIndex];
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	if (it.HasNext(value)) {
 		blendOp.enabled = Convert::ToBool(value);
 	}
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	if (it.HasNext(value)) {
 		blendOp.srcCol = Helper::GetBlendSource(value);
 	}
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	if (it.HasNext(value)) {
 		blendOp.destCol = Helper::GetBlendSource(value);
 	}
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	if (it.HasNext(value)) {
 		blendOp.colOp = Helper::GetColorOperation(value);
 	}
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	if (it.HasNext(value)) {
 		blendOp.srcAlpha = Helper::GetBlendSource(value);
 	}
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	if (it.HasNext(value)) {
 		blendOp.destAlpha = Helper::GetBlendSource(value);
 	}
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	if (it.HasNext(value)) {
 		blendOp.alphaOp = Helper::GetColorOperation(value);
 	}
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	if (it.HasNext(value)) {
 		blendOp.mask = Helper::GetColorMask(value);
 	}
 }

@@ -6,7 +6,6 @@
  */
 #include <RenderOpenGL.h>
 #include <RenderDriverGL.h>
-#include <RenderDriverGLX.h>
 #include <RenderContextImplGLX.h>
 #include <WindowGLX.h>
 #include <X11/extensions/Xrandr.h>
@@ -45,7 +44,7 @@ void RenderContextImplGLX::SetCreationParams(
 		const RenderDriver::ContextCreationParams& contextCreationParams) {
 	bool failed = true;
 	baseContext->SetContextParams(contextCreationParams);
-	display = OpenDisplay(((RenderDriverGLX*) driver)->GetGpuIndex());
+	display = OpenDisplay(((RenderDriverGL*) baseContext->GetDriver())->GetGpuIndex());
 	if (display) {
 
 		int error_base, event_base;
@@ -68,7 +67,7 @@ void RenderContextImplGLX::SetCreationParams(
 
 				VideoModeList vidModes;
 				EnumVideoModes(vidModes);
-				baseContext->SetVideoModes(vidModes);
+				baseContext->SetVideoModes(std::move(vidModes));
 				// check atoms
 
 				fullScreen = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN",
@@ -132,7 +131,7 @@ void RenderContextImplGLX::SetCreationParams(
 void RenderContextImplGLX::ReadyGlxExtensions() {
 	const char *glxExts = glXQueryExtensionsString(display, screenIndex);
 
-	if (IsSupported("GLX_ARB_create_context", glxExts))
+	if (ExtensionHelper::IsSupported("GLX_ARB_create_context", glxExts))
 		GlXCreateContextAttribsARB =
 				(PFNGLXCREATECONTEXTATTRIBSARB) RenderContext_Base_GL::GetExtension(
 						"glXCreateContextAttribsARB");
@@ -142,11 +141,14 @@ void RenderContextImplGLX::ReadyContext(RenderWindow* gw) {
 	// create context based of fbConfig and set as current
 	// do we have a shared context?
 	GLXContext shared = 0;
+	const RenderDriver::ContextCreationParams& contextCreationParams = baseContext->GetContextParams();
 	if (contextCreationParams.sharedContextIndex >= 0) {
-		RenderContextPtr ptr = driver->AsyncGetContext(
+		RenderContextPtr ptr = baseContext->GetDriver()->AsyncGetContext(
 				contextCreationParams.sharedContextIndex);
 		if (ptr) {
-			shared = (static_cast<RenderContextImplGLX*>(ptr.GetPtr()))->context;
+			shared = static_cast<RenderContextImplGLX*>((
+					static_cast<RenderContext_Base_GL*>(
+							ptr.GetPtr()))->GetImpl())->context;
 		}
 	}
 
@@ -243,7 +245,13 @@ void RenderContextImplGLX::EnumVideoModes(VideoModeList& videoModes) {
 		VideoMode current = VideoMode(screenSize[currsize].width,
 				screenSize[currsize].height, XRRConfigCurrentRate(conf));
 		std::sort(videoModes.begin(), videoModes.end());
-		currentVideoMode = originalVideoMode = GetVideoModeIndex(current);
+		auto it = std::find(videoModes.begin(), videoModes.end(), current);
+		if (it != videoModes.end())
+			baseContext->SetOriginalVideoMode((uint32)(it - videoModes.begin()));
+		else {
+			videoModes.push_back(current);
+			baseContext->SetOriginalVideoMode((uint32)videoModes.size() - 1);
+		}
 		XRRFreeScreenConfigInfo(conf);
 	} /* check vid modes*/
 	if (fallback || !videoModes.size()) {
@@ -251,8 +259,9 @@ void RenderContextImplGLX::EnumVideoModes(VideoModeList& videoModes) {
 		vmode.width = DisplayWidth(display, screenIndex);
 		vmode.height = DisplayHeight(display, screenIndex);
 		vmode.refreshRate = 0;
-		currentVideoMode = originalVideoMode = 0;
 		videoModes.push_back(vmode);
+		baseContext->SetOriginalVideoMode((uint32)videoModes.size() - 1);
+		Error("Viewmode set in fallback mode!");
 	}
 }
 
