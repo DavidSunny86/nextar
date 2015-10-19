@@ -319,6 +319,9 @@ inline RefPtr<T> Assign(U* what) {
 	w.Assign(what);
 	return w;
 }
+
+#define NEX_DEFINE_REFPTR(Class) using Class##Ptr = RefPtr<Class>;
+
 }
 
 #endif //NEXTAR_SHARED_PTR_H

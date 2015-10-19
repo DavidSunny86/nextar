@@ -21,9 +21,9 @@ bool GpuProgramGL::Compile(GLenum shaderType, RenderContext* ctx,
 		const char* src, const nextar::StringUtils::WordList& macroList) {
 	/* get program source */
 	String macroStr, macro;
-	StringUtils::TokenIterator it = 0;
-
-	while ((it = StringUtils::NextWord(macroList, macro, it)) != String::npos) {
+	ConstMultiStringHelper::Iterator it =  ConstMultiStringHelper::It(macroList);
+	
+	while (it.HasNext(macro)) {
 		macroStr += "#define ";
 		macroStr += macro;
 		macroStr += "\n";

@@ -312,7 +312,7 @@ class MemoryPool {
 	MemoryPool(const MemoryPool& p);
 
 public:
-	MemoryPool(MemoryPool&& p)
+	MemoryPool(MemoryPool&& p) :
 #if NEX_ENABLE_MEMORY_POOLS
 		pool(std::move(p.pool))
 #else

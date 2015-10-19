@@ -42,19 +42,18 @@ void MaterialListener::ShaderCmd_Execute(void* state,
 	MaterialTemplate::StreamRequest* material =
 				(reinterpret_cast<MaterialScript*>(state)->GetRequest());
 	const StringUtils::WordList& paramContext = ctx.GetParamList();
-	StringUtils::TokenIterator it = 0;
+	ConstMultiStringHelper::Iterator it =  ConstMultiStringHelper::It(paramContext);
 	String value;
 	SharedComponent::ID id = SharedComponent::NullID;
 	URL location;
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (it != String::npos) {
+	if (it.HasNext(value))
 		location = URL(value);
-	}
-	it = StringUtils::NextWord(paramContext, value, it);
-	if (value.length()) {
+
+	if (it.HasNext(value))
 		id = SharedComponent::ToID(value);
-	} else
+	else
 		id = Asset::ToID(location);
+		
 	material->SetShader(id, location);
 }
 
@@ -70,15 +69,13 @@ void MaterialListener::ParamValueCmd_Execute(void* state,
 		ScriptParser::StatementContext& ctx) {
 	MaterialTemplate::StreamRequest* material =
 				(reinterpret_cast<MaterialScript*>(state)->GetRequest());
-	const StringUtils::WordList& paramContext = ctx.GetParamList();
-	StringUtils::TokenIterator it = 0;
+	StringUtils::TokenIterator it = ConstMultiStringHelper::It(ctx.GetParamList());
 	String name, valueTmp;
-	it = StringUtils::NextWord(paramContext, name, it);
-	if (it == String::npos) {
+	if (it.HasNext(name)) {
 		return;
 	}
 	String value;
-	while( (it = StringUtils::NextWord(paramContext, valueTmp, it)) != String::npos ) {
+	while( (it.HasNext(valueTmp)) ) {
 		StringUtils::PushBackWord(value, valueTmp);
 	}
 	if (value.length()) {
@@ -90,11 +87,8 @@ void MaterialListener::LayerCmd_Execute(void* state,
 		ScriptParser::StatementContext& ctx) {
 	MaterialTemplate::StreamRequest* material =
 				(reinterpret_cast<MaterialScript*>(state)->GetRequest());
-	const StringUtils::WordList& paramContext = ctx.GetParamList();
-	StringUtils::TokenIterator it = 0;
-	String layer;
+	String layer = ConstMultiStringHelper(ctx.GetParamList()).Get(0);
 	uint8 layerValue = (uint8)Layer::NORMAL;
-	it = StringUtils::NextWord(paramContext, layer, it);
 	if (layer == _SS(ARG_NORMAL))
 		layerValue = (uint8)Layer::NORMAL;
 	else if (layer == _SS(ARG_LOWEST))

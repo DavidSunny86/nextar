@@ -1,4 +1,3 @@
-
 #ifndef ASTDOCUMENT_H_
 #define ASTDOCUMENT_H_
 
@@ -6,10 +5,22 @@
 
 namespace nextar {
 
-class ASTDocument : public ASTNode {
+class _NexNeoScriptAPI ASTDocument : public ASTNode {
+public:
+	ASTDocument(String name) : _name(name) {}
 
+	void AddRegion(ASTRegionPtr& reg) {
+		_regions.push_back(reg);
+	}
+
+	const ASTRegionList& GetRegions() const {
+		return _regions;
+	}
+
+	virtual Type GetType() const {return Type::AST_DOCUMENT;}
 private:
-  ASTRegionList _regions;
+	String _name;
+	ASTRegionList _regions;
 };
 
 }

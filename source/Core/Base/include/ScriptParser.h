@@ -95,7 +95,7 @@ public:
 		const StringUtils::WordList& GetParamList() const;
 
 		void ParseBlock(BlockListener*);
-		String GetTaggedParamVal(const String& tag, StringUtils::TokenIterator startAt = 0);
+		String GetTaggedParamVal(const String& tag, StringUtils::TokenIterator startAt);
 
 	protected:
 		void _Clear();

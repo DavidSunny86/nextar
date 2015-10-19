@@ -284,7 +284,7 @@ void ScriptParser::StatementContext::ParseBlock(BlockListener* listener) {
 String ScriptParser::StatementContext::GetTaggedParamVal(const String& tag, 
 	StringUtils::TokenIterator it) {
 	String value;
-	while (it != String::npos) {
+	while (it) {
 		it = StringUtils::NextWord(paramContext, value, it);
 		if (value.length()) {
 			StringPair tagVal = StringUtils::Split(value, ':');

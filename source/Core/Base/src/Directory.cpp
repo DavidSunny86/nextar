@@ -110,10 +110,11 @@ namespace nextar {
 	}
 
 	InputStreamPtr Directory::OpenRead(const String& fileName) {
-		StringUtils::TokenIterator it = 0;
 		String path;
 		if (paths.length()) {
-			while ((it = StringUtils::NextWord(paths, path, it)) != String::npos) {
+			MultiStringHelper pathsL(paths);
+			MultiStringHelper::Iterator it = pathsL.Iterate();
+			while (it.HasNext(path)) {
 				InputStreamPtr ptr = OpenRead(path, fileName);
 				if (ptr)
 					return ptr;
@@ -125,10 +126,10 @@ namespace nextar {
 	}
 
 	OutputStreamPtr Directory::OpenWrite(const String& fileName, bool append) {
-		StringUtils::TokenIterator it = 0;
 		String path;
-		String pathStr;
-		while ((it = StringUtils::NextWord(paths, path, it)) != String::npos) {
+		MultiStringHelper pathsL(paths);
+		MultiStringHelper::Iterator it = pathsL.Iterate();
+		while (it.HasNext(path)) {
 			OutputStreamPtr ptr = OpenWrite(path, fileName, append);
 			if (ptr)
 				return ptr;
@@ -139,7 +140,6 @@ namespace nextar {
 	void Directory::Scan(Archive::ScanCallback* callback, const String& pattern,
 		bool recursive) {
 		StringVector pathstack;
-		StringUtils::TokenIterator it = 0;
 		String path;
 		String subPath;
 		String subPattern;
@@ -150,7 +150,9 @@ namespace nextar {
 		} else
 			subPattern = pattern;
 
-		while ((it = StringUtils::NextWord(paths, path, it)) != String::npos) {
+		MultiStringHelper pathsL(paths);
+		MultiStringHelper::Iterator it = pathsL.Iterate();
+		while (it.HasNext(path)) {
 			_VisitDirectory(path, subPattern, subPath, callback, recursive);
 		}
 	}
@@ -250,9 +252,10 @@ namespace nextar {
 	bool Directory::GetAttribute(const String& fileName,
 		nextar::FileAttribute & attr) {
 
-		StringUtils::TokenIterator it = 0;
 		String path;
-		while ((it = StringUtils::NextWord(paths, path, it)) != String::npos) {
+		MultiStringHelper pathsL(paths);
+		MultiStringHelper::Iterator it = pathsL.Iterate();
+		while (it.HasNext(path)) {
 			String fullPath = URL::GetAppendedPath(path, fileName);
 
 #if NEX_WINDOWS==1
@@ -318,9 +321,10 @@ namespace nextar {
 
 	bool Directory::Exists(const String& filename) {
 
-		StringUtils::TokenIterator it = 0;
 		String path;
-		while ((it = StringUtils::NextWord(paths, path, it)) != String::npos) {
+		MultiStringHelper pathsL(paths);
+		MultiStringHelper::Iterator it = pathsL.Iterate();
+		while (it.HasNext(path)) {
 			String fullPath = URL::GetAppendedPath(path, filename);
 #if NEX_WINDOWS==1
 			DWORD attribs = 0;

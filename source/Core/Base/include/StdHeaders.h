@@ -30,6 +30,7 @@
 #include <condition_variable>
 #include <atomic>
 #include <chrono>
+#include <type_traits>
 
 #undef max
 #undef min

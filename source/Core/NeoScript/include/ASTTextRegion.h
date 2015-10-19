@@ -4,9 +4,20 @@
 
 namespace nextar {
 
-class ASTTextRegion : public ASTRegion {
+class _NexNeoScriptAPI ASTTextRegion : public ASTRegion {
+	NEX_LOG_HELPER(ASTTextRegion);
 public:
-  String _contents;
+
+	ASTTextRegion(const String& name) : ASTRegion(name) {}
+
+	virtual const String& GetContents() const;
+	virtual const ASTCommandList& GetCommands() const;
+	virtual void AddCommands(ASTCommandList&& block);
+	virtual void SetContents(String&& contents);
+
+	virtual Type GetType() const {return Type::AST_TEXT_REGION;}
+public:
+	String _contents;
 };
 
 }

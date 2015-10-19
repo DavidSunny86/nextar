@@ -1,0 +1,124 @@
+/*============================================================================*/
+%skeleton "lalr1.cc"
+%name-prefix "neo_"
+
+%defines
+%define parser_class_name {neo_parser_impl}
+%define api.namespace {nextar}
+%define api.token.constructor
+%define api.value.type variant
+%define parse.assert
+%define parse.trace
+%define parse.error verbose
+
+%code requires
+{
+#include <NeoBaseDecl.h>
+#include <ParseLocation.h>
+namespace nextar {
+  class ParseLocation;
+  class ParserContext;
+}
+#define YY_DECL extern nextar::neo_parser_impl::symbol_type neo_lex(nextar::ParserContext& b, void* yyscanner)
+
+}
+
+%define api.location.type {nextar::ParseLocation}
+%param { ParserContext& b }
+%lex-param { void* SCANNER_PARAM  }
+%locations
+%initial-action
+{
+  @$.begin._fileName = @$.end._fileName = &b.GetFileName();
+}
+
+%code
+{
+#include "ParserContext.h"
+#define SCANNER_PARAM b._scanner
+YY_DECL;
+}
+
+%token END 0 "end of file"
+%token <String> REGION_ID TEXT_REGION_ID TEXT_CONTENTS COMMAND STRING_LITERAL
+
+// Types
+%type <ASTDocumentPtr> script  named_regions.1.N
+%type <ASTRegionPtr> named_region unnamed_region
+%type <ASTCommandPtr> command
+%type <ASTCommandList> commands.0.N commands.1.N
+%type <ASTParameterList> parameters.0.N
+%type <ASTParameter> parameter list
+
+%start script
+
+%%
+/*============================================================================*/
+script:                                  { $$.Clear(); }
+      | named_regions.1.N                { $$ = $1; }
+      | unnamed_region                   { $$ = b.MakeDocument($1); }
+      | unnamed_region named_regions.1.N { $2->AddRegion($1); $$ = $2; }
+      ;
+
+named_regions.1.N: named_region             { $$ = b.MakeDocument($1); }
+           | named_regions.1.N named_region { $1->AddRegion($2); $$ = $1; }
+           ;
+
+unnamed_region: commands.1.N          { $$ = b.MakeBlockRegion("", std::move($1)); }
+              ;
+
+named_region: REGION_ID commands.0.N  { $$ = b.MakeBlockRegion($1, std::move($2)); }
+      | TEXT_REGION_ID TEXT_CONTENTS  { $$ = b.MakeTextRegion($1, std::move($2)); }
+      ;
+
+commands.0.N:                         {  }
+            | commands.1.N            { $$ = std::move($1); }
+
+commands.1.N: command                 { $$.push_back($1); }
+            | commands.1.N command    { $1.push_back($2); $$ = $1; }
+            ;
+
+command: COMMAND parameters.0.N ';'   { $$ = b.MakeCommand($1, std::move($2)); }
+       | COMMAND parameters.0.N '{' commands.0.N '}'
+       {
+          /* returns $4 if its not null with appropriate stuff */
+          $$ = b.MakeBlock($1, std::move($2), std::move($4));
+       }
+       ;
+
+parameters.0.N:                           { }
+              | parameters.0.N parameter  { $1.Append($2); $$ = std::move($1); }
+              ;
+
+
+parameter: STRING_LITERAL                 { $$ = $1; }
+         | COMMAND                        { $$ = $1; }
+         | '{' list '}'                   { $$ = std::move($2); }
+         ;
+
+list:  parameter                          { $$ = $1; }
+    |  list ',' parameter                 { $1.Append($3); $$ = std::move($1); }
+    ;
+
+%%
+/*============================================================================*/
+
+namespace nextar {
+
+void neo_parser_impl::error(const location_type& l,
+                                      const std::string& e) {
+  b.Error(l, e.c_str());
+}
+
+ASTDocumentPtr ParserContext::Parse() {
+	BeginScan();
+	neo_parser_impl parser(*this);
+	parser.set_debug_level(_traceParsing);
+	int res = parser.parse();
+	EndScan();
+	if (res)
+		return ASTDocumentPtr();
+	return _document;
+}
+
+}

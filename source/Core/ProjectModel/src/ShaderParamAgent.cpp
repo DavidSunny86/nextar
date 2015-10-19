@@ -164,20 +164,21 @@ void ShaderParamTexture::SetParamValueImpl(size_t offset,
 		const String& value) {
 	URL locator;
 	Asset::ID objectId;
-	StringUtils::TokenIterator it = 0;
+	ConstMultiStringHelper valueL(value);
+	ConstMultiStringHelper::Iterator it = valueL.Iterate();
 	{
 	String url;
-	it = StringUtils::NextWord(value, url, it);
-	if (url.length() <= 0)
+	if (!it.HasNext(url))
 		return;
 	locator = URL(url);
 	}
-	if (it != String::npos) {
+	{
 		String id;
-		it = StringUtils::NextWord(value, id, it);
-		objectId = SharedComponent::ToID(id);
-	} else
-		objectId = Asset::ToID(locator);
+		if (it.HasNext(id))
+			objectId = SharedComponent::ToID(id);
+		else
+			objectId = Asset::ToID(locator);
+	}
 	TextureAssetPtr texture = TextureAsset::Traits::Instance(objectId, locator);
 	TextureUnit unit(texture);
 	request->SetTextureValue((uint32)offset, &unit);

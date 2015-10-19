@@ -11,6 +11,7 @@
 #include <NexBase.h>
 #include <MemUtils.h>
 #include <StringInternTable.h>
+#include <MultiString.h>
 
 // some macros
 #define NEX_DEFAULT_UCHAR	0xFFFD
@@ -20,6 +21,7 @@
 namespace nextar {
 typedef vector<String, AllocatorString>::type StringVector;
 typedef std::pair<String, String> StringPair;
+
 
 namespace StringUtils {
 // const char* operator
@@ -45,9 +47,9 @@ struct Less { // functor for operator <
 	}
 };
 
-enum {
-	SEPARATOR_CHAR = 4, // EOT
-};
+//enum {
+//	SEPARATOR_CHAR = 4, // EOT
+//};
 
 /**
  * @note
@@ -56,7 +58,7 @@ enum {
  * TokenIterator is the basic iterator used for those strings, it should
  * be initialized to 0.
  */
-typedef size_t TokenIterator;
+typedef MultiString::Iterator TokenIterator;
 typedef nextar::StringPair StringPair;
 typedef String WordList;
 
@@ -69,19 +71,20 @@ struct NotAsciiTest: public std::unary_function<int, bool > {
  * Change the delimeter for each word in this string to
  * compatible string array type.
  */
+/*
 template<typename StringType>
 void ReplaceDelimiter(StringType& strArr,
 		typename StringType::value_type delt) {
 	typename StringType::value_type val = StringUtils::SEPARATOR_CHAR;
 	std::replace(strArr.begin(), strArr.end(), delt, val);
 }
-
+*/
 /**
  * @remarks
  * For a container class, this will append all the strings in the
  * array or list or queue into one string
  */
-template<typename _ContIter, typename StringType/* = String*/>
+/*template<typename _ContIter, typename StringType/
 StringType Combine(_ContIter beg, _ContIter end) {
 	StringType ret;
 	size_t totalLength = 0;
@@ -99,16 +102,16 @@ StringType Combine(_ContIter beg, _ContIter end) {
 		++it;
 	}
 	return ret;
-}
+}*/
 
 /**
  * Returns the count of the string words stored in this container
  */
-template<typename StringType/* = String*/>
+/*template<typename StringType>
 size_t GetWordCount(const StringType& arr) {
 	size_t offset = 0;
 	size_t i = 0;
-	/* check if offset is less than length */
+	// check if offset is less than length
 	while (offset < arr.length()) {
 		size_t pos = arr.find_first_of(SEPARATOR_CHAR, offset);
 		if (pos == StringType::npos)
@@ -117,19 +120,19 @@ size_t GetWordCount(const StringType& arr) {
 		offset = pos + 1;
 	}
 	return i;
-}
+}*/
 
 /**
  * Get location of word within a string, returns -1 if not found.
  */
-template<typename StringType/* = String*/>
+/*template<typename StringType>
 size_t GetWordIndex(const StringType& arr, const StringType& word) {
 	size_t location = arr.find(word);
 	if (location == StringType::npos)
 		return -1;
 	return std::count(arr.c_str(), arr.c_str() + location,
 			(StringType::value_type)(SEPARATOR_CHAR));
-}
+}*/
 
 /**
  * Return's the ith token
@@ -137,7 +140,7 @@ size_t GetWordIndex(const StringType& arr, const StringType& word) {
  * @param arr The string container
  * @return Null if no tokens at ith index, else the string.
  */
-template<typename StringType/* = String*/>
+/*template<typename StringType>
 StringType GetWord(size_t num, const StringType& arr) {
 	size_t offset = 0;
 	size_t i = 0;
@@ -151,7 +154,7 @@ StringType GetWord(size_t num, const StringType& arr) {
 		i++;
 	}
 	return StringType();
-}
+}*/
 
 /**
  * Set the ith token to the given word
@@ -160,7 +163,7 @@ StringType GetWord(size_t num, const StringType& arr) {
  * @param what The string to store
  * @return Null if no tokens at ith index, else the string.
  */
-template<typename StringType/* = String*/>
+/*template<typename StringType>
 void SetWord(size_t num, StringType& arr, const StringType& what) {
 	size_t offset = 0;
 	size_t i = 0;
@@ -175,7 +178,7 @@ void SetWord(size_t num, StringType& arr, const StringType& what) {
 		offset = pos + 1;
 		i++;
 	}
-}
+}*/
 
 /**
  * Traverse a string array container
@@ -184,25 +187,17 @@ void SetWord(size_t num, StringType& arr, const StringType& what) {
  * @param prev Previous iterator
  * @return StringType::npos when done.
  */
-template<typename StringType/* = String*/>
-TokenIterator NextWord(const StringType& arr, StringType& store,
-		TokenIterator prev = 0) {
-	size_t ret_offset = StringType::npos;
-	if (prev < arr.length()) {
-		size_t pos = arr.find_first_of(SEPARATOR_CHAR, prev);
-		if (pos == StringType::npos)
-			pos = arr.length();
-
-		ret_offset = pos + 1;
-		store = arr.substr(prev, pos - prev);
-	}
-	return ret_offset;
+inline TokenIterator NextWord(const String& arr, String& store,
+		TokenIterator prev) {
+	prev.HasNext(store);
+	return prev;
 }
 
 /**
  * Replace a word at a particular position
  **/
-template<typename StringType/* = String*/>
+ /*
+template<typename StringType>
 void ReplaceWord(StringType& arr, TokenIterator prev, const StringType& by) {
 
 	if (prev < arr.length()) {
@@ -215,49 +210,24 @@ void ReplaceWord(StringType& arr, TokenIterator prev, const StringType& by) {
 		arr.replace(prev, pos - prev, by);
 	}
 }
-
+*/
 /**
  * Push the string at the very end of the buffer
  * @param arr The string array container
  * @param what The string to push
  */
-template<typename StringType/* = String*/>
-void PushBackWord(StringType& arr, const StringType& what) {
-	if (!arr.length()) {
-		if (what.length())
-			arr = what;
-		else
-			arr.append(1, SEPARATOR_CHAR);
-	} else {
-		if (*arr.rbegin() != SEPARATOR_CHAR)
-			arr += SEPARATOR_CHAR;
-		if (what.length())
-			arr += what;
-		else
-			arr += SEPARATOR_CHAR;
-	}
+inline void PushBackWord(String& arr, const String& what) {
+	MultiString m(arr);
+	m.PushBack(what);
 }
-
 /**
  * Push the string at the very begining of the buffer
  * @param arr The string array container
  * @param what The string to push
  */
-template<typename StringType/* = String*/>
-void PushFrontWord(StringType& arr, const StringType& what) {
-
-	size_t len = arr.length();
-	char* strCopy = (char*) NEX_ALLOC(len + 1, MEMCAT_GENERAL);
-	std::memcpy(strCopy, arr.c_str(), len);
-	strCopy[len] = 0;
-
-	arr.clear();
-	arr.reserve(len + what.length() + 1);
-	arr = what;
-	if (*what.rbegin() != SEPARATOR_CHAR)
-		arr += SEPARATOR_CHAR;
-	arr += strCopy;
-	NEX_FREE(strCopy, MEMCAT_GENERAL);
+inline void PushFrontWord(String& arr, const String& what) {
+	MultiString m(arr);
+	m.PushFront(what);
 }
 
 inline size_t Length(const char* s) {

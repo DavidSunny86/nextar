@@ -37,11 +37,11 @@ uint32 ShaderTemplate::GetProxyID() const {
 }
 
 String ShaderTemplate::GetHashNameFromOptions(const StringUtils::WordList& opt) {
-	StringUtils::TokenIterator it = 0;
 	String word;
 	String hashCode;
+	ConstMultiStringHelper::Iterator it =  ConstMultiStringHelper::It(opt);
 	vector<uint32>::type listOfUniques;
-	while( (it = StringUtils::NextWord(opt, word, it)) != String::npos ) {
+	while(it.HasNext(word)) {
 		MacroTable::iterator it = macros.find(word);
 		if (it != macros.end()) {
 			listOfUniques.push_back((*it).second.index);
@@ -213,7 +213,7 @@ void ShaderTemplate::ShaderFromTemplate::Load(InputStreamPtr& stream, AssetLoade
 		request->SetSemanticMap(p.semanticMap);
 	}
 
-	
+
 	request->SetRenderQueueFlags(parent->renderFlags);
 	request->SetCompleted(true);
 }

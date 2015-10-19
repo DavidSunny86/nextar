@@ -5,21 +5,34 @@
 
 namespace nextar {
 
-class ASTNode : public AllocGeneral {
+class _NexNeoScriptAPI ASTNode : public Referenced<ASTNode, AllocGeneral> {
 public:
-  ASTNode() {}
-  virtual ~ASTNode() {}
+	enum Type {
+		AST_NODE,
+		AST_DOCUMENT,
+		AST_COMMAND,
+		AST_BLOCK,
+		AST_BLOCK_REGION,
+		AST_TEXT_REGION,
+	};
 
-  void SetValue(const String& v) {
-    _value = v;
-  }
+	ASTNode() {}
+	ASTNode(const String& n) : _value(n) {}
+	virtual ~ASTNode() {}
 
-  const String& GetValue() {
-    return _value;
-  }
+	void SetValue(const String& v) {
+		_value = v;
+	}
+
+	const String& GetValue() {
+		return _value;
+	}
+
+	virtual Type GetType() const = 0;
 
 protected:
-  String _value;
+
+	String _value;
 };
 
 }

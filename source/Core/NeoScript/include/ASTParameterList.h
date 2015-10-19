@@ -5,13 +5,23 @@
 
 namespace nextar {
 
-class ASTParameterList : public ASTParameter {
+class _NexNeoScriptAPI ASTParameterList : public ASTParameter {
 public:
-  const String& GetStringValue() {
-    return GetValue();
-  }
-};
+	ASTParameterList() {}
+	ASTParameterList(const ASTParameterList& p) : ASTParameter(p.AsString()) {}
+	ASTParameterList(ASTParameterList&& p) : ASTParameter(std::move(p._value)) {}
 
+	ASTParameterList& operator = (const ASTParameterList& p) {
+		_value = p._value;
+		return *this;
+	}
+
+	ASTParameterList& operator = (ASTParameterList&& p) {
+		_value = std::move(p._value);
+		return *this;
+	}
+
+};
 
 }
 

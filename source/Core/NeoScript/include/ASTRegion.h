@@ -5,15 +5,18 @@
 
 namespace nextar {
 
-class ASTRegion : public ASTNode {
+class _NexNeoScriptAPI ASTRegion : public ASTNode {
 public:
-  ASTRegion();
-  ~ASTRegion();
+	ASTRegion(const String& name) {_value = name;}
+	~ASTRegion();
 
-  String GetRegionContents() const;
+	const String& GetName() const {return _value;}
+	virtual const ASTCommandList& GetCommands() const = 0;
+	virtual const String& GetContents() const = 0;
+	virtual void AddCommands(ASTCommandList&& block) = 0;
+	virtual void SetContents(String&& contents) = 0;
 
 protected:
-
 
 };
 
