@@ -7,6 +7,7 @@
 /install
 /docs/pdfs
 /source/UnitTests/External.tst/PhysicallyBasedRendering/src
+gen
 
 # Compiled source #
 ###################
@@ -45,4 +46,3 @@
 .Trashes
 ehthumbs.db
 Thumbs.db
-
