@@ -16,6 +16,8 @@ namespace ESpecialValues {
 	constexpr uint32 STR_OFFSET = 5;
 };
 
+constexpr uint32 npos = -1;
+
 template <typename _StringType>
 class IteratorType {
 	using StringType = const _StringType;
@@ -53,7 +55,7 @@ class IteratorType {
 	bool operator ==(ConstType& _what) const {
 		if (!_location)
 			return false;
-		if (_location == Type::npos)
+		if (_location == npos)
 			return _object == _what;
 		NEX_ASSERT(_location < _object.size());
 		NEX_ASSERT(_object[_location] == ESpecialValues::STX_CHAR);
@@ -110,34 +112,37 @@ private:
 		if (_location != 0) {
 			// condition where this was just one string
 			// not yet constructred
-			if (_location == Type::npos)
+			if (_location == npos)
 				_location = 0;
-
-			NEX_ASSERT(_location < _object.size());
-			NEX_ASSERT(_object[_location] == ESpecialValues::STX_CHAR);
-			_location += _Len() + ESpecialValues::STR_OFFSET;
-			if ((_location >= _object.size())
+			else {
+				NEX_ASSERT(_location < _object.size());
+				NEX_ASSERT(_object[_location] == ESpecialValues::STX_CHAR);
+				_location += _Len() + ESpecialValues::STR_OFFSET;
+				if ((_location >= _object.size())
 					|| (_object[_location] != ESpecialValues::STX_CHAR))
-				_location = 0;
+					_location = 0;
+			}
 		}
 	}
 
 	void _Store(Type& store) const {
 		if (!_location)
 			return;
-		if (_location == Type::npos)
+		if (_location == npos)
 			store = _object;
-		NEX_ASSERT(_object[_location] == ESpecialValues::STX_CHAR);
-		uint32 l = _Len();
-		store.reserve(l);
-		NEX_ASSERT(_location + ESpecialValues::STR_OFFSET + l <= _object.size());
-		store.assign(_object.c_str() + _location + ESpecialValues::STR_OFFSET, l);
+		else {
+			NEX_ASSERT(_object[_location] == ESpecialValues::STX_CHAR);
+			uint32 l = _Len();
+			store.reserve(l);
+			NEX_ASSERT(_location + ESpecialValues::STR_OFFSET + l <= _object.size());
+			store.assign(_object.c_str() + _location + ESpecialValues::STR_OFFSET, l);
+		}
 	}
 
 	uint32 _Len() const {
-		if (_location == Type::npos)
-			return _object.size();
-		NEX_ASSERT(_location + ESpecialValues::STR_OFFSET - 1 < _object.size());
+		if (_location == npos)
+			return (uint32)_object.size();
+		NEX_ASSERT(_location + ESpecialValues::STR_OFFSET - 1 < (uint32)_object.size());
 
 		return (((uint32) _object[_location + 1] << 24)
 				| ((uint32) _object[_location + 2] << 16)
@@ -194,7 +199,7 @@ public:
 				return it;
 			++it;
 		}
-		return Iterator();
+		return Iterator(_object);
 	}
 
 	Type& Get(Type& store, uint32 i) const {
@@ -217,7 +222,7 @@ public:
 
 	Iterator Iterate() const {
 		if (!_IsCted(_object) && _object.size() > 0)
-			return Iterator(_object, (uint32)Type::npos);
+			return Iterator(_object, (uint32)npos);
 		if (Length() > 0)
 			return Iterator(_object, ESpecialValues::HEAD_OFFSET);
 		return Iterator(_object);
@@ -331,18 +336,18 @@ public:
 		if (!BaseType::_IsCted(BaseType::_Obj())) {
 			uint32 sz = BaseType::_Obj().size() > 0;
 			_CtDump();
-			_Ctor(BaseType::_Obj(), sz + 1, BaseType::_Obj().size() + what.size() + ESpecialValues::STR_OFFSET);
+			_Ctor(BaseType::_Obj(), sz + 1, (uint32)BaseType::_Obj().size() + (uint32)what.size() + ESpecialValues::STR_OFFSET);
 		} else {
 			_SetLen(BaseType::Length() + 1);
 		}
-		_Here(BaseType::_Obj().size(), what);
+		_Here((uint32)BaseType::_Obj().size(), what);
 	}
 
 	void PushFront(ConstType& what) {
 		if (!BaseType::_IsCted(BaseType::_Obj())) {
 			uint32 sz = BaseType::_Obj().size() > 0;
 			_CtDump();
-			_Ctor(BaseType::_Obj(), sz + 1, BaseType::_Obj().size() + what.size() + ESpecialValues::STR_OFFSET);
+			_Ctor(BaseType::_Obj(), sz + 1, (uint32)BaseType::_Obj().size() + (uint32)what.size() + ESpecialValues::STR_OFFSET);
 		} else {
 			_SetLen(BaseType::Length() + 1);
 		}

@@ -65,7 +65,7 @@ public:
 
 class ParseLocation {
 public:
-	ParseLocation();
+	ParseLocation() {}
 	ParseLocation(const ParseLocation& p) :
 			begin(p.begin), end(p.end) {
 	}

@@ -65,7 +65,11 @@ public:
 
 		TextureStreamRequest(TextureAsset* texture) :
 				AssetStreamRequest(texture) {
+			codecInfo.metaInfoInited = false;
 			codecInfo.metaInfo.maxMipMapCount = -1;
+			codecInfo.metaInfo.maxDepth = 1;
+			codecInfo.metaInfo.maxWidth = 0;
+			codecInfo.metaInfo.maxHeight = 0;
 		}
 	};
 

@@ -181,19 +181,6 @@ void SetWord(size_t num, StringType& arr, const StringType& what) {
 }*/
 
 /**
- * Traverse a string array container
- * @param arr The string container
- * @param str To store the string into
- * @param prev Previous iterator
- * @return StringType::npos when done.
- */
-inline TokenIterator NextWord(const String& arr, String& store,
-		TokenIterator prev) {
-	prev.HasNext(store);
-	return prev;
-}
-
-/**
  * Replace a word at a particular position
  **/
  /*

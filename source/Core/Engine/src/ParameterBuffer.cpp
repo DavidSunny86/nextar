@@ -42,6 +42,7 @@ void ParameterBuffer::Prepare(const ParamEntryTableItem& table) {
 	paramTable = table;
 	size = table.totalParamBufferSize;
 	data.reset((uint8*) NEX_ALLOC(table.totalParamBufferSize, MEMCAT_CACHEALIGNED));
+	std::memset(this->data.get(), 0, size);
 }
 
 void ParameterBuffer::Prepare(void* data, size_t size) {
@@ -49,6 +50,8 @@ void ParameterBuffer::Prepare(void* data, size_t size) {
 	this->data.reset((uint8*) NEX_ALLOC(size, MEMCAT_CACHEALIGNED));
 	if (data)
 		std::memcpy(this->data.get(), data, size);
+	else
+		std::memset(this->data.get(), 0, size);
 }
 
 void ParameterBuffer::Prepare(BufferPtr&& data, size_t size) {
@@ -208,15 +211,19 @@ void ParameterBuffer::AsyncSave(OutputSerializer& ser) const {
 				break;
 			case ParamDataBaseType::BASE_TEXTURE: {
 				const TextureUnit* tu = reinterpret_cast<const TextureUnit*>(buffer);
-				bool asset = tu->texture->IsTextureAsset();
-				ser << asset;
-				if (asset && tu->texture) {
-					TextureAsset* assetPtr = static_cast<TextureAsset*>(tu->texture);
-					TextureAsset::ID id;
-					URL url = assetPtr->GetAssetLocator();
-					assetPtr->GetID(id);
-					ser << id;
-					ser << url;
+				if (tu && tu->texture) {
+					bool asset = tu->texture->IsTextureAsset();
+					ser << asset;
+					if (asset) {
+						TextureAsset* assetPtr = static_cast<TextureAsset*>(tu->texture);
+						TextureAsset::ID id;
+						URL url = assetPtr->GetAssetLocator();
+						assetPtr->GetID(id);
+						ser << id;
+						ser << url;
+					}
+				} else {
+					ser << false;
 				}
 			}
 				break;

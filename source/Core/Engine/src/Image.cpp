@@ -97,6 +97,7 @@ NEX_IMPLEMENT_FACTORY(Image::Serializer);
 ImageData Image::Serializer::Serialize(InputStreamPtr& stream,
 		ImageCodecMetaInfo& metaInfo) {
 	String fakeLoaderName = params.codecName;
+	StringUtils::ToUpper(fakeLoaderName);
 
 	ImageCodec* codec = GetImpl(fakeLoaderName);
 	if (!codec) {

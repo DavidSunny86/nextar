@@ -4,6 +4,7 @@
 **/
 #include "BaseRenderContext.h"
 #include "RenderContext_4_3_GL.h"
+#include "VertexLayoutGL.h"
 
 namespace RenderOpenGL {
 

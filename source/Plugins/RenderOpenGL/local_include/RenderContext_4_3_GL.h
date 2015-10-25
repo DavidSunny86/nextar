@@ -17,7 +17,7 @@ class RenderContext_4_3_GL : public RenderContext_4_2_GL,
 public:
   RenderContext_4_3_GL(RenderDriverGL*);
   virtual VersionGL GetContextVersion();
-
+    
   virtual void PostWindowCreation(RenderWindow* gw) override;
 protected:
 

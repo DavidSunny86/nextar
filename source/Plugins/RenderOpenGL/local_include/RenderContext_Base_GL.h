@@ -217,6 +217,11 @@ public:
 	void AttachToFBO(RenderTextureViewGL* rt, GLenum attachmentType);
 	void AttachToFBO(RenderBufferViewGL* rt, GLenum attachmentType);
 	bool ValidateFBO();
+
+	// semantics
+	VertexSemanticID MapLayout(
+		const VertexSemanticGL* semantics, uint32 numSemantics);
+	VertexSemanticDataGL GetInputSemanticsDataFromID(VertexSemanticID id);
 protected:
 	void DetermineShaderTarget();
 	GLuint CreateSamplerFromParams(const TextureUnitParams& params);
@@ -267,6 +272,10 @@ protected:
 	RasterStateGL rasterState;
 
 	PlatformImpl* pImpl;
+
+	VertexSemanticListGL vertexSemanticBlob;
+	VertexSemanticListElementList registeredSignatures;
+
 	static GLenum s_attachmentMap[(uint32)FrameBuffer::FBTYPE_COUNT];
 };
 

@@ -2,6 +2,7 @@
 #define ASTCOMMAND_H_
 
 #include <ASTNode.h>
+#include <ASTParameterList.h>
 
 namespace nextar {
 

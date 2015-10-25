@@ -13,6 +13,7 @@
 #include <JPEGImageCodec.h>
 #include <PNGImageCodec.h>
 #include <DDSImageCodec.h>
+#include <TGAImageCodec.h>
 
 using namespace nextar;
 

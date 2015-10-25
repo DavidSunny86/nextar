@@ -71,7 +71,7 @@ void MaterialListener::ParamValueCmd_Execute(void* state,
 				(reinterpret_cast<MaterialScript*>(state)->GetRequest());
 	StringUtils::TokenIterator it = ConstMultiStringHelper::It(ctx.GetParamList());
 	String name, valueTmp;
-	if (it.HasNext(name)) {
+	if (!it.HasNext(name)) {
 		return;
 	}
 	String value;

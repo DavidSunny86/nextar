@@ -12,7 +12,7 @@ RenderContext_4_0_GL::RenderContext_4_0_GL(RenderDriverGL* d) : ParentContext(d)
 }
 
 void RenderContext_4_0_GL::InitializeExtensions() {
-	ParentContext::InitializeFunctionPointers();
+	ParentContext::InitializeExtensions();
 	FunctionTable::InitializeFunctionPointers();
 }
 

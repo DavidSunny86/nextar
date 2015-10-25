@@ -152,6 +152,12 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(NEX_OS "MacOSX")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
+## Platform specific stuff
+#============================================================
+if(NEX_OS MATCHES "Windows")
+  set(CMAKE_PREFIX_PATH ${NEX_DEPENDENCIES})
+endif()
+
 ## Create plugin configuration file
 #============================================================
 set(NEX_PLUGIN_CONFIG_FILE ${NEX_INSTALL}/Bin/Plugins.xml)
@@ -214,24 +220,23 @@ macro(create_gen_files)
 		endif()
 	endforeach()
 endmacro(create_gen_files)
-
 #============================================================
 # Pre build step
 #============================================================
 macro(add_pre_build_execute)
-	set(NEX_PRE_BUILD_STEP TRUE)
-	set(NEX_PRE_BUILD_TARGET ${NEXTAR_BINARY_NAME}_PRE_BUILD)
-	add_custom_target(${NEX_PRE_BUILD_TARGET} COMMAND echo Building - ${NEX_PRE_BUILD_TARGET})
-	set(NEX_COUNTER 0)
+	if (NOT NEX_PRE_BUILD_STEP)
+		set(NEX_PRE_BUILD_STEP TRUE)
+		set(NEX_PRE_BUILD_TARGET ${NEXTAR_BINARY_NAME}_PRE_BUILD)
+		add_custom_target(${NEX_PRE_BUILD_TARGET} COMMAND echo Building - ${NEX_PRE_BUILD_TARGET})
+	endif()
 	foreach(arg ${ARGN})
-		MATH(EXPR NEX_COUNTER "${NEX_COUNTER}+1")
-		set(NE_PRE_BUILD_SUB ${NEX_PRE_BUILD_TARGET}_${NEX_COUNTER})
+		MATH(EXPR NEX_PRE_BUILD_STEP_COUNTER "${NEX_PRE_BUILD_STEP_COUNTER}+1")
+		set(NE_PRE_BUILD_SUB ${NEX_PRE_BUILD_TARGET}_${NEX_PRE_BUILD_STEP_COUNTER})
 		set(NE_PCOMMAND ${arg})
 		separate_arguments(NE_PCOMMAND)
 		add_custom_target(${NE_PRE_BUILD_SUB} COMMAND ${NE_PCOMMAND})
 		add_dependencies(${NEX_PRE_BUILD_TARGET} ${NE_PRE_BUILD_SUB})
 	endforeach()
-
 endmacro(add_pre_build_execute)
 #============================================================
 # Add_Dependency
@@ -446,6 +451,7 @@ endmacro(for_platform)
 #============================================================
 macro(clear_variables)
 	set(NEX_PRE_BUILD_STEP FALSE)
+	set(NEX_PRE_BUILD_STEP_COUNTER 0)
 	set(NEX_GEN_SRC_FILES "")
 endmacro(clear_variables)
 #============================================================

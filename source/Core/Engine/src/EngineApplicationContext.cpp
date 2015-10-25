@@ -47,13 +47,13 @@ void EngineApplicationContext::ConfigureExtendedInterfacesImpl() {
 void EngineApplicationContext::ReleaseResourcesImpl() {
 	TaskSchedular::Instance().Close();
 	MeshServices::Instance().Close();
+	ComponentGroupArchive::Instance().AsyncDeleteAll();
+	ComponentFactoryArchive::Instance().AsyncDeleteAll();
 	if (RenderManager::InstancePtr()) {
 		DispatchEvent(EVENT_RENDERMANAGER_PRE_CLOSE);
 		RenderManager::Instance().Close();
 		DispatchEvent(EVENT_RENDERMANAGER_POST_CLOSE);
 	}
-	ComponentGroupArchive::Instance().AsyncDeleteAll();
-	ComponentFactoryArchive::Instance().AsyncDeleteAll();
 	InputManager::Instance().Close();
 	VertexLayout::ClearCommonLayouts();
 }

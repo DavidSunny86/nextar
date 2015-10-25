@@ -21,13 +21,14 @@ LRESULT CALLBACK Win32Window::WndProc(HWND wnd, UINT message, WPARAM wparam,
 	if (wind) {
 		switch (message) {
 		case WM_CLOSE:
-			if (!wind->IsClosed()) {
-				wind->Destroy();
-			}
 			if (wind->IsMainWindow()) {
 				// post quit message
+				ApplicationContext::Instance().SetQuitting(true);
 				PostQuitMessage(0);
+			} else if (!wind->IsClosed()) {
+				wind->Destroy();
 			}
+
 			break;
 		case WM_EXITSIZEMOVE:
 			// todo should have size change started, size change ended

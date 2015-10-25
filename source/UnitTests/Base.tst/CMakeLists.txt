@@ -8,3 +8,5 @@
 add_unit_test(FileSystem)
 add_unit_test(OutputSerializer)
 add_unit_test(Math)
+add_unit_test(MultiStringTest)
+

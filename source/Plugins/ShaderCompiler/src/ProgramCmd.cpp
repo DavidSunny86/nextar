@@ -82,7 +82,7 @@ void ProgramListener::ParamCmd_Execute(int parentType, void* state,
 	
 	const StringUtils::WordList& paramContext = ctx.GetParamList();
 	StringUtils::TokenIterator it = ConstMultiStringHelper::It(paramContext);
-	StringUtils::NextWord(paramContext, name, it);
+	it(name);
 	uiName = ctx.GetTaggedParamVal(_SS(TAG_UI), it);
 	desc = ctx.GetTaggedParamVal(_SS(TAG_DESC), it);
 
@@ -100,7 +100,7 @@ void ProgramListener::ShaderCmd_Execute(ShaderScript* script,
 	String programName;
 	const StringUtils::WordList& words = statement.GetParamList();
 	StringUtils::TokenIterator prev = ConstMultiStringHelper::It(words);
-	while (	(prev = StringUtils::NextWord(words, programName, prev)) ) {
+	while (	prev.HasNext(programName) )  {
 		for(int i = 0; i < RenderManager::ShaderLanguage::SPP_COUNT; ++i) {
 			InputStreamPtr program =
 					script->FetchProgram(programName, (RenderManager::ShaderLanguage)i, stage);

@@ -55,50 +55,50 @@ YY_DECL;
 %%
 /*============================================================================*/
 script:                                  { $$.Clear(); }
-      | named_regions.1.N                { $$ = $1; }
-      | unnamed_region                   { $$ = b.MakeDocument($1); }
-      | unnamed_region named_regions.1.N { $2->AddRegion($1); $$ = $2; }
-      ;
+		| named_regions.1.N                { $$ = $1; }
+		| unnamed_region                   { $$ = b.MakeDocument($1); }
+		| unnamed_region named_regions.1.N { $2->AddRegion($1); $$ = $2; }
+		;
 
 named_regions.1.N: named_region             { $$ = b.MakeDocument($1); }
-           | named_regions.1.N named_region { $1->AddRegion($2); $$ = $1; }
-           ;
+			  | named_regions.1.N named_region { $1->AddRegion($2); $$ = $1; }
+			  ;
 
 unnamed_region: commands.1.N          { $$ = b.MakeBlockRegion("", std::move($1)); }
-              ;
+				  ;
 
 named_region: REGION_ID commands.0.N  { $$ = b.MakeBlockRegion($1, std::move($2)); }
-      | TEXT_REGION_ID TEXT_CONTENTS  { $$ = b.MakeTextRegion($1, std::move($2)); }
-      ;
+		| TEXT_REGION_ID TEXT_CONTENTS  { $$ = b.MakeTextRegion($1, std::move($2)); }
+		;
 
 commands.0.N:                         {  }
-            | commands.1.N            { $$ = std::move($1); }
+				| commands.1.N            { $$ = std::move($1); }
 
 commands.1.N: command                 { $$.push_back($1); }
-            | commands.1.N command    { $1.push_back($2); $$ = $1; }
-            ;
+				| commands.1.N command    { $1.push_back($2); $$ = $1; }
+				;
 
 command: COMMAND parameters.0.N ';'   { $$ = b.MakeCommand($1, std::move($2)); }
-       | COMMAND parameters.0.N '{' commands.0.N '}'
-       {
-          /* returns $4 if its not null with appropriate stuff */
-          $$ = b.MakeBlock($1, std::move($2), std::move($4));
-       }
-       ;
+		 | COMMAND parameters.0.N '{' commands.0.N '}'
+		 {
+			 /* returns $4 if its not null with appropriate stuff */
+			 $$ = b.MakeBlock($1, std::move($2), std::move($4));
+		 }
+		 ;
 
 parameters.0.N:                           { }
-              | parameters.0.N parameter  { $1.Append($2); $$ = std::move($1); }
-              ;
+				  | parameters.0.N parameter  { $1.Append($2); $$ = std::move($1); }
+				  ;
 
 
 parameter: STRING_LITERAL                 { $$ = $1; }
-         | COMMAND                        { $$ = $1; }
-         | '{' list '}'                   { $$ = std::move($2); }
-         ;
+			| COMMAND                        { $$ = $1; }
+			| '[' list ']'                   { $$ = std::move($2); }
+			;
 
-list:  parameter                          { $$ = $1; }
-    |  list ',' parameter                 { $1.Append($3); $$ = std::move($1); }
-    ;
+list:  parameters.0.N                          { $$ = $1; }
+	 |  list ',' parameters.0.N                 { $1.Append($3); $$ = std::move($1); }
+	 ;
 
 %%
 /*============================================================================*/
@@ -106,7 +106,7 @@ list:  parameter                          { $$ = $1; }
 namespace nextar {
 
 void neo_parser_impl::error(const location_type& l,
-                                      const std::string& e) {
+												  const std::string& e) {
   b.Error(l, e.c_str());
 }
 

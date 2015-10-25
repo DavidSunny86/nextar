@@ -50,7 +50,7 @@ vec2 getEncodedNormal(vec3 n) {
 }
 
 vec2 getEncodedNormal() {
-	return getEncodedNormal(normalize(varyingNormal.xyz));
+	return getEncodedNormal(normalize(getNormal().xyz));
 }
 
 void main(void) {

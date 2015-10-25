@@ -102,18 +102,15 @@ void TextureViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 					Warn("Pixel box has pixel padding. Cannot copy.");
 					continue;
 				}
-				if (textureParams.textureFlags
-						& TextureBase::PRE_ALLOCATE_STORAGE) {
-					gl->AllocateTextureLevel(realTarget + f,
+				gl->AllocateTextureLevel(realTarget + f,
 							(GLint) (textureParams.baseMipLevel + i),
 							pixelFormat, box.GetWidth(), box.GetHeight(),
 							box.GetDepth(), box.data, box.GetDataSize());
-				} else {
-					gl->WriteTextureLevel(realTarget + f,
-							(GLint) (textureParams.baseMipLevel + i),
-							pixelFormat, box.GetWidth(), box.GetHeight(),
-							box.GetDepth(), box.data, box.GetDataSize());
-				}
+				//	gl->WriteTextureLevel(realTarget + f,
+				//			(GLint) (textureParams.baseMipLevel + i),
+				//			pixelFormat, box.GetWidth(), box.GetHeight(),
+				//			box.GetDepth(), box.data, box.GetDataSize());
+
 			}
 		}
 	}

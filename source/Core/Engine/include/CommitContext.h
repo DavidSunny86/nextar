@@ -64,7 +64,8 @@ public:
 
 	Color color;
 
-	const ParameterBuffer* paramBuffers[(uint32) ParameterContext::CTX_COUNT];
+	typedef array<const ParameterBuffer*, (uint32)ParameterContext::CTX_COUNT>::type ParamBufferList;
+	ParamBufferList paramBuffers;
 	// rename the
 	ParamContext paramContext;
 	ParameterGroup* paramGroup;

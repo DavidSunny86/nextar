@@ -13,10 +13,7 @@ GLenum PassViewGL::stagesMap[Pass::STAGE_COUNT] = {
 	GL_FRAGMENT_SHADER,
 };
 
-PassViewGL::VertexSemanticListList PassViewGL::registeredSignatures;
-
-PassViewGL::PassViewGL() :
-		inputSemantics(nullptr), iGlProgram(0), inputLayoutId(-1) {
+PassViewGL::PassViewGL() : iGlProgram(0), inputLayoutId(-1) {
 }
 
 PassViewGL::~PassViewGL() {
@@ -59,7 +56,7 @@ void PassViewGL::Compile(nextar::RenderContext* rc,
 		Error("Failed to read semantics!");
 		return;
 	}
-	std::pair<uint16, VertexSemanticListGL*> layout = MapLayout(inputSemantics,
+	inputLayoutId = ctx->MapLayout(inputSemantics,
 			numSemantics);
 
 	long int preCompileStatus = 0;
@@ -73,9 +70,6 @@ void PassViewGL::Compile(nextar::RenderContext* rc,
 			params.autoNames,
 			produceReflectionData ? params.parameters : nullptr,
 			params.textureStates);
-
-	this->inputSemantics = layout.second;
-	this->inputLayoutId = layout.first;
 
 	SetupStates(params);
 }
@@ -188,9 +182,11 @@ void PassViewGL::SetTexture(RenderContext* rc, const SamplerParameter& desc,
 		const TextureUnit* tu) {
 	RenderContext_Base_GL* ctx = static_cast<RenderContext_Base_GL*>(rc);
 	const SamplerState* samplerState = static_cast<const SamplerState*>(&desc);
-	TextureViewGL* texture = static_cast<TextureViewGL*>(ctx->GetView(
+	if (tu->texture) {
+		TextureViewGL* texture = static_cast<TextureViewGL*>(ctx->GetView(
 			tu->texture));
-	ctx->SetTexture(samplerState->index, samplerState->sampler, texture);
+		ctx->SetTexture(samplerState->index, samplerState->sampler, texture);
+	}
 }
 
 void PassViewGL::Destroy(RenderContext* _ctx) {
@@ -202,21 +198,5 @@ void PassViewGL::Destroy(RenderContext* _ctx) {
 	ctx->DestroyProgram(iGlProgram);
 }
 
-std::pair<uint16, VertexSemanticListGL*> PassViewGL::MapLayout(
-		const VertexSemanticGL* semantics, uint32 numSemantics) {
-	// @urgent Make thread safe
-	uint16 index = 0;
-	for (auto& it : registeredSignatures) {
-		if (it.size() == numSemantics) {
-			if (std::equal(it.begin(), it.end(), semantics))
-				return std::pair<uint16, VertexSemanticListGL*>(index, &it);
-		}
-		index++;
-	}
-	registeredSignatures.push_back(
-			VertexSemanticListGL(semantics, semantics + numSemantics));
-	return std::pair<uint16, VertexSemanticListGL*>(index,
-			&registeredSignatures.back());
-}
 
 }

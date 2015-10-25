@@ -80,7 +80,6 @@ void Pass::View::Update(RenderContext* rc, uint32 msg, ContextParamPtr param) {
 	else if (msg == Pass::MSG_PASS_UPDATE_PARAMBUFFER_OFFSET) {
 		const ParamBufferOffsetParams& p =
 			*reinterpret_cast<const ParamBufferOffsetParams*>(param);
-		uint32 offsetAt = 0;
 
 		auto enParamIt = sharedParameters.end();
 		auto paramIt = sharedParameters.begin();
@@ -111,7 +110,7 @@ void Pass::View::Update(RenderContext* rc, uint32 msg, ContextParamPtr param) {
 				e.beginSamplerIt = e.endSamplerIt = nullptr;
 			}
 			
-			e.offsetInParamBuffer = p.offset[offsetAt++];
+			e.offsetInParamBuffer = p.offset[context];
 		}
 	}
 }
@@ -149,7 +148,9 @@ void Pass::View::UpdateParams(CommitContext& ctx, ParameterContext type,
 		ctx.paramGroup = group;
 		if (group->processor) {
 			ctx.groupDataPtr = nullptr;
+			group->Map(ctx.renderContext);
 			group->processor(ctx, group);
+			group->Unmap(ctx.renderContext);
 		} else {
 			ctx.groupDataPtr = group->Map(ctx.renderContext);
 			for (uint32 i = 0; i < group->numParams; ++i) {
@@ -180,6 +181,8 @@ void CustomTextureProcessorApply(CommitContext& context,
 	const SamplerParameter* sampler =
 			reinterpret_cast<const SamplerParameter*>(param);
 	CommitContext::ParamContext& pc = context.paramContext;
+	if (!pc.second)
+		return;
 	context.pass->SetTexture(context.renderContext, *sampler,
 			pc.second->AsTexture(pc.first));
 	pc.first += sampler->size;
@@ -194,6 +197,8 @@ void CustomParameterProcessorApply(CommitContext& context,
 	const ConstantParameter* constParam =
 			reinterpret_cast<const ConstantParameter*>(param);
 	CommitContext::ParamContext& pc = context.paramContext;
+	if (!pc.second)
+		return;
 	context.paramGroup->SetRawBuffer(context.renderContext, *constParam,
 			pc.second->AsRawData(pc.first));
 	pc.first += param->size;
@@ -207,6 +212,8 @@ void CustomStructProcessorApply(CommitContext& context,
 	NEX_ASSERT(param->type == ParamDataType::PDT_STRUCT);
 
 	CommitContext::ParamContext& pc = context.paramContext;
+	if (!pc.second)
+		return;
 	uint32 size = (uint32)pc.second->GetSize();
 	context.paramGroup->WriteRawData(context.renderContext,
 			pc.second->AsRawData(pc.first), 0, size);

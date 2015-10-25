@@ -1,12 +1,12 @@
 %option reentrant
 %option noyywrap
 %option prefix="neo_"
-
+%option never-interactive
 %{
 
 #include <ParserContext.h>
 #include <parse.neo.hpp>
-
+#define YY_NO_UNISTD_H
 #define YY_EXTRA_TYPE nextar::ParserContext*
 #define YY_INPUT(buf,result,max_size)       \
 	result = yyextra->Read(buf, max_size);	\
@@ -14,98 +14,98 @@
 	buf[result] = 0;						\
 
 #define yyterminate() return nextar::neo_parser_impl::make_END(b.Loc())	
-#define YY_USER_ACTION                     b.Loc().Columns(yyleng);
+#define YY_USER_ACTION                     b.Loc().Columns((nextar::uint32)yyleng);
 void * neo_alloc (size_t bytes, void * yyscanner);
 void * neo_realloc (void * ptr, size_t bytes, void * yyscanner);
 void   neo_free (void * ptr, void * yyscanner);
 %}
 
-%x REGION TEXT STR CONTENT
+%x STATE_REGION STATE_TEXT STATE_STR STATE_CONTENT
 
 CH      [$#_a-zA-Z]
 BLANK   [ \t]
 %%
 
 "@" {
-  BEGIN(REGION);
+  BEGIN(STATE_REGION);
 }
 
-<REGION>{CH}*":neo"?[ \n\t]+       {
-  BEGIN(CONTENT);
+<STATE_REGION>{CH}*":neo"?[ \n\t]+       {
+  BEGIN(STATE_CONTENT);
   return nextar::neo_parser_impl::make_REGION_ID(&yytext[1], b.Loc());
 }
 
-<REGION>{CH}*":text"[ \n\t]+       {
-  BEGIN(TEXT);
+<STATE_REGION>{CH}*":text"[ \n\t]+       {
+  BEGIN(STATE_TEXT);
   b.StartContent();
   return nextar::neo_parser_impl::make_TEXT_REGION_ID(&yytext[1], b.Loc());
 }
 
-<TEXT>"@"       {
-  BEGIN(REGION);
+<STATE_TEXT>"@"       {
+  BEGIN(STATE_REGION);
   return nextar::neo_parser_impl::make_TEXT_CONTENTS(b.GetContent(), b.Loc());
 }
 
-<TEXT>\\@  {
+<STATE_TEXT>\\@  {
   b.PutContent('@');
 }
 
-<TEXT>[^\\@\n]+  {
+<STATE_TEXT>[^\\@\n]+  {
   b.PutContent(yytext);
 }
 
-<TEXT>\\[^@] {
+<STATE_TEXT>\\[^@] {
   b.PutContent(yytext);
 }
 
 \"             {
-  BEGIN(STR);
+  BEGIN(STATE_STR);
   b.StartContent();
 }
 
-<STR>\"        {
+<STATE_STR>\"        {
  BEGIN(INITIAL);
  return nextar::neo_parser_impl::make_STRING_LITERAL(b.GetContent(), b.Loc());
 }
 
-<STR>\\[0-7]{1,3}   {
+<STATE_STR>\\[0-7]{1,3}   {
   int result;
   std::sscanf( yytext + 1, "%o", &result);
   if ( result > 0xff )
-     b.PutContent(result);
+	  b.PutContent(result);
 }
 
-<STR>\\[0-9]+     {
+<STATE_STR>\\[0-9]+     {
  b.Error(nextar::ParserContext::BAD_ESCAPE_SEQ);
 }
 
-<STR>\\n  b.PutContent('\n');
-<STR>\\t  b.PutContent('\t');
-<STR>\\r  b.PutContent('\r');
-<STR>\\b  b.PutContent('\b');
-<STR>\\f  b.PutContent('\f');
+<STATE_STR>\\n  b.PutContent('\n');
+<STATE_STR>\\t  b.PutContent('\t');
+<STATE_STR>\\r  b.PutContent('\r');
+<STATE_STR>\\b  b.PutContent('\b');
+<STATE_STR>\\f  b.PutContent('\f');
 
-<STR>\\(.|\n)  b.PutContent(yytext[1]);
+<STATE_STR>\\(.|\n)  b.PutContent(yytext[1]);
 
-<STR>[^\\\n\"]+   b.PutContent(yytext);
+<STATE_STR>[^\\\n\"]+   b.PutContent(yytext);
 
-<CONTENT>[^ \t\n\r]+ {
+<STATE_CONTENT>[^ \t\n\r]+ {
   return nextar::neo_parser_impl::make_COMMAND(yytext, b.Loc());
 }
 
-<CONTENT>[\n]+  {
- b.Loc().Lines(yyleng);
+<STATE_CONTENT>[\n]+  {
+ b.Loc().Lines((nextar::uint32)yyleng);
  b.Loc().Step();
 }
 
-<CONTENT>{BLANK}+ {
+<STATE_CONTENT>{BLANK}+ {
   b.Loc().Step();
 }
 
-<TEXT,STR>\n      {
+<STATE_TEXT,STATE_STR>\n      {
   // no error, just increase the line number
   // @todo
-  b.Loc().Lines(yyleng);
+  b.Loc().Lines((nextar::uint32)yyleng);
   b.Loc().Step();
   b.PutContent('\n');
 }

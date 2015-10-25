@@ -15,6 +15,7 @@
 
 namespace nextar {
 
+struct ParamEntryTableItem;
 /* Non automatic parameters for shaders and shader options
  * and the compiled shader technique reference stored here.
  */
@@ -42,7 +43,7 @@ public:
 
 		void SetShader(ShaderAssetPtr& shader);
 		void SetShader(const ShaderAsset::ID& id, const URL& location);
-		void SetParamBufferSize(uint32 paramBufferSize);
+		void PrepareParamBuffer(const ParamEntryTableItem& table);
 		void SetParamValue(uint32 offset, const void* data, size_t amount);
 		void SetTextureValue(uint32 offset, const TextureUnit* texture);
 		void SetParameterBuffer(ParameterBuffer&& buff);
@@ -92,7 +93,7 @@ protected:
 	virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);
 
 	void PrepareMaterial(MaterialAsset::MaterialLoadRequest*);
-	void SetParamBufferSize(size_t size);
+	void PrepareParamBuffer(const ParamEntryTableItem& table);
 	void SetParamData(const void* data, size_t offset, size_t size);
 	void SetParamData(const TextureUnit* data, size_t offset);
 	void SetParameterBuffer(ParameterBuffer&& buff);

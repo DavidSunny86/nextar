@@ -19,31 +19,34 @@ else
 	  # check if sub module exists, if not we create a submodule and add it to list
 	  if [ ! -d "${src_dir}/${fw_name}/${sub_mod}" ]; then
 		mkdir "${src_dir}/${fw_name}/${sub_mod}"
-		echo  "##---- SubModule: ${sub_mod} ----" >> ${src_dir}/${fw_name}/${sub_mod}/CMakeLists.txt
-		echo  "##---- Created: $(date) ----" >> ${src_dir}/${fw_name}/${sub_mod}/CMakeLists.txt	
-		echo  "add_module(${sub_mod_name})" >> ${src_dir}/${fw_name}/CMakeLists.txt
+		echo  "\n##---- SubModule: ${sub_mod} ----" >> ${src_dir}/${fw_name}/${sub_mod}/CMakeLists.txt
+		echo  "\n##---- Created: $(date) ----" >> ${src_dir}/${fw_name}/${sub_mod}/CMakeLists.txt	
+		echo  ""
+		echo  "\nadd_module(${sub_mod_name})" >> ${src_dir}/${fw_name}/CMakeLists.txt
 	  else
-		echo  "# Added test ${mod_name}: $(date)" >> ${src_dir}/${fw_name}/${sub_mod}/CMakeLists.txt
-		echo  "add_unit_test(${mod_name})" >> ${src_dir}/${fw_name}/${sub_mod}/CMakeLists.txt
+		echo  "\n# Added test ${mod_name}: $(date)" >> ${src_dir}/${fw_name}/${sub_mod}/CMakeLists.txt
+		echo  ""
+		echo  "\nadd_unit_test(${mod_name})" >> ${src_dir}/${fw_name}/${sub_mod}/CMakeLists.txt
 	  fi
 	  
 	elif [ "${fw_name}" = "Plugins" ]; then
-	  sed -i "/## EndAdd/i add_module(${mod_name})" ${src_dir}/${fw_name}/CMakeLists.txt
+	  sed -i "## EndAdd/i add_module(${mod_name})" ${src_dir}/${fw_name}/CMakeLists.txt
 	else
-	  echo "add_module(${mod_name})" >> ${src_dir}/${fw_name}/CMakeLists.txt
+	  echo ""
+	  echo "\nadd_module(${mod_name})" >> ${src_dir}/${fw_name}/CMakeLists.txt
 	fi;
 
 	mkdir ${module_path}
 	mkdir ${module_path}/src
 	mkdir ${module_path}/local_include
-	echo "# Module created" >> ${module_path}/CMakeLists.txt
-	echo "# Dated: $(date)" >> ${module_path}/CMakeLists.txt
-	echo "#-------------------------------" >> ${module_path}/CMakeLists.txt
-	echo "/**" >> ${module_path}/src/${mod_name}.cpp
+	echo "\n# Module created" >> ${module_path}/CMakeLists.txt
+	echo "\n# Dated: $(date)" >> ${module_path}/CMakeLists.txt
+	echo "\n#-------------------------------" >> ${module_path}/CMakeLists.txt
+	echo "\n/**" >> ${module_path}/src/${mod_name}.cpp
 	echo " * ${mod_name}.cpp" >> ${module_path}/src/${mod_name}.cpp
 	echo " * Created on: $(date)" >> ${module_path}/src/${mod_name}.cpp
 	echo " * @author: obhi" >> ${module_path}/src/${mod_name}.cpp
-	echo " */" >> ${module_path}/src/${mod_name}.cpp
+	echo " */\n" >> ${module_path}/src/${mod_name}.cpp
 fi
 # . gen-eclipse-project-files.sh
 

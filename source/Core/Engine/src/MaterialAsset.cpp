@@ -64,8 +64,8 @@ nextar::StreamRequest* MaterialAsset::CreateStreamRequestImpl(bool load) {
 	return NEX_NEW(MaterialAsset::MaterialLoadRequest(this));
 }
 
-void MaterialAsset::SetParamBufferSize(size_t size) {
-	materialParamData.Prepare(nullptr, size);
+void MaterialAsset::PrepareParamBuffer(const ParamEntryTableItem& table) {
+	materialParamData.Prepare(table);
 }
 
 void MaterialAsset::SetParamData(const void* data, size_t offset,
@@ -114,9 +114,9 @@ void MaterialAsset::MaterialLoadRequest::SetShader(const ShaderAsset::ID& id,
 		SetShader(shader);
 }
 
-void MaterialAsset::MaterialLoadRequest::SetParamBufferSize(uint32 paramBufferSize) {
+void MaterialAsset::MaterialLoadRequest::PrepareParamBuffer(const ParamEntryTableItem& table) {
 	MaterialAsset* material = static_cast<MaterialAsset*>(GetStreamedObject());
-	material->SetParamBufferSize(paramBufferSize);
+	material->PrepareParamBuffer(table);
 }
 
 void MaterialAsset::MaterialLoadRequest::SetParamValue(uint32 offset,

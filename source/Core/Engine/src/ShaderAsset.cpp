@@ -155,7 +155,7 @@ void ShaderAsset::_BuildParameterTable(StreamPassList& spl) {
 	for (auto i = std::pair<StreamPassList::iterator,PassList::iterator>(spl.begin(), passes.begin()); i.first != spl.end();
 			++i.first, ++i.second) {
 		(*i.second).RequestUpdate(Pass::MSG_PASS_UPDATE_PARAMBUFFER_OFFSET,
-				reinterpret_cast<ContextObject::ContextParamPtr>(&(*i.first).compileParams));
+								  reinterpret_cast<ContextObject::ContextParamPtr>(&(*i.first).offsets));
 	}
 }
 

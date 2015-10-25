@@ -71,7 +71,7 @@ void ShaderListener::FlagsCmd_Execute(int parentType, void* parentParam,
 		String value;
 		StringUtils::TokenIterator prev = ConstMultiStringHelper::It(wl);
 		uint32 flags = 0;
-		while (	(prev = StringUtils::NextWord(wl, value, prev)) != String::npos ) {
+		while (prev.HasNext(value)) {
 			flags |= Helper::GetShaderFlag(value);
 		}
 

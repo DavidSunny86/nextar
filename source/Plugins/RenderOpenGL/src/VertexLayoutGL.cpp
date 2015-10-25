@@ -131,7 +131,7 @@ void VertexLayoutStaticGL::Enable(VertexBufferBinding& binding,
 		cachedIndex = (cachedIndex + 1) % numPairs, count++);
 
 	if (count == numPairs) {
-		GLuint layout = CreateLayout(rc, binding, pass->GetInputSemantics());
+		GLuint layout = CreateLayout(rc, binding, pass->GetInputLayoutID());
 		cachedIndex = numPairs;
 		passVertexArrayPairs.push_back(PassLayoutVertexArrayPair(id, layout));
 		rc->DisableVertexArrayObject();
@@ -146,11 +146,12 @@ void VertexLayoutStaticGL::Disable(RenderContext_Base_GL* rc) {
 
 GLuint VertexLayoutStaticGL::CreateLayout(RenderContext_Base_GL* gl,
 		VertexBufferBinding& binding,
-		const VertexSemanticListGL& semantics) {
+		VertexSemanticID semanticID) {
 
 	uint16 outElements[RenderConstants::MAX_VERTEX_ELEMENT];
+	VertexSemanticDataGL data = gl->GetInputSemanticsDataFromID(semanticID);
 	uint32 numMapped = VertexSemantic::MapSignatureToSemantics(
-		&semantics[0].semantic, (uint32)sizeof(VertexSemanticGL), (uint32)semantics.size(),
+		&data.rawArray[0].semantic, (uint32)sizeof(VertexSemanticGL), (uint32)data.count,
 		&attributes[0].element, (uint32)sizeof(VertexAttribGL), (uint32)attributes.size(),
 			outElements);
 
@@ -161,7 +162,7 @@ GLuint VertexLayoutStaticGL::CreateLayout(RenderContext_Base_GL* gl,
 		gl->EnableVertexArrayObject(vao);
 
 		for (uint32 j = 0; j < numMapped; ++j) {
-			NEX_ASSERT(semantics[j].index < (uint16 )-1);
+			NEX_ASSERT(data.rawArray[j].index < (uint16)-1);
 			VertexAttribGL& vegl = attributes[outElements[j]];
 			if (vegl.element.streamIndex != stream) {
 				stream = vegl.element.streamIndex;
@@ -170,7 +171,7 @@ GLuint VertexLayoutStaticGL::CreateLayout(RenderContext_Base_GL* gl,
 				stride = bufferView->GetStride();
 				gl->SetVertexBuffer(bufferView);
 			}
-			gl->EnableVertexAttribute(semantics[j].index, stride, vegl);
+			gl->EnableVertexAttribute(data.rawArray[j].index, stride, vegl);
 		}
 		return vao;
 	}
@@ -221,7 +222,7 @@ void VertexLayoutFlexibleGL::Enable(VertexBufferBinding& binding,
 		cachedIndex = (cachedIndex + 1) % numPairs, count++);
 
 	if (count == numPairs) {
-		GLuint layout = CreateLayout(rc, pass->GetInputSemantics());
+		GLuint layout = CreateLayout(rc, pass->GetInputLayoutID());
 		cachedIndex = numPairs;
 		passVertexArrayPairs.push_back(PassLayoutVertexArrayPair(id, layout));
 		rc->DisableVertexArrayObject();
@@ -246,10 +247,11 @@ void VertexLayoutFlexibleGL::Disable(RenderContext_Base_GL* rc) {
 }
 
 GLuint VertexLayoutFlexibleGL::CreateLayout(RenderContext_Base_GL* gl,
-		const VertexSemanticListGL& semantics) {
+											VertexSemanticID semanticID) {
 	uint16 outElements[RenderConstants::MAX_VERTEX_ELEMENT];
+	VertexSemanticDataGL data = gl->GetInputSemanticsDataFromID(semanticID);
 	uint32 numMapped = VertexSemantic::MapSignatureToSemantics(
-		&semantics[0].semantic, (uint32)sizeof(VertexSemanticGL), (uint32)semantics.size(),
+		&data.rawArray[0].semantic, (uint32)sizeof(VertexSemanticGL), (uint32)data.count,
 		&attributes[0].element, (uint32)sizeof(VertexAttribGL), (uint32)attributes.size(),
 				outElements);
 	if (numMapped) {
@@ -258,10 +260,10 @@ GLuint VertexLayoutFlexibleGL::CreateLayout(RenderContext_Base_GL* gl,
 		gl->EnableVertexArrayObject(vao);
 
 		for (uint32 j = 0; j < numMapped; ++j) {
-			NEX_ASSERT(semantics[j].index < (uint16 )-1);
+			NEX_ASSERT(data.rawArray[j].index < (uint16)-1);
 			VertexAttribGL& vegl = attributes[outElements[j]];
-			gl->VertexAttribBinding(semantics[j].index, vegl.element.streamIndex);
-			gl->EnableVertexAttribute(semantics[j].index, vegl);
+			gl->VertexAttribBinding(data.rawArray[j].index, vegl.element.streamIndex);
+			gl->EnableVertexAttribute(data.rawArray[j].index, vegl);
 		}
 		return vao;
 	}
@@ -292,27 +294,27 @@ void VertexLayoutDynamicGL::Enable(VertexBufferBinding& binding,
 				cached = selected;
 				break;
 			}
-			current = current + 2 + selected->numAttributes * 2;
+			current = current + MappedVertexAttribList::HEADER_SIZE + selected->numAttributes * 2;
 		}
 		if (i == numberOfStoredPassMapping) {
 			uint16 outElements[RenderConstants::MAX_VERTEX_ELEMENT];
-			const VertexSemanticListGL& semantics = pass->GetInputSemantics();
+			VertexSemanticDataGL data = rc->GetInputSemanticsDataFromID(pass->GetInputLayoutID());
 			uint32 numMapped = VertexSemantic::MapSignatureToSemantics(
-				&semantics[0].semantic, (uint32)sizeof(VertexSemanticGL),
-					(uint32)semantics.size(), &attributes[0].element,
+				&data.rawArray[0].semantic, (uint32)sizeof(VertexSemanticGL),
+					(uint32)data.count, &attributes[0].element,
 					(uint32)sizeof(VertexAttribGL), (uint32)attributes.size(), outElements);
 			if (numMapped) {
 				numberOfStoredPassMapping++;
-				indices.resize(indices.size() + 2 + numMapped * 2);
-				cached =
-						reinterpret_cast<MappedVertexAttribList*>((&indices.back())
-								- 2 - numMapped * 2);
+				size_t offset = indices.size();
+				indices.resize(offset + MappedVertexAttribList::HEADER_SIZE + numMapped * 2);
+				cached = reinterpret_cast<MappedVertexAttribList*>(indices.data() + offset);
+				cached->layout = rc->CreateVAO();
 				cached->numAttributes = numMapped;
 				cached->passId = id;
 				for (uint32 j = 0; j < numMapped; ++j) {
-					NEX_ASSERT(semantics[j].index < (uint16 )-1);
+					NEX_ASSERT(data.rawArray[j].index < (uint16)-1);
 					cached->attribs[j].attribIndex = outElements[j];
-					cached->attribs[j].index = (uint16) semantics[j].index;
+					cached->attribs[j].index = (uint16)data.rawArray[j].index;
 				}
 			} else {
 				Error("Unable to map vertex layout to semantics.");
@@ -328,6 +330,7 @@ void VertexLayoutDynamicGL::Enable(VertexBufferBinding& binding,
 	uint16 stream = -1;
 	uint32 stride = 0;
 	numSyncRequired = 0;
+	rc->EnableVertexArrayObject(cached->layout);
 	for (uint16 s = 0; s < numAttributes; ++s) {
 		MappedVertexAttrib& mva = cached->attribs[s];
 		VertexAttribGL& vegl = attributes[mva.attribIndex];
@@ -354,6 +357,7 @@ void VertexLayoutDynamicGL::Disable(RenderContext_Base_GL* rc) {
 	for (uint32 i  = 0; i < numSyncRequired; ++i) {
 		static_cast<GpuTransientBufferViewGL*>(transients[i])->Sync(rc);
 	}
+	rc->DisableVertexArrayObject();
 }
 
 } /* namespace RenderOpenGL */

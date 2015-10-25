@@ -17,7 +17,7 @@ shader Deferred {
 			}
 			
 			unit linear_sampler diffuseMap ui:Maps.DiffuseMap;
-			unit linear_sampler specularMap ui:Maps.SpecularMap;
+			unit linear_sampler specularAndGlossMap ui:Maps.SpecularAndGlossMap;
 			unit linear_sampler normalMap ui:Maps.NormalMap;
 		}
 
@@ -43,7 +43,7 @@ shader Deferred {
 			option HAS_SPECULAR_AND_GLOSS_MAP ui:Options.HasSpecularAndGloss "desc:Apply specular and gloss map.";
 			define HAS_NORMAL;
 			vertex_program PreConfig Common PostConfig Deferred;
-			fragment_program Deferred;
+			fragment_program PreConfig Deferred;
 		}
 	}
 }

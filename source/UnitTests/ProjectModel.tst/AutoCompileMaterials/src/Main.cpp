@@ -48,19 +48,18 @@ public:
 		if (arch) {
 			arch->Scan(this, "Scripts/Materials/*.mtl");
 		}
-		this->QuitApplication();
+		ApplicationContext::Instance().QuitApplication();
 	}
 
 	virtual void _SetupScene(SceneAssetPtr& scene) {
-		UTApplication::_SetupScene(scene);
-		Execute();
-		ApplicationContext::Instance().QuitApplication();
+		UTApplication::_SetupScene(scene);		
 	}
 };
 
 int NextarMain(int argc, char* argv[]) {
 	UTApplicationAutoCompileMtl application;
 	application.InitializeContext(argc, argv);
+	application.Execute();
 	application.Run();
 	application.DestroyContext();
 	return 0;

@@ -42,27 +42,28 @@ ShaderParamAgent* ShaderParamAgent::GetAgent(ParamDataType type) {
 void ShaderParamAgent::SetParamValue(size_t offset,
 		MaterialAsset::MaterialLoadRequest* request, const ParamEntry& pe,
 		const String& value) {
-	size_t start = 0;
-	bool stop = false;
-	size_t stride = pe.maxSize / pe.arrayCount;
-	for (uint32 i = 0; i < pe.arrayCount && !stop; i++) {
-		size_t n = value.find_first_of(',', start);
-		if (n == String::npos) {
-			n = value.length();
-			stop = true;
-		}
-		String v = value.substr(start, n-start);
-		if (v.length()) {
-			StringUtils::Trim(v);
-			SetParamValueImpl(offset, request, pe, v);
+	if (pe.arrayCount > 1) {
+		// it must be a list
+		size_t stride = pe.maxSize / pe.arrayCount;
+		ConstMultiStringHelper::Iterator it = ConstMultiStringHelper::It(value);
+		String subValue;
+		for (uint32 i = 0; i < pe.arrayCount && it.HasNext(subValue); i++) {
+			StringUtils::Trim(subValue);
+			SetParamValueImpl(offset, request, pe, subValue);
 			offset += stride;
 		}
+	} else {
+		SetParamValueImpl(offset, request, pe, value);
 	}
 }
 
 void ShaderParamScalar::SetParamValueImpl(size_t offset,
 		MaterialAsset::MaterialLoadRequest* request, const ParamEntry& pe,
-		const String& value) {
+		const String& i_value) {
+	ConstMultiStringHelper h(i_value);
+	String value;
+	h.Get(value, 0);
+	StringUtils::Trim(value);
 	switch(pe.type) {
 	case ParamDataType::PDT_BOOL:
 	{
@@ -95,7 +96,12 @@ void ShaderParamScalar::SetParamValueImpl(size_t offset,
 
 void ShaderParamVector::SetParamValueImpl(size_t offset,
 		MaterialAsset::MaterialLoadRequest* request, const ParamEntry& pe,
-		const String& value) {
+		const String& i_value) {
+	ConstMultiStringHelper h(i_value);
+	String value;
+	h.Get(value, 0);
+	StringUtils::Trim(value);
+
 	switch(pe.type) {
 	case ParamDataType::PDT_VEC2:
 	{
@@ -140,7 +146,12 @@ void ShaderParamVector::SetParamValueImpl(size_t offset,
 
 void ShaderParamMatrix::SetParamValueImpl(size_t offset,
 		MaterialAsset::MaterialLoadRequest* request, const ParamEntry& pe,
-		const String& value) {
+		const String& i_value) {
+	ConstMultiStringHelper h(i_value);
+	String value;
+	h.Get(value, 0);
+	StringUtils::Trim(value);
+
 	switch(pe.type) {
 	case ParamDataType::PDT_MAT4x4:
 	{

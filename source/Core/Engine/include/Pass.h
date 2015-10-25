@@ -55,6 +55,10 @@ public:
 
 	struct ParamBufferOffsetParams {
 		uint32 offset[(size_t) ParameterContext::CTX_COUNT];
+		ParamBufferOffsetParams() {
+			for (uint32 i = 0; i < ParameterContext::CTX_COUNT; ++i)
+				offset[i] = 0;
+		}
 	};
 
 	typedef map<String, AutoParamName>::type VarToAutoParamMap;

@@ -16,7 +16,7 @@ namespace ShaderCompiler {
 ShaderScript::ShaderScript(ShaderTemplate::LoadStreamRequest* s) :
 		shader(s) {
 
-	String effectPath = s->GetAssetLocator().GetRelativePath();
+	String effectPath = s->GetAssetLocator().GetComputedFilePath();
 	String shaderPath = effectPath + "../Shaders/";
 	String cbufferPath = effectPath + "../ConstBuffers/";
 	StringUtils::PushBackWord(programIncludePath, shaderPath);
@@ -33,7 +33,7 @@ void ShaderScript::SetRegionsAsSource(Pass::ProgramStage type,
 	StringUtils::TokenIterator regIt = ConstMultiStringHelper::It(regionNames);
 	String name;
 	String value[(uint32)RenderManager::ShaderLanguage::SPP_COUNT];
-	while ((regIt = StringUtils::NextWord(regionNames, name, regIt))) {
+	while (regIt.HasNext(name)) {
 		auto it = regions.equal_range(name);
 		for(; it.first != it.second; ++it.first) {
 			value[(*it.first).second.first] += (*it.first).second.second;
@@ -127,7 +127,7 @@ InputStreamPtr ShaderScript::FetchProgram(const String& name,
 		return retFile;
 	}
 
-	while((it = StringUtils::NextWord(programIncludePath, store, it))) {
+	while(it.HasNext(store)) {
 		
 		switch (lang) {
 		case RenderManager::SPP_GLSL:

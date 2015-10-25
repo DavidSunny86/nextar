@@ -149,7 +149,7 @@ void MaterialTemplate::MaterialFromTemplate::Load(InputStreamPtr& stream, AssetL
 	for(auto it = paramContext.beginIt; it != paramContext.endIt; ++it) {
 		NEX_ASSERT( (*it).autoName == AutoParamName::AUTO_CUSTOM_CONSTANT );
 	}
-	request->SetParamBufferSize(size);
+	request->PrepareParamBuffer(paramContext);
 	size_t offset = 0;
 	for(auto it = paramContext.beginIt; it != paramContext.endIt; ++it) {
 		auto pv = paramValues.find((*it).name);

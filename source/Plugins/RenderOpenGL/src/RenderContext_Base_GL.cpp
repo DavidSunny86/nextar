@@ -220,7 +220,7 @@ void RenderContext_Base_GL::Clear(const ClearBufferInfo& info) {
 					GlClearBufferfv(GL_COLOR, i, info.clearColor[i].AsFloatArray());
 			}
 		} else {
-			GlClearBufferfv(GL_BACK, 0, info.clearColor[0].AsFloatArray());
+			GlClearBufferfv(GL_COLOR, 0, info.clearColor[0].AsFloatArray());
 		}
 	}
 	if (Test(info.clearFlags & ClearFlags::CLEAR_DEPTH) &&
@@ -1967,6 +1967,33 @@ void RenderContext_Base_GL::ReportError(GLenum source,
 	String msg((const char*)message, length);
 	stream << msg;
 	Error(stream.str());
+}
+
+VertexSemanticDataGL RenderContext_Base_GL::GetInputSemanticsDataFromID(VertexSemanticID id) {
+	VertexSemanticDataGL data;
+	VertexSemanticListElement& vsle = registeredSignatures[id.indexIntoRegisteredList];
+	data.rawArray = &vertexSemanticBlob[vsle.indexIntoBlobList];
+	data.count = vsle.count;
+	return data;
+}
+
+VertexSemanticID RenderContext_Base_GL::MapLayout(
+	const VertexSemanticGL* semantics, uint32 numSemantics) {
+	// @urgent Make thread safe
+	uint16 index = 0;
+	for (auto& it : registeredSignatures) {
+		if (it.count == numSemantics) {
+			VertexSemanticGL* l = &vertexSemanticBlob[it.indexIntoBlobList];
+			if (std::equal(l, l + it.count, semantics))
+				return VertexSemanticID(index);
+		}
+		index++;
+	}
+	
+	registeredSignatures.push_back({ (uint16)vertexSemanticBlob.size(), (uint16)numSemantics });
+	vertexSemanticBlob.insert(vertexSemanticBlob.end(), semantics, semantics + numSemantics);
+
+	return VertexSemanticID(index);
 }
 
 }

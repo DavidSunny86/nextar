@@ -107,20 +107,13 @@ public:
 
 	PassViewGL();
 	virtual ~PassViewGL();
-	/* Could be async accessed when using multi gpu setup, so have to make sure its thread safe */
-	static std::pair<uint16, VertexSemanticListGL*> MapLayout(
-			const VertexSemanticGL* semantics, uint32 numSemantics);
-
-	inline const VertexSemanticListGL& GetInputSemantics() const {
-		return *inputSemantics;
-	}
-
+		
 	inline GLuint GetProgram() {
 		return iGlProgram;
 	}
 
-	inline uint16 GetInputLayoutID() const {
-		return inputLayoutId;
+	inline uint32 GetInputLayoutID() const {
+		return inputLayoutId.indexIntoRegisteredList;
 	}
 
 	inline const RasterStateGL& GetRasterState() const {
@@ -147,19 +140,16 @@ public:
 
 protected:
 
+	static VertexSemanticDataGL GetInputSemanticsDataFromID(RenderContext_Base_GL* gl, VertexSemanticID id);
+
 	GLuint iGlProgram;
 
-	uint16 inputLayoutId;
-	VertexSemanticListGL* inputSemantics;
-
+	VertexSemanticID inputLayoutId;
+	
 	DepthStencilStateGL depthStencilState;
 	RasterStateGL rasterState;
 	BlendStateGL blendState;
-
-	typedef vector<VertexSemanticListGL>::type VertexSemanticListList;
-
-	// todo make thread safe
-	static VertexSemanticListList registeredSignatures;
+			
 
 	GpuProgramGL programs[Pass::STAGE_COUNT];
 	static GLenum stagesMap[Pass::STAGE_COUNT];

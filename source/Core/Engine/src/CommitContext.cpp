@@ -50,6 +50,8 @@ void CommitContext::_Reset() {
 	depthMap = nullptr;
 	frameTime = 0.0f;
 	frameTimer = nullptr;
+	for (auto &b : paramBuffers)
+		b = nullptr;
 }
 
 } /* namespace nextar */

@@ -21,7 +21,7 @@ StreamData::~StreamData() {
 }
 
 VertexBufferBinding::VertexBufferBinding() :
-		bindingNumber(0), transientBufferCount(0) {
+bindingNumber(0), transientBufferCount(0), listOfBuffers(fixedBuffer), numBuffers(0) {
 }
 
 }

@@ -8,7 +8,7 @@ namespace nextar {
 class _NexNeoScriptAPI ASTRegion : public ASTNode {
 public:
 	ASTRegion(const String& name) {_value = name;}
-	~ASTRegion();
+	~ASTRegion() {}
 
 	const String& GetName() const {return _value;}
 	virtual const ASTCommandList& GetCommands() const = 0;

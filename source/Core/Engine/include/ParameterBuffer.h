@@ -33,10 +33,12 @@ public:
 	void Prepare(BufferPtr&& data, size_t size);
 
 	const TextureUnit* AsTexture(uint32 offset) const {
+		NEX_ASSERT(offset < size);
 		return reinterpret_cast<const TextureUnit*>(data.get() + offset);
 	}
 
 	const void* AsRawData(uint32 offset) const {
+		NEX_ASSERT(offset < size);
 		return static_cast<const void*>(data.get() + offset);
 	}
 

@@ -1,4 +1,6 @@
-﻿#include <BaseHeaders.h>
+﻿
+#include <BaseHeaders.h>
+#include <UTDefs.h>
 #include <ctime>
 
 NEX_IMPLEMENT_PLATFORM_APP()
@@ -84,32 +86,32 @@ void TestVec3A() {
 
 	float dotProd = Vec3ADot(allOne, allOne);
 
-	NEX_ASSERT(Equals(dotProd, EstimatedDot));
+	NEX_UT_ASSERT(Equals(dotProd, EstimatedDot));
 
 	allOne = Vec3ANormalize(allOne);
 	dotProd = Vec3ADot(allOne, allOne);
 
-	NEX_ASSERT(Equals(dotProd, 1));
+	NEX_UT_ASSERT(Equals(dotProd, 1));
 
 	float length = Vec3ASqLength(allOne);
-	NEX_ASSERT(Equals(length, 1));
+	NEX_UT_ASSERT(Equals(length, 1));
 
 	length = Vec3ALength(allOne);
-	NEX_ASSERT(Equals(length, 1));
+	NEX_UT_ASSERT(Equals(length, 1));
 
 
 	allMOne = Vec3ANormalize(allMOne);
-	NEX_ASSERT(Equals(allOne, Vec3AAbs(allMOne)));
+	NEX_UT_ASSERT(Equals(allOne, Vec3AAbs(allMOne)));
 
-	NEX_ASSERT(Equals(Vec3AAdd(allOne, allMOne), Vec3AZero()));
+	NEX_UT_ASSERT(Equals(Vec3AAdd(allOne, allMOne), Vec3AZero()));
 
 	length = Vec3ALength(Vec3ACross(allOne, allMOne));
-	NEX_ASSERT(Equals(length, 0));
+	NEX_UT_ASSERT(Equals(length, 0));
 
 	Vector3A tmp = Vec3AMul(allOne, allMOne);
 	Vector3A res1 = Vec3AAdd(tmp, allOne);
 	Vector3A res2 = Vec3AMulAdd(allOne, allMOne, allOne);
-	NEX_ASSERT(Equals(res1, res2));
+	NEX_UT_ASSERT(Equals(res1, res2));
 
 	// @todo Write further tests
 }
@@ -126,28 +128,28 @@ void TestVec4A() {
 
 	float dotProd = Vec4ADot(allOne, allOne);
 
-	NEX_ASSERT(Equals(dotProd, EstimatedDot));
+	NEX_UT_ASSERT(Equals(dotProd, EstimatedDot));
 
 	allOne = Vec4ANormalize(allOne);
 	dotProd = Vec4ADot(allOne, allOne);
 
-	NEX_ASSERT(Equals(dotProd, 1));
+	NEX_UT_ASSERT(Equals(dotProd, 1));
 
 	float length = Vec4ASqLength(allOne);
-	NEX_ASSERT(Equals(length, 1));
+	NEX_UT_ASSERT(Equals(length, 1));
 
 	length = Vec4ALength(allOne);
-	NEX_ASSERT(Equals(length, 1));
+	NEX_UT_ASSERT(Equals(length, 1));
 
 	allMOne = Vec4ANormalize(allMOne);
-	NEX_ASSERT(Equals(allOne, Vec4AAbs(allMOne)));
+	NEX_UT_ASSERT(Equals(allOne, Vec4AAbs(allMOne)));
 
-	NEX_ASSERT(Equals(Vec4AAdd(allOne, allMOne), Vec4AZero()));
+	NEX_UT_ASSERT(Equals(Vec4AAdd(allOne, allMOne), Vec4AZero()));
 
 	Vector4A tmp = Vec4AMul(allOne, allMOne);
 	Vector4A res1 = Vec4AAdd(tmp, allOne);
 	Vector4A res2 = Vec4AMulAdd(allOne, allMOne, allOne);
-	NEX_ASSERT(Equals(res1, res2));
+	NEX_UT_ASSERT(Equals(res1, res2));
 
 	// @todo Write further tests
 }
@@ -164,29 +166,29 @@ void TestQuat() {
 	DirectX::XMVECTOR Axis2 = { 1, 0, 0 };
 	Quaternion q1 = QuatFromAxisAng(Vec3ASet(0, 1, 0), ang);
 	DirectX::XMVECTOR q2 = DirectX::XMQuaternionRotationAxis(Axis, ang);
-	NEX_ASSERT(Equals(q1, ToVector4A(q2)));
+	NEX_UT_ASSERT(Equals(q1, ToVector4A(q2)));
 
 	ang = RandomGen::RangeFloat(-Math::PI, Math::PI);
 
 	Quaternion qm1 = QuatFromAxisAng(Vec3ASet(0, 1, 0), ang);
 	DirectX::XMVECTOR vqm1 = DirectX::XMQuaternionRotationAxis(Axis, ang);
 
-	NEX_ASSERT(Equals(qm1, ToVector4A(vqm1)));
+	NEX_UT_ASSERT(Equals(qm1, ToVector4A(vqm1)));
 
 	ang = RandomGen::RangeFloat(-Math::PI, Math::PI);
 
 	Quaternion qm2 = QuatFromAxisAng(Vec3ASet(1, 0, 0), ang);
 	DirectX::XMVECTOR vqm2 = DirectX::XMQuaternionRotationAxis(Axis2, ang);
 
-	NEX_ASSERT(Equals(qm2, ToVector4A(vqm2)));
+	NEX_UT_ASSERT(Equals(qm2, ToVector4A(vqm2)));
 
 	Quaternion r1 = QuatMul(qm1, qm2);
 	DirectX::XMVECTOR r2 = DirectX::XMQuaternionMultiply(vqm1, vqm2);
-	NEX_ASSERT(Equals(r1, ToVector4A(r2)));
+	NEX_UT_ASSERT(Equals(r1, ToVector4A(r2)));
 
 	Quaternion n1 = QuatNormalize(r1);
 	DirectX::XMVECTOR n2 = DirectX::XMQuaternionNormalize(r2);
-	NEX_ASSERT(Equals(n1, ToVector4A(n2)));
+	NEX_UT_ASSERT(Equals(n1, ToVector4A(n2)));
 
 	// test quat mul accumulation
 	ang = RandomGen::RangeFloat(-Math::PI, Math::PI);
@@ -202,14 +204,14 @@ void TestQuat() {
 		vaccq = DirectX::XMQuaternionMultiply(vqmc, vaccq);
 	}
 
-	NEX_ASSERT(Equals(accq, ToVector4A(vaccq)));
+	NEX_UT_ASSERT(Equals(accq, ToVector4A(vaccq)));
 
 	for (int i = 0; i < 20; ++i) {
 		accq = QuatMul(accq, qmc);
 		vaccq = DirectX::XMQuaternionMultiply(vaccq, vqmc);
 	}
 
-	NEX_ASSERT(Equals(accq, ToVector4A(vaccq)));
+	NEX_UT_ASSERT(Equals(accq, ToVector4A(vaccq)));
 #endif
 }
 
@@ -232,7 +234,7 @@ void TestPerspectiveMatrix() {
 #else
 	m2 = m1;
 #endif
-	NEX_ASSERT(Equals(m1, m2));
+	NEX_UT_ASSERT(Equals(m1, m2));
 }
 
 void TestLookAtMatrix() {
@@ -249,9 +251,9 @@ void TestLookAtMatrix() {
 	DirectX::XMVECTOR u = { 0, 1, 0 };
 	DirectX::XMMATRIX m = DirectX::XMMatrixLookAtLH(e, t, u);
 	Matrix4x4 v3 = ToMatrix4x4(m);
-	NEX_ASSERT(Equals(v3, v2));
+	NEX_UT_ASSERT(Equals(v3, v2));
 #endif
-	NEX_ASSERT(Equals(v1, v2));
+	NEX_UT_ASSERT(Equals(v1, v2));
 }
 
 void TestMatrix4x4Mul() {
@@ -276,7 +278,7 @@ void TestMatrix4x4Mul() {
 	cm = ToMatrix4x4(xm);
 #else
 #endif
-	NEX_ASSERT(Equals(m, cm));
+	NEX_UT_ASSERT(Equals(m, cm));
 }
 
 void TestMatrix4x4AABoxTransform() {
@@ -306,7 +308,7 @@ void TestMatrix4x4AABoxTransform() {
 		box2 = AABoxUnion(box2, tpoint);
 	}
 
-	NEX_ASSERT(Equals3(box1.minPoint, box2.minPoint) && Equals3(box1.maxPoint, box2.maxPoint));
+	NEX_UT_ASSERT(Equals3(box1.minPoint, box2.minPoint) && Equals3(box1.maxPoint, box2.maxPoint));
 	// use directx method
 #ifdef NEX_WINDOWS
 	DirectX::XMVECTOR Axis = { 1, 0, 0 };
@@ -315,7 +317,7 @@ void TestMatrix4x4AABoxTransform() {
 	DirectX::XMVECTOR Trans = { tx, ty, tz };
 	DirectX::XMVECTOR q2 = DirectX::XMQuaternionRotationAxis(Axis, ang);
 	DirectX::XMMATRIX dxtform = DirectX::XMMatrixAffineTransformation(Scaling, RotOrig, q2, Trans);
-	NEX_ASSERT(Equals(tform, ToMatrix4x4(dxtform)));
+	NEX_UT_ASSERT(Equals(tform, ToMatrix4x4(dxtform)));
 	Vector3A c = AABoxGetCenter(box);
 	Vector3A e = AABoxGetSize(box);
 	DirectX::XMFLOAT3 boxCenter = { Vec3AGetX(c), Vec3AGetY(c), Vec3AGetZ(c) };
@@ -325,7 +327,7 @@ void TestMatrix4x4AABoxTransform() {
 	box3.Transform(box4, scale, q2, Trans);
 	Vector3A box4Max = Vec3ASet(box4.Center.x + box4.Extents.x, box4.Center.y + box4.Extents.y, box4.Center.z + box4.Extents.z);
 	Vector3A box4Min = Vec3ASet(box4.Center.x - box4.Extents.x, box4.Center.y - box4.Extents.y, box4.Center.z - box4.Extents.z);
-	NEX_ASSERT(Equals3(box1.minPoint, box4Min) && Equals3(box1.maxPoint, box4Max));
+	NEX_UT_ASSERT(Equals3(box1.minPoint, box4Min) && Equals3(box1.maxPoint, box4Max));
 #endif
 
 }

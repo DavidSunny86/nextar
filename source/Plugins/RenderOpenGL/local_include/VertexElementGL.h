@@ -29,8 +29,12 @@ struct MappedVertexAttrib {
 };
 
 struct MappedVertexAttribList {
+	enum {
+		HEADER_SIZE = (sizeof(uint16) * 2 + sizeof(GLuint)) / 2
+	};
 	uint16 passId;
 	uint16 numAttributes;
+	GLuint layout;
 	MappedVertexAttrib attribs[1];
 };
 
@@ -48,10 +52,27 @@ struct VertexSemanticGL {
 /** Stored in passes, streams can only be bound
  * to matching vertex signatures.
  */
+struct VertexSemanticDataGL {
+	uint16 count;
+	const VertexSemanticGL* rawArray;
+};
+
+struct VertexSemanticID {
+	uint32 indexIntoRegisteredList;
+	VertexSemanticID() : indexIntoRegisteredList(-1) {}
+	VertexSemanticID(uint32 i) : indexIntoRegisteredList(i) {}
+};
+
+struct VertexSemanticListElement {
+	uint16 indexIntoBlobList;
+	uint16 count;
+};
+
+typedef vector<VertexSemanticListElement>::type VertexSemanticListElementList;
 typedef vector<VertexSemanticGL>::type VertexSemanticListGL;
-typedef std::vector<VertexAttribGL> VertexAttribListGL;
+typedef vector<VertexAttribGL>::type VertexAttribListGL;
 typedef std::pair<uint32, GLuint> PassLayoutVertexArrayPair;
-typedef std::vector<PassLayoutVertexArrayPair> PassLayoutVertexArrayPairList;
+typedef vector<PassLayoutVertexArrayPair>::type PassLayoutVertexArrayPairList;
 }
 #endif	/* GLVERTEXELEMENT_H */
 

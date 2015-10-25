@@ -53,13 +53,9 @@ void WindowManager::UnregisterWindow(RenderWindow* winPtr) {
 }
 
 void WindowManager::Quit() {
-	if (processing)
-		return;
-	processing = true;
-	for(auto& e : registeredWindows) {
-		e->Destroy();
-	}
-	processing = false;
+#if defined(NEX_WINDOWS)
+	PostQuitMessage(0);
+#endif
 	_ProcessRemovedItems();
 }
 

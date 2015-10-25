@@ -54,9 +54,9 @@ void OmniLightPropertiesApply(CommitContext& context, const ShaderParameter* par
 	params[0] = Vec4ASet(color.red, color.green, color.blue, color.alpha);
 	params[1] = Vec4ASetW(context.light->GetTranslation(),
 		context.light->GetRadius());
-	const ConstantParameter* constParam =
-		static_cast<const ConstantParameter*>(param);
-	context.paramGroup->SetRawBuffer(context.renderContext, *constParam, params);
+	const ParameterGroup* constParam =
+		static_cast<const ParameterGroup*>(param);
+	context.paramGroup->WriteRawData(context.renderContext, &params, 0, constParam->size);
 }
 
 void AlbedoMapApply(CommitContext& context, const ShaderParameter* param) {

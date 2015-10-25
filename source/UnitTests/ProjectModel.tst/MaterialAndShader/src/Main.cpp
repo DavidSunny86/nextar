@@ -14,7 +14,7 @@ public:
 		ShaderTemplatePtr shader;
 
 		MaterialTemplate::ID id(NamedObject::AsyncStringID("Box"));
-		URL loadUrl("{EngineData}/Scripts/Materials/DefaultMaterials.mtl");
+		URL loadUrl("{EngineData}/Scripts/Materials/Box.mtl");
 		URL saveUrl("{EngineData}/Materials/Box.mtl");
 		URL saveShaderUrl("{EngineData}/Shaders/Deferred.nfx");
 		material = MaterialTemplate::Traits::Instance(id, loadUrl);

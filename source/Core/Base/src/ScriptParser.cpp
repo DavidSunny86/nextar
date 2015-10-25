@@ -194,6 +194,17 @@ void ScriptParser::BlockContext::ParseStatements(StatementListener* listener) {
 				// ParameterContext
 				scriptContext.lexer.SkipWhite();
 				switch (scriptContext.lexer.Current()) {
+				case '"': {
+					scriptContext.lexer.Forward();
+					const String& word = scriptContext.lexer.ReadWord("\"");
+					scriptContext.lexer.Forward();
+					if (word.length() > 0)
+						StringUtils::PushBackWord(statement.paramContext,
+						word);
+					else
+						break;
+				}
+				continue;
 				case ';':
 					terminated = true;
 					scriptContext.lexer.Forward();
@@ -284,8 +295,7 @@ void ScriptParser::StatementContext::ParseBlock(BlockListener* listener) {
 String ScriptParser::StatementContext::GetTaggedParamVal(const String& tag, 
 	StringUtils::TokenIterator it) {
 	String value;
-	while (it) {
-		it = StringUtils::NextWord(paramContext, value, it);
+	while (it.HasNext(value)) {
 		if (value.length()) {
 			StringPair tagVal = StringUtils::Split(value, ':');
 			if (tagVal.first == tag) {

@@ -47,8 +47,10 @@ struct ImageData {
 
 class ImageCodec {
 public:
+	/* Must return true, if this codec can load the file specified */
 	virtual bool TryLoad(InputStreamPtr& file, const ImageParams& params,
 			ImageCodecMetaInfo& metaInfo) = 0;
+
 	virtual ImageData Load(InputStreamPtr& file, const ImageParams& params,
 			ImageCodecMetaInfo& metaInfo) = 0;
 	virtual void Save(OutputStreamPtr& file, const ImageParams& params,

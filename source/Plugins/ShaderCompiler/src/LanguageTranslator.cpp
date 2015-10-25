@@ -84,21 +84,22 @@ void LanguageTranslator::ConstBufferListener::EnterStatement(ScriptParser::State
 		bool determineContext = true;
 		const StringUtils::WordList& words = ctx.GetParamList();
 		StringUtils::TokenIterator it = ConstMultiStringHelper::It(words);
-		it = StringUtils::NextWord(words, name, it);
-		StringPair semantic = StringUtils::Split(name, ':');
-		if (semantic.second != StringUtils::Null) {
-			AutoParamName apn = Helper::GetAutoParam(semantic.second);
-			if (apn != AutoParamName::AUTO_INVALID_PARAM) {
-				script->GetRequest()->AddSemanticBinding(semantic.first, apn);
-				determineContext = false;
-				name = std::move(semantic.first);
+		if (it.HasNext(name)) {
+			StringPair semantic = StringUtils::Split(name, ':');
+			if (semantic.second != StringUtils::Null) {
+				AutoParamName apn = Helper::GetAutoParam(semantic.second);
+				if (apn != AutoParamName::AUTO_INVALID_PARAM) {
+					script->GetRequest()->AddSemanticBinding(semantic.first, apn);
+					determineContext = false;
+					name = std::move(semantic.first);
+				}
 			}
 		}
 
 		if (determineContext) {
 			String context;
 			String contextStr = _SS(CMD_CONTEXT);
-			while ((it = StringUtils::NextWord(words, context, it)) != String::npos) {
+			while ((it.HasNext(context))) {
 				if (!context.compare(0, contextStr.length(), contextStr)) {
 					StringUtils::StringPair p = StringUtils::Split(context);
 					name += "__";

@@ -126,7 +126,7 @@ StreamNotification TextureAsset::NotifyAssetLoadedImpl(nextar::StreamRequest* re
 			reinterpret_cast<ContextObject::ContextParamPtr>(&textureParams->createParams));
 	bool completed = false;
 	/* should we stream again, in case it was not fully loaded ? */
-	if (currentMaxMipLevel < numMipMaps) {
+	if (currentMaxMipLevel < numMipMaps-1) {
 		if (!IsAutoStreamEnabled()) {
 			textureParams->flags |= StreamRequest::COMPLETED;
 			completed = true;

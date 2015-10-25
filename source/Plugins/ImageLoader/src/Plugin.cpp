@@ -26,12 +26,14 @@ void Plugin::LicenseRenewed() {
 	Image::Serializer::RegisterFactory("PNG", &PNGImageCodec::codec);
 	Image::Serializer::RegisterFactory("JPG", &JPEGImageCodec::codec);
 	Image::Serializer::RegisterFactory("DDS", &DDSImageCodec::codec);
+	Image::Serializer::RegisterFactory("TGA", &TGAImageCodec::codec);
 }
 
 bool Plugin::LicenseExpired() {
 	Image::Serializer::UnregisterFactory("PNG");
 	Image::Serializer::UnregisterFactory("JPG");
 	Image::Serializer::UnregisterFactory("DDS");
+	Image::Serializer::UnregisterFactory("TGA");
 	return true;
 }
 

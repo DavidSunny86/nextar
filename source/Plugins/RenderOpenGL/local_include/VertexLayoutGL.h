@@ -57,7 +57,7 @@ public:
 	virtual void Disable(RenderContext_Base_GL* rc);
 
 	void ClearAllVAO(RenderContext_Base_GL*);
-	GLuint CreateLayout(RenderContext_Base_GL*, VertexBufferBinding& binding, const VertexSemanticListGL& semantics);
+	GLuint CreateLayout(RenderContext_Base_GL*, VertexBufferBinding& binding, VertexSemanticID semantics);
 };
 
 // implement VAO + loose binding
@@ -81,7 +81,7 @@ public:
 	void ClearAllVAO(RenderContext_Base_GL*);
 
 protected:
-	GLuint CreateLayout(RenderContext_Base_GL*, const VertexSemanticListGL& semantics);
+	GLuint CreateLayout(RenderContext_Base_GL*, VertexSemanticID semantics);
 };
 
 class VertexLayoutDynamicGL: public VertexLayoutGL {
