@@ -5,11 +5,5 @@
 # : Plugin configuration file.
 ##---------------------------------------------------
 
-add_unit_test(FileSystem)
-add_unit_test(OutputSerializer)
-add_unit_test(Math)
-add_unit_test(MultiStringTest)
-
-
 # Added test ParserTests: Mon, Oct 26, 2015 12:13:11
 add_unit_test(ParserTests)
