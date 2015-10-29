@@ -21,6 +21,7 @@ public:
 		return *this;
 	}
 
+	void Accept(ASTVisitor*) const;
 };
 
 }

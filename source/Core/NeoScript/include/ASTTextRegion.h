@@ -16,6 +16,7 @@ public:
 	virtual void SetContents(String&& contents);
 
 	virtual Type GetType() const {return Type::AST_TEXT_REGION;}
+	virtual void Accept(ASTVisitor*) const;
 public:
 	String _contents;
 };

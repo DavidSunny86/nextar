@@ -26,7 +26,8 @@ public:
 		return _commands;
 	}
 
-	virtual Type GetType() const {return Type::AST_BLOCK;}
+	virtual Type GetType() const;
+	virtual void Accept(ASTVisitor*) const;
 private:
 	ASTCommandList _commands;
 };

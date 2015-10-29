@@ -24,11 +24,12 @@ public:
 		_value = v;
 	}
 
-	const String& GetValue() {
+	const String& GetValue() const {
 		return _value;
 	}
 
 	virtual Type GetType() const = 0;
+	virtual void Accept(ASTVisitor*) const = 0;
 
 protected:
 

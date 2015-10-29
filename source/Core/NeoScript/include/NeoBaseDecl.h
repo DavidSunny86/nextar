@@ -20,6 +20,7 @@ class ASTBlockRegion;
 class ASTDocument;
 class ASTParameter;
 class ASTParameterList;
+class ASTVisitor;
 
 NEX_DEFINE_REFPTR(ASTNode);
 NEX_DEFINE_REFPTR(ASTCommand);

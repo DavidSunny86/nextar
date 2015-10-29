@@ -18,6 +18,7 @@ public:
 	virtual void SetContents(String&& contents);
 
 	virtual Type GetType() const {return Type::AST_BLOCK_REGION;}
+	virtual void Accept(ASTVisitor*) const;
 private:
 	// this block is not a declared block
 	ASTBlock _main;

@@ -12,7 +12,12 @@ public:
 	ASTCommand(const String& name, ASTParameterList&& params) : ASTNode(name),
 	_parameters(std::move(params)) {}
 
+	const String& GetName() const {
+		return GetValue();
+	}
+	
 	virtual Type GetType() const {return Type::AST_COMMAND;}
+	virtual void Accept(ASTVisitor*) const;
 private:
 	ASTParameterList _parameters;
 };

@@ -19,6 +19,7 @@ public:
 	 * @returns a valid document or throws error EXCEPT_COMPILATION_FAILED
 	 **/
 	static ASTDocumentPtr AsyncParse(InputStreamPtr input, const String& sourceName, const String& options);
+	static void AsyncPrint(ASTDocumentPtr doc, OutputStreamPtr out);
 };
 
 }

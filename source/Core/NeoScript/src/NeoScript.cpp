@@ -8,6 +8,7 @@
 #include <NeoScript.h>
 #include <ParserContext.h>
 #include <NeoScriptHeaders.h>
+#include <ASTPrinter.h>
 
 namespace nextar {
 
@@ -27,6 +28,11 @@ ASTDocumentPtr NeoScript::AsyncParse(InputStreamPtr input, const String& sourceN
     NEX_THROW_GracefulError(EXCEPT_COMPILATION_FAILED);
   }
   return ret;
+}
+
+void NeoScript::AsyncPrint(ASTDocumentPtr doc, OutputStreamPtr out) {
+	ASTPrinter o(out);
+	doc->Accept(&o);
 }
 
 } /* namespace nextar */

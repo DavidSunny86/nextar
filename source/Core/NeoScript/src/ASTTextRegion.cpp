@@ -1,5 +1,6 @@
 #include <NeoBaseDecl.h>
 #include <ASTTextRegion.h>
+#include <NeoScriptHeaders.h>
 
 namespace nextar {
 
@@ -18,6 +19,11 @@ void ASTTextRegion::SetContents(String&& contents) {
 const ASTCommandList& ASTTextRegion::GetCommands() const {
 	Error("ASTTextRegion - Incorrect function call!");
 	return *static_cast<const ASTCommandList*>(nullptr);
+}
+
+void ASTTextRegion::Accept(ASTVisitor* visitor) const {
+	visitor->VisitTextRegionBegin(this);
+	visitor->VisitTextRegionEnd(this);
 }
 
 }

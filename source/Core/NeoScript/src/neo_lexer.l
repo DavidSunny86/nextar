@@ -13,14 +13,14 @@
 	NEX_ASSERT(result <= max_size);			\
 	buf[result] = 0;						\
 
-#define yyterminate() return nextar::neo_parser_impl::make_END(b.Loc())	
+#define yyterminate() return nextar::neo_parser_impl::make_END(b.Loc())
 #define YY_USER_ACTION                     b.Loc().Columns((nextar::uint32)yyleng);
 void * neo_alloc (size_t bytes, void * yyscanner);
 void * neo_realloc (void * ptr, size_t bytes, void * yyscanner);
 void   neo_free (void * ptr, void * yyscanner);
 %}
 
-%x STATE_REGION STATE_TEXT STATE_STR STATE_CONTENT
+%x STATE_REGION STATE_TEXT STATE_STR STATE_CONTENT STATE_COMMENT
 
 CH      [$#_a-zA-Z]
 BLANK   [ \t]
@@ -30,7 +30,7 @@ BLANK   [ \t]
   BEGIN(STATE_REGION);
 }
 
-<STATE_REGION>{CH}*":neo"?[ \n\t]+       {
+<STATE_REGION>{CH}*":script"?[ \n\t]+       {
   BEGIN(STATE_CONTENT);
   return nextar::neo_parser_impl::make_REGION_ID(&yytext[1], b.Loc());
 }
@@ -41,21 +41,13 @@ BLANK   [ \t]
   return nextar::neo_parser_impl::make_TEXT_REGION_ID(&yytext[1], b.Loc());
 }
 
-<STATE_TEXT>"@"       {
-  BEGIN(STATE_REGION);
-  return nextar::neo_parser_impl::make_TEXT_CONTENTS(b.GetContent(), b.Loc());
-}
+<STATE_TEXT>{
 
-<STATE_TEXT>\\@  {
-  b.PutContent('@');
-}
+"@"       {  BEGIN(STATE_REGION);  return nextar::neo_parser_impl::make_TEXT_CONTENTS(b.GetContent(), b.Loc()); }
+\\@  		 		 b.PutContent('@');
+[^\\@\n]+    b.PutContent(yytext);
+\\[^@] 			 b.PutContent(yytext);
 
-<STATE_TEXT>[^\\@\n]+  {
-  b.PutContent(yytext);
-}
-
-<STATE_TEXT>\\[^@] {
-  b.PutContent(yytext);
 }
 
 \"             {
@@ -63,43 +55,31 @@ BLANK   [ \t]
   b.StartContent();
 }
 
-<STATE_STR>\"        {
- BEGIN(INITIAL);
- return nextar::neo_parser_impl::make_STRING_LITERAL(b.GetContent(), b.Loc());
+<STATE_STR>{
+\"     				BEGIN(STATE_CONTENT);  return nextar::neo_parser_impl::make_STRING_LITERAL(b.GetContent(), b.Loc());
+\\[0-7]{1,3}  {  int result;  std::sscanf( yytext + 1, "%o", &result);  if ( result > 0xff )	  b.PutContent(result); }
+\\[0-9]+     	b.Error(nextar::ParserContext::BAD_ESCAPE_SEQ);
+\\n  					b.PutContent('\n');
+\\t  					b.PutContent('\t');
+\\r  					b.PutContent('\r');
+\\b  					b.PutContent('\b');
+\\f  					b.PutContent('\f');
+\\(.|\n)  		b.PutContent(yytext[1]);
+[^\\\n\"]+   	b.PutContent(yytext);
 }
 
-<STATE_STR>\\[0-7]{1,3}   {
-  int result;
-  std::sscanf( yytext + 1, "%o", &result);
-  if ( result > 0xff )
-	  b.PutContent(result);
+<INITIAL,STATE_CONTENT>{
+"/*" 		  		BEGIN(STATE_COMMENT);
+[^ \t\n\r]+   return nextar::neo_parser_impl::make_COMMAND(yytext, b.Loc());
+[\n]+  		  	b.Loc().Lines((nextar::uint32)yyleng); b.Loc().Step();
+{BLANK}+   	  b.Loc().Step();
 }
 
-<STATE_STR>\\[0-9]+     {
- b.Error(nextar::ParserContext::BAD_ESCAPE_SEQ);
-}
-
-<STATE_STR>\\n  b.PutContent('\n');
-<STATE_STR>\\t  b.PutContent('\t');
-<STATE_STR>\\r  b.PutContent('\r');
-<STATE_STR>\\b  b.PutContent('\b');
-<STATE_STR>\\f  b.PutContent('\f');
-
-<STATE_STR>\\(.|\n)  b.PutContent(yytext[1]);
-
-<STATE_STR>[^\\\n\"]+   b.PutContent(yytext);
-
-<STATE_CONTENT>[^ \t\n\r]+ {
-  return nextar::neo_parser_impl::make_COMMAND(yytext, b.Loc());
-}
-
-<STATE_CONTENT>[\n]+  {
- b.Loc().Lines((nextar::uint32)yyleng);
- b.Loc().Step();
-}
-
-<STATE_CONTENT>{BLANK}+ {
-  b.Loc().Step();
+<STATE_COMMENT>{
+"*/" 			BEGIN(STATE_CONTENT);
+[^*\n]+		// eat comment in chunks
+"*"				// eat the lone star
+\n				b.Loc().Lines((nextar::uint32)1);
 }
 
 <STATE_TEXT,STATE_STR>\n      {

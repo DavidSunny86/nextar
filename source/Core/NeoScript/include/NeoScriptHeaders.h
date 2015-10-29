@@ -11,5 +11,7 @@
 #include <ASTBlockRegion.h>
 #include <ASTTextRegion.h>
 #include <ASTDocument.h>
+#include <ASTVisitor.h>
+#include <NeoScript.h>
 
 #endif // NEOSCRIPTHEADERS_H_

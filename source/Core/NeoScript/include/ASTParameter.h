@@ -13,6 +13,11 @@ public:
 	ASTParameter(const ASTParameter& p) : _value(p._value) {}
 	ASTParameter(ASTParameter&& p) : _value(std::move(p._value)) {}
 
+	ASTParameter& operator = (const String& p) {
+		_value = p;
+		return *this;
+	}
+
 	ASTParameter& operator = (const ASTParameter& p) {
 		_value = p._value;
 		return *this;
@@ -22,12 +27,18 @@ public:
 		return *this;
 	}
 
+	String& AsStringRef() {
+		return _value;
+	}
+
 	const String& AsString() const {
 		return _value;
 	}
 
 	void Append(const String& value);
 	void Append(const ASTParameter& value);
+
+	void Accept(ASTVisitor*) const;
 
 protected:
 	String _value;

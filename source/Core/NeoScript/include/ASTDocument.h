@@ -7,8 +7,12 @@ namespace nextar {
 
 class _NexNeoScriptAPI ASTDocument : public ASTNode {
 public:
-	ASTDocument(String name) : _name(name) {}
+	ASTDocument(String name) : ASTNode(name) {}
 
+	const String& GetName() const {
+		return GetValue();
+	}
+	
 	void AddRegion(ASTRegionPtr& reg) {
 		_regions.push_back(reg);
 	}
@@ -18,11 +22,13 @@ public:
 	}
 
 	virtual Type GetType() const {return Type::AST_DOCUMENT;}
+	virtual void Accept(ASTVisitor*) const;
 private:
-	String _name;
+
 	ASTRegionList _regions;
 };
 
 }
+
 
 #endif // ASTDOCUMENT_H_
