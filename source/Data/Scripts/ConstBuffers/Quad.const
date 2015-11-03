@@ -1,5 +1,6 @@
 
 cbuffer Quad context:Object {
   var vec4 translationAndScale;
+  var vec4 textureOffsetAndRepeat;
   var vec4 mixColor;
 };

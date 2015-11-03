@@ -151,7 +151,7 @@ public:
 	static const AutoParam* MapParam(AutoParamName name);
 
 	static uint32 MapSamplerParams(const String& name,
-			const TextureDescMap& texMap);
+			const TextureDescMap& texMap, ParameterContext& context);
 
 	// Set texture states, called during pass creation
 

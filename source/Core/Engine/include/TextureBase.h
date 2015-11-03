@@ -95,6 +95,7 @@ public:
 	}
 
 protected:
+	
 	// type
 	TextureType type;
 	// is an asset?

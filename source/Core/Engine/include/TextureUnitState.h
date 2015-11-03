@@ -72,7 +72,6 @@ struct TextureUnitParams {
 	TextureAddressMode vAddress;
 	TextureAddressMode wAddress;
 	TextureComparisonMode comparisonFunc;
-	ParameterContext context;
 	TextureUnitType unitType;
 	uint16 flags;
 	uint32 maxAnisotropy;
@@ -84,7 +83,7 @@ struct TextureUnitParams {
 	TextureUnitParams() : minFilter(TextureMinFilter::TF_MIN_NEAREST),
 		magFilter(TextureMagFilter::TF_MAG_NEAREST), uAddress(TextureAddressMode::TAM_CLAMP),
 		vAddress(TextureAddressMode::TAM_CLAMP), wAddress(TextureAddressMode::TAM_CLAMP),
-		comparisonFunc(TextureComparisonMode::TEXCOMP_NONE), context(ParameterContext::CTX_UNKNOWN),
+		comparisonFunc(TextureComparisonMode::TEXCOMP_NONE), 
 		unitType(MESH_TEXTURE), flags(0), maxAnisotropy(0), lodBias(0), minLod(0), maxLod(1000) {
 	}
 };
@@ -99,7 +98,7 @@ public:
 	inline TextureUnit() :
 			texture(0) {
 	}
-
+	/*
 	inline TextureUnit(TextureBase* _texture) :
 			texture(_texture) {
 		if (texture && texture->IsTextureAsset())
@@ -108,13 +107,20 @@ public:
 
 	inline TextureUnit(const TextureUnit& tu) :
 			texture(tu.texture) {
+		if (texture && texture->IsTextureAsset())
+			static_cast<TextureAsset*>(texture)->AddRef();
+	}
+
+	inline TextureUnit(TextureUnit&& tu) :
+		texture(tu.texture) {
+		tu.texture = nullptr;
 	}
 
 	inline ~TextureUnit() {
 		if (texture && texture->IsTextureAsset())
 			static_cast<TextureAsset*>(texture)->Release();
 	}
-
+	
 	inline void SetTexture(TextureBase* _texture) {
 		if (texture && texture->IsTextureAsset())
 			static_cast<TextureAsset*>(texture)->Release();
@@ -128,6 +134,17 @@ public:
 		return *this;
 	}
 
+	inline TextureUnit& operator =(const TextureUnit& _texture) {
+		SetTexture(_texture.texture);
+		return *this;
+	}
+
+	inline TextureUnit& operator =(TextureUnit&& _texture) {
+		texture = (_texture.texture);
+		_texture.texture = nullptr;
+		return *this;
+	}
+	*/
 	inline TextureBase* operator ->() {
 		return texture;
 	}

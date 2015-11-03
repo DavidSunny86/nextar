@@ -32,7 +32,7 @@ public:
 		String uiName;
 		String uiDescription;
 		String catagory;
-
+		ParameterContext context;
 	};
 
 	typedef map<String, Parameter>::type ParameterTable;
@@ -101,7 +101,7 @@ public:
 		void SetDepthStencilState(DepthStencilState& state);
 		void SetRenderFlags(uint32 flags);
 
-		void AddTextureUnit(const String& unitName, const String& samplerName);
+		void AddTextureUnit(const String& unitName, const String& samplerName, ParameterContext context);
 		void AddSampler(const String& samplerName,
 				TextureUnitParams& unit);
 

@@ -97,17 +97,19 @@ void TextureUnitStateListener::UnitCmd_Execute(int parentType, void* parentParam
 
 	unitName = std::move(nameSemantic.first);
 
+	ParameterContext context = ParameterContext::CTX_UNKNOWN;
 	if (apn != AutoParamName::AUTO_INVALID_PARAM)
-		shader->AddSemanticBinding(unitName,
-			Helper::GetAutoParam(nameSemantic.second)
-		);
+		shader->AddSemanticBinding(unitName, apn);
 	else {
 		String uiName = ctx.GetTaggedParamVal(_SS(TAG_UI), it);
 		String desc = ctx.GetTaggedParamVal(_SS(TAG_DESC), it);
+		String contextName = ctx.GetTaggedParamVal(_SS(TAG_CONTEXT), it);
+		StringUtils::ToLower(contextName);
+		context = Helper::GetContextFromName(contextName);
 		shader->AddParam(unitName, uiName, desc, ParamDataType::PDT_TEXTURE);
 	}
 
-	shader->AddTextureUnit(unitName, samplerName);
+	shader->AddTextureUnit(unitName, samplerName, context);
 }
 
 

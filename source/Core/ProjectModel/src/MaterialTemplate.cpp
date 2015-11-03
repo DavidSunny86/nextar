@@ -152,7 +152,8 @@ void MaterialTemplate::MaterialFromTemplate::Load(InputStreamPtr& stream, AssetL
 	request->PrepareParamBuffer(paramContext);
 	size_t offset = 0;
 	for(auto it = paramContext.beginIt; it != paramContext.endIt; ++it) {
-		auto pv = paramValues.find((*it).name);
+		NEX_ASSERT((*it).name);
+		auto pv = paramValues.find(*(*it).name);
 		if (pv != paramValues.end()) {
 			auto agent = ShaderParamAgent::GetAgent((*it).type);
 			if (agent)

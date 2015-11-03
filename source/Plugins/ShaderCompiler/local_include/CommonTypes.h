@@ -85,6 +85,7 @@ struct CommandNameCompare {
 
 class Helper {
 public:
+	
 	static CommandDelegate_Execute FindCommand(CommandNamePair cmdMap[],
 			size_t arraySize, const String& name);
 	static ComparisonFunc GetComparisonFunc(const String& val);
@@ -102,6 +103,7 @@ public:
 	static TextureAddressMode GetTextureAddressMode(const String& val);
 	static uint32 GetShaderFlag(const String& val);
 	static AutoParamName GetAutoParam(const String& val);
+	static ParameterContext GetContextFromName(const String& name);
 };
 }
 

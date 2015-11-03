@@ -1,0 +1,33 @@
+/* Full syntax file test */
+
+block parameter0 parameter1 {
+ command parameter2 parameter4;
+};
+
+comm1 [param1, param2, param3];
+comm2 "param0" [param1, param2, param3];
+comm3 [[param1, param2], param1, [param3]];
+comm4 "sub-param" [[param1, param2], param1, [param3]] "big string value";
+
+[[another.script]]
+comm5 {
+ comm6 [[param1, param2]];
+ comm7 {
+   comm8 {
+	multi_line_string "some multi line
+	string is added ";
+   }
+ }
+}
+
+[[atextreg.text]]
+So this is what was expected.
+Everything working. No big deal.
+Lets check if this actually works.
+
+Last line of operation.
+[[onemore.script]]
+
+block parameter0 parameter1 {
+ command parameter2 parameter4;
+};

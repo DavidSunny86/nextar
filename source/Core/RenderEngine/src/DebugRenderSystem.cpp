@@ -34,6 +34,7 @@ DebugRenderSystem::DebugRenderSystem() {
 	idCounter = 0;
 	boxDataGenerated = false;
 	axisDataGenerated = false;
+	quadDataGenerated = false;
 	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_INIT_RESOURCES, CreateResources, this);
 	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyResources, this);
 }
@@ -57,8 +58,8 @@ void DebugRenderSystem::CreateResources(void* renderSystem) {
 }
 
 void DebugRenderSystem::CreateMaterials() {
-	URL debugMaterialPath(FileSystem::ArchiveEngineData_Name, "Materials/Assets/Debug3D.mtl");
-	URL debugQuadMaterialPath(FileSystem::ArchiveEngineData_Name, "Materials/Assets/DebugQuad.mtl");
+	URL debugMaterialPath(FileSystem::ArchiveEngineData_Name, "Materials/Assets/Debug3D.asset");
+	URL debugQuadMaterialPath(FileSystem::ArchiveEngineData_Name, "Materials/Assets/DebugQuad.asset");
 	try {
 		debugMaterial = Asset::AssetLoad(debugMaterialPath);
 	} catch (const GracefulErrorExcept& e) {
@@ -84,6 +85,8 @@ void DebugRenderSystem::ReleaseObjects() {
 	debugMaterial.Clear();
 	debugQuadMaterial.Clear();
 	ClearStreamData(boxDataStream);
+	ClearStreamData(quadDataStream);
+	ClearStreamData(axisData);
 	boxDataGenerated = false;
 }
 
@@ -149,24 +152,32 @@ uint32 DebugRenderSystem::Register(const Frustum& frustum,
 }
 
 uint32 DebugRenderSystem::Register(const Box2D& rect,
-	const Color& color, TextureBase* textured, bool border,
+	const Color& color, Vec4AF textureOffsetAndRepeat, TextureBase* textured, bool border,
 	float expiryTimeInSec) {
-	/*DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
+	if (!quadDataGenerated) {
+		GenerateStreamDataForQuad();
+		quadDataGenerated = true;
+	}
+
+	DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
 	primitive->SetDebugMaterial(debugQuadMaterial);
+	primitive->SetStreamData(&quadDataStream);
 	ParameterBuffer* b = primitive->GetParameters();
 	Vector2 size = rect.GetSize();
 	Vector2 center = rect.GetCenter();
-
-	Vector4A translationAndScale[2] = {
+	if (!textured)
+		textured = RenderManager::Instance().GetDefaultTexture();
+	Vector4A translationAndScale[3] = {
 		Vec4ASet(	center.x, center.y, size.x, size.y	),
-		Vec4ASet(	color.red, color.green, color.blue, color.alpha	)
+		textureOffsetAndRepeat,
+		Vec4ASet(color.red, color.green, color.blue, color.alpha)
 	};
 	TextureUnit textureData;
 	textureData.texture = textured;
-	b->SetData(translationAndScale, 0, sizeof(Vector4A)*2);
-	b->SetData(&textureData, sizeof(Vector4A)*2);
+	b->SetData(translationAndScale, 0, sizeof(Vector4A)*3);
+	b->SetData(&textureData, sizeof(Vector4A)*3);
 	alivePrimitives.push_back(primitive);
-	*/
+	
 	return idCounter;
 }
 
@@ -295,7 +306,7 @@ void DebugRenderSystem::GenerateStreamDataForAxis() {
 
 	void* pVData = NEX_ALLOC(vbsize, MEMCAT_GENERAL);
 	float* pos = (float*)pVData;
-	for (uint32 i = 0; i < main.points.size(); ++i) {
+	for (uint32 i = 0; i < (uint32)main.points.size(); ++i) {
 		auto &p = main.points[i];
 		auto& c = main.colors[i];
 
@@ -339,7 +350,7 @@ void DebugRenderSystem::GenerateStreamDataForBox() {
 
 	void* pVData = NEX_ALLOC(vbsize, MEMCAT_GENERAL);
 	float* pos = (float*)pVData;
-	for (uint32 i = 0; i < boxData.points.size(); ++i) {
+	for (uint32 i = 0; i < (uint32)boxData.points.size(); ++i) {
 		auto &p = boxData.points[i];
 		auto& c = boxData.colors[i];
 
@@ -367,6 +378,40 @@ void DebugRenderSystem::GenerateStreamDataForBox() {
 	stream->indices.start = 0;
 	stream->indices.count = (uint32)boxData.topology.size();
 	stream->indices.indices = std::move(indexBuffer);
+	stream->instanceCount = 1;
+
+	NEX_FREE(pVData, MEMCAT_GENERAL);
+}
+
+void DebugRenderSystem::GenerateStreamDataForQuad() {
+	Geometry quadData = Geometry::CreateQuad(1, 1);
+	VertexBufferPtr vertexBuffer = Assign(NEX_NEW(VertexBuffer(GpuBuffer::NEVER_RELEASED)));
+
+	uint32 stride = ((sizeof(float) * 2));
+	uint32 vbsize = (uint32)quadData.points.size() * stride;
+
+	void* pVData = NEX_ALLOC(vbsize, MEMCAT_GENERAL);
+	float* pos = (float*)pVData;
+	for (uint32 i = 0; i < (uint32)quadData.points.size(); ++i) {
+		auto &p = quadData.points[i];
+		
+		*pos++ = p.x;
+		*pos++ = p.y;
+	}
+
+	vertexBuffer->CreateBuffer(vbsize, stride, reinterpret_cast<const uint8*>(pVData));
+
+	StreamData* stream = &quadDataStream;
+	stream->flags = StreamData::DELETE_BINDING;
+	stream->type = PrimitiveType::PT_TRI_LIST;
+	stream->vertices.count = (uint32)quadData.points.size();
+	stream->vertices.start = 0;
+	stream->vertices.layout = VertexLayout::GetCommonLayout(VertexLayoutType::POSITION2D_0).GetPtr();
+	stream->vertices.binding = NEX_NEW(VertexBufferBinding());
+	stream->vertices.binding->SetBufferCount(1);
+	stream->vertices.binding->BindBuffer(0, vertexBuffer, 0);
+	stream->indices.start = 0;
+	stream->indices.count = 0;
 	stream->instanceCount = 1;
 
 	NEX_FREE(pVData, MEMCAT_GENERAL);

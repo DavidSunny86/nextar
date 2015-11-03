@@ -54,7 +54,7 @@ public:
 	}
 
 	friend std::ostream& operator << (std::ostream& yyo, const ParsePosition& l) {
-		yyo << "(" << l._column << "," << l._line << ")";
+		yyo << "(" << l._line << "," << l._column << ")";
 		return yyo;
 	}
 

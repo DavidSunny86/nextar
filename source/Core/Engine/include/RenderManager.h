@@ -93,7 +93,18 @@ public:
 	 from the thread this window was created in */
 	virtual void RenderFrame(const FrameTimer& frameTimer) = 0;
 
+	/* Returns the default texture */
+	inline TextureAssetPtr GetDefaultTexture() const {
+		return defaultTexture;
+	}
+
 protected:
+
+	static void DestroyResources(void* renderSystem);
+	static void CreateResources(void* renderSystem);
+
+	void DestroyResources();
+	void CreateResources();
 
 	typedef map<String, uint16>::type RenderLayerNameMap;
 
@@ -107,7 +118,10 @@ protected:
 	RenderSystemList renderSystems;
 	/* Render layers */
 	RenderQueueDescList renderQueues;	
+	// Default texture
+	TextureAssetPtr defaultTexture;
 };
+
 }
 /* namespace nextar */
 #endif /* RENDERMANAGER_H_ */

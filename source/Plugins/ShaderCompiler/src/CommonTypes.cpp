@@ -307,4 +307,23 @@ AutoParamName Helper::GetAutoParam(const String& val) {
 	return AutoParamName::AUTO_INVALID_PARAM;
 }
 
+ParameterContext Helper::GetContextFromName(const String& name) {
+	static EnumNamePair names[] = {
+		{ ParameterContext::CTX_FRAME, _SS(ARG_FRAME) },
+		{ ParameterContext::CTX_MATERIAL, _SS(ARG_MATERIAL) },
+		{ ParameterContext::CTX_OBJECT, _SS(ARG_OBJECT) },
+		{ ParameterContext::CTX_PASS, _SS(ARG_PASS) },
+		{ ParameterContext::CTX_UNKNOWN, _SS(ARG_UNKNOWN) },
+		{ ParameterContext::CTX_VIEW, _SS(ARG_VIEW) },
+	};
+
+	const size_t array_size = sizeof(names) / sizeof(names[0]);
+
+	EnumNamePair* ptr = std::lower_bound(names, names + array_size, name,
+		EnumNameCompare());
+	if (ptr != names + array_size && !(name.compare(ptr->name) < 0))
+		return static_cast<ParameterContext>(ptr->val);
+	return ParameterContext::CTX_UNKNOWN;
+}
+
 }

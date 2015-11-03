@@ -340,7 +340,7 @@ void Asset::_LoadDependencies(AssetStreamRequest* req) {
 AssetPtr Asset::AssetLoad(const URL& input, const String& streamer) {
 	InputStreamPtr inputStream = FileSystem::Instance().OpenRead(input);
 	if (inputStream)
-		return AssetLoad(inputStream, streamer.length() ? streamer : input.GetExtension());
+		return AssetLoad(inputStream, streamer);
 	return AssetPtr();
 }
 
@@ -352,7 +352,8 @@ AssetPtr Asset::AssetLoad(InputStreamPtr& input, const String& streamer) {
 	if (InputSerializer::IsValid(c)) {
 		uint32 classId;
 		Asset::ID id;
-		ser >> classId >> id;
+		String defaultStreamer;
+		ser >> classId >> id >> defaultStreamer;
 		SharedComponentPtr oInst;
 		Group* groupPtr = nullptr;
 		if (id.group != StringUtils::NullID)
@@ -364,7 +365,7 @@ AssetPtr Asset::AssetLoad(InputStreamPtr& input, const String& streamer) {
 			AssetPtr asset = oInst;
 			if (asset->AsyncIsCreated()) {
 				
-				String streamerImpl = streamer;
+				String streamerImpl = streamer.length() ? streamer : defaultStreamer;
 				StringUtils::ToUpper(streamerImpl);
 				AssetLoaderImpl* impl = AssetLoader::GetImpl(streamerImpl, classId);
 				// @todo Write appropriate constructor to initialize the loader/input combo
@@ -382,7 +383,7 @@ AssetPtr Asset::AssetLoad(InputStreamPtr& input, const String& streamer) {
 void Asset::AssetSave(AssetPtr& asset, const URL& output, const String& streamer) {
 	OutputStreamPtr stream = FileSystem::Instance().OpenWrite(output);
 	if (stream)
-		AssetSave(asset, stream, streamer.length() ? streamer : output.GetExtension());
+		AssetSave(asset, stream, streamer);
 }
 
 void Asset::AssetSave(AssetPtr& asset, OutputStreamPtr& output, const String& streamer) {
@@ -393,7 +394,7 @@ void Asset::AssetSave(AssetPtr& asset, OutputStreamPtr& output, const String& st
 		SharedComponent::ID id;
 		uint32 classId = asset->GetProxyID();
 		asset->GetID(id);
-		ser << classId << id.name << id.factory << id.group;
+		ser << classId << id << streamer;
 		cser.EndChunk();
 		// destroy the cser object for flushing
 	}

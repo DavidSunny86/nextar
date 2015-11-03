@@ -44,10 +44,18 @@ const AutoParam* Pass::MapParam(AutoParamName name) {
 }
 
 uint32 Pass::MapSamplerParams(const String& name,
-		const TextureDescMap& texMap) {
+	const TextureDescMap& texMap, ParameterContext& context) {
 	for(uint32 i = 0; i < texMap.size(); ++i) {
-		if(texMap[i].unitsBound.find(name) != String::npos)
+		size_t w = texMap[i].unitsBound.find(name);
+		if (w != String::npos) {
+			size_t dot = texMap[i].unitsBound.find('.', w);
+			if (dot != String::npos && dot + 1 < texMap[i].unitsBound.length()) {
+				context = ShaderParameter::GetContextFromKey(texMap[i].unitsBound[dot + 1]);
+			} else {
+				context = ParameterContext::CTX_UNKNOWN;
+			}
 			return i;
+		}
 	}
 	return -1;
 }
@@ -181,8 +189,9 @@ void CustomTextureProcessorApply(CommitContext& context,
 	const SamplerParameter* sampler =
 			reinterpret_cast<const SamplerParameter*>(param);
 	CommitContext::ParamContext& pc = context.paramContext;
-	if (!pc.second)
-		return;
+	//@urgent Need provision for default parameters
+	NEX_ASSERT(pc.second);
+		
 	context.pass->SetTexture(context.renderContext, *sampler,
 			pc.second->AsTexture(pc.first));
 	pc.first += sampler->size;
@@ -197,8 +206,9 @@ void CustomParameterProcessorApply(CommitContext& context,
 	const ConstantParameter* constParam =
 			reinterpret_cast<const ConstantParameter*>(param);
 	CommitContext::ParamContext& pc = context.paramContext;
-	if (!pc.second)
-		return;
+	//@urgent Need provision for default parameters
+	NEX_ASSERT(pc.second);
+
 	context.paramGroup->SetRawBuffer(context.renderContext, *constParam,
 			pc.second->AsRawData(pc.first));
 	pc.first += param->size;
@@ -212,9 +222,10 @@ void CustomStructProcessorApply(CommitContext& context,
 	NEX_ASSERT(param->type == ParamDataType::PDT_STRUCT);
 
 	CommitContext::ParamContext& pc = context.paramContext;
-	if (!pc.second)
-		return;
-	uint32 size = (uint32)pc.second->GetSize();
+	//@urgent Need provision for default parameters
+	NEX_ASSERT(pc.second);
+		
+	uint32 size = param->size;
 	context.paramGroup->WriteRawData(context.renderContext,
 			pc.second->AsRawData(pc.first), 0, size);
 	pc.first += size;

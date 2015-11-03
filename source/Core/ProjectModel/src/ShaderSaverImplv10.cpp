@@ -90,7 +90,6 @@ void ShaderSaverImplv1_0::SavePass(const ShaderTemplate::PassUnit& pu,
 			<< (uint8)e.second.params.vAddress
 			<< (uint8)e.second.params.wAddress
 			<< (uint8)e.second.params.comparisonFunc
-			<< (uint8)e.second.params.context
 			<< (uint8)e.second.params.unitType
 			<< e.second.params.flags
 			<< e.second.params.maxAnisotropy

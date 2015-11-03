@@ -22,6 +22,29 @@ RenderManager::~RenderManager() {
 	VertexSemantic::ClearSemanticMap();
 }
 
+void RenderManager::DestroyResources(void* renderSystem) {
+	RenderManager* pRenderSys = reinterpret_cast<RenderManager*>(renderSystem);
+	if (pRenderSys)
+		pRenderSys->DestroyResources();
+}
+
+
+void RenderManager::CreateResources(void* renderSystem) {
+	RenderManager* pRenderSys = reinterpret_cast<RenderManager*>(renderSystem);
+	if (pRenderSys)
+		pRenderSys->CreateResources();
+}
+
+void RenderManager::DestroyResources() {
+	defaultTexture.Clear();
+}
+
+void RenderManager::CreateResources() {
+	URL defaultTexturePath(FileSystem::ArchiveEngineData_Name, "Textures/Assets/DefaultTexture.asset");
+	//@urgent load default texture
+	//defaultTexture = Asset::AssetLoad(defaultTexturePath);
+}
+
 void RenderManager::Configure(const Config& config) {
 	const NameValueMap& nv = config.GetSectionMap("Render");
 	ConfigureImpl(nv);

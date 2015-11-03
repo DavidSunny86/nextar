@@ -228,8 +228,8 @@ protected:
 
 	UniformBufferGL* CreateUniformBuffer(PassViewGL* pass, uint32 passIndex,
 										 const String& name, GLint blockIndex, GLuint prog, GLuint numParams,
-										 uint32 size, const Pass::VarToAutoParamMap& remapParams,
-										 ParamEntryTable* paramTable);
+										 uint32 size, const Pass::VarToAutoParamMap& remapParams);
+	static void PrepareParamTable(const UniformBufferGL& buffer, uint32 passIndex, ParamEntryTable* table);
 
 	enum {
 		CONTEXT_READY = 1 << 0,

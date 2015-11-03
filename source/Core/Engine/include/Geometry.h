@@ -21,7 +21,8 @@ public:
 		POINTS,
 		TRIANGLES,
 	};
-
+	// @note All faces are counter-clockwise oriented
+	// Consider top-left as -1,-1 and right-bottom as 1,1
 	typedef vector<Vector3>::type PointList;
 	typedef vector<Color>::type ColorList;
 	typedef vector<Vector2>::type Point2DList;
@@ -69,7 +70,8 @@ public:
 		bool normalData = false, bool colorData = false, const Color& color = Color::Black);
 	static Geometry CreateBox(float dx, float dy, float dz,
 		bool colorData = false, const Color& color = Color::Black);
-
+	static Geometry CreateQuad(float dx, float dy, 
+		bool colorData = false, const Color& color = Color::White, bool uvData = false);
 
 	Type type;
 	IndexList topology;

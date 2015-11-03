@@ -17,6 +17,10 @@ public:
 		_regions.push_back(reg);
 	}
 
+	void AddRegionFront(ASTRegionPtr& reg) {
+		_regions.push_front(reg);
+	}
+
 	const ASTRegionList& GetRegions() const {
 		return _regions;
 	}

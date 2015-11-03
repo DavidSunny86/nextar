@@ -20,6 +20,7 @@ public:
 		StreamInfo streamInfo;
 		streamInfo.locator = URL("{EngineData}/Meshes/Buggy.mesh");
 		mesh->RequestSave(streamInfo);
+		ApplicationContext::Instance().QuitApplication();
 	}
 };
 

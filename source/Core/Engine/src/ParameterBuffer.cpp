@@ -11,7 +11,7 @@
 namespace nextar {
 
 ParameterBuffer::ParameterBuffer() :
-		size(0), data(nullptr) {
+size(0), data(nullptr), textureAssetsBitField(0) {
 }
 
 ParameterBuffer::ParameterBuffer(const ParameterBuffer& pb) {
@@ -27,12 +27,16 @@ ParameterBuffer::~ParameterBuffer() {
 	if (!buffer || !size)
 		return;
 
+	uint32 index = 0;
 	for (auto it = paramTable.beginIt; it != paramTable.endIt; ++it) {
 		if( (*it).type == ParamDataType::PDT_TEXTURE ) {
-			TextureUnit* unit = reinterpret_cast<TextureUnit*>(buffer);
-			if (unit->texture && unit->texture->IsTextureAsset()) {
-				static_cast<TextureAsset*>(unit->texture)->Release();
+			if (textureAssetsBitField & (1 << index)) {
+				TextureUnit* unit = reinterpret_cast<TextureUnit*>(buffer);
+				if (unit->texture && unit->texture->IsTextureAsset()) {
+					static_cast<TextureAsset*>(unit->texture)->Release();
+				}
 			}
+			index++;
 		}
 		buffer += (*it).maxSize;
 	}
@@ -45,7 +49,7 @@ void ParameterBuffer::Prepare(const ParamEntryTableItem& table) {
 	std::memset(this->data.get(), 0, size);
 }
 
-void ParameterBuffer::Prepare(void* data, size_t size) {
+void ParameterBuffer::Prepare(void* data, uint32 size) {
 	this->size = size;
 	this->data.reset((uint8*) NEX_ALLOC(size, MEMCAT_CACHEALIGNED));
 	if (data)
@@ -54,16 +58,17 @@ void ParameterBuffer::Prepare(void* data, size_t size) {
 		std::memset(this->data.get(), 0, size);
 }
 
-void ParameterBuffer::Prepare(BufferPtr&& data, size_t size) {
+void ParameterBuffer::Prepare(BufferPtr&& data, uint32 size) {
 	this->size = size;
 	this->data = std::move(data);
 }
 
-size_t ParameterBuffer::GetOffset(const String& name) const {
-	size_t offset = 0;
+uint32 ParameterBuffer::GetOffset(const String& name) const {
+	uint32 offset = 0;
 	auto it = paramTable.beginIt;
 	while (it != paramTable.endIt) {
-		if ((*it).name == name)
+		NEX_ASSERT((*it).name);
+		if (*(*it).name == name)
 			return offset;
 			offset += (*it).maxSize;
 	}
@@ -73,23 +78,47 @@ size_t ParameterBuffer::GetOffset(const String& name) const {
 const ParamEntry* ParameterBuffer::_GetParameter(const String& name) const {
 	auto it = paramTable.beginIt;
 	while (it != paramTable.endIt) {
-		if ((*it).name == name)
+		NEX_ASSERT((*it).name);
+		if (*(*it).name == name)
 			return &(*it);
 	}
 	return nullptr;
 }
 
-void ParameterBuffer::SetData(const void* data, size_t offset, size_t size) {
+void ParameterBuffer::SetData(const void* data, uint32 offset, uint32 size) {
 	if (data && this->data)
 		std::memcpy(this->data.get() + offset, data, size);
 }
 
-void ParameterBuffer::SetData(const TextureUnit* data, size_t offset) {
+void ParameterBuffer::SetData(const TextureUnit* data, uint32 offset) {
 	if (data && this->data) {
+		TextureUnit& unit = *reinterpret_cast<TextureUnit*>(this->data.get() + offset);
+		if (unit.texture) {
+			if (unit.texture &&
+				unit.texture->IsTextureAsset()) {
+				static_cast<TextureAsset*>(unit.texture)->Release();
+			}
+		}
 		std::memcpy(this->data.get() + offset, data, sizeof(TextureUnit));
+		NEX_ASSERT(paramTable.beginIt != paramTable.endIt);
+		uint32 coffset = 0;
+		uint32 index = 0;
+		// can optimize this search because the parameters are sorted, but offsets are not stored
+		for (auto it = paramTable.beginIt; it != paramTable.endIt && coffset != offset; 
+			++it) {
+			if ((*it).type == ParamDataType::PDT_TEXTURE)
+				++index;
+			coffset += (*it).maxSize;
+		}
+		NEX_ASSERT(coffset == offset);
+		NEX_ASSERT(index < 32);
 		if(data->texture &&
 				data->texture->IsTextureAsset()) {
+			
 			static_cast<TextureAsset*>(data->texture)->AddRef();
+			textureAssetsBitField |= 1 << index;
+		} else {
+			textureAssetsBitField &= ~(1 << index);
 		}
 	}
 }
@@ -97,9 +126,20 @@ void ParameterBuffer::SetData(const TextureUnit* data, size_t offset) {
 ParameterBuffer& ParameterBuffer::operator=(const ParameterBuffer& pb) {
 	size = pb.size;
 	paramTable = pb.paramTable;
+	textureAssetsBitField = pb.textureAssetsBitField;
 	this->data.reset((uint8*) NEX_ALLOC(size, MEMCAT_CACHEALIGNED));
 	if (pb.data)
 		std::memcpy(this->data.get(), pb.data.get(), size);
+	uint8* buffer = this->data.get();
+	if (!buffer || !size)
+		return *this;
+	for (auto it = paramTable.beginIt; it != paramTable.endIt; ++it) {
+		if ((*it).type == ParamDataType::PDT_TEXTURE) {
+			TextureUnit* unit = reinterpret_cast<TextureUnit*>(buffer);
+			if (unit->texture && unit->texture->IsTextureAsset()) 
+				static_cast<TextureAsset*>(unit->texture)->AddRef();
+		}
+	}
 	return *this;
 }
 
@@ -107,68 +147,75 @@ ParameterBuffer& ParameterBuffer::operator=(ParameterBuffer&& pb) {
 	size = pb.size;
 	paramTable = std::move(pb.paramTable);
 	data = std::move(pb.data);
+	textureAssetsBitField = pb.textureAssetsBitField;
 	return *this;
 }
 
 void ParameterBuffer::AsyncLoad(InputSerializer& ser, AssetStreamRequest* request) {
 	ser >> size;
 	if (size) {
-		this->data.reset((uint8*) NEX_ALLOC(size, MEMCAT_CACHEALIGNED));
+		uint32 numParams;
+		this->data.reset((uint8*)NEX_ALLOC(size, MEMCAT_CACHEALIGNED));
+		std::memset(this->data.get(), 0, size);
 		uint8* buffer = data.get();
 		uint8 baseType;
 		uint32 count = 0;
-		ser >> baseType;
-		switch(baseType) {
-		case ParamDataBaseType::BASE_BYTE: {
-			ser >> count;
-			InputSerializer::ByteArray arr(reinterpret_cast<int8*>(buffer), count);
-			ser >> arr;
-		}
+		ser >> numParams;
+
+		for (uint32 i = 0; i < numParams; ++i) {
+			ser >> baseType;
+			switch (baseType) {
+			case ParamDataBaseType::BASE_BYTE: {
+				ser >> count;
+				InputSerializer::ByteArray arr(reinterpret_cast<int8*>(buffer), count);
+				ser >> arr;
+			}
 			break;
-		case ParamDataBaseType::BASE_INT32: {
-			ser >> count;
-			InputSerializer::IntArray arr(reinterpret_cast<int32*>(buffer), count);
-			ser >> arr;
-			count *= 4;
-		}
+			case ParamDataBaseType::BASE_INT32: {
+				ser >> count;
+				InputSerializer::IntArray arr(reinterpret_cast<int32*>(buffer), count);
+				ser >> arr;
+				count *= 4;
+			}
 			break;
-		case ParamDataBaseType::BASE_INT64:	{
-			ser >> count;
-			InputSerializer::Int64Array arr(reinterpret_cast<int64*>(buffer), count);
-			ser >> arr;
-			count *= 8;
-		}
+			case ParamDataBaseType::BASE_INT64:	{
+				ser >> count;
+				InputSerializer::Int64Array arr(reinterpret_cast<int64*>(buffer), count);
+				ser >> arr;
+				count *= 8;
+			}
 			break;
-		case ParamDataBaseType::BASE_FLOAT: {
-			ser >> count;
-			InputSerializer::FloatArray arr(reinterpret_cast<float*>(buffer), count);
-			ser >> arr;
-			count *= 4;
-		}
+			case ParamDataBaseType::BASE_FLOAT: {
+				ser >> count;
+				InputSerializer::FloatArray arr(reinterpret_cast<float*>(buffer), count);
+				ser >> arr;
+				count *= 4;
+			}
 			break;
-		case ParamDataBaseType::BASE_TEXTURE: {
-			TextureUnit* tu = reinterpret_cast<TextureUnit*>(buffer);
-			bool asset = false;
-			ser >> asset;
-			if (asset) {
-				TextureAsset::ID id;
-				URL url;
-				ser >> id;
-				ser >> url;
-				TextureAssetPtr assetPtr = TextureAsset::Traits::Instance(id, url);
-				if (request)
-					request->GetMetaInfo().AddDependency(assetPtr);
-				else
-					assetPtr->AsyncRequestLoad();
-				tu->texture = assetPtr;
-				assetPtr->AddRef();
-			} else
-				tu->texture = nullptr;
-			count = sizeof(TextureUnit);
-		}
+			case ParamDataBaseType::BASE_TEXTURE: {
+				TextureUnit* tu = reinterpret_cast<TextureUnit*>(buffer);
+				bool asset = false;
+				ser >> asset;
+				if (asset) {
+					TextureAsset::ID id;
+					URL url;
+					ser >> id;
+					ser >> url;
+					TextureAssetPtr assetPtr = TextureAsset::Traits::Instance(id, url);
+					if (request)
+						request->GetMetaInfo().AddDependency(assetPtr);
+					else
+						assetPtr->AsyncRequestLoad();
+					tu->texture = assetPtr;
+					assetPtr->AddRef();
+				} else
+					tu->texture = nullptr;
+				count = sizeof(TextureUnit);
+			}
 			break;
+			}
+			buffer += count;
 		}
-		buffer += count;
 	}
 }
 
@@ -176,6 +223,8 @@ void ParameterBuffer::AsyncSave(OutputSerializer& ser) const {
 	ser << size;
 	if (size) {
 		const uint8* buffer = data.get();
+		uint32 numParams = (uint32)std::distance(paramTable.beginIt, paramTable.endIt);
+		ser << numParams;
 		for(auto it = paramTable.beginIt; it != paramTable.endIt; ++it) {
 			uint8 baseType = ShaderParameter::GetBaseType((*it).type);
 			uint32 count = 0;

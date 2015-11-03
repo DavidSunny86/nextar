@@ -39,8 +39,17 @@ namespace nextar {
 YY_DECL;
 }
 
-%token END 0 "end of file"
-%token <String> REGION_ID TEXT_REGION_ID TEXT_CONTENTS COMMAND STRING_LITERAL
+%token 
+	END 0 "end of file"
+	SEMICOLON ";"
+	LBRACKET  "{"
+	RBRACKET  "}"
+	LSQBRACKET "["
+	RSQBRACKET "]"
+	COMMA      ","
+	;
+
+%token <String> REGION_ID TEXT_REGION_ID TEXT_CONTENTS IDENTIFIER STRING_LITERAL
 
 // Types
 %type <ASTDocumentPtr> script  named_regions.1.N
@@ -50,6 +59,8 @@ YY_DECL;
 %type <ASTParameterList> parameters.0.N
 %type <ASTParameter> parameter list
 
+%printer { yyoutput << $$; } <String>
+
 %start script
 
 %%
@@ -57,7 +68,7 @@ YY_DECL;
 script:                                  { $$.Clear(); }
 		| named_regions.1.N                { $$ = $1; }
 		| unnamed_region                   { $$ = b.MakeDocument($1); }
-		| unnamed_region named_regions.1.N { $2->AddRegion($1); $$ = $2; }
+		| unnamed_region named_regions.1.N { $2->AddRegionFront($1); $$ = $2; }
 		;
 
 named_regions.1.N: named_region             { $$ = b.MakeDocument($1); }
@@ -74,12 +85,13 @@ named_region: REGION_ID commands.0.N  { $$ = b.MakeBlockRegion($1, std::move($2)
 commands.0.N:                         {  }
 				| commands.1.N            { $$ = std::move($1); }
 
-commands.1.N: command                 { $$.push_back($1); }
-				| commands.1.N command    { $1.push_back($2); $$ = $1; }
+commands.1.N: command                 { if ($1) $$.push_back($1); }
+				| commands.1.N command    { if ($2) $1.push_back($2); $$ = $1; }
 				;
 
-command: COMMAND parameters.0.N ';'   { $$ = b.MakeCommand($1, std::move($2)); }
-		 | COMMAND parameters.0.N '{' commands.0.N '}'
+command: SEMICOLON                          { $$.Clear(); }
+		 | IDENTIFIER parameters.0.N SEMICOLON   { $$ = b.MakeCommand($1, std::move($2)); }
+		 | IDENTIFIER parameters.0.N LBRACKET commands.0.N RBRACKET
 		 {
 			 /* returns $4 if its not null with appropriate stuff */
 			 $$ = b.MakeBlock($1, std::move($2), std::move($4));
@@ -92,12 +104,12 @@ parameters.0.N:                           { }
 
 
 parameter: STRING_LITERAL                 { $$ = $1; }
-			| COMMAND                        { $$ = $1; }
-			| '[' list ']'                   { $$ = std::move($2); }
+			| IDENTIFIER                        { $$ = $1; }
+			| LSQBRACKET list RSQBRACKET     { $$ = std::move($2); }
 			;
 
 list:  parameters.0.N                          { $$ = $1; }
-	 |  list ',' parameters.0.N                 { $1.Append($3); $$ = std::move($1); }
+	 |  list COMMA parameters.0.N               { $1.Append($3); $$ = std::move($1); }
 	 ;
 
 %%
@@ -108,6 +120,7 @@ namespace nextar {
 void neo_parser_impl::error(const location_type& l,
 												  const std::string& e) {
   b.Error(l, e.c_str());
+  NEX_THROW_GracefulError(EXCEPT_COMPILATION_FAILED);
 }
 
 ASTDocumentPtr ParserContext::Parse() {

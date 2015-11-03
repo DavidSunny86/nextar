@@ -37,6 +37,12 @@ public:
 
 	static ParamDataType MapParamType(const String& typeName);
 	static ParamDataBaseType GetBaseType(ParamDataType type);
+	inline static char GetContextKey(ParameterContext context) {
+		return '1' + (int8)context;
+	}
+	inline static ParameterContext GetContextFromKey(char c) {
+		return static_cast<ParameterContext>(c - '1');
+	}
 };
 
 class _NexEngineAPI ConstantParameter: public ShaderParameter {
@@ -132,7 +138,7 @@ struct ParamEntry {
 	ParamDataType type;
 	uint16 arrayCount;
 	uint32 maxSize;
-	String name;
+	const String* name;
 };
 
 typedef vector<ParamEntry>::type ParamEntryTable;

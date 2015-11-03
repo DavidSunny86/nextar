@@ -342,6 +342,46 @@ Geometry Geometry::CreateBox(float width, float height, float depth,
 	return p;
 }
 
+Geometry Geometry::CreateQuad(float dx, float dy,
+	bool colorData, const Color& color, bool uvData) {
+	Geometry p;
+	Geometry::PointList points = {
+		Vector3(-dx,-dy, 0), // 0
+		Vector3(-dx, dy, 0), // 1
+		Vector3( dx, dy, 0), // 2
+		Vector3( dx, dy, 0), // 2
+		Vector3( dx,-dy, 0), // 3
+		Vector3(-dx,-dy, 0), // 0
+	};
+
+	p.points = std::move(points);
+	p.type = Geometry::TRIANGLES;
+		
+	if (colorData) {
+		Geometry::ColorList colors;
+		for (uint32 i = 0; i < 6; ++i) {
+			colors.push_back(color);
+		}
+		p.colors = std::move(colors);
+	}
+
+
+
+	if (uvData) {
+		Geometry::Point2DList uv = {
+			Vector2(0, 0),
+			Vector2(0, 1),
+			Vector2(1, 1),
+			Vector2(1, 1),
+			Vector2(1, 0),
+			Vector2(0, 0)
+		};
+		p.uv = std::move(uv);
+	}
+
+	return p;
+}
+
 void Geometry::Transform(Mat4x4R m) {
 	if (points.size() > 0)
 		Mat4x4TransVec3(points.data(), sizeof(Vector3), (uint32)points.size(), m);

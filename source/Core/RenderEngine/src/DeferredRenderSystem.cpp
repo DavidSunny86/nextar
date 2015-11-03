@@ -82,7 +82,7 @@ void DeferredRenderSystem::PrepareGeometryBuffer() {
 
 void DeferredRenderSystem::PrepareMaterials() {
 	if (!lightMaterial) {
-		URL lightMaterialPath(FileSystem::ArchiveEngineData_Name, "Materials/Assets/DeferredLights.mtl");
+		URL lightMaterialPath(FileSystem::ArchiveEngineData_Name, "Materials/Assets/DeferredLights.asset");
 		lightMaterial = Asset::AssetLoad(lightMaterialPath);
 	}
 }
@@ -137,22 +137,26 @@ void DeferredRenderSystem::Commit(CommitContext& context) {
 	gbuffer.normalMap->Capture(context.renderContext, image, FrameBuffer::FRONT);
 	Image imageObj(std::move(image));
 	/* Display Image */
-	if (DebugDisplay::InstancePtr()) {
+	static bool registeredForRender = false;
+	if (DebugDisplay::InstancePtr() && !registeredForRender) {
 		Box2D box(0, 0, 0.25f, 0.25f);
-		DebugDisplay::Instance().Register(box, Color::Red, gbuffer.normalMap);
+		DebugDisplay::Instance().Register(box, Color::Red, Vec4AZero(), gbuffer.normalMap);
 		Box2D box2(0.25f, 0, 0.5f, 0.25f);
-		DebugDisplay::Instance().Register(box2, Color::Red, gbuffer.albedoMap);
+		DebugDisplay::Instance().Register(box2, Color::Red, Vec4AZero(), gbuffer.albedoMap);
 		Box2D box3(0.0f, 0.25f, 0.25f, 0.5f);
-		DebugDisplay::Instance().Register(box3, Color::Red, gbuffer.albedoMap);
+		DebugDisplay::Instance().Register(box3, Color::Red, Vec4AZero(), gbuffer.albedoMap);
+		registeredForRender = true;
 	}
 
 	context.albedoMap = gbuffer.albedoMap;
 	context.normalMap = gbuffer.normalMap;
 	context.specularMap = gbuffer.specularAndGlossMap;
 	context.depthMap = gbuffer.depth;
-
-	context.renderContext->BeginRender(&context.renderTargetInfo);
+	
+	/*
 	context.renderTargetInfo.info.clearFlags = ClearFlags::CLEAR_NONE;
+	context.renderContext->BeginRender(&context.renderTargetInfo);
+	
 	for(auto& lightPair : ls) {
 		auto light = lightPair.second;
 		switch(light->GetLightType()) {
@@ -162,7 +166,7 @@ void DeferredRenderSystem::Commit(CommitContext& context) {
 		}
 	}
 	context.renderContext->EndRender();
-
+	*/
 	// @urgent This step might be unnecessary once we have a compositor system in place
 	if (context.renderTargetInfo.rt->GetRenderTargetType() == RenderTargetType::BACK_BUFFER) {
 		// transfer the depth buffer to back-buffer-depth

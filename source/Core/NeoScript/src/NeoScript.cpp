@@ -16,6 +16,9 @@ ASTDocumentPtr NeoScript::AsyncParse(InputStreamPtr input, const String& sourceN
   const String& options) {
   bool traceParsing = false;
   bool traceScanning = false;
+#ifdef NEX_DEBUG
+  //traceScanning = traceParsing = true;
+#endif
   if (options.find("--trace-scan") != String::npos)
     traceScanning = true;
   else if (options.find("--trace-parse") != String::npos)
@@ -24,10 +27,7 @@ ASTDocumentPtr NeoScript::AsyncParse(InputStreamPtr input, const String& sourceN
     traceParsing = traceScanning = true;
   ParserContext p(input, sourceName, traceParsing, traceScanning);
   ASTDocumentPtr ret = p.Parse();
-  if(!ret) {
-    NEX_THROW_GracefulError(EXCEPT_COMPILATION_FAILED);
-  }
-  return ret;
+ return ret;
 }
 
 void NeoScript::AsyncPrint(ASTDocumentPtr doc, OutputStreamPtr out) {

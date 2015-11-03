@@ -19,7 +19,7 @@ TranslatorGLSL::~TranslatorGLSL() {
 
 void TranslatorGLSL::BeginBuffer(const String& name) {
 	transientBuffer.clear();
-	transientBuffer += "uniform " + name + " {\n";
+	transientBuffer += "layout(std140) uniform " + name + " {\n";
 }
 
 void TranslatorGLSL::AddParam(ParamDataType dataType, const String& name,

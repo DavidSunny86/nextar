@@ -141,10 +141,13 @@ void ShaderTemplate::LoadStreamRequest::AddSampler(const String& samplerName,
 }
 
 void ShaderTemplate::LoadStreamRequest::AddTextureUnit(const String& unitName,
-	const String& samplerName) {
+	const String& samplerName,
+	ParameterContext context) {
 	auto& state = current->textureUnitStates[samplerName];
-	state.unitsBound += ", ";
 	state.unitsBound += unitName;
+	state.unitsBound += '.';
+	state.unitsBound += ShaderParameter::GetContextKey(context);
+	state.unitsBound += ';';
 }
 
 void ShaderTemplate::LoadStreamRequest::AddParam(const String& param,

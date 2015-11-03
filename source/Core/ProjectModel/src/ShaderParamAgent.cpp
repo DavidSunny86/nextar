@@ -191,7 +191,8 @@ void ShaderParamTexture::SetParamValueImpl(size_t offset,
 			objectId = Asset::ToID(locator);
 	}
 	TextureAssetPtr texture = TextureAsset::Traits::Instance(objectId, locator);
-	TextureUnit unit(texture);
+	TextureUnit unit;
+	unit.texture = texture;
 	request->SetTextureValue((uint32)offset, &unit);
 }
 

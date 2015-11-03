@@ -13,7 +13,7 @@ namespace RenderOpenGL {
 
 #if defined (NEX_DEBUG)
 
-bool DebugGL::s_Enabled = true;
+bool DebugGL::s_Enabled = false;
 void DebugGL::CheckGL(const char* function, long line) {
 	if (!s_Enabled)
 		return;

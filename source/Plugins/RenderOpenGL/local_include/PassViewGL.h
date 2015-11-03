@@ -14,6 +14,7 @@ public:
 	uint32 samplerRefCount;
 	GLint location;
 	GLuint sampler;
+	String name; // only valid for custom parameters
 };
 
 struct RasterStateGL {

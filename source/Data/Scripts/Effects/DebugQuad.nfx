@@ -14,7 +14,7 @@ shader DebugQuad {
 				address_v clamp;
 			}
 
-			unit linear_sampler textureMap ui:Maps.TextureMap context:Object;
+			unit linear_sampler diffuseMap ui:Maps.TextureMap context:Object;
 		}
 
 		depth_stencil_state {

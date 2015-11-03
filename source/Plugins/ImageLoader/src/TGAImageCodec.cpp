@@ -119,7 +119,7 @@ ImageData TGAImageCodec::ReadUncompressed(InputSerializer& ser, const ImageParam
 	data.data = NEX_ALLOC(destBytes, MEMCAT_GENERAL);
 
 	uint8* udata = static_cast<uint8*>(data.data);
-	InputSerializer::UByteArray arr(udata, srcBytes);
+	InputSerializer::UByteArray arr(udata, (uint32)srcBytes);
 	ser >> arr;
 
 	// swap

@@ -180,6 +180,10 @@ public:
 				| ((uint32) _object[3] << 8) | ((uint32) _object[4] << 0));
 	}
 
+	static bool IsSimpleString(const String& value) {
+		return !_IsCted(value);
+	}
+
 	uint32 IndexOf(ConstType& what) const {
 		Iterator it = Iterate();
 		uint32 i = 0;

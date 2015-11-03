@@ -23,7 +23,7 @@ public:
 
 		MaterialTemplate::ID id(NamedObject::AsyncStringID(materialName));
 		URL materialSaveUrl("{EngineData}/Materials/" + materialName + ".mtl");
-		URL materialAssetSaveUrl("{EngineData}/Materials/Assets/" + materialName + ".mtl");
+		URL materialAssetSaveUrl("{EngineData}/Materials/Assets/" + materialName + ".asset");
 		MaterialTemplatePtr material = MaterialTemplate::Traits::Instance(id, attribute.fileName);
 		material->RequestLoad();
 		if (material->AsyncIsLoaded()) {
@@ -36,7 +36,7 @@ public:
 				shader->RequestSave();
 				material->RequestSave();
 				AssetPtr asset = material;
-				Asset::AssetSave(asset, materialAssetSaveUrl);
+				Asset::AssetSave(asset, materialAssetSaveUrl, "MTL");
 				return;
 			}
 		}

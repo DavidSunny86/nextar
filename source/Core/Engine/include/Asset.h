@@ -382,7 +382,7 @@ public:
 	static AssetPtr AssetLoad(const URL& input, const String& streamer = StringUtils::Null);
 	static AssetPtr AssetLoad(InputStreamPtr& input, const String& streamer);
 	// @remarks Used by the engine to stream out resources
-	static void AssetSave(AssetPtr& asset, const URL& output, const String& streamer = StringUtils::Null);
+	static void AssetSave(AssetPtr& asset, const URL& output, const String& streamer);
 	static void AssetSave(AssetPtr& asset, OutputStreamPtr& output, const String& streamer);
 
 

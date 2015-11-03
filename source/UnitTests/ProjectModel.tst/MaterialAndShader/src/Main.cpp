@@ -28,7 +28,7 @@ public:
 		// save engine lights	
 		MaterialTemplate::ID id2(NamedObject::AsyncStringID("DeferredLights"));
 		URL dlMaterialUrl("{EngineData}/Scripts/Materials/DeferredLights.mtl");
-		URL saveDlMaterialUrl("{EngineData}/Materials/DeferredLights.mtl");
+		URL saveDlMaterialUrl("{EngineData}/Materials/Assets/DeferredLights.asset");
 		URL saveDlShaderUrl("{EngineData}/Shaders/DeferredLights.nfx");
 		material = MaterialTemplate::Traits::Instance(id2, dlMaterialUrl);
 		material->RequestLoad();
@@ -36,11 +36,11 @@ public:
 		shader->SetAssetLocator(saveDlShaderUrl);
 		shader->RequestSave();
 		AssetPtr mtl = material;
-		Asset::AssetSave(mtl, saveDlMaterialUrl);
+		Asset::AssetSave(mtl, saveDlMaterialUrl, "MTL");
 
 		MaterialTemplate::ID id3(NamedObject::AsyncStringID("Debug3D"));
 		URL dbMaterialUrl("{EngineData}/Scripts/Materials/Debug3D.mtl");
-		URL saveDbMaterialUrl("{EngineData}/Materials/Debug3D.mtl");
+		URL saveDbMaterialUrl("{EngineData}/Materials/Assets/Debug3D.asset");
 		URL saveDbShaderUrl("{EngineData}/Shaders/Debug3D.nfx");
 		material = MaterialTemplate::Traits::Instance(id3, dbMaterialUrl);
 		material->RequestLoad();
@@ -48,7 +48,7 @@ public:
 		shader->SetAssetLocator(saveDbShaderUrl);
 		shader->RequestSave();
 		mtl = material;
-		Asset::AssetSave(mtl, saveDbMaterialUrl);
+		Asset::AssetSave(mtl, saveDbMaterialUrl, "MTL");
 	}
 };
 

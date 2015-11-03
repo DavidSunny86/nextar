@@ -68,12 +68,12 @@ void MaterialAsset::PrepareParamBuffer(const ParamEntryTableItem& table) {
 	materialParamData.Prepare(table);
 }
 
-void MaterialAsset::SetParamData(const void* data, size_t offset,
-		size_t size) {
+void MaterialAsset::SetParamData(const void* data, uint32 offset,
+		uint32 size) {
 	materialParamData.SetData(data, offset, size);
 }
 
-void MaterialAsset::SetParamData(const TextureUnit* data, size_t offset) {
+void MaterialAsset::SetParamData(const TextureUnit* data, uint32 offset) {
 	materialParamData.SetData(data, offset);
 }
 
@@ -120,7 +120,7 @@ void MaterialAsset::MaterialLoadRequest::PrepareParamBuffer(const ParamEntryTabl
 }
 
 void MaterialAsset::MaterialLoadRequest::SetParamValue(uint32 offset,
-		const void* data, size_t amount) {
+		const void* data, uint32 amount) {
 	MaterialAsset* material = static_cast<MaterialAsset*>(GetStreamedObject());
 	material->SetParamData(data, offset, amount);
 }

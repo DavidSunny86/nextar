@@ -44,7 +44,7 @@ public:
 		void SetShader(ShaderAssetPtr& shader);
 		void SetShader(const ShaderAsset::ID& id, const URL& location);
 		void PrepareParamBuffer(const ParamEntryTableItem& table);
-		void SetParamValue(uint32 offset, const void* data, size_t amount);
+		void SetParamValue(uint32 offset, const void* data, uint32 amount);
 		void SetTextureValue(uint32 offset, const TextureUnit* texture);
 		void SetParameterBuffer(ParameterBuffer&& buff);
 		void SetLayer(Layer layer);
@@ -94,8 +94,8 @@ protected:
 
 	void PrepareMaterial(MaterialAsset::MaterialLoadRequest*);
 	void PrepareParamBuffer(const ParamEntryTableItem& table);
-	void SetParamData(const void* data, size_t offset, size_t size);
-	void SetParamData(const TextureUnit* data, size_t offset);
+	void SetParamData(const void* data, uint32 offset, uint32 size);
+	void SetParamData(const TextureUnit* data, uint32 offset);
 	void SetParameterBuffer(ParameterBuffer&& buff);
 	void SetShader(ShaderAssetPtr& shader);
 

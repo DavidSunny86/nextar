@@ -18,6 +18,7 @@ public:
 	GLint typeGl;
 	uint16 matrixStride; // matrix/array
 	uint16 arrayStride;
+	String name; // valid only for custom parameters
 };
 
 typedef vector<UniformGL>::type UniformList;

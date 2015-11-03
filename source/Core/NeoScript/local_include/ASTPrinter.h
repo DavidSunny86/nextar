@@ -31,6 +31,7 @@ public:
 	virtual void VisitParameter(const ASTParameter*);
 
 protected:
+	void PrintString(const String& value);
 
 	OutStringStream& Indent() {
 		std::fill_n(std::ostream_iterator<char>(_out), _indention, '\t');

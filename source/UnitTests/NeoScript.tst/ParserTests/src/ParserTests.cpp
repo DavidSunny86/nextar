@@ -18,11 +18,11 @@ public:
 	UTApplicationParserTest(const String& name) : ApplicationContext(name) {
 	}
 
-	void TestParser(const String& dir, const String& suff) {
+	void TestParser(const String& dir, const String& suff, const String& pattern) {
 		suffix = suff;
 		ArchivePtr arch = FileSystem::Instance().OpenArchive("EngineData");
 		if (arch) {
-			arch->Scan(this, dir + "/*.neoscript");
+			arch->Scan(this, dir + "/" + pattern);
 		}
 	}
 
@@ -30,6 +30,7 @@ public:
 		InputStreamPtr input = FileSystem::Instance().OpenRead(attribute.fileName);
 		if (input) {
 			try {
+				Trace("Parsing: " + attribute.fileName.ToString());
 				ASTDocumentPtr doc =
 						NeoScript::AsyncParse(input, attribute.fileName.GetComputedName(), "");
 				if (doc) {
@@ -48,21 +49,27 @@ public:
 int NextarMain(int argc, char* argv[]) {
 	UTApplicationParserTest application("ParserTest");
 	application.InitializeContext(argc, argv);
-	String inputDir("Scripts/NeoScriptUnits"), fileSuffix("1.out");
+	String inputDir("Scripts/NeoScriptUnits"), fileSuffix(".1.out"), searchPattern("*.neoscript");
 	for(int i = 1; i < argc; ++i) {
 		char* suffix = std::strstr(argv[i], "--suffix=");
 		if (suffix) {
-			suffix += sizeof("--suffix=");
+			suffix += sizeof("--suffix");
 			fileSuffix = suffix;
 		} else {
 			char* out = std::strstr(argv[i], "--out=");
 			if (out) {
-				out += sizeof("--out=");
+				out += sizeof("--out");
 				inputDir = out;
+			} else {
+				char* pattern = std::strstr(argv[i], "--pattern=");
+				if (pattern) {
+					pattern += sizeof("--pattern");
+					searchPattern = pattern;
+				}
 			}
 		}
 	}
-	application.TestParser(inputDir, fileSuffix);
+	application.TestParser(inputDir, fileSuffix, searchPattern);
 	application.DestroyContext();
 	std::cin.get();
 	return 0;

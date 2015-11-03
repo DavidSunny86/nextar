@@ -223,6 +223,24 @@ endmacro(create_gen_files)
 #============================================================
 # Pre build step
 #============================================================
+macro(add_pre_build_command)
+	if (NOT NEX_PRE_BUILD_STEP)
+		set(NEX_PRE_BUILD_STEP TRUE)
+		set(NEX_PRE_BUILD_TARGET ${NEXTAR_BINARY_NAME}_PRE_BUILD)
+		set(NEX_PRE_BUILD_DEPENDENCIES "")
+	endif()
+   set(NE_PCOMMAND ${ARGV1})
+   separate_arguments(NE_PCOMMAND)
+	add_custom_command(
+      OUTPUT ${ARGV2}
+      COMMAND ${NE_PCOMMAND}
+      DEPENDS ${ARGV0}
+   )
+   list(APPEND NEX_PRE_BUILD_DEPENDENCIES ${ARGV2})
+endmacro(add_pre_build_command)
+#============================================================
+# Pre build execute
+#============================================================
 macro(add_pre_build_execute)
 	if (NOT NEX_PRE_BUILD_STEP)
 		set(NEX_PRE_BUILD_STEP TRUE)
@@ -354,7 +372,7 @@ macro(pre_configure)
 	file(GLOB HEADER_GROUP_FILES
 		${NEXTAR_HEADER_LIST}
 		)
-	file(REMOVE_RECURSE ${NEXTAR_TARGET_PATH}/gen)
+	# file(REMOVE_RECURSE ${NEXTAR_TARGET_PATH}/gen) - no remove
 	create_gen_files()
 endmacro(pre_configure)
 #============================================================
@@ -500,6 +518,9 @@ macro(place_bin library)
 		set(NEX_INSTALL_DIR ${NEX_INSTALL}/Bin)
 	endif()
 	if (NEX_PRE_BUILD_STEP)
+      separate_arguments(NEX_PRE_BUILD_DEPENDENCIES)
+      message("C:  " ${NEX_PRE_BUILD_DEPENDENCIES})
+      add_custom_target(${NEX_PRE_BUILD_TARGET} DEPENDS ${NEX_PRE_BUILD_DEPENDENCIES})
 		add_dependencies(${NEXTAR_TARGET} ${NEX_PRE_BUILD_TARGET})
 	endif()
 	#add_custom_command(TARGET ${NEXTAR_TARGET} POST_BUILD

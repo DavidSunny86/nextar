@@ -93,6 +93,7 @@ public:
 	}
 
 	virtual uint32 GetClassID() const;
+		
 
 protected:
 		
@@ -105,8 +106,9 @@ protected:
 	virtual void UnloadImpl();
 
 	virtual StreamRequest* CreateStreamRequestImpl(bool load);
-
+		
 	LodStrategy* lodStrategy;
+	friend class RenderManager;
 };
 
 } /* namespace nextar */

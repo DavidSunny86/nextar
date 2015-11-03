@@ -29,8 +29,8 @@ public:
 	virtual ~ParameterBuffer();
 
 	void Prepare(const ParamEntryTableItem& table);
-	void Prepare(void* data, size_t size);
-	void Prepare(BufferPtr&& data, size_t size);
+	void Prepare(void* data, uint32 size);
+	void Prepare(BufferPtr&& data, uint32 size);
 
 	const TextureUnit* AsTexture(uint32 offset) const {
 		NEX_ASSERT(offset < size);
@@ -46,16 +46,16 @@ public:
 		this->paramTable = paramTable;
 	}
 
-	inline size_t GetSize() const {
+	inline uint32 GetSize() const {
 		return size;
 	}
 
 	void AsyncLoad(InputSerializer& ser, AssetStreamRequest* request = nullptr);
 	void AsyncSave(OutputSerializer& ser) const;
 
-	void SetData(const void* data, size_t offset, size_t size);
-	void SetData(const TextureUnit* data, size_t offset);
-	size_t GetOffset(const String& name) const;
+	void SetData(const void* data, uint32 offset, uint32 size);
+	void SetData(const TextureUnit* data, uint32 offset);
+	uint32 GetOffset(const String& name) const;
 
 	ParameterBuffer& operator =(const ParameterBuffer& pb);
 	ParameterBuffer& operator =(ParameterBuffer&& pb);
@@ -63,7 +63,9 @@ protected:
 
 	const ParamEntry* _GetParameter(const String& name) const;
 
-	size_t size;
+	uint32 textureAssetsBitField;
+	uint32 size;
+
 	ParamEntryTableItem paramTable;
 	//uint8 smallBuffer[16];
 	BufferPtr data;

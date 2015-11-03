@@ -50,12 +50,12 @@ void EngineApplicationContext::ReleaseResourcesImpl() {
 	ComponentGroupArchive::Instance().AsyncDeleteAll();
 	ComponentFactoryArchive::Instance().AsyncDeleteAll();
 	if (RenderManager::InstancePtr()) {
+		VertexLayout::ClearCommonLayouts();
 		DispatchEvent(EVENT_RENDERMANAGER_PRE_CLOSE);
 		RenderManager::Instance().Close();
 		DispatchEvent(EVENT_RENDERMANAGER_POST_CLOSE);
 	}
 	InputManager::Instance().Close();
-	VertexLayout::ClearCommonLayouts();
 }
 
 void EngineApplicationContext::DestroyExtendedInterfacesImpl() {

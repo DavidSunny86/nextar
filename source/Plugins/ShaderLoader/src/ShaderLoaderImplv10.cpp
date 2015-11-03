@@ -146,7 +146,7 @@ bool ShaderLoaderImplv1_0::ReadPass(ShaderAsset::StreamRequest* request,
 	ser >> numUnits;
 	for(uint32 i = 0; i < numUnits; ++i) {
 		TextureUnitParams params;
-		uint8 minFilter, magFilter, uAddress, vAddress, wAddress, comparisonFunc, context, unitType;
+		uint8 minFilter, magFilter, uAddress, vAddress, wAddress, comparisonFunc, unitType;
 		String unitsBound;
 
 		ser >> unitName
@@ -156,7 +156,6 @@ bool ShaderLoaderImplv1_0::ReadPass(ShaderAsset::StreamRequest* request,
 			>> vAddress
 			>> wAddress
 			>> comparisonFunc
-			>> context
 			>> unitType
 			>> params.flags
 			>> params.maxAnisotropy
@@ -171,7 +170,6 @@ bool ShaderLoaderImplv1_0::ReadPass(ShaderAsset::StreamRequest* request,
 		params.vAddress = (TextureAddressMode)vAddress;
 		params.wAddress = (TextureAddressMode)wAddress;
 		params.comparisonFunc = (TextureComparisonMode)comparisonFunc;
-		params.context = (ParameterContext)context;
 		params.unitType = (TextureUnitType)unitType;
 		request->AddSamplerUnit(params, unitsBound);
 	}

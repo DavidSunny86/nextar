@@ -103,7 +103,8 @@ void LanguageTranslator::ConstBufferListener::EnterStatement(ScriptParser::State
 				if (!context.compare(0, contextStr.length(), contextStr)) {
 					StringUtils::StringPair p = StringUtils::Split(context);
 					name += "__";
-					name += p.second;
+					StringUtils::ToLower(p.second);
+					name += ShaderParameter::GetContextKey(Helper::GetContextFromName(p.second));
 					break;
 				}
 

@@ -9,6 +9,8 @@
 #include <UniformBufferGL.h>
 #include <GpuBufferViewGL.h>
 #include <VertexLayoutGL.h>
+#include <MultiRenderTargetViewGL.h>
+#include <RenderDriverGL.h>
 
 namespace RenderOpenGL {
 
@@ -651,9 +653,12 @@ void RenderContext_Base_GL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
 		if (!ubPtr) {
 			// create a new uniform buffer
 			ubPtr = CreateUniformBuffer(pass, passIndex, uniName, i, program,
-										numParams, size, remapParams, paramTable);
+										numParams, size, remapParams);
 			GL_CHECK();
 			//ubPtr->SetBinding((GLuint) uniformBufferMap.size()-1);
+		}
+		if (ubPtr) {
+			PrepareParamTable(*ubPtr, passIndex, paramTable);
 		}
 
 		ubList.push_back(ubPtr);
@@ -669,10 +674,39 @@ void RenderContext_Base_GL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
 	});
 }
 
+void RenderContext_Base_GL::PrepareParamTable(const UniformBufferGL& u, uint32 passIndex, ParamEntryTable* table) {
+	// parameter parsing is not important if the
+	// the auto param is well defined and understood
+	// by the engine
+	if (!u.parameter) {
+		return;
+	}
+		
+	uint32 startParamIndex = (uint32)table->size();
+	table->reserve(startParamIndex + u.numParams);
+
+	const UniformGL* en = static_cast<const UniformGL*>(u.parameter) + u.numParams;
+	for (const UniformGL* uniform = static_cast<const UniformGL*>(u.parameter); uniform != en; ++uniform) {
+		if (uniform->autoName == AutoParamName::AUTO_CUSTOM_CONSTANT) {
+			auto& uform = *uniform;
+			ParamEntry pe;
+			pe.arrayCount = uform.arrayCount;
+			pe.autoName = uform.autoName;
+			pe.maxSize = uform.size;
+			pe.name = &uform.name;
+			pe.type = uform.type;
+			pe.passIndex = passIndex;
+			pe.context = u.context;
+			table->push_back(pe);
+		}
+	}
+
+}
+
 UniformBufferGL* RenderContext_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 															uint32 passIndex, const String& name, GLint blockIndex, GLuint prog,
-															GLuint numParams, uint32 size, const Pass::VarToAutoParamMap& remapParams,
-															ParamEntryTable* table) {
+															GLuint numParams, uint32 size, const Pass::VarToAutoParamMap& remapParams
+															) {
 
 	NEX_ASSERT(size > 0);
 	uint16 numUnmappedParams = 0;
@@ -693,7 +727,6 @@ UniformBufferGL* RenderContext_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 		NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
 	}
 
-	bool storeIndividualParams = table != nullptr;
 	bool parseIndividualParams = true;
 	const AutoParam* autoParam = nullptr;
 	// look for AutoParams
@@ -705,16 +738,13 @@ UniformBufferGL* RenderContext_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 		u.autoName = autoParam->autoName;
 		u.context = autoParam->context;
 		u.processor = autoParam->processor;
-		// parameter parsing is not important if the
-		// the auto param is well defined and understood
-		// by the engine
-		if (u.processor) {
+		u.type = ParamDataType::PDT_STRUCT;
+		if (u.processor)
 			parseIndividualParams = false;
-			storeIndividualParams = false;
-		}
 	} else {
 		u.context = ParameterContext::CTX_UNKNOWN;
 		u.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
+		u.type = ParamDataType::PDT_UNKNOWN;
 	}
 
 	u.size = size;
@@ -724,8 +754,8 @@ UniformBufferGL* RenderContext_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 	GL_CHECK();
 	GlBindBuffer(GL_UNIFORM_BUFFER, 0);
 	GL_CHECK();
-
-	if (!storeIndividualParams && !parseIndividualParams)
+		
+	if (!parseIndividualParams)
 		return &u;
 
 	void* tempBuffer = NEX_ALLOC(sizeof(GLint) * numParams * 7 + 128,
@@ -775,14 +805,12 @@ UniformBufferGL* RenderContext_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 	ParameterContext chosen = u.context;
 	UniformGL* uniforms = NEX_NEW(UniformGL[numParams]);
 	uint32 startParamIndex = -1;
-	if (storeIndividualParams) {
-		startParamIndex = (uint32)table->size();
-		table->reserve(startParamIndex + numParams);
-	}
+	
 	for (GLint i = 0; i < (GLint)numParams; ++i) {
 		UniformGL& uform = uniforms[i];
 		GlGetActiveUniformName(prog, indices[i], 128, 0, uniName);
 		GL_CHECK();
+		// put the string construction outside the loop? we do a move for custom params however.
 		String paramName = uniName;
 		auto it = remapParams.find(paramName);
 		const AutoParam* paramDef = nullptr;
@@ -803,6 +831,7 @@ UniformBufferGL* RenderContext_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 			uform.processor = paramDef->processor;
 			autoParamCount++;
 		} else {
+			uform.name = std::move(paramName);
 			uform.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
 			uform.processor = Pass::GetConstantProcessor();
 		}
@@ -815,16 +844,6 @@ UniformBufferGL* RenderContext_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 		uform.size = GetShaderParamSize(uform.typeGl) * uform.arrayCount;
 		uform.type = GetShaderParamType(uform.typeGl);
 
-		if (storeIndividualParams && !paramDef) {
-			ParamEntry pe;
-			pe.arrayCount = uform.arrayCount;
-			pe.autoName = uform.autoName;
-			pe.maxSize = uform.size;
-			pe.name = std::move(paramName);
-			pe.type = uform.type;
-			pe.passIndex = passIndex;
-			table->push_back(pe);
-		}
 	}
 
 	if (chosen == ParameterContext::CTX_UNKNOWN)
@@ -836,25 +855,17 @@ UniformBufferGL* RenderContext_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 		chosen = ParameterContext::CTX_MATERIAL;
 	}
 	u.context = chosen;
+	u.parameter = uniforms;
 	// the context was just determined
-	if (storeIndividualParams) {
-		for (; startParamIndex < table->size(); ++startParamIndex) {
-			table->at(startParamIndex).context = chosen;
-		}
-	}
-
-	if ((!autoParamCount && chosen != ParameterContext::CTX_VIEW
-		&& chosen != ParameterContext::CTX_FRAME)
-		|| !parseIndividualParams) {
+	if (!autoParamCount && chosen != ParameterContext::CTX_VIEW
+		&& chosen != ParameterContext::CTX_FRAME) {
 		// lets look for the struct processor
 		if (!u.processor)
 			u.processor = Pass::GetStructProcessor();
-		NEX_DELETE_ARRAY(uniforms);
-		u.parameter = nullptr;
+		u.type = ParamDataType::PDT_STRUCT;
 	} else {
-		u.parameter = uniforms;
 		// sort the resulting uniforms such that auto params come first
-		// followed by unmapped params. Unmapped params are sorted by name.
+		// followed by unmapped params. Unmapped params are sorted by buffer offset.
 		std::sort(uniforms, uniforms + numParams,
 				  [](const UniformGL& first, const UniformGL& second) {
 			if (first.autoName == second.autoName) {
@@ -980,7 +991,7 @@ void RenderContext_Base_GL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 			ss.index = mapped++;
 			ss.arrayCount = 1;
 			uint32 tu = Pass::MapSamplerParams(unitName,
-											   texMap);
+				texMap, ss.context);
 			if (tu >= samplerList.size()) {
 				Error(
 					String(
@@ -996,12 +1007,11 @@ void RenderContext_Base_GL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 			ss.location = loc;
 			if (paramDef == nullptr) {
 				ss.autoName = AutoParamName::AUTO_CUSTOM_CONSTANT;
-				if (texMap[tu].texUnitParams.context == ParameterContext::CTX_UNKNOWN)
+				if (ss.context == ParameterContext::CTX_UNKNOWN)
 					ss.context = GuessContextByName(unitName,
 					ParameterContext::CTX_MATERIAL);
-				else
-					ss.context = texMap[tu].texUnitParams.context;
 				ss.processor = Pass::GetTextureProcessor();
+				ss.name = std::move(unitName);
 			} else {
 				ss.autoName = paramDef->autoName;
 				ss.context = paramDef->context;
@@ -1015,7 +1025,7 @@ void RenderContext_Base_GL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 				pe.autoName = ss.autoName;
 				pe.context = ss.context;
 				pe.maxSize = ss.size;
-				pe.name = std::move(unitName);
+				pe.name = &ss.name;
 				pe.passIndex = passIndex;
 				pe.type = ParamDataType::PDT_TEXTURE;
 				paramTable->push_back(pe);
@@ -1619,16 +1629,13 @@ ParameterContext RenderContext_Base_GL::GuessContextByName(const String& name,
 														   ParameterContext defaultContex) {
 	String lowerName = name;
 	StringUtils::ToLower(lowerName);
-	if (lowerName.find("__frame") != String::npos)
-		return ParameterContext::CTX_FRAME;
-	else if (lowerName.find("__view") != String::npos)
-		return ParameterContext::CTX_VIEW;
-	else if (lowerName.find("__pass") != String::npos)
-		return ParameterContext::CTX_PASS;
-	else if (lowerName.find("__material") != String::npos)
-		return ParameterContext::CTX_MATERIAL;
-	else if (lowerName.find("__object") != String::npos)
-		return ParameterContext::CTX_OBJECT;
+	size_t p = lowerName.find("__");
+	if (p != String::npos && p + 2 < lowerName.length()) {
+		ParameterContext c = ShaderParameter::GetContextFromKey(lowerName[p + 2]);
+		if (c >= 0 && c <= ParameterContext::CTX_COUNT)
+			return c;
+	}
+
 	return defaultContex;
 }
 

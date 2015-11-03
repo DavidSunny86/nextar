@@ -5,7 +5,10 @@
 namespace nextar {
 
 size_t ParserContext::Read(char* buffer, size_t max) {
-	return _input->Read(buffer, max);
+	size_t read = _input->Read(buffer, max-1);
+	NEX_ASSERT(read < max);
+	buffer[read] = 0;
+	return read;
 }
 
 ASTDocumentPtr ParserContext::MakeDocument(ASTRegionPtr& region) {
