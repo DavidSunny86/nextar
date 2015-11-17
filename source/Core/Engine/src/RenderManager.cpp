@@ -40,7 +40,10 @@ void RenderManager::DestroyResources() {
 }
 
 void RenderManager::CreateResources() {
-	URL defaultTexturePath(FileSystem::ArchiveEngineData_Name, "Textures/Assets/DefaultTexture.asset");
+	URL defaultTexturePath(FileSystem::ArchiveEngineData_Name, "Textures/DefaultTexture.jpg");
+	TextureAsset::ID id(StringUtils::DefaultID);
+	defaultTexture = TextureAsset::Traits::Instance(id, defaultTexturePath);
+	defaultTexture->RequestLoad();
 	//@urgent load default texture
 	//defaultTexture = Asset::AssetLoad(defaultTexturePath);
 }

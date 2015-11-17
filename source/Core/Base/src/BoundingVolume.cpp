@@ -5,6 +5,7 @@
 
 namespace nextar {
 
+const BoundsInfo BoundsInfo::Null;
 /*********************************
  * BoundingBox
  *********************************/

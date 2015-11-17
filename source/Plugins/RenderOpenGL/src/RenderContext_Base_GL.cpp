@@ -149,7 +149,7 @@ void RenderContext_Base_GL::Draw(StreamData* streamData, CommitContext& ctx) {
 				streamData->instanceCount, vd.start);
 		}
 	} else {
-		if (streamData->instanceCount == 1)
+		if (streamData->instanceCount == 1) 
 			glDrawArrays(primtype, vd.start, vd.count);
 		else
 			GlDrawArraysInstanced(primtype, vd.start, vd.count,
@@ -917,7 +917,7 @@ GLuint RenderContext_Base_GL::CreateSamplerFromParams(const TextureUnitParams& p
 	GlSamplerParameterf(sampler, GL_TEXTURE_LOD_BIAS,
 						params.lodBias);
 	GL_CHECK();
-	GlSamplerParameterf(sampler, GL_TEXTURE_MIN_LOD, params.minLod);
+	GlSamplerParameterf(sampler, GL_TEXTURE_MIN_LOD, params.minLod-1000);
 	GL_CHECK();
 	GlSamplerParameterf(sampler, GL_TEXTURE_MAX_LOD, params.maxLod);
 	GL_CHECK();

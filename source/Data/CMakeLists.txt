@@ -11,7 +11,9 @@ set(NEX_DATA_SHADERS_GLSL ${NEX_DATA}/Shaders/GLSL)
 set(NEX_DATA_EFFECTS ${NEX_DATA}/Effects)
 set(NEX_DATA_CONFIGS ${NEX_DATA}/Configs)
 set(NEX_DATA_TEXTURES ${NEX_DATA}/Textures)
+set(NEX_DATA_TEXTURE_ASSETS ${NEX_DATA}/Textures/Assets)
 set(NEX_DATA_MESHES ${NEX_DATA}/Meshes)
+set(NEX_DATA_MESH_ASSETS ${NEX_DATA}/Meshes/Assets)
 set(NEX_DATA_MATERIALS ${NEX_DATA}/Materials)
 set(NEX_DATA_MATERIAL_ASSETS ${NEX_DATA}/Materials/Assets)
 set(NEX_DATA_SCRIPTS ${NEX_DATA}/Scripts)
@@ -20,7 +22,9 @@ file(GLOB_RECURSE NEX_DATA_SHADERS_GLSL_LIST ${NEX_DATA_SHADERS_GLSL}/*)
 file(GLOB_RECURSE NEX_DATA_EFFECTS_LIST ${NEX_DATA_EFFECTS}/*)
 file(GLOB_RECURSE NEX_DATA_CONFIG_LIST ${NEX_DATA_CONFIGS}/*)
 file(GLOB_RECURSE NEX_DATA_TEXTURE_LIST ${NEX_DATA_TEXTURES}/*)
+file(GLOB_RECURSE NEX_DATA_TEXTURE_ASSET_LIST ${NEX_DATA_TEXTURE_ASSETS}/*)
 file(GLOB_RECURSE NEX_DATA_MESH_LIST ${NEX_DATA_MESHES}/*)
+file(GLOB_RECURSE NEX_DATA_MESH_ASSET_LIST ${NEX_DATA_MESH_ASSETS}/*)
 file(GLOB_RECURSE NEX_DATA_MATERIAL_LIST ${NEX_DATA_MATERIALS}/*)
 file(GLOB_RECURSE NEX_DATA_MATERIAL_ASSET_LIST ${NEX_DATA_MATERIAL_ASSETS}/*)
 file(GLOB_RECURSE NEX_DATA_SCRIPTS_LIST ${NEX_DATA_SCRIPTS}/*)
@@ -30,7 +34,9 @@ set(DATA_SRC_LIST
 	${NEX_DATA_EFFECTS_LIST}
 	${NEX_DATA_CONFIG_LIST}
 	${NEX_DATA_TEXTURE_LIST}
+   ${NEX_DATA_TEXTURE_ASSET_LIST}
 	${NEX_DATA_MESH_LIST}
+   ${NEX_DATA_MESH_ASSET_LIST}
 	${NEX_DATA_MATERIAL_LIST}
 	${NEX_DATA_MATERIAL_ASSET_LIST}
 	${NEX_DATA_SCRIPTS_LIST}
@@ -61,7 +67,9 @@ endmacro(copy_data)
 prepare_data(Shaders)
 prepare_data(Configs)
 prepare_data(Textures)
+prepare_data("Textures/Assets")
 prepare_data(Meshes)
+prepare_data("Meshes/Assets")
 prepare_data(Materials)
 prepare_data("Materials/Assets")
 prepare_data(Scripts/Materials)
@@ -76,7 +84,9 @@ add_custom_target(NE_Data ALL
 copy_data(Shaders)
 copy_data(Configs)
 copy_data(Textures)
+copy_data("Textures/Assets")
 copy_data(Meshes)
+copy_data("Meshes/Assets")
 copy_data(Materials)
 copy_data("Materials/Assets")
 copy_data(Scripts)

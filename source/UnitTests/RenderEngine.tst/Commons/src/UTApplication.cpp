@@ -48,7 +48,7 @@ void UTApplication::_SetupScene(SceneAssetPtr& scene) {
 
 	camera->AddToScene(scene);
 
-	window->CreateViewport(Camera::Traits::Cast(camera->GetSpatial()));
+	window->CreateViewport(Camera::Traits::Cast(camera->GetSpatial()))->SetClearColor(Color(1, 1, 1, 1));
 }
 
 void UTApplication::ConfigureExtendedInterfacesImpl() {

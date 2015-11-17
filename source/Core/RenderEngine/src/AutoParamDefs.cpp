@@ -17,7 +17,9 @@ namespace nextar {
 void ObjectTransformsApply(CommitContext& context, const ShaderParameter* d) {
 	NEX_ASSERT(context.primitive);
 	const Matrix4x4* m = context.primitive->GetWorldMatrices();
-	context.paramGroup->WriteRawData(context.renderContext, m, 0, 16 * 4);
+	const Matrix4x4* vp = context.viewProjectionMatrix;
+	Matrix4x4 mvp = Mat4x4Mul(*m, *vp);
+	context.paramGroup->WriteRawData(context.renderContext, &mvp, 0, 16 * 4);
 	Matrix4x4 modelView = Mat4x4Mul(*m, *context.viewMatrix);
 	context.paramGroup->WriteRawData(context.renderContext, &modelView, 16 * 4, 16 * 4);
 }

@@ -59,14 +59,19 @@ public:
 		PixelFormat textureFormat;
 		TextureType type;
 		uint8 textureFlags;
+		// if 2 mip levels are being loaded, those levels are expected to be stored in image
+		// however, considering that progressive loading is being done, and more levels were
+		// previously loaded (should be continuous), the lowest level is not baseMipLevel + image.numMipLevel, 
+		// but something rather bigger. texture view does not track it, so this should be tracked here.
+		uint8 lowestMipLevel; // lowest is smaller mip maps and higher number, can be safely set to totalMipMaps - 1
+		uint8 baseMipLevel;   // highest mip level
 		ImageMetaInfo desc;
-		uint8 baseMipLevel;
 		Image* image;
 
 		UpdateParams() :
-				image(nullptr), baseMipLevel(0), textureFlags(0), type(
-						TEXTURE_TYPE_UNKNOWN), textureFormat(
-						PixelFormat::UNKNOWN) {
+			image(nullptr), baseMipLevel(0), lowestMipLevel(0),
+			textureFlags(0), type(TEXTURE_TYPE_UNKNOWN), 
+			textureFormat(PixelFormat::UNKNOWN) {
 		}
 	};
 

@@ -53,8 +53,8 @@ void GBuffer::Setup(Size dimensions) {
 		renderTarget->Create(params);
 
 		depth = renderTarget->GetDepthAttachment();
-		normalMap = renderTarget->GetAttachment(0);
-		albedoMap = renderTarget->GetAttachment(1);
+		albedoMap = renderTarget->GetAttachment(0);
+		normalMap = renderTarget->GetAttachment(1);
 		specularAndGlossMap = renderTarget->GetAttachment(2);
 	}
 }
@@ -98,7 +98,6 @@ void DeferredRenderSystem::Commit(CommitContext& context) {
 	VisibilitySet& visibles = *context.visibiles;
 	context.renderContext->BeginRender(&gbufferRI);
 	RenderQueueList& layerList = visibles.GetRenderQueues();
-
 	for (auto &layer : layerList) {
 		if (Test(layer.flags & RenderQueueFlags::DEFERRED)) {
 			for (auto &prim : layer.visibles) {
@@ -122,7 +121,7 @@ void DeferredRenderSystem::Commit(CommitContext& context) {
 				}
 
 				context.paramBuffers[(uint32)ParameterContext::CTX_OBJECT] = prim.second->GetParameters();
-				context.pass->UpdateParams(context, ParameterContext::CTX_OBJECT, prim.first);
+				context.pass->UpdateParams(context, ParameterContext::CTX_OBJECT, prim.first + context.frameNumber);
 				context.renderContext->Draw(prim.second->GetStreamData(), context);
 			}
 		}
@@ -140,11 +139,13 @@ void DeferredRenderSystem::Commit(CommitContext& context) {
 	static bool registeredForRender = false;
 	if (DebugDisplay::InstancePtr() && !registeredForRender) {
 		Box2D box(0, 0, 0.25f, 0.25f);
-		DebugDisplay::Instance().Register(box, Color::Red, Vec4AZero(), gbuffer.normalMap);
+		DebugDisplay::Instance().Register(box, Color::White, Vec4AZero(), gbuffer.albedoMap);
 		Box2D box2(0.25f, 0, 0.5f, 0.25f);
-		DebugDisplay::Instance().Register(box2, Color::Red, Vec4AZero(), gbuffer.albedoMap);
-		Box2D box3(0.0f, 0.25f, 0.25f, 0.5f);
-		DebugDisplay::Instance().Register(box3, Color::Red, Vec4AZero(), gbuffer.albedoMap);
+		DebugDisplay::Instance().Register(box2, Color::White, Vec4AZero(), gbuffer.normalMap);
+		Box2D box3(0.5f, 0.0f, 0.75f, 0.25f);
+		DebugDisplay::Instance().Register(box3, Color::White, Vec4AZero(), gbuffer.specularAndGlossMap);
+		Box2D box4(0.75f, 0.0f, 1.0f, 0.25f);
+		DebugDisplay::Instance().Register(box3, Color::White, Vec4AZero(), gbuffer.depth);
 		registeredForRender = true;
 	}
 

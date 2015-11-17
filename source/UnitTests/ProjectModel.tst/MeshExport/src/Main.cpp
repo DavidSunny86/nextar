@@ -7,27 +7,48 @@ NEX_IMPLEMENT_APP()
 using namespace nextar;
 
 class UTApplicationMeshExport: public UTApplication {
+	String filePath;
+	String savePath;
 public:
+	UTApplicationMeshExport(const String& file, const String& save) : filePath(file), savePath(save) {}
 	virtual void _SetupScene(SceneAssetPtr& scene) {
 		UTApplication::_SetupScene(scene);
-		MeshTemplate::ID id(NamedObject::AsyncStringID("BuggyNew"));
-		URL location(FileSystem::ArchiveEngineData_Name, "Meshes/FBX/BuggyNew/buggy.FBX");
-
+		
+		URL location(FileSystem::ArchiveEngineData_Name, filePath);
+		MeshTemplate::ID id(NamedObject::AsyncStringID(location.GetComputedName()));
+		
 		MeshTemplatePtr mesh =
 				MeshTemplate::Traits::Instance(id,
 						location);
 		mesh->RequestLoad();
 		StreamInfo streamInfo;
-		streamInfo.locator = URL("{EngineData}/Meshes/Buggy.mesh");
+		streamInfo.locator = URL(FileSystem::ArchiveEngineData_Name, savePath);
 		mesh->RequestSave(streamInfo);
 		ApplicationContext::Instance().QuitApplication();
 	}
 };
 
 int NextarMain(int argc, char* argv[]) {
-	UTApplicationMeshExport application;
-	application.InitializeContext(argc, argv);
-	application.Run();
-	application.DestroyContext();
+	
+	String filePath, savePath;
+	for (int i = 1; i < argc; ++i) {
+		char* suffix = std::strstr(argv[i], "--file=");
+		if (suffix) {
+			suffix += sizeof("--file");
+			filePath = suffix;
+		} else {
+			char* out = std::strstr(argv[i], "--save=");
+			if (out) {
+				out += sizeof("--save");
+				savePath = out;
+			}
+		}
+	}
+	if (filePath.length()) {
+		UTApplicationMeshExport application(filePath, savePath.length() > 0 ? savePath : filePath + ".mesh");
+		application.InitializeContext(argc, argv);
+		application.Run();
+		application.DestroyContext();
+	}
 	return 0;
 }

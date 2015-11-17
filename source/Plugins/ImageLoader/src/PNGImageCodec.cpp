@@ -159,9 +159,9 @@ ImageData PNGImageCodec::Load(InputStreamPtr& file, const ImageParams& params,
 			alpha = false;
 
 		break;
-	case PNG_COLOR_TYPE_RGB:
 	case PNG_COLOR_TYPE_RGBA:
 		alpha = true;
+	case PNG_COLOR_TYPE_RGB:
 		imagetype = RGBImage;
 		if (!(color_type & PNG_COLOR_MASK_ALPHA)) {
 			alpha = false;
@@ -260,16 +260,16 @@ ImageData PNGImageCodec::Load(InputStreamPtr& file, const ImageParams& params,
 					switch (fmt) {
 					case PixelFormat::RGBA8:
 
-						*(imgDest++) = *(rowPtr++);
-						*(imgDest++) = *(rowPtr++);
-						*(imgDest++) = *(rowPtr++);
+						imgDest[0] = rowPtr[0];
+						imgDest[1] = rowPtr[1];
+						imgDest[2] = rowPtr[2];
 						if (alpha)
-							*(imgDest++) = *(rowPtr++);
+							imgDest[3] = rowPtr[3];
 						else
-							*(imgDest++) = 0xff;
+							imgDest[3] = 0xff;
 						break;
 					case PixelFormat::R8:
-						*(imgDest++) = *(rowPtr++);
+						imgDest[0] = rowPtr[0];
 						break;
 					}
 					imgDest += bpp;

@@ -154,6 +154,16 @@ uint32 DebugRenderSystem::Register(const Frustum& frustum,
 uint32 DebugRenderSystem::Register(const Box2D& rect,
 	const Color& color, Vec4AF textureOffsetAndRepeat, TextureBase* textured, bool border,
 	float expiryTimeInSec) {
+	// remap rect
+	Box2D remapped(rect);
+	remapped.min -= Vector2(0.5f, 0.5f);
+	remapped.max -= Vector2(0.5f, 0.5f);
+	remapped.min *= 2;
+	remapped.max *= 2;
+	
+	// actual size is 2,2
+	Vector2 size = remapped.GetSize() * 0.5;
+	Vector2 center = remapped.GetCenter();
 	if (!quadDataGenerated) {
 		GenerateStreamDataForQuad();
 		quadDataGenerated = true;
@@ -163,8 +173,6 @@ uint32 DebugRenderSystem::Register(const Box2D& rect,
 	primitive->SetDebugMaterial(debugQuadMaterial);
 	primitive->SetStreamData(&quadDataStream);
 	ParameterBuffer* b = primitive->GetParameters();
-	Vector2 size = rect.GetSize();
-	Vector2 center = rect.GetCenter();
 	if (!textured)
 		textured = RenderManager::Instance().GetDefaultTexture();
 	Vector4A translationAndScale[3] = {
@@ -220,6 +228,7 @@ void DebugRenderSystem::RemovePrimitive(uint32 id) {
 void DebugRenderSystem::Commit(CommitContext& context) {
 
 	DetermineVisiblePrimitives(context.frameTime);
+	// @urgent We should not clear here
 	context.renderTargetInfo.info.clearColor[0] = Color::Black;
 	context.renderTargetInfo.info.clearFlags = ClearFlags::CLEAR_COLOR;
 	context.renderContext->BeginRender(&context.renderTargetInfo);
@@ -246,7 +255,7 @@ void DebugRenderSystem::Commit(CommitContext& context) {
 		context.primitive = prim;
 		context.color = dp->GetColor();
 		context.paramBuffers[(uint32)ParameterContext::CTX_OBJECT] = prim->GetParameters();
-		context.pass->UpdateParams(context, ParameterContext::CTX_OBJECT, (uint32)(ptrdiff_t)prim);
+		context.pass->UpdateParams(context, ParameterContext::CTX_OBJECT, (uint32)(ptrdiff_t)prim + context.frameNumber);
 		context.renderContext->Draw(prim->GetStreamData(), context);
 	}
 	context.renderContext->EndRender();

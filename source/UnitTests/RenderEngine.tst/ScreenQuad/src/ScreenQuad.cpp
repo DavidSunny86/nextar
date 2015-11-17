@@ -16,17 +16,7 @@ class UTApplicationImageLoader : public UTApplication {
 	
 public:
 	virtual void _SetupScene(SceneAssetPtr& scene) {
-
 		UTApplication::_SetupScene(scene);
-		// load textures and display
-		URL tiledTexture("{EngineData}/Textures/tiled_art.jpg");
-		TextureAsset::ID id(NamedObject::AsyncStringID("TiledArt"));
-		TextureAssetPtr texture = TextureAsset::Traits::Instance(id, tiledTexture);
-		if (texture) {
-			texture->RequestLoad();
-			Box2D box(0, 0, 0.25f, 0.25f);
-			DebugDisplay::Instance().Register(box, Color::White, Vec4ASet(0,0,1,1), texture);
-		}
 		
 	}
 };

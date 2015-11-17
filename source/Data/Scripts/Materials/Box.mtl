@@ -4,6 +4,6 @@ material #:#.Box {
 	layer normal;
 	enable_options HAS_DIFFUSE_MAP;
 	param_value diffuseAndGloss ".3 .3 .3 .5";
-	param_value diffuseMap "{Data}/Textures/Box.jpg" BoxTexture; 
+	param_value diffuseMap "{Data}/Textures/DefaultTexture.png" Default; 
 }
 

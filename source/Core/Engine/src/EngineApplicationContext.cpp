@@ -13,6 +13,7 @@
 #include <MeshServices.h>
 #include <InputManagerImpl.h>
 #include <TaskSchedular.h>
+#include <AssetStreamer.h>
 
 namespace nextar {
 
@@ -30,6 +31,7 @@ void EngineApplicationContext::CreateExtendedInterfacesImpl() {
 	NEX_NEW(ComponentFactoryArchive());
 	NEX_NEW(ComponentGroupArchive());
 	NEX_NEW(MeshServices());
+	NEX_NEW(AssetStreamer());
 	ComponentFactoryArchive::Instance().InstallDefaultFactories();
 }
 
@@ -59,6 +61,7 @@ void EngineApplicationContext::ReleaseResourcesImpl() {
 }
 
 void EngineApplicationContext::DestroyExtendedInterfacesImpl() {
+	NEX_DELETE(AssetStreamer::InstancePtr());
 	NEX_DELETE(MeshServices::InstancePtr());
 	NEX_DELETE(ComponentFactoryArchive::InstancePtr());
 	NEX_DELETE(ComponentGroupArchive::InstancePtr());

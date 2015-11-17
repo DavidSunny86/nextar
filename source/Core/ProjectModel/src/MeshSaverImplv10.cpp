@@ -111,7 +111,8 @@ void MeshSaverImplv1_0::WriteVertexBufferData(MeshBuffer* buffer,
 		uint32 vertexCount = buffer->GetVertexCount();
 		uint32 vertexStride = buffer->GetVertexStride(i);
 		uint32 bufferSize =  vertexCount * vertexStride;
-		ser << bufferSize << vertexCount << i << vertexStride;
+		uint16 streamIndex = (uint16)i;
+		ser << bufferSize << vertexCount << streamIndex << vertexStride;
 		buffer->GetVertices(i, bytes);
 		OutputSerializer::UByteArray arr(bytes.data(), (uint32)bytes.size());
 		NEX_ASSERT(arr.second == bufferSize);

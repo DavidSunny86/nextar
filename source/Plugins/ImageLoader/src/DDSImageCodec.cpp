@@ -32,6 +32,8 @@ bool DDSImageCodec::TryLoad(InputStreamPtr& file, const ImageParams& params, Ima
 ImageData DDSImageCodec::Load(InputStreamPtr& file, const ImageParams& params, ImageCodecMetaInfo& metaInfo) {
 	// read uint32 + sizeof(DDS_HEADER) bytes of data
 	uint32 magic;
+	// we read from the start
+	file->Rewind();
 	InputSerializer ser(file);
 
 	ser >> magic;
@@ -279,7 +281,7 @@ void DDSImageCodec::GetSurfaceInfo(size_t width, size_t height, PixelFormat fmt,
 		rowBytes = ((width + 1) >> 1) * 4;
 		numRows = height;
 	} else {
-		size_t bpp = PixelUtils::BytesPerPixel(fmt) * 4;
+		size_t bpp = PixelUtils::BytesPerPixel(fmt) * 8;
 		rowBytes = (width * bpp + 7) / 8; // round up to nearest byte
 		numRows = height;
 	}
@@ -315,7 +317,12 @@ ImageData DDSImageCodec::FillInitData(InputSerializer& ser, size_t arraySize,
 	if (baseMipLevel == Image::IMAGE_HIGHEST_MIP_LEVEL) {
 		baseMipLevel = 0;
 	} else if (baseMipLevel == Image::IMAGE_LOWEST_MIP_LEVEL) {
-		baseMipLevel = metaInfo.metaInfo.maxMipMapCount - numMipLevelToLoad;
+		if (metaInfo.metaInfo.maxMipMapCount > numMipLevelToLoad)
+			baseMipLevel = metaInfo.metaInfo.maxMipMapCount - numMipLevelToLoad;
+		else {
+			baseMipLevel = 0;
+			numMipLevelToLoad = metaInfo.metaInfo.maxMipMapCount;
+		}
 	}
 
 	if (baseMipLevel + numMipLevelToLoad > metaInfo.metaInfo.maxMipMapCount)
@@ -423,6 +430,9 @@ ImageData DDSImageCodec::FillInitData(InputSerializer& ser, size_t arraySize,
 				InputSerializer::UByteArray arr(byteArr, (uint32)(numBytes * d));
 				ser >> arr;
 #endif
+				// wont work for compressed formats
+				FlipY(byteArr, bpp, w, h, d);
+				byteArr += (numBytes * d); 
 			} else {
 				ser.Seek(numBytes * d, std::ios_base::cur);
 			}
@@ -442,6 +452,24 @@ ImageData DDSImageCodec::FillInitData(InputSerializer& ser, size_t arraySize,
 		}
 	}
 	return ret;
+}
+
+void DDSImageCodec::FlipY(uint8* rows, uint32 bpp, const uint32 numInRow, uint32 numRow, uint32 d) {
+	uint32 rowPitch = numInRow * bpp;
+	uint8* singleRow = (uint8*)NEX_ALLOC(rowPitch, MEMCAT_GENERAL);	
+	for (uint32 i = 0; i < d; ++i) {
+		uint32 lastRow = numRow - 1;
+		for (uint32 i = 0; i < lastRow; ++i, --lastRow) {
+			if (i != lastRow) {
+				std::memcpy(singleRow, rows + lastRow * rowPitch, rowPitch);
+				std::memcpy(rows + lastRow * rowPitch, rows + i * rowPitch, rowPitch);
+				std::memcpy(rows + i * rowPitch, singleRow, rowPitch);
+			}
+		}
+
+		rows = rows + rowPitch*numRow;
+	}
+	NEX_FREE(singleRow, MEMCAT_GENERAL);
 }
 
 void DDSImageCodec::Save(OutputStreamPtr& file, const ImageParams& params,

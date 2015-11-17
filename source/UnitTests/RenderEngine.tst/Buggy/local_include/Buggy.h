@@ -13,6 +13,7 @@ using namespace nextar;
 class Buggy : public UTApplication {
 protected:
   Component* cameraEntity;
+  Component* meshEntity;
 public:
   virtual void _SetupScene(SceneAssetPtr& scene);
   virtual void Execute(const FrameTimer& frameTimer) override;

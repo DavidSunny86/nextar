@@ -17,3 +17,6 @@ add_unit_test(FpsCameraBehaviourTest)
 add_unit_test(Buggy)
 # Added test ScreenQuad: Sun, Nov  1, 2015  1:36:51 AM
 add_unit_test(ScreenQuad)
+# Added test Textures: Sat, Nov  7, 2015  4:43:57 PM
+
+add_unit_test(Textures)

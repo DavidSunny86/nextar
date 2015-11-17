@@ -22,7 +22,7 @@ StreamNotification MeshTemplate::NotifyAssetLoadedImpl(
 	MeshBuilder* builder = static_cast<MeshBuilder*>(request);
 
 	sharedMaterial = builder->sharedMaterial;
-	sharedBuffer = builder->sharedBuffer;
+	std::swap(sharedBuffer, builder->sharedBuffer);
 	bounds = builder->bounds;
 	primitives = std::move(builder->primitives);
 

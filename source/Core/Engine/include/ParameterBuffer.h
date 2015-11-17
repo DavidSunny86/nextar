@@ -26,7 +26,7 @@ public:
 	ParameterBuffer();
 	ParameterBuffer(const ParameterBuffer&);
 	ParameterBuffer(ParameterBuffer&&);
-	virtual ~ParameterBuffer();
+	~ParameterBuffer();
 
 	void Prepare(const ParamEntryTableItem& table);
 	void Prepare(void* data, uint32 size);
@@ -61,9 +61,14 @@ public:
 	ParameterBuffer& operator =(ParameterBuffer&& pb);
 protected:
 
+	typedef STDPoolAllocator<AssetPtr,
+		32,
+		MEMCAT_GENERAL> PointerAllocator;
+	
+	typedef list<AssetPtr, AllocatorGeneral, PointerAllocator>::type AssetList;
 	const ParamEntry* _GetParameter(const String& name) const;
 
-	uint32 textureAssetsBitField;
+	AssetList assetRefs;
 	uint32 size;
 
 	ParamEntryTableItem paramTable;

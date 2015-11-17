@@ -440,6 +440,7 @@ void AssetLoader::Serialize() {
 		impl = GetImpl(ext, assetPtr->GetClassID());
 	}
 	if (!impl) {
+		request->SetCompleted(false);
 		Error("No loader for type.");
 		NEX_THROW_GracefulError(EXCEPT_MISSING_PLUGIN);
 	}
@@ -451,6 +452,8 @@ void AssetLoader::Serialize() {
 
 		if (!input) {
 			Error("Failed to open file: " + location.ToString());
+			impl->PreLoadFailed(*this);
+			request->SetCompleted(false);
 			return;
 		}
 	}
@@ -483,6 +486,7 @@ void AssetSaver::Serialize() {
 		impl = GetImpl(ext, assetPtr->GetClassID());
 	}
 	if (!impl) {
+		request->SetCompleted(false);
 		Error("No saver for type.");
 		NEX_THROW_GracefulError(EXCEPT_MISSING_PLUGIN);
 	}
@@ -494,6 +498,8 @@ void AssetSaver::Serialize() {
 
 		if (!output) {
 			Error("Failed to open file: " + location.ToString());
+			impl->PreSaveFailed(*this);
+			request->SetCompleted(false);
 			return;
 		}
 	}

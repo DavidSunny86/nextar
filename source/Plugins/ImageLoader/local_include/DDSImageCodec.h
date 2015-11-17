@@ -41,6 +41,7 @@ protected:
 	ImageData FillInitData(InputSerializer& file, size_t arraySize, PixelFormat, const ImageParams& params, ImageCodecMetaInfo& metaInfo);
 	ImageData CreateImageData(InputSerializer& file, DDS_HEADER* header,
 			size_t offset, const ImageParams& params, ImageCodecMetaInfo& metaInfo);
+	static void FlipY(uint8* data, uint32 bpp, uint32 w, uint32 h, uint32 d);
 };
 
 } /* namespace nextar */

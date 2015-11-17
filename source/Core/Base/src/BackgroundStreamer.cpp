@@ -115,6 +115,7 @@ void BackgroundStreamerImpl::Execute(const FrameTimer& frameTimer) {
 			else
 				r->streamHandler->NotifyLoaded(r);
 		}
+		responseQueue.clear();
 	}
 }
 }

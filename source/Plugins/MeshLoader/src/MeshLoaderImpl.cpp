@@ -50,18 +50,24 @@ void MeshLoaderImpl::Load(InputStreamPtr& input, AssetLoader& loader) {
 				Error(
 						String("Unsupported mesh version in file: ")
 								+ request->GetName());
-				NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
+				request->SetCompleted(false);
 				break;
 			}
 
 			NEX_ASSERT(impl);
-			impl->Load(ser, loader);
+			try {
+				impl->Load(ser, loader);
+				request->SetCompleted(true);
+			}
+			catch (GracefulErrorExcept& e) {
+				request->SetCompleted(false);
+			}
 		}
 	} else {
 		Error(
 				String("Could not open mesh file: ")
 						+ request->GetName());
-		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOCATE_ASSET);
+		request->SetCompleted(false);
 	}
 }
 }

@@ -20,6 +20,7 @@ public:
 	FbxMaterialLoaderImplv1_0(FbxSurfaceMaterial* pFbxMat, const URL& kMeshPath);
 	virtual ~FbxMaterialLoaderImplv1_0();
 
+	virtual void PreLoadFailed(AssetLoader& assetLoader);
 	virtual void Load(InputStreamPtr&, AssetLoader&);
 
 	void CreateFromMaterial(FbxSurfaceMaterial* pFbxMat);

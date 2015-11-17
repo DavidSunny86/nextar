@@ -10,8 +10,8 @@ shader DebugQuad {
 			sampler linear_sampler {
 				min_filter linear_mip_linear;
 				mag_filter linear;
-				address_u clamp;
-				address_v clamp;
+				address_u repeat;
+				address_v repeat;
 			}
 
 			unit linear_sampler diffuseMap ui:Maps.TextureMap context:Object;

@@ -73,12 +73,13 @@ void TextureAsset::LoadImpl(StreamRequest* request, bool isStreamed) {
 			textureParams->SetCompleted(false); // todo Not found return code. unify return codes??
 			return;
 		}
-	} else
-		img.baseMipLevel = currentMaxMipLevel;
+	} else {
+		if (currentMaxMipLevel < img.numMipLevelToLoad)
+			img.numMipLevelToLoad = currentMaxMipLevel;
+		img.baseMipLevel = currentMaxMipLevel - img.numMipLevelToLoad;
+	}
 
 	if (textureParams->inputStream) {
-		// todo handle error here? try catch {}
-		textureParams->inputStream->Rewind();
 		textureParams->image.Load(textureParams->inputStream, img,
 				textureParams->codecInfo);
 	}
@@ -101,16 +102,21 @@ StreamNotification TextureAsset::NotifyAssetLoadedImpl(nextar::StreamRequest* re
 
 	if (!IsTextureInited()) {
 		numMipMaps = textureParams->codecInfo.metaInfo.maxMipMapCount;
+		textureParams->createParams.lowestMipLevel = (uint8)textureParams->codecInfo.metaInfo.maxMipMapCount - 1;
 		textureParams->createParams.image = &textureParams->image;
+		
 		textureParams->createParams.textureFormat =
 				PixelUtils::GetNearestTextureFormat(
 						textureParams->image.GetFormat());
 		textureParams->createParams.textureFlags = (uint8)GetTextureFlags();
+		// progressive load? we have to preallocate as otherwise it doesn't work for some reason
+		if (textureParams->codecInfo.mipLevelsToRead > 0)
+			textureParams->createParams.textureFlags |= TextureBase::PRE_ALLOCATE_STORAGE;
 		// todo Texture array support
 		type = TEXTURE_2D;
-		if (height == 1)
+		if (textureParams->codecInfo.metaInfo.maxHeight == 1)
 			type = TEXTURE_1D;
-		else if (depth > 1)
+		else if (textureParams->codecInfo.metaInfo.maxDepth > 1)
 			type = TEXTURE_3D;
 		if (faces == 6)
 			type = TEXTURE_CUBE_MAP;
@@ -118,15 +124,18 @@ StreamNotification TextureAsset::NotifyAssetLoadedImpl(nextar::StreamRequest* re
 		textureParams->createParams.type = GetTextureType();
 	}
 
-	textureParams->createParams.baseMipLevel =
-			(uint8)textureParams->codecInfo.mipLevelsToRead;
 	textureParams->createParams.desc = textureParams->codecInfo.metaInfo;
-
+	uint8 numMipsLeftToRead = (uint8)textureParams->codecInfo.mipLevelsToRead;
+	
+	textureParams->createParams.baseMipLevel = numMipsLeftToRead;			
+	currentMaxMipLevel = numMipsLeftToRead;
+	
+	
 	ContextObject::RequestUpdate(MSG_TEX_CREATE | MSG_TEX_UPLOAD,
 			reinterpret_cast<ContextObject::ContextParamPtr>(&textureParams->createParams));
 	bool completed = false;
 	/* should we stream again, in case it was not fully loaded ? */
-	if (currentMaxMipLevel < numMipMaps-1) {
+	if (numMipsLeftToRead > 0) {
 		if (!IsAutoStreamEnabled()) {
 			textureParams->flags |= StreamRequest::COMPLETED;
 			completed = true;

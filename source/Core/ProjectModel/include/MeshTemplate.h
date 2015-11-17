@@ -40,6 +40,10 @@ public:
 
 		MeshBuilder(MeshTemplate* asset) : AssetStreamRequest(asset), sharedBuffer(nullptr) {
 		}
+		~MeshBuilder() {
+			if (sharedBuffer)
+				NEX_DELETE(sharedBuffer);
+		}
 
 		PrimitiveGroup& AddPrimitiveGroup() {
 			primitives.push_back(PrimitiveGroup());

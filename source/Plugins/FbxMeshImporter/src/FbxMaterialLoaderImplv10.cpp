@@ -22,6 +22,10 @@ FbxMaterialLoaderImplv1_0::~FbxMaterialLoaderImplv1_0() {
 	// TODO Auto-generated destructor stub
 }
 
+void FbxMaterialLoaderImplv1_0::PreLoadFailed(AssetLoader& assetLoader) {
+	NEX_DELETE(this);
+}
+
 void FbxMaterialLoaderImplv1_0::Load(InputStreamPtr& input,
 		AssetLoader& assetLoader) {
 	assetLoader.GetRequestPtr()->SetCompleted(true);

@@ -267,8 +267,8 @@ TextureAddressMode Helper::GetTextureAddressMode(const String& val) {
 uint32 Helper::GetShaderFlag(const String& val) {
 	static EnumNamePair names[] = {
 		{ RenderQueueFlags::BACKGROUND, _SS(ARG_BACKGROUND) },
-		{ RenderQueueFlags::DEBUG, _SS(ARG_DEBUG) },
 		{ RenderQueueFlags::DEFERRED, _SS(ARG_BASIC_DEFERRED) },
+		{ RenderQueueFlags::DEBUG, _SS(ARG_DEBUG) },
 		{ RenderQueueFlags::DEFERRED_LIGHTING, _SS(ARG_DEFERRED_LIGHTING) },
 		{ RenderQueueFlags::OVERLAY, _SS(ARG_OVERLAY) },
 		{ RenderQueueFlags::POST_FX, _SS(ARG_POST_FX) },

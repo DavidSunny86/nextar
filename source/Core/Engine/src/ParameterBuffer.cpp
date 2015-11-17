@@ -11,7 +11,7 @@
 namespace nextar {
 
 ParameterBuffer::ParameterBuffer() :
-size(0), data(nullptr), textureAssetsBitField(0) {
+size(0), data(nullptr) {
 }
 
 ParameterBuffer::ParameterBuffer(const ParameterBuffer& pb) {
@@ -27,19 +27,7 @@ ParameterBuffer::~ParameterBuffer() {
 	if (!buffer || !size)
 		return;
 
-	uint32 index = 0;
-	for (auto it = paramTable.beginIt; it != paramTable.endIt; ++it) {
-		if( (*it).type == ParamDataType::PDT_TEXTURE ) {
-			if (textureAssetsBitField & (1 << index)) {
-				TextureUnit* unit = reinterpret_cast<TextureUnit*>(buffer);
-				if (unit->texture && unit->texture->IsTextureAsset()) {
-					static_cast<TextureAsset*>(unit->texture)->Release();
-				}
-			}
-			index++;
-		}
-		buffer += (*it).maxSize;
-	}
+	assetRefs.clear();
 }
 
 void ParameterBuffer::Prepare(const ParamEntryTableItem& table) {
@@ -96,29 +84,14 @@ void ParameterBuffer::SetData(const TextureUnit* data, uint32 offset) {
 		if (unit.texture) {
 			if (unit.texture &&
 				unit.texture->IsTextureAsset()) {
-				static_cast<TextureAsset*>(unit.texture)->Release();
+				AssetPtr asset = Bind(static_cast<TextureAsset*>(unit.texture));
+				assetRefs.remove(asset);
 			}
 		}
 		std::memcpy(this->data.get() + offset, data, sizeof(TextureUnit));
-		NEX_ASSERT(paramTable.beginIt != paramTable.endIt);
-		uint32 coffset = 0;
-		uint32 index = 0;
-		// can optimize this search because the parameters are sorted, but offsets are not stored
-		for (auto it = paramTable.beginIt; it != paramTable.endIt && coffset != offset; 
-			++it) {
-			if ((*it).type == ParamDataType::PDT_TEXTURE)
-				++index;
-			coffset += (*it).maxSize;
-		}
-		NEX_ASSERT(coffset == offset);
-		NEX_ASSERT(index < 32);
-		if(data->texture &&
-				data->texture->IsTextureAsset()) {
-			
-			static_cast<TextureAsset*>(data->texture)->AddRef();
-			textureAssetsBitField |= 1 << index;
-		} else {
-			textureAssetsBitField &= ~(1 << index);
+		if (unit.texture && unit.texture->IsTextureAsset()) {
+			AssetPtr asset = Bind(static_cast<TextureAsset*>(unit.texture));
+			assetRefs.push_back(asset);
 		}
 	}
 }
@@ -126,7 +99,6 @@ void ParameterBuffer::SetData(const TextureUnit* data, uint32 offset) {
 ParameterBuffer& ParameterBuffer::operator=(const ParameterBuffer& pb) {
 	size = pb.size;
 	paramTable = pb.paramTable;
-	textureAssetsBitField = pb.textureAssetsBitField;
 	this->data.reset((uint8*) NEX_ALLOC(size, MEMCAT_CACHEALIGNED));
 	if (pb.data)
 		std::memcpy(this->data.get(), pb.data.get(), size);
@@ -147,7 +119,7 @@ ParameterBuffer& ParameterBuffer::operator=(ParameterBuffer&& pb) {
 	size = pb.size;
 	paramTable = std::move(pb.paramTable);
 	data = std::move(pb.data);
-	textureAssetsBitField = pb.textureAssetsBitField;
+	assetRefs = std::move(pb.assetRefs);
 	return *this;
 }
 
@@ -207,7 +179,7 @@ void ParameterBuffer::AsyncLoad(InputSerializer& ser, AssetStreamRequest* reques
 					else
 						assetPtr->AsyncRequestLoad();
 					tu->texture = assetPtr;
-					assetPtr->AddRef();
+					assetRefs.push_back(assetPtr);
 				} else
 					tu->texture = nullptr;
 				count = sizeof(TextureUnit);

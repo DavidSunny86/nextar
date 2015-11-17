@@ -151,8 +151,10 @@ void Pass::View::UpdateParams(CommitContext& ctx, ParameterContext type,
 	for (auto it = item.beginIt; it != item.endIt; ++it) {
 		ParameterGroup* group = (*it);
 		NEX_ASSERT(group->context == type);
-		if (group->lastUpdateId == id)
+		if (group->lastUpdateId == id) {
+			ctx.paramContext.first += group->size;
 			continue;
+		}
 		ctx.paramGroup = group;
 		if (group->processor) {
 			ctx.groupDataPtr = nullptr;

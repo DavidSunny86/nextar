@@ -13,13 +13,29 @@
 
 namespace nextar {
 
-struct BoundsInfo {
+struct _NexBaseAPI BoundsInfo {
 
-	static BoundsInfo Null;
+	static const BoundsInfo Null;
 
 	Vector3 center;
 	Vector3 extends;
 	float radius;
+
+	inline BoundsInfo& operator += (const BoundsInfo& info) {
+		if (info.radius > 0) {
+			if (radius <= 0)
+				*this = info;
+			else {
+				Vector3 a = center - info.center;
+				a.Abs();
+				Vector3 b = center + info.center;
+				center = b * 0.5f;
+				extends = a + extends + info.extends;
+				radius += (info.radius + Dot(a, a));
+			}
+		}
+		return *this;
+	}
 
 	BoundsInfo() : radius(0), center(0,0,0), extends(0,0,0) {
 	}

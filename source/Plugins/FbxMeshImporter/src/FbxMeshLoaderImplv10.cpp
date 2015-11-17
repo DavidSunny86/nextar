@@ -455,9 +455,9 @@ void FbxMeshLoaderImplv1_0::CreatePrimitiveGroupFrom(FbxSurfaceMaterial* pMtl,
 }
 
 void FbxMeshLoaderImplv1_0::BuildMesh(MeshTemplate::MeshBuilder* pMesh) {
-
-	pMesh->SetBounds(mFullBounds);
+		
 	pMesh->SetSharedBuffer(mSharedBuffer);
+	mFullBounds = BoundsInfo::Null;
 	for(auto &e : mElements) {
 		MeshTemplate::PrimitiveGroup& pg = pMesh->AddPrimitiveGroup();
 		pg.buffer = e.mMesh == mSharedBuffer ? nullptr : e.mMesh;
@@ -466,12 +466,13 @@ void FbxMeshLoaderImplv1_0::BuildMesh(MeshTemplate::MeshBuilder* pMesh) {
 		pg.vertexCount = e.mVertexCount;
 		pg.startVertex = e.mStartVertex;
 		pg.bounds = e.mBounds;
+		mFullBounds += e.mBounds;
 		pg.material = CreateMaterial(e.mMaterial, pMesh->GetAssetLocator());
 
 		if (pg.material)
 			pMesh->GetMetaInfo().AddDependency(pg.material);
 	}
-
+	pMesh->SetBounds(mFullBounds);
 	mElements.clear();
 	mSharedBuffer = nullptr;
 }

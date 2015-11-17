@@ -546,6 +546,7 @@ protected:
 class _NexEngineAPI AssetLoaderImpl {
 public:
 
+	virtual void PreLoadFailed(AssetLoader& assetLoader) {}
 	virtual void Load(InputStreamPtr&, AssetLoader&) = 0;
 
 protected:
@@ -576,6 +577,7 @@ class AssetSaver;
 class AssetSaverImpl {
 public:
 
+	virtual void PreSaveFailed(AssetSaver&) {}
 	virtual void Save(OutputStreamPtr&, AssetSaver&) = 0;
 
 protected:

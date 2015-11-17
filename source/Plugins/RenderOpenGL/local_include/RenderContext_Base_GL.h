@@ -108,6 +108,7 @@ public:
 	void WriteTextureLevel(GLenum target, GLint level,
 						   const PixelFormatGl& format, GLsizei width, GLsizei height,
 						   GLsizei depth, const uint8* data, size_t size);
+	inline void SetMipLevels(GLenum target, GLint baseLevel, GLint maxLevel);
 	void SpecifyTargetState(bool readOrDraw, bool setUnset, RenderTarget* target, FrameBuffer index);
 
 	void CopyBuffer(GLuint src, GLuint dest, size_t size);
@@ -158,7 +159,7 @@ public:
 		const RenderBuffer::CreateParams*  createParams,
 		const PixelFormatGl& format);
 	inline void DestroyRenderBuffer(GLuint buffer);
-
+	
 	// capture
 	void Capture(PixelBox& image, RenderTarget* rt, GLuint *pbo,
 				 FrameBuffer frameBuffer);
@@ -588,6 +589,11 @@ inline RenderContext_Base_GL::PlatformImpl* RenderContext_Base_GL::GetImpl() {
 
 inline void RenderContext_Base_GL::SetOriginalVideoMode(uint32 m) {
 	currentVideoMode = originalVideoMode = m;
+}
+
+inline void RenderContext_Base_GL::SetMipLevels(GLenum target, GLint baseLevel, GLint maxLevel) {
+	glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, baseLevel);
+	glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, maxLevel);
 }
 
 }

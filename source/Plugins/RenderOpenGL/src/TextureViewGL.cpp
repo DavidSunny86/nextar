@@ -12,7 +12,7 @@
 namespace RenderOpenGL {
 
 TextureViewGL::TextureViewGL() :
-		texture(0), target(0) {
+texture(0), target(0) {
 	pixelFormat.internalFormat = GL_NONE;
 }
 
@@ -47,7 +47,7 @@ void TextureViewGL::ReadPixels(RenderContext_Base_GL* gl, TextureBase::ReadPixel
 }
 
 void TextureViewGL::Update(nextar::RenderContext* rc, uint32 msg,
-		ContextObject::ContextParamPtr params) {
+	ContextObject::ContextParamPtr params) {
 
 	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	if (msg & TextureBase::MSG_TEX_READ) {
@@ -58,7 +58,7 @@ void TextureViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 
 	// todo Incorrect implementation
 	const TextureBase::UpdateParams& textureParams =
-			*reinterpret_cast<const TextureBase::UpdateParams*>(params);
+		*reinterpret_cast<const TextureBase::UpdateParams*>(params);
 
 	PixelFormat imageFormat = textureParams.textureFormat;
 	if (textureParams.image)
@@ -66,11 +66,11 @@ void TextureViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 
 	if (!IsCreated()) {
 		pixelFormat = RenderContext_Base_GL::GetGlPixelFormat(imageFormat,
-				textureParams.textureFormat);
+			textureParams.textureFormat);
 
 		if (pixelFormat.internalFormat == GL_NONE) {
 			Warn(
-					"Currently image should be of compatible format with texture!");
+				"Currently image should be of compatible format with texture!");
 			return;
 		}
 
@@ -80,9 +80,9 @@ void TextureViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 
 		if (textureParams.textureFlags & TextureBase::PRE_ALLOCATE_STORAGE) {
 			gl->AllocateTexture(target,
-					(GLint) textureParams.desc.maxMipMapCount,
-					pixelFormat.internalFormat, textureParams.desc.maxWidth,
-					textureParams.desc.maxHeight, textureParams.desc.maxDepth);
+				(GLint)textureParams.desc.maxMipMapCount,
+				pixelFormat.internalFormat, textureParams.desc.maxWidth,
+				textureParams.desc.maxHeight, textureParams.desc.maxDepth);
 		}
 	} else
 		gl->ActivateTexture(target, texture);
@@ -102,17 +102,22 @@ void TextureViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 					Warn("Pixel box has pixel padding. Cannot copy.");
 					continue;
 				}
-				gl->AllocateTextureLevel(realTarget + f,
-							(GLint) (textureParams.baseMipLevel + i),
-							pixelFormat, box.GetWidth(), box.GetHeight(),
-							box.GetDepth(), box.data, box.GetDataSize());
-				//	gl->WriteTextureLevel(realTarget + f,
-				//			(GLint) (textureParams.baseMipLevel + i),
-				//			pixelFormat, box.GetWidth(), box.GetHeight(),
-				//			box.GetDepth(), box.data, box.GetDataSize());
+				if (textureParams.textureFlags & TextureBase::PRE_ALLOCATE_STORAGE)
+					gl->WriteTextureLevel(realTarget + f,
+					(GLint)(textureParams.baseMipLevel + i),
+					pixelFormat, box.GetWidth(), box.GetHeight(),
+					box.GetDepth(), box.data, box.GetDataSize());
+				else
+					gl->AllocateTextureLevel(realTarget + f,
+					(GLint)(textureParams.baseMipLevel + i),
+					pixelFormat, box.GetWidth(), box.GetHeight(),
+					box.GetDepth(), box.data, box.GetDataSize());
 
 			}
+			gl->SetMipLevels(realTarget + f, textureParams.baseMipLevel, textureParams.lowestMipLevel);
 		}
+		// update number of mip levels
 	}
 }
+
 } /* namespace RenderOpenGL */

@@ -37,7 +37,9 @@ MaterialAssetPtr MeshLoaderIntfv1_0::ReadMaterialData(
 	MaterialAsset::ID id;
 	URL path;
 	ser >> id >> path;
-	return MaterialAsset::Traits::Instance(id, path);
+	MaterialAssetPtr ret = MaterialAsset::Traits::Instance(id, path);
+	mesh->GetMetaInfo().AddDependency(ret);
+	return ret;
 }
 
 void MeshLoaderIntfv1_0::FindStreamVertexElements(
