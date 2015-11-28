@@ -24,21 +24,27 @@ public:
 
 	virtual InputChangeBuffer UpdateSettings() override;
 
-	virtual bool IsDown(KeyID);
-	virtual bool IsOn(KeyID);
-	virtual AnalogValue GetValue(KeyID);
-	virtual InputDir GetDir(KeyID);
+	virtual bool IsDown(Key);
+	virtual bool IsOn(Key);
+	virtual AnalogValue GetValue(Key);
+	virtual InputDir GetDir(Key);
 
 	virtual DigitalControls* GetDigitalSettings();
 	virtual AnalogControls* GetAnalogSettings();
 
+	void AddKeyEvent(Key code, bool bDown);
+	void AddMouseEvent(float x, float y);
+	void AddMouseEvent(float wheelValue);
+	void AddMouseEvent(Key code, bool bDown);
 protected:
+	void CommitMouseMoveEvent();
 
 
 	bool capsLockState;
 	bool numLockState;
 	bool scrollLockState;
 	uint32 changeCount;
+	InputDir mouseDisplacement;
 	InputDir mousePos; // absolute pos
 	AnalogValue mouseWheel; // absolute value
 	array<KeyState, NEX_KEYBOARD_KEY_COUNT>::type  keyboardKeyStates;

@@ -23,7 +23,7 @@ void Buggy::_SetupScene(SceneAssetPtr& scene) {
     String deviceId;
     for(uint32 i = 0; i < InputManager::Instance().GetNumController(); ++i) {
       auto& desc = InputManager::Instance().GetControllerDesc(i);
-      if (desc.type == ControllerType::TYPE_XBOX360_CONTROLLER) {
+      if (desc.type == ControllerType::TYPE_KEYBOARD_AND_MOUSE) {
         InputManager::Instance().RegisterController(desc.deviceId);
         deviceId = Convert::ToString(desc.deviceId);
         break;

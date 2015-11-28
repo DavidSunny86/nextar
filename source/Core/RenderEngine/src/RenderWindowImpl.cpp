@@ -21,4 +21,8 @@ Size RenderWindowImpl::GetDimensions() const {
 	return dimensions;
 }
 
+Size RenderWindowImpl::GetCurrentDimensions() const {
+	return dimensions;
+}
+
 } /* namespace nextar */

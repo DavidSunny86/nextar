@@ -152,23 +152,23 @@ InputChangeBuffer Win360GamepadController::UpdateSettings() {
 	return buffer;
 }
 
-bool Win360GamepadController::IsDown(KeyID keyId) {
-	NEX_ASSERT(keyId >= NEX_XB360_CTRL_BUTTON_START && keyId < NEX_XB360_CTRL_BUTTON_END);
+bool Win360GamepadController::IsDown(Key Key) {
+	NEX_ASSERT(Key >= NEX_XB360_CTRL_BUTTON_START && Key < NEX_XB360_CTRL_BUTTON_END);
 	return false;
-	//return (bool)buttonStates[keyId - NEX_XB360_CTRL_BUTTON_START].value;
+	//return (bool)buttonStates[Key - NEX_XB360_CTRL_BUTTON_START].value;
 }
 
-bool Win360GamepadController::IsOn(KeyID keyId) {
+bool Win360GamepadController::IsOn(Key Key) {
 	return false;
 }
 
-AnalogValue Win360GamepadController::GetValue(KeyID keyId) {
-	NEX_ASSERT(XBOX_TRIG_LEFT == keyId || XBOX_TRIG_RIGHT == keyId);
+AnalogValue Win360GamepadController::GetValue(Key Key) {
+	NEX_ASSERT(XBOX_TRIG_LEFT == Key || XBOX_TRIG_RIGHT == Key);
 	return 0;
 }
 
-InputDir Win360GamepadController::GetDir(KeyID keyId) {
-	NEX_ASSERT(XBOX_AXIS_LEFT == keyId || XBOX_AXIS_RIGHT == keyId);
+InputDir Win360GamepadController::GetDir(Key Key) {
+	NEX_ASSERT(XBOX_AXIS_LEFT == Key || XBOX_AXIS_RIGHT == Key);
 	return InputDir();
 }
 

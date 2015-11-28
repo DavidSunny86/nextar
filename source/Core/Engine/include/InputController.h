@@ -11,8 +11,6 @@
 
 namespace nextar {
 
-typedef uint16 KeyID;
-
 enum ControllerType : uint16 {
 	TYPE_KEYBOARD_AND_MOUSE,
 	TYPE_XBOX360_CONTROLLER,
@@ -46,7 +44,7 @@ struct InputDir {
 
 struct InputEvent {
 	uint16 deviceId;
-	KeyID key;
+	Key key;
 	uint32 timeStamp;
 	union {
 		KeyState keyState;
@@ -92,8 +90,8 @@ protected:
 
 class AnalogControls {
 public:
-	virtual AnalogValue GetValue(KeyID) = 0;
-	virtual InputDir GetDir(KeyID) = 0;
+	virtual AnalogValue GetValue(Key) = 0;
+	virtual InputDir GetDir(Key) = 0;
 protected:
 	~AnalogControls() {
 	}
@@ -101,9 +99,9 @@ protected:
 
 class DigitalControls {
 public:
-	virtual bool IsDown(KeyID) = 0;
+	virtual bool IsDown(Key) = 0;
 	/* Valid for toggle keys */
-	virtual bool IsOn(KeyID) = 0;
+	virtual bool IsOn(Key) = 0;
 protected:
 	~DigitalControls() {
 	}
@@ -111,19 +109,19 @@ protected:
 
 namespace InputUtils {
 
-inline bool IsAnalog(KeyID key) {
+inline bool IsAnalog(Key key) {
 	return (key & KEY_ANALOG_BIT) != 0;
 }
 
-inline bool IsDigital(KeyID key) {
+inline bool IsDigital(Key key) {
 	return (key & (KEY_ANALOG_BIT | KEY_DIRECTION_BIT)) == 0;
 }
 
-inline bool IsDirection(KeyID key) {
+inline bool IsDirection(Key key) {
 	return (key & KEY_DIRECTION_BIT) == 0;
 }
 
-_NexEngineAPI int32 GetCookedCode(KeyID, bool shift, bool numlockon);
+_NexEngineAPI int32 GetCookedCode(Key, bool shift, bool numlockon);
 
 }
 

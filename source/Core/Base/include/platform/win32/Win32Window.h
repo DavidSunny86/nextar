@@ -2,6 +2,7 @@
 #define NEX_GRAPHICSWINDOW_H
 
 #include <IncWnds.h>
+#include <RenderWindow.h>
 
 namespace nextar {
 

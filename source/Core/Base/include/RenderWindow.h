@@ -33,6 +33,7 @@ public:
 				const NameValueMap* params) = 0;
 		virtual void ApplyChangedAttributes() = 0;
 		virtual void FocusChanged() = 0;
+		virtual Size GetCurrentDimensions() const = 0;
 		virtual ~Impl() {
 		}
 	};
@@ -115,6 +116,11 @@ public:
 	 **/
 	virtual void SetToFullScreen(bool fullscreen);
 
+	/* dimension */
+	Size GetCurrentDimensions() const {
+		NEX_ASSERT(impl);
+		return impl->GetCurrentDimensions();
+	}
 protected:
 	enum {
 		WINDOW_CREATED = 1 << 0,

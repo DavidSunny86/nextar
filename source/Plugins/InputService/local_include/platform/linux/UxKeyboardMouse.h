@@ -25,10 +25,10 @@ public:
 
 	virtual InputChangeBuffer UpdateSettings() override;
 
-	virtual bool IsDown(KeyID);
-	virtual bool IsOn(KeyID);
-	virtual AnalogValue GetValue(KeyID);
-	virtual InputDir GetDir(KeyID);
+	virtual bool IsDown(Key);
+	virtual bool IsOn(Key);
+	virtual AnalogValue GetValue(Key);
+	virtual InputDir GetDir(Key);
 
 	virtual DigitalControls* GetDigitalSettings();
 	virtual AnalogControls* GetAnalogSettings();

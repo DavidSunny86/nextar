@@ -1251,6 +1251,21 @@ void RenderContext_Base_GL::WriteTextureLevel(GLenum target, GLint level,
 
 }
 
+void RenderContext_Base_GL::GetTextureData(GLenum target, GLenum format, GLenum type, GLvoid* data) {
+	GLenum retformat = format;
+	switch (format) {
+	case GL_RG16:
+		retformat = GL_RG; break;
+	case GL_RGBA8:
+		retformat = GL_RGBA; break;
+	case GL_R8:
+		retformat = GL_RED; break;
+		// todo
+	}
+	glGetTexImage(target, 0, retformat, type, data);
+	GL_CHECK();
+}
+
 bool RenderContext_Base_GL::IsSamplerType(GLint type) {
 	switch (type) {
 	case GL_SAMPLER_1D: //sampler1D

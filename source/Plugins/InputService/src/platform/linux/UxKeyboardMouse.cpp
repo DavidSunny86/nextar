@@ -16,8 +16,8 @@ namespace InputService {
  * #include <X11/keysym.h>
  * Check that header file for keysyms
  * The display is required here, we wait for message proc to send us an event for init
- * While initing, use XGetKeyboardMapping to generate the mapping from keycode->keysym->KeyID
- * The info should be enough to build a map from keycode->KeyID and we use that map in key events.
+ * While initing, use XGetKeyboardMapping to generate the mapping from keycode->keysym->Key
+ * The info should be enough to build a map from keycode->Key and we use that map in key events.
  */
 
 /***************************************************
@@ -225,7 +225,7 @@ void UxKeyboardMouse::Listener::ConsumeMouseButtonEvent(nextar::XWindow* window,
 			inpEvent->timeStamp = event.xbutton.time;
 		}
 	} else {
-		KeyID k = (event.xbutton.button-Button1) + Key::MOUSE_LEFT;
+		Key k = (event.xbutton.button-Button1) + Key::MOUSE_LEFT;
 		KeyState state = device->mouseButtons[k] = (pressEvent ? KeyState::KEY_STATE_DOWN : KeyState::KEY_STATE_UP);
 		InputEvent* inpEvent = device->PushEvent();
 		if (inpEvent) {
@@ -260,15 +260,15 @@ InputChangeBuffer UxKeyboardMouse::UpdateSettings() {
 	return buffer;
 }
 
-bool UxKeyboardMouse::IsDown(KeyID keyId) {
-	if (keyId >= NEX_KEYBOARD_KEY_START && keyId <= NEX_KEYBOARD_KEY_END)
-		return keyboardKeyStates[keyId - NEX_KEYBOARD_KEY_START] == KeyState::KEY_STATE_DOWN;
-	else if (keyId >= NEX_MOUSE_BUTTON_START && keyId <= NEX_MOUSE_BUTTON_END)
-		return mouseButtons[keyId - NEX_MOUSE_BUTTON_START] == KeyState::KEY_STATE_DOWN;
+bool UxKeyboardMouse::IsDown(Key Key) {
+	if (Key >= NEX_KEYBOARD_KEY_START && Key <= NEX_KEYBOARD_KEY_END)
+		return keyboardKeyStates[Key - NEX_KEYBOARD_KEY_START] == KeyState::KEY_STATE_DOWN;
+	else if (Key >= NEX_MOUSE_BUTTON_START && Key <= NEX_MOUSE_BUTTON_END)
+		return mouseButtons[Key - NEX_MOUSE_BUTTON_START] == KeyState::KEY_STATE_DOWN;
 	return false;
 }
 
-bool UxKeyboardMouse::IsOn(KeyID k) {
+bool UxKeyboardMouse::IsOn(Key k) {
 	switch (k) {
 	case Key::KB_CAPITAL:
 		return capsLockState;
@@ -280,11 +280,11 @@ bool UxKeyboardMouse::IsOn(KeyID k) {
 	return false;
 }
 
-AnalogValue UxKeyboardMouse::GetValue(KeyID k) {
+AnalogValue UxKeyboardMouse::GetValue(Key k) {
 	return 0;
 }
 
-InputDir UxKeyboardMouse::GetDir(KeyID unsignedShortInt) {
+InputDir UxKeyboardMouse::GetDir(Key unsignedShortInt) {
 	return InputDir();
 }
 

@@ -36,6 +36,7 @@ public:
 
 	virtual uint32 GetNumController();
 	virtual const InputControllerDesc& GetControllerDesc(uint32 n);
+	virtual const InputControllerDesc& GetControllerDescById(uint16 n);
 
 	virtual void Execute(const FrameTimer& frameTimer);
 	virtual void Close();

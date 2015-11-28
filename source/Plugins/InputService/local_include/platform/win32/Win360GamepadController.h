@@ -34,10 +34,10 @@ public:
 
 	virtual InputChangeBuffer UpdateSettings() override;
 
-	virtual bool IsDown(KeyID) override;
-	virtual bool IsOn(KeyID) override;
-	virtual AnalogValue GetValue(KeyID) override;
-	virtual InputDir GetDir(KeyID) override;
+	virtual bool IsDown(Key) override;
+	virtual bool IsOn(Key) override;
+	virtual AnalogValue GetValue(Key) override;
+	virtual InputDir GetDir(Key) override;
 
 	void InitControls();
 

@@ -116,6 +116,7 @@ public:
 	void SetRasterState(const RasterStateGL&);
 	void SetDepthStencilState(const DepthStencilStateGL&);
 	void SetBlendState(const BlendStateGL&);
+	void GetTextureData(GLenum target, GLenum format, GLenum type, GLvoid* data);
 
 	inline GLuint CreateVAO();
 	inline void DestroyVAO(GLuint vao);
@@ -146,7 +147,6 @@ public:
 	inline void SetTexture(uint32 texIdx, GLuint samplerObject,
 						   TextureViewGL* tu);
 	inline Size GetTextureParams(GLenum target);
-	inline void GetTextureData(GLenum target, GLenum format, GLenum type, GLvoid* data);
 
 	inline void SetReadBuffer(GLenum b);
 	inline void SetDrawBuffer(GLenum b);
@@ -480,11 +480,6 @@ inline Size RenderContext_Base_GL::GetTextureParams(GLenum target) {
 	GL_CHECK();
 
 	return Size((uint16)width, (uint16)height);
-}
-
-inline void RenderContext_Base_GL::GetTextureData(GLenum target, GLenum format, GLenum type, GLvoid* data) {
-	glGetTexImage(target, 0, format, type, data);
-	GL_CHECK();
 }
 
 inline void RenderContext_Base_GL::SetReadBuffer(GLenum b) {

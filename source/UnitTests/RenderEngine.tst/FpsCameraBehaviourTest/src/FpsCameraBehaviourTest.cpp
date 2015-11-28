@@ -41,6 +41,16 @@ public:
 					break;
 				}
 			}
+			if (deviceId.length() == 0) {
+				for (uint32 i = 0; i < InputManager::Instance().GetNumController(); ++i) {
+					auto& desc = InputManager::Instance().GetControllerDesc(i);
+					if (desc.type == ControllerType::TYPE_KEYBOARD_AND_MOUSE) {
+						InputManager::Instance().RegisterController(desc.deviceId);
+						deviceId = Convert::ToString(desc.deviceId);
+						break;
+					}
+				}
+			}
 			Behaviour* b = static_cast<Behaviour*>(Component::Instance(
 				Component::CLASS_FPS_BEHAVIOR,
 				NamedObject::AsyncStringID("FPSBehaviour")));

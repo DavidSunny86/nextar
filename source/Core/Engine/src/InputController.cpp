@@ -86,7 +86,7 @@ static const char shiftNumKeys[10] = { ')', '!', '@', '#', '$', '%', '^', '&',
 static const char shiftOtherKeys[] = { '~', '_', '+', '|', '{', '}', ':', '"',
 		'<', '>', '?' };
 
-_NexEngineAPI int32 GetCookedCode(KeyID k, bool shift, bool numlock) {
+_NexEngineAPI int32 GetCookedCode(Key k, bool shift, bool numlock) {
 	if (k >= NEX_KEY_CONVERTABLE_START && k <= NEX_KEY_CONVERTABLE_END) {
 		if (shift) {
 			if (k >= Key::KB_A && k <= Key::KB_Z)

@@ -40,6 +40,7 @@ public:
 
 	virtual uint32 GetNumController() = 0;
 	virtual const InputControllerDesc& GetControllerDesc(uint32 n) = 0;
+	virtual const InputControllerDesc& GetControllerDescById(uint16 n) = 0;
 
 	virtual void Configure(const Config&) = 0;
 	virtual void RegisterController(uint16 deviceId) = 0;

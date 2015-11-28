@@ -14,7 +14,7 @@
 
 namespace InputService {
 
-
+class WinKeyboardMouse;
 class InputControllerProviderImpl:
 	public Win32InputListener,
 	public InputService::InputControllerProviderv1_0 {
@@ -39,7 +39,7 @@ public:
 	virtual InputController* CreateController(uint16 deviceId);
 	virtual void DestroyController(InputController*);
 
-	virtual void ConsumeEvent(Win32Window* window, HRAWINPUT) {}
+	virtual void ConsumeEvent(Win32Window* window, HRAWINPUT);
 
 private:
 
@@ -53,9 +53,12 @@ private:
 	void CreateKeyboardAndMouseDesc(HANDLE keyboard, HANDLE mouse);
 	
 	typedef vector<WinDeviceDesc>::type InputControllerDescList;
-
+	ByteStream rawInputStream;
+	WinKeyboardMouse* keyboardAndMouse;
 	InputControllerDescList controllers;
 	String devInpPath;
+	Key virtToKey[256];
+	int32 lastMouseX, lastMouseY;
 };
 
 } /* namespace InputService */

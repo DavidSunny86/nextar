@@ -30,6 +30,7 @@ public:
 			const NameValueMap* params) override = 0;
 	virtual void ApplyChangedAttributes() override = 0;
 	virtual void FocusChanged() override = 0;
+	virtual Size GetCurrentDimensions() const override;
 
 	// RenderTarget
 	virtual Size GetDimensions() const;

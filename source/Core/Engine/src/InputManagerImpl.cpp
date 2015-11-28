@@ -104,8 +104,22 @@ const InputControllerDesc& InputManagerImpl::GetControllerDesc(uint32 n) {
 	for(auto p : providers) {
 		uint32 numController = p->GetNumController();
 		if (runningCount + numController > n)
-			return p->GetControllerDesc(runningCount + n);
+			return p->GetControllerDesc(n - runningCount);
 		runningCount += numController;
+	}
+
+	return InputControllerDesc::Null;
+}
+
+const InputControllerDesc& InputManagerImpl::GetControllerDescById(uint16 devId) {
+	for (auto p : providers) {
+		uint32 numController = p->GetNumController();
+		for (uint32 n = 0; n < numController; ++n) {
+			const InputControllerDesc& desc = p->GetControllerDesc(n);
+			if (desc.deviceId == devId) {
+				return desc;
+			}
+		}
 	}
 
 	return InputControllerDesc::Null;

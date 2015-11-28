@@ -39,8 +39,8 @@ const String FPSControlBehaviour::ControllerDeviceAccessor::GetStringValue(
 
 /******* Property Accessors ***********/
 FPSControlBehaviour::FPSControlBehaviour(const StringID name, const StringID factory) :
-	Behaviour(name, factory), moveSpeedXZ(0, 0), rotateSpeedXY(0, 0),
-	movementSpeedFactor(50.1f), rotationSpeedFactor(1.5f) {
+Behaviour(name, factory), controls(nullptr),
+movementSpeedFactor(50.1f), rotationSpeedFactor(1.5f) {
 
 	if (OverrideDictionary("ControllerProperties")) {
 		Populate(GetDictionary());
@@ -65,32 +65,53 @@ void FPSControlBehaviour::Update(const FrameTimer& frameTimer) {
 	Entity* attached = GetEntity();
 	if (attached) {
 		Moveable* m = attached->GetMoveable();
-		if (m) {
-			// @todo We need the timer here
+		if (m && controls) {
 			float timeDelta = frameTimer.GetFrameTime();
-			Vector2 movement(movementSpeedFactor * moveSpeedXZ.x * timeDelta,
-				-movementSpeedFactor * moveSpeedXZ.y * timeDelta);
-			Vector2 rotation(rotationSpeedFactor * rotateSpeedXY.x * timeDelta, 
-				rotationSpeedFactor * rotateSpeedXY.y * timeDelta);
-			m->LocalApplyCameraMotion(movement, rotation);
+			controls->Process(m, timeDelta, movementSpeedFactor, rotationSpeedFactor);
 		}
 	}
 }
 
-void FPSControlBehaviour::ProcessEvents(const InputChangeBuffer& events) {
+void FPSControlBehaviour::SetControllerID(uint32 deviceId) {
+	const InputControllerDesc& desc = InputManager::Instance().GetControllerDescById(deviceId);
+	if (desc.IsValid()) {
+		if (desc.type == ControllerType::TYPE_XBOX360_CONTROLLER)
+			controls = NEX_NEW(XBox360Controller());
+		else if (desc.type == ControllerType::TYPE_KEYBOARD_AND_MOUSE)
+			controls = NEX_NEW(KeyboardMouseController());
+		InputManager::Instance().RegisterListener(controls, deviceId);
+	}
+}
+
+void FPSControlBehaviour::RemoveDictionary() {
+	PropertyInterface::RemoveDictionary("ControllerProperties");
+}
+
+void FPSControlBehaviour::XBox360Controller::Process(Moveable* m,
+	float timeDelta,
+	float movementSpeedFactor, float rotationSpeedFactor) {
+	// @todo We need the timer here
+	Vector2 movement(movementSpeedFactor * moveSpeedXZ.x * timeDelta,
+		-movementSpeedFactor * moveSpeedXZ.y * timeDelta);
+	Vector2 rotation(rotationSpeedFactor * rotateSpeedXY.x * timeDelta,
+		rotationSpeedFactor * rotateSpeedXY.y * timeDelta);
+	m->LocalApplyCameraMotion(movement, rotation);
+}
+
+void FPSControlBehaviour::XBox360Controller::ProcessEvents(const InputChangeBuffer& events) {
 	float strafeX = 0;
 	float strafeZ = 0;
 
-	for(uint32 i = 0; i < events.second; ++i) {
+	for (uint32 i = 0; i < events.second; ++i) {
 		const InputEvent& ie = events.first[i];
 
-		switch(ie.key)	{
-		// control camera movement
+		switch (ie.key)	{
+			// control camera movement
 		case Key::XBOX_AXIS_LEFT:
 			moveSpeedXZ.x = ie.analogDir.xy[0];
 			moveSpeedXZ.y = ie.analogDir.xy[1];
 			break;
-		// control camera look-at
+			// control camera look-at
 		case Key::XBOX_AXIS_RIGHT:
 			rotateSpeedXY.x = -ie.analogDir.xy[1];
 			rotateSpeedXY.y = ie.analogDir.xy[0];
@@ -99,12 +120,46 @@ void FPSControlBehaviour::ProcessEvents(const InputChangeBuffer& events) {
 	}
 }
 
-void FPSControlBehaviour::SetControllerID(uint32 deviceId) {
-	InputManager::Instance().RegisterListener(this, deviceId);
+void FPSControlBehaviour::KeyboardMouseController::ProcessEvents(const InputChangeBuffer& events) {
+	float strafeX = 0;
+	float strafeZ = 0;
+
+	for (uint32 i = 0; i < events.second; ++i) {
+		const InputEvent& ie = events.first[i];
+
+		switch (ie.key)	{
+			// control camera movement
+		case Key::KB_W:
+			moveSpeedXZ.y = (ie.keyState == KeyState::KEY_STATE_DOWN) ? 1.0f : 0.0f;
+			break;
+		case Key::KB_S:
+			moveSpeedXZ.y = (ie.keyState == KeyState::KEY_STATE_DOWN) ? -1.0f : 0.0f;
+			break;
+		case Key::KB_A:
+			moveSpeedXZ.x = (ie.keyState == KeyState::KEY_STATE_DOWN) ? -1.0f : 0.0f;
+			break;
+		case Key::KB_D:
+			moveSpeedXZ.x = (ie.keyState == KeyState::KEY_STATE_DOWN) ? 1.0f : 0.0f;
+			break;
+			// control camera look-at
+		case Key::MOUSE_XY_AXIS:
+			rotateSpeedXY.x -= ie.analogDir.xy[1] * 0.1f;
+			rotateSpeedXY.y -= ie.analogDir.xy[0] * 0.1f;
+			break;
+		}
+	}
 }
 
-void FPSControlBehaviour::RemoveDictionary() {
-	PropertyInterface::RemoveDictionary("ControllerProperties");
+void FPSControlBehaviour::KeyboardMouseController::Process(Moveable* m,
+	float timeDelta,
+	float movementSpeedFactor, float rotationSpeedFactor) {
+	// @todo We need the timer here
+	Vector2 movement(movementSpeedFactor * moveSpeedXZ.x * timeDelta,
+		-movementSpeedFactor * moveSpeedXZ.y * timeDelta);
+	Vector2 rotation(rotationSpeedFactor * rotateSpeedXY.x * timeDelta,
+		rotationSpeedFactor * rotateSpeedXY.y * timeDelta);
+	m->LocalApplyCameraMotion(movement, rotation);
 }
+
 
 } /* namespace SimpleBehaviours */
