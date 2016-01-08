@@ -1,0 +1,2065 @@
+
+//@ Abhishek Dey
+//@ October 2 2006
+//@ December 14 2006
+//@ September 16 2007
+//@# September 23 2007
+
+#include <d3d9.h>
+#include <d3dx9shader.h>
+#include <isystem.h>
+#include <xmemory.h>
+#include <xmath_c.h>
+#include <cstr.h>
+#include "cdirectx9renderer.h"
+#include "cdirectx9texture.h"
+#include <ishader.h>
+#include "directx9shaders.h"
+#include "cdirectx9toonshader.h"
+#include "cdirectx9llshader.h"
+#include "cdirectx9hlshader.h"
+
+using namespace nextar;
+#define XDEBUG_LOG(ll,msg) iSystem::XSELFPTR->getLogger().print(ll,msg)
+//@ the flag controls whether to compile with dx 
+//@ #ifdef COMPILE_WITH_DIRECT3D9 
+//@ some functions described here are c type functions that might be called by other 
+//@ internal classes, these functions are not exported hence not available 
+//@ Some directx interfaces are externally linked but not exported 
+namespace nextar
+{
+/* some state blocks */
+enum STATEBLOCKS
+{
+	SB_BASIC2D = 0,
+	SB_STENCIL_FILL,
+	SB_STENCIL_FILL_WITH_ALPHA,
+	SB_STENCIL_FILL_WITHOUT_ALPHA,
+	SB_SHADOW_MODE,
+	SB_SHADOW_VOLUME_ZPASS,
+	SB_SHADOW_VOLUME_ZFAIL,
+	SB_COUNT
+};
+
+#define LIGHT_RANGE_MAX 18446743522909402667.065850117074f
+#define MAX_2DPOLY_VERT  12
+/* the class members as statics */
+//---------------------------------------------------------------------------
+static D3DPRESENT_PARAMETERS	gkPresentParams;
+static D3DCAPS9					gkDeviceCaps;
+static IDirect3DStateBlock9*	garrpkStates[SB_COUNT] = {0};
+static u32						guBackColor = 0;
+static u32						guRenderFlags = 0;
+static u32						guTotalPolysRendered = 0;
+static u32						guTotalStateChanges = 0;
+static u32						guCurMaterialFlags = 0;
+static u32						guCurLightIdx = 0;
+static u32						guLastLightSettings = 0;
+static RENDERSTATEMODE			geCurMode = RSC_INVALID;
+static VERTEXTYPE				geCurVertexShader = VERTEX_UNUSED;
+static iShader*					gpkCurShader = 0;
+static iTexture*				garrpkCurTextures[MAX_TEXTURE_PER_MATERIAL] = {0};
+static const cLight**			gpkAddedLights = 0;
+static cStr						gkDriverName("Unknown");
+static D3DLIGHT9				gkLight = { 
+	D3DLIGHT_DIRECTIONAL, 
+	{0}, {0}, {0}, {0}, {0}, 
+	LIGHT_RANGE_MAX,	
+	0.0f, 0.0f, 1.0f/200.0f, 0.0f, 0.0f 
+};
+cDxVertex2D						gk2DVertices[N3D2DVertPrecache];
+static u16						gu2DIndices[N3D2DIdxPrecache];
+IDirect3D9*						gpkDirect3D = 0;
+IDirect3DDevice9*				gpkDirect3DDevice = 0;
+extern mat44_t					garrkTransforms[TS_COUNT];
+extern cVertex2D				gk2DVertices[N3D2DVertPrecache];
+
+} // end of nextar
+//---------------------------------------------------------------------------
+
+#pragma comment ( lib, "d3d9.lib" )
+#pragma comment ( lib, "d3dx9.lib" )
+
+//---------------------------------------------------------------------------
+//@ Function Definitions
+//---------------------------------------------------------------------------
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+cDirectX9Renderer::cDirectX9Renderer(HWND hWnd, const sizex& rkScreenSize, u32 uBits, u32 uFlags)
+{
+	XREFOBJECT( cDirectX9Renderer );
+
+	guRenderFlags = uFlags|ResetMaterial|ResetShader;
+	guBackColor = 0; 
+	geCurVertexShader = VERTEX_UNUSED;
+	gpkCurShader = 0;
+	gpkAddedLights = 0;
+	guCurLightIdx = 0;
+	guLastLightSettings = 0;
+	muBitsPerPixel = uBits;
+
+	zeroMemory( garrpkStates, sizeof(garrpkStates) );
+	zeroMemory( &gkPresentParams, sizeof(gkPresentParams) );
+	zeroMemory( &gkDeviceCaps, sizeof(gkDeviceCaps) );
+	zeroMemory( garrpkCurTextures, sizeof(garrpkCurTextures) );
+
+	// initialize the stream of indices
+	// and vertices
+	for( s32 index = 0; index < N3D2DQuadPrecache; index++ )
+	{
+		gu2DIndices[0 + index*6] = u16(0 + index*4);
+		gu2DIndices[1 + index*6] = u16(1 + index*4);
+		gu2DIndices[2 + index*6] = u16(2 + index*4);
+
+		gu2DIndices[3 + index*6] = u16(1 + index*4);
+		gu2DIndices[4 + index*6] = u16(3 + index*4);
+		gu2DIndices[5 + index*6] = u16(2 + index*4);
+	}
+	
+	for( s32 index = 0; index < N3D2DVertPrecache; index++ )
+	{
+		gk2DVertices[index].mkPosition.z = 0.5f;
+		gk2DVertices[index].mkPosition.w = 1.0f;
+	}
+
+	mkScreenSize = rkScreenSize;
+	XERRORCODE eRetCode = _create(hWnd);
+	if(eRetCode != X_SUCCESS)
+	{
+		iSystem::XSELFPTR->msgBox("Error in Renderer device creation.","Error");
+		iSystem::XSELFPTR->getLogger().print(LL_FATAL,"Renderer:Error code[%d]",eRetCode);
+	}
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+cDirectX9Renderer::~cDirectX9Renderer()
+{
+	if( gpkAddedLights )
+	{
+		delete [] gpkAddedLights;
+		gpkAddedLights = 0;
+	}
+	
+	if( gpkDirect3DDevice )
+	{
+		gpkDirect3DDevice->SetTexture(0,0);
+		gpkDirect3DDevice->SetTexture(1,0);
+	}
+
+	remAllShaders();
+	for( s32 i = 0; i < SB_COUNT; i++ )
+		SafeRelease( garrpkStates[i] );
+	SafeRelease( gpkDirect3DDevice );
+	SafeRelease( gpkDirect3D );
+	
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+RENDERDEVICE cDirectX9Renderer::getDriverType() const
+{
+	return RD_DIRECT3D9;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+const tchar* cDirectX9Renderer::getDriverName() const
+{
+	return gkDriverName;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+const u32 cDirectX9Renderer::getTotalPolysRendered() const
+{
+	return guTotalPolysRendered;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+const u32 cDirectX9Renderer::getTotalRenderStateChanges() const
+{
+	return guTotalStateChanges;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+s32 cDirectX9Renderer::getMaxDynamicLight() const
+{
+	return (s32)gkDeviceCaps.MaxActiveLights;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+const f32* cDirectX9Renderer::getWorld() const
+{
+	static mat44_t m={0};
+	gpkDirect3DDevice->GetTransform(D3DTS_WORLD,reinterpret_cast<D3DMATRIX*>(m));
+	return m;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::setBackgroundColor( s32 c )
+{
+	guBackColor = (u32)c;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::setMode( RENDERSTATEMODE mode )
+{
+	if( geCurMode != mode )
+	{
+		switch(mode)
+		{
+		case RSC_2D:
+			garrpkStates[SB_BASIC2D]->Apply();
+			guTotalStateChanges += 28;
+			guRenderFlags |= ResetTransforms;
+			break;
+		case RSC_3D:
+			if(guRenderFlags & ResetTransforms)
+			{
+				gpkDirect3DDevice->SetTransform( D3DTS_VIEW, (D3DMATRIX*)&garrkTransforms[TS_VIEW] );
+				gpkDirect3DDevice->SetTransform( D3DTS_PROJECTION, (D3DMATRIX*)&garrkTransforms[TS_PROJECTION] );
+				guRenderFlags &=~ResetTransforms;
+			}
+			gpkDirect3DDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+			guRenderFlags |= ResetMaterial;
+			guTotalStateChanges += 3;
+			break;
+		case RSC_STENCIL_FILL_WITH_ALPHA:
+			if( geCurMode != RSC_STENCIL_FILL_WITHOUT_ALPHA )
+				garrpkStates[SB_STENCIL_FILL]->Apply();
+			garrpkStates[SB_STENCIL_FILL_WITH_ALPHA]->Apply();
+			guRenderFlags |= ResetTransforms;
+			guTotalStateChanges += 23;
+			break;
+		case RSC_STENCIL_FILL_WITHOUT_ALPHA:
+			if( geCurMode != RSC_STENCIL_FILL_WITH_ALPHA )
+				garrpkStates[SB_STENCIL_FILL]->Apply();
+			garrpkStates[SB_STENCIL_FILL_WITHOUT_ALPHA]->Apply();
+			guRenderFlags |= ResetTransforms;
+			guTotalStateChanges += 20;
+			break;
+		case RSC_SHADOW_VOLUME_ZPASS:
+			if( geCurMode != RSC_SHADOW_VOLUME_ZFAIL )
+				garrpkStates[SB_SHADOW_MODE]->Apply();
+			if( geCurMode == RSC_3D && gpkCurShader )
+			{
+				gpkCurShader->unset();
+				gpkCurShader = 0;
+			}
+			garrpkStates[SB_SHADOW_VOLUME_ZPASS]->Apply();
+			guTotalStateChanges += 19;
+			break;
+		case RSC_SHADOW_VOLUME_ZFAIL:
+			if( geCurMode != RSC_SHADOW_VOLUME_ZPASS )
+				garrpkStates[SB_SHADOW_MODE]->Apply();
+			if( geCurMode == RSC_3D && gpkCurShader )
+			{
+				gpkCurShader->unset();
+				gpkCurShader = 0;
+			}
+			garrpkStates[SB_SHADOW_VOLUME_ZFAIL]->Apply();
+			guTotalStateChanges += 20;
+			break;
+		}
+		
+		geCurMode = mode;
+	}
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::setViewport( const rectx &rkRc )
+{
+	if( mkViewport != rkRc )
+	{
+		rectx kTemp = rkRc;
+		rectx rc(0,0,mkScreenSize.dx,mkScreenSize.dy);
+		kTemp.clip(rc);
+		HRESULT hr = -1;
+		if( kTemp.height() > 0 && kTemp.width() > 0 )
+		{
+			D3DVIEWPORT9 kViewPort;
+			kViewPort.X = kTemp.left;
+			kViewPort.Y = kTemp.top;
+			kViewPort.Width = kTemp.width();
+			kViewPort.Height = kTemp.height();
+			kViewPort.MinZ = 0.0f;
+			kViewPort.MaxZ = 1.0f;
+			hr = gpkDirect3DDevice->SetViewport(&kViewPort);
+		}
+			if(FAILED(hr))	
+			{
+				iSystem::XSELFPTR->getLogger().print( LL_INFO,
+					"Renderer:setViewport := viewport could not be set!");
+			}
+			else
+				mkViewport = kTemp;
+	}
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::setScreenSize( const sizex& rkSc , u32 uBits )
+{
+	if( rkSc == mkScreenSize && uBits == muBitsPerPixel )
+		return;
+	if( uBits == -1 ) uBits = muBitsPerPixel;
+	if( guRenderFlags & iRenderer::FullScreen )
+	{
+		mkScreenSize = rkSc;
+		muBitsPerPixel = uBits;
+		gkPresentParams.BackBufferHeight = mkScreenSize.dy;
+		gkPresentParams.BackBufferWidth  = mkScreenSize.dx;
+		gkPresentParams.BackBufferFormat = uBits == 32 ? D3DFMT_X8R8G8B8 : D3DFMT_R5G6B5; /* w/f */
+		reset();
+	}
+	else
+	{
+		_onResize(rkSc);
+	}
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::setMaterial( cMaterial* pkMat )
+{
+	if( geCurMode != RSC_3D )
+		setMode( RSC_3D );
+#ifdef X_DEBUG
+	if( !pkMat || !pkMat->mpkShader )
+	{
+		ReportBug("Material or Shader not present.", "DirectX9Renderer::setMaterial" );
+		return;
+	}
+#endif //X_DEBUG
+		
+	gpkDirect3DDevice->SetMaterial( (D3DMATERIAL9*)&(pkMat->mkProperty) );
+
+	if( guRenderFlags & ResetMaterial ) 
+	{
+		if( gpkCurShader ) gpkCurShader->unset();
+		gpkCurShader = pkMat->mpkShader;
+		gpkCurShader->set( pkMat, true );
+		_setMaterialStates( pkMat->muFlags );
+				
+		if(pkMat->mpkTexture1)
+		{
+			garrpkCurTextures[0] = pkMat->mpkTexture1;
+			gpkDirect3DDevice->SetTexture(0,
+				((cDirectX9Texture*)pkMat->mpkTexture1)->getTextureInterface());
+		}
+		else
+		{
+			garrpkCurTextures[0] = 0;
+			gpkDirect3DDevice->SetTexture(0,0);
+		}
+		if(pkMat->mpkTexture2)
+		{
+			garrpkCurTextures[1] = pkMat->mpkTexture2;
+			gpkDirect3DDevice->SetTexture(1,
+				((cDirectX9Texture*)pkMat->mpkTexture2)->getTextureInterface());
+		}
+		else
+		{
+			garrpkCurTextures[1] = 0;
+			gpkDirect3DDevice->SetTexture(1,0);
+		}
+	}
+	else
+	{
+		if( gpkCurShader != pkMat->mpkShader )
+		{
+			if( gpkCurShader ) gpkCurShader->unset();
+			gpkCurShader = pkMat->mpkShader;
+			guRenderFlags |= ResetShader;
+		}
+		
+		gpkCurShader->set( pkMat, bool(guRenderFlags & ResetShader));
+
+		if( guCurMaterialFlags != pkMat->muFlags )
+			_setMaterialStates( pkMat->muFlags );
+
+		if(pkMat->mpkTexture1 != garrpkCurTextures[0])
+		{
+			if(pkMat->mpkTexture1)
+			{
+				garrpkCurTextures[0] = pkMat->mpkTexture1;
+				gpkDirect3DDevice->SetTexture(0,
+					((cDirectX9Texture*)pkMat->mpkTexture1)->getTextureInterface());
+			}
+			else
+			{
+				garrpkCurTextures[0] = 0;
+				gpkDirect3DDevice->SetTexture(0,0);
+			}
+		}
+		if(pkMat->mpkTexture2 != garrpkCurTextures[1])
+		{
+			if(pkMat->mpkTexture2)
+			{
+				garrpkCurTextures[1] = pkMat->mpkTexture2;
+				gpkDirect3DDevice->SetTexture(1,
+					((cDirectX9Texture*)pkMat->mpkTexture2)->getTextureInterface());
+			}
+			else
+			{
+				garrpkCurTextures[1] = 0;
+				gpkDirect3DDevice->SetTexture(1,0);
+			}
+		}
+	}
+
+	guRenderFlags &=~(ResetShader|ResetMaterial);
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::setTexture( s32 iStage, iTexture *pkTex )
+{
+	if(iStage<2 && garrpkCurTextures[iStage]!=pkTex)
+	{
+		guTotalStateChanges++;
+
+		if( pkTex )
+		{
+			garrpkCurTextures[iStage] = pkTex;
+			gpkDirect3DDevice->SetTexture(iStage,
+			((cDirectX9Texture*)pkTex)->getTextureInterface());
+		}
+		else
+		{
+			garrpkCurTextures[iStage] = 0;
+			gpkDirect3DDevice->SetTexture(iStage,0);
+		}
+	}
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::setVertexShader( VERTEXTYPE eType )
+{
+	if( geCurVertexShader == eType ) return;
+	guTotalStateChanges++;
+		
+	switch(eType)
+	{
+	case VERTEX_2D:
+		gpkDirect3DDevice->SetFVF( D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1 );
+		break;
+	case VERTEX_STD:
+		gpkDirect3DDevice->SetFVF( D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1 );
+		break;
+	case VERTEX_2TEX:
+		gpkDirect3DDevice->SetFVF( D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX2 );
+		break;
+	case VERTEX_TAN:
+		gpkDirect3DDevice->SetFVF( D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX3 | D3DFVF_TEXCOORDSIZE2(0) | D3DFVF_TEXCOORDSIZE3(1) | D3DFVF_TEXCOORDSIZE3(2) );
+		break;
+	}
+
+	geCurVertexShader = eType;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::setWorld( const f32* pfMat )
+{
+	guRenderFlags |= ResetTransforms;
+	gpkDirect3DDevice->SetTransform( D3DTS_WORLD, (const D3DMATRIX*)(pfMat) );
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::setAmbientLight( s32 uColor )
+{
+	gpkDirect3DDevice->SetRenderState( D3DRS_AMBIENT , (u32)uColor );
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::addDynamicLight( const cLight *pkLight )
+{
+	XASSERT( guCurLightIdx >= gkDeviceCaps.MaxActiveLights );
+
+	if( pkLight->meType == cLight::LT_POINT )
+	{
+		gkLight.Type = D3DLIGHT_POINT;
+		gkLight.Position.x = pkLight->mkVector.x;
+		gkLight.Position.y = pkLight->mkVector.y;
+		gkLight.Position.z = pkLight->mkVector.z;
+	}
+	else
+	{
+		gkLight.Type = D3DLIGHT_DIRECTIONAL;
+		gkLight.Direction.x = pkLight->mkVector.x;
+		gkLight.Direction.y = pkLight->mkVector.y;
+		gkLight.Direction.z = pkLight->mkVector.z;
+		gkLight.Attenuation1 = 1.0f / pkLight->mfRadius;
+	}
+	gkLight.Diffuse = *(D3DCOLORVALUE*)(const_cast<cColor4*>(&pkLight->mkDiffuse));
+	gkLight.Ambient = *(D3DCOLORVALUE*)(const_cast<cColor4*>(&pkLight->mkAmbient));
+	gkLight.Specular = *(D3DCOLORVALUE*)(const_cast<cColor4*>(&pkLight->mkSpecular));
+
+	gpkDirect3DDevice->SetLight( guCurLightIdx, &gkLight );
+	gpkAddedLights[guCurLightIdx] = pkLight;
+	if( guCurLightIdx >= guLastLightSettings )
+		gpkDirect3DDevice->LightEnable( guCurLightIdx, TRUE );
+	guCurLightIdx++;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::finalizeLights()
+{
+	/* disable rest of the lights */
+	for( u32 i = guCurLightIdx; i < guLastLightSettings; i++ )
+		gpkDirect3DDevice->LightEnable( i, FALSE );
+
+	guLastLightSettings = guCurLightIdx;
+	guCurLightIdx = 0;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+const cLight* cDirectX9Renderer::findAddedLight( s32 idx )
+{
+	if( (u32)idx < guLastLightSettings )
+		return gpkAddedLights[idx];
+	return 0;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::reset()
+{
+	if( FAILED( gpkDirect3DDevice->Reset(&gkPresentParams) ) ) 
+	{
+		ReportBug("Resetting device failed!","iRenderer::reset");
+		return;
+	}
+	
+	/* 	MAX_TEXTURE_PER_MATERIAL */
+	garrpkCurTextures[0] = garrpkCurTextures[1] = 0;
+	gpkDirect3DDevice->SetTexture(0,0);
+	gpkDirect3DDevice->SetTexture(1,0);
+	gpkCurShader = 0;
+	guRenderFlags |= (ResetShader|ResetMaterial|ResetTransforms);
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::onSwitchMode( bool bFullScreen )
+{
+	if( bFullScreen != (guRenderFlags&iRenderer::FullScreen) )
+	{
+		gkPresentParams.PresentationInterval	= D3DPRESENT_INTERVAL_IMMEDIATE;
+		if(bFullScreen)
+		{
+			guRenderFlags |= iRenderer::FullScreen;
+			gkPresentParams.Windowed = FALSE;
+			gkPresentParams.SwapEffect = D3DSWAPEFFECT_FLIP;
+			gkPresentParams.BackBufferHeight			= mkScreenSize.dy;
+			gkPresentParams.BackBufferWidth				= mkScreenSize.dx;
+			gkPresentParams.FullScreen_RefreshRateInHz	= D3DPRESENT_RATE_DEFAULT;
+			gkPresentParams.BackBufferCount				= 0;
+			if( guRenderFlags & iRenderer::VSync )
+				gkPresentParams.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+		}
+		else
+		{
+			guRenderFlags &=~iRenderer::FullScreen;
+			gkPresentParams.Windowed = TRUE;
+			gkPresentParams.SwapEffect = D3DSWAPEFFECT_COPY;
+			gkPresentParams.BackBufferHeight = 0;
+			gkPresentParams.BackBufferWidth = 0;
+			gkPresentParams.FullScreen_RefreshRateInHz	= 0;
+		}
+
+		gkPresentParams.BackBufferFormat = 
+			muBitsPerPixel == 32 ? D3DFMT_X8R8G8B8 : D3DFMT_R5G6B5;
+		reset();
+	}
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::clearZBuffer()
+{
+	gpkDirect3DDevice->Clear( 0, 0, D3DCLEAR_ZBUFFER, 0, 1.0, 0);
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::beginScene( bool bClearBack, bool bClearZbuff )
+{
+	guTotalStateChanges = 0;
+	guTotalPolysRendered = 0;
+	
+	HRESULT hr = -1;
+	DWORD flag;
+
+	flag = bClearBack ? D3DCLEAR_TARGET : 0 ;
+	if(bClearZbuff) flag |= D3DCLEAR_ZBUFFER;
+//	if(guRenderFlags & iRenderer::StencilBuffer) 
+//		flag |= D3DCLEAR_STENCIL;//TODO: check why this doesnt work!!
+		
+	if( guRenderFlags & DeviceLost )
+	{
+		if( FAILED(hr = gpkDirect3DDevice->TestCooperativeLevel()) )
+		{
+			if( hr == D3DERR_DEVICELOST )
+				return;
+			if( hr == D3DERR_DEVICENOTRESET )
+				reset();
+		}
+	}
+		
+#ifdef X_DEBUG
+	hr = gpkDirect3DDevice->Clear( 0, 0, flag, guBackColor, 1.0, 0);
+	if( FAILED(hr) )
+		iSystem::XSELFPTR->getLogger().print(LL_INFO,"Renderer:Clear Failed");
+	hr = gpkDirect3DDevice->BeginScene();
+	if( FAILED(hr) )
+		iSystem::XSELFPTR->getLogger().print(LL_INFO,"Renderer:Begin Scene Failed");
+#else
+	gpkDirect3DDevice->Clear( 0, 0, flag, guBackColor, 1.0, 0);
+	gpkDirect3DDevice->BeginScene();
+#endif
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::endScene()
+{
+	if( !(guRenderFlags & DeviceLost) )
+	{
+		HRESULT hr = gpkDirect3DDevice->EndScene();
+		
+		if (FAILED(hr))
+		{
+			XDEBUG_LOG(LL_INFO,"Renderer:End Scene Failed");
+			return;
+		}
+			
+		hr = gpkDirect3DDevice->Present( 0, 0, 0, 0);
+			
+		if(hr == D3DERR_DEVICELOST)
+		{
+			guRenderFlags |= DeviceLost;
+			XDEBUG_LOG(LL_INFO,"Renderer:Device Lost");
+		}
+		else if (FAILED(hr) && hr != D3DERR_INVALIDCALL)
+			XDEBUG_LOG(LL_INFO,"Renderer:Present Failed");
+	}
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool cDirectX9Renderer::isFeatureSupported( FEATURE3D f ) 
+{
+	switch(f)
+	{
+	case FS_RENDER_TO_MULTIPLE_TEXTURE:
+		return (gkDeviceCaps.NumSimultaneousRTs > 1);
+	case FS_HARDWARE_TL:
+		return (gkDeviceCaps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT);
+	case FS_MIP_MAPS:
+		return (gkDeviceCaps.TextureCaps & D3DPTEXTURECAPS_MIPMAP);
+	case FS_AUTOGEN_MIP_MAPS:
+		return (gkDeviceCaps.Caps2 & D3DCAPS2_CANAUTOGENMIPMAP);
+	case FS_STENCIL_BUFFER:
+		return ((guRenderFlags & iRenderer::StencilBuffer) &&  gkDeviceCaps.StencilCaps);
+	case FS_ANY_SIZE_TEXTURE:
+		return (gkDeviceCaps.TextureCaps & D3DPTEXTURECAPS_NONPOW2CONDITIONAL);
+	case FS_INDEXED_VERTEX_BLENDING:
+		return (gkDeviceCaps.MaxVertexBlendMatrixIndex);
+		// pixel shader
+	case FS_PS_1_1:
+		return gkDeviceCaps.PixelShaderVersion >= D3DPS_VERSION(1,1);
+	case FS_PS_1_2:
+		return gkDeviceCaps.PixelShaderVersion >= D3DPS_VERSION(1,2);
+	case FS_PS_1_3:
+		return gkDeviceCaps.PixelShaderVersion >= D3DPS_VERSION(1,3);
+	case FS_PS_1_4:
+		return gkDeviceCaps.PixelShaderVersion >= D3DPS_VERSION(1,4);
+	case FS_PS_2_0:
+		return gkDeviceCaps.PixelShaderVersion >= D3DPS_VERSION(2,0);
+	case FS_PS_3_0:
+		return gkDeviceCaps.PixelShaderVersion >= D3DPS_VERSION(3,0);
+		// vertex shader
+	case FS_VS_1_1:
+		return gkDeviceCaps.VertexShaderVersion >= D3DVS_VERSION(1,1);
+	case FS_VS_2_0:
+		return gkDeviceCaps.VertexShaderVersion >= D3DVS_VERSION(2,0);
+	case FS_VS_3_0:
+		return gkDeviceCaps.VertexShaderVersion >= D3DVS_VERSION(3,0);
+	}
+	return 0;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+iTexture* cDirectX9Renderer::createTexture( cSoftwareTexture *pkImage, u32 flags )
+{
+	return new cDirectX9Texture( pkImage, flags );
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+iTexture* cDirectX9Renderer::createTexture( const s32 iWidth, const s32 iHeight, u32 flags )
+{
+	return new cDirectX9Texture( iWidth, iHeight, flags );
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+iTexture* cDirectX9Renderer::createRenderTarget( const s32 iWidth, const s32 iHeight )
+{
+	return new cDirectX9Texture( iWidth, iHeight );
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::prepare2DVertices(cVertex2D* pkV,s32 iCnt)
+{
+	f32 fXPlus = (f32)(mkScreenSize.dx>>1);
+	f32 fYPlus = (f32)(mkScreenSize.dy>>1);
+	f32	fXFact = 1.f/fXPlus;
+	f32 fYFact = 1.f/fYPlus;
+	fXPlus = -fXPlus;
+	fYPlus = (f32)mkScreenSize.dy - fYPlus;
+
+	for(s32 i=0; i<iCnt; i++)
+	{
+		pkV[i].mkPosition.x = (pkV[i].mkPosition.x+fXPlus)*fXFact;
+		pkV[i].mkPosition.y = (fYPlus-pkV[i].mkPosition.y)*fYFact;
+	}
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::drawIndexedTriangleList( void *pV, u16 *pI, u32 uVert, u32 uPrim, u32 uSizeOfVert )
+{
+	gpkDirect3DDevice->DrawIndexedPrimitiveUP( 
+		D3DPT_TRIANGLELIST, 0, uVert, uPrim, pI, D3DFMT_INDEX16, pV, uSizeOfVert );
+	guTotalPolysRendered += uPrim;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::drawIndexedTriangleFan( void *pV, u16 *pI, u32 uVert, u32 uPrim, u32 uSizeOfVert )
+{
+	gpkDirect3DDevice->DrawIndexedPrimitiveUP( 
+		D3DPT_TRIANGLEFAN, 0, uVert, uPrim, pI, D3DFMT_INDEX16, pV, uSizeOfVert );
+	guTotalPolysRendered += uPrim;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::draw2DImage(iTexture *pkTex,const float *rkSrc,const rectx &rkDest,
+									s32 iColor)
+{
+	//RENDER_TARGET_MODIFY
+	s32 iXPlus = mkScreenSize.dx>>1;
+	s32 iYPlus = mkScreenSize.dy>>1;
+	f32	fXFact = 1.f/(f32)iXPlus;
+	f32 fYFact = 1.f/(f32)iYPlus;
+	iXPlus = -iXPlus;
+	iYPlus = mkScreenSize.dy - iYPlus;
+	
+#ifdef X_DEBUG
+	if( !rkSrc.width() || !rkSrc.height() || !rkDest.width() || !rkDest.height() ) 
+	{
+		XDEBUG_LOG(LL_INFO,"cDirectX9Renderer::draw2DImage := Rendering nothing!");
+		return;
+	}
+#endif
+
+	setMode( RSC_2D );	
+	setTexture( 0, pkTex );
+	
+	gk2DVertices[0].mkPosition.x = gk2DVertices[1].mkPosition.x = 
+		(f32)(rkDest.left+iXPlus) * fXFact;
+	gk2DVertices[2].mkPosition.x = gk2DVertices[3].mkPosition.x = 
+		(f32)(rkDest.right+iXPlus) * fXFact;
+	gk2DVertices[1].mkPosition.y = gk2DVertices[3].mkPosition.y = 
+		(f32)(iYPlus-rkDest.top) * fYFact; 
+	gk2DVertices[0].mkPosition.y = gk2DVertices[2].mkPosition.y = 
+		(f32)(iYPlus-rkDest.bottom) * fYFact; 	
+	gk2DVertices[0].miColor = gk2DVertices[1].miColor = 
+	gk2DVertices[2].miColor = gk2DVertices[3].miColor = iColor;
+	gk2DVertices[0].mkTexCoord.x = gk2DVertices[1].mkTexCoord.x = 
+		rkSrc[0];
+	gk2DVertices[2].mkTexCoord.x = gk2DVertices[3].mkTexCoord.x = 
+		rkSrc[2];
+	gk2DVertices[1].mkTexCoord.y = gk2DVertices[3].mkTexCoord.y = 
+		rkSrc[1];
+	gk2DVertices[0].mkTexCoord.y = gk2DVertices[2].mkTexCoord.y = 
+		rkSrc[3];
+	
+	if( geCurVertexShader != VERTEX_2D )
+		setVertexShader(VERTEX_2D);
+	
+	gpkDirect3DDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, gk2DVertices, sizeof( cVertex2D ) );
+	guTotalPolysRendered += 2;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::draw2DPoly( const coordx &rkCenter, const f32 fRadius, 
+								   s32 iColOuter, s32 iColCenter)
+{
+	setMode(RSC_2D);		
+	if(garrpkCurTextures[0])
+	{
+		garrpkCurTextures[0] = 0;
+		gpkDirect3DDevice->SetTexture( 0, 0 );
+	}
+	//RENDER_TARGET_MODIFY
+	s32 iXPlus = mkScreenSize.dx>>1;
+	s32 iYPlus = mkScreenSize.dy>>1;
+	f32	fXFact = 1.f/(f32)iXPlus;
+	f32 fYFact = 1.f/(f32)iYPlus;
+	iXPlus = -iXPlus;
+	iYPlus = mkScreenSize.dy - iYPlus;
+			
+	f32 ang = N3D2Pi / (f32)(MAX_2DPOLY_VERT-1);
+	gk2DVertices[0].mkPosition.x = (f32)(rkCenter.x+iXPlus)*fXFact;
+	gk2DVertices[0].mkPosition.y = (f32)(iYPlus-rkCenter.y)*fYFact;
+	gk2DVertices[0].mkPosition.z = 0;
+	gk2DVertices[0].miColor = iColCenter;
+		
+	for( s32 i = 1; i < MAX_2DPOLY_VERT; i++ )
+	{
+		gk2DVertices[i].mkPosition.x = (fRadius*cosr(ang*(i-1))+(f32)iXPlus)*fXFact;
+		gk2DVertices[i].mkPosition.y = ((f32)iYPlus-fRadius*sinr(ang*(i-1)))*fYFact;
+		gk2DVertices[i].mkPosition.x = 0;
+		gk2DVertices[i].miColor = iColOuter;
+	}
+		
+	if( geCurVertexShader != VERTEX_2D )
+		setVertexShader(VERTEX_2D);
+		
+	gpkDirect3DDevice->DrawPrimitiveUP( D3DPT_TRIANGLEFAN, (UINT)(MAX_2DPOLY_VERT-1), gk2DVertices, sizeof( cVertex2D ) );
+	guTotalPolysRendered += (MAX_2DPOLY_VERT-1);
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::draw2DTri( s32 iColor, const coordx& kP1, const coordx& kP2, const coordx& kP3 )
+{
+	setMode(RSC_2D);
+	if(garrpkCurTextures[0])
+	{
+		garrpkCurTextures[0] = 0;
+		gpkDirect3DDevice->SetTexture( 0, 0 );
+	}
+	//RENDER_TARGET_MODIFY
+	s32 iXPlus = mkScreenSize.dx>>1;
+	s32 iYPlus = mkScreenSize.dy>>1;
+	f32	fXFact = 1.f/(f32)iXPlus;
+	f32 fYFact = 1.f/(f32)iYPlus;
+	iXPlus = -iXPlus;
+	iYPlus = mkScreenSize.dy - iYPlus;
+		
+	gk2DVertices[0].mkPosition.x = f32(kP1.x+iXPlus)*fXFact;
+	gk2DVertices[1].mkPosition.x = f32(kP2.x+iXPlus)*fXFact;
+	gk2DVertices[2].mkPosition.x = f32(kP3.x+iXPlus)*fXFact;
+	gk2DVertices[0].mkPosition.y = f32(iYPlus-kP1.y)*fYFact;
+	gk2DVertices[1].mkPosition.y = f32(iYPlus-kP2.y)*fYFact;
+	gk2DVertices[2].mkPosition.y = f32(iYPlus-kP3.y)*fYFact;
+		
+	gk2DVertices[0].miColor = gk2DVertices[1].miColor = gk2DVertices[2].miColor = gk2DVertices[3].miColor = iColor;
+		
+	if( geCurVertexShader != VERTEX_2D )
+		setVertexShader(VERTEX_2D);
+		
+	gpkDirect3DDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 1, gk2DVertices, sizeof( cVertex2D ) );
+	guTotalPolysRendered++;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::draw2DQuad( const rectx &rkRc, s32 iColTopLeft, s32 iColTopRight, s32 iColBotLeft, s32 iColBotRight )
+{
+	setMode(RSC_2D);
+	if(garrpkCurTextures[0])
+	{
+		garrpkCurTextures[0] = 0;
+		gpkDirect3DDevice->SetTexture( 0, 0 );
+	}
+	//RENDER_TARGET_MODIFY
+	s32 iXPlus = mkScreenSize.dx>>1;
+	s32 iYPlus = mkScreenSize.dy>>1;
+	f32	fXFact = 1.f/(f32)iXPlus;
+	f32 fYFact = 1.f/(f32)iYPlus;
+	iXPlus = -iXPlus;
+	iYPlus = mkScreenSize.dy - iYPlus;
+
+	gpkDirect3DDevice->SetRenderState( D3DRS_SHADEMODE, D3DSHADE_GOURAUD );
+		
+	gk2DVertices[0].mkPosition.x = gk2DVertices[1].mkPosition.x = (f32)(rkRc.left+iXPlus)*fXFact;
+	gk2DVertices[2].mkPosition.x = gk2DVertices[3].mkPosition.x = (f32)(rkRc.right+iXPlus)*fXFact;
+	gk2DVertices[1].mkPosition.y = gk2DVertices[3].mkPosition.y = (f32)(iYPlus-rkRc.top)*fYFact; 
+	gk2DVertices[0].mkPosition.y = gk2DVertices[2].mkPosition.y = (f32)(iYPlus-rkRc.bottom)*fYFact; 
+		
+	gk2DVertices[0].miColor = iColBotLeft;
+	gk2DVertices[1].miColor = iColTopLeft;
+	gk2DVertices[2].miColor = iColBotRight;
+	gk2DVertices[3].miColor = iColTopRight;
+		
+	if( geCurVertexShader != VERTEX_2D )
+		setVertexShader(VERTEX_2D);
+		
+	gpkDirect3DDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, gk2DVertices, sizeof( cVertex2D ) );
+	gpkDirect3DDevice->SetRenderState( D3DRS_SHADEMODE, D3DSHADE_FLAT );
+	guTotalPolysRendered += 2;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::draw2DQuad( s32 iColor, s32 left, s32 top, s32 right, s32 bottom )
+{
+	setMode(RSC_2D);
+	if(garrpkCurTextures[0])
+	{
+		garrpkCurTextures[0] = 0;
+		gpkDirect3DDevice->SetTexture( 0, 0 );
+	}
+	//RENDER_TARGET_MODIFY
+	s32 iXPlus = mkScreenSize.dx>>1;
+	s32 iYPlus = mkScreenSize.dy>>1;
+	f32	fXFact = 1.f/(f32)iXPlus;
+	f32 fYFact = 1.f/(f32)iYPlus;
+	iXPlus = -iXPlus;
+	iYPlus = mkScreenSize.dy - iYPlus;
+	
+	gk2DVertices[0].mkPosition.x=gk2DVertices[1].mkPosition.x=(f32)(left+iXPlus)*fXFact;
+	gk2DVertices[2].mkPosition.x=gk2DVertices[3].mkPosition.x=(f32)(right+iXPlus)*fXFact;
+	gk2DVertices[1].mkPosition.y=gk2DVertices[3].mkPosition.y=(f32)(iYPlus-top)*fYFact; 
+	gk2DVertices[0].mkPosition.y=gk2DVertices[2].mkPosition.y=(f32)(iYPlus-bottom)*fYFact;
+	
+	gk2DVertices[0].miColor = gk2DVertices[1].miColor = 
+	gk2DVertices[2].miColor = gk2DVertices[3].miColor = iColor;
+		
+	if( geCurVertexShader != VERTEX_2D )
+		setVertexShader(VERTEX_2D);
+		
+	gpkDirect3DDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, gk2DVertices, sizeof( cVertex2D ) );
+	guTotalPolysRendered += 2;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::draw2DRect( s32 color, s32 left, s32 top, s32 right, s32 bottom )
+{
+	setMode(RSC_2D);
+	if(garrpkCurTextures[0])
+	{
+		garrpkCurTextures[0] = 0;
+		gpkDirect3DDevice->SetTexture( 0, 0 );
+	}
+	//RENDER_TARGET_MODIFY
+	s32 iXPlus = mkScreenSize.dx>>1;
+	s32 iYPlus = mkScreenSize.dy>>1;
+	f32	fXFact = 1.f/(f32)iXPlus;
+	f32 fYFact = 1.f/(f32)iYPlus;
+	iXPlus = -iXPlus;
+	iYPlus = mkScreenSize.dy - iYPlus;
+	
+	gk2DVertices[0].mkPosition.x = 
+	gk2DVertices[3].mkPosition.x = 
+	gk2DVertices[4].mkPosition.x = (f32)(left+iXPlus)*fXFact;
+	gk2DVertices[1].mkPosition.x = 
+	gk2DVertices[2].mkPosition.x = (f32)(right+iXPlus)*fXFact;
+	gk2DVertices[0].mkPosition.y = 
+	gk2DVertices[1].mkPosition.y = 
+	gk2DVertices[4].mkPosition.y = (f32)(iYPlus-top)*fYFact;
+	gk2DVertices[2].mkPosition.y = 
+	gk2DVertices[3].mkPosition.y = (f32)(iYPlus-bottom)*fYFact;
+		
+	gk2DVertices[0].miColor = gk2DVertices[1].miColor = 
+	gk2DVertices[2].miColor = gk2DVertices[3].miColor = 
+	gk2DVertices[4].miColor = color;
+	
+	if( geCurVertexShader != VERTEX_2D )
+		setVertexShader(VERTEX_2D);
+	
+	gpkDirect3DDevice->DrawPrimitiveUP( D3DPT_LINESTRIP, 4, gk2DVertices, sizeof( cVertex2D ) );
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::draw2DLine( coordx &start, coordx &end, s32 color ) 
+{	
+	setMode(RSC_2D);
+	if(garrpkCurTextures[0])
+	{
+		garrpkCurTextures[0] = 0;
+		gpkDirect3DDevice->SetTexture( 0, 0 );
+	}
+	//RENDER_TARGET_MODIFY
+	s32 iXPlus = mkScreenSize.dx>>1;
+	s32 iYPlus = mkScreenSize.dy>>1;
+	f32	fXFact = 1.f/(f32)iXPlus;
+	f32 fYFact = 1.f/(f32)iYPlus;
+	iXPlus = -iXPlus;
+	iYPlus = mkScreenSize.dy - iYPlus;
+	
+	gk2DVertices[0].mkPosition.x = (f32)( start.x + iXPlus ) * fXFact;
+	gk2DVertices[0].mkPosition.y = (f32)( iYPlus - start.y ) * fYFact;
+//	gk2DVertices[0].mkPosition.z = 0.0f;
+	gk2DVertices[1].mkPosition.x = (f32)( end.x + iXPlus ) * fXFact;
+	gk2DVertices[1].mkPosition.y = (f32)( iYPlus - end.y ) * fYFact;
+//	gk2DVertices[1].mkPosition.z = 0.0f;
+	gk2DVertices[0].miColor = gk2DVertices[1].miColor = color;
+	
+	if( geCurVertexShader != VERTEX_2D )
+		setVertexShader(VERTEX_2D);
+	
+	gpkDirect3DDevice->DrawPrimitiveUP( D3DPT_LINESTRIP, 1, gk2DVertices, sizeof( cVertex2D ) );
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::draw2DLineStrip(nextar::cVertex2D *pkV, s32 iCnt)
+{
+	if(garrpkCurTextures[0])
+		garrpkCurTextures[0] = 0;
+	gpkDirect3DDevice->SetTexture( 0, 0 );
+	if( geCurVertexShader != VERTEX_2D )
+		setVertexShader(VERTEX_2D);
+	gpkDirect3DDevice->DrawPrimitiveUP( D3DPT_LINESTRIP, iCnt, pkV, sizeof( cVertex2D ) );
+	guTotalStateChanges += 2;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::draw2DTriFan(nextar::cVertex2D *pkV, s32 iCnt)
+{
+	if( geCurVertexShader != VERTEX_2D )
+		setVertexShader(VERTEX_2D);
+	// we are unsure about color at this point
+	// so make gouraud shading available
+//	gpkDirect3DDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD);
+	gpkDirect3DDevice->DrawPrimitiveUP( D3DPT_TRIANGLEFAN, iCnt, pkV, sizeof( cVertex2D ) );
+	// return to normal shading
+//	gpkDirect3DDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_FLAT);
+	guTotalStateChanges += 1;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::draw2DTriStrip(nextar::cVertex2D *pkV, s32 iCnt)
+{
+	if( geCurVertexShader != VERTEX_2D )
+		setVertexShader(VERTEX_2D);
+	// we are unsure about color at this point
+	// so make gouraud shading available
+//	gpkDirect3DDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD);
+	gpkDirect3DDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, iCnt, pkV, sizeof( cVertex2D ) );
+	// return to normal shading
+//	gpkDirect3DDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_FLAT);
+	guTotalStateChanges += 1;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#ifdef X_DEBUG
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::draw3DLine( const vec3 &start, const vec3 &end, s32 color )
+{
+	DWORD ltstate;
+	iTexture* Tex = garrpkCurTextures[0];
+	garrpkCurTextures[0] = 0;
+	gpkDirect3DDevice->SetTexture( 0, 0 );
+	setMode(RSC_3D);
+
+	gpkDirect3DDevice->GetRenderState( D3DRS_LIGHTING, &ltstate );
+	gpkDirect3DDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
+	
+	cVertexStd v[2];
+	
+	v[0].mkPosition = start;
+	v[1].mkPosition = end;
+	v[1].miColor = v[0].miColor = color;
+	
+	if( geCurVertexShader != VERTEX_STD )
+		setVertexShader(VERTEX_STD);
+
+	gpkDirect3DDevice->DrawPrimitiveUP( D3DPT_LINELIST, 1, v, sizeof( cVertexStd ) );
+	gpkDirect3DDevice->SetRenderState( D3DRS_LIGHTING, ltstate );
+	setTexture( 0, Tex );
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::draw3DBone( const vec3 &start, const vec3 &end, s32 color )
+{
+	f32 diffx = end.x - start.x;
+	f32 diffy = end.y - start.y;
+	f32 diffz = end.z - start.z;
+
+	f32 BoneLength = sqrtr(diffx*diffx + diffy*diffy + diffz*diffz);
+	draw3DLine( start, end, color );
+	draw3DSphere( start, BoneLength * 0.1f, color );
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::draw3DSphere( const vec3 &center, const f32 rad, s32 color )
+{
+	static cVertexStd v[33] = 
+	{
+		{ { 0.000000f, 1.000000f, 0.000000f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ { 0.707107f, 0.707107f, 0.000000f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ { 1.000000f,-0.000000f, 0.000000f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ { 0.707107f,-0.707107f, 0.000000f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ {-0.000000f,-1.000000f, 0.000000f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ {-0.707107f,-0.707107f, 0.000000f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ {-1.000000f, 0.000000f, 0.000000f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ {-0.707107f, 0.707107f, 0.000000f }, {0.0f}, 0xffff0000, {0.0f} },
+
+		{ { 0.000000f, 1.000000f, 0.000000f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ { 0.500000f, 0.707107f, 0.500000f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ { 0.707107f,-0.000000f, 0.707107f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ { 0.500000f,-0.707107f, 0.500000f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ {-0.000000f,-1.000000f,-0.000000f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ {-0.500000f,-0.707107f,-0.500000f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ {-0.707107f, 0.000000f,-0.707107f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ {-0.500000f, 0.707107f,-0.500000f }, {0.0f}, 0xffff0000, {0.0f} },
+
+		{ { 0.000000f, 1.000000f, 0.000000f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ {-0.000000f, 0.707107f, 0.707107f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ {-0.000000f,-0.000000f, 1.000000f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ {-0.000000f,-0.707107f, 0.707107f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ { 0.000000f,-1.000000f,-0.000000f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ { 0.000000f,-0.707107f,-0.707107f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ { 0.000000f, 0.000000f,-1.000000f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ { 0.000000f, 0.707107f,-0.707107f }, {0.0f}, 0xffff0000, {0.0f} },
+
+		{ { 0.000000f, 1.000000f, 0.000000f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ {-0.500000f, 0.707107f, 0.500000f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ {-0.707107f,-0.000000f, 0.707107f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ {-0.500000f,-0.707107f, 0.500000f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ { 0.000000f,-1.000000f,-0.000000f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ { 0.500000f,-0.707107f,-0.500000f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ { 0.707107f, 0.000000f,-0.707107f }, {0.0f}, 0xffff0000, {0.0f} },
+		{ { 0.500000f, 0.707107f,-0.500000f }, {0.0f}, 0xffff0000, {0.0f} },
+
+		{ { 0.000000f, 1.000000f, 0.000000f }, {0.0f}, 0xffff0000, {0.0f} }
+	};
+
+	DWORD ltstate;
+	mat44_t Matrix = {0};
+	Matrix[3*4+0] = center.x;
+	Matrix[3*4+1] = center.x;
+	Matrix[3*4+2] = center.x;
+	Matrix[0*4+0] = rad;
+	Matrix[1*4+1] = rad;
+	Matrix[2*4+2] = rad;
+
+	iTexture* Tex = garrpkCurTextures[0];
+	garrpkCurTextures[0] = 0;
+	gpkDirect3DDevice->SetTexture( 0, 0 );
+	setMode(RSC_3D);
+
+	gpkDirect3DDevice->SetTransform( D3DTS_WORLD, (D3DMATRIX*)(Matrix) );
+	gpkDirect3DDevice->GetRenderState( D3DRS_LIGHTING, &ltstate );
+	gpkDirect3DDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
+	for( s32 i = 0; i < 33; i++ )
+		v[i].miColor = color;
+
+	if( geCurVertexShader != VERTEX_STD )
+		setVertexShader(VERTEX_STD);
+
+	gpkDirect3DDevice->DrawPrimitiveUP( D3DPT_LINESTRIP, 16, v, sizeof( cVertexStd ) );
+	gpkDirect3DDevice->SetRenderState( D3DRS_LIGHTING, ltstate );
+	setTexture( 0, Tex );
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::draw3DBox( const vec3 &box_max, const vec3 &box_min, s32 color, bool wireframe )
+{
+	vec3 v[8] = 
+	{
+		{ box_max.x, box_max.y, box_min.z },
+		{ box_min.x, box_min.y, box_max.z },
+		{ box_max.x, box_min.y, box_min.z },
+		{ box_min.x, box_max.y, box_max.z },
+		{ box_max.x, box_min.y, box_max.z },
+		{ box_min.x, box_max.y, box_min.z },
+		{ box_min.x, box_min.y, box_min.z },
+		{ box_max.x, box_max.y, box_max.z }
+	};
+	cVertexStd vx[4];
+
+	for( s32 i = 0; i < 8; i++ ) 
+	{ 
+		vx[i].mkPosition = v[i];
+		vx[i].miColor = color;
+	}
+	
+	u32			cull,ltstate;
+	D3DMATRIX	World;
+	
+	setMode(RSC_3D);
+
+	setTexture( 0 , 0 );
+	gpkDirect3DDevice->GetRenderState( D3DRS_CULLMODE, &cull );
+	gpkDirect3DDevice->GetRenderState( D3DRS_LIGHTING, &ltstate );
+	gpkDirect3DDevice->GetTransform( D3DTS_WORLD, &World );
+	
+	gpkDirect3DDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
+	gpkDirect3DDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
+	setWorld( N3D4x4IdentityMatrix );
+	
+	setVertexShader( VERTEX_STD );
+	
+	//		3--------7
+	//		/|		/|
+	//	   5-|-----0 |
+	//	   | 1_____| 4
+	//	   |/	   |/
+	//	   6-------2
+	//
+	
+	if( wireframe )
+	{
+		u16 index[] = 
+		{
+			5,0, 0,2, 
+			2,6, 6,5,
+			3,7, 7,4,
+			4,1, 1,3,
+			7,0, 3,5,
+			1,6, 4,2
+		};
+		
+		gpkDirect3DDevice->DrawIndexedPrimitiveUP( D3DPT_LINELIST, 0, 8, 12, index, D3DFMT_INDEX16, vx, sizeof( cVertexStd ) );
+	}
+	else
+	{
+		DWORD alphastate;
+		DWORD bs1, bs2;
+
+		gpkDirect3DDevice->GetRenderState(D3DRS_ALPHABLENDENABLE, &alphastate ); 
+		gpkDirect3DDevice->GetRenderState(D3DRS_SRCBLEND, &bs1 ); 
+		gpkDirect3DDevice->GetRenderState(D3DRS_DESTBLEND, &bs2 ); 
+
+		gpkDirect3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE); 
+		gpkDirect3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA); 
+		gpkDirect3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA ); 
+
+		u16 index[36] = 
+		{
+			6,5,2, 5,0,2,
+			2,0,4, 0,7,4, 
+			4,7,1, 7,3,1, 
+			1,3,6, 3,5,6,
+			5,3,0, 3,7,0,
+			1,6,2, 6,2,4
+		};
+		
+		gpkDirect3DDevice->DrawIndexedPrimitiveUP( D3DPT_TRIANGLELIST, 0, 8, 12, index, D3DFMT_INDEX16, vx, sizeof( cVertexStd ) );
+
+		gpkDirect3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, alphastate ); 
+		gpkDirect3DDevice->SetRenderState(D3DRS_SRCBLEND, bs1 ); 
+		gpkDirect3DDevice->SetRenderState(D3DRS_DESTBLEND, bs2 );
+	}
+
+	gpkDirect3DDevice->SetTransform( D3DTS_WORLD, &World );
+	gpkDirect3DDevice->SetRenderState( D3DRS_LIGHTING, ltstate );
+	gpkDirect3DDevice->SetRenderState( D3DRS_CULLMODE, cull );
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::draw3DTriangle( const vec3 &kP1, const vec3 &kP2, const vec3 &kP3, s32 color, bool wireframe )
+{
+	DWORD alphastate;
+	DWORD bs1, bs2;
+
+	cVertexStd v[3];
+	v[0].mkPosition=kP1; 
+	v[1].mkPosition=kP2; 
+	v[2].mkPosition=kP3; 
+	v[0].miColor = color; v[1].miColor = color; v[2].miColor = color;
+	
+	setMode(RSC_3D);
+	
+	u32 cull,ltstate;
+
+	setTexture( 0 , 0 );
+
+	gpkDirect3DDevice->GetRenderState( D3DRS_CULLMODE, &cull );
+	gpkDirect3DDevice->GetRenderState( D3DRS_LIGHTING, &ltstate );
+
+	gpkDirect3DDevice->GetRenderState(D3DRS_ALPHABLENDENABLE, &alphastate ); 
+	gpkDirect3DDevice->GetRenderState(D3DRS_SRCBLEND, &bs1 ); 
+	gpkDirect3DDevice->GetRenderState(D3DRS_DESTBLEND, &bs2 ); 
+
+	
+	gpkDirect3DDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
+	gpkDirect3DDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
+
+	gpkDirect3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE); 
+	gpkDirect3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA); 
+	gpkDirect3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA ); 
+
+	
+	setVertexShader( VERTEX_STD );
+	
+	if( wireframe )
+	{
+		u16 index[] = { 0,1, 1,2, 2,1 };
+		gpkDirect3DDevice->DrawIndexedPrimitiveUP( D3DPT_LINELIST, 0, 3, 3, index, D3DFMT_INDEX16, v, sizeof( cVertexStd ) );
+	}
+	else
+	{
+		gpkDirect3DDevice->DrawPrimitiveUP( D3DPT_TRIANGLELIST, 1, v, sizeof( cVertexStd ) );
+	}
+	
+	gpkDirect3DDevice->SetRenderState( D3DRS_LIGHTING, ltstate );
+	gpkDirect3DDevice->SetRenderState( D3DRS_CULLMODE, cull );
+
+	gpkDirect3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, alphastate ); 
+	gpkDirect3DDevice->SetRenderState(D3DRS_SRCBLEND, bs1 ); 
+	gpkDirect3DDevice->SetRenderState(D3DRS_DESTBLEND, bs2 ); 
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::draw3DTransform( const f32* t, const f32 length )
+{
+	vec3 x,y,z;
+	vec3 o = {t[12],t[13],t[14]};
+#define scaleit(v,idx) \
+	v.x = t[0+idx]*length + o.x;\
+	v.y = t[4+idx]*length + o.y;\
+	v.z = t[8+idx]*length + o.z;
+	scaleit(x,0);
+	scaleit(y,1);
+	scaleit(z,2);
+#undef  scaleit
+	draw3DLine(o,x,0xffff0000);
+	draw3DLine(o,y,0xff00ff00);
+	draw3DLine(o,z,0xff0000ff);
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::draw3DPlane( const plane &p, const vec3 &pos, f32 size, s32 color )
+{
+	DWORD ltstate;
+	DWORD cull;
+	DWORD alphastate;
+	DWORD bs1, bs2;
+	
+	setMode(RSC_3D);
+	setTexture( 0 , 0 );
+	
+	gpkDirect3DDevice->GetRenderState( D3DRS_CULLMODE, &cull );
+	gpkDirect3DDevice->GetRenderState( D3DRS_LIGHTING, &ltstate );
+
+	gpkDirect3DDevice->GetRenderState(D3DRS_ALPHABLENDENABLE, &alphastate ); 
+	gpkDirect3DDevice->GetRenderState(D3DRS_SRCBLEND, &bs1 ); 
+	gpkDirect3DDevice->GetRenderState(D3DRS_DESTBLEND, &bs2 ); 
+
+
+	gpkDirect3DDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );	
+	gpkDirect3DDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
+	
+	gpkDirect3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE); 
+	gpkDirect3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA); 
+	gpkDirect3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA ); 
+
+	setVertexShader( VERTEX_STD );
+
+	// draw here
+
+	gpkDirect3DDevice->SetRenderState( D3DRS_LIGHTING, ltstate );
+	gpkDirect3DDevice->SetRenderState( D3DRS_CULLMODE, cull );
+
+	gpkDirect3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, alphastate ); 
+	gpkDirect3DDevice->SetRenderState(D3DRS_SRCBLEND, bs1 ); 
+	gpkDirect3DDevice->SetRenderState(D3DRS_DESTBLEND, bs2 ); 
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::draw3DFrustum( const plane p[], s32 color )
+{
+	// TODO: need implementation
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif // X_DEBUG draws
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+XERRORCODE cDirectX9Renderer::_create(HWND kWnd)
+{
+	cLog& rkLog = iSystem::XSELFPTR->getLogger();
+	if( 0 == ( gpkDirect3D = Direct3DCreate9( D3D_SDK_VERSION ) ) )
+		return X_ERR_COULDNT_CREATE_D3D;
+	
+	if( guRenderFlags & iRenderer::FullScreen )
+	{
+		gkPresentParams.Windowed	= FALSE;	// w/f
+		gkPresentParams.SwapEffect	= D3DSWAPEFFECT_FLIP; // w/f 
+	}
+	else
+	{
+		gkPresentParams.Windowed	= TRUE;
+		gkPresentParams.SwapEffect	= D3DSWAPEFFECT_COPY;
+	}
+
+	gkPresentParams.EnableAutoDepthStencil	= TRUE;
+	gkPresentParams.BackBufferFormat		= muBitsPerPixel == 32 ? D3DFMT_X8R8G8B8 : D3DFMT_R5G6B5; // w/f 
+	gkPresentParams.PresentationInterval	= D3DPRESENT_INTERVAL_IMMEDIATE;
+	
+	if( !gkPresentParams.Windowed ) // w/f 
+	{
+		gkPresentParams.BackBufferHeight			= mkScreenSize.dy;
+		gkPresentParams.BackBufferWidth				= mkScreenSize.dx;
+		gkPresentParams.FullScreen_RefreshRateInHz	= D3DPRESENT_RATE_DEFAULT;
+		gkPresentParams.BackBufferCount				= 0;
+		
+		if( guRenderFlags & iRenderer::VSync )	// w/f 
+			gkPresentParams.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+		
+	}
+	
+	D3DDEVTYPE eDevType = D3DDEVTYPE_HAL;
+	
+	// antialias enabled
+	if( guRenderFlags & iRenderer::AntiAlias )
+	{
+		DWORD uQualityLevels = 0; 
+		
+		if ( !FAILED( gpkDirect3D->CheckDeviceMultiSampleType( D3DADAPTER_DEFAULT, eDevType, gkPresentParams.BackBufferFormat, gkPresentParams.Windowed, D3DMULTISAMPLE_2_SAMPLES, &uQualityLevels)))
+		{        
+			// enable multi sampling
+			gkPresentParams.SwapEffect         = D3DSWAPEFFECT_DISCARD; 
+			gkPresentParams.MultiSampleType    = D3DMULTISAMPLE_2_SAMPLES; 
+			gkPresentParams.MultiSampleQuality = uQualityLevels-1;
+		} 
+		else if ( !FAILED( gpkDirect3D->CheckDeviceMultiSampleType( D3DADAPTER_DEFAULT, 
+			eDevType, gkPresentParams.BackBufferFormat, gkPresentParams.Windowed, D3DMULTISAMPLE_NONMASKABLE, &uQualityLevels))) 
+		{        
+			// enable non maskable multi sampling
+			gkPresentParams.SwapEffect         = D3DSWAPEFFECT_DISCARD; 
+			gkPresentParams.MultiSampleType    = D3DMULTISAMPLE_NONMASKABLE; 
+			gkPresentParams.MultiSampleQuality = uQualityLevels-1;
+		} 		
+		else 
+		{ 
+			rkLog.print(LL_INFO,"Renderer:Anti aliasing disabled because hardware/driver support was not found.");
+			guRenderFlags &= ~iRenderer::AntiAlias;
+		}
+	}
+	
+	// stencil buffer compatibility test
+	if ( guRenderFlags & iRenderer::StencilBuffer )
+	{
+		gkPresentParams.AutoDepthStencilFormat = D3DFMT_D24S8;
+
+		if( FAILED( gpkDirect3D->CheckDeviceFormat( D3DADAPTER_DEFAULT, eDevType, gkPresentParams.BackBufferFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D24S8 ) ) )
+		{
+			rkLog.print(LL_INFO,"Renderer:Device does not support stencilbuffer, disabling stencil buffer.");
+			guRenderFlags &= ~iRenderer::StencilBuffer;
+		}
+		else if( FAILED( gpkDirect3D->CheckDepthStencilMatch( D3DADAPTER_DEFAULT, eDevType, gkPresentParams.BackBufferFormat, gkPresentParams.BackBufferFormat, D3DFMT_D24S8) ) )
+		{
+			rkLog.print(LL_INFO,"Renderer:Depth-stencil format is not compatible with display format, disabling stencil buffer.");
+			guRenderFlags &= ~iRenderer::StencilBuffer;
+		}
+	}
+	
+	if ( guRenderFlags & iRenderer::StencilBuffer )
+		gkPresentParams.AutoDepthStencilFormat = D3DFMT_D16;
+
+	// create the device 
+	guRenderFlags |= iRenderer::HardwareVP;
+	if( FAILED( gpkDirect3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, kWnd, D3DCREATE_HARDWARE_VERTEXPROCESSING, &gkPresentParams, &gpkDirect3DDevice ) ) )
+	{
+		if( FAILED( gpkDirect3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, kWnd, D3DCREATE_MIXED_VERTEXPROCESSING, &gkPresentParams, &gpkDirect3DDevice ) ) )
+		{
+			guRenderFlags &=~iRenderer::HardwareVP;
+			gpkDirect3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, kWnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &gkPresentParams, &gpkDirect3DDevice );
+		}
+	}
+
+	if( !gpkDirect3DDevice )
+		return X_ERR_COULDNT_CREATE_D3DDEV;
+
+	gpkDirect3DDevice->GetDeviceCaps( &gkDeviceCaps );
+	
+	// disable stencilbuffer if necessary 
+	if ((guRenderFlags & iRenderer::StencilBuffer) && 
+		(
+		!( gkDeviceCaps.StencilCaps & D3DSTENCILCAPS_DECRSAT) ||
+		!( gkDeviceCaps.StencilCaps & D3DSTENCILCAPS_INCRSAT) ||
+		!( gkDeviceCaps.StencilCaps & D3DSTENCILCAPS_KEEP)
+		)
+		)
+	{
+		rkLog.print(LL_INFO,"Renderer:Disabling stencil buffer. No device support found.");
+		guRenderFlags &= ~iRenderer::StencilBuffer;
+	}
+
+	if (guRenderFlags & iRenderer::AntiAlias)
+		gpkDirect3DDevice->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, TRUE);
+	
+	// set maximal anisotropy 
+	gpkDirect3DDevice->SetSamplerState(0, D3DSAMP_MAXANISOTROPY, __min( 16, gkDeviceCaps.MaxAnisotropy ) );
+	gpkDirect3DDevice->SetSamplerState(1, D3DSAMP_MAXANISOTROPY, __min( 16, gkDeviceCaps.MaxAnisotropy ) );
+	
+	// get device information 
+	D3DADAPTER_IDENTIFIER9 dai;
+	if ( !FAILED( gpkDirect3D->GetAdapterIdentifier(D3DADAPTER_DEFAULT, 0, &dai)) )
+	{
+		gkDriverName.format(TEXT("%s %s %s"), 196, dai.Description, dai.Driver, 
+			guRenderFlags&iRenderer::HardwareVP? TEXT("(hw vp)"):TEXT("(sw vp)"));
+	}
+
+	guTotalStateChanges = 0;
+	guTotalPolysRendered = 0;
+	_recordStates();
+	_createMaterialShaders();
+	_setMaterialStates(0);
+
+	s32 iMaxDynLight = getMaxDynamicLight();
+	XASSERT(iMaxDynLight);
+	
+	gpkAddedLights = new const cLight*[iMaxDynLight];
+	zeroMemory( gpkAddedLights, iMaxDynLight*sizeof(cLight*) );
+	return X_SUCCESS;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::_onResize( const sizex &rkSize )
+{
+	if( mkScreenSize != rkSize )
+	{
+		mkScreenSize = rkSize;
+		mkViewport.right = mkScreenSize.dx;
+		mkViewport.bottom = mkScreenSize.dy;
+		setViewport(mkViewport);
+		reset();
+	}
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::_setMaterialStates( u32 flags )
+{
+	register BOOL bTemp = false;
+	if( (flags & cMaterial::BILINEARFILTER) && !(guCurMaterialFlags & cMaterial::BILINEARFILTER) )
+	{
+		bTemp = true;
+		gpkDirect3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
+		gpkDirect3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
+		gpkDirect3DDevice->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
+		gpkDirect3DDevice->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
+
+	}
+	else if( (flags & cMaterial::ANISOTROPICFILTER) && !(guCurMaterialFlags & cMaterial::ANISOTROPICFILTER) )
+	{
+		bTemp = true;
+		gpkDirect3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_ANISOTROPIC );
+		gpkDirect3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_ANISOTROPIC );
+		gpkDirect3DDevice->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_ANISOTROPIC );
+		gpkDirect3DDevice->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_ANISOTROPIC );
+	}
+
+	if( (flags & cMaterial::TRILINEARFILTER) && !(guCurMaterialFlags & cMaterial::TRILINEARFILTER) )
+	{
+		bTemp = true;
+		gpkDirect3DDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
+		gpkDirect3DDevice->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
+	}
+	
+	if( !bTemp )
+	{
+		gpkDirect3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+		gpkDirect3DDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+		gpkDirect3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+				
+		gpkDirect3DDevice->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+		gpkDirect3DDevice->SetSamplerState(1, D3DSAMP_MIPFILTER,  D3DTEXF_NONE);
+		gpkDirect3DDevice->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+	}
+		
+	/* wireframe mode */
+	if( (flags & cMaterial::DRAWWIREFRAME) )
+	{
+		if( !(guCurMaterialFlags & cMaterial::DRAWWIREFRAME)  )
+			gpkDirect3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+	}
+	else
+	{
+		if( (guCurMaterialFlags & cMaterial::DRAWWIREFRAME) )
+			gpkDirect3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+	}
+	
+	/* shade mode */
+	if( (flags & cMaterial::GOURAUDSHADING) )
+	{
+		if( !(guCurMaterialFlags & cMaterial::GOURAUDSHADING) )
+			gpkDirect3DDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD);
+	}
+	else
+	{
+		if( (guCurMaterialFlags & cMaterial::GOURAUDSHADING) )
+			gpkDirect3DDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_FLAT);
+	}
+
+	/* lighting */
+	bTemp = (flags & cMaterial::LIGHTING);
+	if( bTemp != (guCurMaterialFlags & cMaterial::LIGHTING) )
+		gpkDirect3DDevice->SetRenderState(D3DRS_LIGHTING, bTemp);
+			
+	/* z buffer */
+	bTemp = (flags & cMaterial::ZBUFFER);
+	if ( bTemp != (guCurMaterialFlags & cMaterial::ZBUFFER ) )
+		gpkDirect3DDevice->SetRenderState(D3DRS_ZENABLE, bTemp);
+
+	/* z write */
+	bTemp = (flags & cMaterial::ZWRITE);
+	if ( bTemp != (guCurMaterialFlags & cMaterial::ZWRITE) )
+		gpkDirect3DDevice->SetRenderState( D3DRS_ZWRITEENABLE, bTemp );
+	
+	/* back face culling */
+	if( (flags & cMaterial::IS2SIDED) )
+	{
+		if( !(guCurMaterialFlags & cMaterial::IS2SIDED) )
+			gpkDirect3DDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	}
+	else
+	{
+		if( (guCurMaterialFlags & cMaterial::IS2SIDED) )
+			gpkDirect3DDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	}
+
+	/* fog */
+	bTemp = (flags & cMaterial::FOGENABLE);
+	if( bTemp != (guCurMaterialFlags & cMaterial::FOGENABLE) )
+		gpkDirect3DDevice->SetRenderState( D3DRS_FOGENABLE, bTemp ); 
+	
+	/* specular highlights */
+	bTemp = (flags & cMaterial::SPECULARHIGHLIGHTS);
+	if ( bTemp != (guCurMaterialFlags & cMaterial::SPECULARHIGHLIGHTS) )
+	{
+		gpkDirect3DDevice->SetRenderState( D3DRS_SPECULARENABLE, bTemp );
+		gpkDirect3DDevice->SetRenderState( D3DRS_NORMALIZENORMALS, bTemp );
+		gpkDirect3DDevice->SetRenderState( D3DRS_SPECULARMATERIALSOURCE, D3DMCS_MATERIAL );
+	}
+	
+	/* normalization */
+	bTemp = (flags & cMaterial::NORMALIZENORMALS);
+	if ( bTemp != (guCurMaterialFlags & cMaterial::NORMALIZENORMALS) )
+		gpkDirect3DDevice->SetRenderState( D3DRS_NORMALIZENORMALS, bTemp);
+
+	guCurMaterialFlags = flags;
+	guTotalStateChanges += 14; /* approximately the max value */
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::_recordStates()
+{
+#define DX9BugRS(str) ReportBug(str,"cDirectX9Renderer:_recordState")
+	// basic 2d state block
+	if( FAILED(gpkDirect3DDevice->BeginStateBlock()) )
+	{
+		DX9BugRS("Failed to record state blocks.");
+		return;
+	}
+	
+	//** TRANSFORM CHANGES
+//	gpkDirect3DDevice->SetTransform( D3DTS_VIEW, (D3DMATRIX*)(N3D4x4IdentityMatrix) );
+//	gpkDirect3DDevice->SetTransform( D3DTS_WORLD, (D3DMATRIX*)(N3D4x4IdentityMatrix) );
+//	gpkDirect3DDevice->SetTransform( D3DTS_PROJECTION, ( D3DMATRIX*)(N3D4x4IdentityMatrix) );
+
+	gpkDirect3DDevice->SetRenderState( D3DRS_ZENABLE, FALSE);
+	gpkDirect3DDevice->SetRenderState( D3DRS_SHADEMODE, D3DSHADE_FLAT);
+	gpkDirect3DDevice->SetRenderState( D3DRS_FILLMODE, D3DFILL_SOLID);
+	gpkDirect3DDevice->SetRenderState( D3DRS_LIGHTING, FALSE);
+	gpkDirect3DDevice->SetRenderState( D3DRS_FOGENABLE, FALSE);
+	gpkDirect3DDevice->SetRenderState( D3DRS_SPECULARENABLE, FALSE);
+	
+	gpkDirect3DDevice->SetTextureStageState( 1, D3DTSS_COLOROP,   D3DTOP_DISABLE);
+	gpkDirect3DDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP,  D3DTOP_DISABLE );
+	
+	gpkDirect3DDevice->SetRenderState( D3DRS_STENCILENABLE, FALSE );
+	gpkDirect3DDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW);
+	
+	gpkDirect3DDevice->SetTextureStageState( 0, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_DISABLE );
+	gpkDirect3DDevice->SetTextureStageState( 0, D3DTSS_TEXCOORDINDEX, 0);
+	gpkDirect3DDevice->SetTransform( D3DTS_TEXTURE0, ( D3DMATRIX*)(N3D4x4IdentityMatrix) );
+	
+	gpkDirect3DDevice->SetSamplerState( 0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+	gpkDirect3DDevice->SetSamplerState( 0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+	gpkDirect3DDevice->SetSamplerState( 0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+	
+	gpkDirect3DDevice->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
+	gpkDirect3DDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
+	gpkDirect3DDevice->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
+	
+	gpkDirect3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP,  D3DTOP_MODULATE );
+	gpkDirect3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
+	gpkDirect3DDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
+	
+	gpkDirect3DDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE);
+	gpkDirect3DDevice->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_SRCALPHA); 
+	gpkDirect3DDevice->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA ); 
+	
+	if( FAILED(gpkDirect3DDevice->EndStateBlock(&garrpkStates[SB_BASIC2D]) ) )
+	{
+		DX9BugRS("Failed to record state blocks. [Block: SB_BASIC2D]");
+		return;
+	}
+	
+	// basic shadow mode state block
+	if( FAILED(gpkDirect3DDevice->BeginStateBlock()) )
+	{
+		DX9BugRS("Failed to record state blocks.");
+		return;
+	}
+	
+	gpkDirect3DDevice->SetTexture(0,0);
+	gpkDirect3DDevice->SetTexture(1,0);
+	
+	gpkDirect3DDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+	gpkDirect3DDevice->SetTextureStageState(1,  D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+	gpkDirect3DDevice->SetTextureStageState(2, D3DTSS_COLOROP, D3DTOP_DISABLE);
+	gpkDirect3DDevice->SetTextureStageState(2,  D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+	
+	gpkDirect3DDevice->SetFVF(D3DFVF_XYZ);
+	
+	gpkDirect3DDevice->SetRenderState( D3DRS_ZWRITEENABLE,  FALSE );
+	gpkDirect3DDevice->SetRenderState( D3DRS_STENCILENABLE, TRUE );
+	gpkDirect3DDevice->SetRenderState( D3DRS_SHADEMODE, D3DSHADE_FLAT);
+	
+	if( FAILED(gpkDirect3DDevice->EndStateBlock(&garrpkStates[SB_SHADOW_MODE])) )
+	{
+		DX9BugRS("Failed to record state blocks. [Block: SB_SHADOW_MODE]");
+		return;
+	}
+	
+	// shadow_volume_zpass state block
+	if( FAILED(gpkDirect3DDevice->BeginStateBlock()) )
+	{
+		DX9BugRS("Failed to record state blocks.");
+		return;
+	}
+	
+	gpkDirect3DDevice->SetRenderState( D3DRS_STENCILFUNC,  D3DCMP_ALWAYS );
+	gpkDirect3DDevice->SetRenderState( D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP );
+	gpkDirect3DDevice->SetRenderState( D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP );
+	gpkDirect3DDevice->SetRenderState( D3DRS_STENCILREF, 0x1 );
+	gpkDirect3DDevice->SetRenderState( D3DRS_STENCILMASK, 0xffffffff );
+	gpkDirect3DDevice->SetRenderState( D3DRS_STENCILWRITEMASK, 0xffffffff );
+	gpkDirect3DDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE);
+	gpkDirect3DDevice->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_ZERO );
+	gpkDirect3DDevice->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_ONE );
+	
+	if( FAILED(gpkDirect3DDevice->EndStateBlock(&garrpkStates[SB_SHADOW_VOLUME_ZPASS])) )
+	{
+		DX9BugRS("Failed to record state blocks.[Block: SB_SHADOW_VOLUME_ZPASS]");
+		return;
+	}
+	
+	// shadow_volume_zfail state block
+	if( FAILED(gpkDirect3DDevice->BeginStateBlock()) )
+	{
+		DX9BugRS("Failed to record state blocks.");
+		return;
+	}
+	
+	gpkDirect3DDevice->SetRenderState( D3DRS_STENCILFUNC, D3DCMP_ALWAYS );
+	gpkDirect3DDevice->SetRenderState( D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP );
+	gpkDirect3DDevice->SetRenderState( D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP );
+	gpkDirect3DDevice->SetRenderState( D3DRS_STENCILPASS, D3DSTENCILOP_KEEP );
+	
+	gpkDirect3DDevice->SetRenderState( D3DRS_STENCILREF, 0x0 );
+	gpkDirect3DDevice->SetRenderState( D3DRS_STENCILMASK, 0xffffffff );
+	gpkDirect3DDevice->SetRenderState( D3DRS_STENCILWRITEMASK, 0xffffffff );
+	
+	gpkDirect3DDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
+	gpkDirect3DDevice->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_ZERO );
+	gpkDirect3DDevice->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_ONE );
+	
+	if( FAILED(gpkDirect3DDevice->EndStateBlock(&garrpkStates[SB_SHADOW_VOLUME_ZFAIL])) )
+	{
+		DX9BugRS("Failed to record state blocks. [Block: SB_SHADOW_VOLUME_ZFAIL]");
+		return;
+	}
+	
+	// stencil fill state block
+	if( FAILED(gpkDirect3DDevice->BeginStateBlock()) )
+	{
+		DX9BugRS("Failed to record state blocks.");
+		return;
+	}
+	
+	//** TRANSFORM CHANGES
+	gpkDirect3DDevice->SetTransform( D3DTS_VIEW, ( D3DMATRIX*)(N3D4x4IdentityMatrix) );
+	gpkDirect3DDevice->SetTransform( D3DTS_WORLD, ( D3DMATRIX*)(N3D4x4IdentityMatrix) );
+	gpkDirect3DDevice->SetTransform( D3DTS_PROJECTION, ( D3DMATRIX*)(N3D4x4IdentityMatrix) );
+	gpkDirect3DDevice->SetRenderState( D3DRS_ZENABLE, FALSE);
+	gpkDirect3DDevice->SetRenderState( D3DRS_LIGHTING, FALSE);
+	gpkDirect3DDevice->SetRenderState( D3DRS_FOGENABLE, FALSE);
+	gpkDirect3DDevice->SetTextureStageState( 1, D3DTSS_COLOROP, D3DTOP_DISABLE );
+	gpkDirect3DDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP,  D3DTOP_DISABLE );
+	gpkDirect3DDevice->SetRenderState( D3DRS_STENCILREF, 0x1 );
+	gpkDirect3DDevice->SetRenderState( D3DRS_STENCILFUNC, D3DCMP_LESSEQUAL );
+	gpkDirect3DDevice->SetRenderState( D3DRS_STENCILPASS, D3DSTENCILOP_KEEP );
+	gpkDirect3DDevice->SetRenderState( D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP );
+	gpkDirect3DDevice->SetRenderState( D3DRS_STENCILMASK, 0xffffffff );
+	gpkDirect3DDevice->SetRenderState( D3DRS_STENCILWRITEMASK, 0xffffffff );		
+	gpkDirect3DDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
+	
+	if( FAILED(gpkDirect3DDevice->EndStateBlock(&garrpkStates[SB_STENCIL_FILL])) )
+	{
+		DX9BugRS("Failed to record state blocks. [Block: SB_STENCIL_FILL]");
+		return;
+	}
+	
+	// stencil_fill_with_alpha state block
+	if( FAILED(gpkDirect3DDevice->BeginStateBlock()) )
+	{
+		DX9BugRS("Failed to record state blocks.");
+		return;
+	}
+	
+	gpkDirect3DDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_MODULATE );
+	gpkDirect3DDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
+	gpkDirect3DDevice->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
+	gpkDirect3DDevice->SetTextureStageState (0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+	gpkDirect3DDevice->SetTextureStageState (0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE );
+	gpkDirect3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	gpkDirect3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	gpkDirect3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
+	
+	if( FAILED(gpkDirect3DDevice->EndStateBlock(&garrpkStates[SB_STENCIL_FILL_WITH_ALPHA])) )
+	{
+		DX9BugRS("Failed to record state blocks. [Block: SB_STENCIL_FILL_WITH_ALPHA]");
+		return;
+	}
+	
+	// stencil_fill_without_alpha state block
+	if( FAILED(gpkDirect3DDevice->BeginStateBlock()) )
+	{
+		DX9BugRS("Failed to record state blocks.");
+		return;
+	}
+	
+	gpkDirect3DDevice->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
+	gpkDirect3DDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
+	gpkDirect3DDevice->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
+	gpkDirect3DDevice->SetTextureStageState (0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+	gpkDirect3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+	
+	if( FAILED(gpkDirect3DDevice->EndStateBlock(&garrpkStates[SB_STENCIL_FILL_WITHOUT_ALPHA])) )
+	{
+		DX9BugRS("Failed to record state blocks. [Block: SB_STENCIL_FILL_WITHOUT_ALPHA]");
+		return;
+	}
+#undef DX9BugRS
+	return;
+
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void cDirectX9Renderer::_createMaterialShaders()
+{
+	// create the basic shaders
+	iShader* pkS = 0;
+	iShader* pkSolid = 0;
+#define newshader(x,e) pkS = new x; addShader(e,pkS); XASSERT(pkS->getRefCount()>1); pkS->release();
+		
+	// new matrix for sphere map
+	mat44_t kSphereM = {
+		0.5f, 0.0f, 0.0f, 0.0f,
+		0.0f,-0.5f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.5f, 0.5f, 0.0f, 1.0f
+	};
+
+	newshader(cDirectX9SolidShader(),iShader::SHADER_SOLID);
+	pkSolid = pkS;
+	newshader(cDirectX9LightMap(iShader::SHADER_LIGHTMAP),iShader::SHADER_LIGHTMAP);
+	newshader(cDirectX9LightMap(iShader::SHADER_LIGHTMAP2X),iShader::SHADER_LIGHTMAP2X);
+	newshader(cDirectX9LightMap(iShader::SHADER_LIGHTMAP4X),iShader::SHADER_LIGHTMAP4X);
+	newshader(cDirectX9LightMap(iShader::SHADER_LIGHTMAPDYNAMIC),iShader::SHADER_LIGHTMAPDYNAMIC);
+	newshader(cDirectX9SphereMap(kSphereM),iShader::SHADER_SPHEREMAP);
+	newshader(cDirectX9DetailMap(),iShader::SHADER_DETAILMAP);
+	newshader(cDirectX9GlowMap(),iShader::SHADER_GLOWMAP);
+	newshader(cDirectX9ToonShader(pkSolid),iShader::SHADER_TOON);
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool cDirectX9Renderer::setPSShaderConst( u32 startReg, const f32* b, s32 count )
+{
+	if(FAILED(gpkDirect3DDevice->SetPixelShaderConstantF(startReg,b,(UINT)count)))
+		return false;
+	return true;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool cDirectX9Renderer::setVSShaderConst( u32 startReg, const f32* b, s32 count )
+{
+	if(FAILED(gpkDirect3DDevice->SetVertexShaderConstantF(startReg,b,(UINT)count)))
+		return true;
+	return false;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool cDirectX9Renderer::assembleLowLevelShader(const s8* sVSProg,const s8* sPSProg,
+											   IDirect3DVertexShader9** pkVShader, 
+											   IDirect3DPixelShader9 **pkPShader)
+{
+	// lets first do the vertex shader thing
+#ifdef X_DEBUG
+#	define D3DSDCOMPILE_FLAGS D3DXSHADER_DEBUG
+#else
+#	define D3DSDCOMPILE_FLAGS 0
+#endif
+	
+#define D3DSCOMPILE_FLAGS D3DSDCOMPILE_FLAGS
+#define DX9BugRS(str) ReportBug(str,"cDirectX9Renderer:assembleLowLevelShader")
+	LPD3DXBUFFER pkProg = 0;
+	HRESULT rVal = 0;
+	
+	if(sVSProg)
+	{
+
+		rVal = D3DXAssembleShader(sVSProg,(UINT)strlen(sVSProg),0,0,D3DSCOMPILE_FLAGS,&pkProg,0);
+
+		if(FAILED(rVal))
+		{	// we have errors
+			DX9BugRS("Errors in vshader.");
+			return false;
+		}
+
+		rVal = gpkDirect3DDevice->CreateVertexShader( (DWORD*)pkProg->GetBufferPointer(),pkVShader);
+
+		if(FAILED(rVal))
+			DX9BugRS("Vshader creation failed.");
+			
+		if(pkProg) pkProg->Release();
+
+	}
+
+	if(sPSProg)
+	{
+
+		rVal = D3DXAssembleShader(sPSProg,(UINT)strlen(sPSProg),0,0,D3DSCOMPILE_FLAGS,&pkProg,0);
+
+		if(FAILED(rVal))
+		{	// we have errors
+			DX9BugRS("Errors in pshader.");
+			return false;
+		}
+
+		rVal = gpkDirect3DDevice->CreatePixelShader( (DWORD*)pkProg->GetBufferPointer(),pkPShader);
+
+		if(FAILED(rVal))
+			DX9BugRS("Could not create pshader.");
+
+		if(pkProg) pkProg->Release();
+
+	}
+
+	return true; // it doesnt matter neway
+#undef D3DSDCOMPILE_FLAGS
+#undef D3DSCOMPILE_FLAGS
+#undef DX9BugRS
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool cDirectX9Renderer::compileHighLevelShader(const s8* sVSProg, const s8* sVSEntry, 
+		const s8* sPSProg, const s8* sPSEntry, VSHADER_TARGET eVTar, PSHADER_TARGET ePTar, 
+		IDirect3DVertexShader9** pkVShader, IDirect3DPixelShader9** pkPShader,
+		void** pkVSConstTable,void** pkPSConstTable)
+{
+#define DX9BugRS(str) ReportBug(str,"cDirectX9Renderer:compileHighLevelShader")
+	const s8* strVSProfile[] =
+	{
+		"vs_1_1",
+		"vs_2_0",
+		"vs_2_a",
+		"vs_3_0",
+		0
+	};
+
+	const s8* strPSProfile[] =
+	{
+		"ps_1_1", 
+		"ps_1_2",
+		"ps_1_3",
+		"ps_1_4",
+		"ps_2_0",
+		"ps_2_a",
+		"ps_2_b",
+		"ps_3_0",
+		0
+	};
+
+	// lets first do the vertex shader thing
+#ifdef X_DEBUG
+#	define D3DSDCOMPILE_FLAGS D3DXSHADER_DEBUG
+#else
+#	define D3DSDCOMPILE_FLAGS 0
+#endif
+
+	LPD3DXBUFFER pkProg = 0;
+	HRESULT rVal = 0;
+
+	if(sVSProg)
+	{
+
+		rVal = D3DXCompileShader(sVSProg,(UINT)strlen(sVSProg),0,0,sVSEntry,strVSProfile[eVTar],D3DSDCOMPILE_FLAGS,&pkProg,0,(LPD3DXCONSTANTTABLE*)pkVSConstTable);
+
+		if(FAILED(rVal))
+		{	// we have errors
+			DX9BugRS("Errors in vshader.");
+			return false;
+		}
+
+		rVal = gpkDirect3DDevice->CreateVertexShader( (DWORD*)pkProg->GetBufferPointer(),pkVShader);
+
+		if(FAILED(rVal))
+			DX9BugRS("Could not create vshader.");
+		
+		if(pkProg) pkProg->Release();
+
+	}
+
+	if(sPSProg)
+	{
+
+		rVal = D3DXCompileShader(sPSProg,(UINT)strlen(sPSProg),0,0,sPSEntry,strPSProfile[eVTar],D3DSDCOMPILE_FLAGS,&pkProg,0,(LPD3DXCONSTANTTABLE*)pkPSConstTable);
+
+		if(FAILED(rVal))
+		{	// we have errors
+			DX9BugRS("Errors in pshader.");
+			return false;
+		}
+
+		rVal = gpkDirect3DDevice->CreatePixelShader( (DWORD*)pkProg->GetBufferPointer(),pkPShader);
+
+		if(FAILED(rVal))
+			DX9BugRS("Could not create pshader.");
+
+		if(pkProg) pkProg->Release();
+
+	}
+
+	return true; // it doesnt matter neway
+
+#undef D3DSDCOMPILE_FLAGS
+#undef D3DSCOMPILE_FLAGS
+#undef DX9BugRS
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+iShader* cDirectX9Renderer::assembleLowLevelShader(const s8* sVSProg, const s8* sPSProg, 
+		iSetShaderConstCallback* pkCallback, iShader* pkBase)
+{
+	   IDirect3DVertexShader9* pkVShader = 0; 
+	   IDirect3DPixelShader9 * pkPShader = 0;
+	   if( assembleLowLevelShader(sVSProg,sPSProg,&pkVShader,&pkPShader) )
+	   {
+		   // create the shader
+		   return new cDirectX9LLShader(pkVShader,pkPShader,pkCallback,pkBase);
+	   }
+	   if(pkVShader) pkVShader->Release();
+	   if(pkPShader) pkPShader->Release();
+	   return 0;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+iShader* cDirectX9Renderer::compileHighLevelShader( const s8* sVSProg, const s8* sVSEntry, 
+		const s8* sPSProg, const s8* sPSEntry, VSHADER_TARGET eVT, PSHADER_TARGET ePT, 
+		iSetShaderConstCallback* pkCallback, iShader* pkBase )
+{
+	   IDirect3DVertexShader9*	pkVShader = 0; 
+	   IDirect3DPixelShader9 *	pkPShader = 0;
+	   ID3DXConstantTable*		pkVTbl = 0;
+	   ID3DXConstantTable*		pkPTbl = 0;
+
+	   if( compileHighLevelShader(sVSProg,sVSEntry,sPSProg,sPSEntry,eVT,ePT,&pkVShader,&pkPShader,(void**)&pkVTbl,(void**)&pkPTbl) )
+	   {
+		   // create the shader
+		   return new cDirectX9HLShader(pkVShader,pkPShader,pkCallback,pkBase,pkVTbl,pkPTbl);
+	   }
+
+	   if(pkVShader) pkVShader->Release();
+	   if(pkPShader) pkPShader->Release();
+	   if(pkVTbl)	 pkVTbl->Release();
+	   if(pkPTbl)	 pkPTbl->Release();
+	   return 0;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//@--------------------------------------------------------------------------
+

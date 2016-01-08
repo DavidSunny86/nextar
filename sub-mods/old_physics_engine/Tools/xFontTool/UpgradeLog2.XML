@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?>
+<UpgradeLog>
+<Properties><Property Name="Solution" Value="xFontTool">
+</Property><Property Name="Solution File" Value="G:\Projects\Nextar Build 1.01\Tools\xFontTool\xFontTool.sln">
+</Property><Property Name="User Options File" Value="G:\Projects\Nextar Build 1.01\Tools\xFontTool\xFontTool.suo">
+</Property><Property Name="Date" Value="Wednesday, September 17, 2008">
+</Property><Property Name="Time" Value="17:33 PM">
+</Property><Property Name="Log Number" Value="2">
+</Property></Properties><Event ErrorLevel="0" Project="" Source="xFontTool.sln" Description="File successfully backed up as G:\Projects\Nextar Build 1.01\Tools\xFontTool\xFontTool.sln.old">
+</Event><Event ErrorLevel="0" Project="" Source="xFontTool.suo" Description="File successfully backed up as G:\Projects\Nextar Build 1.01\Tools\xFontTool\xFontTool.suo.old">
+</Event><Event ErrorLevel="0" Project="xFontTool" Source="xFontTool.vcproj" Description="Project upgraded successfully.">
+</Event><Event ErrorLevel="3" Project="xFontTool" Source="xFontTool.vcproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="" Source="xFontTool.sln" Description="Solution converted successfully">
+</Event><Event ErrorLevel="3" Project="" Source="xFontTool.sln" Description="Converted">
+</Event></UpgradeLog>

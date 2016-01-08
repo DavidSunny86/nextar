@@ -104,6 +104,7 @@ bool fullscreen, const NameValueMap* params) {
 		context->SetVideoMode(setVideoMode);
 	}
 
+	//DWORD style = WS_BORDER;
 	DWORD style = WS_OVERLAPPEDWINDOW;
 	DWORD  exStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 	
@@ -157,14 +158,13 @@ bool fullscreen, const NameValueMap* params) {
 	if (fullscreen) {
 		SetToFullScreen(true);
 	}
-
-	ShowWindow(wnd, SW_SHOW);
-    SetForegroundWindow(wnd);
-    SetFocus(wnd);
-    UpdateWindow(wnd);
-    
+		
 	parent->SetFlag(WINDOW_CLOSED, false);
 	parent->SetWindowProc(WindowWGL::WndProc);	
+	ShowWindow(wnd, SW_SHOW);
+	SetForegroundWindow(wnd);
+	SetFocus(wnd);
+	UpdateWindow(wnd);
 }
 
 void WindowWGL::Impl::SetToFullScreen(bool fullScreen) {

@@ -1,0 +1,15 @@
+
+The Shuffle macro _MM_SHUFFLE(z,y,x,w)
+works like this:
+
+	3	2	1	0
+m1 = 	a	b	c	d
+m2 =	m	n	o	p
+
+m3 = _MM_SHUFFLE(m1,m2,code(1,0,3,2))
+
+(3,2)	is selected from m1
+(1,0)	is selected from m2
+
+	3	2	1	0
+m3 =	o	p	a	b

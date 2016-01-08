@@ -1,0 +1,73 @@
+
+
+/* created : feb 17, 07 */
+/* by : Abhishek Dey */
+
+#ifndef DIRECTX9SHADERS_H
+#define DIRECTX9SHADERS_H
+
+#include <iShader.h>
+
+namespace nextar
+{
+
+/* make state blocks if state changes more than 5 */
+class cDirectX9SolidShader : public iShader
+{
+public:
+
+	cDirectX9SolidShader();
+	~cDirectX9SolidShader();
+	virtual void set( cMaterial*,bool reset  );
+};
+
+class cDirectX9LightMap : public iShader
+{
+	void*	mpvStateBlock;
+public:
+
+	cDirectX9LightMap( iShader::STDSHADERS eType );
+	~cDirectX9LightMap();
+	virtual void set( cMaterial*,bool  );
+	virtual void unset();
+};
+
+class cDirectX9SphereMap : public iShader
+{
+	void*	mpvStateBlock;
+public:
+
+	cDirectX9SphereMap( const f32* m );
+	~cDirectX9SphereMap();
+
+	virtual void set( cMaterial*,bool reset  );
+	virtual void unset();
+};
+
+class cDirectX9DetailMap : public iShader
+{
+	void*	mpvStateBlock;
+public:
+
+	cDirectX9DetailMap();
+	~cDirectX9DetailMap();
+
+	virtual void set( cMaterial*,bool reset  );
+	virtual void unset();
+};
+
+class cDirectX9GlowMap : public iShader
+{
+	void*	mpvStateBlock;
+public:
+
+	cDirectX9GlowMap();
+	~cDirectX9GlowMap();
+
+	virtual void set( cMaterial*,bool  );
+	virtual void unset();
+};
+
+}
+
+#endif /*DIRECTX9SHADERS_H*/

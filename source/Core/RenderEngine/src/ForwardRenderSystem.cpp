@@ -24,22 +24,14 @@ ForwardRenderSystem::ForwardRenderSystem() {
 ForwardRenderSystem::~ForwardRenderSystem() {
 }
 
-void ForwardRenderSystem::PrepareGeometryBuffer() {
-}
-
 void ForwardRenderSystem::PrepareMaterials() {
 }
 
 void ForwardRenderSystem::Commit(CommitContext& context) {
 }
 
-void ForwardRenderSystem::RenderLight(Light* light, uint32 passIdx, uint32 updateId, CommitContext& context) {
-}
-
 void ForwardRenderSystem::DestroyResources(void* renderSystem) {
 	ForwardRenderSystem* pRenderSys = reinterpret_cast<ForwardRenderSystem*>(renderSystem);
-	if (pRenderSys)
-		pRenderSys->DestroyBuffer();
 }
 
 

@@ -40,23 +40,30 @@ LRESULT CALLBACK Win32Window::WndProc(HWND wnd, UINT message, WPARAM wparam,
 			if (wparam == SIZE_MINIMIZED) {
 				wind->SetActive(false);
 				wind->SetVisible(false);
+				WindowManager::Instance().DeactivateWindow(wind);
 			} else {
 				wind->SetActive(true);
 				wind->SetVisible(true);
+				WindowManager::Instance().ActivateWindow(wind);
 			}
 			wind->WindowConfigChanged();
-			wind->WindowFocusChanged();
 			break;
 		case WM_ACTIVATE:
 			// Add pause code here.
 			if (WA_INACTIVE == LOWORD(wparam)) {
 				wind->SetActive(false);
 				wind->SetVisible(false);
+				WindowManager::Instance().DeactivateWindow(wind);
 			} else {
 				wind->SetActive(true);
 				wind->SetVisible(true);
+				WindowManager::Instance().ActivateWindow(wind);
 			}
 			wind->WindowFocusChanged();
+			break;
+		case WM_CREATE:
+			wind->SetActive(true);
+			WindowManager::Instance().ActivateWindow(wind);
 			break;
 		case WM_INPUT:
 			if (Win32InputListener::InstancePtr() && wparam == RIM_INPUT)

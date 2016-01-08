@@ -1,0 +1,255 @@
+
+// created by: Abhishek Dey
+// on: the 30th of may.
+
+//--------------------------------------
+
+#include <cscene.h>
+#include <ctimer.h>
+#include <irenderer.h>
+
+namespace nextar
+{
+
+#if defined(X_DEBUG) && defined(XALLOW_TRACE_MSG)
+#	define XTIMER(__msg__)	XTRACE(("[%s]T[%d]",TEXT(__msg__),cTimer::skGameTimer.getCurrentTime()))
+#	else
+#	define XTIMER(__msg__)
+#	endif
+
+//vector4_t				gkCamPos = {0};
+//extern cXpeSpace* xCreateQuadTreeSpace(cXpeSpace* _space,vector3_t center,vector3_t ext,s32 depth);
+
+//extern void initCollider();
+// constructor
+XSELFPTR_CLASS_SETUP(cScene);
+cScene::cScene()
+{
+	XREFOBJECT(cScene);
+	XSELFPTR_CLASS_INIT;
+//	initCollider();
+	muLastTime = cTimer::skGameTimer.getCurrentTime();
+}
+
+// destructor, call it explicitly to destroy it
+cScene::~cScene()
+{
+//	if(mpkParentSpace) mpkParentSpace->release();
+//	if(mpkActiveCamera) mpkActiveCamera->release();
+	mkControllers.clear();
+	XSELFPTR_CLASS_DINIT;
+}
+
+// register new drawable, can be called by space cullers
+void cScene::registerNewDrawable(iRenderable* pkDraw, s32 iClass )
+{
+	XASSERT(pkDraw);
+	cMaterial* m = 0;
+	switch(iClass)
+	{
+	case iRenderable::_SKY_BOX:
+		mkSkyBoxes.push_back((xarray::alloc_type)pkDraw);
+		break;
+	case iRenderable::_SOLID_OBJECT:
+	//	m = pkDraw->getMaterial();
+	//	mkSolids.push_back((xarray::alloc_type)pkDraw);
+	//	if(m) 
+	//	{ 
+	//		if(m->mpkTexture1) mkSolids.push_back((xarray::alloc_type)m->mpkTexture1);
+	//		else mkSolids.push_back((xarray::alloc_type)m->mpkTexture2);
+	//	}
+	//	else
+	//		mkSolids.push_back(0); // null
+		break;
+	case iRenderable::_TRANSPARENT_OBJECT:
+	//	mkTransparents.push_back((xarray::alloc_type)pkDraw);
+/*		if(pkDraw->mpkFrame)
+		{
+			f32 d;
+			xVDistanceSq(&d,pkDraw->mpkFrame->pos,gkCamPos);
+			mkTransparents.push_back(*(u32*)&d);
+		}
+		else
+		{
+			const f32 fval = 0.001f;
+			mkTransparents.push_back(*(u32*)(&fval));
+		}
+*/
+		break;
+	case iRenderable::_2D_TYPE:
+		mk2DNodes.push_back((xarray::alloc_type)pkDraw);
+		break;
+	case iRenderable::_SHADOW_OBJECT:
+		mkShadows.push_back((xarray::alloc_type)pkDraw);
+		break;
+	}
+}
+
+// add new light to scene
+void cScene::addNewLight(cLight* pkL)
+{
+	mkLights.push_back((xarray::alloc_type)pkL);
+}
+
+// add new controller
+void cScene::addNewController(iController* pkControl)
+{
+	mkControllers.push_back(pkControl);
+}
+
+// rem old controller
+void cScene::remOldController(iController* pkControl)
+{
+	mkControllers.remove(pkControl);
+}
+
+// all important update scene
+void cScene::updateScene()
+{
+	XTRACE(("\ncScene::updateScene"));
+//	if(!mpkParentSpace) return;
+//	if(!mpkActiveCamera) return;
+	// tick timer
+	// update controllers
+	// controllers can decide whether to remove
+	// or add objects to scene or not and do so
+	// here without any problem whatsoever.
+	XTIMER("\ncScene::updateScene: <Updating Controllers");
+	for(xlist<iController*>::iterator it = mkControllers.begin(); it != mkControllers.end(); ++it)
+		(*it)->update();
+	XTIMER("\nUpdating Controllers>");
+	// clean geoms
+	XTIMER("\ncScene::updateScene: Cleaning Geoms<");
+//	mpkParentSpace->cleanGeoms();
+	XTIMER("\nCleaning Geoms>");
+	// update scene for collision
+	XTIMER("\ncScene::updateScene: Colliding Geoms<");
+//	mpkParentSpace->collide();
+	XTIMER("\nColliding Geoms>");
+	// simulate and render using mt
+	XTIMER("\ncScene::updateScene: Simulating<");
+//	cXpeSimulator::XSELFPTR->xSimulate(mfElapsedTime);
+	XTIMER("\nSimulating>");
+	// we can hope the camera is uptodate, so we tell it to update its plane_ts
+	XTRACE(("\ncScene::updateScene: Constructing View Cone"));
+//	mpkActiveCamera->updateCone();
+	// check frustum's inclusion
+	muFlags |= RegisteringDrawables;
+	XTIMER("\ncScene::updateScene: Culling Renderabels<");
+	cXuiManager::XSELFPTR->onDraw();
+//	mpkParentSpace->cullRenderables(mpkActiveCamera->getCone());
+	XTIMER("\nCulling Renderabels>");
+	muFlags &=~RegisteringDrawables;
+	// we hope all renderables to have been added to the scene
+	// we can use a 2d manipulator update here, but for the 
+	// sake of a test we just render
+}
+
+void cScene::draw()
+{
+	XTRACE(("\ncScene::draw"));
+//	if(!mpkParentSpace) return;
+//	if(!mpkActiveCamera) return;
+	u32 uCnt = 0;
+	// drawing is easy, we just draw here
+	XTRACE(("\ncScene::draw: Updating camera"));
+//	mpkActiveCamera->getPosition(gkCamPos);
+//	mpkActiveCamera->setViewMatrix();
+	// draw 2d nodes
+	// add dynamic lights
+	XTRACE(("\ncScene::draw [3D Pass]"));
+	iRenderer::XSELFPTR->setMode(RSC_3D);
+	XTRACE(("\ncScene::draw [Adding Lights]"));
+	uCnt = mkLights.size();
+	for(u32 i=0;i<uCnt;i++)
+		iRenderer::XSELFPTR->addDynamicLight((cLight*)mkLights[i]);
+	iRenderer::XSELFPTR->finalizeLights();
+	mkLights.clear_record();
+	// draw skybox
+	XTRACE(("\ncScene::draw [Drawing Skybox]"));
+	uCnt = mkSkyBoxes.size();
+	for(u32 i=0;i<uCnt;i++)
+		((iRenderable*)(mkSkyBoxes[i]))->onDraw();
+	mkSkyBoxes.clear_record();
+	XTRACE(("\ncScene::draw [Drawing Solids]"));
+	uCnt = mkSolids.size();
+	XASSERT(uCnt%2==0);
+	if(uCnt)
+	{
+		uCnt /= 2;
+		// sort solid list and draw
+		// this is pretty unsafe, but ok
+		solid_node* node = (solid_node*)mkSolids.pointer();
+		xHeapsort<solid_node>(node,uCnt);
+		for(u32 i=0;i<uCnt;i++)
+			node[i].rend->onDraw();
+	}
+	mkSolids.clear_record();
+	XTRACE(("\ncScene::draw [Drawing Transparents]"));
+	uCnt = mkTransparents.size();
+	XASSERT(uCnt%2==0);
+	if(uCnt)
+	{
+		uCnt /= 2;
+		// sort transparent nodes and draw
+		transparent_node* node = (transparent_node*)mkTransparents.pointer();
+		xHeapsort<transparent_node>(node,uCnt);
+		for(u32 i=0;i<uCnt;i++)
+			node[i].rend->onDraw();
+	}
+	mkTransparents.clear_record();
+
+	uCnt = mk2DNodes.size();
+	if(uCnt)
+	{
+		XTRACE(("\ncScene::draw [2D Pass]"));
+		iRenderer::XSELFPTR->setMode(RSC_2D);
+		iRenderer::XSELFPTR->setVertexShader(VERTEX_2D);
+		for(u32 i=0;i<uCnt;i++)
+			((iRenderable*)(mk2DNodes[i]))->onDraw();
+	}
+	mk2DNodes.clear_record();
+
+}
+
+// set basic compelx space
+/*void cScene::setBasicComplexSpace(cXpeSpace* space)
+{
+	XASSERT(space);
+	XASSERT(X_GEOM_IS_SPACE(space));
+	XASSERT(X_GEOM_IS_CMPLXSPACE(space));
+	X_CHECK_NOTLOCKED(mpkParentSpace);
+	if(mpkParentSpace) { mpkParentSpace->release(); mpkParentSpace = 0; }
+	if(space)
+	{
+		mpkParentSpace = space;
+		mpkParentSpace->addRef();
+	}
+}
+
+// create quad tree
+cXpeSpace* cScene::crtQuadTree(cXpeSpace* _space,const vector3& center,const vector3& ext,s32 depth)
+{
+	vector3_t c,e;
+	center.getAs3Values(c);
+	ext.getAs3Values(e);
+	return xCreateQuadTreeSpace(_space,c,e,depth);
+}
+
+// create a box
+cXpeGeom* cScene::crtBox(cXpeSpace* pkP,f32 fx,f32 fy,f32 fz)
+{
+	XASSERT(mpkParentSpace);
+	if(!pkP) pkP = mpkParentSpace;
+	return new cXpeGBox(pkP,fx,fy,fz);
+}
+
+// create a plane_t
+cXpeGeom* cScene::crtPlane(cXpeSpace* pkP,f32 a,f32 b,f32 c,f32 d)
+{
+	XASSERT(mpkParentSpace);
+	if(!pkP) pkP = mpkParentSpace;
+	return new cXpeGPlane(pkP,a,b,c,d);
+}
+*/
+}

@@ -158,6 +158,15 @@ void InputManagerImpl::UnregisterListener(InputListener* l, uint16 deviceId) {
 	}
 }
 
+void InputManagerImpl::SetProperty(uint16 deviceId,
+	const String& propertyName, const String& value) {
+	auto it = controllerMap.find(deviceId);
+	if (it != controllerMap.end()) {
+		if ((*it).second.controller)
+			(*it).second.controller->SetProperty(propertyName, value);
+	}
+}
+
 void InputManagerImpl::Close() {
 	ApplicationContext::Listener l(this, ApplicationContext::PRIORITY_HIGH);
 	ApplicationContext::Instance().UnregisterListener(l);

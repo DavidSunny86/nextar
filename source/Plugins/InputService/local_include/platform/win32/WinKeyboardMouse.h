@@ -36,6 +36,8 @@ public:
 	void AddMouseEvent(float x, float y);
 	void AddMouseEvent(float wheelValue);
 	void AddMouseEvent(Key code, bool bDown);
+
+	virtual void SetProperty(const String& propertyName, const String& value);
 protected:
 	void CommitMouseMoveEvent();
 
@@ -43,6 +45,7 @@ protected:
 	bool capsLockState;
 	bool numLockState;
 	bool scrollLockState;
+	bool lockMouseToCenter;
 	uint32 changeCount;
 	InputDir mouseDisplacement;
 	InputDir mousePos; // absolute pos

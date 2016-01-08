@@ -6,6 +6,11 @@ NEX_IMPLEMENT_APP()
 
 using namespace nextar;
 
+/**
+ * Command Line:
+ * --file=Meshes/FBX/Box.FBX 
+ * --save=Meshes/Box.mesh
+*/
 class UTApplicationMeshExport: public UTApplication {
 	String filePath;
 	String savePath;

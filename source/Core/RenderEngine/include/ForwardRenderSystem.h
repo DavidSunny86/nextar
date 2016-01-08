@@ -28,20 +28,9 @@ public:
 	static void DestroyResources(void* renderSystem);
 	static void CreateResources(void* renderSystem);
 
-	inline void DestroyBuffer() {
-		gbufferRI.rt = nullptr;
-		gbuffer.Destroy();
-		lightMaterial.Clear();
-	}
-
 protected:
 		
-	void RenderLight(Light* light, uint32 passIdx, uint32 updateId, CommitContext& context);
-	void PrepareGeometryBuffer();
 	void PrepareMaterials();
-		
-	Size gbufferDimension;
-	GBuffer gbuffer;
 };
 
 } /* namespace nextar */

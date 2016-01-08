@@ -49,6 +49,8 @@ public:
 	virtual void RegisterListener(InputListener*, uint16 deviceId = -1) = 0;
 	virtual void UnregisterListener(InputListener*, uint16 deviceId = -1) = 0;
 
+	virtual void SetProperty(uint16 deviceId, const String& propertyName, const String& value) = 0;
+
 	virtual void Close() = 0;
 };
 

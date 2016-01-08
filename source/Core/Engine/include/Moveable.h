@@ -118,6 +118,8 @@ public:
 	/** @todo Test this function */
 	void LocalApplyCameraMotion(const Vector2& moveXZ, const Vector2& rotateXY);
 	/** @todo Test this function */
+	void LocalApplyCameraMotionOnLocal(const Vector2& moveXZ, const Vector2& rotateXY);
+	/** @todo Test this function */
 	void LocalApplyDeltaTransform(Vec3AF t, QuatF q);
 
 	virtual void Update(const FrameTimer& frameTimer);

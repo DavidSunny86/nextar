@@ -369,15 +369,18 @@ void FbxMeshLoaderImplv1_0::CreatePrimitiveGroupFrom(FbxSurfaceMaterial* pMtl,
 	for (auto p : polys) {
 		uint32 lPolygonSize = pMesh->GetPolygonSize(p);
 		NEX_ASSERT(lPolygonSize == 3);
+		uint32 triangles[3];
 		for (uint32 j = 0; j < 3; j++) {
 			uint32 index = pMesh->GetPolygonVertex(p, j);
 			auto &kV = lControlPoints[index];
 			float fVertices[3] = { (float) kV.mData[0], (float) kV.mData[1],
 					(float) kV.mData[2] };
 			pPosition->PushVertex(fVertices);
-			pBuffer->PushIndex(baseVertexIdx++);
 		}
-
+		triangles[0] = baseVertexIdx++;
+		triangles[2] = baseVertexIdx++;
+		triangles[1] = baseVertexIdx++;
+		pBuffer->PushIndices(triangles);
 	}
 
 	if (normalCount > 0) {

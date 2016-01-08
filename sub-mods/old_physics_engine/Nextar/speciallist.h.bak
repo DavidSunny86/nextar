@@ -1,0 +1,80 @@
+//@# Abhishek Dey
+//@# Nov 09 2007
+
+template <typename T>
+class SpecialList {
+
+	T*	mpkBegin;
+	T*	mpkEndActive;
+	T*	mpkEnd;
+	s32 miCount;
+	
+public:
+	SpecialList() : mpkStart(0),mpkEndActives(0),mpkEnd(0),miCount(0) {}
+	~SpecialList() {}
+
+	xinline s32		size() { return miCount; }
+	xinline T*		begin() { return mpkBegin; }
+	xinline T*		end() { return mpkEnd; }
+	xinline T*		endactive() { return mpkEndActive; }
+	xinline void	add(T* el) { 
+		mpkBegin->mpkPrev = el;
+		el->mpkNext = mpkBegin;
+		el->mpkPrev = 0;
+		mpkBegin = el;
+		if(!mpkEnd) mpkEnd = el;
+		++miCount;
+	}
+	void	rem(T* el) {
+		if(el == mpkEndActive)
+			mpkEndActive = el->mpkNext;
+		if(el->mpkPrev)
+			el->mpkPrev->mpkNext = el->mpkNext;
+		else
+			mpkBegin = el->mpkNext;
+		if(el->mpkNext)
+			el->mpkNext->mpkPrev = el->mpkPrev;
+		else
+			mpkEnd = el->mpkPrev;
+		--miCount;
+	}
+	void	deactivate(T* el) {
+		// attach after tail
+		if(mpkEndActive)
+		{
+			if(el->mpkPrev)
+				el->mpkPrev->mpkNext = el->mpkNext;
+			else
+				mpkBegin = el->mpkNext;
+
+			XASSERT(el->mpkNext)
+			el->mpkNext->mpkPrev = el->mpkPrev;
+		
+			mpkEnd->mpkNext = el;
+			el->mpkNext = 0;
+			el->mpkPrev = mpkEnd;
+			mpkEnd = el;
+		}
+		else
+		{
+			if(mpkEnd != el)
+			{
+				if(el->mpkPrev)
+					el->mpkPrev->mpkNext = el->mpkNext;
+				else
+					mpkBegin = el->mpkNext;
+
+				el->mpkNext->mpkPrev = el->mpkPrev;
+				el->mpkPrev = mpkEnd;
+				el->mpkNext = 0;
+				if(mpkEnd) 
+					mpkEnd->mpkNext = el;
+				mpkEnd = el;
+			}
+			mpkEndActive = el;
+		}
+	}
+	void	activate(T* el)
+	{
+	}
+};

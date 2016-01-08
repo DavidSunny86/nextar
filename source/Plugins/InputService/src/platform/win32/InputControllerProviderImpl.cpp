@@ -97,22 +97,6 @@ void InputControllerProviderImpl::FindAndRegisterX360Controller(DWORD index) {
 
 void InputControllerProviderImpl::CreateKeyboardAndMouseDesc(HANDLE keyboard,
 	HANDLE mouse) {
-	RAWINPUTDEVICE Rid[2];
-
-	Rid[0].usUsagePage = 0x01;
-	Rid[0].usUsage = 0x02;
-	Rid[0].dwFlags = RIDEV_NOLEGACY;   // adds HID mouse and also ignores legacy mouse messages
-	Rid[0].hwndTarget = 0;
-
-	Rid[1].usUsagePage = 0x01;
-	Rid[1].usUsage = 0x06;
-	Rid[1].dwFlags = RIDEV_NOLEGACY;   // adds HID keyboard and also ignores legacy keyboard messages
-	Rid[1].hwndTarget = 0;
-
-	if (RegisterRawInputDevices(Rid, 2, sizeof(Rid[0])) == FALSE) {
-		Error("Failed to register Keyboard and Mouse!");
-		return;
-	}
 	this->controllers.push_back(WinDeviceDesc(keyboard, mouse, "Keyboard & Mouse", (uint16)controllers.size() + baseId));
 }
 
@@ -139,7 +123,26 @@ InputController* InputControllerProviderImpl::CreateController(
 	const WinDeviceDesc& d = GetDesc(deviceId);
 	switch (d._info.type) {
 	case ControllerType::TYPE_KEYBOARD_AND_MOUSE:
+	{
+		RAWINPUTDEVICE Rid[2];
+
+		Rid[0].usUsagePage = 0x01;
+		Rid[0].usUsage = 0x02;
+		Rid[0].dwFlags = RIDEV_NOLEGACY;   // adds HID mouse and also ignores legacy mouse messages
+		Rid[0].hwndTarget = 0;
+
+		Rid[1].usUsagePage = 0x01;
+		Rid[1].usUsage = 0x06;
+		Rid[1].dwFlags = RIDEV_NOLEGACY;   // adds HID keyboard and also ignores legacy keyboard messages
+		Rid[1].hwndTarget = 0;
+
+		if (RegisterRawInputDevices(Rid, 2, sizeof(Rid[0])) == FALSE) {
+			Error("Failed to register Keyboard and Mouse!");
+			return nullptr;
+		}
+
 		return (keyboardAndMouse = NEX_NEW(WinKeyboardMouse(d)));
+	}
 	case ControllerType::TYPE_XBOX360_CONTROLLER:
 		return NEX_NEW(Win360GamepadController(d));
 	}

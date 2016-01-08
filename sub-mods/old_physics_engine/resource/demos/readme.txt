@@ -1,0 +1,1 @@
+All demos should be put in the output directory for testing. Screenshots are provided.

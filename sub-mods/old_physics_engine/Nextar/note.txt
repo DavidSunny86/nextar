@@ -1,0 +1,150 @@
+/*FILE MARK
+ DOC ORIGINAL NAME:	Notes.txt
+******************************************************************************************************
+ AUTHOR:	Abhishek Dey
+ CREATED:	1/7/2007		AT:		5:24:37 AM
+ REVISION:	1/18/2007		AT:		2:40:41 AM
+END
+******************************************************************************************************
+*/
+  NOTES AND CHANGES
+-----------------
+
+CONSTANTS AND DEFS IN USE
+-------------------------
+ - platforms
+X_WIN32 == WIN32
+__APPLE__
+POSIX
+UNIX
+LINUX
+XBOX
+ - architecture
+ _M_MRX000
+ _M_ALPHA
+BIGENDIAN
+LITTLEENDIAN
+ - compilers
+_MSC_VER
+__GNUC__
+__INTEL_COMPILER
+
+TYPE CONVENTION
+---------------
+In order.
+
+m - Member
+s - Static
+g - Global
+
+arr - array, hashtables, etc.
+lst - xlist , dl
+
+p  - pointer
+r  - reference
+
+i  - s8,s32,s16
+u  - u8,u32,u16
+f  - float, double
+c  - tchar, s8
+s  - tchar*, s8*
+b  - bool
+k  - object
+e  - enumerators
+
+functions starting with '_' are either private or protected(unlikely).
+
+Special types
+-------------
+t - xcltime
+/* change: feb 17, 07 */
+h - handles i.e. h32
+
+MAKE ADJUSTMENTS
+-----------------
+1. BYTEORDER tag must be checked later
+2. Check out the POSIX, __APPLE__, WIN32 definition later. Upgrade them to 
+   definitions like, X_MACOSX, etc.
+3. Check out the CHECKOUT s
+4. Currently for aligment of structures and members, the only supported compilers
+   are the Microsoft Visual C++ compiler and GNUC compiler
+   
+Update Jan 21
+-------------
+
+nextar is not ready for UNICODE handling.
+The codes I'll add next will have specs if it is using any function that 
+has a different look in UNICODE.
+The Text regarding this would be marked as: UNICODESPECS or UNICODE
+
+feb 17, 07 
+----------
+
+TODO: Create a resource manager to manage resources and eliminate texture repository in iXRenderer.
+
+June 21, 07 
+-----------
+
+---------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------
+                                            Engine Structure
+                                            ----------------
+                                            
+The Engine is made in a way that optimization regarding physics and collision processing may be achieved.
+---
+Notes: The World class contains a list of objects and joints along with a list of islands that defines how joints
+ and objects are grouped together.
+Revision: The former definition has been changed. After some tests it was realized that, its better to
+maintain objects normally and create an island on the fly.
+//===================================================================================
+//===================================================================================
+// PSEUDO SIMULATION STEP //
+//===================================================================================
+//===================================================================================
+
+// ---------------------------- //
+// Loop
+// Apply Animation and IK
+// Apply Physical forces (from AI for eg.)
+// Detect Collision and Generate Collision Contacts
+// Take a Simulation Step (generating constrain forces)
+// End
+
+---------------------------------------------------------------------------------------------------------------
+July 07, 07 
+---------------------------------------------------------------------------------------------------------------
+
+A new notion has been added to the system,
+private and protected functions and the internal defintions and funtions that only means to the engine should
+begin with an undersore (like: _doSomething()). Former defintions will be changed and a log will be generated.
+
+---------------------------------------------------------------------------------------------------------------
+// 15 july 07
+---------------------------------------------------------------------------------------------------------------
+Lets start with a basic demo of rendering a cube or any static object with a collision model set up for it
+and over a plane.
+
+---------------------------------------------------------------------------------------------------------------
+// 20 july 07
+---------------------------------------------------------------------------------------------------------------
+TIME_OUT = suggests that time is in secs
+
+---------------------------------------------------------------------------------------------------------------
+// 19 Aug 07
+---------------------------------------------------------------------------------------------------------------
+AUG-19-2007-GUI 
+Check the above entry in cXuiSkin.cpp
+The following needs be done
+1. Draw the left,right border, the top border is not drawn during this process
+2. Draw the bottom border with some space left for the close button, the close button's rect should
+   be returned to the calling window so that it can respond to clicks.
+
+---------------------------------------------------------------------------------------------------------------
+// 26 Aug 07
+---------------------------------------------------------------------------------------------------------------
+RENDER_TARGET_MODIFY :: Check out for this def where the size of the render target is needed 
+						rather than than the screen size
+---------------------------------------------------------------------------------------------------------------
+// 26 Oct 07
+---------------------------------------------------------------------------------------------------------------
+USE UNINITIALIZED: The tag works for SSE functions which can use uninitialized parameters as store objects.

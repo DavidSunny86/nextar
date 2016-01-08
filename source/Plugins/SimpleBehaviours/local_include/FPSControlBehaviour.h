@@ -47,7 +47,7 @@ class FPSControlBehaviour:
 		KeyboardMouseController() {
 		}
 		virtual void ProcessEvents(const InputChangeBuffer&);
-		virtual void Process(Moveable* m, float timeDelta, float moveSpeed, float rotateSpeed)
+		virtual void Process(Moveable* m, float timeDelta, float moveSpeed, float rotateSpeed);
 	};
 
 public:

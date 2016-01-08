@@ -112,6 +112,12 @@ public:
 		indices.push_back(index);
 	}
 
+	inline void PushIndices(const uint32 indices[3]) {
+		this->indices.push_back(indices[0]);
+		this->indices.push_back(indices[1]);
+		this->indices.push_back(indices[2]);
+	}
+
 	inline const String& GetVertexSignature() const {
 		return vertexSignature;
 	}

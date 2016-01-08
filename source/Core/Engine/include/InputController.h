@@ -74,8 +74,9 @@ public:
 
 	virtual DigitalControls* GetDigitalSettings() = 0;
 	virtual AnalogControls* GetAnalogSettings() = 0;
-
 	virtual InputChangeBuffer UpdateSettings() = 0;
+
+	virtual void SetProperty(const String& propertyName, const String& value) {}
 
 	const InputControllerDesc& GetDesc() const {
 		return desc;

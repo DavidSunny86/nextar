@@ -38,6 +38,7 @@ public:
 	const WinDeviceDesc& GetDesc(uint16 deviceId) const;
 	virtual InputController* CreateController(uint16 deviceId);
 	virtual void DestroyController(InputController*);
+		
 
 	virtual void ConsumeEvent(Win32Window* window, HRAWINPUT);
 

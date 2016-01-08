@@ -1,0 +1,56 @@
+//  --- 
+//  --- created: September 15 2007
+//  **************************************************************************
+//	--------------------------------------------------------------------------
+
+## Sep 15 2007:
+All sse _n (mainly transformation) functions need testing.
+##
+
+## Sep 22 2007:
+Check why the stencil buffer clear doesnt work!! 
+file: cDirectX9Renderer
+func: beginScene
+##
+
+##Sep 23 2007:
+I've planned to use the following techniques in describing the ui draw method:
+1. Each window has to be of atleast 20 in height and xx in width (xx not determined)
+2. This enables the use of 18 pix as the title bar, also the xx pix enables the use of 3 small boxes (max, min and close buttons)
+3. This buttons are handled internally by frame window.
+4. The use of constant width of buttons and title bars, (unlike the % of widht and height of the actual window method i used earlier) makes it easier and consistent.
+##
+
+##Sep 23 2007:
+The values that are multiplied and added to get retrieve the actual 2d coordinates can be precomputed.
+##
+
+##Oct 1 2007
+Complete the gui system
+##
+
+##Oct 26 2007
+I would like to load(compile) specifically certain math functions as sse asm, some as sse intrinsic
+while some other as c after testing, so keep idividual support.
+
+##Nov 12 2007
+1.This is serious and needs to be addressed ASAP. The simulator was rectified of most errors, 
+but still it has got some stability problems, the main.cpp has a demo showing the problem the
+engine is facing. The rotation is very unrealistic.
+2.The quadtree structure is nice for effective determination of pairwise collision as far as
+the number of objects are constrained to certain limit. I tried to implement the run time auto
+disabling feature where a stable system will not go into collision detection at all. Only the 
+dynamic and moving objects can query collision. The potential problem is then we will need a top
+-down collision routine for the quadtree, i.e. irrespective of the node the object is in, we will
+have to start our query from the root node, this seems a better approach, because it will generate
+less contact points though order of the constrains will be unaltered in either case (because we can 
+implement complete system disabling at each step from the simulator). The approach is not implemented
+yet, so we should test it.
+##
+
+##Nov 13 2007
+[@@ Nov 12 2007 1.] The simulator error was solved, the inversion of the inertia matrix had a code, that rejected
+the determinant when it was less than epsilon, I changed it to 0 as we will have to work with small values too often.
+[@@ Nov 12 2007 2.] The potential solution to the quadtree problem is to collide the dirty list objects with the root
+block by calling collideexternal.
+##

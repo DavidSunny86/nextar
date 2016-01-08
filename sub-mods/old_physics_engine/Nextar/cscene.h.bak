@@ -1,0 +1,108 @@
+//@# Abhishek Dey
+//@# May 30 2007
+//@# September 23 2007
+
+#ifndef CXSCENEMANAGER_H
+#define CXSCENEMANAGER_H
+
+#include <iobject.h>
+#include <irenderable.h>
+#include <xlist.h>
+#include <xarray.h>
+#include "icontroller.h"
+//#include "ccamera.h"
+#include <clight.h>
+// scene manager helps us to control the way scene renders we prefer 
+// to allocate variable frequency of updation for for each of the following :
+
+// 1. Animation and Physics(50-80%)
+// 2. Collision(50-80%)
+// 3. AI(10-50%)
+// 4. Rendering (100%)
+
+// All of these are part of the scene manager and all of them will highly depend on
+// the viewing cone. We will try to cull as much as possible
+// in all the fields nonetheless to avoid updating  a lot of objects.
+
+// The Scene Engine is based on three primary processes. First
+// is the AI whose response on objects is noted first.
+// Next the Physics response is added to the initial response.
+// Finally the deciding factor is the collision response, according to 
+// which we modify body's attributes.
+// TODO: Attempt to make the 4 process MT
+
+// update: 15 july
+// Task List::
+// 1. update animation and controllers
+// 2. followed by collision and physics
+// 3. now render and play sound or whatever.
+
+namespace nextar
+{
+
+class XAPI cScene : public iObject
+{
+protected:
+	XSELFPTR_CLASS( cScene );
+private:
+
+	enum { RegisteringDrawables = 1 };
+	// scene timer
+
+//	cXpeSpace*				mpkParentSpace;
+//	cCamera*				mpkActiveCamera;
+	xlist<iController*>		mkControllers;
+	xarray					mkLights; //<cXLight*>
+	xarray					mkSkyBoxes;
+	xarray					mkTransparents;
+	xarray					mkSolids;
+	xarray					mkShadows;
+	xarray					mk2DNodes;
+	u32						muFlags;
+	
+	u32						muLastTime;
+
+public:
+
+	cScene();
+	virtual ~cScene();
+
+protected:
+public:
+
+	//! get the current active camera
+//	xinline cCamera* getActiveCamera() { return mpkActiveCamera; }
+	//! sets the current active camera
+//	xinline void setActiveCamera(cCamera* mpkCam) {
+//		XASSERT(mpkCam);
+//		if(mpkActiveCamera) mpkActiveCamera->release();
+//		mpkActiveCamera = mpkCam;
+//		mpkActiveCamera->addRef();
+//	}
+	//! get the basic complex space or the parent of all spaces
+//	xinline cXpeSpace* getBasicComplexSpace() {
+//		return mpkParentSpace;
+//	}
+	// set functions, basic spaces are automatically delted by
+	// scene manager
+//	XAPI void setBasicComplexSpace(cXpeSpace*);
+	// crt functions, factory for creating objects
+	//--collision objects
+	//---Space creation: create quad tree space
+//	XAPI cXpeSpace* crtQuadTree(cXpeSpace* _space,const vector3& center,const vector3& ext,s32 depth);
+	//---Box creation: pass the size and the parent space
+//	XAPI cXpeGeom* crtBox(cXpeSpace* pkParentSpace,f32 fX,f32 fY,f32 fZ);
+	//---Plane creation: create a plane_t
+//	XAPI cXpeGeom* crtPlane(cXpeSpace* pkParentSpace,f32 a,f32 b,f32 c,f32 d);
+	void	addNewLight(cLight*);
+	void	registerNewDrawable(iRenderable*, s32 iClassId);	//@ use getClass() of iRenderable if unsure
+	void	addNewController(iController*);
+	void	remOldController(iController*);
+	void	updateScene();
+	void	draw();
+
+};
+
+}
+
+#endif //CXSCENEMANAGER_H

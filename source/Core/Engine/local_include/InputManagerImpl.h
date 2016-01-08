@@ -38,6 +38,8 @@ public:
 	virtual const InputControllerDesc& GetControllerDesc(uint32 n);
 	virtual const InputControllerDesc& GetControllerDescById(uint16 n);
 
+	virtual void SetProperty(uint16 deviceId, const String& propertyName, const String& value);
+
 	virtual void Execute(const FrameTimer& frameTimer);
 	virtual void Close();
 

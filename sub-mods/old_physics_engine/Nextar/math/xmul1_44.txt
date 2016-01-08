@@ -1,0 +1,38 @@
+; THIS IS AN UPDATE, IT IS MORE OPTIMAL BUT HAS AN ERROR
+	mov		ebx, [a]
+		mov		ecx, [b]
+				
+		movaps	xmm1,[ecx]
+		movaps	xmm2,[ecx+16]
+		movaps	xmm3,[ecx+32]
+		movaps	xmm4,[ecx+48]
+
+		mov		ecx, store
+		mov		eax, 0
+
+loop_mul144:
+		movss	xmm0,[ebx+eax]
+		shufps	xmm0,xmm0,40h
+		movaps	xmm5,xmm0
+		mulps	xmm5,xmm1
+
+		movss	xmm0,[ebx+eax+4]
+		shufps	xmm0,xmm0,40h
+		mulps	xmm0,xmm2
+		addps	xmm5,xmm0
+
+		movss	xmm0,[ebx+eax+8]
+		shufps	xmm0,xmm0,40h
+		mulps	xmm0,xmm3
+		addps	xmm5,xmm0
+
+		movss	xmm0,[ebx+eax+12]
+		shufps	xmm0,xmm0,40h
+		mulps	xmm0,xmm4
+		addps	xmm5,xmm0
+
+		movaps	[ecx+eax],xmm5
+
+		add		eax,16
+		cmp		eax,64
+		jne		loop_mul144

@@ -14,7 +14,7 @@ namespace nextar {
 NEX_DEFINE_SINGLETON_PTR(WindowManager);
 
 WindowManager ::WindowManager() :
-		processing(false) {
+		processing(false), activeWindow(nullptr) {
 }
 
 WindowManager::~WindowManager() {
@@ -33,6 +33,7 @@ void WindowManager::RegisterWindow(RenderWindow* winPtr) {
 
 #endif
 	registeredWindows.push_back(winPtr);
+	ActivateWindow(winPtr);
 }
 
 void WindowManager::_Unregister(RenderWindow* winPtr) {
@@ -69,6 +70,20 @@ void WindowManager::_ProcessRemovedItems() {
 			++rwit;
 		}
 		removedWindows.clear();
+	}
+}
+
+void WindowManager::ActivateWindow(RenderWindow* rw) {
+	if (activeWindow != rw) {
+		activeWindow = rw;
+		DispatchEvent(EVENT_ACTIVE_WINDOW_CHANGED);
+	}
+}
+
+void WindowManager::DeactivateWindow(RenderWindow* rw) {
+	if (activeWindow == rw) {
+		activeWindow = nullptr;
+		DispatchEvent(EVENT_ACTIVE_WINDOW_CHANGED);
 	}
 }
 

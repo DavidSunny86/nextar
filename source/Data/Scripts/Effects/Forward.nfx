@@ -1,0 +1,31 @@
+
+shader Forward {
+
+	flags forward;
+	pass Main {
+	
+		cbuffer ObjectProperties;
+		
+		depth_stencil_state {
+			depth_state true true less_equal;
+			stencil_test false;
+		}
+		
+		blend_state {
+			blend false;
+		}
+		
+		raster_state {
+			raster solid back true;
+			scissor false;
+			anti_aliasing false false;
+		}
+		
+		program {
+			define HAS_COLOR;
+			vertex_program Forward;
+			fragment_program Forward;
+		}
+
+	}
+}

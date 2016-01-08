@@ -6,6 +6,7 @@
  */
 
 #include <WinKeyboardMouse.h>
+#include <WindowManager.h>
 
 namespace InputService {
 
@@ -18,9 +19,10 @@ namespace InputService {
  * WinKeyboardMouse
  ***************************************************/
 WinKeyboardMouse::WinKeyboardMouse(const WinDeviceDesc& d) :
-WinInputController(d), changeCount(0), mousePos{ { 0, 0 } },
+WinInputController(d), changeCount(0), 
 scrollLockState(false), capsLockState(false), numLockState(false),
 mouseWheel(0) {
+	mousePos = { { 0, 0 } };
 	std::fill(keyboardKeyStates.begin(), keyboardKeyStates.end(), KEY_STATE_UP);
 	std::fill(mouseButtons.begin(), mouseButtons.end(), KEY_STATE_UP);
 	mouseDisplacement.xy[0] = 0;
@@ -90,10 +92,19 @@ void WinKeyboardMouse::CommitMouseMoveEvent() {
 }
 
 InputChangeBuffer WinKeyboardMouse::UpdateSettings() {
+	CommitMouseMoveEvent();
 	InputChangeBuffer buffer;
 	buffer.first = inputEvents.data();
 	buffer.second = changeCount;
 	changeCount = 0;
+	// reset mouse position
+	if (lockMouseToCenter) {
+		RenderWindow* rw = WindowManager::Instance().GetActiveWindow();
+		if (rw) {
+			Size s = rw->GetCurrentDimensions();
+			SetCursorPos(s.dx >> 1, s.dy >> 1);
+		}
+	}
 	return buffer;
 }
 
@@ -135,6 +146,12 @@ DigitalControls* WinKeyboardMouse::GetDigitalSettings() {
 
 AnalogControls* WinKeyboardMouse::GetAnalogSettings() {
 	return this;
+}
+
+void WinKeyboardMouse::SetProperty(const String& propertyName,
+	const String& value) {
+	if (propertyName == "lock_cursor")
+		lockMouseToCenter = value == "1" || value == "true" ? true : false;
 }
 
 } /* namespace InputService */

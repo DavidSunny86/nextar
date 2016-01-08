@@ -49,6 +49,8 @@ movementSpeedFactor(50.1f), rotationSpeedFactor(1.5f) {
 }
 
 FPSControlBehaviour::~FPSControlBehaviour() {
+	if (controls)
+		NEX_DELETE(controls);
 }
 
 void FPSControlBehaviour::Populate(PropertyDictionary* dic) {
@@ -77,8 +79,10 @@ void FPSControlBehaviour::SetControllerID(uint32 deviceId) {
 	if (desc.IsValid()) {
 		if (desc.type == ControllerType::TYPE_XBOX360_CONTROLLER)
 			controls = NEX_NEW(XBox360Controller());
-		else if (desc.type == ControllerType::TYPE_KEYBOARD_AND_MOUSE)
+		else if (desc.type == ControllerType::TYPE_KEYBOARD_AND_MOUSE) {
 			controls = NEX_NEW(KeyboardMouseController());
+			InputManager::Instance().SetProperty(deviceId, "lock_cursor", "true");
+		}
 		InputManager::Instance().RegisterListener(controls, deviceId);
 	}
 }
@@ -159,6 +163,8 @@ void FPSControlBehaviour::KeyboardMouseController::Process(Moveable* m,
 	Vector2 rotation(rotationSpeedFactor * rotateSpeedXY.x * timeDelta,
 		rotationSpeedFactor * rotateSpeedXY.y * timeDelta);
 	m->LocalApplyCameraMotion(movement, rotation);
+	rotateSpeedXY.x = 0;
+	rotateSpeedXY.y = 0;
 }
 
 
