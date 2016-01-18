@@ -107,4 +107,22 @@ void StringInternTable::LoadFromCache() {
 	NEX_THREAD_MUTEX(accessLock);
 	_LoadFromCache();
 }
+
+void StringInternTable::UnloadTable() {
+	NEX_THREAD_MUTEX(accessLock);
+	if (saveToCache)
+		_SaveToCache();
+	if (loadedFromCache)
+		_Unload();
+}
+
+void StringInternTable::_Unload() {
+	Trace("Strings unloaded!");
+	ForwardMap fm;
+	ReverseMap rm;
+	fm.swap(forwardMap);
+	rm.swap(reverseMap);
+	loadedFromCache = false;
+}
+
 }

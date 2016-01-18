@@ -38,6 +38,7 @@ public:
 
 	static StringID AsyncStringID(const String&);
 	static void OnExit();
+	static void OnFlushStrings();
 
 protected:
 	static StringInternTable nameTable;

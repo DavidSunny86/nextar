@@ -49,7 +49,7 @@ void RenderManager::CreateResources() {
 }
 
 void RenderManager::Configure(const Config& config) {
-	const NameValueMap& nv = config.GetSectionMap("Render");
+	const NameValueMap& nv = config.GetSectionMap("RenderManager");
 	ConfigureImpl(nv);
 }
 
@@ -65,6 +65,12 @@ void RenderManager::AddRenderQueue(const StringID name, uint16 priority,
 	desc.flags = flags;
 	renderQueues.push_back(desc);
 	std::sort(renderQueues.begin(), renderQueues.end());
+}
+
+void RenderManager::AddRenderSystem(const String& name, const Config& cfg) {
+	auto it = renderSystemFactories.find(name);
+	if (it != renderSystemFactories.end() && (*it).second)
+		AddRenderSystem( (*it).second(cfg) );
 }
 
 void RenderManager::AddRenderSystem(RenderSystem* rs) {

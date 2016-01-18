@@ -63,6 +63,12 @@ public:
 		return renderQueues;
 	}
 
+	void AddRenderSystemFactory(const String& name, RenderSystem::CreateInstance ci) {
+		renderSystemFactories[name] = ci;
+	}
+
+	void AddRenderSystem(const String& name, const Config& cfg);
+
 	virtual void AddRenderSystem(RenderSystem* rs);
 	virtual void RemoveRenderSystem(RenderSystem* rs);
 
@@ -105,8 +111,8 @@ protected:
 
 	void DestroyResources();
 	void CreateResources();
-
-	typedef map<String, uint16>::type RenderLayerNameMap;
+		
+	typedef map<String, RenderSystem::CreateInstance>::type RenderSystemFactoryMap;
 
 	virtual RenderDriverPtr CreateDriverImpl(DriverCreationParams&) = 0;
 	virtual void ConfigureImpl(const NameValueMap&) = 0;
@@ -120,6 +126,8 @@ protected:
 	RenderQueueDescList renderQueues;	
 	// Default texture
 	TextureAssetPtr defaultTexture;
+	// Render systems
+	RenderSystemFactoryMap renderSystemFactories;
 };
 
 }

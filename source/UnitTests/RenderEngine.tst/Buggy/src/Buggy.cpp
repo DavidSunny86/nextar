@@ -13,9 +13,9 @@
 void Buggy::_SetupScene(SceneAssetPtr& scene) {
   UTApplication::_SetupScene(scene);
   AxisAlignedBox box = AxisAlignedBox(-10, -10, -10, 10, 10, 10);
-  DebugDisplay::Instance().Register(box, Color::Blue);
+  DebugDisplay::Register(box, Color::Blue);
   Matrix4x4 m = Matrix4x4::IdentityMatrix;
-  DebugDisplay::Instance().Register(m, 2);
+  DebugDisplay::Register(m, 2);
   cameraEntity = scene->FindComponent(NamedObject::AsyncStringID("MainCamera"));
   if (cameraEntity) {
     Entity* e = static_cast<Entity*>(cameraEntity);

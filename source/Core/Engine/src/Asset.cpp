@@ -81,23 +81,25 @@ bool Asset::AsyncLoad(const StreamInfo& request, bool async) {
 	if (assetState.compare_exchange_strong(expected,
 		ASSET_LOADING, std::memory_order_release,
 		std::memory_order_relaxed)) {
+		AssetStreamRequest* streamRequest = static_cast<AssetStreamRequest*>(_savedRequestPtr);
+		NEX_ASSERT(streamRequest);
+		Debug("Loading: " + streamRequest->GetAssetLocator().ToString());
 		if (async) {
 			if (IsBackgroundStreamed() &&
-				(_savedRequestPtr->flags & StreamRequest::ASSET_STREAM_REQUEST)) {
-				AssetStreamer::Instance().AsyncRequestLoad(static_cast<AssetStreamRequest*>(_savedRequestPtr));
+				(streamRequest->flags & StreamRequest::ASSET_STREAM_REQUEST)) {
+				AssetStreamer::Instance().AsyncRequestLoad(streamRequest);
 			} else {
 				Warn("Asset cannot be background loaded!");
 			}
 		} else {
 			try {
-				LoadImpl(_savedRequestPtr, false);
-				if (_savedRequestPtr->flags & StreamRequest::ASSET_STREAM_REQUEST)
-					_LoadDependencies(
-					static_cast<AssetStreamRequest*>(_savedRequestPtr));
+				LoadImpl(streamRequest, false);
+				if (streamRequest->flags & StreamRequest::ASSET_STREAM_REQUEST)
+					_LoadDependencies(streamRequest);
 			} catch (GracefulErrorExcept& e) {
 				Debug(e.GetMsg());
 				// @todo Combine the flags set/unset
-				_savedRequestPtr->returnCode = StreamResult::STREAM_FAILED;
+				streamRequest->returnCode = StreamResult::STREAM_FAILED;
 			}
 			NotifyAssetLoaded();
 		}

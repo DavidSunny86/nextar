@@ -14,6 +14,12 @@ namespace nextar {
 #define MAKE_AUTO_PARAM(Class, variableName, type, context, description)	\
 	MAKE_AUTO_PARAM_REGISTER(MAKE_AUTO_PARAM_REF(Class), variableName, type, context, description)
 
+void SceneLightApply(CommitContext& context, const ShaderParameter* d) {
+	context.paramGroup->WriteRawData(context.renderContext, &context.sunLightPosition, 0, 16);
+	context.paramGroup->WriteRawData(context.renderContext, &context.sunLightIntensity, 16, 16);
+	context.paramGroup->WriteRawData(context.renderContext, &context.sunLightColor, 32, 16);
+}
+
 void ObjectTransformsApply(CommitContext& context, const ShaderParameter* d) {
 	NEX_ASSERT(context.primitive);
 	const Matrix4x4* m = context.primitive->GetWorldMatrices();
@@ -124,6 +130,8 @@ void BaseRenderManager::RegisterAutoParams() {
 		ParameterContext::CTX_OBJECT, "Diffuse color.");
 	MAKE_AUTO_PARAM(ObjectTransforms, AutoParamName::AUTO_OBJECT_TRANSFORM, PDT_STRUCT,
 		ParameterContext::CTX_OBJECT, "Model view projection and model view matrix.");
+	MAKE_AUTO_PARAM(SceneLight, AutoParamName::AUTO_SCENE_LIGHT, PDT_STRUCT,
+		ParameterContext::CTX_FRAME, "Scene lighting.");
 	MAKE_AUTO_PARAM(InvProjectionTransform, AutoParamName::AUTO_INV_PROJECTION, PDT_MAT4x4,
 		ParameterContext::CTX_VIEW, "Inverse projection matrix.");
 	MAKE_AUTO_PARAM(OmniLightProperties, AutoParamName::AUTO_OMNI_LIGHT_PROPERTIES, PDT_STRUCT,

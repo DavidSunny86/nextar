@@ -10,7 +10,7 @@ using namespace nextar;
 class PBRenderSystem : public nextar::RenderSystem
 {
 public:
-  PBRenderSystem();
+  PBRenderSystem(const Config& cfg);
   virtual ~PBRenderSystem();
   
   

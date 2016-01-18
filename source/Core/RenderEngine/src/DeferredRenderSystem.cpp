@@ -62,13 +62,19 @@ void GBuffer::Setup(Size dimensions) {
 /************************************************************************/
 /* DeferredRenderSystem                                                 */
 /************************************************************************/
-DeferredRenderSystem::DeferredRenderSystem() {
+DeferredRenderSystem::DeferredRenderSystem(const Config& c) : RenderSystem(c) {
 	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_INIT_RESOURCES, CreateResources, this);
 	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyResources, this);
 }
 
 DeferredRenderSystem::~DeferredRenderSystem() {
 }
+
+
+RenderSystem* DeferredRenderSystem::CreateInstance(const Config& c) {
+	return NEX_NEW(DeferredRenderSystem(c));
+}
+
 
 void DeferredRenderSystem::PrepareGeometryBuffer() {
 	gbufferRI.rt = gbuffer.renderTarget;

@@ -11,8 +11,9 @@ cbuffer MaterialProperty context:Material {
 	var float gloss ui:ObjectProperties.Gloss;
 };
 
-cbuffer OmniLightProperty context:Scene {
+cbuffer SceneLight:SCENELIGHT {
    var vec4 omniLightPosition;
    var vec4 omniLightIntensity;
+   var vec4 ambientColor;
 }
 

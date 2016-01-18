@@ -19,6 +19,7 @@ public:
 
 	void SaveToCache();
 	void LoadFromCache();
+	void UnloadTable();
 
 	StringID AsyncStringID(const String& value);
 	StringRef AsyncString(const StringID v);
@@ -28,6 +29,7 @@ protected:
 	URL _GetURL();
 	void _SaveToCache();
 	void _LoadFromCache();
+	void _Unload();
 
 	typedef map<StringID, String>::type ForwardMap;
 	typedef map<StringRef, StringID>::type ReverseMap;

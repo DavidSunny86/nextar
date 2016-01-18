@@ -35,7 +35,7 @@ public:
 class _NexRenderAPI DeferredRenderSystem: public nextar::RenderSystem {
 public:
 
-	DeferredRenderSystem();
+	DeferredRenderSystem(const Config& c);
 	virtual ~DeferredRenderSystem();
 
 	virtual void Commit(CommitContext& context);
@@ -48,6 +48,8 @@ public:
 		gbuffer.Destroy();
 		lightMaterial.Clear();
 	}
+
+	static RenderSystem* CreateInstance(const Config& c);
 
 protected:
 		

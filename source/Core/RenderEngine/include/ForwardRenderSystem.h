@@ -20,13 +20,15 @@ namespace nextar {
 class _NexRenderAPI ForwardRenderSystem: public nextar::RenderSystem {
 public:
 
-	ForwardRenderSystem();
+	ForwardRenderSystem(const Config& c);
 	virtual ~ForwardRenderSystem();
 
 	virtual void Commit(CommitContext& context);
 
 	static void DestroyResources(void* renderSystem);
 	static void CreateResources(void* renderSystem);
+
+	static RenderSystem* CreateInstance(const Config& c);
 
 protected:
 		

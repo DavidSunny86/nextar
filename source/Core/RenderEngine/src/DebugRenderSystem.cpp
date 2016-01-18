@@ -30,7 +30,8 @@ void DebugPrimitive::SetDebugMaterial(MaterialAssetPtr& m) {
 	}
 }
 
-DebugRenderSystem::DebugRenderSystem() {
+DebugRenderSystem::DebugRenderSystem(const Config& c) : RenderSystem(c) {
+
 	idCounter = 0;
 	boxDataGenerated = false;
 	axisDataGenerated = false;
@@ -43,6 +44,9 @@ DebugRenderSystem::~DebugRenderSystem() {
 	ReleaseObjects();
 }
 
+RenderSystem* DebugRenderSystem::CreateInstance(const Config& c) {
+	return NEX_NEW(DebugRenderSystem(c));
+}
 
 void DebugRenderSystem::DestroyResources(void* renderSystem) {
 	DebugRenderSystem* pRenderSys = reinterpret_cast<DebugRenderSystem*>(renderSystem);
@@ -98,11 +102,11 @@ void DebugRenderSystem::ClearStreamData(StreamData& s) {
 	}
 }
 
-VisiblePrimitiveList& DebugRenderSystem::GetPrimitives(CommitContext& context) {
+VisiblePrimitiveList& DebugRenderSystem::_GetPrimitives(CommitContext& context) {
 	return alivePrimitives;
 }
 
-uint32 DebugRenderSystem::Register(AABoxF box,
+uint32 DebugRenderSystem::_Register(AABoxF box,
 	const Color& color, float expiryTimeInSec) {
 	if (!boxDataGenerated) {
 		GenerateStreamDataForBox();
@@ -119,7 +123,7 @@ uint32 DebugRenderSystem::Register(AABoxF box,
 	return idCounter;
 }
 
-uint32 DebugRenderSystem::Register(Mat4x4R tform,
+uint32 DebugRenderSystem::_Register(Mat4x4R tform,
 	float screenSpaceFactor,
 	const Color& color, float expiryTimeInSec) {
 	if (!axisDataGenerated) {
@@ -137,21 +141,21 @@ uint32 DebugRenderSystem::Register(Mat4x4R tform,
 	return idCounter;
 }
 
-uint32 DebugRenderSystem::Register(PlaneF plane,
+uint32 DebugRenderSystem::_Register(PlaneF plane,
 	const Color& color, float expiryTimeInSec) {
 	//DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
 	//alivePrimitives.push_back(primitive);
 	return idCounter;
 }
 
-uint32 DebugRenderSystem::Register(const Frustum& frustum,
+uint32 DebugRenderSystem::_Register(const Frustum& frustum,
 	const Color& color, float expiryTimeInSec) {
 	//DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
 	//alivePrimitives.push_back(primitive);
 	return idCounter;
 }
 
-uint32 DebugRenderSystem::Register(const Box2D& rect,
+uint32 DebugRenderSystem::_Register(const Box2D& rect,
 	const Color& color, Vec4AF textureOffsetAndRepeat, TextureBase* textured, bool border,
 	float expiryTimeInSec) {
 	// remap rect
@@ -189,7 +193,7 @@ uint32 DebugRenderSystem::Register(const Box2D& rect,
 	return idCounter;
 }
 
-uint32 DebugRenderSystem::Register(const Geometry& triList, const Color& color,
+uint32 DebugRenderSystem::_Register(const Geometry& triList, const Color& color,
 	float expiryTimeInSec) {
 	//DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
 	//alivePrimitives.push_back(primitive);
@@ -215,7 +219,7 @@ void DebugRenderSystem::DetermineVisiblePrimitives(float frameTime) {
 	}
 }
 
-void DebugRenderSystem::RemovePrimitive(uint32 id) {
+void DebugRenderSystem::_RemovePrimitive(uint32 id) {
 	for (auto it = alivePrimitives.begin(); it != alivePrimitives.end(); ++it) {
 		DebugPrimitive* dp = static_cast<DebugPrimitive*>(*it);
 		if (dp->GetPrimitiveID() == id) {
@@ -226,7 +230,6 @@ void DebugRenderSystem::RemovePrimitive(uint32 id) {
 }
 
 void DebugRenderSystem::Commit(CommitContext& context) {
-
 	DetermineVisiblePrimitives(context.frameTime);
 	// @urgent We should not clear here
 	context.renderTargetInfo.info.clearColor[0] = Color::Black;

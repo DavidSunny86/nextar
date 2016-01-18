@@ -36,6 +36,7 @@ RenderDriverPtr RenderManagerGL::CreateDriverImpl(
 }
 
 void RenderManagerGL::ConfigureImpl(const nextar::NameValueMap& nameValues) {
+	BaseRenderManager::ConfigureImpl(nameValues);
 }
 
 void RenderManagerGL::CloseImpl() {

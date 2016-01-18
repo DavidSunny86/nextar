@@ -59,7 +59,7 @@ void MeshLoaderImpl::Load(InputStreamPtr& input, AssetLoader& loader) {
 				impl->Load(ser, loader);
 				request->SetCompleted(true);
 			}
-			catch (GracefulErrorExcept& e) {
+			catch (GracefulErrorExcept& ) {
 				request->SetCompleted(false);
 			}
 		}

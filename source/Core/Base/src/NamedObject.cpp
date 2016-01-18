@@ -17,4 +17,8 @@ void NamedObject::OnExit() {
 	nameTable.SaveToCache();
 }
 
+void NamedObject::OnFlushStrings() {
+	nameTable.UnloadTable();
+}
+
 }

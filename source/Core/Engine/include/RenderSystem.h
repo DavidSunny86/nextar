@@ -16,7 +16,9 @@ namespace nextar {
 class _NexEngineAPI RenderSystem: public AllocGraphics {
 public:
 
-	RenderSystem();
+	typedef RenderSystem* (*CreateInstance) (const Config&);
+
+	RenderSystem(const Config&);
 	virtual ~RenderSystem();
 
 	virtual void Commit(CommitContext& context) = 0;

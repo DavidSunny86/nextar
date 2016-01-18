@@ -4,6 +4,8 @@
 #include <RenderTarget.h>
 #include <DeferredRenderSystem.h>
 #include <DebugRenderSystem.h>
+#include <ForwardRenderSystem.h>
+#include <ApplicationContext.h>
 
 namespace nextar {
 
@@ -16,9 +18,10 @@ BaseRenderManager::BaseRenderManager() {
 BaseRenderManager::~BaseRenderManager() {
 }
 
-void BaseRenderManager::Configure(const Config&) {
+void BaseRenderManager::ConfigureImpl(const NameValueMap& c) {
 	// @todo
-	CreateRenderQueues();
+	CreateDefaultRenderSystemFactories();
+	CreateRenderQueues(c);
 	RegisterAutoParams();
 }
 
@@ -186,17 +189,55 @@ void BaseRenderManager::PresentSwapChains(RenderContext* rc) {
 }
 
 void BaseRenderManager::CreateRenderSystems() {
-	AddRenderSystem(NEX_NEW(DeferredRenderSystem));
-	AddRenderSystem(NEX_NEW(DebugRenderSystem));
+	// get the config here
+	const Config& c = ApplicationContext::Instance().GetConfig();
+	String systems = c.GetValue("RenderManager", "Systems", "Deferred,Forward,Debug");
+
+	StringVector l = StringUtils::Tokenize(systems, ",");
+	for (auto& e : l) {
+		AddRenderSystem(e, c);
+	}
 }
 
-void BaseRenderManager::CreateRenderQueues() {
+void BaseRenderManager::CreateRenderQueues(const NameValueMap& section) {
+
 	// @todo We run this only when configuration is not present
-	AddRenderQueue(NamedObject::AsyncStringID("Background"), 110, RenderQueueFlags::BACKGROUND);
-	AddRenderQueue(NamedObject::AsyncStringID("Deferred"), 111, RenderQueueFlags::DEFERRED | RenderQueueFlags::SORT_ENABLED);
-	AddRenderQueue(NamedObject::AsyncStringID("Forward"), 112, RenderQueueFlags::FORWARD | RenderQueueFlags::SORT_ENABLED);
-	AddRenderQueue(NamedObject::AsyncStringID("Transparent"), 113, RenderQueueFlags::TRANSLUCENCY | RenderQueueFlags::SORT_ENABLED);
-	AddRenderQueue(NamedObject::AsyncStringID("Overlay"), 114, RenderQueueFlags::OVERLAY);
+	bool queuesAdded = false;
+	auto it = section.find("RenderQueueCount");
+	if (it != section.end()) {
+		uint32 l = Convert::ToULong((*it).second);
+		for (uint32 i = 0; i < l; ++i) {
+			String qname = String("RQ#") + Convert::ToString(i);
+			auto it2 = section.find(qname);
+			if (it2 != section.end()) {
+				StringVector v = StringUtils::Tokenize((*it2).second, ",");
+				if (v.size() > 1) {
+					StringID nameId = Convert::ToULong(v[0]);
+					uint32 priority = Convert::ToULong(v[1]);
+					RenderQueueFlags flags = RenderQueueFlags::SORT_ENABLED | RenderQueueFlags::DEFERRED;
+					if (v.size() > 2) {
+						flags = (RenderQueueFlags)Convert::ToULong(v[2]);
+					}
+					AddRenderQueue(nameId, priority, flags);
+					queuesAdded = true;
+				}
+			}
+		}
+	} 
+	
+	if (!queuesAdded) {
+		AddRenderQueue(NamedObject::AsyncStringID("Background"), 110, RenderQueueFlags::BACKGROUND);
+		AddRenderQueue(NamedObject::AsyncStringID("Deferred"), 111, RenderQueueFlags::DEFERRED | RenderQueueFlags::SORT_ENABLED);
+		AddRenderQueue(NamedObject::AsyncStringID("Forward"), 112, RenderQueueFlags::FORWARD | RenderQueueFlags::SORT_ENABLED);
+		AddRenderQueue(NamedObject::AsyncStringID("Transparent"), 113, RenderQueueFlags::TRANSLUCENCY | RenderQueueFlags::SORT_ENABLED);
+		AddRenderQueue(NamedObject::AsyncStringID("Overlay"), 114, RenderQueueFlags::OVERLAY);
+	}
+}
+
+void BaseRenderManager::CreateDefaultRenderSystemFactories()  {
+	AddRenderSystemFactory("Deferred", &DeferredRenderSystem::CreateInstance);
+	AddRenderSystemFactory("Forward", &ForwardRenderSystem::CreateInstance);
+	AddRenderSystemFactory("Debug", &DebugRenderSystem::CreateInstance);
 }
 
 }

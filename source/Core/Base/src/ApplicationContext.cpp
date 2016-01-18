@@ -11,7 +11,7 @@ namespace nextar {
 
 NEX_DEFINE_SINGLETON_PTR(ApplicationContext);
 
-String ApplicationContext::_configPathName = "${Bin}/Config.cfg";
+String ApplicationContext::_configPathName = "${EngineData}/Configs/Config.cfg";
 
 ApplicationContext::ApplicationContext(const String& name) :
 		appName(name), quitting(false), runningLoop(false), errorHandler(nullptr),
@@ -61,6 +61,8 @@ void ApplicationContext::InitializeContext(int argc, char* argv[]) {
 			StringUtils::Null, true);
 	ConfigureExtendedInterfacesImpl();
 	DispatchEvent(EVENT_INIT_RESOURCES);
+	// in case it was loaded
+	NamedObject::OnFlushStrings();
 }
 
 void ApplicationContext::LoadConfiguration() {

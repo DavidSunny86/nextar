@@ -3,7 +3,7 @@
 namespace PBRenderEngine
 {
 
-PBRenderSystem::PBRenderSystem() {
+PBRenderSystem::PBRenderSystem(const Config& c) : RenderSystem(c) {
 
 }
 

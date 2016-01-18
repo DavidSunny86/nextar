@@ -270,6 +270,7 @@ uint32 Helper::GetShaderFlag(const String& val) {
 		{ RenderQueueFlags::DEFERRED, _SS(ARG_BASIC_DEFERRED) },
 		{ RenderQueueFlags::DEBUG, _SS(ARG_DEBUG) },
 		{ RenderQueueFlags::DEFERRED_LIGHTING, _SS(ARG_DEFERRED_LIGHTING) },
+		{ RenderQueueFlags::FORWARD, _SS(ARG_FORWARD) },
 		{ RenderQueueFlags::OVERLAY, _SS(ARG_OVERLAY) },
 		{ RenderQueueFlags::POST_FX, _SS(ARG_POST_FX) },
 		{ RenderQueueFlags::TRANSLUCENCY, _SS(ARG_TRANSLUCENT) },
@@ -295,6 +296,7 @@ AutoParamName Helper::GetAutoParam(const String& val) {
 		{ AutoParamName::AUTO_NORMAL_MAP, _SS(ARG_NORMAL_MAP) },
 		{ AutoParamName::AUTO_OBJECT_TRANSFORM, _SS(ARG_OBJECT_TRANSFORM) },
 		{ AutoParamName::AUTO_OMNI_LIGHT_PROPERTIES, _SS(ARG_OMNI_LIGHT_PROPERTIES) },
+		{ AutoParamName::AUTO_SCENE_LIGHT, _SS(ARG_SCENE_LIGHT) },
 		{ AutoParamName::AUTO_SPECULAR_AND_GLOSS_MAP, _SS(ARG_SPECULAR_AND_GLOSS_MAP) },
 	};
 

@@ -64,6 +64,8 @@ enum AutoParamName
 	AUTO_DIFFUSE_COLOR,
 	// Constant scale factor
 	AUTO_CONSTANT_SCALE_FACTOR,
+	// Scene light
+	AUTO_SCENE_LIGHT,
 	// Custom generic parameter, could be texture or constant
 	// accessed from property buffer.
 	AUTO_CUSTOM_CONSTANT,

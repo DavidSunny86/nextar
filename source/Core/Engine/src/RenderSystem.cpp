@@ -9,7 +9,7 @@
 
 namespace nextar {
 
-RenderSystem::RenderSystem() {
+RenderSystem::RenderSystem(const Config&) {
 	// TODO Auto-generated constructor stub
 
 }

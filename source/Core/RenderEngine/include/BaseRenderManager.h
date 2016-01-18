@@ -24,7 +24,7 @@ public:
 	virtual ~BaseRenderManager();
 
 	/* */
-	virtual void Configure(const Config&);
+	virtual void ConfigureImpl(const NameValueMap&) override;
 	virtual RenderDriverPtr AsyncCreateDriver(DriverCreationParams&);
 	virtual RenderDriverPtr AsyncGetDriver(uint32 index);
 	virtual void Close();
@@ -45,8 +45,9 @@ protected:
 	void RenderAllTargets(RenderContext* rc, const FrameTimer& frameTimer, bool callPresent);
 	void PresentSwapChains(RenderContext* rc);
 	void CreateRenderSystems();
-	void CreateRenderQueues();
+	void CreateRenderQueues(const NameValueMap&);
 	void RegisterAutoParams();
+	void CreateDefaultRenderSystemFactories();
 
 	/* The first registered context is always the primary context, other
 	 * contexts are present if usingMultiGpuSetup is true */

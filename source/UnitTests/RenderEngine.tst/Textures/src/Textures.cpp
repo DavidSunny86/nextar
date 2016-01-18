@@ -22,7 +22,7 @@ public:
 		TextureAssetPtr texture = TextureAsset::Traits::Instance(id, texturePath);
 		Box2D box1(x, y, x + 0.25f, y + 0.25f);
 		texture->RequestLoad();
-		DebugDisplay::Instance().Register(box1, Color::White, Vec4ASet(0, 0, tileX, tileY), texture);
+		DebugDisplay::Register(box1, Color::White, Vec4ASet(0, 0, tileX, tileY), texture);
 	}
 	virtual void _SetupScene(SceneAssetPtr& scene) {
 

@@ -62,6 +62,10 @@ public:
 	float frameTime;
 	Size targetDimension;
 
+	Vector4 sunLightIntensity;
+	Vector4 sunLightPosition;
+	Color sunLightColor;
+
 	Color color;
 
 	typedef array<const ParameterBuffer*, (uint32)ParameterContext::CTX_COUNT>::type ParamBufferList;

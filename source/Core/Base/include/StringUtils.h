@@ -67,137 +67,7 @@ struct NotAsciiTest: public std::unary_function<int, bool > {
 		return !isascii(a);
 	}
 };
-/**
- * Change the delimeter for each word in this string to
- * compatible string array type.
- */
-/*
-template<typename StringType>
-void ReplaceDelimiter(StringType& strArr,
-		typename StringType::value_type delt) {
-	typename StringType::value_type val = StringUtils::SEPARATOR_CHAR;
-	std::replace(strArr.begin(), strArr.end(), delt, val);
-}
-*/
-/**
- * @remarks
- * For a container class, this will append all the strings in the
- * array or list or queue into one string
- */
-/*template<typename _ContIter, typename StringType/
-StringType Combine(_ContIter beg, _ContIter end) {
-	StringType ret;
-	size_t totalLength = 0;
-	_ContIter it = beg;
-	while (it != end) {
-		totalLength += (*it).length() + 1;
-		++it;
-	}
-	totalLength += 1;
-	ret.reserve(totalLength);
-	it = beg;
-	while (it != end) {
-		ret += (*it);
-		ret += SEPARATOR_CHAR;
-		++it;
-	}
-	return ret;
-}*/
 
-/**
- * Returns the count of the string words stored in this container
- */
-/*template<typename StringType>
-size_t GetWordCount(const StringType& arr) {
-	size_t offset = 0;
-	size_t i = 0;
-	// check if offset is less than length
-	while (offset < arr.length()) {
-		size_t pos = arr.find_first_of(SEPARATOR_CHAR, offset);
-		if (pos == StringType::npos)
-			pos = arr.length();
-		i++;
-		offset = pos + 1;
-	}
-	return i;
-}*/
-
-/**
- * Get location of word within a string, returns -1 if not found.
- */
-/*template<typename StringType>
-size_t GetWordIndex(const StringType& arr, const StringType& word) {
-	size_t location = arr.find(word);
-	if (location == StringType::npos)
-		return -1;
-	return std::count(arr.c_str(), arr.c_str() + location,
-			(StringType::value_type)(SEPARATOR_CHAR));
-}*/
-
-/**
- * Return's the ith token
- * @param num Index of the token
- * @param arr The string container
- * @return Null if no tokens at ith index, else the string.
- */
-/*template<typename StringType>
-StringType GetWord(size_t num, const StringType& arr) {
-	size_t offset = 0;
-	size_t i = 0;
-	while (offset < arr.length()) {
-		size_t pos = arr.find_first_of(SEPARATOR_CHAR, offset);
-		if (pos == StringType::npos)
-			pos = arr.length();
-		if (i == num)
-			return arr.substr(offset, pos - offset);
-		offset = pos + 1;
-		i++;
-	}
-	return StringType();
-}*/
-
-/**
- * Set the ith token to the given word
- * @param num Index of the token
- * @param arr The string container
- * @param what The string to store
- * @return Null if no tokens at ith index, else the string.
- */
-/*template<typename StringType>
-void SetWord(size_t num, StringType& arr, const StringType& what) {
-	size_t offset = 0;
-	size_t i = 0;
-	while (offset <= arr.length()) {
-		size_t pos = arr.find_first_of(SEPARATOR_CHAR, offset);
-		if (pos == StringType::npos)
-			pos = arr.length();
-		if (i == num) {
-			arr.replace(offset, pos - offset, what);
-			break;
-		}
-		offset = pos + 1;
-		i++;
-	}
-}*/
-
-/**
- * Replace a word at a particular position
- **/
- /*
-template<typename StringType>
-void ReplaceWord(StringType& arr, TokenIterator prev, const StringType& by) {
-
-	if (prev < arr.length()) {
-		size_t pos = arr.find_first_of(SEPARATOR_CHAR, prev);
-		if (pos == StringType::npos)
-			pos = arr.length();
-		else if (by.length() <= 0)
-			pos += 1;
-
-		arr.replace(prev, pos - prev, by);
-	}
-}
-*/
 /**
  * Push the string at the very end of the buffer
  * @param arr The string array container
@@ -550,6 +420,16 @@ inline StringPair Split(const String& name, char by = ':') {
 		return StringPair(name, Null);
 }
 
+inline StringVector Tokenize(const String& value, const String& seperators) {
+	StringVector ret;
+	size_t what = 0;
+	do {
+		what = value.find_first_of(seperators, what);
+		ret.push_back(value.substr(0, what));
+	} while (what != String::npos);
+	return ret;
+}
+
 /** @remarks Trim leading white space **/
 inline void TrimLeading(String& str) {
 	size_t endpos = str.find_first_not_of(" \t\n\r");
@@ -674,6 +554,7 @@ inline int32 DecodeSizeUtf8(const utf8* buf, int32 len) {
 	}
 	return count;
 }
+
 
 }
 }

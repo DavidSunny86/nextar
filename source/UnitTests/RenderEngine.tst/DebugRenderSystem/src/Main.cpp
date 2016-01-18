@@ -11,10 +11,10 @@ public:
 	virtual void _SetupScene(SceneAssetPtr& scene) {
 		UTApplication::_SetupScene(scene);
 		AxisAlignedBox box =  AxisAlignedBox(-10, -10, -10, 10,  10,  10);
-		//DebugDisplay::Instance().Register(box, Color::Blue);
+		//DebugDisplay::Register(box, Color::Blue);
 		Matrix4x4 m = Matrix4x4::IdentityMatrix;
 		m = Mat4x4Scale(4, m);
-		DebugDisplay::Instance().Register(m);
+		DebugDisplay::Register(m);
 	}
 };
 
