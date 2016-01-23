@@ -1,17 +1,17 @@
 #ifndef PBRENDERSYSTEM_H
 #define PBRENDERSYSTEM_H
 
-#include <RenderSystem.h>
+#include <RenderPass.h>
 
 namespace PBRenderEngine {
 
 using namespace nextar;
   
-class PBRenderSystem : public nextar::RenderSystem
+class PBRenderPass : public nextar::RenderPass
 {
 public:
-  PBRenderSystem(const Config& cfg);
-  virtual ~PBRenderSystem();
+  PBRenderPass(const Config& cfg);
+  virtual ~PBRenderPass();
   
   
   virtual void Commit(CommitContext& context);

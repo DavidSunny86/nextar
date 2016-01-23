@@ -11,7 +11,7 @@
 #include <NexBase.h>
 #include <RenderDriver.h>
 #include <NameValueMap.h>
-#include <RenderSystem.h>
+#include <RenderPass.h>
 #include <RenderConstants.h>
 
 namespace nextar {
@@ -55,7 +55,7 @@ public:
 		return renderSettings;
 	}
 
-	inline const RenderSystemList& GetRenderSystems() const {
+	inline const RenderPassList& GetRenderPasss() const {
 		return renderSystems;
 	}
 
@@ -63,14 +63,14 @@ public:
 		return renderQueues;
 	}
 
-	void AddRenderSystemFactory(const String& name, RenderSystem::CreateInstance ci) {
+	void AddRenderPassFactory(const String& name, RenderPass::CreateInstance ci) {
 		renderSystemFactories[name] = ci;
 	}
 
-	void AddRenderSystem(const String& name, const Config& cfg);
+	void AddRenderPass(const String& name, const Config& cfg);
 
-	virtual void AddRenderSystem(RenderSystem* rs);
-	virtual void RemoveRenderSystem(RenderSystem* rs);
+	virtual void AddRenderPass(RenderPass* rs);
+	virtual void RemoveRenderPass(RenderPass* rs);
 
 	/* */
 	virtual void Configure(const Config&);
@@ -112,7 +112,7 @@ protected:
 	void DestroyResources();
 	void CreateResources();
 		
-	typedef map<String, RenderSystem::CreateInstance>::type RenderSystemFactoryMap;
+	typedef map<String, RenderPass::CreateInstance>::type RenderPassFactoryMap;
 
 	virtual RenderDriverPtr CreateDriverImpl(DriverCreationParams&) = 0;
 	virtual void ConfigureImpl(const NameValueMap&) = 0;
@@ -121,13 +121,13 @@ protected:
 	/* Global render options */
 	RenderSettings renderSettings;
 	/* Registered render systems */
-	RenderSystemList renderSystems;
+	RenderPassList renderSystems;
 	/* Render layers */
 	RenderQueueDescList renderQueues;	
 	// Default texture
 	TextureAssetPtr defaultTexture;
 	// Render systems
-	RenderSystemFactoryMap renderSystemFactories;
+	RenderPassFactoryMap renderSystemFactories;
 };
 
 }

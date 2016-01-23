@@ -5,7 +5,7 @@ shader Forward {
 	pass Main {
 	
 		cbuffer ObjectProperties;
-
+      
 		depth_stencil_state {
 			depth_state true true less_equal;
 			stencil_test false;
@@ -23,8 +23,8 @@ shader Forward {
 		
 		program {
          define DEBUG;
-			vertex_program PreConfig Common PostConfig Forward;
-			fragment_program PreConfig Forward;
+			vertex_program Common ForwardDebug;
+			fragment_program ForwardDebug;
 		}
 
 	}

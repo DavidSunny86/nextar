@@ -1,11 +1,11 @@
 /*
- * DebugRenderSystem.cpp
+ * DebugRenderPass.cpp
  *
  *  Created on: 25-Oct-2014
  *      Author: obhi
  */
 
-#include <DebugRenderSystem.h>
+#include <DebugRenderPass.h>
 #include <DebugDisplay.h>
 #include <Geometry.h>
 
@@ -30,7 +30,7 @@ void DebugPrimitive::SetDebugMaterial(MaterialAssetPtr& m) {
 	}
 }
 
-DebugRenderSystem::DebugRenderSystem(const Config& c) : RenderSystem(c) {
+DebugRenderPass::DebugRenderPass(const Config& c) : RenderPass(c) {
 
 	idCounter = 0;
 	boxDataGenerated = false;
@@ -40,28 +40,28 @@ DebugRenderSystem::DebugRenderSystem(const Config& c) : RenderSystem(c) {
 	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyResources, this);
 }
 
-DebugRenderSystem::~DebugRenderSystem() {
+DebugRenderPass::~DebugRenderPass() {
 	ReleaseObjects();
 }
 
-RenderSystem* DebugRenderSystem::CreateInstance(const Config& c) {
-	return NEX_NEW(DebugRenderSystem(c));
+RenderPass* DebugRenderPass::CreateInstance(const Config& c) {
+	return NEX_NEW(DebugRenderPass(c));
 }
 
-void DebugRenderSystem::DestroyResources(void* renderSystem) {
-	DebugRenderSystem* pRenderSys = reinterpret_cast<DebugRenderSystem*>(renderSystem);
+void DebugRenderPass::DestroyResources(void* renderSystem) {
+	DebugRenderPass* pRenderSys = reinterpret_cast<DebugRenderPass*>(renderSystem);
 	if (pRenderSys)
 		pRenderSys->ReleaseObjects();
 }
 
 
-void DebugRenderSystem::CreateResources(void* renderSystem) {
-	DebugRenderSystem* pRenderSys = reinterpret_cast<DebugRenderSystem*>(renderSystem);
+void DebugRenderPass::CreateResources(void* renderSystem) {
+	DebugRenderPass* pRenderSys = reinterpret_cast<DebugRenderPass*>(renderSystem);
 	if (pRenderSys)
 		pRenderSys->CreateMaterials();
 }
 
-void DebugRenderSystem::CreateMaterials() {
+void DebugRenderPass::CreateMaterials() {
 	URL debugMaterialPath(FileSystem::ArchiveEngineData_Name, "Materials/Assets/Debug3D.asset");
 	URL debugQuadMaterialPath(FileSystem::ArchiveEngineData_Name, "Materials/Assets/DebugQuad.asset");
 	try {
@@ -78,7 +78,7 @@ void DebugRenderSystem::CreateMaterials() {
 
 }
 
-void DebugRenderSystem::ReleaseObjects() {
+void DebugRenderPass::ReleaseObjects() {
 
 	std::for_each(alivePrimitives.begin(), alivePrimitives.end(),
 		[] (VisiblePrimitive* o) {
@@ -94,7 +94,7 @@ void DebugRenderSystem::ReleaseObjects() {
 	boxDataGenerated = false;
 }
 
-void DebugRenderSystem::ClearStreamData(StreamData& s) {
+void DebugRenderPass::ClearStreamData(StreamData& s) {
 	s.indices.Clear();
 	if (s.vertices.binding) {
 		NEX_DELETE(s.vertices.binding);
@@ -102,11 +102,11 @@ void DebugRenderSystem::ClearStreamData(StreamData& s) {
 	}
 }
 
-VisiblePrimitiveList& DebugRenderSystem::_GetPrimitives(CommitContext& context) {
+VisiblePrimitiveList& DebugRenderPass::_GetPrimitives(CommitContext& context) {
 	return alivePrimitives;
 }
 
-uint32 DebugRenderSystem::_Register(AABoxF box,
+uint32 DebugRenderPass::_Register(AABoxF box,
 	const Color& color, float expiryTimeInSec) {
 	if (!boxDataGenerated) {
 		GenerateStreamDataForBox();
@@ -123,7 +123,7 @@ uint32 DebugRenderSystem::_Register(AABoxF box,
 	return idCounter;
 }
 
-uint32 DebugRenderSystem::_Register(Mat4x4R tform,
+uint32 DebugRenderPass::_Register(Mat4x4R tform,
 	float screenSpaceFactor,
 	const Color& color, float expiryTimeInSec) {
 	if (!axisDataGenerated) {
@@ -141,21 +141,21 @@ uint32 DebugRenderSystem::_Register(Mat4x4R tform,
 	return idCounter;
 }
 
-uint32 DebugRenderSystem::_Register(PlaneF plane,
+uint32 DebugRenderPass::_Register(PlaneF plane,
 	const Color& color, float expiryTimeInSec) {
 	//DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
 	//alivePrimitives.push_back(primitive);
 	return idCounter;
 }
 
-uint32 DebugRenderSystem::_Register(const Frustum& frustum,
+uint32 DebugRenderPass::_Register(const Frustum& frustum,
 	const Color& color, float expiryTimeInSec) {
 	//DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
 	//alivePrimitives.push_back(primitive);
 	return idCounter;
 }
 
-uint32 DebugRenderSystem::_Register(const Box2D& rect,
+uint32 DebugRenderPass::_Register(const Box2D& rect,
 	const Color& color, Vec4AF textureOffsetAndRepeat, TextureBase* textured, bool border,
 	float expiryTimeInSec) {
 	// remap rect
@@ -193,14 +193,14 @@ uint32 DebugRenderSystem::_Register(const Box2D& rect,
 	return idCounter;
 }
 
-uint32 DebugRenderSystem::_Register(const Geometry& triList, const Color& color,
+uint32 DebugRenderPass::_Register(const Geometry& triList, const Color& color,
 	float expiryTimeInSec) {
 	//DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
 	//alivePrimitives.push_back(primitive);
 	return idCounter;
 }
 
-void DebugRenderSystem::DetermineVisiblePrimitives(float frameTime) {
+void DebugRenderPass::DetermineVisiblePrimitives(float frameTime) {
 
 	for (uint32 i = 0; i < alivePrimitives.size(); ) {
 		auto p = alivePrimitives[i];
@@ -219,7 +219,7 @@ void DebugRenderSystem::DetermineVisiblePrimitives(float frameTime) {
 	}
 }
 
-void DebugRenderSystem::_RemovePrimitive(uint32 id) {
+void DebugRenderPass::_RemovePrimitive(uint32 id) {
 	for (auto it = alivePrimitives.begin(); it != alivePrimitives.end(); ++it) {
 		DebugPrimitive* dp = static_cast<DebugPrimitive*>(*it);
 		if (dp->GetPrimitiveID() == id) {
@@ -229,11 +229,8 @@ void DebugRenderSystem::_RemovePrimitive(uint32 id) {
 	}
 }
 
-void DebugRenderSystem::Commit(CommitContext& context) {
+void DebugRenderPass::Commit(CommitContext& context) {
 	DetermineVisiblePrimitives(context.frameTime);
-	// @urgent We should not clear here
-	context.renderTargetInfo.info.clearColor[0] = Color::Black;
-	context.renderTargetInfo.info.clearFlags = ClearFlags::CLEAR_COLOR;
 	context.renderContext->BeginRender(&context.renderTargetInfo);
 	for (auto &prim : alivePrimitives) {
 		MaterialAsset* material = prim->GetMaterial();
@@ -286,7 +283,7 @@ Geometry GenerateAxis(float radius, float alpha, int color) {
 	return cone;
 }
 
-void DebugRenderSystem::GenerateStreamDataForAxis() {
+void DebugRenderPass::GenerateStreamDataForAxis() {
 
 	float alpha = 0.7f;
 	float radius = 2.0f;
@@ -353,7 +350,7 @@ void DebugRenderSystem::GenerateStreamDataForAxis() {
 	NEX_FREE(pVData, MEMCAT_GENERAL);
 }
 
-void DebugRenderSystem::GenerateStreamDataForBox() {
+void DebugRenderPass::GenerateStreamDataForBox() {
 	Geometry boxData = Geometry::CreateBox(1, 1, 1, true, Color::White);
 	VertexBufferPtr vertexBuffer = Assign(NEX_NEW(VertexBuffer(GpuBuffer::NEVER_RELEASED)));
 
@@ -395,7 +392,7 @@ void DebugRenderSystem::GenerateStreamDataForBox() {
 	NEX_FREE(pVData, MEMCAT_GENERAL);
 }
 
-void DebugRenderSystem::GenerateStreamDataForQuad() {
+void DebugRenderPass::GenerateStreamDataForQuad() {
 	Geometry quadData = Geometry::CreateQuad(1, 1);
 	VertexBufferPtr vertexBuffer = Assign(NEX_NEW(VertexBuffer(GpuBuffer::NEVER_RELEASED)));
 

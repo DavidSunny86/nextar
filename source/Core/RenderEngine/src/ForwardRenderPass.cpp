@@ -1,36 +1,40 @@
 /*
-* ForwardRenderSystem.cpp
+* ForwardRenderPass.cpp
 *
 *  Created on: 17-Nov-2013
 *      Author: obhi
 */
 
 #include <RenderEngineHeaders.h>
-#include <ForwardRenderSystem.h>
+#include <ForwardRenderPass.h>
 #include <MultiRenderTarget.h>
 #include <RenderTexture.h>
 
 namespace nextar {
 
 /************************************************************************/
-/* ForwardRenderSystem                                                 */
+/* ForwardRenderPass                                                 */
 /************************************************************************/
-ForwardRenderSystem::ForwardRenderSystem(const Config& c) : RenderSystem(c)  {
+ForwardRenderPass::ForwardRenderPass(const Config& c) : RenderPass(c)  {
 	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_INIT_RESOURCES, CreateResources, this);
 	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyResources, this);
 }
 
-ForwardRenderSystem::~ForwardRenderSystem() {
+ForwardRenderPass::~ForwardRenderPass() {
 }
 
-RenderSystem* ForwardRenderSystem::CreateInstance(const Config& c) {
-	return NEX_NEW(ForwardRenderSystem(c));
+RenderPass* ForwardRenderPass::CreateInstance(const Config& c) {
+	return NEX_NEW(ForwardRenderPass(c));
 }
 
-void ForwardRenderSystem::PrepareMaterials() {
+void ForwardRenderPass::PrepareMaterials() {
 }
 
-void ForwardRenderSystem::Commit(CommitContext& context) {
+void ForwardRenderPass::Commit(CommitContext& context) {
+
+	context.renderContext->BeginRender(&context.renderTargetInfo);
+	context.renderTargetInfo.info.clearFlags = ClearFlags::CLEAR_NONE;
+
 	context.sunLightIntensity = Vector4(1, 1, 1, 1);
 	context.sunLightPosition = Vector4(0, 400, 0, 1);
 	context.sunLightColor = Color(0.8f, 0.8f, 0.4f, 1);
@@ -65,15 +69,17 @@ void ForwardRenderSystem::Commit(CommitContext& context) {
 			}
 		}
 	}
+
+	context.renderContext->EndRender();
 }
 
-void ForwardRenderSystem::DestroyResources(void* renderSystem) {
-	ForwardRenderSystem* pRenderSys = reinterpret_cast<ForwardRenderSystem*>(renderSystem);
+void ForwardRenderPass::DestroyResources(void* renderSystem) {
+	ForwardRenderPass* pRenderSys = reinterpret_cast<ForwardRenderPass*>(renderSystem);
 }
 
 
-void ForwardRenderSystem::CreateResources(void* renderSystem) {
-	ForwardRenderSystem* pRenderSys = reinterpret_cast<ForwardRenderSystem*>(renderSystem);
+void ForwardRenderPass::CreateResources(void* renderSystem) {
+	ForwardRenderPass* pRenderSys = reinterpret_cast<ForwardRenderPass*>(renderSystem);
 	if (pRenderSys)
 		pRenderSys->PrepareMaterials();
 }

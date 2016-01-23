@@ -6,7 +6,7 @@
 #include <CommitContext.h>
 #include <SceneTraversal.h>
 #include <VisibilitySet.h>
-#include <RenderSystem.h>
+#include <RenderPass.h>
 #include <LightSystem.h>
 
 namespace nextar {
@@ -210,7 +210,7 @@ protected:
 	VisibilitySet visibleSet;
 	ViewportCallbackList callbacks;
 
-	RenderSystemList renderSystems;
+	RenderPassList renderSystems;
 private:
 
 	/* next viewport in the list */

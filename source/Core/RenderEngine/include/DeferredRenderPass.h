@@ -1,5 +1,5 @@
 /*
- * DeferredRenderSystem.h
+ * DeferredRenderPass.h
  *
  *  Created on: 17-Nov-2013
  *      Author: obhi
@@ -10,7 +10,7 @@
 
 #include <NexRenderEngine.h>
 #include <EngineHeaders.h>
-#include <RenderSystem.h>
+#include <RenderPass.h>
 #include <RenderTexture.h>
 #include <MultiRenderTarget.h>
 
@@ -32,11 +32,11 @@ public:
 	MultiRenderTargetPtr renderTarget;
 };
 
-class _NexRenderAPI DeferredRenderSystem: public nextar::RenderSystem {
+class _NexRenderAPI DeferredRenderPass: public nextar::RenderPass {
 public:
 
-	DeferredRenderSystem(const Config& c);
-	virtual ~DeferredRenderSystem();
+	DeferredRenderPass(const Config& c);
+	virtual ~DeferredRenderPass();
 
 	virtual void Commit(CommitContext& context);
 
@@ -49,7 +49,7 @@ public:
 		lightMaterial.Clear();
 	}
 
-	static RenderSystem* CreateInstance(const Config& c);
+	static RenderPass* CreateInstance(const Config& c);
 
 protected:
 		

@@ -1,20 +1,20 @@
 /*
- * RenderSystem.cpp
+ * RenderPass.cpp
  *
  *  Created on: 17-Nov-2013
  *      Author: obhi
  */
 #include <NexEngine.h>
-#include <RenderSystem.h>
+#include <RenderPass.h>
 
 namespace nextar {
 
-RenderSystem::RenderSystem(const Config&) {
+RenderPass::RenderPass(const Config&) {
 	// TODO Auto-generated constructor stub
 
 }
 
-RenderSystem::~RenderSystem() {
+RenderPass::~RenderPass() {
 	// TODO Auto-generated destructor stub
 }
 

@@ -1,6 +1,7 @@
 
+
 cbuffer ObjectTransforms:OBJECTTRANSFORM {
-	var mat4x4 matMvp;
+	var mat4x4 modelViewProj;
 	var mat4x4 matMv; // assumed orthogonal
 };
 
@@ -16,5 +17,4 @@ cbuffer SceneLight:SCENELIGHT {
    var vec4 omniLightIntensity;
    var vec4 ambientColor;
 }
-
 

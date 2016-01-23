@@ -1,5 +1,5 @@
 /*
- * DebugRenderSystem.h
+ * DebugRenderPass.h
  *
  *  Created on: 25-Oct-2014
  *      Author: obhi
@@ -10,7 +10,7 @@
 
 #include <NexRenderEngine.h>
 #include <EngineHeaders.h>
-#include <RenderSystem.h>
+#include <RenderPass.h>
 #include <DebugDisplay.h>
 
 namespace nextar {
@@ -69,19 +69,25 @@ protected:
 	float timeToDeath;
 };
 
-class DebugRenderSystem:
+class DebugRenderPass:
 	public DebugDisplay,
-	public nextar::RenderSystem {
+	public nextar::RenderPass {
 
-	NEX_LOG_HELPER(DebugRenderSystem);
+	NEX_LOG_HELPER(DebugRenderPass);
 
 public:
 		
-	DebugRenderSystem(const Config& c);
-	virtual ~DebugRenderSystem();
+	DebugRenderPass(const Config& c);
+	virtual ~DebugRenderPass();
 
 	virtual void Commit(CommitContext& context);
 
+	static void DestroyResources(void* renderSystem);
+	static void CreateResources(void* renderSystem);
+
+	static RenderPass* CreateInstance(const Config& c);
+
+protected:
 
 	virtual VisiblePrimitiveList& _GetPrimitives(CommitContext& context);
 
@@ -102,10 +108,6 @@ public:
 
 	virtual void _RemovePrimitive(uint32 id);
 
-	static void DestroyResources(void* renderSystem);
-	static void CreateResources(void* renderSystem);
-
-	static RenderSystem* CreateInstance(const Config& c);
 
 protected:
 

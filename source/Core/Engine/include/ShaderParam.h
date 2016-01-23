@@ -103,7 +103,19 @@ protected:
 	}
 };
 
-typedef vector<ParameterGroup*>::type ParameterGroupList;
+struct ParameterGroupData {
+	ParameterGroup* group;
+	uint32 data;
+
+	inline ParameterGroup* operator ->() {
+		return group;
+	}
+
+	inline const ParameterGroup* operator ->() const {
+		return group;
+	}
+};
+typedef vector<ParameterGroupData>::type ParameterGroupList;
 
 struct ParameterGroupItem {
 	ParameterGroupList::iterator beginIt;

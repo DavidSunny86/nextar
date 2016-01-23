@@ -5,7 +5,9 @@
 #include <BaseRenderDriver.h>
 #include <BaseRenderContext.h>
 #include <BaseRenderManager.h>
-#include <DeferredRenderSystem.h>
+#include <DeferredRenderPass.h>
+#include <ForwardRenderPass.h>
+#include <DebugRenderPass.h>
 #include <RenderWindowImpl.h>
 
 #endif //RENDERENGINEHEADERS_H

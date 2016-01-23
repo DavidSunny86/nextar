@@ -422,10 +422,11 @@ inline StringPair Split(const String& name, char by = ':') {
 
 inline StringVector Tokenize(const String& value, const String& seperators) {
 	StringVector ret;
-	size_t what = 0;
+	size_t what = -1;
 	do {
-		what = value.find_first_of(seperators, what);
-		ret.push_back(value.substr(0, what));
+		size_t start = what+1;
+		what = value.find_first_of(seperators, start);
+		ret.push_back(value.substr(start, what));
 	} while (what != String::npos);
 	return ret;
 }

@@ -2,9 +2,9 @@
 #include <BaseRenderManager.h>
 #include <Viewport.h>
 #include <RenderTarget.h>
-#include <DeferredRenderSystem.h>
-#include <DebugRenderSystem.h>
-#include <ForwardRenderSystem.h>
+#include <DeferredRenderPass.h>
+#include <DebugRenderPass.h>
+#include <ForwardRenderPass.h>
 #include <ApplicationContext.h>
 
 namespace nextar {
@@ -20,7 +20,7 @@ BaseRenderManager::~BaseRenderManager() {
 
 void BaseRenderManager::ConfigureImpl(const NameValueMap& c) {
 	// @todo
-	CreateDefaultRenderSystemFactories();
+	CreateDefaultRenderPassFactories();
 	CreateRenderQueues(c);
 	RegisterAutoParams();
 }
@@ -79,7 +79,7 @@ void BaseRenderManager::RegisterRenderContext(RenderContextPtr& ptr) {
 		primaryContext = ptr;
 	}
 	if (!renderSystems.size())
-		CreateRenderSystems();
+		CreateRenderPasss();
 #endif
 }
 
@@ -188,14 +188,14 @@ void BaseRenderManager::PresentSwapChains(RenderContext* rc) {
 	}
 }
 
-void BaseRenderManager::CreateRenderSystems() {
+void BaseRenderManager::CreateRenderPasss() {
 	// get the config here
 	const Config& c = ApplicationContext::Instance().GetConfig();
 	String systems = c.GetValue("RenderManager", "Systems", "Deferred,Forward,Debug");
 
 	StringVector l = StringUtils::Tokenize(systems, ",");
 	for (auto& e : l) {
-		AddRenderSystem(e, c);
+		AddRenderPass(e, c);
 	}
 }
 
@@ -234,10 +234,10 @@ void BaseRenderManager::CreateRenderQueues(const NameValueMap& section) {
 	}
 }
 
-void BaseRenderManager::CreateDefaultRenderSystemFactories()  {
-	AddRenderSystemFactory("Deferred", &DeferredRenderSystem::CreateInstance);
-	AddRenderSystemFactory("Forward", &ForwardRenderSystem::CreateInstance);
-	AddRenderSystemFactory("Debug", &DebugRenderSystem::CreateInstance);
+void BaseRenderManager::CreateDefaultRenderPassFactories()  {
+	AddRenderPassFactory("Deferred", &DeferredRenderPass::CreateInstance);
+	AddRenderPassFactory("Forward", &ForwardRenderPass::CreateInstance);
+	AddRenderPassFactory("Debug", &DebugRenderPass::CreateInstance);
 }
 
 }

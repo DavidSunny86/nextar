@@ -1,8 +1,6 @@
 
 layout(location = 0) out vec4 oFragColor;
 
-#ifndef DEBUG
-
 smooth in vec4 varyingNormal;
 smooth in vec4 posInEyeSpace;
 
@@ -23,10 +21,7 @@ vec4 getDiffuseColor() {
 }
 
 
-#endif
-
 void main(void) {
-#ifndef DEBUG
    vec3 N = varyingNormal.xyz;
    vec3 L = normalize(omniLightPosition.xyz - posInEyeSpace.xyz);
    vec3 E = normalize(-posInEyeSpace.xyz); // we are in Eye Coordinates, so EyePos is (0,0,0)  
@@ -45,8 +40,5 @@ void main(void) {
    Ispec = clamp(Ispec, 0.0, 1.0); 
    
    oFragColor = Iamb + Idiff + Ispec;
-#else
-   oFragColor = vec4(1,0,0,1);
-#endif
 }
 

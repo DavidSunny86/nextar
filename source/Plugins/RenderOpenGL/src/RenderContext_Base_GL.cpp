@@ -661,7 +661,7 @@ void RenderContext_Base_GL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
 			PrepareParamTable(*ubPtr, passIndex, paramTable);
 		}
 
-		ubList.push_back(ubPtr);
+		ubList.push_back({ ubPtr, (uint32)ubList.size() });
 		//GlBindBufferBase(GL_UNIFORM_BUFFER, ubPtr->GetBinding(),
 		//		ubPtr->ubNameGl);
 		//GL_CHECK();
@@ -669,7 +669,7 @@ void RenderContext_Base_GL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
 		//GL_CHECK();
 	}
 	// sort ublist by context
-	std::sort(ubList.begin(), ubList.end(), [](const ParameterGroup* p1, const ParameterGroup* p2){
+	std::sort(ubList.begin(), ubList.end(), [](const ParameterGroupData& p1, const ParameterGroupData& p2){
 		return (p1->context < p2->context) != 0;
 	});
 }
@@ -1133,10 +1133,10 @@ void RenderContext_Base_GL::SwitchPass(CommitContext& context, Pass::View* passV
 	GL_CHECK();
 	ParameterGroupList& paramList = passViewGl->GetSharedParameters();
 	for (uint32 i = 0; i < paramList.size(); ++i) {
-		UniformBufferGL* ubPtr = static_cast<UniformBufferGL*>(paramList[i]);
+		UniformBufferGL* ubPtr = static_cast<UniformBufferGL*>(paramList[i].group);
 		GlBindBufferBase(GL_UNIFORM_BUFFER, i, ubPtr->ubNameGl);
 		GL_CHECK();
-		GlUniformBlockBinding(program, i, i);
+		GlUniformBlockBinding(program, paramList[i].data, i);
 		GL_CHECK();
 	}
 }

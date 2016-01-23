@@ -149,7 +149,7 @@ void Pass::View::UpdateParams(CommitContext& ctx, ParameterContext type,
 			item.offsetInParamBuffer, ctx.paramBuffers[(uint32) type]);
 
 	for (auto it = item.beginIt; it != item.endIt; ++it) {
-		ParameterGroup* group = (*it);
+		ParameterGroup* group = (*it).group;
 		NEX_ASSERT(group->context == type);
 		if (group->lastUpdateId == id) {
 			ctx.paramContext.first += group->size;

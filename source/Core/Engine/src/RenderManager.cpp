@@ -67,18 +67,18 @@ void RenderManager::AddRenderQueue(const StringID name, uint16 priority,
 	std::sort(renderQueues.begin(), renderQueues.end());
 }
 
-void RenderManager::AddRenderSystem(const String& name, const Config& cfg) {
+void RenderManager::AddRenderPass(const String& name, const Config& cfg) {
 	auto it = renderSystemFactories.find(name);
 	if (it != renderSystemFactories.end() && (*it).second)
-		AddRenderSystem( (*it).second(cfg) );
+		AddRenderPass( (*it).second(cfg) );
 }
 
-void RenderManager::AddRenderSystem(RenderSystem* rs) {
+void RenderManager::AddRenderPass(RenderPass* rs) {
 	renderSystems.push_back(rs);
 }
 
-void RenderManager::RemoveRenderSystem(RenderSystem* rs) {
-	BestErase<RenderSystemList>(renderSystems, rs);
+void RenderManager::RemoveRenderPass(RenderPass* rs) {
+	BestErase<RenderPassList>(renderSystems, rs);
 }
 
 } /* namespace nextar */

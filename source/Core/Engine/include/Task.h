@@ -54,7 +54,7 @@ public:
 		meta.waitingForChildren.store(false);
 #endif
 		meta.parent = nullptr;
-		meta.refCount.store(1, std::memory_order_relaxed);
+		meta.refCount.store(0, std::memory_order_relaxed);
 	}
 	// entry point
 	virtual Task* Run() = 0;

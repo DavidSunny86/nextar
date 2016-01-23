@@ -44,10 +44,10 @@ protected:
 
 	void RenderAllTargets(RenderContext* rc, const FrameTimer& frameTimer, bool callPresent);
 	void PresentSwapChains(RenderContext* rc);
-	void CreateRenderSystems();
+	void CreateRenderPasss();
 	void CreateRenderQueues(const NameValueMap&);
 	void RegisterAutoParams();
-	void CreateDefaultRenderSystemFactories();
+	void CreateDefaultRenderPassFactories();
 
 	/* The first registered context is always the primary context, other
 	 * contexts are present if usingMultiGpuSetup is true */

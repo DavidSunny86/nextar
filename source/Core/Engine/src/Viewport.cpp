@@ -24,7 +24,7 @@ Viewport::Viewport(Camera* cam, RenderTarget* rt, float x, float y, float width,
 	this->flags = flags;
 	this->priority = priority;
 	this->name = optName;
-	this->renderSystems = RenderManager::Instance().GetRenderSystems();
+	this->renderSystems = RenderManager::Instance().GetRenderPasss();
 	this->lightSystem = Assign(NEX_NEW(DefaultLightSystem()));
 }
 
@@ -93,11 +93,10 @@ void Viewport::CommitPrimitives(RenderContext* renderCtx, const FrameTimer&  fra
 	commitContext.renderTargetInfo.rt = renderTarget;
 	// @todo If we have a multi-render target attached we might have to
 	// initialize the clearColor array properly.
-	commitContext.renderTargetInfo.info.clearColor[0] = Color::Black;
+	commitContext.renderTargetInfo.info.clearColor[0] = Color::White;
 	commitContext.renderTargetInfo.info.clearFlags = ClearFlags::CLEAR_ALL;
 	commitContext.renderTargetInfo.info.clearStencil = 0;
 	commitContext.renderTargetInfo.info.clearDepth = 1.0f;
-
 	for (auto &r : renderSystems) {
 		r->Commit(commitContext);
 	}

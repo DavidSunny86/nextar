@@ -1,5 +1,5 @@
 /*
- * RenderSystem.h
+ * RenderPass.h
  *
  *  Created on: 23-Mar-2014
  *      Author: obhi
@@ -17,7 +17,7 @@ class BaseRenderManager;
 class BaseRenderDriver;
 class BaseRenderContext;
 class DefaultLightSystem;
-class DeferredRenderSystem;
+class DeferredRenderPass;
 }
 
 #endif /* RENDERENGINE_H_ */

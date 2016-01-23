@@ -1,12 +1,12 @@
 /*
- * DeferredRenderSystem.cpp
+ * DeferredRenderPass.cpp
  *
  *  Created on: 17-Nov-2013
  *      Author: obhi
  */
 
 #include <RenderEngineHeaders.h>
-#include <DeferredRenderSystem.h>
+#include <DeferredRenderPass.h>
 #include <MultiRenderTarget.h>
 #include <RenderTexture.h>
 #include <DebugDisplay.h>
@@ -60,23 +60,23 @@ void GBuffer::Setup(Size dimensions) {
 }
 
 /************************************************************************/
-/* DeferredRenderSystem                                                 */
+/* DeferredRenderPass                                                 */
 /************************************************************************/
-DeferredRenderSystem::DeferredRenderSystem(const Config& c) : RenderSystem(c) {
+DeferredRenderPass::DeferredRenderPass(const Config& c) : RenderPass(c) {
 	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_INIT_RESOURCES, CreateResources, this);
 	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyResources, this);
 }
 
-DeferredRenderSystem::~DeferredRenderSystem() {
+DeferredRenderPass::~DeferredRenderPass() {
 }
 
 
-RenderSystem* DeferredRenderSystem::CreateInstance(const Config& c) {
-	return NEX_NEW(DeferredRenderSystem(c));
+RenderPass* DeferredRenderPass::CreateInstance(const Config& c) {
+	return NEX_NEW(DeferredRenderPass(c));
 }
 
 
-void DeferredRenderSystem::PrepareGeometryBuffer() {
+void DeferredRenderPass::PrepareGeometryBuffer() {
 	gbufferRI.rt = gbuffer.renderTarget;
 	gbufferRI.info.clearColor[0] = Color::Black;
 	gbufferRI.info.clearColor[1] = Color(0.5f);
@@ -86,14 +86,14 @@ void DeferredRenderSystem::PrepareGeometryBuffer() {
 	gbufferRI.info.clearFlags = ClearFlags::CLEAR_ALL;
 }
 
-void DeferredRenderSystem::PrepareMaterials() {
+void DeferredRenderPass::PrepareMaterials() {
 	if (!lightMaterial) {
 		URL lightMaterialPath(FileSystem::ArchiveEngineData_Name, "Materials/Assets/DeferredLights.asset");
 		lightMaterial = Asset::AssetLoad(lightMaterialPath);
 	}
 }
 
-void DeferredRenderSystem::Commit(CommitContext& context) {
+void DeferredRenderPass::Commit(CommitContext& context) {
 	if (gbufferDimension.combined != context.targetDimension.combined) {
 		PrepareMaterials();
 		gbuffer.Setup(context.targetDimension);
@@ -182,7 +182,7 @@ void DeferredRenderSystem::Commit(CommitContext& context) {
 	}
 }
 
-void DeferredRenderSystem::RenderLight(Light* light, uint32 passIdx, uint32 updateId, CommitContext& context) {
+void DeferredRenderPass::RenderLight(Light* light, uint32 passIdx, uint32 updateId, CommitContext& context) {
 	VisiblePrimitive* lightVol = light->GetLightVolume();
 	MaterialAsset* material = lightVol->GetMaterial();
 	if (material)
@@ -216,15 +216,15 @@ void DeferredRenderSystem::RenderLight(Light* light, uint32 passIdx, uint32 upda
 	context.primitive = nullptr;
 }
 
-void DeferredRenderSystem::DestroyResources(void* renderSystem) {
-	DeferredRenderSystem* pRenderSys = reinterpret_cast<DeferredRenderSystem*>(renderSystem);
+void DeferredRenderPass::DestroyResources(void* renderSystem) {
+	DeferredRenderPass* pRenderSys = reinterpret_cast<DeferredRenderPass*>(renderSystem);
 	if (pRenderSys)
 		pRenderSys->DestroyBuffer();
 }
 
 
-void DeferredRenderSystem::CreateResources(void* renderSystem) {
-	DeferredRenderSystem* pRenderSys = reinterpret_cast<DeferredRenderSystem*>(renderSystem);
+void DeferredRenderPass::CreateResources(void* renderSystem) {
+	DeferredRenderPass* pRenderSys = reinterpret_cast<DeferredRenderPass*>(renderSystem);
 	if (pRenderSys)
 		pRenderSys->PrepareMaterials();
 }

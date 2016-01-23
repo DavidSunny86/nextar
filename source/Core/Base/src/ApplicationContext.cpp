@@ -111,7 +111,7 @@ void ApplicationContext::CreateServices() {
 void ApplicationContext::DestroyServices() {
 	// close services
 	DestroyExtendedInterfacesImpl();
-	// todo Moved: RenderSystem
+	// todo Moved: RenderPass
 	// NEX_ASSERT (!RenderManager::InstancePtr());
 	// todo Moved: Engine
 	// NEX_DELETE(ComponentFactoryArchive::InstancePtr());
