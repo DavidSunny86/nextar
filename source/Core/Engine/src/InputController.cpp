@@ -86,15 +86,15 @@ static const char shiftNumKeys[10] = { ')', '!', '@', '#', '$', '%', '^', '&',
 static const char shiftOtherKeys[] = { '~', '_', '+', '|', '{', '}', ':', '"',
 		'<', '>', '?' };
 
-_NexEngineAPI int32 GetCookedCode(Key k, bool shift, bool numlock) {
+_NexEngineAPI int32 GetCookedCode(KeyName k, bool shift, bool numlock) {
 	if (k >= NEX_KEY_CONVERTABLE_START && k <= NEX_KEY_CONVERTABLE_END) {
 		if (shift) {
-			if (k >= Key::KB_A && k <= Key::KB_Z)
-				return (int32)('A' + (k - Key::KB_A));
-			else if (k >= Key::KB_0 && k <= Key::KB_9)
-				return (int32) shiftNumKeys[k - Key::KB_0];
-			else if (k >= Key::KB_GRAVE && k <= Key::KB_SLASH)
-				return (int32) shiftOtherKeys[k - Key::KB_GRAVE];
+			if (k >= KeyName::KB_A && k <= KeyName::KB_Z)
+				return (int32)('A' + (k - KeyName::KB_A));
+			else if (k >= KeyName::KB_0 && k <= KeyName::KB_9)
+				return (int32) shiftNumKeys[k - KeyName::KB_0];
+			else if (k >= KeyName::KB_GRAVE && k <= KeyName::KB_SLASH)
+				return (int32) shiftOtherKeys[k - KeyName::KB_GRAVE];
 		}
 
 		return asciiForKey[k];

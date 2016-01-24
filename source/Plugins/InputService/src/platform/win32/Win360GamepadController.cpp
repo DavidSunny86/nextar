@@ -10,7 +10,7 @@
 
 namespace InputService {
 
-Key Win360GamepadController::buttonMap[16] = { (Key)0 };
+KeyName Win360GamepadController::buttonMap[16] = { (KeyName)0 };
 Win360GamepadController::PollTask::PollTask() : Task("PollXBox360"), device_(nullptr) {
 	lock_.clear();
 }
@@ -57,7 +57,7 @@ void Win360GamepadController::PollData() {
 
 				for (uint32 i = 0; i < 16; ++i) {
 					if (XBUTSTATE(state, i) != XBUTSTATE(prevState, i)) {
-						if (buttonMap[i] != Key::KEY_INVALID_CODE) {
+						if (buttonMap[i] != KeyName::KEY_INVALID_CODE) {
 							InputEvent &ev = iel[changeCount++];
 							KeyState k = buttonStates[buttonMap[i] - NEX_XB360_CTRL_BUTTON_START].value = XBUTSTATE(state, i) ? KeyState::KEY_STATE_DOWN : KeyState::KEY_STATE_UP;
 							ev.key = buttonMap[i];
@@ -77,7 +77,7 @@ void Win360GamepadController::PollData() {
 				else
 					state.Gamepad.bLeftTrigger -= triggerDeadZone;
 				ev.analogValue = trigValues[0].value = (float)state.Gamepad.bLeftTrigger / (255.0f - triggerDeadZone);
-				ev.key = Key::XBOX_TRIG_LEFT;
+				ev.key = KeyName::XBOX_TRIG_LEFT;
 				ev.timeStamp = timeStamp;
 				
 			}
@@ -89,7 +89,7 @@ void Win360GamepadController::PollData() {
 				else
 					state.Gamepad.bRightTrigger -= triggerDeadZone;
 				ev.analogValue = trigValues[1].value = (float)state.Gamepad.bRightTrigger / (255.0f - triggerDeadZone);
-				ev.key = Key::XBOX_TRIG_RIGHT;
+				ev.key = KeyName::XBOX_TRIG_RIGHT;
 				ev.timeStamp = timeStamp;
 			}
 						
@@ -97,7 +97,7 @@ void Win360GamepadController::PollData() {
 				state.Gamepad.sThumbLY != prevState.Gamepad.sThumbLY) {
 				InputEvent &ev = iel[changeCount++];
 				ev.analogDir = axes[0].value = GetCircular(state.Gamepad.sThumbLX, state.Gamepad.sThumbLY, thumbDeadZone[0]);
-				ev.key = Key::XBOX_AXIS_LEFT;
+				ev.key = KeyName::XBOX_AXIS_LEFT;
 				ev.timeStamp = timeStamp;
 			}
 
@@ -105,7 +105,7 @@ void Win360GamepadController::PollData() {
 				state.Gamepad.sThumbRY != prevState.Gamepad.sThumbRY) {
 				InputEvent &ev = iel[changeCount++];
 				ev.analogDir = axes[0].value = GetCircular(state.Gamepad.sThumbRX, state.Gamepad.sThumbRY, thumbDeadZone[1]);
-				ev.key = Key::XBOX_AXIS_RIGHT;
+				ev.key = KeyName::XBOX_AXIS_RIGHT;
 				ev.timeStamp = timeStamp;
 			}
 			prevState = state;
@@ -153,47 +153,47 @@ InputChangeBuffer Win360GamepadController::UpdateSettings() {
 	return buffer;
 }
 
-bool Win360GamepadController::IsDown(Key Key) {
-	NEX_ASSERT(Key >= NEX_XB360_CTRL_BUTTON_START && Key < NEX_XB360_CTRL_BUTTON_END);
+bool Win360GamepadController::IsDown(KeyName KeyName) {
+	NEX_ASSERT(KeyName >= NEX_XB360_CTRL_BUTTON_START && KeyName < NEX_XB360_CTRL_BUTTON_END);
 	return false;
-	//return (bool)buttonStates[Key - NEX_XB360_CTRL_BUTTON_START].value;
+	//return (bool)buttonStates[KeyName - NEX_XB360_CTRL_BUTTON_START].value;
 }
 
-bool Win360GamepadController::IsOn(Key Key) {
+bool Win360GamepadController::IsOn(KeyName KeyName) {
 	return false;
 }
 
-AnalogValue Win360GamepadController::GetValue(Key Key) {
-	NEX_ASSERT(XBOX_TRIG_LEFT == Key || XBOX_TRIG_RIGHT == Key);
+AnalogValue Win360GamepadController::GetValue(KeyName KeyName) {
+	NEX_ASSERT(XBOX_TRIG_LEFT == KeyName || XBOX_TRIG_RIGHT == KeyName);
 	return 0;
 }
 
-InputDir Win360GamepadController::GetDir(Key Key) {
-	NEX_ASSERT(XBOX_AXIS_LEFT == Key || XBOX_AXIS_RIGHT == Key);
+InputDir Win360GamepadController::GetDir(KeyName KeyName) {
+	NEX_ASSERT(XBOX_AXIS_LEFT == KeyName || XBOX_AXIS_RIGHT == KeyName);
 	return InputDir();
 }
 
 void Win360GamepadController::InitControls() {
 	// setup default map
 
-	if (buttonMap[0] == (Key)0 ) {
+	if (buttonMap[0] == (KeyName)0 ) {
 		for (int i = 0; i < 16; ++i)
-			buttonMap[i] = Key::KEY_INVALID_CODE;
+			buttonMap[i] = KeyName::KEY_INVALID_CODE;
 
-		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_DPAD_UP>::position] = Key::XBOX_UP;
-		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_DPAD_DOWN>::position] = Key::XBOX_DOWN;
-		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_DPAD_LEFT>::position] = Key::XBOX_LEFT;
-		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_DPAD_RIGHT>::position] = Key::XBOX_RIGHT;
-		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_START>::position] = Key::XBOX_START;
-		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_BACK>::position] = Key::XBOX_BACK;
-		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_LEFT_THUMB>::position] = Key::XBOX_LEFT_THUMB;
-		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_RIGHT_THUMB>::position] = Key::XBOX_RIGHT_THUMB;
-		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_LEFT_SHOULDER>::position] = Key::XBOX_SHOULDER_BUTTON_LEFT;
-		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_RIGHT_SHOULDER>::position] = Key::XBOX_SHOULDER_BUTTON_RIGHT;
-		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_A>::position] = Key::XBOX_A;
-		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_B>::position] = Key::XBOX_B;
-		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_X>::position] = Key::XBOX_X;
-		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_Y>::position] = Key::XBOX_Y;
+		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_DPAD_UP>::position] = KeyName::XBOX_UP;
+		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_DPAD_DOWN>::position] = KeyName::XBOX_DOWN;
+		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_DPAD_LEFT>::position] = KeyName::XBOX_LEFT;
+		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_DPAD_RIGHT>::position] = KeyName::XBOX_RIGHT;
+		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_START>::position] = KeyName::XBOX_START;
+		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_BACK>::position] = KeyName::XBOX_BACK;
+		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_LEFT_THUMB>::position] = KeyName::XBOX_LEFT_THUMB;
+		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_RIGHT_THUMB>::position] = KeyName::XBOX_RIGHT_THUMB;
+		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_LEFT_SHOULDER>::position] = KeyName::XBOX_SHOULDER_BUTTON_LEFT;
+		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_RIGHT_SHOULDER>::position] = KeyName::XBOX_SHOULDER_BUTTON_RIGHT;
+		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_A>::position] = KeyName::XBOX_A;
+		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_B>::position] = KeyName::XBOX_B;
+		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_X>::position] = KeyName::XBOX_X;
+		buttonMap[Utils::first_set_bit_pos<XINPUT_GAMEPAD_Y>::position] = KeyName::XBOX_Y;
 	}
 
 	DWORD dwResult = XInputGetState(index, &prevState);

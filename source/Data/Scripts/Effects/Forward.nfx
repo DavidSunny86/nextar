@@ -4,7 +4,7 @@ shader Forward {
 	flags forward;
 	pass Main {
 	
-		cbuffer ObjectProperties;
+	  cbuffer ObjectProperties;
 		
       texture_state {
 			sampler linear_sampler {

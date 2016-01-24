@@ -25,10 +25,10 @@ public:
 
 	virtual InputChangeBuffer UpdateSettings() override;
 
-	virtual bool IsDown(Key);
-	virtual bool IsOn(Key);
-	virtual AnalogValue GetValue(Key);
-	virtual InputDir GetDir(Key);
+	virtual bool IsDown(KeyName);
+	virtual bool IsOn(KeyName);
+	virtual AnalogValue GetValue(KeyName);
+	virtual InputDir GetDir(KeyName);
 
 	virtual DigitalControls* GetDigitalSettings();
 	virtual AnalogControls* GetAnalogSettings();
@@ -36,7 +36,7 @@ public:
 protected:
 	class Listener : public XWinInputListener {
 	public:
-		typedef unordered_map<KeySym, nextar::Key>::type KeySymMap;
+		typedef unordered_map<KeySym, nextar::KeyName>::type KeySymMap;
 		typedef array<uint32, 256>::type KeyCodeToSymMap;
 		Listener();
 		~Listener();
@@ -62,13 +62,13 @@ protected:
 
 		int minKeyCode;
 		int maxKeyCode;
-		array<Key, 256>::type keyCodeToKey;
+		array<KeyName, 256>::type keyCodeToKey;
 		bool keyCodesInited;
 		UxKeyboardMouse* device;
 	};
 
 public:
-	inline void SetKbKeyState(Key k, KeyState s) {
+	inline void SetKbKeyState(KeyName k, KeyState s) {
 		keyboardKeyStates[k] = s;
 	}
 

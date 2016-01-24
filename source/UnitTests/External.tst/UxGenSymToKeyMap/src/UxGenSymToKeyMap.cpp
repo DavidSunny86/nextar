@@ -5,7 +5,7 @@
  */
 
 #include <EngineHeaders.h>
-#include <KeyCode.h>
+#include <KeyName.h>
 
 using namespace nextar;
 NEX_IMPLEMENT_PLATFORM_APP();
@@ -24,7 +24,7 @@ int NextarMain(int argc, char* argv[]) {
 	uint32 keySym[NEX_KEYBOARD_KEY_COUNT] = {0};
 	OutputSerializer::UIntArray a(keySym, NEX_KEYBOARD_KEY_COUNT);
 
-#define MAP_KEY(a, b) keySym[(uint32)Key::a] = b;
+#define MAP_KEY(a, b) keySym[(uint32)KeyName::a] = b;
 #include <KeySymMap.h>
 #undef MAP_KEY
 

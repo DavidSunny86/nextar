@@ -58,7 +58,7 @@ private:
 	WinKeyboardMouse* keyboardAndMouse;
 	InputControllerDescList controllers;
 	String devInpPath;
-	Key virtToKey[256];
+	KeyName virtToKey[256];
 	int32 lastMouseX, lastMouseY;
 };
 

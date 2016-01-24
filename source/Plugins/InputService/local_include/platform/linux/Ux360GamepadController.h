@@ -34,10 +34,10 @@ public:
 
 	virtual InputChangeBuffer UpdateSettings() override;
 
-	virtual bool IsDown(Key) override;
-	virtual bool IsOn(Key) override;
-	virtual AnalogValue GetValue(Key) override;
-	virtual InputDir GetDir(Key) override;
+	virtual bool IsDown(KeyName) override;
+	virtual bool IsOn(KeyName) override;
+	virtual AnalogValue GetValue(KeyName) override;
+	virtual InputDir GetDir(KeyName) override;
 
 	void InitControls();
 
@@ -73,7 +73,7 @@ protected:
 	void ParseButton(const js_event& ev, bool init);
 	void ParseData(const js_event& ev, bool init);
 
-	typedef vector<Key>::type KeyMap;
+	typedef vector<KeyName>::type KeyMap;
 	template <typename T>
 	struct KeyValue {
 		T value;
@@ -89,8 +89,8 @@ protected:
 	typedef KeyValue<AnalogValue> AnalogValueType;
 	typedef KeyValue<InputDir> InputDirType;
 
-	array<Key, 9>::type reverseButtonMap;
-	array<Key, 8>::type reverseAxisMap;
+	array<KeyName, 9>::type reverseButtonMap;
+	array<KeyName, 8>::type reverseAxisMap;
 
 	bool currBuffer;
 	PollTask pollTask;

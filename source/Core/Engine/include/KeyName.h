@@ -25,12 +25,13 @@ enum KeyAnalogBit {
 	KEY_DIRECTION_BIT = 0x4000
 };
 
+
 /* Standard key codes, can be directly used without input mapper */
-enum Key : uint16 {
-#define NEX_KEY_CONVERTABLE_START		(uint16)(Key::KB_ESCAPE)
-#define NEX_KEYBOARD_KEY_START	(uint16)(Key::KB_ESCAPE)
+enum KeyName : uint16 {
+#define NEX_KEY_CONVERTABLE_START		(uint16)(KeyName::KB_ESCAPE)
+#define NEX_KEYBOARD_KEY_START	(uint16)(KeyName::KB_ESCAPE)
 	KB_ESCAPE = NEX_BUTTON_KEY(1),
-#define NEX_KEY_ALPHABETS_START		(uint16)(Key::KB_A)
+#define NEX_KEY_ALPHABETS_START		(uint16)(KeyName::KB_A)
 	KB_A,
 	KB_B,
 	KB_C,
@@ -57,13 +58,13 @@ enum Key : uint16 {
 	KB_X,
 	KB_Y,
 	KB_Z,
-#define NEX_KEY_ALPHABETS_END	(uint16)(Key::KB_SPACE)
+#define NEX_KEY_ALPHABETS_END	(uint16)(KeyName::KB_SPACE)
 	KB_SPACE,
 	KB_TAB,
 	KB_RETURN,
 	KB_NUMPADENTER,
 
-#define NEX_KEY_NUMKEYS_START	(uint16)(Key::KB_0)
+#define NEX_KEY_NUMKEYS_START	(uint16)(KeyName::KB_0)
 	KB_0,
 	KB_1,
 	KB_2,
@@ -74,7 +75,7 @@ enum Key : uint16 {
 	KB_7,
 	KB_8,
 	KB_9,
-#define NEX_KEY_NUMKEYS_END	(uint16)(Key::KB_GRAVE)
+#define NEX_KEY_NUMKEYS_END	(uint16)(KeyName::KB_GRAVE)
 
 	KB_GRAVE,
 	KB_MINUS,
@@ -100,9 +101,9 @@ enum Key : uint16 {
 	KB_COLON,
 	KB_UNDERLINE,
 
-#define NEX_KEY_CONVERTABLE_END	(uint16)(Key::KB_UNDERLINE)
+#define NEX_KEY_CONVERTABLE_END	(uint16)(KeyName::KB_UNDERLINE)
 #define NEX_KEY_CONVERTABLE_COUNT (uint16)(NEX_KEY_CONVERTABLE_START - NEX_KEY_CONVERTABLE_END) + 1
-#define NEX_KEY_PADKEYS_START	(uint16)(Key::KB_NUMPAD0)
+#define NEX_KEY_PADKEYS_START	(uint16)(KeyName::KB_NUMPAD0)
 	KB_NUMPAD0,
 	KB_NUMPAD1,
 	KB_NUMPAD2,
@@ -113,9 +114,9 @@ enum Key : uint16 {
 	KB_NUMPAD7,
 	KB_NUMPAD8,
 	KB_NUMPAD9,
-#define NEX_KEY_PADKEYS_END		(uint16)(Key::KB_F1)
+#define NEX_KEY_PADKEYS_END		(uint16)(KeyName::KB_F1)
 
-#define NEX_KEY_FUNCTIONKEYS_START	(uint16)(Key::KB_F1)
+#define NEX_KEY_FUNCTIONKEYS_START	(uint16)(KeyName::KB_F1)
 	KB_F1,
 	KB_F2,
 	KB_F3,
@@ -131,7 +132,7 @@ enum Key : uint16 {
 	KB_F13,
 	KB_F14,
 	KB_F15,
-#define NEX_KEY_FUNCTIONKEYS_END	(uint16)(Key::KB_F15)
+#define NEX_KEY_FUNCTIONKEYS_END	(uint16)(KeyName::KB_F15)
 	KB_BACK,
 
 	KB_CAPITAL,
@@ -164,21 +165,21 @@ enum Key : uint16 {
 	KB_POWER,
 	KB_SLEEP,
 
-#define NEX_KEY_NONCONTROL_COUNT (uint16)(Key::KB_LCONTROL)
+#define NEX_KEY_NONCONTROL_COUNT (uint16)(KeyName::KB_LCONTROL)
 
-#define NEX_KEY_CONTROLKEYS_START (uint16)(Key::KB_LCONTROL)
+#define NEX_KEY_CONTROLKEYS_START (uint16)(KeyName::KB_LCONTROL)
 	KB_LCONTROL,
 	KB_RCONTROL,
 	KB_LSHIFT,
 	KB_RSHIFT,
 	KB_LALT,
 	KB_RALT,
-#define NEX_KEY_CONTROLKEYS_END (uint16)(Key::KB_UNKNOWN_K)
+#define NEX_KEY_CONTROLKEYS_END (uint16)(KeyName::KB_UNKNOWN_K)
 	KB_UNKNOWN_K, // this is never queried
 
-#define NEX_KEYBOARD_KEY_END	(uint16)(Key::KB_UNKNOWN_K)
-#define NEX_KEYBOARD_KEY_COUNT ((uint16)(Key::KB_UNKNOWN_K)+1)
-#define NEX_MOUSE_BUTTON_START ((uint16)(Key::MOUSE_LEFT))
+#define NEX_KEYBOARD_KEY_END	(uint16)(KeyName::KB_UNKNOWN_K)
+#define NEX_KEYBOARD_KEY_COUNT ((uint16)(KeyName::KB_UNKNOWN_K)+1)
+#define NEX_MOUSE_BUTTON_START ((uint16)(KeyName::MOUSE_LEFT))
 
 	MOUSE_LEFT = NEX_BUTTON_KEY(1000),
 	MOUSE_RIGHT,
@@ -186,8 +187,8 @@ enum Key : uint16 {
 	MOUSE_THUMB1,
 	MOUSE_THUMB2,
 
-#define NEX_MOUSE_BUTTON_END ((uint16)(Key::MOUSE_THUMB2))
-#define NEX_MOUSE_DIGITAL_BUTTON_COUNT (((uint16)Key::MOUSE_THUMB2 - (uint16)Key::MOUSE_LEFT)+1)
+#define NEX_MOUSE_BUTTON_END ((uint16)(KeyName::MOUSE_THUMB2))
+#define NEX_MOUSE_DIGITAL_BUTTON_COUNT (((uint16)KeyName::MOUSE_THUMB2 - (uint16)KeyName::MOUSE_LEFT)+1)
 
 	MOUSE_XY_AXIS = NEX_DIRECTION_KEY(1100), /* Direction */
 	MOUSE_WHEEL = NEX_ANALOG_KEY(1200), /* Analog */
@@ -233,7 +234,7 @@ enum Key : uint16 {
 	JOY_FSLIDER1, // extra force slider1
 	JOY_FSLIDER2, // extra force slider2
 */
-#define NEX_XB360_CTRL_BUTTON_START (uint16)(Key::XBOX_A)
+#define NEX_XB360_CTRL_BUTTON_START (uint16)(KeyName::XBOX_A)
 	XBOX_A = NEX_BUTTON_KEY(4000),
 	XBOX_B,
 	XBOX_X,

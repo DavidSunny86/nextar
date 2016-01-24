@@ -34,10 +34,10 @@ public:
 
 	virtual InputChangeBuffer UpdateSettings() override;
 
-	virtual bool IsDown(Key) override;
-	virtual bool IsOn(Key) override;
-	virtual AnalogValue GetValue(Key) override;
-	virtual InputDir GetDir(Key) override;
+	virtual bool IsDown(KeyName) override;
+	virtual bool IsOn(KeyName) override;
+	virtual AnalogValue GetValue(KeyName) override;
+	virtual InputDir GetDir(KeyName) override;
 
 	void InitControls();
 
@@ -99,7 +99,7 @@ protected:
 	int32 thumbDeadZone[2];
 	int32 triggerDeadZone;
 
-	static Key buttonMap[16];
+	static KeyName buttonMap[16];
 };
 
 } /* namespace InputService */

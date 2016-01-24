@@ -278,7 +278,7 @@ void cDirectX9UISkin::_readPathAndKey(iXMLElement *e, cStr &rkPath,u32 &ruKey)
 	X_Assert(e);
 
 	iXMLAttribute* pkPath = e->find("Path");
-	iXMLAttribute* pkKey  = e->find("Key");
+	iXMLAttribute* pkKey  = e->find("KeyName");
 	
 	X_Assert(pkPath && pkKey);
 	rkPath = pkPath->getValue();

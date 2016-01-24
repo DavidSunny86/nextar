@@ -1,6 +1,6 @@
 
 material #:#.Box {
-	shader "{EngineData}/Scripts/Effects/ForwardDebug.nfx";
+	shader "{EngineData}/Scripts/Effects/Forward.nfx";
 	layer normal;
 }
 

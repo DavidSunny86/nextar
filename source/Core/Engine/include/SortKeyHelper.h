@@ -61,7 +61,7 @@ public:
 				| ((((uint32) depth) << SHIFT_DEPTH_SECOND) & MASK_DEPTH_SECOND);
 	}
 
-	static inline uint32 Key(uint8 layer, uint8 translucencyMask, uint16 depth,
+	static inline uint32 KeyName(uint8 layer, uint8 translucencyMask, uint16 depth,
 			uint16 shader) {
 		return translucencyMask ?
 				KeyTranslucent(layer, translucencyMask, depth, shader) :

@@ -16,8 +16,8 @@ namespace InputService {
  * #include <X11/keysym.h>
  * Check that header file for keysyms
  * The display is required here, we wait for message proc to send us an event for init
- * While initing, use XGetKeyboardMapping to generate the mapping from keycode->keysym->Key
- * The info should be enough to build a map from keycode->Key and we use that map in key events.
+ * While initing, use XGetKeyboardMapping to generate the mapping from keycode->keysym->KeyName
+ * The info should be enough to build a map from keycode->KeyName and we use that map in key events.
  */
 
 /***************************************************
@@ -26,7 +26,7 @@ namespace InputService {
 UxKeyboardMouse::Listener::Listener() :
 	keyCodesInited(false), minKeyCode(0), maxKeyCode(0), device(nullptr) {
 	for(auto& k : keyCodeToKey)
-		k = Key::KEY_INVALID_CODE;
+		k = KeyName::KEY_INVALID_CODE;
 }
 
 UxKeyboardMouse::Listener::~Listener() {
@@ -146,7 +146,7 @@ bool UxKeyboardMouse::Listener::ReadKeySymMap(const URL& path, KeySymMap& ksm) {
 			iser >> arr;
 			for(uint32 i = 0; i < NEX_KEYBOARD_KEY_COUNT; ++i) {
 				if (keySym[i]) {
-					ksm.emplace((KeySym)keySym[i], (Key)i);
+					ksm.emplace((KeySym)keySym[i], (KeyName)i);
 				}
 			}
 			return true;
@@ -187,12 +187,12 @@ void UxKeyboardMouse::Listener::ConsumeKeyEvent(nextar::XWindow* window, XEvent&
 	if (!keyCodesInited)
 		RetrieveKeyLayout(window->GetDisplay());
 
-	Key id = keyCodeToKey[event.xkey.keycode];
+	KeyName id = keyCodeToKey[event.xkey.keycode];
 	KeyState state = pressEvent? KeyState::KEY_STATE_DOWN : KeyState::KEY_STATE_UP;
 	device->SetKbKeyState(id, state);
 	InputEvent* inpEvent = device->PushEvent();
-	if (id == Key::KB_SCROLL || id == Key::KB_CAPITAL ||
-			id == Key::KB_NUMLOCK)
+	if (id == KeyName::KB_SCROLL || id == KeyName::KB_CAPITAL ||
+			id == KeyName::KB_NUMLOCK)
 		DetermineLockKeyStates(window->GetDisplay());
 
 	if (inpEvent) {
@@ -208,7 +208,7 @@ void UxKeyboardMouse::Listener::ConsumeMouseMove(nextar::XWindow* window, XEvent
 	device->SetMouseLoc(inp);
 	InputEvent* inpEvent = device->PushEvent();
 	if (inpEvent) {
-		inpEvent->key = Key::MOUSE_XY_AXIS;
+		inpEvent->key = KeyName::MOUSE_XY_AXIS;
 		inpEvent->analogDir = inp;
 		inpEvent->timeStamp = event.xmotion.time;
 	}
@@ -220,12 +220,12 @@ void UxKeyboardMouse::Listener::ConsumeMouseButtonEvent(nextar::XWindow* window,
 		device->mouseWheel += (((event.xbutton.button - 4) << 1)-1);
 		InputEvent* inpEvent = device->PushEvent();
 		if (inpEvent) {
-			inpEvent->key = Key::MOUSE_WHEEL;
+			inpEvent->key = KeyName::MOUSE_WHEEL;
 			inpEvent->analogValue = device->mouseWheel;
 			inpEvent->timeStamp = event.xbutton.time;
 		}
 	} else {
-		Key k = (event.xbutton.button-Button1) + Key::MOUSE_LEFT;
+		KeyName k = (KeyName)((event.xbutton.button-Button1) + KeyName::MOUSE_LEFT);
 		KeyState state = device->mouseButtons[k] = (pressEvent ? KeyState::KEY_STATE_DOWN : KeyState::KEY_STATE_UP);
 		InputEvent* inpEvent = device->PushEvent();
 		if (inpEvent) {
@@ -260,31 +260,31 @@ InputChangeBuffer UxKeyboardMouse::UpdateSettings() {
 	return buffer;
 }
 
-bool UxKeyboardMouse::IsDown(Key Key) {
-	if (Key >= NEX_KEYBOARD_KEY_START && Key <= NEX_KEYBOARD_KEY_END)
-		return keyboardKeyStates[Key - NEX_KEYBOARD_KEY_START] == KeyState::KEY_STATE_DOWN;
-	else if (Key >= NEX_MOUSE_BUTTON_START && Key <= NEX_MOUSE_BUTTON_END)
-		return mouseButtons[Key - NEX_MOUSE_BUTTON_START] == KeyState::KEY_STATE_DOWN;
+bool UxKeyboardMouse::IsDown(KeyName key) {
+	if (key >= NEX_KEYBOARD_KEY_START && key <= NEX_KEYBOARD_KEY_END)
+		return keyboardKeyStates[key - NEX_KEYBOARD_KEY_START] == KeyState::KEY_STATE_DOWN;
+	else if (key >= NEX_MOUSE_BUTTON_START && key <= NEX_MOUSE_BUTTON_END)
+		return mouseButtons[key - NEX_MOUSE_BUTTON_START] == KeyState::KEY_STATE_DOWN;
 	return false;
 }
 
-bool UxKeyboardMouse::IsOn(Key k) {
+bool UxKeyboardMouse::IsOn(KeyName k) {
 	switch (k) {
-	case Key::KB_CAPITAL:
+	case KeyName::KB_CAPITAL:
 		return capsLockState;
-	case Key::KB_NUMLOCK:
+	case KeyName::KB_NUMLOCK:
 		return numLockState;
-	case Key::KB_SCROLL:
+	case KeyName::KB_SCROLL:
 		return scrollLockState;
 	}
 	return false;
 }
 
-AnalogValue UxKeyboardMouse::GetValue(Key k) {
+AnalogValue UxKeyboardMouse::GetValue(KeyName k) {
 	return 0;
 }
 
-InputDir UxKeyboardMouse::GetDir(Key unsignedShortInt) {
+InputDir UxKeyboardMouse::GetDir(KeyName unsignedShortInt) {
 	return InputDir();
 }
 
@@ -297,4 +297,3 @@ AnalogControls* UxKeyboardMouse::GetAnalogSettings() {
 }
 
 } /* namespace InputService */
-

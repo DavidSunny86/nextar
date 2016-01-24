@@ -217,6 +217,7 @@ macro(create_gen_files)
 		# @todo need a cleanup macro in case files are not overwirtten
 		if (NOT EXISTS ${FileInList})
 			file(WRITE ${FileInList} "")
+			set(NEX_CLEAN_UP_FILE_LIST "${NEX_CLEAN_UP_FILE_LIST};${FileInList}" CACHE INTERNAL "")
 		endif()
 	endforeach()
 endmacro(create_gen_files)
@@ -589,7 +590,6 @@ macro(create_ut consoleApp)
 	place_bin(FALSE)
 endmacro(create_ut)
 
-## Macros
 #============================================================
 # Create_Plugin
 #============================================================
@@ -613,6 +613,27 @@ macro(create_plugin pluginName pluginPath type build optional)
 	set(NEX_INSTALL_PLUGIN OFF)
 endmacro(create_plugin)
 
+#===========================================================
+## variables
+set(NEX_CLEAN_UP_FILE_LIST "" CACHE INTERNAL "")
+#============================================================
+# initialize_build_sys
+#============================================================
+macro(initialize_build_sys)
+endmacro(initialize_build_sys)
+
+#============================================================
+# finalize_build_sys
+#============================================================
+macro(finalize_build_sys)
+	# cleanup the dummy generated files
+	message("-->> Cleaning up...")
+	foreach(FileInList ${NEX_CLEAN_UP_FILE_LIST})
+		if (EXISTS ${FileInList})
+			file(REMOVE ${FileInList})
+		endif()
+	endforeach()
+endmacro(finalize_build_sys)
 ## Build Options:
 #============================================================
 set(NEX_PACKAGE_TYPE "All" CACHE STRING "Package configuration.")
@@ -626,8 +647,12 @@ foreach(FileName ${NEX_AVAILABLE_PACKAGES})
 endforeach()
 set_property(CACHE NEX_PACKAGE_TYPE PROPERTY STRINGS ${NEX_PACKAGE_LIST})
 
+## Begin here
+initialize_build_sys()
 ## Build Include
 include(${NEX_ROOT}/CMake/Scripts/BuildConfig_${NEX_PACKAGE_TYPE}.txt)
+## Cleanup
+finalize_build_sys()
 
 ## @urgent 1. Platform specific build option, a module may or may not be build on certain platform. eg: for_platform
 ## @urgent 2. Anything apart from this script should only use macros

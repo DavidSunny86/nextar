@@ -111,12 +111,12 @@ void FPSControlBehaviour::XBox360Controller::ProcessEvents(const InputChangeBuff
 
 		switch (ie.key)	{
 			// control camera movement
-		case Key::XBOX_AXIS_LEFT:
+		case KeyName::XBOX_AXIS_LEFT:
 			moveSpeedXZ.x = ie.analogDir.xy[0];
 			moveSpeedXZ.y = ie.analogDir.xy[1];
 			break;
 			// control camera look-at
-		case Key::XBOX_AXIS_RIGHT:
+		case KeyName::XBOX_AXIS_RIGHT:
 			rotateSpeedXY.x = -ie.analogDir.xy[1];
 			rotateSpeedXY.y = ie.analogDir.xy[0];
 			break;
@@ -133,20 +133,20 @@ void FPSControlBehaviour::KeyboardMouseController::ProcessEvents(const InputChan
 
 		switch (ie.key)	{
 			// control camera movement
-		case Key::KB_W:
+		case KeyName::KB_W:
 			moveSpeedXZ.y = (ie.keyState == KeyState::KEY_STATE_DOWN) ? 1.0f : 0.0f;
 			break;
-		case Key::KB_S:
+		case KeyName::KB_S:
 			moveSpeedXZ.y = (ie.keyState == KeyState::KEY_STATE_DOWN) ? -1.0f : 0.0f;
 			break;
-		case Key::KB_A:
+		case KeyName::KB_A:
 			moveSpeedXZ.x = (ie.keyState == KeyState::KEY_STATE_DOWN) ? -1.0f : 0.0f;
 			break;
-		case Key::KB_D:
+		case KeyName::KB_D:
 			moveSpeedXZ.x = (ie.keyState == KeyState::KEY_STATE_DOWN) ? 1.0f : 0.0f;
 			break;
 			// control camera look-at
-		case Key::MOUSE_XY_AXIS:
+		case KeyName::MOUSE_XY_AXIS:
 			rotateSpeedXY.x -= ie.analogDir.xy[1] * 0.1f;
 			rotateSpeedXY.y -= ie.analogDir.xy[0] * 0.1f;
 			break;

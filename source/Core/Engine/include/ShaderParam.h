@@ -104,8 +104,10 @@ protected:
 };
 
 struct ParameterGroupData {
-	ParameterGroup* group;
+	// @note this might result in loosing cache alignment,
+	// we can test it out, but i guess that would be premature without profiling
 	uint32 data;
+	ParameterGroup* group;
 
 	inline ParameterGroup* operator ->() {
 		return group;
@@ -118,12 +120,11 @@ struct ParameterGroupData {
 typedef vector<ParameterGroupData>::type ParameterGroupList;
 
 struct ParameterGroupItem {
+	uint32 offsetInParamBuffer;
 	ParameterGroupList::iterator beginIt;
 	ParameterGroupList::iterator endIt;
 	SamplerParameter* beginSamplerIt;
 	SamplerParameter* endSamplerIt;
-
-	uint32 offsetInParamBuffer;
 
 };
 

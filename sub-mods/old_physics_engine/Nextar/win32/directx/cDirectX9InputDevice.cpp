@@ -53,9 +53,9 @@ static cInput						garrkInput[ DEVICE_COUNT ] = {0};
 static s32							giCount = 0;
 static bool							garrbDeviceActive[DEVICE_COUNT] = {0};
 /*************************************************************************/
-/* Key lookup table
+/* KeyName lookup table
 /*************************************************************************/
-static byte garrKeyMap[] = 
+static byte garrKeyMap[] =
 {
 	DIK_ESCAPE,
 	DIK_A,
@@ -120,12 +120,12 @@ static byte garrKeyMap[] =
 	DIK_PERIOD,
 	DIK_SLASH,
 	DIK_NUMPADEQUALS,
-	DIK_ADD,	
+	DIK_ADD,
 	DIK_SUBTRACT,
 	DIK_MULTIPLY,
 	DIK_DIVIDE,
 	DIK_DECIMAL,
-	DIK_NUMPADCOMMA,	
+	DIK_NUMPADCOMMA,
 	DIK_CIRCUMFLEX,
 	DIK_COLON,
 	DIK_UNDERLINE,
@@ -151,13 +151,13 @@ static byte garrKeyMap[] =
 	DIK_KANA,
 	DIK_CONVERT,
 	DIK_NOCONVERT,
-	DIK_YEN,	
+	DIK_YEN,
 	DIK_AT,
 	DIK_KANJI,
 	DIK_STOP,
 	DIK_AX,
-	DIK_UNLABELED,	
-	DIK_SYSRQ,	
+	DIK_UNLABELED,
+	DIK_SYSRQ,
 	DIK_PAUSE,
 	DIK_HOME,
 	DIK_UP,
@@ -173,7 +173,7 @@ static byte garrKeyMap[] =
 	DIK_RWIN,
 	DIK_APPS,
 	DIK_POWER,
-	DIK_SLEEP,	
+	DIK_SLEEP,
 	DIK_LCONTROL,
 	DIK_RCONTROL,
 	DIK_LSHIFT,
@@ -184,33 +184,33 @@ static byte garrKeyMap[] =
 
 
 /************************************
-./ cDirectX9InputDevice::cDirectX9InputDevice	
+./ cDirectX9InputDevice::cDirectX9InputDevice
 ./ Decscription: constructor
-./ Return type:	
-./ param: u32 uWin	[]:		
+./ Return type:
+./ param: u32 uWin	[]:
 ************************************/
 cDirectX9InputDevice::cDirectX9InputDevice( u32 uWin ) : muWndHandle(uWin), muEventCount(0), mbPaused(false)
 {
 	RefObjectInit(cDirectX9InputDevice);
 
 	X_BreakOutIf( gpkDirectInput );
-	
+
 	for( s32 i = 0; i < DEVICE_COUNT; i++ )
 	{
 		gpkDevices[i] = 0;
 		garrbDeviceActive[i] = false;
 	}
-	
+
 	HRESULT uVal = -1;
-	
+
 	uVal = DirectInput8Create( GetModuleHandle( 0 ), DIRECTINPUT_VERSION, IID_IDirectInput8, (LPVOID*)&gpkDirectInput, 0 );
-	
+
 	if( FAILED( uVal ) )
 	{
 		ReportBug( ERROR3, "cDirectX9InputDevice" );
 		return;
 	}
-	
+
 	muDevicesObtained = true;
 	createMouse();
 	createKeyboard();
@@ -235,30 +235,30 @@ void cDirectX9InputDevice::createKeyboard()
 	mbCapsLockOn = (GetKeyState(VK_CAPITAL)&0x1) ? true : false;
 	mbNumLockOn = (GetKeyState(VK_NUMLOCK)&0x1) ? true : false;
 	mbScrollLockOn = (GetKeyState(VK_SCROLL)&0x1) ? true : false;
-	
+
 	if( !gpkDevices[1] )
 	{
 		uVal = gpkDirectInput->CreateDevice( GUID_SysKeyboard, &gpkDevices[1], 0 );
-		
-		if( (bFailed = FAILED( uVal )) ) 
+
+		if( (bFailed = FAILED( uVal )) )
 			ReportBug( ERROR4, "cDirectX9InputDevice::createKeyboard()" );
 	}
-	
+
 	/* TODO: define data formats like c_dfDIKeyboard*/
 	uVal = gpkDevices[1]->SetDataFormat( &c_dfDIKeyboard );
-	
-	if( (bFailed = FAILED( uVal )) ) 
+
+	if( (bFailed = FAILED( uVal )) )
 		ReportBug( ERROR5, "cDirectX9InputDevice::createKeyboard()" );
-	
+
 	uVal = gpkDevices[1]->SetCooperativeLevel( (HWND)muWndHandle, DISCL_NONEXCLUSIVE|DISCL_FOREGROUND );
-	
-	if( (bFailed = FAILED( uVal )) ) 
+
+	if( (bFailed = FAILED( uVal )) )
 		ReportBug( ERROR6, "cDirectX9InputDevice::createKeyboard()" );
-	
+
 	/*
-	DIPROPDWORD dipdw = 
-	{             
-		{                 
+	DIPROPDWORD dipdw =
+	{
+		{
 			sizeof(DIPROPDWORD),	// diph.dwSize
 				sizeof(DIPROPHEADER),	// diph.dwHeaderSize
 				0,						// diph.dwObj
@@ -266,16 +266,16 @@ void cDirectX9InputDevice::createKeyboard()
 		},
 		MAX_KEY_BUFFER_SIZE,			// dwData
 	};
-	
+
 	uVal = gpkDevices[1]->SetProperty( DIPROP_BUFFERSIZE, &dipdw.diph );
 	*/
-	
-	if( (bFailed = FAILED( uVal )) ) 
+
+	if( (bFailed = FAILED( uVal )) )
 		ReportBug( ERROR7, "cDirectX9InputDevice::createKeyboard()" );
-	
+
 	uVal = gpkDevices[1]->Acquire();
 	garrbDeviceActive[1] = FAILED( uVal ) ? 0 : 1;
-	
+
 	if(!bFailed) muDevicesObtained |= E_IDEVT_KEYBOARD;
 }
 
@@ -284,29 +284,29 @@ void cDirectX9InputDevice::createMouse()
 {
 	bool    bFailed = false;
 	HRESULT uVal = -1;
-	
+
 	if( !gpkDevices[1] )
 	{
 		uVal = gpkDirectInput->CreateDevice( GUID_SysMouse, &gpkDevices[0], 0 );
-		
-		if( (bFailed = FAILED( uVal )) ) 
+
+		if( (bFailed = FAILED( uVal )) )
 			ReportBug( ERROR8, "cDirectX9InputDevice::createMouse()" );
 	}
-	
+
 	uVal = gpkDevices[0]->SetDataFormat( &c_dfDIMouse );
-	
-	if( (bFailed = FAILED( uVal )) ) 
+
+	if( (bFailed = FAILED( uVal )) )
 		ReportBug( ERROR9, "cDirectX9InputDevice::createMouse()" );
-	
+
 	uVal = gpkDevices[0]->SetCooperativeLevel( (HWND)muWndHandle, DISCL_EXCLUSIVE | DISCL_FOREGROUND );
-	
-	if( (bFailed = FAILED( uVal )) ) 
+
+	if( (bFailed = FAILED( uVal )) )
 		ReportBug( ERROR10, "cDirectX9InputDevice::createMouse()" );
-			
+
 	uVal = gpkDevices[0]->Acquire();
-	
+
 	garrbDeviceActive[0] = FAILED( uVal ) ? 0 : 1;
-	
+
 	if(!bFailed) muDevicesObtained |= E_IDEVT_MOUSE;
 }
 
@@ -316,7 +316,7 @@ void cDirectX9InputDevice::createMouse()
 }*/
 
 /* isValidDevice */
-u32 cDirectX9InputDevice::getDevicesObtained() 
+u32 cDirectX9InputDevice::getDevicesObtained()
 { return muDevicesObtained; }
 
 /* destroy */
@@ -332,7 +332,7 @@ void cDirectX9InputDevice::destroy( IDEVTYPE t )
 	case E_IDEVT_JOYSTICK:
 		i = 2; muDevicesObtained &= ~E_IDEVT_JOYSTICK; break;
 	}
-	
+
 	if( i > 0 && gpkDevices[i] )
 	{
 		if( garrbDeviceActive[i] )
@@ -340,7 +340,7 @@ void cDirectX9InputDevice::destroy( IDEVTYPE t )
 			gpkDevices[i]->Unacquire();
 			garrbDeviceActive[i] = false;
 		}
-		
+
 		gpkDevices[i]->Release();
 		gpkDevices[i] = 0;
 	}
@@ -385,7 +385,7 @@ void cDirectX9InputDevice::deactivate()
 void cDirectX9InputDevice::pollData()
 {
 	if( mbPaused ) return;
-	
+
 	HRESULT uVal = -1;
 
 	giCount = 0;
@@ -396,9 +396,9 @@ void cDirectX9InputDevice::pollData()
 	{
 		/* get buffered data */
 		uVal = gpkDevices[1]->GetDeviceState( 256, (void*)&garruKeyState );
-		
+
 		/* if failed set keyboard input to 0 */
-		if( FAILED( uVal ) ) 
+		if( FAILED( uVal ) )
 		{
 			ReportBug( ERROR12, "cDirectX9InputDevice::pollData()" );
 		}
@@ -434,15 +434,15 @@ void cDirectX9InputDevice::pollData()
 		}
 	}
 	/* end keyboard */
-	
+
 	/* update mouse */
 	/* check if the device is ok */
 	if( garrbDeviceActive[0] && gpkDevices[0] )
 	{
 		/* poll data */
 		uVal = gpkDevices[0]->GetDeviceState( sizeof(DIMOUSESTATE), &gkMouseData );
-		
-		if( FAILED( uVal ) ) 
+
+		if( FAILED( uVal ) )
 		{
 			ReportBug( ERROR13, "cDirectX9InputDevice::pollData()" );
 		}
@@ -451,7 +451,7 @@ void cDirectX9InputDevice::pollData()
 			garrkInput[giCount].meDevice = E_IDEVT_MOUSE;
 			garrkInput[giCount].mpkMState = &gkMouseState;
 			giCount++;
-	
+
 			gkMouseState.mkRelCoord.x = (s16)gkMouseData.lX;
 			gkMouseState.mkRelCoord.y = (s16)gkMouseData.lY;
 			gkMouseState.miRelWheel   = (s16)gkMouseData.lZ;

@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <linux/joystick.h>
 #include <Ux360GamepadController.h>
-#include <KeyCode.h>
+#include <KeyName.h>
 
 namespace InputService {
 
@@ -54,12 +54,12 @@ InputChangeBuffer Ux360GamepadController::UpdateSettings() {
 	return buffer;
 }
 
-bool Ux360GamepadController::IsDown(Key Key) {
-	NEX_ASSERT(Key >= NEX_XB360_CTRL_BUTTON_START && Key < NEX_XB360_CTRL_BUTTON_END);
-	return (bool)buttonStates[Key - NEX_XB360_CTRL_BUTTON_START].value;
+bool Ux360GamepadController::IsDown(KeyName k) {
+	NEX_ASSERT(k >= NEX_XB360_CTRL_BUTTON_START && k < NEX_XB360_CTRL_BUTTON_END);
+	return (bool)buttonStates[k - NEX_XB360_CTRL_BUTTON_START].value;
 }
 
-bool Ux360GamepadController::IsOn(Key Key) {
+bool Ux360GamepadController::IsOn(KeyName k) {
 	return false;
 }
 
@@ -76,20 +76,20 @@ void Ux360GamepadController::PollData() {
 	}
 }
 
-AnalogValue Ux360GamepadController::GetValue(Key Key) {
-	NEX_ASSERT(XBOX_TRIG_LEFT == Key || XBOX_TRIG_RIGHT == Key);
-	return trigValues[Key-XBOX_TRIG_LEFT].value;
+AnalogValue Ux360GamepadController::GetValue(KeyName k) {
+	NEX_ASSERT(XBOX_TRIG_LEFT == k || XBOX_TRIG_RIGHT == k);
+	return trigValues[k-XBOX_TRIG_LEFT].value;
 }
 
-InputDir Ux360GamepadController::GetDir(Key Key) {
-	NEX_ASSERT(XBOX_AXIS_LEFT == Key || XBOX_AXIS_RIGHT == Key);
-	return axes[Key - XBOX_AXIS_LEFT].value;
+InputDir Ux360GamepadController::GetDir(KeyName k) {
+	NEX_ASSERT(XBOX_AXIS_LEFT == k || XBOX_AXIS_RIGHT == k);
+	return axes[k - XBOX_AXIS_LEFT].value;
 }
 
 void Ux360GamepadController::ParseAxis(const js_event& js, bool init) {
 	InputEventList& iel = inputEvents[currBuffer];
 	if (js.number >= 0 && js.number < reverseAxisMap.size()) {
-		Key k = reverseAxisMap[js.number];
+		KeyName k = reverseAxisMap[js.number];
 		switch(k) {
 		case XBOX_AXIS_RIGHT:
 		case XBOX_AXIS_LEFT: {
@@ -145,18 +145,18 @@ void Ux360GamepadController::ParseAxis(const js_event& js, bool init) {
 		break;
 		case XBOX_LEFT:
 		case XBOX_UP: {
-			Key key = XBOX_UP;
+			KeyName key = XBOX_UP;
 			KeyState state = KeyState::KEY_STATE_DOWN;
 			int axis = (k == XBOX_UP);
 			// if its a key up event
 			if (js.value == 0) {
 				if (prevDirButtonState[axis]) {
 					state = KeyState::KEY_STATE_UP;
-					key = ((prevDirButtonState[axis] < 0) ? XBOX_LEFT : XBOX_RIGHT) + axis*2;
+					key = (KeyName)(((prevDirButtonState[axis] < 0) ? XBOX_LEFT : XBOX_RIGHT) + axis*2);
 				} else
 					init = true;
 			} else {
-				key = ((js.value < 0) ? XBOX_LEFT : XBOX_RIGHT) + axis*2;
+				key = (KeyName)(((js.value < 0) ? XBOX_LEFT : XBOX_RIGHT) + axis*2);
 			}
 
 			if (!init) {
@@ -175,7 +175,7 @@ void Ux360GamepadController::ParseAxis(const js_event& js, bool init) {
 void Ux360GamepadController::ParseButton(const js_event& js, bool init) {
 	InputEventList& iel = inputEvents[currBuffer];
 	if (js.number >= 0 && js.number < reverseButtonMap.size()) {
-		Key k = reverseButtonMap[js.number];
+		KeyName k = reverseButtonMap[js.number];
 		KeyState state = js.value == 0? KeyState::KEY_STATE_UP : KeyState::KEY_STATE_DOWN;
 		buttonStates[k - NEX_XB360_CTRL_BUTTON_START].value = state;
 		buttonStates[k - NEX_XB360_CTRL_BUTTON_START].timeStamp = js.time;

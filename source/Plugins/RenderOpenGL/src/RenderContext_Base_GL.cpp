@@ -655,18 +655,12 @@ void RenderContext_Base_GL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
 			ubPtr = CreateUniformBuffer(pass, passIndex, uniName, i, program,
 										numParams, size, remapParams);
 			GL_CHECK();
-			//ubPtr->SetBinding((GLuint) uniformBufferMap.size()-1);
 		}
 		if (ubPtr) {
 			PrepareParamTable(*ubPtr, passIndex, paramTable);
 		}
 
-		ubList.push_back({ ubPtr, (uint32)ubList.size() });
-		//GlBindBufferBase(GL_UNIFORM_BUFFER, ubPtr->GetBinding(),
-		//		ubPtr->ubNameGl);
-		//GL_CHECK();
-		//GlUniformBlockBinding(program, i, ubPtr->GetBinding());
-		//GL_CHECK();
+		ubList.push_back({ i, ubPtr });
 	}
 	// sort ublist by context
 	std::sort(ubList.begin(), ubList.end(), [](const ParameterGroupData& p1, const ParameterGroupData& p2){

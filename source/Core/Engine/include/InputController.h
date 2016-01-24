@@ -7,7 +7,7 @@
 #ifndef INPUTCONTROLLER_H
 #define INPUTCONTROLLER_H
 
-#include <KeyCode.h>
+#include <KeyName.h>
 
 namespace nextar {
 
@@ -44,7 +44,7 @@ struct InputDir {
 
 struct InputEvent {
 	uint16 deviceId;
-	Key key;
+	KeyName key;
 	uint32 timeStamp;
 	union {
 		KeyState keyState;
@@ -91,8 +91,8 @@ protected:
 
 class AnalogControls {
 public:
-	virtual AnalogValue GetValue(Key) = 0;
-	virtual InputDir GetDir(Key) = 0;
+	virtual AnalogValue GetValue(KeyName) = 0;
+	virtual InputDir GetDir(KeyName) = 0;
 protected:
 	~AnalogControls() {
 	}
@@ -100,9 +100,9 @@ protected:
 
 class DigitalControls {
 public:
-	virtual bool IsDown(Key) = 0;
+	virtual bool IsDown(KeyName) = 0;
 	/* Valid for toggle keys */
-	virtual bool IsOn(Key) = 0;
+	virtual bool IsOn(KeyName) = 0;
 protected:
 	~DigitalControls() {
 	}
@@ -110,19 +110,19 @@ protected:
 
 namespace InputUtils {
 
-inline bool IsAnalog(Key key) {
+inline bool IsAnalog(KeyName key) {
 	return (key & KEY_ANALOG_BIT) != 0;
 }
 
-inline bool IsDigital(Key key) {
+inline bool IsDigital(KeyName key) {
 	return (key & (KEY_ANALOG_BIT | KEY_DIRECTION_BIT)) == 0;
 }
 
-inline bool IsDirection(Key key) {
+inline bool IsDirection(KeyName key) {
 	return (key & KEY_DIRECTION_BIT) == 0;
 }
 
-_NexEngineAPI int32 GetCookedCode(Key, bool shift, bool numlockon);
+_NexEngineAPI int32 GetCookedCode(KeyName, bool shift, bool numlockon);
 
 }
 

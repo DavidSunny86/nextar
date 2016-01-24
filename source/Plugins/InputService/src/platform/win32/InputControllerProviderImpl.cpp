@@ -30,7 +30,7 @@ InputControllerProviderImpl::InputControllerProviderImpl() : keyboardAndMouse(nu
 #define VKEYMAP_RANGE(first, last, kf, kl) \
 	NEX_STATIC_ASSERT((last - first) == (uint32)((uint32)kl - (uint32)kf)); \
 	for (uint32 i = 0; i <= last - first; ++i) \
-	virtToKey[i + first] = (Key)((uint32)kf + i);
+	virtToKey[i + first] = (KeyName)((uint32)kf + i);
 
 #include <VirtKeyMap.h>
 #undef VKEYMAP
@@ -195,25 +195,25 @@ void InputControllerProviderImpl::ConsumeEvent(Win32Window* window, HRAWINPUT in
 		}
 		if (m.usButtonFlags) {
 			if (m.usButtonFlags & RI_MOUSE_LEFT_BUTTON_DOWN)
-				keyboardAndMouse->AddMouseEvent(Key::MOUSE_LEFT, true);
+				keyboardAndMouse->AddMouseEvent(KeyName::MOUSE_LEFT, true);
 			if (m.usButtonFlags & RI_MOUSE_LEFT_BUTTON_UP)
-				keyboardAndMouse->AddMouseEvent(Key::MOUSE_LEFT, false);
+				keyboardAndMouse->AddMouseEvent(KeyName::MOUSE_LEFT, false);
 			if (m.usButtonFlags & RI_MOUSE_MIDDLE_BUTTON_DOWN)
-				keyboardAndMouse->AddMouseEvent(Key::MOUSE_MIDDLE, true);
+				keyboardAndMouse->AddMouseEvent(KeyName::MOUSE_MIDDLE, true);
 			if (m.usButtonFlags & RI_MOUSE_MIDDLE_BUTTON_UP)
-				keyboardAndMouse->AddMouseEvent(Key::MOUSE_MIDDLE, false);
+				keyboardAndMouse->AddMouseEvent(KeyName::MOUSE_MIDDLE, false);
 			if (m.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_DOWN)
-				keyboardAndMouse->AddMouseEvent(Key::MOUSE_RIGHT, true);
+				keyboardAndMouse->AddMouseEvent(KeyName::MOUSE_RIGHT, true);
 			if (m.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_UP)
-				keyboardAndMouse->AddMouseEvent(Key::MOUSE_RIGHT, false);
+				keyboardAndMouse->AddMouseEvent(KeyName::MOUSE_RIGHT, false);
 			if (m.usButtonFlags & RI_MOUSE_BUTTON_4_DOWN)
-				keyboardAndMouse->AddMouseEvent(Key::MOUSE_THUMB1, true);
+				keyboardAndMouse->AddMouseEvent(KeyName::MOUSE_THUMB1, true);
 			if (m.usButtonFlags & RI_MOUSE_BUTTON_4_UP)
-				keyboardAndMouse->AddMouseEvent(Key::MOUSE_THUMB1, false);
+				keyboardAndMouse->AddMouseEvent(KeyName::MOUSE_THUMB1, false);
 			if (m.usButtonFlags & RI_MOUSE_BUTTON_5_DOWN)
-				keyboardAndMouse->AddMouseEvent(Key::MOUSE_THUMB2, true);
+				keyboardAndMouse->AddMouseEvent(KeyName::MOUSE_THUMB2, true);
 			if (m.usButtonFlags & RI_MOUSE_BUTTON_5_UP)
-				keyboardAndMouse->AddMouseEvent(Key::MOUSE_THUMB2, false);
+				keyboardAndMouse->AddMouseEvent(KeyName::MOUSE_THUMB2, false);
 			if (m.usButtonFlags & RI_MOUSE_WHEEL) {
 				int16 data = (int16)m.usButtonData;
 				keyboardAndMouse->AddMouseEvent((float)data / (float)WHEEL_DELTA);

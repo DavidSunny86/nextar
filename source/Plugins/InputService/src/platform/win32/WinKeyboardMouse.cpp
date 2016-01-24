@@ -33,7 +33,7 @@ WinKeyboardMouse::~WinKeyboardMouse() {
 
 }
 
-void WinKeyboardMouse::AddKeyEvent(Key code, bool bDown) {
+void WinKeyboardMouse::AddKeyEvent(KeyName code, bool bDown) {
 	if (changeCount >= MAX_CHANGE_BUFFER) {
 		Warn("Too many input events!");
 		return;
@@ -44,7 +44,7 @@ void WinKeyboardMouse::AddKeyEvent(Key code, bool bDown) {
 	keyboardKeyStates[code - NEX_KEYBOARD_KEY_START] = ie.keyState;
 }
 
-void WinKeyboardMouse::AddMouseEvent(Key code, bool bDown) {
+void WinKeyboardMouse::AddMouseEvent(KeyName code, bool bDown) {
 	CommitMouseMoveEvent();
 	if (changeCount >= MAX_CHANGE_BUFFER) {
 		Warn("Too many input events!");
@@ -68,7 +68,7 @@ void WinKeyboardMouse::AddMouseEvent(float wheelValue) {
 		return;
 	}
 	InputEvent& ie = inputEvents[changeCount++];
-	ie.key = Key::MOUSE_WHEEL;
+	ie.key = KeyName::MOUSE_WHEEL;
 	ie.analogValue = wheelValue;
 	mouseWheel += wheelValue;
 }
@@ -80,7 +80,7 @@ void WinKeyboardMouse::CommitMouseMoveEvent() {
 		}
 		else {
 			InputEvent& ie = inputEvents[changeCount++];
-			ie.key = Key::MOUSE_XY_AXIS;
+			ie.key = KeyName::MOUSE_XY_AXIS;
 			ie.analogDir.xy[0] = mouseDisplacement.xy[0];
 			ie.analogDir.xy[1] = mouseDisplacement.xy[1];
 			mousePos.xy[0] += mouseDisplacement.xy[0];
@@ -108,34 +108,34 @@ InputChangeBuffer WinKeyboardMouse::UpdateSettings() {
 	return buffer;
 }
 
-bool WinKeyboardMouse::IsDown(Key Key) {
-	if (Key >= NEX_KEYBOARD_KEY_START && Key <= NEX_KEYBOARD_KEY_END)
-		return keyboardKeyStates[Key - NEX_KEYBOARD_KEY_START] == KeyState::KEY_STATE_DOWN;
-	else if (Key >= NEX_MOUSE_BUTTON_START && Key <= NEX_MOUSE_BUTTON_END)
-		return mouseButtons[Key - NEX_MOUSE_BUTTON_START] == KeyState::KEY_STATE_DOWN;
+bool WinKeyboardMouse::IsDown(KeyName KeyName) {
+	if (KeyName >= NEX_KEYBOARD_KEY_START && KeyName <= NEX_KEYBOARD_KEY_END)
+		return keyboardKeyStates[KeyName - NEX_KEYBOARD_KEY_START] == KeyState::KEY_STATE_DOWN;
+	else if (KeyName >= NEX_MOUSE_BUTTON_START && KeyName <= NEX_MOUSE_BUTTON_END)
+		return mouseButtons[KeyName - NEX_MOUSE_BUTTON_START] == KeyState::KEY_STATE_DOWN;
 	return false;
 }
 
-bool WinKeyboardMouse::IsOn(Key k) {
+bool WinKeyboardMouse::IsOn(KeyName k) {
 	switch (k) {
-	case Key::KB_CAPITAL:
+	case KeyName::KB_CAPITAL:
 		return capsLockState;
-	case Key::KB_NUMLOCK:
+	case KeyName::KB_NUMLOCK:
 		return numLockState;
-	case Key::KB_SCROLL:
+	case KeyName::KB_SCROLL:
 		return scrollLockState;
 	}
 	return false;
 }
 
-AnalogValue WinKeyboardMouse::GetValue(Key k) {
-	if (k == Key::MOUSE_WHEEL)
+AnalogValue WinKeyboardMouse::GetValue(KeyName k) {
+	if (k == KeyName::MOUSE_WHEEL)
 		return mouseWheel;
 	return 0;
 }
 
-InputDir WinKeyboardMouse::GetDir(Key k) {
-	if (k == Key::MOUSE_XY_AXIS)
+InputDir WinKeyboardMouse::GetDir(KeyName k) {
+	if (k == KeyName::MOUSE_XY_AXIS)
 		return mousePos;
 	return InputDir();
 }

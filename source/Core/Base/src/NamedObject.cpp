@@ -15,6 +15,7 @@ StringID NamedObject::AsyncStringID(const String& name) {
 
 void NamedObject::OnExit() {
 	nameTable.SaveToCache();
+	nameTable.UnloadTable();
 }
 
 void NamedObject::OnFlushStrings() {

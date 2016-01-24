@@ -24,18 +24,18 @@ public:
 
 	virtual InputChangeBuffer UpdateSettings() override;
 
-	virtual bool IsDown(Key);
-	virtual bool IsOn(Key);
-	virtual AnalogValue GetValue(Key);
-	virtual InputDir GetDir(Key);
+	virtual bool IsDown(KeyName);
+	virtual bool IsOn(KeyName);
+	virtual AnalogValue GetValue(KeyName);
+	virtual InputDir GetDir(KeyName);
 
 	virtual DigitalControls* GetDigitalSettings();
 	virtual AnalogControls* GetAnalogSettings();
 
-	void AddKeyEvent(Key code, bool bDown);
+	void AddKeyEvent(KeyName code, bool bDown);
 	void AddMouseEvent(float x, float y);
 	void AddMouseEvent(float wheelValue);
-	void AddMouseEvent(Key code, bool bDown);
+	void AddMouseEvent(KeyName code, bool bDown);
 
 	virtual void SetProperty(const String& propertyName, const String& value);
 protected:
