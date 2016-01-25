@@ -39,6 +39,6 @@ void main(void) {
                 * pow(max(dot(R,E),0.0),0.3*specularIntensity);
    Ispec = clamp(Ispec, 0.0, 1.0); 
    
-   oFragColor = Iamb + Idiff + Ispec;
+   oFragColor = (Iamb + Idiff + Ispec) * vec4(N,1);
 }
 

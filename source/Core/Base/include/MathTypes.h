@@ -127,12 +127,12 @@ namespace Math {
 		inline static bool Equals(const float v1, const float v2) {
 			if (Math::AlmostEqualUlps(v1, v2, 2))
 				return true;
-			return Math::AlmostEqualRelativeOrAbsolute(v1, v1, MAX_RELATIVE_ERROR,
+			return Math::AlmostEqualRelativeOrAbsolute(v1, v2, MAX_RELATIVE_ERROR,
 					std::numeric_limits<float>::min());
 		}
 
 		inline static uint32 Hash(const float v) {
-			return (uint32)(v);
+			return (uint32)(v*100);
 		}
 
 		inline static uint32 Size() {
@@ -153,7 +153,7 @@ namespace Math {
 		}
 
 		inline static uint32 Hash(const Vector2& v) {
-			return (uint32)((v.x+v.y));
+			return (uint32)((v.x + v.y) * 100);
 		}
 
 		inline static uint32 Size() {
@@ -175,7 +175,7 @@ namespace Math {
 		}
 
 		inline static uint32 Hash(const Vector3& v) {
-			return (uint32)((v.x+v.y+v.z));
+			return (uint32)((v.x + v.y + v.z) * 100);
 		}
 
 		inline static uint32 Size() {
@@ -198,7 +198,7 @@ namespace Math {
 		}
 
 		inline static uint32 Hash(const Vector4& v) {
-			return (uint32)((v.x+v.y+v.z+v.w));
+			return (uint32)((v.x + v.y + v.z + v.w) * 100);
 		}
 
 		inline static uint32 Size() {
