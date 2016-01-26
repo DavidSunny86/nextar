@@ -66,9 +66,9 @@ public:
 	void WaitForChildren();
 
 protected:
-
+	
 	~Task() {}
-
+	
 private:
 
 	inline void PrepareSubmit() {

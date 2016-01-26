@@ -143,7 +143,6 @@ InputChangeBuffer Win360GamepadController::UpdateSettings() {
 	// see if task was executed
 	InputChangeBuffer buffer(0, 0);
 	if (pollTask.TryLock()) {
-		PollData();
 		buffer.first = inputEvents[currBuffer].data();
 		buffer.second = changeCount;
 		currBuffer = !currBuffer;

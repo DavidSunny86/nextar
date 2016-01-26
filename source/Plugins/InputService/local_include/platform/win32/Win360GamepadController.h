@@ -20,6 +20,7 @@ class Win360GamepadController:
 		public nextar::DigitalControls,
 		public nextar::AnalogControls,
 		public WinInputController {
+	NEX_LOG_HELPER(Win360GamepadController);
 public:
 	Win360GamepadController(const WinDeviceDesc& desc);
 	virtual ~Win360GamepadController();

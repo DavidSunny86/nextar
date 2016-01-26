@@ -14,10 +14,15 @@
 #	define _NexEngineAPI
 #endif
 
+#cmakedefine NEX_TASK_SCHEDULAR_TRACES 1
+
 #ifdef NEX_DEBUG
-#	define NEX_TASK_SCHEDULAR_TRACES 0
 #	define NEX_TASK_SCHEDULAR_CHECKS 
-#else
+#elif !defined(NEX_TASK_SCHEDULAR_TRACES)
+#	define NEX_TASK_SCHEDULAR_TRACES 0
+#endif
+
+#ifndef NEX_TASK_SCHEDULAR_TRACES
 #	define NEX_TASK_SCHEDULAR_TRACES 0
 #endif
 

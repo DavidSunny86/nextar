@@ -225,11 +225,13 @@ void MeshBuffer::RemoveDuplicates() {
 			nex++;
 		} while (nex != en && nex->first == it->first);
 		for (auto i = it; i != nex; ++i) {
-			if (remapped[i->second] == i->second) {
+			uint32 xi = i->second;
+			if (remapped[xi] == xi) {
 				auto j = i;
 				for (++j; j != nex; ++j) {
-					if (VertexEquals(i->second, j->second)) {
-						remapped[std::max(i->second, j->second)] = std::min(i->second, j->second);
+					uint32 xj = j->second;
+					if (VertexEquals(xi, xj)) {
+						remapped[std::max(xi, xj)] = std::min(xi, xj);
 					}
 				}
 			}
@@ -253,12 +255,11 @@ void MeshBuffer::RemoveDuplicates() {
 			for (uint32 c = 0; c < dupChannel.size(); ++c) {
 				dupChannel[c]->PushVertex(channels[c]->GetVertex(i));
 			}
-		} else {
+		} else
 			remapped[i] = remapped[remapped[i]];
-		}
 	}
 
-	Trace("Vertices removed: " + Convert::ToString(nCount - vertexCount));
+	Trace("Vertices removed: " + Convert::ToString(nCount - vertexCount) + " from a total count of: " + Convert::ToString(nCount));
 	for (uint32_t i = 0; i < indices.size(); ++i)
 		indices[i] = remapped[indices[i]];
 

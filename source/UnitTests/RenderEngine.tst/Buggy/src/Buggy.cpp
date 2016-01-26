@@ -45,13 +45,13 @@ void Buggy::_SetupScene(SceneAssetPtr& scene) {
           Entity::CLASS_ID));
 
   // load buggy and render deferred
-  URL locator = URL("{EngineData}/Meshes/buggy.mesh");
+  URL locator = URL("{EngineData}/Meshes/Box.mesh");
   MeshAssetPtr mesh =
-      MeshAsset::Traits::Instance(NamedObject::AsyncStringID("buggy"),
+      MeshAsset::Traits::Instance(NamedObject::AsyncStringID("Box"),
           locator);
   mesh->RequestLoad();
   EntityPtr meshEnt = entityFactory->AsyncCreateMeshEntity(
-      NamedObject::AsyncStringID("buggy"), mesh);
+      NamedObject::AsyncStringID("Box"), mesh);
   meshEnt->SetTransform(Vec3ASet(0,0,0), QuatIdentity(), 1.0f);
   meshEnt->Update(this->frameTimer);
   meshEnt->AddToScene(scene);

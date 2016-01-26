@@ -151,8 +151,13 @@ Task* TaskSchedular::AsyncGetWork(TaskRunner* runner, bool repeat) {
 
 		if (!repeat || task) {
 #ifdef NEX_TASK_SCHEDULAR_CHECKS
-			if(task)
-				NEX_ASSERT(task->meta.state == Task::TASK_QUEUED);
+			// This check is problematic, as a task may be queued once,
+			// Run is completed, by the time PrepareSubmit is called on it, 
+			// the task may not have been marked as finished and it might
+			// be marked so afterwards, thus the state might come up as
+			// either Running or Finished here.
+			//if(task)
+			//	NEX_ASSERT(task->meta.state == Task::TASK_QUEUED);
 #endif
 			return task;
 		}
@@ -188,6 +193,7 @@ void TaskSchedular::AsyncResume(Task* waitingOn, uint32 limit) {
 
 	if (toExec) {
 #ifdef NEX_TASK_SCHEDULAR_CHECKS
+		
 		NEX_ASSERT(toExec->meta.state == Task::TASK_QUEUED ||
 				toExec->meta.state == Task::TASK_INIT);
 		toExec->meta.state = Task::TASK_QUEUED;

@@ -1,6 +1,6 @@
 
 material #:#.Box {
-	shader "{EngineData}/Scripts/Effects/Forward.nfx";
+	shader "{EngineData}/Scripts/Effects/Deferred.nfx";
 	layer normal;
 }
 

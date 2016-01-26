@@ -93,7 +93,7 @@ void Viewport::CommitPrimitives(RenderContext* renderCtx, const FrameTimer&  fra
 	commitContext.renderTargetInfo.rt = renderTarget;
 	// @todo If we have a multi-render target attached we might have to
 	// initialize the clearColor array properly.
-	commitContext.renderTargetInfo.info.clearColor[0] = Color::White;
+	commitContext.renderTargetInfo.info.clearColor[0] = Color::Black;
 	commitContext.renderTargetInfo.info.clearFlags = ClearFlags::CLEAR_ALL;
 	commitContext.renderTargetInfo.info.clearStencil = 0;
 	commitContext.renderTargetInfo.info.clearDepth = 1.0f;

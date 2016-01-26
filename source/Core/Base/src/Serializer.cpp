@@ -111,6 +111,8 @@ ChunkOutputStream::ChunkOutputStream(OutputStreamPtr& mainOut) :
 }
 
 ChunkOutputStream::~ChunkOutputStream() {
+	BeginChunk(MARKER_CHUNK_FILE_END_HEADER);
+	EndChunk();
 	Write(roots);
 	outStream->Write(pseudoOutput->GetData(), pseudoOutput->GetSize());
 }

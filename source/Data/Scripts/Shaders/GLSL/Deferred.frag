@@ -54,8 +54,8 @@ vec2 getEncodedNormal() {
 }
 
 void main(void) {
-	oAlbedoMap = vec4(getDiffuseColor().rgb, 0) + vec4(1, 0, 0, 1);
-	oNormalMap = vec4(getEncodedNormal(), 0, 0);
-	oSpecularAndGlossMap = vec4(getSpecularAndGloss(), vec2(0, 0));
+	oAlbedoMap = vec4(normalize(getNormal().xyz).rgb, 0) * 0.0 + vec4(1, 0, 0, 1);
+	oNormalMap = vec4(getEncodedNormal(), 0, 0) * 0.0 + vec4(0, 1, 0, 1);
+	oSpecularAndGlossMap = vec4(getSpecularAndGloss(), vec2(0, 0)) * 0.0 + vec4(0, 0, 1, 1);;
 }
 

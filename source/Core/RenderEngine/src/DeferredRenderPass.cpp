@@ -138,12 +138,11 @@ void DeferredRenderPass::Commit(CommitContext& context) {
 	LightSystem* lightSys = context.lightSystem;
 	LightList& ls = lightSys->GetLights();
 	/* etc */
-	PixelBox image;
-	gbuffer.normalMap->Capture(context.renderContext, image, FrameBuffer::FRONT);
-	Image imageObj(std::move(image));
+	//PixelBox image;
+	//gbuffer.normalMap->Capture(context.renderContext, image, FrameBuffer::FRONT);
+	//Image imageObj(std::move(image));
 	/* Display Image */
-	static bool registeredForRender = false;
-	if (DebugDisplay::InstancePtr() && !registeredForRender) {
+	if (DebugDisplay::InstancePtr()) {
 		Box2D box(0, 0, 0.25f, 0.25f);
 		DebugDisplay::Instance().Register(box, Color::White, Vec4AZero(), gbuffer.albedoMap);
 		Box2D box2(0.25f, 0, 0.5f, 0.25f);
@@ -152,7 +151,6 @@ void DeferredRenderPass::Commit(CommitContext& context) {
 		DebugDisplay::Instance().Register(box3, Color::White, Vec4AZero(), gbuffer.specularAndGlossMap);
 		Box2D box4(0.75f, 0.0f, 1.0f, 0.25f);
 		DebugDisplay::Instance().Register(box3, Color::White, Vec4AZero(), gbuffer.depth);
-		registeredForRender = true;
 	}
 
 	context.albedoMap = gbuffer.albedoMap;

@@ -29,7 +29,6 @@ enum MeshChunkID {
 	MCID_SUBMESH_END,
 	MCID_SUBMESH_INFO,
 	MCID_MESH_HEADER,
-	MCID_END
 };
 
 MaterialAssetPtr MeshLoaderIntfv1_0::ReadMaterialData(
@@ -385,7 +384,7 @@ void MeshLoaderIntfv1_0::ReadMeshChunk(MeshAsset::StreamRequest* request,
 				ReadMeshHeader(request, ser);
 				headersRead = true;
 				break;
-			case MCID_END:
+			case MARKER_CHUNK_FILE_END_HEADER:
 				return;
 			}
 		} else {

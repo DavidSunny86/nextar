@@ -339,7 +339,16 @@ inline bool AlmostEqualUlps(float A, float B, int maxUlps)
 	assert(sizeof(float) == sizeof(int));
 	if (A == B)
 		return true;
-	int intDiff = abs(*(int*)&A - *(int*)&B);
+	int aInt = *(int*)&A;
+	// Make aInt lexicographically ordered as a twos-complement int
+	if (aInt < 0)
+		aInt = 0x80000000 - aInt;
+	// Make bInt lexicographically ordered as a twos-complement int
+	int bInt = *(int*)&B;
+	if (bInt < 0)
+		bInt = 0x80000000 - bInt;
+
+	int intDiff = std::abs(aInt - bInt);
 	if (intDiff <= maxUlps)
 		return true;
 	return false;

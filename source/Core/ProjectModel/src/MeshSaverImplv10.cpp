@@ -32,7 +32,6 @@ enum MeshChunkID {
 	MCID_SUBMESH_END,
 	MCID_SUBMESH_INFO,
 	MCID_MESH_HEADER,
-	MCID_END
 };
 
 MeshSaverImplv1_0::MeshSaverImplv1_0() {
@@ -177,11 +176,12 @@ void MeshSaverImplv1_0::Save(OutputStreamPtr& out,
 			WriteMaterialData(material, stream);
 		}
 
-		OutputSerializer& ser = stream.BeginChunk(MCID_SUBMESH_DATA);
 		uint32 numPrim = mesh->GetNumPrimitiveGroups();
-		for (uint32 i = 0; i < numPrim; ++i)
+		for (uint32 i = 0; i < numPrim; ++i) {
+			OutputSerializer& ser = stream.BeginChunk(MCID_SUBMESH_DATA);
 			WriteSubMeshData(mesh, mesh->GetPrimitive(i), stream);
-		stream.EndChunk();
+			stream.EndChunk();
+		}
 	} catch (const GracefulErrorExcept& e) {
 		saver.GetRequestPtr()->SetCompleted(false);
 		NEX_THROW(e);

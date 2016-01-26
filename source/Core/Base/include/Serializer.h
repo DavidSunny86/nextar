@@ -18,6 +18,7 @@ enum {
 	MARKER_STRING_UTF16 = 0x16,
 	MARKER_STRING_UTF8 = 0x08,
 	MARKER_OBJECT = 0x0b,
+	MARKER_CHUNK_FILE_END_HEADER = 0x7fed,
 };
 
 /** @remarks Classes having serialization support
@@ -227,10 +228,12 @@ public:
  * using the chunk header/chuck size hieararchy format. This creates a memory file first
  * before writing the data to the disk in one go, hence could be very inefficient for very
  * large files.
+ * @todo Increase efficiency by writing root chunks beforehand to filesystem once they are done.
  */
 class _NexBaseAPI ChunkOutputStream : public AllocGeneral {
 	NEX_LOG_HELPER(ChunkOutputStream);
 public:
+	
 	ChunkOutputStream(OutputStreamPtr&);
 	~ChunkOutputStream();
 
