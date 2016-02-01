@@ -10,6 +10,7 @@
 
  using namespace nextar;
 
+
 void Buggy::_SetupScene(SceneAssetPtr& scene) {
   UTApplication::_SetupScene(scene);
   AxisAlignedBox box = AxisAlignedBox(-10, -10, -10, 10, 10, 10);
@@ -17,6 +18,7 @@ void Buggy::_SetupScene(SceneAssetPtr& scene) {
   Matrix4x4 m = Matrix4x4::IdentityMatrix;
   DebugDisplay::Register(m, 2);
   cameraEntity = scene->FindComponent(NamedObject::AsyncStringID("MainCamera"));
+
   if (cameraEntity) {
     Entity* e = static_cast<Entity*>(cameraEntity);
     // create a behaviour
@@ -45,7 +47,7 @@ void Buggy::_SetupScene(SceneAssetPtr& scene) {
           Entity::CLASS_ID));
 
   // load buggy and render deferred
-  URL locator = URL("{EngineData}/Meshes/Box.mesh");
+  URL locator = URL("{EngineData}/Meshes/buggy.mesh");
   MeshAssetPtr mesh =
       MeshAsset::Traits::Instance(NamedObject::AsyncStringID("Box"),
           locator);

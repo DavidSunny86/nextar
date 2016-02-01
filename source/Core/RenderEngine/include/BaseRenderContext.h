@@ -21,7 +21,7 @@ public:
 	virtual void DestroyedRenderWindow(RenderWindow*);
 	virtual RenderTargetList& GetRenderTargetList();
 	virtual void SetVideoMode(uint32 videoModeIndex);
-	virtual void BeginRender(RenderInfo*);
+	virtual void BeginRender(RenderInfo*, ClearFlags cf) override;
 	virtual void EndRender();
 	virtual void Close();
 
@@ -38,7 +38,7 @@ public:
 	virtual void SetVideoModeImpl(const VideoMode& videoMode) = 0;
 	virtual void Draw(StreamData*, CommitContext&) override = 0;
 	virtual void SetCurrentTarget(RenderTarget*) = 0;
-	virtual void Clear(const ClearBufferInfo&) = 0;
+	virtual void Clear(const ClearBufferInfo&, ClearFlags cf) = 0;
 
 	/* helpers */
 	uint32 GetVideoModeIndex(const VideoMode& vm) const;

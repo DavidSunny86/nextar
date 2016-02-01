@@ -109,14 +109,14 @@ void BaseRenderContext::BeginFrame(const FrameTimer& frameTimer) {
 void BaseRenderContext::EndFrame() {
 }
 
-void BaseRenderContext::BeginRender(RenderInfo* ri) {
+void BaseRenderContext::BeginRender(RenderInfo* ri, ClearFlags cf) {
 	if (currentTarget != ri->rt) {
 		currentTarget = ri->rt;
 		SetCurrentTarget(ri->rt);
 		frameStats.renderTargetsUsed++;
 	}
-	if (Test(ri->info.clearFlags)) {
-		Clear(ri->info);
+	if (Test(cf)) {
+		Clear(ri->info, cf);
 	}
 }
 

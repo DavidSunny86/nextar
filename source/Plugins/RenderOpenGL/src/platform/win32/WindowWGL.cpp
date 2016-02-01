@@ -105,7 +105,7 @@ bool fullscreen, const NameValueMap* params) {
 	}
 
 	//DWORD style = WS_BORDER;
-	DWORD style = WS_OVERLAPPEDWINDOW;
+	DWORD style = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 	DWORD  exStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 	
 	WindowWGL::InitializeWindowClass();
@@ -126,16 +126,16 @@ bool fullscreen, const NameValueMap* params) {
 		windowRect.bottom += (-windowRect.top);
 		windowRect.top = 0;
 	}
-	this->dimensions.dx = (uint16)(windowRect.right - windowRect.left);
-	this->dimensions.dy = (uint16)(windowRect.bottom - windowRect.top);
+	this->dimensions.dx = (uint16)(width);
+	this->dimensions.dy = (uint16)(height);
 	
 	// create basic window
 	HWND wnd = CreateWindowEx(exStyle, (LPCSTR) wndClass,
 		parent->GetTitle().c_str(),
-		style | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
+		style,
 		windowRect.left, windowRect.top,
-		width,
-		height,
+		windowRect.right,
+		windowRect.bottom,
 		parentWindow,
 		NULL, NULL, NULL);
 

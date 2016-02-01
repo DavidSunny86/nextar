@@ -39,7 +39,7 @@ void MultiRenderTargetViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 		uint32 numColorTargets = rt->GetColorTargetsCount();
 		colorAttachmentCount = numColorTargets;
 		gl->CreateFBO(fbo);
-		gl->BindFBO(fbo, false);
+		gl->BindFBO(fbo);
 		for (uint32 i = 0; i < numColorTargets; ++i) {
 			RenderTarget* colorTarget = rt->GetAttachment(i).GetPtr();
 			switch (colorTarget->GetRenderTargetType()) {
@@ -55,24 +55,26 @@ void MultiRenderTargetViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 		}
 
 		RenderTarget* depthTarget = rt->GetDepthAttachment().GetPtr();
-		switch (depthTarget->GetRenderTargetType()) {
-		case RenderTargetType::RENDER_BUFFER: {
-			RenderBufferViewGL* textureView =
+		if (depthTarget) {
+			switch (depthTarget->GetRenderTargetType()) {
+			case RenderTargetType::RENDER_BUFFER: {
+				RenderBufferViewGL* textureView =
 					static_cast<RenderBufferViewGL*>(gl->GetView(
-							static_cast<RenderBuffer*>(depthTarget)));
-			gl->AttachToFBO(textureView, textureView->GetAttachment());
-			break;
-		}
-		case RenderTargetType::TEXTURE: {
-			RenderTextureViewGL* textureView =
+					static_cast<RenderBuffer*>(depthTarget)));
+				gl->AttachToFBO(textureView, textureView->GetAttachment());
+				break;
+			}
+			case RenderTargetType::TEXTURE: {
+				RenderTextureViewGL* textureView =
 					static_cast<RenderTextureViewGL*>(gl->GetView(
-							static_cast<RenderTexture*>(depthTarget)));
-			gl->AttachToFBO(textureView, textureView->GetAttachment());
-		}
-			break;
+					static_cast<RenderTexture*>(depthTarget)));
+				gl->AttachToFBO(textureView, textureView->GetAttachment());
+			}
+				break;
+			}
 		}
 		gl->ValidateFBO();
-		gl->UnbindFBO(false);
+		gl->UnbindFBO();
 		break;
 	}
 	default:

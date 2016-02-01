@@ -7,6 +7,7 @@
 
 #include <RenderOpenGL.h>
 #include <RenderTextureViewGL.h>
+#include <RenderContext_Base_GL.h>
 
 namespace RenderOpenGL {
 
@@ -20,6 +21,7 @@ RenderTextureViewGL::~RenderTextureViewGL() {
 void RenderTextureViewGL::Update(RenderContext* rc, uint32 msg,
 								 ContextObject::ContextParamPtr cb) {
 	TextureViewGL::Update(rc, msg, cb);
+	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 }
 
 void RenderTextureViewGL::Destroy(RenderContext* rc) {

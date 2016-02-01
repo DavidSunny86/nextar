@@ -90,16 +90,13 @@ void Viewport::CommitPrimitives(RenderContext* renderCtx, const FrameTimer&  fra
 	commitContext.visibiles = &visibleSet;
 	commitContext.lightSystem = traversal.lightSystem;
 	commitContext.targetDimension = renderTarget->GetDimensions();
+	
 	commitContext.renderTargetInfo.rt = renderTarget;
-	// @todo If we have a multi-render target attached we might have to
-	// initialize the clearColor array properly.
-	commitContext.renderTargetInfo.info.clearColor[0] = Color::Black;
-	commitContext.renderTargetInfo.info.clearFlags = ClearFlags::CLEAR_ALL;
-	commitContext.renderTargetInfo.info.clearStencil = 0;
-	commitContext.renderTargetInfo.info.clearDepth = 1.0f;
+	renderCtx->BeginRender(&commitContext.renderTargetInfo, ClearFlags::CLEAR_ALL);
 	for (auto &r : renderSystems) {
 		r->Commit(commitContext);
 	}
+	renderCtx->EndRender();
 }
 
 void Viewport::Render(RenderContext* renderCtx, const FrameTimer& frameNumber) {

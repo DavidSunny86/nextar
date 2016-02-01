@@ -70,7 +70,7 @@ public:
 	virtual void BeginFrame(const FrameTimer& frameTimer) = 0;
 	virtual void EndFrame() = 0;
 	virtual FrameStats GetFrameStats() = 0;
-	virtual void BeginRender(RenderInfo*) = 0;
+	virtual void BeginRender(RenderInfo*, ClearFlags cf) = 0;
 	virtual void EndRender() = 0;
 	virtual void Copy(RenderTarget* src, FrameBuffer srcFb, RenderTarget* dest, FrameBuffer destFb) = 0;
 

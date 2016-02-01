@@ -83,7 +83,6 @@ void DeferredRenderPass::PrepareGeometryBuffer() {
 	gbufferRI.info.clearColor[2] = Color::Black;
 	gbufferRI.info.clearStencil = 0;
 	gbufferRI.info.clearDepth = 1.0f;
-	gbufferRI.info.clearFlags = ClearFlags::CLEAR_ALL;
 }
 
 void DeferredRenderPass::PrepareMaterials() {
@@ -102,7 +101,7 @@ void DeferredRenderPass::Commit(CommitContext& context) {
 	}
 	/* geometry pass */
 	VisibilitySet& visibles = *context.visibiles;
-	context.renderContext->BeginRender(&gbufferRI);
+	context.renderContext->BeginRender(&gbufferRI, ClearFlags::CLEAR_ALL);
 	RenderQueueList& layerList = visibles.GetRenderQueues();
 	for (auto &layer : layerList) {
 		if (Test(layer.flags & RenderQueueFlags::DEFERRED)) {
@@ -144,13 +143,13 @@ void DeferredRenderPass::Commit(CommitContext& context) {
 	/* Display Image */
 	if (DebugDisplay::InstancePtr()) {
 		Box2D box(0, 0, 0.25f, 0.25f);
-		DebugDisplay::Instance().Register(box, Color::White, Vec4AZero(), gbuffer.albedoMap);
+		DebugDisplay::Instance().Register(box, Color::White, Vec4ASet(0, 0, 1, 1), gbuffer.albedoMap, false, -1);
 		Box2D box2(0.25f, 0, 0.5f, 0.25f);
-		DebugDisplay::Instance().Register(box2, Color::White, Vec4AZero(), gbuffer.normalMap);
+		DebugDisplay::Instance().Register(box2, Color::White, Vec4ASet(0, 0, 1, 1), gbuffer.normalMap, false, -1);
 		Box2D box3(0.5f, 0.0f, 0.75f, 0.25f);
-		DebugDisplay::Instance().Register(box3, Color::White, Vec4AZero(), gbuffer.specularAndGlossMap);
+		DebugDisplay::Instance().Register(box3, Color::White, Vec4ASet(0, 0, 1, 1), gbuffer.specularAndGlossMap, false, -1);
 		Box2D box4(0.75f, 0.0f, 1.0f, 0.25f);
-		DebugDisplay::Instance().Register(box3, Color::White, Vec4AZero(), gbuffer.depth);
+		DebugDisplay::Instance().Register(box4, Color::White, Vec4ASet(0, 0, 1, 1), gbuffer.depth, false, -1);
 	}
 
 	context.albedoMap = gbuffer.albedoMap;
@@ -173,11 +172,11 @@ void DeferredRenderPass::Commit(CommitContext& context) {
 	context.renderContext->EndRender();
 	*/
 	// @urgent This step might be unnecessary once we have a compositor system in place
-	if (context.renderTargetInfo.rt->GetRenderTargetType() == RenderTargetType::BACK_BUFFER) {
+	/*if (context.renderTargetInfo.rt->GetRenderTargetType() == RenderTargetType::BACK_BUFFER) {
 		// transfer the depth buffer to back-buffer-depth
 		context.renderContext->Copy(gbuffer.depth, FrameBuffer::DEPTH,
 				context.renderTargetInfo.rt, FrameBuffer::DEPTH);
-	}
+	}*/
 }
 
 void DeferredRenderPass::RenderLight(Light* light, uint32 passIdx, uint32 updateId, CommitContext& context) {

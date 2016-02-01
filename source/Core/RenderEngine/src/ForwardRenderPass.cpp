@@ -32,12 +32,18 @@ void ForwardRenderPass::PrepareMaterials() {
 
 void ForwardRenderPass::Commit(CommitContext& context) {
 
-	context.renderContext->BeginRender(&context.renderTargetInfo);
-	context.renderTargetInfo.info.clearFlags = ClearFlags::CLEAR_NONE;
-
 	context.sunLightIntensity = Vector4(1, 1, 1, 1);
 	context.sunLightPosition = Vector4(0, 400, 0, 1);
 	context.sunLightColor = Color(0.8f, 0.8f, 0.4f, 1);
+
+	context.renderContext->BeginRender(&context.renderTargetInfo, ClearFlags::CLEAR_ALL);
+	Render(context);
+	context.renderContext->EndRender();
+	
+}
+
+void ForwardRenderPass::Render(CommitContext& context) {
+
 
 	VisibilitySet& visibles = *context.visibiles;
 	RenderQueueList& layerList = visibles.GetRenderQueues();
@@ -69,8 +75,6 @@ void ForwardRenderPass::Commit(CommitContext& context) {
 			}
 		}
 	}
-
-	context.renderContext->EndRender();
 }
 
 void ForwardRenderPass::DestroyResources(void* renderSystem) {

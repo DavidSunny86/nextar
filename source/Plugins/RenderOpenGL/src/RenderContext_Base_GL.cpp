@@ -130,7 +130,7 @@ void RenderContext_Base_GL::Draw(StreamData* streamData, CommitContext& ctx) {
 		if (vd.start == 0) {
 			if (streamData->instanceCount == 1)
 				glDrawElements(primtype, streamData->indices.count, indextype,
-				reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start));
+					reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start));
 			else
 				GlDrawElementsInstanced(primtype, streamData->indices.count,
 				indextype,
@@ -213,24 +213,24 @@ void RenderContext_Base_GL::SetCurrentTarget(RenderTarget* canvas) {
 	}
 }
 
-void RenderContext_Base_GL::Clear(const ClearBufferInfo& info) {
-	if (Test(info.clearFlags & ClearFlags::CLEAR_COLOR)) {
+void RenderContext_Base_GL::Clear(const ClearBufferInfo& info, ClearFlags cflags) {
+	if (Test(cflags & ClearFlags::CLEAR_COLOR)) {
 		if (currentCountOfColorAttachments) {
 			for (uint32 i = 0; i < currentCountOfColorAttachments; ++i) {
 				ClearFlags cf = (ClearFlags)((uint16)ClearFlags::CLEAR_COLOR_0 << (uint16)i);
-				if (Test(info.clearFlags & cf))
+				if (Test(cflags & cf))
 					GlClearBufferfv(GL_COLOR, i, info.clearColor[i].AsFloatArray());
 			}
 		} else {
 			GlClearBufferfv(GL_COLOR, 0, info.clearColor[0].AsFloatArray());
 		}
 	}
-	if (Test(info.clearFlags & ClearFlags::CLEAR_DEPTH) &&
-		Test(info.clearFlags & ClearFlags::CLEAR_STENCIL)) {
+	if (Test(cflags & ClearFlags::CLEAR_DEPTH) &&
+		Test(cflags & ClearFlags::CLEAR_STENCIL)) {
 		GlClearBufferfi(GL_DEPTH_STENCIL, 0, info.clearDepth, info.clearStencil);
-	} else if (Test(info.clearFlags & ClearFlags::CLEAR_DEPTH)) {
+	} else if (Test(cflags & ClearFlags::CLEAR_DEPTH)) {
 		GlClearBufferfv(GL_DEPTH, 0, &info.clearDepth);
-	} else if (Test(info.clearFlags & ClearFlags::CLEAR_STENCIL)) {
+	} else if (Test(cflags & ClearFlags::CLEAR_STENCIL)) {
 		GLint stencil = info.clearStencil;
 		GlClearBufferiv(GL_STENCIL, 0, &stencil);
 	}
@@ -1394,6 +1394,7 @@ GLenum RenderContext_Base_GL::GetGlCompareFunc(DepthStencilCompare type) {
 		return GL_LESS;
 	case DSCOMP_EQUAL:
 		return GL_EQUAL;
+	case DSCOMP_DEFAULT:
 	case DSCOMP_LESS_EQUAL:
 		return GL_LEQUAL;
 	case DSCOMP_GREATER:

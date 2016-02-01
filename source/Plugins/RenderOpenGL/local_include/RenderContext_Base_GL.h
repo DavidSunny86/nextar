@@ -61,7 +61,7 @@ public:
 	virtual void PostWindowDestruction(RenderWindow* windowGl);
 	virtual void Draw(StreamData*, CommitContext&);
 	virtual void SetCurrentTarget(RenderTarget*);
-	virtual void Clear(const ClearBufferInfo&);
+	virtual void Clear(const ClearBufferInfo&, ClearFlags cf);
 	virtual void CloseImpl();
 	virtual void Copy(RenderTarget* src, FrameBuffer srcFb, RenderTarget* dest, FrameBuffer destFb);
 	virtual void EndRender();
@@ -207,6 +207,8 @@ public:
 	inline void SetOriginalVideoMode(uint32 m);
 	inline void BindWriteFBO(FrameBufferObjectGL& fbo);
 	inline void UnbindWriteFBO();
+	inline void BindFBO(FrameBufferObjectGL& fbo);
+	inline void UnbindFBO();
 	inline void BindFBO(FrameBufferObjectGL& fbo, bool readDraw);
 	virtual void BindNamedFBO(FrameBufferObjectGL& fbo, bool readDraw, FrameBuffer fb);
 	virtual void UnbindNamedFBO(bool readDraw);
@@ -215,6 +217,7 @@ public:
 	inline void CreateFBO(RenderTextureViewGL*);
 	inline void CreateFBO(RenderBufferViewGL*);
 	inline void DestroyFBO(FrameBufferObjectGL& fbo);
+	inline void SetFiltering(GLenum target, TextureMinFilter minFilter, TextureMagFilter magFilter);
 	void AttachToFBO(RenderTextureViewGL* rt, GLenum attachmentType);
 	void AttachToFBO(RenderBufferViewGL* rt, GLenum attachmentType);
 	bool ValidateFBO();
@@ -286,6 +289,14 @@ void RenderContext_Base_GL::BindWriteFBO(FrameBufferObjectGL& fbo) {
 
 void RenderContext_Base_GL::UnbindWriteFBO() {
 	GlBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+}
+
+void RenderContext_Base_GL::BindFBO(FrameBufferObjectGL& fbo) {
+	GlBindFramebuffer(GL_FRAMEBUFFER, fbo.frameBufferObject);
+}
+
+void RenderContext_Base_GL::UnbindFBO() {
+	GlBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void RenderContext_Base_GL::BindFBO(FrameBufferObjectGL& fbo, bool readDraw) {
@@ -589,6 +600,14 @@ inline void RenderContext_Base_GL::SetOriginalVideoMode(uint32 m) {
 inline void RenderContext_Base_GL::SetMipLevels(GLenum target, GLint baseLevel, GLint maxLevel) {
 	glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, baseLevel);
 	glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, maxLevel);
+}
+
+inline void RenderContext_Base_GL::SetFiltering(
+	GLenum target,
+	TextureMinFilter minFilter, 
+	TextureMagFilter magFilter) {
+	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GetGlMagFilter(magFilter));
+	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GetGlMinFilter(minFilter));
 }
 
 }

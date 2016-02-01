@@ -230,8 +230,7 @@ void DebugRenderPass::_RemovePrimitive(uint32 id) {
 }
 
 void DebugRenderPass::Commit(CommitContext& context) {
-	DetermineVisiblePrimitives(context.frameTime);
-	context.renderContext->BeginRender(&context.renderTargetInfo);
+	context.renderContext->BeginRender(&context.renderTargetInfo, ClearFlags::CLEAR_NONE);
 	for (auto &prim : alivePrimitives) {
 		MaterialAsset* material = prim->GetMaterial();
 		ShaderAsset* shader = material->GetShader();
@@ -259,6 +258,7 @@ void DebugRenderPass::Commit(CommitContext& context) {
 		context.renderContext->Draw(prim->GetStreamData(), context);
 	}
 	context.renderContext->EndRender();
+	DetermineVisiblePrimitives(context.frameTime);
 }
 
 Geometry GenerateAxis(float radius, float alpha, int color) {

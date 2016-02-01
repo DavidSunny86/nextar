@@ -13,6 +13,7 @@
 #include <RenderPass.h>
 #include <RenderTexture.h>
 #include <MultiRenderTarget.h>
+#include <MultiRenderTarget.h>
 
 namespace nextar {
 
@@ -31,8 +32,10 @@ public:
 	static RenderPass* CreateInstance(const Config& c);
 
 protected:
-		
+	
+	void Render(CommitContext& context);
 	void PrepareMaterials();
+
 };
 
 } /* namespace nextar */

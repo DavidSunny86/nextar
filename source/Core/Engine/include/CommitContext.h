@@ -32,11 +32,10 @@ enum class ClearFlags : uint16 {
 NEX_ENUM_FLAGS(ClearFlags, uint16);
 
 struct ClearBufferInfo {
-	ClearFlags clearFlags;
 	uint16 clearStencil;
 	float clearDepth;
 	Color clearColor[RenderConstants::MAX_COLOR_TARGETS];
-	ClearBufferInfo() : clearFlags(ClearFlags::CLEAR_NONE), clearDepth(1.0f), clearStencil(0) {}
+	ClearBufferInfo() : clearDepth(1.0f), clearStencil(0) {}
 };
 
 struct RenderInfo {
