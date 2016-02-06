@@ -1,0 +1,37 @@
+
+define-color-buffer main-color;
+define-depth-buffer main-depth;
+
+pass Forward {
+ color-output  main-color;
+ depth-output  main-depth;
+}
+
+pass Deferred {
+ name-buffer normal   normal;
+ use-buffer    depth    main-depth;
+ color-output  main; 
+}
+
+pass Compositor {
+ post-fx-material    Materials/Blur.mtl;
+ name-buffer color composed-1;
+ bind-buffer  colorInput main;
+}
+
+pass Compositor { 
+ post-fx-material    Materials/Bloom.mtl;
+ define-buffer color main;
+ bind-buffer  colorInput composed-1;
+}
+
+pass Compositor { 
+ post-fx-material    Materials/Cartoonify.mtl;
+ define-buffer color composed-1;
+ bind-buffer  colorInput main;
+}
+
+pass Copy { 
+ bind-buffer  colorInput composed-1;
+ color-output back-buffer;
+}

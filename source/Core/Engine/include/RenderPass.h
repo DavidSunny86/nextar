@@ -15,12 +15,12 @@ namespace nextar {
 
 class _NexEngineAPI RenderPass: public AllocGraphics {
 public:
-
+	
 	typedef RenderPass* (*CreateInstance) (const Config&);
 
 	RenderPass(const Config&);
 	virtual ~RenderPass();
-
+		
 	virtual void Commit(CommitContext& context) = 0;
 };
 
