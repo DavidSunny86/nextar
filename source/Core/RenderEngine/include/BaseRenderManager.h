@@ -35,8 +35,8 @@ public:
 			ContextObject::ContextParamPtr);
 
 	virtual void RegisterRenderContext(RenderContextPtr&);
-
 	virtual void RenderFrame(const FrameTimer&) override;
+
 
 protected:
 
@@ -44,7 +44,6 @@ protected:
 
 	void RenderAllTargets(RenderContext* rc, const FrameTimer& frameTimer, bool callPresent);
 	void PresentSwapChains(RenderContext* rc);
-	void CreateRenderPasss();
 	void CreateRenderQueues(const NameValueMap&);
 	void RegisterAutoParams();
 	void CreateDefaultRenderPassFactories();
@@ -53,11 +52,12 @@ protected:
 	 * contexts are present if usingMultiGpuSetup is true */
 	RenderDriverPtr primaryDriver;
 	RenderContextPtr primaryContext;
+
 #if NEX_MULTIGPU_BUILD
 	typedef vector<RenderDriverPtr>::type RenderDriverList;
 	typedef vector<RenderContextPtr>::type RenderContextList;
 	typedef vector<ContextObject*>::type GpuObjectTraitsList;
-	
+
 	ContextID emptySlot;
 	RenderContextList activeContexts;
 	RenderDriverList renderDrivers;

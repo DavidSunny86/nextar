@@ -13,8 +13,4 @@ void ASTParameter::Append(const ASTParameter& p) {
 	msh.PushBack(p._value);
 }
 
-void ASTParameter::Accept(ASTVisitor* visitor) const {
-	visitor->VisitParameter(this);
-}
-
 }

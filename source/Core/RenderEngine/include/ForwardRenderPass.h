@@ -18,22 +18,21 @@
 namespace nextar {
 
 
-class _NexRenderAPI ForwardRenderPass: public nextar::RenderPass {
+class _NexRenderAPI ForwardRenderPass: public nextar::BaseRenderPass {
 public:
 
-	ForwardRenderPass(const Config& c);
+	ForwardRenderPass();
 	virtual ~ForwardRenderPass();
 
 	virtual void Commit(CommitContext& context);
 
-	static void DestroyResources(void* renderSystem);
-	static void CreateResources(void* renderSystem);
+	virtual void CreateResources();
+	virtual void DestroyResources();
 
-	static RenderPass* CreateInstance(const Config& c);
+	static RenderPass* CreateInstance();
 
 protected:
-	
-	void Render(CommitContext& context);
+
 	void PrepareMaterials();
 
 };

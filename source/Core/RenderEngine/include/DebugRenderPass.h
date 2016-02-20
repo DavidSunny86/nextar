@@ -60,6 +60,7 @@ public:
 
 	void SetDebugMaterial(MaterialAssetPtr& m);
 
+
 protected:
 	ParameterBuffer _parameters;
 	Matrix4x4* worldMatrix;
@@ -69,23 +70,23 @@ protected:
 	float timeToDeath;
 };
 
-class DebugRenderPass:
+class _NexRenderAPI DebugRenderPass:
 	public DebugDisplay,
-	public nextar::RenderPass {
+	public nextar::BaseRenderPass {
 
 	NEX_LOG_HELPER(DebugRenderPass);
 
 public:
 		
-	DebugRenderPass(const Config& c);
+	DebugRenderPass();
 	virtual ~DebugRenderPass();
 
 	virtual void Commit(CommitContext& context);
 
-	static void DestroyResources(void* renderSystem);
-	static void CreateResources(void* renderSystem);
+	virtual void CreateResources();
+	virtual void DestroyResources();
 
-	static RenderPass* CreateInstance(const Config& c);
+	static RenderPass* CreateInstance();
 
 protected:
 
@@ -111,7 +112,6 @@ protected:
 
 protected:
 
-	void ClearStreamData(StreamData&);
 	void DetermineVisiblePrimitives(float frameTime);
 	void CreateMaterials();
 	void ReleaseObjects();

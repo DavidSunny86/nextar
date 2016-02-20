@@ -28,7 +28,6 @@ public:
 	virtual void VisitBlockRegionEnd(const ASTBlockRegion*);
 	virtual void VisitTextRegionBegin(const ASTTextRegion*);
 	virtual void VisitTextRegionEnd(const ASTTextRegion*);
-	virtual void VisitParameter(const ASTParameter*);
 
 protected:
 	void PrintString(const String& value);

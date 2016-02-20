@@ -1,0 +1,25 @@
+
+create-buffer main {
+ target color RGBA8 true;
+ target depth D24S8 true;
+}
+
+pass Forward {
+	
+	render-to main;
+	clean-depth;
+	clean-color 0 black; 
+}
+
+pass Debug {
+	render-to last;
+}
+
+pass Compositor {
+	material "Materials/Copy.mtl";
+	set-param copyTexture last.color-0;
+	set-param translationAndScale "0 0 1 1"
+	set-param textureOffsetAndRepeat "0 0 1 1"
+	set-param mixColor "1 1 1 1"
+	render-to viewport;
+}

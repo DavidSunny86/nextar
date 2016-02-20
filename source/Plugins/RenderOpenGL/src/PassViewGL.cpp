@@ -179,12 +179,12 @@ void PassViewGL::SetupDepthStencilState(const DepthStencilState& desc) {
 }
 
 void PassViewGL::SetTexture(RenderContext* rc, const SamplerParameter& desc,
-		const TextureUnit* tu) {
+		TextureBase* tu) {
 	RenderContext_Base_GL* ctx = static_cast<RenderContext_Base_GL*>(rc);
 	const SamplerState* samplerState = static_cast<const SamplerState*>(&desc);
-	if (tu->texture) {
+	if (tu) {
 		TextureViewGL* texture = static_cast<TextureViewGL*>(ctx->GetView(
-			tu->texture));
+			tu));
 		ctx->SetTexture(samplerState->index, samplerState->sampler, texture);
 	}
 }

@@ -20,7 +20,9 @@
 
 namespace nextar {
 
-NEX_DEFINE_SINGLETON_PTR(ComponentFactoryArchive);ComponentFactoryArchive ::ComponentFactoryArchive() {
+NEX_DEFINE_SINGLETON_PTR(ComponentFactoryArchive);
+
+ComponentFactoryArchive ::ComponentFactoryArchive() {
 }
 
 ComponentFactoryArchive::~ComponentFactoryArchive() {

@@ -30,7 +30,7 @@ void DebugPrimitive::SetDebugMaterial(MaterialAssetPtr& m) {
 	}
 }
 
-DebugRenderPass::DebugRenderPass(const Config& c) : RenderPass(c) {
+DebugRenderPass::DebugRenderPass() : RenderPass() {
 
 	idCounter = 0;
 	boxDataGenerated = false;
@@ -44,8 +44,8 @@ DebugRenderPass::~DebugRenderPass() {
 	ReleaseObjects();
 }
 
-RenderPass* DebugRenderPass::CreateInstance(const Config& c) {
-	return NEX_NEW(DebugRenderPass(c));
+RenderPass* DebugRenderPass::CreateInstance() {
+	return NEX_NEW(DebugRenderPass());
 }
 
 void DebugRenderPass::DestroyResources(void* renderSystem) {
@@ -88,18 +88,12 @@ void DebugRenderPass::ReleaseObjects() {
 	alivePrimitives.clear();
 	debugMaterial.Clear();
 	debugQuadMaterial.Clear();
-	ClearStreamData(boxDataStream);
-	ClearStreamData(quadDataStream);
-	ClearStreamData(axisData);
+	boxDataStream.Clear();
+	quadDataStream.Clear();
+	axisData.Clear();
+	quadDataGenerated = false;
+	axisDataGenerated = false;
 	boxDataGenerated = false;
-}
-
-void DebugRenderPass::ClearStreamData(StreamData& s) {
-	s.indices.Clear();
-	if (s.vertices.binding) {
-		NEX_DELETE(s.vertices.binding);
-		s.vertices.binding = nullptr;
-	}
 }
 
 VisiblePrimitiveList& DebugRenderPass::_GetPrimitives(CommitContext& context) {
@@ -230,34 +224,13 @@ void DebugRenderPass::_RemovePrimitive(uint32 id) {
 }
 
 void DebugRenderPass::Commit(CommitContext& context) {
-	context.renderContext->BeginRender(&context.renderTargetInfo, ClearFlags::CLEAR_NONE);
+	BeginRender(context);
 	for (auto &prim : alivePrimitives) {
-		MaterialAsset* material = prim->GetMaterial();
-		ShaderAsset* shader = material->GetShader();
 		DebugPrimitive* dp = static_cast<DebugPrimitive*>(prim);
-		if (context.shader != shader) {
-			context.shader = shader;
-			// deferred pass at 0
-			Pass& pass = context.shader->GetPass(0);
-			context.passNumber = pass.GetID();
-			context.pass = static_cast<Pass::View*>(context.renderContext->GetView(&pass));
-			context.paramBuffers[(uint32)ParameterContext::CTX_PASS] = &shader->GetParameters();
-			context.pass->SwitchAndUpdateParams(context);
-		}
-		if (context.material != material) {
-			context.material = material;
-			context.materialNumber++;
-			context.paramBuffers[(uint32)ParameterContext::CTX_MATERIAL] = context.material->GetParameters();
-			context.pass->UpdateParams(context, ParameterContext::CTX_MATERIAL, context.materialNumber);
-		}
-
-		context.primitive = prim;
 		context.color = dp->GetColor();
-		context.paramBuffers[(uint32)ParameterContext::CTX_OBJECT] = prim->GetParameters();
-		context.pass->UpdateParams(context, ParameterContext::CTX_OBJECT, (uint32)(ptrdiff_t)prim + context.frameNumber);
-		context.renderContext->Draw(prim->GetStreamData(), context);
+		RenderPrimitive(context, (uint32)(ptrdiff_t)prim, dp);
 	}
-	context.renderContext->EndRender();
+	EndRender(ctx);
 	DetermineVisiblePrimitives(context.frameTime);
 }
 
@@ -393,37 +366,8 @@ void DebugRenderPass::GenerateStreamDataForBox() {
 }
 
 void DebugRenderPass::GenerateStreamDataForQuad() {
-	Geometry quadData = Geometry::CreateQuad(1, 1);
-	VertexBufferPtr vertexBuffer = Assign(NEX_NEW(VertexBuffer(GpuBuffer::NEVER_RELEASED)));
-
-	uint32 stride = ((sizeof(float) * 2));
-	uint32 vbsize = (uint32)quadData.points.size() * stride;
-
-	void* pVData = NEX_ALLOC(vbsize, MEMCAT_GENERAL);
-	float* pos = (float*)pVData;
-	for (uint32 i = 0; i < (uint32)quadData.points.size(); ++i) {
-		auto &p = quadData.points[i];
-		
-		*pos++ = p.x;
-		*pos++ = p.y;
-	}
-
-	vertexBuffer->CreateBuffer(vbsize, stride, reinterpret_cast<const uint8*>(pVData));
-
-	StreamData* stream = &quadDataStream;
-	stream->flags = StreamData::DELETE_BINDING;
-	stream->type = PrimitiveType::PT_TRI_LIST;
-	stream->vertices.count = (uint32)quadData.points.size();
-	stream->vertices.start = 0;
-	stream->vertices.layout = VertexLayout::GetCommonLayout(VertexLayoutType::POSITION2D_0).GetPtr();
-	stream->vertices.binding = NEX_NEW(VertexBufferBinding());
-	stream->vertices.binding->SetBufferCount(1);
-	stream->vertices.binding->BindBuffer(0, vertexBuffer, 0);
-	stream->indices.start = 0;
-	stream->indices.count = 0;
-	stream->instanceCount = 1;
-
-	NEX_FREE(pVData, MEMCAT_GENERAL);
+	quadDataStream = RenderManager::Instance().GetFullScreenQuad();
+	quadDataStream.flags &=~StreamData::DELETE_BINDING;
 }
 
 } /* namespace nextar */

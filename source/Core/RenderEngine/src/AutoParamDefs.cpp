@@ -68,39 +68,31 @@ void OmniLightPropertiesApply(CommitContext& context, const ShaderParameter* par
 }
 
 void AlbedoMapApply(CommitContext& context, const ShaderParameter* param) {
-	TextureUnit tu;
-	tu.texture = context.albedoMap;
 	const SamplerParameter* samplerParam =
 		static_cast<const SamplerParameter*>(param);
 	context.pass->SetTexture(context.renderContext, *samplerParam,
-		&tu);
+			context.albedoMap);
 }
 
 void SpecularAndGlossMapApply(CommitContext& context, const ShaderParameter* param) {
-	TextureUnit tu;
-	tu.texture = context.specularMap;
 	const SamplerParameter* samplerParam =
 		static_cast<const SamplerParameter*>(param);
 	context.pass->SetTexture(context.renderContext, *samplerParam,
-		&tu);
+			context.specularMap);
 }
 
 void DepthMapApply(CommitContext& context, const ShaderParameter* param) {
-	TextureUnit tu;
-	tu.texture = context.depthMap;
 	const SamplerParameter* samplerParam =
 		static_cast<const SamplerParameter*>(param);
 	context.pass->SetTexture(context.renderContext, *samplerParam,
-		&tu);
+			context.depthMap);
 }
 
 void NormalMapApply(CommitContext& context, const ShaderParameter* param) {
-	TextureUnit tu;
-	tu.texture = context.normalMap;
 	const SamplerParameter* samplerParam =
 		static_cast<const SamplerParameter*>(param);
 	context.pass->SetTexture(context.renderContext, *samplerParam,
-		&tu);
+			context.normalMap);
 }
 
 void ConstantScaleFactorApply(CommitContext& context, const ShaderParameter* param) {

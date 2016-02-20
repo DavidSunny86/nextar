@@ -30,6 +30,14 @@ void ASTPrinter::VisitDocumentEnd(const ASTDocument* document) {
 
 void ASTPrinter::VisitCommandBegin(const ASTCommand* command) {
 	Indent() << command->GetName() << " ";
+
+	StringUtils::ConstMultiString m(command->GetParameters().AsString());
+	auto it =  m.Iterate();
+	String temp;
+	while(it.HasNext(temp)) {
+		PrintString(temp);
+	}
+
 }
 
 void ASTPrinter::VisitCommandEnd(const ASTCommand* command) {
@@ -92,8 +100,5 @@ void ASTPrinter::PrintString(const String& value) {
 	}
 }
 
-void ASTPrinter::VisitParameter(const ASTParameter* parameter) {
-	PrintString(parameter->AsString());
-}
 
 } /* namespace nextar */

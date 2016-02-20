@@ -10,12 +10,8 @@
 namespace nextar {
 
 void ASTParameterList::Accept(ASTVisitor* visitor) const {
-	StringUtils::ConstMultiString m(_value);
-	auto it =  m.Iterate();
-	ASTParameter temp;
-	while(it.HasNext(temp.AsStringRef())) {
-		temp.Accept(visitor);
-	}
+	if(_value.size() > 0)
+		visitor->VisitParameterList(this);
 }
 
 }

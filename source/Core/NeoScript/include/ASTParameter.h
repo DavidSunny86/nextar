@@ -38,8 +38,6 @@ public:
 	void Append(const String& value);
 	void Append(const ASTParameter& value);
 
-	void Accept(ASTVisitor*) const;
-
 protected:
 	String _value;
 

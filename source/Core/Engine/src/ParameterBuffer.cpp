@@ -12,21 +12,27 @@ namespace nextar {
 
 ParameterBuffer::ParameterBuffer() :
 size(0), data(nullptr) {
+	id = (uint16)(ptrdiff_t)this;
+	ticket = 0;
 }
 
-ParameterBuffer::ParameterBuffer(const ParameterBuffer& pb) {
+ParameterBuffer::ParameterBuffer(const ParameterBuffer& pb) : ParameterBuffer() {
 	*this = pb;
 }
 
-ParameterBuffer::ParameterBuffer(ParameterBuffer&& pb) {
+ParameterBuffer::ParameterBuffer(ParameterBuffer&& pb) : ParameterBuffer() {
 	*this = std::move(pb);
 }
 
 ParameterBuffer::~ParameterBuffer() {
+	Clear();
+}
+
+void ParameterBuffer::Clear() {
 	uint8* buffer = data.get();
 	if (!buffer || !size)
 		return;
-
+	data.reset(nullptr);
 	assetRefs.clear();
 }
 
@@ -35,6 +41,7 @@ void ParameterBuffer::Prepare(const ParamEntryTableItem& table) {
 	size = table.totalParamBufferSize;
 	data.reset((uint8*) NEX_ALLOC(table.totalParamBufferSize, MEMCAT_CACHEALIGNED));
 	std::memset(this->data.get(), 0, size);
+	ticket++;
 }
 
 void ParameterBuffer::Prepare(void* data, uint32 size) {
@@ -44,11 +51,45 @@ void ParameterBuffer::Prepare(void* data, uint32 size) {
 		std::memcpy(this->data.get(), data, size);
 	else
 		std::memset(this->data.get(), 0, size);
+	ticket++;
 }
 
 void ParameterBuffer::Prepare(BufferPtr&& data, uint32 size) {
 	this->size = size;
 	this->data = std::move(data);
+	ticket++;
+}
+
+ParamEntryTable::const_iterator ParameterBuffer::_Find(const String& name) const {
+	auto it = paramTable.beginIt;
+	while (it != paramTable.endIt) {
+		NEX_ASSERT((*it).name);
+		if (*(*it).name == name)
+			return it;
+	}
+	return paramTable.endIt;
+}
+
+std::pair<const ParamEntry*, uint32> ParameterBuffer::GetParamEntryAndOffset(const String& name) const {
+	uint32 offset = 0;
+	auto it = paramTable.beginIt;
+	while (it != paramTable.endIt) {
+		NEX_ASSERT((*it).name);
+		if (*(*it).name == name)
+			return std::pair<ParamDataType, uint32>(&(*it), offset);
+		offset += (*it).maxSize;
+	}
+	return std::pair<const ParamEntry*, uint32>(nullptr, 0);
+}
+
+ParamDataType ParameterBuffer::GetType(const String& name) const {
+	auto it = paramTable.beginIt;
+	while (it != paramTable.endIt) {
+		NEX_ASSERT((*it).name);
+		if (*(*it).name == name)
+			return (*it).type;
+	}
+	return ParamDataType::PDT_UNKNOWN;
 }
 
 uint32 ParameterBuffer::GetOffset(const String& name) const {
@@ -76,6 +117,7 @@ const ParamEntry* ParameterBuffer::_GetParameter(const String& name) const {
 void ParameterBuffer::SetData(const void* data, uint32 offset, uint32 size) {
 	if (data && this->data)
 		std::memcpy(this->data.get() + offset, data, size);
+	ticket++;
 }
 
 void ParameterBuffer::SetData(const TextureUnit* data, uint32 offset) {
@@ -94,6 +136,7 @@ void ParameterBuffer::SetData(const TextureUnit* data, uint32 offset) {
 			assetRefs.push_back(asset);
 		}
 	}
+	ticket++;
 }
 
 ParameterBuffer& ParameterBuffer::operator=(const ParameterBuffer& pb) {
@@ -112,6 +155,7 @@ ParameterBuffer& ParameterBuffer::operator=(const ParameterBuffer& pb) {
 				static_cast<TextureAsset*>(unit->texture)->AddRef();
 		}
 	}
+	ticket++;
 	return *this;
 }
 
@@ -120,6 +164,7 @@ ParameterBuffer& ParameterBuffer::operator=(ParameterBuffer&& pb) {
 	paramTable = std::move(pb.paramTable);
 	data = std::move(pb.data);
 	assetRefs = std::move(pb.assetRefs);
+	ticket++;
 	return *this;
 }
 
@@ -189,6 +234,7 @@ void ParameterBuffer::AsyncLoad(InputSerializer& ser, AssetStreamRequest* reques
 			buffer += count;
 		}
 	}
+	ticket++;
 }
 
 void ParameterBuffer::AsyncSave(OutputSerializer& ser) const {

@@ -96,7 +96,7 @@ public:
 				uint32 updateId);
 		// Bind texture to a shader parameter. The number of units must match the desc->numUnits count.
 		virtual void SetTexture(RenderContext* rc, const SamplerParameter& desc,
-				const TextureUnit* tu) = 0;
+				TextureBase* t) = 0;
 
 		virtual void Update(nextar::RenderContext*, uint32 msg,
 				ContextParamPtr);

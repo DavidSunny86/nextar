@@ -16,6 +16,10 @@ public:
 		return GetValue();
 	}
 	
+	const ASTParameterList& GetParameters() const {
+		return _parameters;
+	}
+
 	virtual Type GetType() const {return Type::AST_COMMAND;}
 	virtual void Accept(ASTVisitor*) const;
 private:

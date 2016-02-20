@@ -28,7 +28,7 @@ Size MultiRenderTarget::GetDimensions() const {
 	return dimensions;
 }
 
-void MultiRenderTarget::Create(const CreateParam& params) {
+void MultiRenderTarget::Create(const CreateParams& params) {
 	/* create the individual textures */
 	const TargetParamArray& tpa = params.targets;
 	dimensions = params.dimensions;
@@ -53,13 +53,6 @@ PixelFormat MultiRenderTarget::GetPixelFormat() const {
 	return PixelFormat::UNKNOWN;
 }
 
-RenderTargetPtr MultiRenderTarget::GetAttachment(uint16 i) const {
-	return color[i];
-}
-
-RenderTargetPtr MultiRenderTarget::GetDepthAttachment() const {
-	return depth;
-}
 
 RenderTargetPtr MultiRenderTarget::CreateTexture(const TargetParam& tp) {
 	if (tp.useAsTexture) {

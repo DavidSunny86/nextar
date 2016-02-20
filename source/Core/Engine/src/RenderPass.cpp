@@ -9,13 +9,10 @@
 
 namespace nextar {
 
-RenderPass::RenderPass(const Config&) {
-	// TODO Auto-generated constructor stub
-
+RenderPass::RenderPass() {
 }
 
 RenderPass::~RenderPass() {
-	// TODO Auto-generated destructor stub
 }
 
 } /* namespace nextar */

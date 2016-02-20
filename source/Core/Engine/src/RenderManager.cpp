@@ -36,6 +36,7 @@ void RenderManager::CreateResources(void* renderSystem) {
 }
 
 void RenderManager::DestroyResources() {
+	fullScreenQuad.Clear();
 	defaultTexture.Clear();
 }
 
@@ -46,6 +47,7 @@ void RenderManager::CreateResources() {
 	defaultTexture->RequestLoad();
 	//@urgent load default texture
 	//defaultTexture = Asset::AssetLoad(defaultTexturePath);
+	GenerateStreamDataForQuad();
 }
 
 void RenderManager::Configure(const Config& config) {
@@ -67,18 +69,54 @@ void RenderManager::AddRenderQueue(const StringID name, uint16 priority,
 	std::sort(renderQueues.begin(), renderQueues.end());
 }
 
-void RenderManager::AddRenderPass(const String& name, const Config& cfg) {
+RenderPass* RenderManager::CreateRenderPass(const String& name) {
 	auto it = renderSystemFactories.find(name);
 	if (it != renderSystemFactories.end() && (*it).second)
-		AddRenderPass( (*it).second(cfg) );
+		return (*it).second();
+	return nullptr;
 }
 
-void RenderManager::AddRenderPass(RenderPass* rs) {
-	renderSystems.push_back(rs);
+void RenderManager::AddRenderStreamer(const String& name,
+		RenderSystem::Streamer* streamer) {
+	renderSystemStreamers[name] = streamer;
 }
 
-void RenderManager::RemoveRenderPass(RenderPass* rs) {
-	BestErase<RenderPassList>(renderSystems, rs);
+void RenderManager::RemoveRenderStreamer(const String& name) {
+	renderSystemStreamers.erase(name);
+}
+
+void RenderManager::GenerateStreamDataForQuad() {
+	Geometry quadData = Geometry::CreateQuad(1, 1);
+	VertexBufferPtr vertexBuffer = Assign(NEX_NEW(VertexBuffer(GpuBuffer::NEVER_RELEASED)));
+
+	uint32 stride = ((sizeof(float) * 2));
+	uint32 vbsize = (uint32)quadData.points.size() * stride;
+
+	void* pVData = NEX_ALLOC(vbsize, MEMCAT_GENERAL);
+	float* pos = (float*)pVData;
+	for (uint32 i = 0; i < (uint32)quadData.points.size(); ++i) {
+		auto &p = quadData.points[i];
+
+		*pos++ = p.x;
+		*pos++ = p.y;
+	}
+
+	vertexBuffer->CreateBuffer(vbsize, stride, reinterpret_cast<const uint8*>(pVData));
+
+	StreamData* stream = &fullScreenQuad;
+	stream->flags = StreamData::DELETE_BINDING;
+	stream->type = PrimitiveType::PT_TRI_LIST;
+	stream->vertices.count = (uint32)quadData.points.size();
+	stream->vertices.start = 0;
+	stream->vertices.layout = VertexLayout::GetCommonLayout(VertexLayoutType::POSITION2D_0).GetPtr();
+	stream->vertices.binding = NEX_NEW(VertexBufferBinding());
+	stream->vertices.binding->SetBufferCount(1);
+	stream->vertices.binding->BindBuffer(0, vertexBuffer, 0);
+	stream->indices.start = 0;
+	stream->indices.count = 0;
+	stream->instanceCount = 1;
+
+	NEX_FREE(pVData, MEMCAT_GENERAL);
 }
 
 } /* namespace nextar */

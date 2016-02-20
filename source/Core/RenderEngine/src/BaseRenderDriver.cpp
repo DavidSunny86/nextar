@@ -42,4 +42,5 @@ void BaseRenderDriver::Close() {
 	});
 	renderContexts.clear();
 }
+
 }

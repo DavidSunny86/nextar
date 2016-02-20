@@ -5,6 +5,24 @@
 
 namespace nextar {
 
+class _NexBaseAPI Stream : public Referenced<Stream, AllocGeneral> {
+public:
+	inline Stream() {
+	}
+
+	virtual ~Stream() {
+
+	}
+
+	/** Gets the full size of this stream. */
+	virtual size_t GetSize() const = 0;
+	/** Tells the position of the marker **/
+	virtual std::streamoff Tell() = 0;
+	/** Changes the position of the pointer. */
+	virtual bool Seek(std::streamoff offset, std::ios_base::seekdir dir =
+				std::ios_base::cur) = 0;
+};
+
 /**
  * @class	InputStream
  *
@@ -13,7 +31,7 @@ namespace nextar {
  * @author	Abhishek Dey
  * @date	11/28/2009
  **/
-class _NexBaseAPI InputStream: public Referenced<InputStream, AllocGeneral> {
+class _NexBaseAPI InputStream:  public Stream {
 protected:
 	size_t size;
 public:
@@ -45,7 +63,7 @@ public:
 	virtual void ReleaseBuffer(const void* readOnlyData);
 };
 
-class _NexBaseAPI OutputStream: public Referenced<OutputStream, AllocGeneral> {
+class _NexBaseAPI OutputStream: public Stream {
 protected:
 	size_t size;
 public:
@@ -59,7 +77,7 @@ public:
 	/** Writes data to stream, throws EXCEPT_WRITE_ERROR on faliure. Returns
 	 * actual amount of bytes written. **/
 	virtual void Write(const void* buffer, size_t size) = 0;
-	/** Changes the position of read pointer. **/
+	/** Changes the position of write pointer. **/
 	virtual bool Seek(std::streamoff offset, std::ios_base::seekdir dir =
 			std::ios_base::cur) = 0;
 	/** Returns the position of the marker. **/

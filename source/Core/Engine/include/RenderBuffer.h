@@ -33,8 +33,16 @@ public:
 	virtual Size GetDimensions() const;
 	virtual PixelFormat GetPixelFormat() const;
 
-	virtual void Create(PixelFormat format, uint32 width, uint32 height,
-			uint32 samples = 0);
+	inline void Create(PixelFormat format, uint32 width, uint32 height,
+			uint32 samples = 0) {
+		CreateParams params;
+		params.format = format;
+		params.width = width;
+		params.height = height;
+		params.samples = samples;
+		Create(params);
+	}
+	virtual void Create(const CreateParams& params);
 	virtual void Capture(RenderContext* rc, PixelBox& image, FrameBuffer);
 
 protected:

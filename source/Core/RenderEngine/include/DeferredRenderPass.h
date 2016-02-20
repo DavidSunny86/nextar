@@ -32,16 +32,14 @@ public:
 	MultiRenderTargetPtr renderTarget;
 };
 
-class _NexRenderAPI DeferredRenderPass: public nextar::RenderPass {
+class _NexRenderAPI DeferredRenderPass: public nextar::BaseRenderPass {
 public:
 
-	DeferredRenderPass(const Config& c);
+	DeferredRenderPass();
 	virtual ~DeferredRenderPass();
 
 	virtual void Commit(CommitContext& context);
 
-	static void DestroyResources(void* renderSystem);
-	static void CreateResources(void* renderSystem);
 
 	inline void DestroyBuffer() {
 		gbufferRI.rt = nullptr;
@@ -49,7 +47,10 @@ public:
 		lightMaterial.Clear();
 	}
 
-	static RenderPass* CreateInstance(const Config& c);
+	static RenderPass* CreateInstance();
+
+	virtual void CreateResources();
+	virtual void DestroyResources();
 
 protected:
 		

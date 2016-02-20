@@ -14,6 +14,11 @@ StreamData::StreamData() :
 }
 
 StreamData::~StreamData() {
+	Clear();
+}
+
+void StreamData::Clear() {
+	indices.indices.Clear();
 	if ((flags & DELETE_BINDING) && vertices.binding)
 		NEX_DELETE(vertices.binding);
 	if ((flags & DELETE_LAYOUT) && vertices.layout)

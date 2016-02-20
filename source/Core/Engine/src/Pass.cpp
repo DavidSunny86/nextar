@@ -194,8 +194,9 @@ void CustomTextureProcessorApply(CommitContext& context,
 	//@urgent Need provision for default parameters
 	NEX_ASSERT(pc.second);
 		
+	const TextureUnit* tu = pc.second->AsTexture(pc.first);
 	context.pass->SetTexture(context.renderContext, *sampler,
-			pc.second->AsTexture(pc.first));
+			tu->texture);
 	pc.first += sampler->size;
 }
 

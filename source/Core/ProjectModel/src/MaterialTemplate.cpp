@@ -149,7 +149,7 @@ void MaterialTemplate::MaterialFromTemplate::Load(InputStreamPtr& stream, AssetL
 	for(auto it = paramContext.beginIt; it != paramContext.endIt; ++it) {
 		NEX_ASSERT( (*it).autoName == AutoParamName::AUTO_CUSTOM_CONSTANT );
 	}
-	request->PrepareParamBuffer(paramContext);
+	ParameterBuffer* params = request->PrepareParamBuffer(paramContext);
 	size_t offset = 0;
 	for(auto it = paramContext.beginIt; it != paramContext.endIt; ++it) {
 		NEX_ASSERT((*it).name);
@@ -157,9 +157,14 @@ void MaterialTemplate::MaterialFromTemplate::Load(InputStreamPtr& stream, AssetL
 		if (pv != paramValues.end()) {
 			auto agent = ShaderParamAgent::GetAgent((*it).type);
 			if (agent)
-				agent->SetParamValue(offset, request, (*it), (*pv).second);
+				agent->SetParamValue(offset, params, (*it), (*pv).second);
 		}
 		offset += (*it).maxSize;
+	}
+	// assets
+	ParameterBuffer::AssetList& l = params->GetAssets();
+	for (auto& e : l) {
+		request->GetMetaInfo().AddDependency(e);
 	}
 	/* Find relevant params and set
 	 * */

@@ -36,7 +36,7 @@ shader DebugQuad {
 			option HAS_DIFFUSE_MAP ui:Options.HasTextureMap "desc:Apply texture map.";
 			define HAS_2DVERT;
 			vertex_program Common Quad;
-			fragment_program DebugQuad;
+			fragment_program Quad;
 		}
 
 	}

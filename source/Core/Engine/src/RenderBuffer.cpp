@@ -19,17 +19,11 @@ RenderBuffer::RenderBuffer() :
 RenderBuffer::~RenderBuffer() {
 }
 
-void RenderBuffer::Create(PixelFormat format, uint32 width, uint32 height,
-		uint32 samples) {
-	this->format = format;
-	this->dimensions.dx = width;
-	this->dimensions.dy = height;
+void RenderBuffer::Create(const CreateParams& params) {
+	this->format = params.format;
+	this->dimensions.dx = params.width;
+	this->dimensions.dy = params.height;
 
-	CreateParams params;
-	params.width = width;
-	params.height = height;
-	params.format = format;
-	params.samples = samples;
 	RequestUpdate(MSG_RB_CREATE,
 			static_cast<ContextObject::ContextParamPtr>(&params));
 }

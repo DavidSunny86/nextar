@@ -26,10 +26,30 @@ public:
 	virtual void VisitBlockRegionEnd(const ASTBlockRegion*) = 0;
 	virtual void VisitTextRegionBegin(const ASTTextRegion*) = 0;
 	virtual void VisitTextRegionEnd(const ASTTextRegion*) = 0;
-	virtual void VisitParameter(const ASTParameter*) = 0;
+
 
 protected:
 	~ASTVisitor() {}
+};
+
+class _NexNeoScriptAPI ASTVisitorAdapter : public ASTVisitor {
+public:
+	ASTVisitorAdapter() {}
+
+	virtual void VisitDocumentBegin(const ASTDocument*) {}
+	virtual void VisitDocumentEnd(const ASTDocument*) {}
+	virtual void VisitCommandBegin(const ASTCommand*) {}
+	virtual void VisitCommandEnd(const ASTCommand*) {}
+	virtual void VisitBlockBegin(const ASTBlock*) {}
+	virtual void VisitBlockEnd(const ASTBlock*) {}
+	virtual void VisitBlockRegionBegin(const ASTBlockRegion*) {}
+	virtual void VisitBlockRegionEnd(const ASTBlockRegion*) {}
+	virtual void VisitTextRegionBegin(const ASTTextRegion*) {}
+	virtual void VisitTextRegionEnd(const ASTTextRegion*) {}
+
+
+protected:
+	~ASTVisitorAdapter() {}
 };
 
 } /* namespace nextar */

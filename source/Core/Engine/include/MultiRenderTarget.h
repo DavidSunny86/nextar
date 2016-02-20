@@ -37,7 +37,7 @@ public:
 
 	typedef array<TargetParam, MAX_COLOR_TARGET>::type TargetParamArray;
 
-	struct CreateParam {
+	struct CreateParams {
 		bool useDepth;
 		uint16 numColorTargets;
 		Size dimensions;
@@ -62,11 +62,23 @@ public:
 	virtual void Capture(RenderContext* rc, PixelBox& image, FrameBuffer);
 	virtual Size GetDimensions() const;
 
-	virtual void Create(const CreateParam& params);
+	virtual void Create(const CreateParams& params);
 
-	RenderTargetPtr GetAttachment(uint16 index) const;
-	RenderTargetPtr GetDepthAttachment() const;
+	RenderTargetPtr GetAttachment(uint16 i) const {
+		return color[i];
+	}
 
+	RenderTargetPtr GetDepthAttachment() const {
+		return depth;
+	}
+
+	RenderTarget* GetAttachmentPtr(uint16 i) const {
+		return color[i];
+	}
+
+	RenderTarget* GetDepthAttachmentPtr() const {
+		return depth;
+	}
 
 protected:
 

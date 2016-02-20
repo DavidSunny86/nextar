@@ -78,18 +78,12 @@ void BaseRenderManager::RegisterRenderContext(RenderContextPtr& ptr) {
 	if (!primaryContext) {
 		primaryContext = ptr;
 	}
-	if (!renderSystems.size())
-		CreateRenderPasss();
+
 #endif
 }
 
 void BaseRenderManager::Close() {
 	CloseImpl();
-
-	for (auto r : renderSystems) {
-		if (r)
-			NEX_DELETE(r);
-	}
 		
 #if NEX_MULTIGPU_BUILD
 	RenderDriverList::iterator it = renderDrivers.begin();
@@ -185,17 +179,6 @@ void BaseRenderManager::PresentSwapChains(RenderContext* rc) {
 	RenderTargetList& rtList = rc->GetRenderTargetList();
 	for (auto &rt : rtList) {
 		rt->Present(rc);
-	}
-}
-
-void BaseRenderManager::CreateRenderPasss() {
-	// get the config here
-	const Config& c = ApplicationContext::Instance().GetConfig();
-	String systems = c.GetValue("RenderManager", "Systems", "Deferred,Forward,Debug");
-
-	StringVector l = StringUtils::Tokenize(systems, ",");
-	for (auto& e : l) {
-		AddRenderPass(e, c);
 	}
 }
 

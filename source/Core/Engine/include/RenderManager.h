@@ -55,10 +55,6 @@ public:
 		return renderSettings;
 	}
 
-	inline const RenderPassList& GetRenderPasss() const {
-		return renderSystems;
-	}
-
 	inline const RenderQueueDescList& GetRenderQueueInfo() const {
 		return renderQueues;
 	}
@@ -66,11 +62,6 @@ public:
 	void AddRenderPassFactory(const String& name, RenderPass::CreateInstance ci) {
 		renderSystemFactories[name] = ci;
 	}
-
-	void AddRenderPass(const String& name, const Config& cfg);
-
-	virtual void AddRenderPass(RenderPass* rs);
-	virtual void RemoveRenderPass(RenderPass* rs);
 
 	/* */
 	virtual void Configure(const Config&);
@@ -104,30 +95,47 @@ public:
 		return defaultTexture;
 	}
 
+	inline StreamData& GetFullScreenQuad() {
+		if (!fullScreenQuad.vertices.count)
+			GenerateStreamDataForQuad();
+		return fullScreenQuad;
+	}
+
+	void AddRenderStreamer(const String& name, RenderSystem::Streamer*);
+	void RemoveRenderStreamer(const String& name);
+
+	RenderPass* CreateRenderPass(const String& name);
+
 protected:
 
 	static void DestroyResources(void* renderSystem);
 	static void CreateResources(void* renderSystem);
 
-	void DestroyResources();
-	void CreateResources();
+	virtual void DestroyResources();
+	virtual void CreateResources();
 		
+	void GenerateStreamDataForQuad();
+
+	typedef map<String, RenderSystem::Streamer*>::type RenderSystemStreamerMap;
 	typedef map<String, RenderPass::CreateInstance>::type RenderPassFactoryMap;
 
 	virtual RenderDriverPtr CreateDriverImpl(DriverCreationParams&) = 0;
 	virtual void ConfigureImpl(const NameValueMap&) = 0;
 
 	NEX_THREAD_MUTEX(accessLock);
+	/* */
+	StreamData fullScreenQuad;
 	/* Global render options */
 	RenderSettings renderSettings;
-	/* Registered render systems */
-	RenderPassList renderSystems;
 	/* Render layers */
 	RenderQueueDescList renderQueues;	
 	// Default texture
 	TextureAssetPtr defaultTexture;
 	// Render systems
 	RenderPassFactoryMap renderSystemFactories;
+	// Render streamers
+	RenderSystemStreamerMap renderSystemStreamers;
+
 };
 
 }

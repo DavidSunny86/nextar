@@ -43,7 +43,7 @@ public:
 
 		void SetShader(ShaderAssetPtr& shader);
 		void SetShader(const ShaderAsset::ID& id, const URL& location);
-		void PrepareParamBuffer(const ParamEntryTableItem& table);
+		ParameterBuffer* PrepareParamBuffer(const ParamEntryTableItem& table);
 		void SetParamValue(uint32 offset, const void* data, uint32 amount);
 		void SetTextureValue(uint32 offset, const TextureUnit* texture);
 		void SetParameterBuffer(ParameterBuffer&& buff);
@@ -93,7 +93,7 @@ protected:
 	virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);
 
 	void PrepareMaterial(MaterialAsset::MaterialLoadRequest*);
-	void PrepareParamBuffer(const ParamEntryTableItem& table);
+	ParameterBuffer* PrepareParamBuffer(const ParamEntryTableItem& table);
 	void SetParamData(const void* data, uint32 offset, uint32 size);
 	void SetParamData(const TextureUnit* data, uint32 offset);
 	void SetParameterBuffer(ParameterBuffer&& buff);

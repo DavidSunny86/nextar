@@ -9,7 +9,7 @@
 #define SHADERPARAMAGENT_H_
 
 #include <ShaderParam.h>
-#include <MaterialAsset.h>
+#include <ParameterBuffer.h>
 
 namespace nextar {
 
@@ -22,11 +22,11 @@ public:
 
 	static ShaderParamAgent* GetAgent(ParamDataType type);
 
-	virtual void SetParamValue(size_t offset, MaterialAsset::MaterialLoadRequest* request,
+	virtual void SetParamValue(size_t offset, ParameterBuffer* buffer,
 			const ParamEntry& pe, const String& value);
 
 protected:
-	virtual void SetParamValueImpl(size_t offset, MaterialAsset::MaterialLoadRequest* request,
+	virtual void SetParamValueImpl(size_t offset, ParameterBuffer* buffer,
 			const ParamEntry& pe, const String& value) = 0;
 
 	static ShaderParamAgentMap agents;
@@ -36,7 +36,7 @@ protected:
 class ShaderParamScalar : public ShaderParamAgent {
 public:
 	static ShaderParamScalar agent;
-	virtual void SetParamValueImpl(size_t offset, MaterialAsset::MaterialLoadRequest* request,
+	virtual void SetParamValueImpl(size_t offset, ParameterBuffer* buffer,
 				const ParamEntry& pe, const String& value);
 
 };
@@ -44,7 +44,7 @@ public:
 class ShaderParamVector : public ShaderParamAgent {
 public:
 	static ShaderParamVector agent;
-	virtual void SetParamValueImpl(size_t offset, MaterialAsset::MaterialLoadRequest* request,
+	virtual void SetParamValueImpl(size_t offset, ParameterBuffer* buffer,
 				const ParamEntry& pe, const String& value);
 
 };
@@ -52,7 +52,7 @@ public:
 class ShaderParamMatrix : public ShaderParamAgent {
 public:
 	static ShaderParamMatrix agent;
-	virtual void SetParamValueImpl(size_t offset, MaterialAsset::MaterialLoadRequest* request,
+	virtual void SetParamValueImpl(size_t offset, ParameterBuffer* buffer,
 				const ParamEntry& pe, const String& value);
 
 };
@@ -60,7 +60,7 @@ public:
 class ShaderParamTexture : public ShaderParamAgent {
 public:
 	static ShaderParamTexture agent;
-	virtual void SetParamValueImpl(size_t offset, MaterialAsset::MaterialLoadRequest* request,
+	virtual void SetParamValueImpl(size_t offset, ParameterBuffer* buffer,
 				const ParamEntry& pe, const String& value);
 
 };

@@ -33,6 +33,7 @@ class FileOutputStream;
 class Frustum;
 
 typedef RefPtr<Archive> ArchivePtr;
+typedef RefPtr<Stream> StreamPtr;
 typedef RefPtr<InputStream> InputStreamPtr;
 typedef RefPtr<OutputStream> OutputStreamPtr;
 typedef RefPtr<MemoryInputStream> MemoryInputStreamPtr;

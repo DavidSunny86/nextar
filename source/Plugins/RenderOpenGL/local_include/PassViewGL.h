@@ -131,7 +131,7 @@ public:
 
 	virtual void Compile(nextar::RenderContext*, const Pass::CompileParams&);
 	virtual void SetTexture(RenderContext* rc, const SamplerParameter& desc,
-			const TextureUnit* tu);
+			TextureBase* t);
 	virtual void Destroy(nextar::RenderContext*);
 
 	void SetupStates(const Pass::CompileParams&);

@@ -89,6 +89,8 @@ public:
 
 	StreamData();
 	~StreamData();
+
+	void Clear();
 };
 
 }
