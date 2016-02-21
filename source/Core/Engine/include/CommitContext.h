@@ -17,6 +17,7 @@
 namespace nextar {
 
 
+class RenderSystem;
 class CommitContext: public AllocGeneral {
 public:
 
@@ -65,6 +66,7 @@ public:
 	RenderContext* renderContext;
 	RenderTarget* viewRenderTarget;
 	RenderTarget* lastRenderTarget;
+	RenderSystem* rsys;
 
 	// camera and planes
 	Camera* camera;
@@ -85,7 +87,8 @@ public:
 			if(type == "depth")
 				lastTarget = RenderTargetName::LAST_RT_DEPTH;
 			else if ((p=type.find_first_of("color-")) != String::npos) {
-				lastTarget = RenderTargetName::LAST_RT_COLOR_0 + Convert::ToULong(type.substr(p+6));
+				lastTarget = (RenderTargetName) 
+					(RenderTargetName::LAST_RT_COLOR_0 + Convert::ToULong(type.substr(p + 6)));
 			}
 		} else if (target == "viewport")
 			lastTarget = RenderTargetName::VIEW_RT_MT;
@@ -94,7 +97,8 @@ public:
 			if(type == "depth")
 				lastTarget = RenderTargetName::VIEW_RT_DEPTH;
 			else if ((p=type.find_first_of("color-")) != String::npos) {
-				lastTarget = RenderTargetName::VIEW_RT_COLOR_0 + Convert::ToULong(type.substr(p+6));
+				lastTarget = (RenderTargetName)(
+					RenderTargetName::VIEW_RT_COLOR_0 + Convert::ToULong(type.substr(p + 6)));
 			}
 		}
 

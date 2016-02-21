@@ -17,6 +17,7 @@ class RenderManager;
 class RenderDriver;
 class RenderContext;
 class RenderWindow;
+class RenderSystem;
 class GpuBuffer;
 class VertexBuffer;
 class IndexBuffer;
@@ -78,6 +79,7 @@ typedef RefPtr<RenderTexture> RenderTexturePtr;
 typedef RefPtr<RenderTarget> RenderTargetPtr;
 typedef RefPtr<MultiRenderTarget> MultiRenderTargetPtr;
 typedef RefPtr<VertexLayout> VertexLayoutPtr;
+typedef RefPtr<RenderSystem> RenderSystemPtr;
 
 typedef RefPtr<SharedComponent> SharedComponentPtr;
 typedef RefPtr<Asset> AssetPtr;

@@ -33,7 +33,9 @@ protected:
  * @remarks Viewport is the portion of a canvas where a camera can draw.
  *        A viewport is created inside a canvas.
  **/
-class Viewport: public AllocGeneral {
+class Viewport: 
+	public NamedObject,
+	public AllocGeneral {
 public:
 
 	enum ClearMask {
@@ -86,10 +88,12 @@ public:
 		return vp1->priority - vp2->priority;
 	}
 
-	Viewport(Camera *cam, RenderTarget *rt, float x = 0.f, float y = 0.f,
-			float width = 1.f, float height = 1.f, int32 priority = 0,
-			uint32 flags = ACTIVE, const String& optName = StringUtils::Null,
-			Viewport* next = 0);
+	Viewport(Camera *cam, RenderTarget *rt, StringID renderSystem = StringUtils::DefaultID,
+		float x = 0.f, float y = 0.f,
+		float width = 1.f, float height = 1.f, int32 priority = 0,
+		uint32 flags = ACTIVE, StringID optName = StringUtils::NullID,
+		Viewport* next = 0);
+
 	virtual ~Viewport();
 
 	inline int32 GetPriority() const {
@@ -185,6 +189,7 @@ protected:
 	LightSystemPtr lightSystem;
 	SceneTraversal traversal;
 
+	uint32 lastTextureDim;
 	float topleftX;
 	float topleftY;
 	float width;
@@ -209,8 +214,7 @@ protected:
 
 	VisibilitySet visibleSet;
 	ViewportCallbackList callbacks;
-
-	RenderPassList renderSystems;
+	RenderSystemPtr renderSystem;
 private:
 
 	/* next viewport in the list */

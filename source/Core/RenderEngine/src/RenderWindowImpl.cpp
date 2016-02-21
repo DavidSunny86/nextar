@@ -11,7 +11,7 @@
 namespace nextar {
 
 RenderWindowImpl::RenderWindowImpl() :
-		RenderTarget(RenderTargetType::BACK_BUFFER) {
+RenderTarget(RenderTargetType::BACK_BUFFER) {
 }
 
 RenderWindowImpl::~RenderWindowImpl() {

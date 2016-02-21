@@ -10,6 +10,38 @@
 
 namespace nextar {
 
+class ShaderParamScalar : public ShaderParamAgent {
+public:
+	static ShaderParamScalar agent;
+	virtual void SetParamValueImpl(size_t offset, ParameterBuffer* buffer,
+		const ParamEntry& pe, const String& value);
+
+};
+
+class ShaderParamVector : public ShaderParamAgent {
+public:
+	static ShaderParamVector agent;
+	virtual void SetParamValueImpl(size_t offset, ParameterBuffer* buffer,
+		const ParamEntry& pe, const String& value);
+
+};
+
+class ShaderParamMatrix : public ShaderParamAgent {
+public:
+	static ShaderParamMatrix agent;
+	virtual void SetParamValueImpl(size_t offset, ParameterBuffer* buffer,
+		const ParamEntry& pe, const String& value);
+
+};
+
+class ShaderParamTexture : public ShaderParamAgent {
+public:
+	static ShaderParamTexture agent;
+	virtual void SetParamValueImpl(size_t offset, ParameterBuffer* buffer,
+		const ParamEntry& pe, const String& value);
+
+};
+
 ShaderParamScalar ShaderParamScalar::agent;
 ShaderParamVector ShaderParamVector::agent;
 ShaderParamTexture ShaderParamTexture::agent;

@@ -5,7 +5,10 @@
 #include <DeferredRenderPass.h>
 #include <DebugRenderPass.h>
 #include <ForwardRenderPass.h>
+#include <CompositorRenderPass.h>
+#include <RenderSystemImpl.h>
 #include <ApplicationContext.h>
+
 
 namespace nextar {
 
@@ -23,6 +26,24 @@ void BaseRenderManager::ConfigureImpl(const NameValueMap& c) {
 	CreateDefaultRenderPassFactories();
 	CreateRenderQueues(c);
 	RegisterAutoParams();
+	RegisterRenderSystemConfig(c);
+}
+
+void BaseRenderManager::CreateResources() {
+	RenderManager::CreateResources();
+	CreateAndLoadRenderSystems();
+}
+
+void BaseRenderManager::DestroyResources() {
+	SaveAndCloseRenderSystems();
+	RenderManager::DestroyResources();
+}
+
+void BaseRenderManager::RegisterRenderSystemConfig(const NameValueMap& c) {
+	auto it = c.find("RenderSystems");
+	if (it != c.end()) {
+		renderSystemConfigs = StringUtils::TokenizeToMultiString((*it).second, ",");
+	}
 }
 
 ContextID BaseRenderManager::RequestObjectCreate(ContextObject::Type type, uint32 hint) {
@@ -218,9 +239,55 @@ void BaseRenderManager::CreateRenderQueues(const NameValueMap& section) {
 }
 
 void BaseRenderManager::CreateDefaultRenderPassFactories()  {
+	AddRenderPassFactory("Compositor", &CompositorRenderPass::CreateInstance);
 	AddRenderPassFactory("Deferred", &DeferredRenderPass::CreateInstance);
 	AddRenderPassFactory("Forward", &ForwardRenderPass::CreateInstance);
 	AddRenderPassFactory("Debug", &DebugRenderPass::CreateInstance);
+}
+
+RenderSystemPtr BaseRenderManager::GetRenderSystem(StringID name) {
+	for (auto& e : renderSystems) {
+		if (e->GetID() == name)
+			return e;
+	}
+	return RenderSystemPtr();
+}
+
+void BaseRenderManager::CreateRenderSystem(const String& configName) {
+	URL firstUrl(FileSystem::ArchiveProjectData_Name, "Configs/" + configName + ".rsys");
+	bool bCompiled = true;
+	InputStreamPtr input = FileSystem::Instance().OpenRead(firstUrl);
+	if (!input) {
+		URL secondUrl(FileSystem::ArchiveProjectData_Name, "Scripts/Configs/" + configName + ".rss");
+		input = FileSystem::Instance().OpenRead(secondUrl);
+		bCompiled = false;
+	}
+
+	if (input) {
+		RenderSystemImplPtr rsys = Assign(NEX_NEW(RenderSystemImpl()));
+		renderSystems.push_back(rsys);
+		if (!bCompiled)
+			rsys->SetName(configName);
+		rsys->Load(input, bCompiled ? "RSYS" : "RSS");
+		rsys->CreateResources();
+	}
+}
+
+void BaseRenderManager::SaveAndCloseRenderSystems() {
+	for (auto& e : renderSystems) {
+		RenderSystemImplPtr rsys = e;
+		rsys->DestroyResources();
+	}
+	renderSystems.clear();
+}
+
+void BaseRenderManager::CreateAndLoadRenderSystems() {
+	ConstMultiStringHelper h(renderSystemConfigs);
+	auto it = h.Iterate();
+	String config;
+	while (it.HasNext(config)) {
+		CreateRenderSystem(config);
+	}
 }
 
 }

@@ -112,6 +112,7 @@ protected:
 
 protected:
 
+	static Geometry GenerateAxis(float radius, float alpha, int color);
 	void DetermineVisiblePrimitives(float frameTime);
 	void CreateMaterials();
 	void ReleaseObjects();

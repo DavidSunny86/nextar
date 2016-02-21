@@ -8,9 +8,10 @@
 
 namespace nextar {
 
-Viewport::Viewport(Camera* cam, RenderTarget* rt, float x, float y, float width,
-		float height, int32 priority, uint32 flags, const String& optName,
-		Viewport* nextVp) {
+Viewport::Viewport(Camera* cam, RenderTarget* rt, StringID rsys, float x, float y, float width,
+		float height, int32 priority, uint32 flags, StringID optName,
+		Viewport* nextVp) : NamedObject(optName) {
+	this->lastTextureDim = -1;
 	this->next = nextVp;
 	this->clearStencil = 0;
 	this->clearDepth = 1;
@@ -23,8 +24,7 @@ Viewport::Viewport(Camera* cam, RenderTarget* rt, float x, float y, float width,
 	this->height = height;
 	this->flags = flags;
 	this->priority = priority;
-	this->name = optName;
-	this->renderSystems = RenderManager::Instance().GetRenderPasss();
+	this->renderSystem = RenderManager::Instance().GetRenderSystem(rsys);
 	this->lightSystem = Assign(NEX_NEW(DefaultLightSystem()));
 }
 
@@ -90,13 +90,10 @@ void Viewport::CommitPrimitives(RenderContext* renderCtx, const FrameTimer&  fra
 	commitContext.visibiles = &visibleSet;
 	commitContext.lightSystem = traversal.lightSystem;
 	commitContext.targetDimension = renderTarget->GetDimensions();
-	
-	commitContext.renderTargetInfo.rt = renderTarget;
-	renderCtx->BeginRender(&commitContext.renderTargetInfo, ClearFlags::CLEAR_ALL);
-	for (auto &r : renderSystems) {
-		r->Commit(commitContext);
+	commitContext.viewRenderTarget = renderTarget;
+	if (renderSystem) {
+		renderSystem->Commit(commitContext);
 	}
-	renderCtx->EndRender();
 }
 
 void Viewport::Render(RenderContext* renderCtx, const FrameTimer& frameNumber) {

@@ -63,6 +63,10 @@ public:
 		material = m;
 	}
 
+	void SetParameters(ParameterBuffer* p) {
+		parameters = p;
+	}
+
 	const ParameterBuffer* GetParameters() const {
 		return parameters;
 	}

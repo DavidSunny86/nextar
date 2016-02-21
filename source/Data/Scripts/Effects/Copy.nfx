@@ -7,8 +7,8 @@ shader Copy {
 		
 		texture_state {
 			sampler linear_sampler {
-				min_filter linear_mip_linear;
-				mag_filter linear;
+				min_filter nearest_mip_nearest;
+				mag_filter nearest;
 				address_u repeat;
 				address_v repeat;
 			}
@@ -31,7 +31,7 @@ shader Copy {
 		}
 		
 		program {
-			option HAS_DIFFUSE_MAP ui:Options.HasTextureMap "desc:Apply texture map.";
+			define HAS_DIFFUSE_MAP;
 			define HAS_2DVERT;
 			vertex_program Common Quad;
 			fragment_program Quad;

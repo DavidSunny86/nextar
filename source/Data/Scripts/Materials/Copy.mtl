@@ -1,0 +1,6 @@
+
+material #:#.Copy {
+	shader "{EngineData}/Scripts/Effects/Copy.nfx";
+	layer normal;
+}
+

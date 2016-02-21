@@ -14,6 +14,13 @@ namespace nextar {
 
 class _NexRenderAPI CompositorRenderPass: public BaseMaterialPass {
 public:
+	struct TexturesToResolve {
+		RenderTargetName name;
+		uint32 offset;
+	};
+
+	static RenderPass* CreateInstance();
+
 	CompositorRenderPass();
 	virtual ~CompositorRenderPass();
 
@@ -30,20 +37,18 @@ public:
 	virtual void CreateResources();
 	virtual void DestroyResources();
 
-protected:
+	void AddTexturesToResolve(const TexturesToResolve* toResolve, uint32 numToResolve);
 
-	struct TexturesToResolve {
-		RenderTargetName name;
-		uint32 offset;
-	};
+protected:
 
 	union {
 		TexturesToResolve* _rtBunchOf;
 		TexturesToResolve  _rtJustOne;
 	};
 
-	VisiblePrimitive primitive;
+	uint32 renderSystemTicket;
 	uint32 numTextureToResolve;
+	VisiblePrimitive primitive;
 	ParameterBuffer parameters;
 };
 

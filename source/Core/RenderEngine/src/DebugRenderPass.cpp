@@ -30,14 +30,12 @@ void DebugPrimitive::SetDebugMaterial(MaterialAssetPtr& m) {
 	}
 }
 
-DebugRenderPass::DebugRenderPass() : RenderPass() {
+DebugRenderPass::DebugRenderPass() : BaseRenderPass() {
 
 	idCounter = 0;
 	boxDataGenerated = false;
 	axisDataGenerated = false;
 	quadDataGenerated = false;
-	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_INIT_RESOURCES, CreateResources, this);
-	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyResources, this);
 }
 
 DebugRenderPass::~DebugRenderPass() {
@@ -48,17 +46,13 @@ RenderPass* DebugRenderPass::CreateInstance() {
 	return NEX_NEW(DebugRenderPass());
 }
 
-void DebugRenderPass::DestroyResources(void* renderSystem) {
-	DebugRenderPass* pRenderSys = reinterpret_cast<DebugRenderPass*>(renderSystem);
-	if (pRenderSys)
-		pRenderSys->ReleaseObjects();
+void DebugRenderPass::DestroyResources() {
+	ReleaseObjects();
 }
 
 
-void DebugRenderPass::CreateResources(void* renderSystem) {
-	DebugRenderPass* pRenderSys = reinterpret_cast<DebugRenderPass*>(renderSystem);
-	if (pRenderSys)
-		pRenderSys->CreateMaterials();
+void DebugRenderPass::CreateResources() {
+	CreateMaterials();
 }
 
 void DebugRenderPass::CreateMaterials() {
@@ -230,11 +224,11 @@ void DebugRenderPass::Commit(CommitContext& context) {
 		context.color = dp->GetColor();
 		RenderPrimitive(context, (uint32)(ptrdiff_t)prim, dp);
 	}
-	EndRender(ctx);
+	EndRender(context);
 	DetermineVisiblePrimitives(context.frameTime);
 }
 
-Geometry GenerateAxis(float radius, float alpha, int color) {
+Geometry DebugRenderPass::GenerateAxis(float radius, float alpha, int color) {
 	Quaternion q;
 	Matrix4x4 m;
 	Color baseColor(alpha, 0.1f, 0.1f, 0.1f);

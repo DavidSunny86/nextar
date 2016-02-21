@@ -13,6 +13,7 @@ RenderScriptContext::RenderScriptContext(RenderSystem& rsys) :
 _rsys(rsys)
 ,_pass(nullptr)
 ,_numTargets(0)
+,_numUnresolvedTextures(0)
 {
 }
 

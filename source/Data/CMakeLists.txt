@@ -77,6 +77,7 @@ prepare_data(Scripts/Shaders)
 prepare_data(Scripts/Effects)
 prepare_data(Scripts/ConstBuffers)
 prepare_data(Scripts/NeoScriptUnits)
+prepare_data(Scripts/Configs)
 
 add_custom_target(NE_Data ALL 
 	SOURCES ${DATA_SRC_LIST})

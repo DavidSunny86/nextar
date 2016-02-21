@@ -13,6 +13,7 @@
 #include <NameValueMap.h>
 #include <RenderPass.h>
 #include <RenderConstants.h>
+#include <RenderSystem.h>
 
 namespace nextar {
 
@@ -103,8 +104,12 @@ public:
 
 	void AddRenderStreamer(const String& name, RenderSystem::Streamer*);
 	void RemoveRenderStreamer(const String& name);
+	RenderSystem::Streamer* GetRenderStreamer(const String& name);
 
 	RenderPass* CreateRenderPass(const String& name);
+
+	virtual void CreateRenderSystem(const String& configName) = 0;
+	virtual RenderSystemPtr GetRenderSystem(StringID name) = 0;
 
 protected:
 
@@ -115,7 +120,7 @@ protected:
 	virtual void CreateResources();
 		
 	void GenerateStreamDataForQuad();
-
+		
 	typedef map<String, RenderSystem::Streamer*>::type RenderSystemStreamerMap;
 	typedef map<String, RenderPass::CreateInstance>::type RenderPassFactoryMap;
 
@@ -123,6 +128,9 @@ protected:
 	virtual void ConfigureImpl(const NameValueMap&) = 0;
 
 	NEX_THREAD_MUTEX(accessLock);
+	
+	/* bool loadDefaultTexture; */
+
 	/* */
 	StreamData fullScreenQuad;
 	/* Global render options */
@@ -131,7 +139,7 @@ protected:
 	RenderQueueDescList renderQueues;	
 	// Default texture
 	TextureAssetPtr defaultTexture;
-	// Render systems
+	// Render pass factory map
 	RenderPassFactoryMap renderSystemFactories;
 	// Render streamers
 	RenderSystemStreamerMap renderSystemStreamers;

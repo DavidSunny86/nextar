@@ -5,7 +5,6 @@ create-buffer main {
 }
 
 pass Forward {
-	
 	render-to main;
 	clean-depth;
 	clean-color 0 black; 

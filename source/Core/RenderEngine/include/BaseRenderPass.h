@@ -59,7 +59,7 @@ inline void BaseRenderPass::SetCleanDepth(bool clean, float v) {
 }
 
 inline void BaseRenderPass::SetCleanColor(uint32 i, const Color& c) {
-	clearFlags |= (1 << (ClearFlags::CLEAR_COLOR_I + i));
+	clearFlags |= (ClearFlags)(1 << ((uint16)ClearFlags::CLEAR_COLOR_I + i));
 	info.info.clearColor[i] = c;
 }
 

@@ -431,6 +431,17 @@ inline StringVector Tokenize(const String& value, const String& seperators) {
 	return ret;
 }
 
+inline String TokenizeToMultiString(const String& value, const String& seperators) {
+	String ret;
+	size_t what = -1;
+	do {
+		size_t start = what + 1;
+		what = value.find_first_of(seperators, start);
+		PushBackWord(ret, (value.substr(start, what)));
+	} while (what != String::npos);
+	return ret;
+}
+
 /** @remarks Trim leading white space **/
 inline void TrimLeading(String& str) {
 	size_t endpos = str.find_first_not_of(" \t\n\r");

@@ -8,8 +8,8 @@
 #ifndef PLUGINS_PASSSCRIPTSTREAMER_LOCAL_INCLUDE_RENDERSCRIPTSTREAMER_H_
 #define PLUGINS_PASSSCRIPTSTREAMER_LOCAL_INCLUDE_RENDERSCRIPTSTREAMER_H_
 
-#include <RenderScriptRoot.h>
 #include <RenderSystemScript.h>
+#include <RenderScriptRoot.h>
 
 namespace RenderSystemScript {
 
@@ -27,7 +27,7 @@ public:
 	void UnregisterDictionary();
 
 	virtual bool Load(RenderSystem& s, InputStreamPtr& stream);
-	virtual bool Save(RenderSystem& s, OutputStreamPtr& stream);
+	virtual bool Save(RenderSystem& s, OutputStreamPtr& stream) {}
 
 protected:
 	RenderScriptRoot _root;

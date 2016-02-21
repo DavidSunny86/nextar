@@ -8,6 +8,7 @@
 #ifndef MULTIRENDERTARGET_H_
 #define MULTIRENDERTARGET_H_
 
+#include <NexEngine.h>
 #include <ContextObject.h>
 #include <RenderTarget.h>
 

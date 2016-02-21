@@ -11,7 +11,7 @@
 namespace nextar {
 
 BaseRenderPass::BaseRenderPass() :
-clearFlags(0)
+clearFlags(ClearFlags::CLEAR_NONE)
 ,toLastSubTarget(RT_NONE) {
 	info.info.clearDepth = 1.0f;
 

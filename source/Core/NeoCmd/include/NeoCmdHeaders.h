@@ -8,8 +8,9 @@
 #ifndef CORE_NEOCMD_INCLUDE_NEOCMDHEADERS_H_
 #define CORE_NEOCMD_INCLUDE_NEOCMDHEADERS_H_
 
-
+#include <NeoScriptHeaders.h>
 #include <NeoCommandInterpreter.h>
+#include <CommandContext.h>
 #include <RootBlockCommandHandler.h>
 #include <CommandDictionaryArchive.h>
 

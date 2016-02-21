@@ -29,7 +29,7 @@ public:
 		~Streamer() {}
 	};
 
-	RenderSystem(Size viewerInitialDim) : viewerDim(viewerInitialDim) {}
+	RenderSystem() : renderSystemTicket(-1) {}
 	virtual ~RenderSystem();
 
 	virtual void BeginConfig(bool bStoreMetaInfo = false) = 0;
@@ -53,14 +53,24 @@ public:
 	virtual void Commit(CommitContext& context) = 0;
 	virtual void RegisterTarget(StringID as, RenderTargetPtr target) = 0;
 	virtual RenderTargetPtr GetTarget(StringID name) = 0;
+		
+	virtual RenderPass* FindPass(StringID name) = 0;
+	virtual void EnablePass(StringID pass) = 0;
+	virtual void DisablePass(StringID pass) = 0;
 
 	/* Streaming in-out */
 	virtual void Load(InputStreamPtr& stream, const String& fileType) = 0;
 	virtual void Save(OutputStreamPtr& stream, const String& fileType) = 0;
 
+	inline uint32 GetTicket() const {
+		return renderSystemTicket;
+	}
+
+
 protected:
 
-	Size viewerDim;
+
+	uint32 renderSystemTicket;
 };
 
 typedef vector<RenderPass*>::type RenderPassList;

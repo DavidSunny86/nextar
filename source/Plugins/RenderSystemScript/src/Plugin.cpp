@@ -21,13 +21,13 @@ Plugin::~Plugin() {
 void Plugin::Open() {
 	Trace("Loaded render system script loader 1.0.");
 	_streamer.RegisterDictionary();
-	RenderManager::Instance().AddRenderStreamer("RSYS", &_streamer);
+	RenderManager::Instance().AddRenderStreamer("RSS", &_streamer);
 
 }
 
 void Plugin::Close() {
 	Trace("Unloading render system script loader 1.0.");
-	RenderManager::Instance().RemoveRenderStreamer("RSYS");
+	RenderManager::Instance().RemoveRenderStreamer("RSS");
 	_streamer.UnregisterDictionary();
 }
 

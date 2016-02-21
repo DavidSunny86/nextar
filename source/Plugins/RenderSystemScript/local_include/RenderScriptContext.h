@@ -30,6 +30,8 @@ public:
 	Target _targets[RenderConstants::MAX_RENDER_TARGETS+1];
 	uint32 _numTargets;
 
+	CompositorRenderPass::TexturesToResolve _unresolvedTextures[RenderTargetName::RT_NAME_COUNT];
+	uint32 _numUnresolvedTextures;
 	BaseRenderPass* _pass;
 	String _passType;
 	String _bufferName;

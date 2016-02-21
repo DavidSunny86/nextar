@@ -5,31 +5,50 @@
  *      Author: obhi
  */
 
+
 #include <CompositorRenderPass.h>
+#include <RenderSystem.h>
 
 namespace nextar {
 
-CompositorRenderPass::CompositorRenderPass() : numTextureToResolve(0) {
+CompositorRenderPass::CompositorRenderPass() : 
+numTextureToResolve(0)
+, renderSystemTicket(-1) {
 	_rtBunchOf = nullptr;
 }
 
 CompositorRenderPass::~CompositorRenderPass() {
+	if (numTextureToResolve > 0 && _rtBunchOf) {
+		NEX_FREE(_rtBunchOf, MEMCAT_GENERAL);
+	}
 }
 
+RenderPass* CompositorRenderPass::CreateInstance() {
+	return NEX_NEW(CompositorRenderPass());
+}
 
 void CompositorRenderPass::Commit(CommitContext& context) {
 	BeginRender(context);
-
-	if (numTextureToResolve == 1) {
-		TextureUnit tu;
-		tu.texture = context.GetTargetByName(_rtJustOne.name);
-		parameters.SetData(&tu, _rtJustOne.offset);
-	} else {
-		for(uint32 i = 0; i < numTextureToResolve; ++i) {
+	
+	if (context.rsys->GetTicket() != this->renderSystemTicket)	{
+		if (numTextureToResolve == 1) {
 			TextureUnit tu;
-			tu.texture = context.GetTargetByName(_rtBunchOf[i].name);
-			parameters.SetData(&tu, _rtBunchOf[i].offset);
+			RenderTarget* target = context.GetTargetByName(_rtJustOne.name);
+			if (target && target->GetRenderTargetType() == RenderTargetType::TEXTURE) {
+				tu.texture = static_cast<RenderTexture*>(target);
+				parameters.SetData(&tu, _rtJustOne.offset);
+			}
+		} else {
+			for (uint32 i = 0; i < numTextureToResolve; ++i) {
+				TextureUnit tu;
+				RenderTarget* target = context.GetTargetByName(_rtBunchOf[i].name);
+				if (target && target->GetRenderTargetType() == RenderTargetType::TEXTURE) {
+					tu.texture = static_cast<RenderTexture*>(target);
+					parameters.SetData(&tu, _rtBunchOf[i].offset);
+				}
+			}
 		}
+		this->renderSystemTicket = context.rsys->GetTicket();
 	}
 
 	RenderPrimitive(context, (uint32)(ptrdiff_t)this, &primitive);
@@ -39,18 +58,30 @@ void CompositorRenderPass::Commit(CommitContext& context) {
 void CompositorRenderPass::CreateResources() {
 	BaseMaterialPass::CreateResources();
 	if (material) {
-		primitive.material = material;
-		primitive.parameters = &parameters;
-		primitive.streamData = &RenderManager::Instance().GetFullScreenQuad();
+		primitive.SetMaterial(material);
+		primitive.SetParameters( &parameters );
+		primitive.SetStreamData( &RenderManager::Instance().GetFullScreenQuad() );
 	}
 }
 
 void CompositorRenderPass::DestroyResources() {
-	primitive.material.Clear();
-	primitive.streamData = nullptr;
-	primitive.parameters = nullptr;
+	primitive.SetMaterial(MaterialAssetPtr());
+	primitive.SetStreamData( nullptr );
+	primitive.SetParameters( nullptr );
 	parameters.Clear();
 	BaseMaterialPass::DestroyResources();
+}
+
+void CompositorRenderPass::AddTexturesToResolve(const TexturesToResolve* toResolve,
+	uint32 numToResolve) {
+	numTextureToResolve = numToResolve;
+	if (numToResolve == 1) {
+		_rtJustOne = *toResolve;
+	} else if (numToResolve > 0) {
+		_rtBunchOf = static_cast<TexturesToResolve*>(
+			NEX_ALLOC(sizeof(TexturesToResolve) * numToResolve, MEMCAT_GENERAL));
+		std::memcpy(_rtBunchOf, toResolve, numToResolve*sizeof(TexturesToResolve));
+	}
 }
 
 } /* namespace nextar */

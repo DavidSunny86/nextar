@@ -13,6 +13,7 @@
 
 namespace RenderSystemScript {
 
+class RenderScriptContext;
 class CmdCreateBuffer : public nextar::BlockCommandHandler {
 	NEX_LOG_HELPER(CmdCreateBuffer);
 public:

@@ -20,7 +20,7 @@ public:
 	virtual void BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
 
 protected:
-	static map<String, Color>::type StringToColorMap;
+	typedef map<String, Color>::type StringToColorMap;
 	static StringToColorMap _colorMap;
 };
 

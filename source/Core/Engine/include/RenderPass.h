@@ -31,6 +31,7 @@ enum RenderTargetName {
 	VIEW_RT_DEPTH,
 
 	RT_NONE,
+	RT_NAME_COUNT
 };
 
 enum class ClearFlags : uint16 {
@@ -62,7 +63,9 @@ struct RenderInfo {
 	RenderInfo() : rt(0) {}
 };
 
-class _NexEngineAPI RenderPass: public AllocGraphics {
+class _NexEngineAPI RenderPass: 
+	public NamedObject,
+	public AllocGraphics {
 public:
 	
 	typedef RenderPass* (*CreateInstance) ();

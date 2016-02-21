@@ -37,22 +37,34 @@ public:
 	virtual void RegisterRenderContext(RenderContextPtr&);
 	virtual void RenderFrame(const FrameTimer&) override;
 
-
+	virtual void CreateRenderSystem(const String& configName);
+	virtual RenderSystemPtr GetRenderSystem(StringID name);
 protected:
+
+	virtual void DestroyResources();
+	virtual void CreateResources();
 
 	virtual void CloseImpl() = 0;
 
+	void CreateAndLoadRenderSystems();
+	void SaveAndCloseRenderSystems();
 	void RenderAllTargets(RenderContext* rc, const FrameTimer& frameTimer, bool callPresent);
 	void PresentSwapChains(RenderContext* rc);
 	void CreateRenderQueues(const NameValueMap&);
 	void RegisterAutoParams();
+	void RegisterRenderSystemConfig(const NameValueMap&);
 	void CreateDefaultRenderPassFactories();
+
+	typedef list<RenderSystemPtr>::type RenderSystemList;
 
 	/* The first registered context is always the primary context, other
 	 * contexts are present if usingMultiGpuSetup is true */
 	RenderDriverPtr primaryDriver;
 	RenderContextPtr primaryContext;
+	// Render systems
+	RenderSystemList renderSystems;
 
+	String renderSystemConfigs;
 #if NEX_MULTIGPU_BUILD
 	typedef vector<RenderDriverPtr>::type RenderDriverList;
 	typedef vector<RenderContextPtr>::type RenderContextList;

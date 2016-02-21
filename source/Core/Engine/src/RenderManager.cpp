@@ -14,8 +14,12 @@
 
 namespace nextar {
 
-NEX_DEFINE_SINGLETON_PTR(RenderManager);RenderManager ::RenderManager() {
+NEX_DEFINE_SINGLETON_PTR(RenderManager);
+
+RenderManager::RenderManager() {
 	VertexSemantic::BuildSemanticMap();
+	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_INIT_RESOURCES, CreateResources, this);
+	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyResources, this);
 }
 
 RenderManager::~RenderManager() {
@@ -27,7 +31,6 @@ void RenderManager::DestroyResources(void* renderSystem) {
 	if (pRenderSys)
 		pRenderSys->DestroyResources();
 }
-
 
 void RenderManager::CreateResources(void* renderSystem) {
 	RenderManager* pRenderSys = reinterpret_cast<RenderManager*>(renderSystem);
@@ -83,6 +86,14 @@ void RenderManager::AddRenderStreamer(const String& name,
 
 void RenderManager::RemoveRenderStreamer(const String& name) {
 	renderSystemStreamers.erase(name);
+}
+
+RenderSystem::Streamer* RenderManager::GetRenderStreamer(const String& name) {
+	auto it = renderSystemStreamers.find(name);
+	if (it != renderSystemStreamers.end()) {
+		return (*it).second;
+	}
+	return nullptr;
 }
 
 void RenderManager::GenerateStreamDataForQuad() {

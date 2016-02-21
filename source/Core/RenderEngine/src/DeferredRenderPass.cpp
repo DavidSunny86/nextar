@@ -62,9 +62,7 @@ void GBuffer::Setup(Size dimensions) {
 /************************************************************************/
 /* DeferredRenderPass                                                 */
 /************************************************************************/
-DeferredRenderPass::DeferredRenderPass() : RenderPass() {
-	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_INIT_RESOURCES, CreateResources, this);
-	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyResources, this);
+DeferredRenderPass::DeferredRenderPass() : BaseRenderPass() {
 }
 
 DeferredRenderPass::~DeferredRenderPass() {
@@ -192,17 +190,13 @@ void DeferredRenderPass::RenderLight(Light* light, uint32 passIdx, uint32 update
 	context.primitive = nullptr;
 }
 
-void DeferredRenderPass::DestroyResources(void* renderSystem) {
-	DeferredRenderPass* pRenderSys = reinterpret_cast<DeferredRenderPass*>(renderSystem);
-	if (pRenderSys)
-		pRenderSys->DestroyBuffer();
+void DeferredRenderPass::DestroyResources() {
+	DestroyBuffer();
 }
 
 
-void DeferredRenderPass::CreateResources(void* renderSystem) {
-	DeferredRenderPass* pRenderSys = reinterpret_cast<DeferredRenderPass*>(renderSystem);
-	if (pRenderSys)
-		pRenderSys->PrepareMaterials();
+void DeferredRenderPass::CreateResources() {
+	PrepareMaterials();
 }
 
 } /* namespace nextar */

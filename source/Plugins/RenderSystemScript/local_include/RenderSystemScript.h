@@ -10,6 +10,10 @@
 
 #include <EngineHeaders.h>
 #include <NeoCmdHeaders.h>
+#include <DeferredRenderPass.h>
+#include <ForwardRenderPass.h>
+#include <CompositorRenderPass.h>
+#include <DebugRenderPass.h>
 
 #define NEX_SINGLE_INSTANCE(Class) \
 	static inline Class& Instance() { \

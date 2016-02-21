@@ -6,6 +6,7 @@
  */
 
 #include <CmdCreateBuffer.h>
+#include <RenderScriptContext.h>
 
 namespace RenderSystemScript {
 

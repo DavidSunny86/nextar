@@ -15,9 +15,7 @@ namespace nextar {
 /************************************************************************/
 /* ForwardRenderPass                                                 */
 /************************************************************************/
-ForwardRenderPass::ForwardRenderPass() : RenderPass()  {
-	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_INIT_RESOURCES, CreateResources, this);
-	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyResources, this);
+ForwardRenderPass::ForwardRenderPass() : BaseRenderPass()  {
 }
 
 ForwardRenderPass::~ForwardRenderPass() {
@@ -49,15 +47,12 @@ void ForwardRenderPass::Commit(CommitContext& context) {
 	EndRender(context);
 }
 
-void ForwardRenderPass::DestroyResources(void* renderSystem) {
-	ForwardRenderPass* pRenderSys = reinterpret_cast<ForwardRenderPass*>(renderSystem);
+void ForwardRenderPass::DestroyResources() {
 }
 
 
-void ForwardRenderPass::CreateResources(void* renderSystem) {
-	ForwardRenderPass* pRenderSys = reinterpret_cast<ForwardRenderPass*>(renderSystem);
-	if (pRenderSys)
-		pRenderSys->PrepareMaterials();
+void ForwardRenderPass::CreateResources() {
+	PrepareMaterials();
 }
 
 } /* namespace nextar */
