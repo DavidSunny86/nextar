@@ -3,8 +3,7 @@
 namespace PBRenderEngine
 {
 
-PBRenderPass::PBRenderPass(const Config& c) : RenderPass(c) {
-
+PBRenderPass::PBRenderPass() {
 }
 
 PBRenderPass::~PBRenderPass() {

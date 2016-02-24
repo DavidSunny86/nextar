@@ -43,8 +43,10 @@ public:
 	};
 
 	enum TextureUpdateMessage {
-		MSG_TEX_RESIZE = 1 << 1, MSG_TEX_UPLOAD = 1 << 2, MSG_TEX_CREATE = 1
-				<< 3, MSG_TEX_READ = 1 << 4,
+		MSG_TEX_RESIZE = 1 << 1,
+		MSG_TEX_UPLOAD = 1 << 2,
+		MSG_TEX_CREATE = 1 << 3,
+		MSG_TEX_READ = 1 << 4,
 	};
 
 	struct ReadPixelUpdateParams {
@@ -73,6 +75,10 @@ public:
 			textureFlags(0), type(TEXTURE_TYPE_UNKNOWN), 
 			textureFormat(PixelFormat::UNKNOWN) {
 		}
+	};
+
+	struct ResizeParams {
+		ImageMetaInfo desc;
 	};
 
 	TextureBase(uint16 flags = 0, ContextObject::Type type =

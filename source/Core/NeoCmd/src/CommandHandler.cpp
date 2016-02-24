@@ -5,6 +5,7 @@
  *      Author: obhi
  */
 
+#include <NeoCmd.h>
 #include <CommandHandler.h>
 
 namespace nextar {

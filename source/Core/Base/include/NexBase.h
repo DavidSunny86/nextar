@@ -14,6 +14,7 @@ class FactoryPlugin;
 class PluginRegistry;
 class Config;
 class URL;
+class Stream;
 class InputStream;
 class OutputStream;
 class Archive;

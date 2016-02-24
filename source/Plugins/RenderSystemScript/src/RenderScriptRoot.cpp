@@ -6,6 +6,7 @@
  */
 
 #include <RenderScriptRoot.h>
+#include <RenderScriptContext.h>
 
 namespace RenderSystemScript {
 

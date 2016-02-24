@@ -6,6 +6,7 @@
  */
 
 #include <CmdCleanColor.h>
+#include <RenderScriptContext.h>
 
 namespace RenderSystemScript {
 

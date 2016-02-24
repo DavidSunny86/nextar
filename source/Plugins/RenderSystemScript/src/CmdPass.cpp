@@ -7,6 +7,7 @@
 
 #include <BaseRenderPass.h>
 #include <CmdPass.h>
+#include <RenderScriptContext.h>
 
 namespace RenderSystemScript {
 
@@ -19,7 +20,8 @@ void CmdPass::BeginExecute(CommandContext* pContext,
 	// create the pass handler here
 	c->_passType = h.Get(0);
 	c->_pass = static_cast<BaseRenderPass*>(
-			RenderManager::Instance().CreateRenderPass(c->_passType));
+			c->_rsys.AddPass(c->_passType));
+
 	if (h.Length() > 1)
 		c->_pass->SetName(h.Get(1));
 	else
@@ -34,12 +36,7 @@ void CmdPass::EndExecute(CommandContext* pContext,
 		CompositorRenderPass* pass = static_cast<CompositorRenderPass*>(c->_pass);
 		pass->AddTexturesToResolve(c->_unresolvedTextures, c->_numUnresolvedTextures);
 	}
-	if (c->_pass) {
-		c->_rsys.AddPass(
-				static_cast<RenderScriptContext*>(pContext)->_pass
-				);
-		c->_pass = nullptr;
-	}
+	c->_pass = nullptr;
 }
 
 } /* namespace RenderSystemScript */

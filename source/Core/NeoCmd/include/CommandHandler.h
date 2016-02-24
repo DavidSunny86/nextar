@@ -12,6 +12,7 @@
 
 namespace nextar {
 
+class CommandContext;
 class BlockCommandHandler;
 class _NexNeoCmdAPI CommandHandler : public AllocGeneral {
 public:

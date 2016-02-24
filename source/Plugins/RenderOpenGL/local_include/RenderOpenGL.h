@@ -68,6 +68,16 @@ public:
 };
 #endif
 
+struct PixelFormatGl {
+	bool isCompressed : 1;
+	bool isDepthSencil : 1;
+	uint8 pixelSize;
+	PixelFormat textureFormat;
+	GLenum attachmentType;
+	GLenum internalFormat;
+	GLenum sourceFormat;
+	GLenum dataType;
+};
 }
 
 #endif //_RENDEROPENGL_H_

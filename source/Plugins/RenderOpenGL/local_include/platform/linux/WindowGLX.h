@@ -41,8 +41,8 @@ public:
 		// RenderTarget
 		virtual PixelFormat GetPixelFormat() const override;
 		virtual void Capture(RenderContext* rc, PixelBox& image, FrameBuffer);
-		virtual void Reset(RenderContext* rc, Size size, PixelFormat format);
 		virtual void Present(RenderContext* rc);
+		virtual void ResizeImpl(Size size);
 
 		// Helpers
 		inline GLXDrawable GetDrawable() const {

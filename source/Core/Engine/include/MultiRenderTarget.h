@@ -82,7 +82,7 @@ public:
 	}
 
 protected:
-
+	virtual void ResizeImpl(Size newDimensions);
 	RenderTargetPtr CreateTexture(const TargetParam& tp);
 
 	uint16 flags;

@@ -16,7 +16,7 @@ namespace RenderSystemScript {
 using namespace nextar;
 
 class RenderScriptStreamer :
-		nextar::RenderSystem::Streamer {
+		public nextar::RenderSystem::Streamer {
 	NEX_LOG_HELPER(RenderScriptStreamer);
 public:
 

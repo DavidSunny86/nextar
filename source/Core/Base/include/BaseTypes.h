@@ -63,6 +63,10 @@ union Size {
 	friend bool operator == (const Size& s1, const Size& s2) {
 		return (s1.combined == s2.combined) != 0;
 	}
+
+	friend bool operator != (const Size& s1, const Size& s2) {
+		return (s1.combined != s2.combined) != 0;
+	}
 };
 
 union Point {

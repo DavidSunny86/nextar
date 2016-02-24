@@ -7,6 +7,7 @@
 
 #include <BaseMaterialPass.h>
 #include <CmdMaterial.h>
+#include <RenderScriptContext.h>
 
 namespace RenderSystemScript {
 

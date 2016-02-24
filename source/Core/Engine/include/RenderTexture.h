@@ -8,6 +8,7 @@
 #ifndef RENDERTEXTURE_H_
 #define RENDERTEXTURE_H_
 
+#include <RenderConstants.h>
 #include <RenderTarget.h>
 #include <TextureBase.h>
 
@@ -38,8 +39,10 @@ public:
 	virtual void Create(TextureType type, PixelFormat format, uint32 width,
 			uint32 height, uint32 depth);
 	virtual void Capture(RenderContext* rc, PixelBox& image, FrameBuffer);
-	
+
 protected:
+	// Resize for 2d render targets
+	virtual void ResizeImpl(Size newDimensions);
 
 };
 

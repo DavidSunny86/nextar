@@ -31,11 +31,9 @@ void BaseRenderManager::ConfigureImpl(const NameValueMap& c) {
 
 void BaseRenderManager::CreateResources() {
 	RenderManager::CreateResources();
-	CreateAndLoadRenderSystems();
 }
 
 void BaseRenderManager::DestroyResources() {
-	SaveAndCloseRenderSystems();
 	RenderManager::DestroyResources();
 }
 
@@ -245,15 +243,7 @@ void BaseRenderManager::CreateDefaultRenderPassFactories()  {
 	AddRenderPassFactory("Debug", &DebugRenderPass::CreateInstance);
 }
 
-RenderSystemPtr BaseRenderManager::GetRenderSystem(StringID name) {
-	for (auto& e : renderSystems) {
-		if (e->GetID() == name)
-			return e;
-	}
-	return RenderSystemPtr();
-}
-
-void BaseRenderManager::CreateRenderSystem(const String& configName) {
+RenderSystemPtr BaseRenderManager::CreateRenderSystem(const String& configName, Size initialDim) {
 	URL firstUrl(FileSystem::ArchiveProjectData_Name, "Configs/" + configName + ".rsys");
 	bool bCompiled = true;
 	InputStreamPtr input = FileSystem::Instance().OpenRead(firstUrl);
@@ -264,30 +254,13 @@ void BaseRenderManager::CreateRenderSystem(const String& configName) {
 	}
 
 	if (input) {
-		RenderSystemImplPtr rsys = Assign(NEX_NEW(RenderSystemImpl()));
-		renderSystems.push_back(rsys);
-		if (!bCompiled)
-			rsys->SetName(configName);
-		rsys->Load(input, bCompiled ? "RSYS" : "RSS");
+		RenderSystemImplPtr rsys = Assign(NEX_NEW(RenderSystemImpl(initialDim)));
+		rsys->Load(input, bCompiled ? "RSYS" : "RSCRIPT");
 		rsys->CreateResources();
+		return rsys;
 	}
-}
 
-void BaseRenderManager::SaveAndCloseRenderSystems() {
-	for (auto& e : renderSystems) {
-		RenderSystemImplPtr rsys = e;
-		rsys->DestroyResources();
-	}
-	renderSystems.clear();
-}
-
-void BaseRenderManager::CreateAndLoadRenderSystems() {
-	ConstMultiStringHelper h(renderSystemConfigs);
-	auto it = h.Iterate();
-	String config;
-	while (it.HasNext(config)) {
-		CreateRenderSystem(config);
-	}
+	return RenderSystemPtr();
 }
 
 }

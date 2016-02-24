@@ -7,6 +7,7 @@
 
 #include <CmdRenderTo.h>
 #include <BaseRenderPass.h>
+#include <RenderScriptContext.h>
 
 namespace RenderSystemScript {
 

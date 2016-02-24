@@ -13,6 +13,8 @@
 namespace nextar {
 
 class _NexNeoCmdAPI NeoCommandInterpreter {
+	NEX_LOG_HELPER(NeoCommandInterpreter);
+
 public:
 
 	static void Execute(const String& dictionaryName, InputStreamPtr& stream, CommandContext* context);

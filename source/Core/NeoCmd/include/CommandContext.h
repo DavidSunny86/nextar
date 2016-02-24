@@ -9,6 +9,7 @@
 #define CORE_NEOCMD_INCLUDE_COMMANDCONTEXT_H_
 
 #include <NeoCmd.h>
+#include <CommandDictionary.h>
 
 namespace nextar {
 
@@ -36,12 +37,7 @@ public:
 
 protected:
 	friend class NeoCommandInterpreter;
-
-
-	inline void SetDictionary(CommandDictionary* dic) {
-		_dictionary = dic;
-		_activeHandler = dic->GetRoot();
-	}
+	void SetDictionary(CommandDictionary* dic);
 
 	CommandDictionary* _dictionary;
 	const CommandHandler* _activeHandler;

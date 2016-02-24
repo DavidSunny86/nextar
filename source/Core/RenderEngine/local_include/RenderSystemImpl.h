@@ -17,7 +17,7 @@ namespace nextar {
 
 class RenderSystemImpl: public RenderSystem {
 public:
-	RenderSystemImpl();
+	RenderSystemImpl(Size size);
 	virtual ~RenderSystemImpl();
 
 	virtual void RegisterTarget(StringID as, RenderTargetPtr target) override;
@@ -39,7 +39,7 @@ public:
 		const RenderBuffer::CreateParams& params,
 		float viewRelativeWidthFactor,
 		float viewRelativeHeightFactor);
-	virtual void AddPass(RenderPass* pass);
+	virtual RenderPass* AddPass(const String& type);
 	virtual void EndConfig();
 
 	virtual uint32 GetRenderTargetCount() const;
@@ -56,12 +56,22 @@ public:
 
 protected:
 		
+	static void DestroyResources(void* thisPointer);
+
 	enum Flags {
 		STORE_META_INFO = 1 << 0,
+		HAS_RELATIVE_TARGETS = 1 << 1,
 	};
 
-	typedef map<StringID, RenderTargetPtr>::type TargetMap;
+	struct BufferData {
+		RenderTargetPtr target;
+		float viewRelativeX;
+		float viewRelativeY;
+	};
 	
+	typedef map<StringID, BufferData>::type TargetMap;
+
+	Size currentSize;
 	uint32 flags;
 	TargetMap targets;
 	RenderPassList renderPasses;

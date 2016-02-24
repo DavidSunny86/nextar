@@ -28,6 +28,7 @@ void CmdCreateBuffer::BeginExecute(CommandContext* pContext,
 	RenderScriptContext* c = static_cast<RenderScriptContext*>(pContext);
 	c->_numTargets = 0;
 	c->_bufferDim.combined = 0;
+	c->_bufferDepth = 1;
 	c->_bufferDimFactor = Vector2(1, 1);
 	auto it = h.Iterate();
 	String temp;
@@ -37,9 +38,13 @@ void CmdCreateBuffer::BeginExecute(CommandContext* pContext,
 		ParseDimension(temp, c->_bufferDim.dx, c->_bufferDimFactor.x);
 	if (it.HasNext(temp))
 		ParseDimension(temp, c->_bufferDim.dy, c->_bufferDimFactor.y);
+	float depthFactor;
+	if (it.HasNext(temp))
+		ParseDimension(temp, c->_bufferDepth, depthFactor);
 }
 
-RenderTargetPtr CmdCreateBuffer::CreateTarget(RenderScriptContext* c, const Target& t, uint32 index) {
+RenderTargetPtr CmdCreateBuffer::CreateTarget(RenderScriptContext* c,
+		const Target& t, uint32 index) {
 	RenderTargetPtr ret;
 	String name = c->_bufferName;
 	if (t.isDepthTarget) {
@@ -51,7 +56,7 @@ RenderTargetPtr CmdCreateBuffer::CreateTarget(RenderScriptContext* c, const Targ
 	StringID nameId = NamedObject::AsyncStringID(name);
 	if (t.asTexture) {
 		RenderTexture::CreateParams params;
-		params.depth = 1;
+		params.depth = c->_bufferDepth;
 		params.width = c->_bufferDim.dx;
 		params.height = c->_bufferDim.dy;
 		params.type = TextureBase::TextureType::TEXTURE_2D;
@@ -61,8 +66,7 @@ RenderTargetPtr CmdCreateBuffer::CreateTarget(RenderScriptContext* c, const Targ
 	} else {
 		RenderBuffer::CreateParams params;
 		params.format = t.format;
-		params.width = c->_bufferDim.dx;
-		params.height = c->_bufferDim.dy;
+		params.dimensions = c->_bufferDim;
 		// @todo Set samples
 		params.samples = 0;
 		ret = c->_rsys.CreateRenderBuffer(nameId, params, c->_bufferDimFactor.x,

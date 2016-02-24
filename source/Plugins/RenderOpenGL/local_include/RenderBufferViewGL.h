@@ -61,7 +61,9 @@ public:
 
 protected:
 	friend class RenderContext_Base_GL;
+	PixelFormatGl format;
 	FrameBufferObjectGL fbo;
+	uint16 samples;
 	GLenum attachmentType;
 	GLuint renderBuffer;
 };

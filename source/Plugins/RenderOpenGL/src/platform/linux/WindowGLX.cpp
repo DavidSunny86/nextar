@@ -198,7 +198,7 @@ void WindowGLX::Impl::Capture(RenderContext* rc, PixelBox& image,
 	context->GetContext()->Capture(image, this, pbo, frameBuffer);
 }
 
-void WindowGLX::Impl::Reset(RenderContext* rc, Size size, PixelFormat format) {
+void WindowGLX::Impl::ResizeImpl(Size size) {
 	RenderContextImplGLX* context = parent->GetContext();
 	Display* display = parent->GetDisplay();
 	Window window = parent->GetWindow();
@@ -206,8 +206,7 @@ void WindowGLX::Impl::Reset(RenderContext* rc, Size size, PixelFormat format) {
 		SetToFullScreen(false);
 	XWindowAttributes attribs;
 	XResizeWindow(display, window, size.dx, size.dy);
-	dimensions.width = size.dx;
-	dimensions.height = size.dy;
+	dimensions = size;
 }
 
 void WindowGLX::Impl::Present(RenderContext* rc) {

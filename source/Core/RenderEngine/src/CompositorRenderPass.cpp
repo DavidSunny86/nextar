@@ -65,7 +65,8 @@ void CompositorRenderPass::CreateResources() {
 }
 
 void CompositorRenderPass::DestroyResources() {
-	primitive.SetMaterial(MaterialAssetPtr());
+	MaterialAssetPtr invalid;
+	primitive.SetMaterial(invalid);
 	primitive.SetStreamData( nullptr );
 	primitive.SetParameters( nullptr );
 	parameters.Clear();

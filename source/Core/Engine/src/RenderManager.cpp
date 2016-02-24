@@ -11,6 +11,7 @@
 #include <RenderTarget.h>
 #include <Viewport.h>
 #include <VideoMode.h>
+#include <Geometry.h>
 
 namespace nextar {
 

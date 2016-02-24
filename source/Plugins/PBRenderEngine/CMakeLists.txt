@@ -7,4 +7,4 @@
 
 # Add definition
 create_plugin("PBRenderEngine" "" "Lifetime" "${NEX_VERSION}" "false")
-add_dependency(Core Engine)
+add_dependency(Core RenderEngine)

@@ -10,6 +10,7 @@
 
 #include <RenderSystemScript.h>
 #include <BlockCommandHandler.h>
+#include <RenderScriptContext.h>
 
 namespace RenderSystemScript {
 

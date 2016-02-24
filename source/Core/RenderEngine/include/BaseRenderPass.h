@@ -31,9 +31,17 @@ public:
 
 	void RenderPrimitive(CommitContext& ctx, uint32 key, VisiblePrimitive* vis);
 
+	bool IsEnabled() const {
+		return enabled;
+	}
+
+	void SetEnabled(bool b) {
+		enabled = b;
+	}
+
 protected:
 
-
+	bool enabled;
 	RenderTargetName toLastSubTarget;
 	ClearFlags clearFlags;
 	RenderInfo info;

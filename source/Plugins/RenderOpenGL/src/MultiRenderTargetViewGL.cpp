@@ -32,12 +32,17 @@ void MultiRenderTargetViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 
 	auto gl = static_cast<RenderContext_Base_GL*>(rc);
 	switch (msg) {
+
+	case MultiRenderTarget::MSG_RT_RESIZE:
 	case MultiRenderTarget::MSG_RT_CREATE: {
 		const MultiRenderTarget* rt =
 				reinterpret_cast<const MultiRenderTarget*>(params);
 
 		uint32 numColorTargets = rt->GetColorTargetsCount();
 		colorAttachmentCount = numColorTargets;
+		if(fbo.IsValid())
+			gl->DestroyFBO(fbo);
+
 		gl->CreateFBO(fbo);
 		gl->BindFBO(fbo);
 		for (uint32 i = 0; i < numColorTargets; ++i) {

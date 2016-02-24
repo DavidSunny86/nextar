@@ -6,6 +6,7 @@
  */
 
 #include <RenderBuffer.h>
+#include <RenderContext.h>
 
 namespace nextar {
 
@@ -21,8 +22,7 @@ RenderBuffer::~RenderBuffer() {
 
 void RenderBuffer::Create(const CreateParams& params) {
 	this->format = params.format;
-	this->dimensions.dx = params.width;
-	this->dimensions.dy = params.height;
+	this->dimensions = params.dimensions;
 
 	RequestUpdate(MSG_RB_CREATE,
 			static_cast<ContextObject::ContextParamPtr>(&params));
@@ -41,5 +41,11 @@ Size RenderBuffer::GetDimensions() const {
 PixelFormat RenderBuffer::GetPixelFormat() const {
 	return format;
 }
+
+void RenderBuffer::ResizeImpl(Size newDimensions) {
+	RequestUpdate(MSG_RB_RESIZE,
+				static_cast<ContextObject::ContextParamPtr>(&newDimensions));
+}
+
 
 } /* namespace nextar */

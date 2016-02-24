@@ -11,7 +11,6 @@ namespace nextar {
 
 void ASTCommand::Accept(ASTVisitor* visitor) const {
 	visitor->VisitCommandBegin(this);
-	_parameters.Accept(visitor);
 	visitor->VisitCommandEnd(this);
 }
 

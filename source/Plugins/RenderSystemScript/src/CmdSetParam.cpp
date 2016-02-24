@@ -8,6 +8,7 @@
 #include <CompositorRenderPass.h>
 #include <CmdSetParam.h>
 #include <ShaderParamAgent.h>
+#include <RenderScriptContext.h>
 
 namespace RenderSystemScript {
 

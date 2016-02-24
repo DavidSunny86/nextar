@@ -16,6 +16,19 @@
 
 namespace nextar {
 
+struct ClearBufferInfo {
+	uint16 clearStencil;
+	float clearDepth;
+	Color clearColor[RenderConstants::MAX_COLOR_TARGETS];
+	ClearBufferInfo() : clearDepth(1.0f), clearStencil(0) {}
+};
+
+struct RenderInfo {
+	RenderTarget* rt;
+	ClearBufferInfo info;
+	RenderInfo() : rt(0) {}
+};
+
 
 class RenderSystem;
 class CommitContext: public AllocGeneral {
@@ -34,6 +47,7 @@ public:
 	uint32 materialNumber;
 	float frameTime;
 	Size targetDimension;
+	Size viewDimensions;
 
 	Vector4 sunLightIntensity;
 	Vector4 sunLightPosition;
@@ -77,76 +91,8 @@ public:
 	const Matrix4x4* invProjectionMatrix;
 	const Matrix4x4* invViewProjectionMatrix;
 
-	static inline RenderTargetName ParseTargetName(const String& target) {
-		RenderTargetName lastTarget = RenderTargetName::RT_NONE;
-		size_t p;
-		if (target == "last")
-			lastTarget = RenderTargetName::LAST_RT_MT;
-		else if ((p = target.find_first_of("last.")) != String::npos) {
-			String type = target.substr(p+5);
-			if(type == "depth")
-				lastTarget = RenderTargetName::LAST_RT_DEPTH;
-			else if ((p=type.find_first_of("color-")) != String::npos) {
-				lastTarget = (RenderTargetName) 
-					(RenderTargetName::LAST_RT_COLOR_0 + Convert::ToULong(type.substr(p + 6)));
-			}
-		} else if (target == "viewport")
-			lastTarget = RenderTargetName::VIEW_RT_MT;
-		else if ((p = target.find_first_of("viewport.")) != String::npos) {
-			String type = target.substr(p+9);
-			if(type == "depth")
-				lastTarget = RenderTargetName::VIEW_RT_DEPTH;
-			else if ((p=type.find_first_of("color-")) != String::npos) {
-				lastTarget = (RenderTargetName)(
-					RenderTargetName::VIEW_RT_COLOR_0 + Convert::ToULong(type.substr(p + 6)));
-			}
-		}
-
-		return lastTarget;
-	}
-
-	inline RenderTarget* GetTargetByName(RenderTargetName toLastSubTarget) {
-		NEX_ASSERT(toLastSubTarget >= LAST_RT_MT && toLastSubTarget < RT_NONE);
-		switch(toLastSubTarget) {
-		case LAST_RT_MT:
-			return lastRenderTarget;
-		case LAST_RT_DEPTH:
-			NEX_ASSERT(lastRenderTarget);
-			if(lastRenderTarget->GetRenderTargetType() == RenderTargetType::MULTI_RENDER_TARGET)
-				return static_cast<MultiRenderTarget*>(lastRenderTarget)->GetDepthAttachmentPtr();
-			else //@todo  this is possibly a depth texture, but we need to verify
-				return lastRenderTarget;
-		case LAST_RT_COLOR_0:
-		case LAST_RT_COLOR_1:
-		case LAST_RT_COLOR_3:
-		case LAST_RT_COLOR_4:
-		case LAST_RT_COLOR_5:
-			NEX_ASSERT(lastRenderTarget);
-			if(lastRenderTarget->GetRenderTargetType() == RenderTargetType::MULTI_RENDER_TARGET)
-				return static_cast<MultiRenderTarget*>(lastRenderTarget)->GetAttachmentPtr(toLastSubTarget - LAST_RT_COLOR_0);
-			else //@todo  this is possibly a color texture, but we need to verify
-				return lastRenderTarget;
-		case VIEW_RT_MT:
-			return viewRenderTarget;
-		case VIEW_RT_DEPTH:
-			NEX_ASSERT(viewRenderTarget);
-			if(viewRenderTarget->GetRenderTargetType() == RenderTargetType::MULTI_RENDER_TARGET)
-				return static_cast<MultiRenderTarget*>(viewRenderTarget)->GetDepthAttachmentPtr();
-			else //@todo  this is possibly a depth texture, but we need to verify
-				return viewRenderTarget;
-		case VIEW_RT_COLOR_0:
-		case VIEW_RT_COLOR_1:
-		case VIEW_RT_COLOR_3:
-		case VIEW_RT_COLOR_4:
-		case VIEW_RT_COLOR_5:
-			NEX_ASSERT(viewRenderTarget);
-			if(viewRenderTarget->GetRenderTargetType() == RenderTargetType::MULTI_RENDER_TARGET)
-				return static_cast<MultiRenderTarget*>(viewRenderTarget)->GetAttachmentPtr(toLastSubTarget - LAST_RT_COLOR_0);
-			else //@todo  this is possibly a color texture, but we need to verify
-				return viewRenderTarget;
-		}
-		return nullptr;
-	}
+	static RenderTargetName ParseTargetName(const String& target);
+	RenderTarget* GetTargetByName(RenderTargetName toLastSubTarget);
 };
 
 } /* namespace nextar */

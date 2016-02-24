@@ -5,6 +5,8 @@
 #include <RenderDriver.h>
 #include <Pass.h>
 #include <CommitContext.h>
+#include <RenderPass.h>
+#include <RenderTarget.h>
 
 namespace nextar {
 
@@ -16,33 +18,6 @@ struct FrameStats {
 	uint32 textureFetches;
 	uint32 elapsedMilliSeconds;
 };
-
-enum class FrameBuffer : uint32 {
-	NONE = 0,
-	FRONT_LEFT = 1,
-	FRONT_RIGHT,
-	BACK_LEFT,
-	BACK_RIGHT,
-	DEPTH,
-
-	COLOR_0,
-	COLOR_1,
-	COLOR_2,
-	COLOR_3,
-	COLOR_4,
-	COLOR_5,
-	COLOR_6,
-	COLOR_7,
-
-	STENCIL,
-	FBTYPE_COUNT,
-
-	FRONT = FRONT_LEFT,
-	BACK = BACK_LEFT,
-};
-
-
-typedef list<RenderTargetPtr>::type RenderTargetList;
 
 class StreamData;
 class _NexEngineAPI RenderContext: public Referenced<RenderContext,
@@ -80,6 +55,7 @@ public:
 	virtual void UnregisterObject(ContextID) = 0;
 	virtual void UpdateObject(ContextObject*, uint32 updateMsg,
 			ContextObject::ContextParamPtr) = 0;
+	virtual void SetViewport(const CommitContext& c) = 0;
 
 #if NEX_MULTIGPU_BUILD
 	virtual ContextObject::View* GetView(const ContextObject*) = 0;

@@ -88,7 +88,7 @@ public:
 		return vp1->priority - vp2->priority;
 	}
 
-	Viewport(Camera *cam, RenderTarget *rt, StringID renderSystem = StringUtils::DefaultID,
+	Viewport(Camera *cam, RenderTarget *rt, const String& renderSystem = StringUtils::Default,
 		float x = 0.f, float y = 0.f,
 		float width = 1.f, float height = 1.f, int32 priority = 0,
 		uint32 flags = ACTIVE, StringID optName = StringUtils::NullID,
@@ -163,6 +163,18 @@ public:
 		return clearMask;
 	}
 
+	Size GetViewportPixelDimensions() const {
+		return viewportSizeInPixels;
+	}
+
+	void SetRenderSystem(RenderSystemPtr rsys) {
+		renderSystem = rsys;
+	}
+
+	RenderSystemPtr GetRenderSystem() const {
+		return renderSystem;
+	}
+
 	/* Update viewport */
 	virtual void Render(RenderContext* renderCtx, const FrameTimer&);
 
@@ -189,7 +201,9 @@ protected:
 	LightSystemPtr lightSystem;
 	SceneTraversal traversal;
 
-	uint32 lastTextureDim;
+	Size viewportSizeInPixels;
+	Size lastTargetSize;
+
 	float topleftX;
 	float topleftY;
 	float width;

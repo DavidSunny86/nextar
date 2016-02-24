@@ -8,10 +8,10 @@
 
 namespace nextar {
 
-Viewport::Viewport(Camera* cam, RenderTarget* rt, StringID rsys, float x, float y, float width,
+Viewport::Viewport(Camera* cam, RenderTarget* rt, const String& rsys,
+		float x, float y, float width,
 		float height, int32 priority, uint32 flags, StringID optName,
 		Viewport* nextVp) : NamedObject(optName) {
-	this->lastTextureDim = -1;
 	this->next = nextVp;
 	this->clearStencil = 0;
 	this->clearDepth = 1;
@@ -24,8 +24,18 @@ Viewport::Viewport(Camera* cam, RenderTarget* rt, StringID rsys, float x, float 
 	this->height = height;
 	this->flags = flags;
 	this->priority = priority;
-	this->renderSystem = RenderManager::Instance().GetRenderSystem(rsys);
+
 	this->lightSystem = Assign(NEX_NEW(DefaultLightSystem()));
+	if (renderTarget) {
+		lastTargetSize = renderTarget->GetDimensions();
+		viewportSizeInPixels = Size((uint16)(lastTargetSize.dx * width),
+				(uint16)(lastTargetSize.dy * height));
+	}
+
+	if (rsys.length() > 0) {
+		Size what = GetViewportPixelDimensions();
+		this->renderSystem = RenderManager::Instance().CreateRenderSystem(rsys, what);
+	}
 }
 
 Viewport::~Viewport() {
@@ -90,7 +100,14 @@ void Viewport::CommitPrimitives(RenderContext* renderCtx, const FrameTimer&  fra
 	commitContext.visibiles = &visibleSet;
 	commitContext.lightSystem = traversal.lightSystem;
 	commitContext.targetDimension = renderTarget->GetDimensions();
+	if (commitContext.targetDimension.combined != lastTargetSize.combined) {
+		lastTargetSize = commitContext.targetDimension;
+		viewportSizeInPixels = Size((uint16)(lastTargetSize.dx * width),
+				(uint16)(lastTargetSize.dy * height));
+	}
+	commitContext.viewDimensions = GetViewportPixelDimensions();
 	commitContext.viewRenderTarget = renderTarget;
+	renderCtx->SetViewport(commitContext);
 	if (renderSystem) {
 		renderSystem->Commit(commitContext);
 	}

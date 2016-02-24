@@ -36,7 +36,6 @@ public:
 	virtual Size GetDimensions() const;
 	virtual PixelFormat GetPixelFormat() const override = 0;
 	virtual void Capture(RenderContext* rc, PixelBox& image, FrameBuffer) = 0;
-	virtual void Reset(RenderContext* rc, Size size, PixelFormat format) = 0;
 	virtual void Present(RenderContext* rc) = 0;
 
 protected:

@@ -108,8 +108,7 @@ public:
 
 	RenderPass* CreateRenderPass(const String& name);
 
-	virtual void CreateRenderSystem(const String& configName) = 0;
-	virtual RenderSystemPtr GetRenderSystem(StringID name) = 0;
+	virtual RenderSystemPtr CreateRenderSystem(const String& configName, Size initialViewDimensions) = 0;
 
 protected:
 

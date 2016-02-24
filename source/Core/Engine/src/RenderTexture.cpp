@@ -56,4 +56,18 @@ void RenderTexture::Capture(RenderContext* rc, PixelBox& image,
 	v->Update(rc, MSG_TEX_READ, &update);
 }
 
+void RenderTexture::ResizeImpl(Size newDimensions) {
+
+	width = newDimensions.dx;
+	height = newDimensions.dy;
+	TextureBase::ResizeParams params;
+	params.desc.maxWidth = width;
+	params.desc.maxHeight = height;
+	params.desc.maxDepth = depth;
+	params.desc.maxMipMapCount = 1;
+	RequestUpdate(MSG_TEX_RESIZE,
+				static_cast<ContextObject::ContextParamPtr>(&params));
+
+}
+
 } /* namespace nextar */

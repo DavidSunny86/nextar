@@ -10,7 +10,7 @@
 
 #include <NexRenderEngine.h>
 #include <EngineHeaders.h>
-#include <RenderPass.h>
+#include <BaseRenderPass.h>
 #include <RenderTexture.h>
 #include <MultiRenderTarget.h>
 #include <MultiRenderTarget.h>

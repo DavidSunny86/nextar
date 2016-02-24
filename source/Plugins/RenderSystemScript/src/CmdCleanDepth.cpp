@@ -6,6 +6,7 @@
  */
 
 #include <CmdCleanDepth.h>
+#include <RenderScriptContext.h>
 
 namespace RenderSystemScript {
 

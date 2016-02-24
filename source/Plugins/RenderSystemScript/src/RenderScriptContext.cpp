@@ -14,6 +14,7 @@ _rsys(rsys)
 ,_pass(nullptr)
 ,_numTargets(0)
 ,_numUnresolvedTextures(0)
+,_bufferDepth(1)
 {
 }
 

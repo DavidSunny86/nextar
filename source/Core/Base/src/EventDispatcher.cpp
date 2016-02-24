@@ -9,30 +9,51 @@
 
 namespace nextar {
 
-EventDispatcher::EventDispatcher() {
+EventDispatcher::EventDispatcher() : isDispatching(false) {
 }
 
 EventDispatcher::~EventDispatcher() {
 }
 
 void EventDispatcher::Subscribe(EventID event, EventCallback callback, void* data) {
-	subscribers.insert(KeyValuePair(event, ValueType(callback, data)));
+	if (isDispatching) {
+		toAdd.push_back(KeyValuePair(event, ValueType(callback, data)));
+	} else {
+		subscribers.insert(KeyValuePair(event, ValueType(callback, data)));
+	}
 }
 
 void EventDispatcher::Unsubscribe(EventID event, EventCallback callback) {
-	auto items = subscribers.equal_range(event);
-	for(auto it = items.first; it != items.second; ) {
-		if ((*it).second.first == callback) {
-			it = subscribers.erase(it);
-		} else
-			++it;
+	if (isDispatching) {
+		toRemove.push_back(KeyValuePair(event, ValueType(callback, nullptr)));
+	} else {
+		auto items = subscribers.equal_range(event);
+		for(auto it = items.first; it != items.second; ) {
+			if ((*it).second.first == callback) {
+				it = subscribers.erase(it);
+			} else
+				++it;
+		}
 	}
 }
 
 void EventDispatcher::DispatchEvent(EventID event) {
+	isDispatching = true;
 	auto items = subscribers.equal_range(event);
 	for(auto it = items.first; it != items.second; ++it) {
 		(*(*it).second.first)((*it).second.second);
+	}
+	isDispatching = false;
+	if (toAdd.size() > 0) {
+		for(auto& e : toAdd) {
+			Subscribe(e.first, e.second.first, e.second.second);
+		}
+	}
+
+	if (toRemove.size() > 0) {
+		for(auto& e : toAdd) {
+			Unsubscribe(e.first, e.second.first);
+		}
 	}
 }
 

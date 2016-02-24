@@ -80,6 +80,12 @@ void RenderContext_Base_GL::SetVideoModeImpl(const VideoMode& videoMode) {
 	GetImpl()->SetVideoModeImpl(videoMode);
 }
 
+void RenderContext_Base_GL::SetViewport(const CommitContext& c) {
+	float x = c.viewport->GetTopLeftX() * ((float)c.targetDimension.dx + 0.5f);
+	float y = c.viewport->GetTopLeftY() * ((float)c.targetDimension.dy + 0.5f);
+	glViewport((GLint)x, (GLint)y, (GLint)c.viewDimensions.dx, (GLint)c.viewDimensions.dy);
+}
+
 void RenderContext_Base_GL::Draw(StreamData* streamData, CommitContext& ctx) {
 	/**
 	 * Note on functions/extensions used:
@@ -660,7 +666,7 @@ void RenderContext_Base_GL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
 			PrepareParamTable(*ubPtr, passIndex, paramTable);
 		}
 
-		ubList.push_back({ i, ubPtr });
+		ubList.push_back({ (uint32)i, ubPtr });
 	}
 	// sort ublist by context
 	std::sort(ubList.begin(), ubList.end(), [](const ParameterGroupData& p1, const ParameterGroupData& p2){

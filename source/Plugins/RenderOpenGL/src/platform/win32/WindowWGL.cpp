@@ -286,7 +286,7 @@ void WindowWGL::Impl::Capture(RenderContext* rc, PixelBox& image,
 	context->GetContext()->Capture(image, this, pbo, frameBuffer);
 }
 
-void WindowWGL::Impl::Reset(RenderContext* rc, Size size, PixelFormat format) {
+void WindowWGL::Impl::ResizeImpl(Size size) {
 	RenderContextImplWGL* context = parent->GetContext();
 	if (parent->IsFullScreen())
 		SetToFullScreen(false);

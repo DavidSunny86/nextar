@@ -57,67 +57,92 @@ void TextureViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 	}
 
 	// todo Incorrect implementation
-	const TextureBase::UpdateParams& textureParams =
-		*reinterpret_cast<const TextureBase::UpdateParams*>(params);
+	if (msg & (TextureBase::MSG_TEX_CREATE|TextureBase::MSG_TEX_UPLOAD)) {
+		const TextureBase::UpdateParams& textureParams =
+				*reinterpret_cast<const TextureBase::UpdateParams*>(params);
 
-	PixelFormat imageFormat = textureParams.textureFormat;
-	if (textureParams.image)
-		imageFormat = textureParams.image->GetFormat();
+		PixelFormat imageFormat = textureParams.textureFormat;
+		if (textureParams.image)
+			imageFormat = textureParams.image->GetFormat();
 
-	if (!IsCreated()) {
-		pixelFormat = RenderContext_Base_GL::GetGlPixelFormat(imageFormat,
-			textureParams.textureFormat);
+		if (!IsCreated()) {
+			pixelFormat = RenderContext_Base_GL::GetGlPixelFormat(imageFormat,
+					textureParams.textureFormat);
 
-		if (pixelFormat.internalFormat == GL_NONE) {
-			Warn(
-				"Currently image should be of compatible format with texture!");
-			return;
+			if (pixelFormat.internalFormat == GL_NONE) {
+				Warn(
+						"Currently image should be of compatible format with texture!");
+				return;
+			}
+
+			texture = gl->CreateTexture();
+			target = RenderContext_Base_GL::GetGlTextureType(
+					textureParams.type);
+			gl->ActivateTexture(target, texture);
+
+			if (textureParams.textureFlags
+					& TextureBase::PRE_ALLOCATE_STORAGE) {
+				gl->AllocateTexture(target,
+						(GLint) textureParams.desc.maxMipMapCount,
+						pixelFormat.internalFormat, textureParams.desc.maxWidth,
+						textureParams.desc.maxHeight,
+						textureParams.desc.maxDepth);
+			}
+		} else
+			gl->ActivateTexture(target, texture);
+
+		if (textureParams.image && (msg & TextureBase::MSG_TEX_UPLOAD)) {
+			Image& img = *textureParams.image;
+			uint32 numMips = img.GetNumMipMaps();
+			uint32 numFaces = img.GetNumFaces();
+			NEX_ASSERT(numFaces == 1 || numFaces == 6);
+			GLenum realTarget = target;
+			if (target == GL_TEXTURE_CUBE_MAP
+					|| target == GL_TEXTURE_CUBE_MAP_ARRAY)
+				realTarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
+			for (uint32 f = 0; f < numFaces; ++f) {
+				for (uint32 i = 0; i < numMips; ++i) {
+					PixelBox box = img.GetPixelBox(f, i);
+					if (!box.IsSimpleArray()) {
+						Warn("Pixel box has pixel padding. Cannot copy.");
+						continue;
+					}
+					if (textureParams.textureFlags
+							& TextureBase::PRE_ALLOCATE_STORAGE)
+						gl->WriteTextureLevel(realTarget + f,
+								(GLint) (textureParams.baseMipLevel + i),
+								pixelFormat, box.GetWidth(), box.GetHeight(),
+								box.GetDepth(), box.data, box.GetDataSize());
+					else
+						gl->AllocateTextureLevel(realTarget + f,
+								(GLint) (textureParams.baseMipLevel + i),
+								pixelFormat, box.GetWidth(), box.GetHeight(),
+								box.GetDepth(), box.data, box.GetDataSize());
+
+				}
+				gl->SetMipLevels(realTarget + f, textureParams.baseMipLevel,
+						textureParams.lowestMipLevel);
+			}
+			// update number of mip levels
 		}
+	}
+	else if (msg & TextureBase::MSG_TEX_RESIZE) {
+		if (IsCreated())
+			gl->DestroyTexture(texture);
+
+		const TextureBase::ResizeParams& textureParams =
+						*reinterpret_cast<const TextureBase::ResizeParams*>(params);
 
 		texture = gl->CreateTexture();
-		target = RenderContext_Base_GL::GetGlTextureType(textureParams.type);
 		gl->ActivateTexture(target, texture);
+		gl->AllocateTexture(target,
+								(GLint) textureParams.desc.maxMipMapCount,
+								pixelFormat.internalFormat, textureParams.desc.maxWidth,
+								textureParams.desc.maxHeight,
+								textureParams.desc.maxDepth);
 
-		if (textureParams.textureFlags & TextureBase::PRE_ALLOCATE_STORAGE) {
-			gl->AllocateTexture(target,
-				(GLint)textureParams.desc.maxMipMapCount,
-				pixelFormat.internalFormat, textureParams.desc.maxWidth,
-				textureParams.desc.maxHeight, textureParams.desc.maxDepth);
-		}
-	} else
-		gl->ActivateTexture(target, texture);
-
-	if (textureParams.image && (msg & TextureBase::MSG_TEX_UPLOAD)) {
-		Image& img = *textureParams.image;
-		uint32 numMips = img.GetNumMipMaps();
-		uint32 numFaces = img.GetNumFaces();
-		NEX_ASSERT(numFaces == 1 || numFaces == 6);
-		GLenum realTarget = target;
-		if (target == GL_TEXTURE_CUBE_MAP || target == GL_TEXTURE_CUBE_MAP_ARRAY)
-			realTarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
-		for (uint32 f = 0; f < numFaces; ++f) {
-			for (uint32 i = 0; i < numMips; ++i) {
-				PixelBox box = img.GetPixelBox(f, i);
-				if (!box.IsSimpleArray()) {
-					Warn("Pixel box has pixel padding. Cannot copy.");
-					continue;
-				}
-				if (textureParams.textureFlags & TextureBase::PRE_ALLOCATE_STORAGE)
-					gl->WriteTextureLevel(realTarget + f,
-					(GLint)(textureParams.baseMipLevel + i),
-					pixelFormat, box.GetWidth(), box.GetHeight(),
-					box.GetDepth(), box.data, box.GetDataSize());
-				else
-					gl->AllocateTextureLevel(realTarget + f,
-					(GLint)(textureParams.baseMipLevel + i),
-					pixelFormat, box.GetWidth(), box.GetHeight(),
-					box.GetDepth(), box.data, box.GetDataSize());
-
-			}
-			gl->SetMipLevels(realTarget + f, textureParams.baseMipLevel, textureParams.lowestMipLevel);
-		}
-		// update number of mip levels
 	}
+
 }
 
 } /* namespace RenderOpenGL */

@@ -76,7 +76,7 @@ std::pair<const ParamEntry*, uint32> ParameterBuffer::GetParamEntryAndOffset(con
 	while (it != paramTable.endIt) {
 		NEX_ASSERT((*it).name);
 		if (*(*it).name == name)
-			return std::pair<ParamDataType, uint32>(&(*it), offset);
+			return std::pair<const ParamEntry*, uint32>(&(*it), offset);
 		offset += (*it).maxSize;
 	}
 	return std::pair<const ParamEntry*, uint32>(nullptr, 0);

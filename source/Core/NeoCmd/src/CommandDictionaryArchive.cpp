@@ -5,6 +5,7 @@
  *      Author: obhi
  */
 
+#include <NeoCmd.h>
 #include <CommandDictionaryArchive.h>
 
 namespace nextar {
@@ -25,7 +26,7 @@ CommandDictionaryArchive::~CommandDictionaryArchive() {
 
 CommandDictionary* CommandDictionaryArchive::RegisterDictionary(
 		const String& name, RootBlockCommandHandler* value) {
-	CommandDictionary* dict = NEX_NEW(CommandDictionary(value));
+	CommandDictionary* dict = NEX_NEW(CommandDictionary(name, value));
 	_scriptHandlers[name] = dict;
 	return dict;
 }

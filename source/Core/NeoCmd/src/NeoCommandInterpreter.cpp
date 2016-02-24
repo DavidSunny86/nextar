@@ -5,6 +5,7 @@
  *      Author: obhi
  */
 
+#include <NeoCmd.h>
 #include <CommandDictionaryArchive.h>
 #include <NeoCommandInterpreter.h>
 

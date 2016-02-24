@@ -11,7 +11,9 @@
 namespace RenderOpenGL {
 
 RenderBufferViewGL::RenderBufferViewGL() :
-		renderBuffer(0), attachmentType(GL_NONE) {
+		renderBuffer(0),
+		attachmentType(GL_NONE),
+		samples(0) {
 }
 
 RenderBufferViewGL::~RenderBufferViewGL() {
@@ -23,10 +25,15 @@ void RenderBufferViewGL::Update(nextar::RenderContext* rc, uint32 msg,
 	if (msg == RenderBuffer::MSG_RB_CREATE) {
 		const RenderBuffer::CreateParams* createParams =
 				static_cast<const RenderBuffer::CreateParams*>(param);
-		PixelFormatGl format = RenderContext_Base_GL::GetGlPixelFormat(
+		format = RenderContext_Base_GL::GetGlPixelFormat(
 				createParams->format, createParams->format);
+		samples = createParams->samples;
 		attachmentType = format.attachmentType;
-		renderBuffer = gl->CreateRenderBuffer(createParams, format);
+		renderBuffer = gl->CreateRenderBuffer(createParams->dimensions, samples, format);
+	} else if (msg == RenderBuffer::MSG_RB_RESIZE) {
+		const Size& s = *reinterpret_cast<const Size*>(param);
+		gl->DestroyRenderBuffer(renderBuffer);
+		renderBuffer = gl->CreateRenderBuffer(s, samples, format);
 	}
 }
 

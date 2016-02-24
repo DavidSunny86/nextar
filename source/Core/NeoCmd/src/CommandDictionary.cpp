@@ -4,7 +4,7 @@
  *  Created on: 12-Feb-2016
  *      Author: obhi
  */
-
+#include <NeoCmd.h>
 #include <CommandDictionary.h>
 #include <RootBlockCommandHandler.h>
 

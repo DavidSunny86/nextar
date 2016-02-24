@@ -10,6 +10,17 @@
 
 #include <NexBase.h>
 #include <NeoCmdConfig.h>
+#include <NeoScriptHeaders.h>
 
+namespace nextar {
+
+class CommandDictionary;
+class CommandDictionaryArchive;
+class CommandContext;
+class CommandHandler;
+class BlockCommandHandler;
+class RootBlockCommandHandler;
+
+}
 
 #endif /* CORE_NEOCMD_INCLUDE_NEOCMD_H_ */

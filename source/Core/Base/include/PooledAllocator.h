@@ -120,7 +120,8 @@ public:
 protected:
 };
 
-template<typename T, const size_t NumPerBlock, enum MemoryCategory Catagory>
+template<typename T, const size_t NumPerBlock = (size_t)BaseConstants::NUM_EVENT_PER_BLOCK,
+		enum MemoryCategory Catagory = MEMCAT_GENERAL>
 class STDPoolAllocator: public std::allocator<T> {
 public:
 	//    typedefs

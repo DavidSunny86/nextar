@@ -4,7 +4,7 @@
  *  Created on: 12-Feb-2016
  *      Author: obhi
  */
-
+#include <NeoCmd.h>
 #include <BlockCommandHandler.h>
 
 namespace nextar {

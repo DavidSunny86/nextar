@@ -191,7 +191,7 @@ public:
 		return object;
 	}
 
-	inline operator const T*() const {
+	inline operator T*() const {
 		return object;
 	}
 

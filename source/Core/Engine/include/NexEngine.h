@@ -26,6 +26,7 @@ class ShaderAsset;
 class TextureBase;
 class RenderTarget;
 class RenderTexture;
+class RenderBuffer;
 class MultiRenderTarget;
 class CommitContext;
 class DebugDisplay;
@@ -78,6 +79,7 @@ typedef RefPtr<GpuBuffer> GpuBufferPtr;
 typedef RefPtr<RenderTexture> RenderTexturePtr;
 typedef RefPtr<RenderTarget> RenderTargetPtr;
 typedef RefPtr<MultiRenderTarget> MultiRenderTargetPtr;
+typedef RefPtr<RenderBuffer> RenderBufferPtr;
 typedef RefPtr<VertexLayout> VertexLayoutPtr;
 typedef RefPtr<RenderSystem> RenderSystemPtr;
 

@@ -41,13 +41,13 @@ public:
 		// RenderTarget
 		virtual PixelFormat GetPixelFormat() const override;
 		virtual void Capture(RenderContext* rc, PixelBox& image, FrameBuffer);
-		virtual void Reset(RenderContext* rc, Size size, PixelFormat format);
 		virtual void Present(RenderContext* rc);
 
 		inline HDC GetWindowDC() {
 			return hDC;
 		}
 
+		virtual void ResizeImpl(Size size);
 		// Helpers
 	private:
 		

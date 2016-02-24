@@ -33,7 +33,7 @@ void MultiRenderTarget::Create(const CreateParams& params) {
 	const TargetParamArray& tpa = params.targets;
 	dimensions = params.dimensions;
 	numColorTargets = params.numColorTargets;
-	for (uint32 i = 0; i < params.numColorTargets; ++i) {
+	for (uint32 i = 0; i < numColorTargets; ++i) {
 		color[i] = tpa[i].useTarget ? tpa[i].useTarget : CreateTexture(tpa[i]);
 
 	}
@@ -53,7 +53,6 @@ PixelFormat MultiRenderTarget::GetPixelFormat() const {
 	return PixelFormat::UNKNOWN;
 }
 
-
 RenderTargetPtr MultiRenderTarget::CreateTexture(const TargetParam& tp) {
 	if (tp.useAsTexture) {
 		RenderTexture* rt = NEX_NEW(RenderTexture());
@@ -65,6 +64,19 @@ RenderTargetPtr MultiRenderTarget::CreateTexture(const TargetParam& tp) {
 		rt->Create(tp.format, dimensions.width, dimensions.height);
 		return Assign(rt);
 	}
+}
+
+void MultiRenderTarget::ResizeImpl(Size d) {
+	dimensions = d;
+	for (uint32 i = 0; i < numColorTargets; ++i) {
+		if(color[i])
+			color[i]->Resize(d);
+	}
+	if (depth)
+		depth->Resize(d);
+	ContextObject::RequestUpdate(MSG_RT_RESIZE,
+				reinterpret_cast<ContextObject::ContextParamPtr>(this));
+
 }
 
 void MultiRenderTarget::Capture(RenderContext* rc, 

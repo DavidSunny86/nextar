@@ -18,8 +18,7 @@
 namespace nextar {
 
 class _NexEngineAPI RenderSystem:
-	public Referenced<RenderSystem, AllocGraphics>,
-	public NamedObject {
+	public Referenced<RenderSystem, AllocGraphics> {
 public:
 	class Streamer {
 	public:
@@ -45,7 +44,7 @@ public:
 			const RenderBuffer::CreateParams& params,
 			float viewRelativeWidthFactor,
 			float viewRelativeHeightFactor) = 0;
-	virtual void AddPass(RenderPass* pass) = 0;
+	virtual RenderPass* AddPass(const String& type) = 0;
 	virtual void EndConfig() = 0;
 
 	virtual uint32 GetRenderTargetCount() const = 0;

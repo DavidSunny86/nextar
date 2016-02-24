@@ -7,6 +7,7 @@
 #include <BaseHeaders.h>
 #include <Plugin.h>
 #include <RenderManager.h>
+#include <RenderScriptContext.h>
 
 NEX_IMPLEMENT_PLUGIN(RenderSystemScript, RenderSystemScript::Plugin);
 
@@ -21,13 +22,13 @@ Plugin::~Plugin() {
 void Plugin::Open() {
 	Trace("Loaded render system script loader 1.0.");
 	_streamer.RegisterDictionary();
-	RenderManager::Instance().AddRenderStreamer("RSS", &_streamer);
+	RenderManager::Instance().AddRenderStreamer("RSCRIPT", &_streamer);
 
 }
 
 void Plugin::Close() {
 	Trace("Unloading render system script loader 1.0.");
-	RenderManager::Instance().RemoveRenderStreamer("RSS");
+	RenderManager::Instance().RemoveRenderStreamer("RSCRIPT");
 	_streamer.UnregisterDictionary();
 }
 

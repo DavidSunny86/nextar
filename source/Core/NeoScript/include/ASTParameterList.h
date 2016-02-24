@@ -20,8 +20,6 @@ public:
 		_value = std::move(p._value);
 		return *this;
 	}
-
-	void Accept(ASTVisitor*) const;
 };
 
 }

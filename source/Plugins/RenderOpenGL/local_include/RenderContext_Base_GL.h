@@ -74,6 +74,9 @@ public:
 	virtual void SwitchPass(CommitContext&, Pass::View*);
 	virtual void SetVideoModeImpl(const VideoMode& videoMode);
 
+	/* Set viewport */
+	virtual void SetViewport(const CommitContext& c);
+
 	/* GPU Object */
 	/* Compile a single shader */
 	GLuint CreateShader(GLenum shaderType, const char* preDefs,
@@ -156,7 +159,8 @@ public:
 	inline GLsync FenceSync(GLenum condition, GLbitfield flags);
 
 	inline GLuint CreateRenderBuffer(
-		const RenderBuffer::CreateParams*  createParams,
+		Size dim,
+		uint16 samples,
 		const PixelFormatGl& format);
 	inline void DestroyRenderBuffer(GLuint buffer);
 	
@@ -521,7 +525,8 @@ inline GLsync RenderContext_Base_GL::FenceSync(GLenum condition, GLbitfield flag
 }
 
 inline GLuint RenderContext_Base_GL::CreateRenderBuffer(
-	const RenderBuffer::CreateParams* createParams,
+	Size dim,
+	uint16 samples,
 	const PixelFormatGl& format) {
 	GLuint renderBuffer;
 	GlGenRenderbuffers(1, &renderBuffer);
@@ -529,8 +534,10 @@ inline GLuint RenderContext_Base_GL::CreateRenderBuffer(
 	GlBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
 	GL_CHECK();
 	GlRenderbufferStorageMultisample(GL_RENDERBUFFER,
-									 createParams->samples, format.internalFormat,
-									 createParams->width, createParams->height);
+									 samples,
+									 format.internalFormat,
+									 dim.dx,
+									 dim.dy);
 	GL_CHECK();
 	GlBindRenderbuffer(GL_RENDERBUFFER, 0);
 	GL_CHECK();

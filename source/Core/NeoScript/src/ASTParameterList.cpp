@@ -9,11 +9,6 @@
 
 namespace nextar {
 
-void ASTParameterList::Accept(ASTVisitor* visitor) const {
-	if(_value.size() > 0)
-		visitor->VisitParameterList(this);
-}
-
 }
 
 

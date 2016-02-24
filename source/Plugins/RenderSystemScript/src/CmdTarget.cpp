@@ -6,6 +6,7 @@
  */
 
 #include <CmdTarget.h>
+#include <RenderScriptContext.h>
 
 namespace RenderSystemScript {
 

@@ -25,6 +25,7 @@ public:
 	virtual ~RenderScriptContext();
 
 	Size _bufferDim;
+	uint16 _bufferDepth;
 	Vector2 _bufferDimFactor;
 
 	Target _targets[RenderConstants::MAX_RENDER_TARGETS+1];

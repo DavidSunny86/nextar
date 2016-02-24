@@ -8,8 +8,9 @@
 #ifndef RENDERTARGET_H_
 #define RENDERTARGET_H_
 
+#include <NexEngine.h>
+#include <RenderConstants.h>
 #include <TextureBase.h>
-#include <RefPtr.h>
 #include <Viewport.h>
 #include <ContextObject.h>
 
@@ -45,8 +46,11 @@ public:
 	 viewports in this canvas. Lesser the number, the later
 	 it is updated.
 	 **/
-	virtual Viewport* CreateViewport(Camera*, float x = 0.0f, float y = 0.0f,
-			float width = 1.0f, float height = 1.0f, int32 priority = 0);
+	virtual Viewport* CreateViewport(Camera*,
+			const String& renderSys = StringUtils::Default,
+			float x = 0.0f, float y = 0.0f,
+			float width = 1.0f, float height = 1.0f,
+			int32 priority = 0);
 
 	/* pixel format */
 	virtual PixelFormat GetPixelFormat() const = 0;
@@ -60,12 +64,23 @@ public:
 	// todo This call should be replaced by the view->Present, may be a list of views
 	// should be maintaned instead of targets.
 	virtual void Present(RenderContext* rc);
-
+	// Resize for 2d render targets
+	void Resize(Size newDimensions);
 protected:
+
+	virtual void ResizeImpl(Size newDim) = 0;
 
 	const RenderTargetType targetType;
 	Viewport* viewport;
 };
+
+typedef list<RenderTargetPtr>::type RenderTargetList;
+
+inline void RenderTarget::Resize(Size newDimensions) {
+	if (GetDimensions() != newDimensions) {
+		ResizeImpl(newDimensions);
+	}
+}
 
 } /* namespace nextar */
 #endif /* RENDERTARGET_H_ */
