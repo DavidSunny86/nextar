@@ -12,7 +12,7 @@
 
 namespace nextar {
 
-class BlockCommandHandler : public CommandHandler {
+class _NexNeoCmdAPI BlockCommandHandler : public CommandHandler {
 public:
 	BlockCommandHandler();
 	virtual ~BlockCommandHandler();

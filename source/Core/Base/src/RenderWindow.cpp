@@ -10,6 +10,8 @@ RenderWindow::RenderWindow(Impl* _impl) :
 }
 
 RenderWindow::~RenderWindow() {
+	if (!(flags & WINDOW_CLOSED))
+		WindowManager::Instance().UnregisterWindow(this);
 }
 
 void RenderWindow::Create(uint32 width, uint32 height, bool fullscreen,

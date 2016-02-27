@@ -156,8 +156,8 @@ Task* TaskSchedular::AsyncGetWork(TaskRunner* runner, bool repeat) {
 			// the task may not have been marked as finished and it might
 			// be marked so afterwards, thus the state might come up as
 			// either Running or Finished here.
-			//if(task)
-			//	NEX_ASSERT(task->meta.state == Task::TASK_QUEUED);
+			if(task)
+				NEX_ASSERT(task->meta.state == Task::TASK_QUEUED);
 #endif
 			return task;
 		}

@@ -17,11 +17,16 @@ BaseMaterialPass::~BaseMaterialPass() {
 
 }
 
+void BaseMaterialPass::SetMaterial(MaterialAssetPtr& material) {
+	this->material = material;
+	material->RequestLoad();
+	OnMaterialLoad();
+}
+
 void BaseMaterialPass::CreateResources() {
 	if (!material) {
 		material = Asset::AssetLoad(materialUrl);
-	} else {
-		material->RequestLoad();
+		OnMaterialLoad();
 	}
 }
 

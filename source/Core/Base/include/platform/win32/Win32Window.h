@@ -13,11 +13,15 @@ protected:
 	WNDPROC original_proc;
 	bool full_control;
 
+	NEX_LOG_HELPER(Win32Window);
+
 public:
 
 	inline Win32Window(Impl* impl) :
 			RenderWindow(impl), window(0), full_control(false), original_proc(0) {
 	}
+
+	~Win32Window();
 
 	WNDPROC GetWindowProc() {
 		return original_proc;

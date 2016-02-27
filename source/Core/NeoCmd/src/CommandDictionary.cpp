@@ -15,7 +15,6 @@ CommandDictionary::CommandDictionary(const String& name, RootBlockCommandHandler
 }
 
 CommandDictionary::~CommandDictionary() {
-	NEX_DELETE(_root );
 }
 
 void CommandDictionary::RegisterHandler(const String& fullyQualifiedName,

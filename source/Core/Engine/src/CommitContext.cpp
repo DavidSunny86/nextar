@@ -42,6 +42,8 @@ void CommitContext::_Reset() {
 	depthMap = nullptr;
 	frameTime = 0.0f;
 	frameTimer = nullptr;
+	lastRenderTarget = nullptr;
+	viewRenderTarget = nullptr;
 
 	for (auto &b : paramBuffers)
 		b = nullptr;
@@ -60,26 +62,23 @@ void CommitContext::_Reset() {
 nextar::RenderTargetName CommitContext::ParseTargetName(
 		const String& target) {
 	RenderTargetName lastTarget = RenderTargetName::RT_NONE;
-	size_t p;
 	if (target == "last")
 		lastTarget = RenderTargetName::LAST_RT_MT;
-	else if ((p = target.find_first_of("last.")) != String::npos) {
-		String type = target.substr(p + 5);
-		if (type == "depth")
+	else if (target.compare(0, 5, "last.") == 0) {
+		if (target.compare(5, 5, "depth") == 0)
 			lastTarget = RenderTargetName::LAST_RT_DEPTH;
-		else if ((p = type.find_first_of("color-")) != String::npos) {
+		else if (target.compare(5, 6, "color-") == 0) {
 			lastTarget = (RenderTargetName) ((RenderTargetName::LAST_RT_COLOR_0
-					+ Convert::ToULong(type.substr(p + 6))));
+				+ Convert::ToULong(&target.c_str()[11])));
 		}
 	} else if (target == "viewport")
 		lastTarget = RenderTargetName::VIEW_RT_MT;
-	else if ((p = target.find_first_of("viewport.")) != String::npos) {
-		String type = target.substr(p + 9);
-		if (type == "depth")
+	else if (target.compare(0, 9, "viewport.") == 0) {
+		if (target.compare(9, 5, "depth"))
 			lastTarget = RenderTargetName::VIEW_RT_DEPTH;
-		else if ((p = type.find_first_of("color-")) != String::npos) {
+		else if (target.compare(9, 6, "color-") == 0) {
 			lastTarget = (RenderTargetName) ((RenderTargetName::VIEW_RT_COLOR_0
-					+ Convert::ToULong(type.substr(p + 6))));
+				+ Convert::ToULong(&target.c_str()[15])));
 		}
 	}
 

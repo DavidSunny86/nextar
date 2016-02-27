@@ -7,6 +7,8 @@
 
 #include <NexEngine.h>
 #include <RenderTexture.h>
+#include <RenderConstants.h>
+#include <RenderContext.h>
 
 namespace nextar {
 

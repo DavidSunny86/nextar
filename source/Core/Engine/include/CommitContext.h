@@ -31,7 +31,7 @@ struct RenderInfo {
 
 
 class RenderSystem;
-class CommitContext: public AllocGeneral {
+class _NexEngineAPI CommitContext: public AllocGeneral {
 public:
 
 	typedef std::pair<uint32, const ParameterBuffer*> ParamContext;

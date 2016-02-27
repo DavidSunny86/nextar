@@ -24,6 +24,8 @@ public:
 	CompositorRenderPass();
 	virtual ~CompositorRenderPass();
 
+	virtual void OnMaterialLoad();
+
 	ParameterBuffer& GetParameterBuffer() {
 		return parameters;
 	}

@@ -15,7 +15,7 @@ void CmdCleanDepth::BeginExecute(CommandContext* pContext,
 
 	ConstMultiStringHelper h(command->GetParameters().AsString());
 	RenderScriptContext* c = static_cast<RenderScriptContext*>(pContext);
-	float cleanDepthValue = -1.0f;
+	float cleanDepthValue = 1.0f;
 	if (h.Length() > 0)
 		cleanDepthValue = Convert::ToFloat(h.Get(0));
 	c->_pass->SetCleanDepth(true, cleanDepthValue);

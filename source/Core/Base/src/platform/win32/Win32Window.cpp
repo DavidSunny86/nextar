@@ -8,6 +8,10 @@
 
 namespace nextar {
 
+Win32Window::~Win32Window() {
+
+}
+
 void Win32Window::WindowConfigChanged() {
 	// todo get the resized window
 	RenderWindow::WindowConfigChanged();
@@ -21,12 +25,13 @@ LRESULT CALLBACK Win32Window::WndProc(HWND wnd, UINT message, WPARAM wparam,
 	if (wind) {
 		switch (message) {
 		case WM_CLOSE:
+			if (!wind->IsClosed()) {
+				wind->Destroy();
+			}
 			if (wind->IsMainWindow()) {
 				// post quit message
 				ApplicationContext::Instance().SetQuitting(true);
 				PostQuitMessage(0);
-			} else if (!wind->IsClosed()) {
-				wind->Destroy();
 			}
 
 			break;
@@ -68,6 +73,9 @@ LRESULT CALLBACK Win32Window::WndProc(HWND wnd, UINT message, WPARAM wparam,
 		case WM_INPUT:
 			if (Win32InputListener::InstancePtr() && wparam == RIM_INPUT)
 				Win32InputListener::Instance().ConsumeEvent(wind, (HRAWINPUT) lparam);
+			break;
+		case WM_DESTROY:
+			Trace("Destruction of a window!");
 			break;
 		}
 	}

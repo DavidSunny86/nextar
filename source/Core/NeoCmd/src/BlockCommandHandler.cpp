@@ -29,18 +29,18 @@ const CommandHandler* BlockCommandHandler::GetHandler(
 }
 
 void BlockCommandHandler::AddHandler(const String& qualifiedName,
-		CommandHandler* handler) {
+		CommandHandler* iHandler) {
 	StringPair p = StringUtils::Split(qualifiedName, '.');
 	if (p.second.length() > 0) {
 		CommandHandler* handler = GetHandler(p.first);
 		if (handler->IsBlockHandler()) {
-			static_cast<BlockCommandHandler*>(handler)->AddHandler(p.second, handler);
+			static_cast<BlockCommandHandler*>(handler)->AddHandler(p.second, iHandler);
 		}
 	} else {
 		auto& e = _handlers[p.first];
 		if (e)
-			NEX_DELETE(e);
-		e = handler;
+			e->SetParentBlock(nullptr);
+		e = iHandler;
 		e->SetParentBlock(this);
 	}
 }

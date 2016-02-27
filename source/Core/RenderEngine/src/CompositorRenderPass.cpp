@@ -18,13 +18,17 @@ numTextureToResolve(0)
 }
 
 CompositorRenderPass::~CompositorRenderPass() {
-	if (numTextureToResolve > 0 && _rtBunchOf) {
+	if (numTextureToResolve > 1 && _rtBunchOf) {
 		NEX_FREE(_rtBunchOf, MEMCAT_GENERAL);
 	}
 }
 
 RenderPass* CompositorRenderPass::CreateInstance() {
 	return NEX_NEW(CompositorRenderPass());
+}
+
+void CompositorRenderPass::OnMaterialLoad() {
+	parameters.Prepare(material->GetShader()->GetParamTableItem(ParameterContext::CTX_OBJECT));
 }
 
 void CompositorRenderPass::Commit(CommitContext& context) {

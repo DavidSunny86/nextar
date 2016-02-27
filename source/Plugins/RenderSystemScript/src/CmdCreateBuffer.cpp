@@ -12,13 +12,12 @@ namespace RenderSystemScript {
 
 void CmdCreateBuffer::ParseDimension(const String& value, uint16& d, float& f) {
 	float r = 0.0f;
-	size_t p = value.find_first_of("view-x-");
-	if (p == String::npos) {
+	if (value.compare(0, 7, "view-x-") != 0) {
 		d = (uint16)Convert::ToULong(value);
 		f = 0.0f;
 	} else {
 		d = 0;
-		f = Convert::ToFloat(value.substr(p + 7));
+		f = Convert::ToFloat(&value.c_str()[7]);
 	}
 }
 

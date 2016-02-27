@@ -77,7 +77,7 @@ protected:
 typedef list<RenderTargetPtr>::type RenderTargetList;
 
 inline void RenderTarget::Resize(Size newDimensions) {
-	if (GetDimensions() != newDimensions) {
+	if (GetDimensions().combined != newDimensions.combined) {
 		ResizeImpl(newDimensions);
 	}
 }

@@ -19,10 +19,15 @@ StreamData::~StreamData() {
 
 void StreamData::Clear() {
 	indices.indices.Clear();
-	if ((flags & DELETE_BINDING) && vertices.binding)
+	if ((flags & DELETE_BINDING) && vertices.binding) {
 		NEX_DELETE(vertices.binding);
-	if ((flags & DELETE_LAYOUT) && vertices.layout)
+		vertices.binding = nullptr;
+	}
+	if ((flags & DELETE_LAYOUT) && vertices.layout) {
 		NEX_DELETE(vertices.layout);
+		vertices.layout = nullptr;
+	}
+		
 }
 
 VertexBufferBinding::VertexBufferBinding() :

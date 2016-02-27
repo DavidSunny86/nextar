@@ -12,7 +12,7 @@
 
 namespace nextar {
 
-class BaseMaterialPass: public BaseRenderPass {
+class _NexRenderAPI BaseMaterialPass : public BaseRenderPass {
 public:
 	BaseMaterialPass();
 	virtual ~BaseMaterialPass();
@@ -21,9 +21,8 @@ public:
 		this->materialUrl = materialUrl;
 	}
 
-	void SetMaterial(MaterialAssetPtr& material) {
-		this->material = material;
-	}
+	void SetMaterial(MaterialAssetPtr& material);
+	virtual void OnMaterialLoad() {}
 
 	MaterialAssetPtr& GetMaterial() {
 		return material;

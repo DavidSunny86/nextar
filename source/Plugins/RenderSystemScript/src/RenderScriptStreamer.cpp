@@ -34,12 +34,12 @@ void RenderScriptStreamer::RegisterDictionary() {
 	CommandDictionary* dict = CommandDictionaryArchive::Instance().RegisterDictionary("RenderSystem",
 			&_root);
 	dict->RegisterHandler("pass", CmdPass::InstancePtr());
-	dict->RegisterHandler("create-buffer", CmdCreateBuffer::InstancePtr());
 	dict->RegisterHandler("pass.clean-color", CmdCleanColor::InstancePtr());
 	dict->RegisterHandler("pass.clean-depth", CmdCleanDepth::InstancePtr());
 	dict->RegisterHandler("pass.material", CmdMaterial::InstancePtr());
 	dict->RegisterHandler("pass.set-param", CmdSetParam::InstancePtr());
 	dict->RegisterHandler("pass.render-to", CmdRenderTo::InstancePtr());
+	dict->RegisterHandler("create-buffer", CmdCreateBuffer::InstancePtr());
 	dict->RegisterHandler("create-buffer.target", CmdTarget::InstancePtr());
 }
 

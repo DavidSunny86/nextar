@@ -135,8 +135,10 @@ void ApplicationContext::SetQuitting(bool value) {
 }
 
 void ApplicationContext::QuitApplication() {
-	quitting = true;
-	WindowManager::Instance().Quit();
+	if (!quitting) {
+		quitting = true;
+		WindowManager::Instance().Quit();
+	}
 }
 
 void ApplicationContext::Run() {

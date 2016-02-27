@@ -19,7 +19,7 @@ void CmdRenderTo::BeginExecute(CommandContext* pContext,
 	String target = h.Get(0);
 	RenderTargetName lastTarget = CommitContext::ParseTargetName(target);
 	BaseRenderPass* pass = c->_pass;
-	if (target != StringUtils::Null)
+	if (target != StringUtils::Null && lastTarget == RenderTargetName::RT_NONE)
 		pass->SetTarget(c->_rsys.GetTarget(NamedObject::AsyncStringID(target)));
 	else
 		pass->SetTarget(lastTarget);

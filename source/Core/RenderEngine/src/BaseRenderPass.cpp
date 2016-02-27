@@ -24,12 +24,13 @@ BaseRenderPass::~BaseRenderPass() {
 void BaseRenderPass::BeginRender(CommitContext& ctx) {
 	if (info.rt) {
 		ctx.renderContext->BeginRender(&info, clearFlags);
+		ctx.lastRenderTarget = info.rt;
 	} else if (toLastSubTarget != RenderTargetName::RT_NONE) {
 		info.rt = ctx.GetTargetByName(toLastSubTarget);
 		ctx.renderContext->BeginRender(&info, clearFlags);
 		if (info.rt) {
 			ctx.lastRenderTarget = info.rt;
-			info.rt = 0;
+			info.rt = nullptr;
 		}
 	}
 }

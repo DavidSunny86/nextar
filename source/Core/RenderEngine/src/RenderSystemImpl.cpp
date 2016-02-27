@@ -137,7 +137,7 @@ void RenderSystemImpl::EndConfig() {
 }
 
 uint32 RenderSystemImpl::GetRenderTargetCount() const {
-	return targets.size();
+	return (uint32)targets.size();
 }
 
 void RenderSystemImpl::Commit(CommitContext& context) {
@@ -146,8 +146,8 @@ void RenderSystemImpl::Commit(CommitContext& context) {
 			for(auto& e : targets) {
 				if (e.second.viewRelativeX > 0 &&
 						e.second.viewRelativeY > 0	) {
-					Size newDim = Size( context.viewDimensions.dx * e.second.viewRelativeX,
-							context.viewDimensions.dy * e.second.viewRelativeY);
+					Size newDim = Size( (uint16)(context.viewDimensions.dx * e.second.viewRelativeX),
+							(uint16)(context.viewDimensions.dy * e.second.viewRelativeY));
 					e.second.target->Resize(newDim);
 				}
 			}

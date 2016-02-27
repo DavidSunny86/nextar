@@ -248,7 +248,7 @@ RenderSystemPtr BaseRenderManager::CreateRenderSystem(const String& configName, 
 	bool bCompiled = true;
 	InputStreamPtr input = FileSystem::Instance().OpenRead(firstUrl);
 	if (!input) {
-		URL secondUrl(FileSystem::ArchiveProjectData_Name, "Scripts/Configs/" + configName + ".rss");
+		URL secondUrl(FileSystem::ArchiveProjectData_Name, "Scripts/Configs/" + configName + ".rscript");
 		input = FileSystem::Instance().OpenRead(secondUrl);
 		bCompiled = false;
 	}

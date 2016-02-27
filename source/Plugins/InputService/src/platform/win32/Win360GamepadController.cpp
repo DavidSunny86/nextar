@@ -142,11 +142,13 @@ InputDir Win360GamepadController::GetCircular(int32 x, int32 y,
 InputChangeBuffer Win360GamepadController::UpdateSettings() {
 	// see if task was executed
 	InputChangeBuffer buffer(0, 0);
-	if (pollTask.TryLock()) {
-		buffer.first = inputEvents[currBuffer].data();
-		buffer.second = changeCount;
-		currBuffer = !currBuffer;
-		TaskSchedular::Instance().AsyncSubmit(&pollTask);
+	if (pollTask.IsCompleted()) {
+		if (pollTask.TryLock()) {
+			buffer.first = inputEvents[currBuffer].data();
+			buffer.second = changeCount;
+			currBuffer = !currBuffer;
+			TaskSchedular::Instance().AsyncSubmit(&pollTask);
+		}
 	}
 
 	return buffer;

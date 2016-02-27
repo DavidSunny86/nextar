@@ -16,6 +16,7 @@ BaseRenderContext::~BaseRenderContext(void) {
 
 void BaseRenderContext::DestroyAllWindows() {
 	std::for_each(renderWindows.begin(), renderWindows.end(), [] (RenderWindow* value) {
+		value->Destroy();
 		NEX_DELETE(value);
 	});
 	renderWindows.clear();

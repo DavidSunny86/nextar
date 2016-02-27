@@ -32,7 +32,11 @@ CommandDictionary* CommandDictionaryArchive::RegisterDictionary(
 }
 
 void CommandDictionaryArchive::UnregisterDictionary(const String& name) {
-	_scriptHandlers.erase(name);
+	auto it = _scriptHandlers.find(name);
+	if (it != _scriptHandlers.end()) {
+		NEX_DELETE((*it).second);
+		_scriptHandlers.erase(it);
+	}
 }
 
 } /* namespace nextar */

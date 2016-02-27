@@ -66,6 +66,7 @@ ParamEntryTable::const_iterator ParameterBuffer::_Find(const String& name) const
 		NEX_ASSERT((*it).name);
 		if (*(*it).name == name)
 			return it;
+		++it;
 	}
 	return paramTable.endIt;
 }
@@ -78,6 +79,7 @@ std::pair<const ParamEntry*, uint32> ParameterBuffer::GetParamEntryAndOffset(con
 		if (*(*it).name == name)
 			return std::pair<const ParamEntry*, uint32>(&(*it), offset);
 		offset += (*it).maxSize;
+		++it;
 	}
 	return std::pair<const ParamEntry*, uint32>(nullptr, 0);
 }
@@ -88,6 +90,7 @@ ParamDataType ParameterBuffer::GetType(const String& name) const {
 		NEX_ASSERT((*it).name);
 		if (*(*it).name == name)
 			return (*it).type;
+		++it;
 	}
 	return ParamDataType::PDT_UNKNOWN;
 }
@@ -99,7 +102,8 @@ uint32 ParameterBuffer::GetOffset(const String& name) const {
 		NEX_ASSERT((*it).name);
 		if (*(*it).name == name)
 			return offset;
-			offset += (*it).maxSize;
+		offset += (*it).maxSize;
+		++it;
 	}
 	return -1;
 }
@@ -110,6 +114,7 @@ const ParamEntry* ParameterBuffer::_GetParameter(const String& name) const {
 		NEX_ASSERT((*it).name);
 		if (*(*it).name == name)
 			return &(*it);
+		++it;
 	}
 	return nullptr;
 }

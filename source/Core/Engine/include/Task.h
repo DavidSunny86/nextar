@@ -56,6 +56,11 @@ public:
 		meta.parent = nullptr;
 		meta.refCount.store(0, std::memory_order_relaxed);
 	}
+
+	inline bool IsCompleted() const {
+		return meta.refCount.load(std::memory_order_relaxed) == 0;
+	}
+
 	// entry point
 	virtual Task* Run() = 0;
 	// spawn a child task

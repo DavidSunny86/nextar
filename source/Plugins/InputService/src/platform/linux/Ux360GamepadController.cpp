@@ -44,12 +44,14 @@ Ux360GamepadController::~Ux360GamepadController() {
 InputChangeBuffer Ux360GamepadController::UpdateSettings() {
 	// see if task was executed
 	InputChangeBuffer buffer(0, 0);
-	if (pollTask.TryLock()) {
-		buffer.first = inputEvents[currBuffer].data();
-		buffer.second = changeCount;
-		currBuffer = !currBuffer;
-		TaskSchedular::Instance().AsyncSubmit(&pollTask);
-		//pollTask.Run();
+	if (pollTask.IsCompleted()) {
+		if (pollTask.TryLock()) {
+			buffer.first = inputEvents[currBuffer].data();
+			buffer.second = changeCount;
+			currBuffer = !currBuffer;
+			TaskSchedular::Instance().AsyncSubmit(&pollTask);
+			//pollTask.Run();
+		}
 	}
 	return buffer;
 }

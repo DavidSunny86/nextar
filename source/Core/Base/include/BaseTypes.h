@@ -60,11 +60,11 @@ union Size {
 			dx(a), dy(b) {
 	}
 
-	friend bool operator == (const Size& s1, const Size& s2) {
+	inline friend bool operator == (Size s1, Size s2) {
 		return (s1.combined == s2.combined) != 0;
 	}
 
-	friend bool operator != (const Size& s1, const Size& s2) {
+	inline friend bool operator != (Size s1, Size s2) {
 		return (s1.combined != s2.combined) != 0;
 	}
 };

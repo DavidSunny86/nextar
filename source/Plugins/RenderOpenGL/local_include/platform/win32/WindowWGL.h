@@ -79,7 +79,6 @@ public:
 	static void InitializeWindowClass();
 protected:
 	
-	HGLRC hGL;
 	RenderContextImplWGL* context;
 
 	static ATOM wndClass;
