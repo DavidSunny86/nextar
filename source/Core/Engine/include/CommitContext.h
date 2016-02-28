@@ -17,7 +17,7 @@
 namespace nextar {
 
 struct ClearBufferInfo {
-	uint16 clearStencil;
+	int16 clearStencil;
 	float clearDepth;
 	Color clearColor[RenderConstants::MAX_COLOR_TARGETS];
 	ClearBufferInfo() : clearDepth(1.0f), clearStencil(0) {}

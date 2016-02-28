@@ -177,7 +177,7 @@ void RenderContext_Base_GL::SetCurrentTarget(RenderTarget* canvas) {
 			FrameBufferObjectGL& fbo = textureView->GetFBO();
 			if (!fbo.IsValid())
 				CreateFBO(textureView);
-			BindWriteFBO(fbo);
+			BindFBO(fbo);
 			contextFlags |= CURRENT_TARGET_FBO;
 			currentCountOfColorAttachments = textureView->IsColorTarget();
 		}
@@ -190,15 +190,22 @@ void RenderContext_Base_GL::SetCurrentTarget(RenderTarget* canvas) {
 			FrameBufferObjectGL& fbo = textureView->GetFBO();
 			if (!fbo.IsValid())
 				CreateFBO(textureView);
-			BindWriteFBO(fbo);
+			BindFBO(fbo);
 			contextFlags |= CURRENT_TARGET_FBO;
 			currentCountOfColorAttachments = textureView->IsColorTarget();
 		}
 											  break;
 
 		case RenderTargetType::BACK_BUFFER:
-			currentWindow = canvas;
-			SetCurrentWindow(canvas);
+			if (contextFlags & CURRENT_TARGET_FBO) {
+				UnbindFBO(false);
+				contextFlags &= ~CURRENT_TARGET_FBO;
+			}
+
+			if (currentWindow != canvas) {
+				currentWindow = canvas;
+				SetCurrentWindow(canvas);
+			}
 			currentCountOfColorAttachments = 0;
 			break;
 
@@ -208,7 +215,7 @@ void RenderContext_Base_GL::SetCurrentTarget(RenderTarget* canvas) {
 				static_cast<MultiRenderTarget*>(canvas)));
 			FrameBufferObjectGL& fbo = textureView->GetFBO();
 			NEX_ASSERT(fbo.IsValid());
-			BindWriteFBO(fbo);
+			BindFBO(fbo);
 			// set the individual draw buffers
 			if ((currentCountOfColorAttachments = textureView->GetColorAttachmentCount()))
 				GlDrawBuffers(currentCountOfColorAttachments, s_attachmentMap + 6);
@@ -231,10 +238,21 @@ void RenderContext_Base_GL::Clear(const ClearBufferInfo& info, ClearFlags cflags
 			GlClearBufferfv(GL_COLOR, 0, info.clearColor[0].AsFloatArray());
 		}
 	}
+
 	if (Test(cflags & ClearFlags::CLEAR_DEPTH) &&
 		Test(cflags & ClearFlags::CLEAR_STENCIL)) {
+		if (!depthStencilState.depthWrite) {
+			depthStencilState.depthWrite = true;
+			glDepthMask(GL_TRUE);
+		}
+					
 		GlClearBufferfi(GL_DEPTH_STENCIL, 0, info.clearDepth, info.clearStencil);
 	} else if (Test(cflags & ClearFlags::CLEAR_DEPTH)) {
+		if (!depthStencilState.depthWrite) {
+			depthStencilState.depthWrite = true;
+			glDepthMask(GL_TRUE);
+		}
+
 		GlClearBufferfv(GL_DEPTH, 0, &info.clearDepth);
 	} else if (Test(cflags & ClearFlags::CLEAR_STENCIL)) {
 		GLint stencil = info.clearStencil;
@@ -413,11 +431,6 @@ bool RenderContext_Base_GL::ValidateFBO() {
 }
 
 void RenderContext_Base_GL::EndRender() {
-	if (contextFlags & CURRENT_TARGET_FBO) {
-		UnbindFBO(false);
-		contextFlags &= ~CURRENT_TARGET_FBO;
-	}
-	currentTarget = currentWindow;
 }
 
 

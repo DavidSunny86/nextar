@@ -80,7 +80,7 @@ private:
 #ifdef NEX_TASK_SCHEDULAR_CHECKS
 		meta.state = Task::TASK_INIT;
 #endif
-		meta.refCount.store(1, std::memory_order_relaxed);
+		meta.refCount.fetch_add(1, std::memory_order_relaxed);
 	}
 
 	friend class TaskSchedular;

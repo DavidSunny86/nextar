@@ -12,12 +12,10 @@ namespace InputService {
 
 KeyName Win360GamepadController::buttonMap[16] = { (KeyName)0 };
 Win360GamepadController::PollTask::PollTask() : Task("PollXBox360"), device_(nullptr) {
-	lock_.clear();
 }
 
 Task* Win360GamepadController::PollTask::Run() {
 	device_->PollData();
-	Unlock();
 	return nullptr;
 }
 
@@ -143,12 +141,10 @@ InputChangeBuffer Win360GamepadController::UpdateSettings() {
 	// see if task was executed
 	InputChangeBuffer buffer(0, 0);
 	if (pollTask.IsCompleted()) {
-		if (pollTask.TryLock()) {
-			buffer.first = inputEvents[currBuffer].data();
-			buffer.second = changeCount;
-			currBuffer = !currBuffer;
-			TaskSchedular::Instance().AsyncSubmit(&pollTask);
-		}
+		buffer.first = inputEvents[currBuffer].data();
+		buffer.second = changeCount;
+		currBuffer = !currBuffer;
+		TaskSchedular::Instance().AsyncSubmit(&pollTask);
 	}
 
 	return buffer;

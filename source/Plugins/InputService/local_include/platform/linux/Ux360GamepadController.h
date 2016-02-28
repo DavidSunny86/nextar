@@ -47,16 +47,6 @@ protected:
 	public:
 		PollTask();
 
-		inline void Lock() {
-			while (lock_.test_and_set(std::memory_order_relaxed));
-		}
-
-		inline bool TryLock() {
-			return !lock_.test_and_set(std::memory_order_relaxed);
-		}
-		inline void Unlock() {
-			lock_.clear();
-		}
 		inline void SetDevice(Ux360GamepadController* dev) {
 			device_ = dev;
 		}
@@ -65,7 +55,6 @@ protected:
 
 	protected:
 		Ux360GamepadController* device_;
-		atomic_flag lock_;
 	};
 
 	void PollData();

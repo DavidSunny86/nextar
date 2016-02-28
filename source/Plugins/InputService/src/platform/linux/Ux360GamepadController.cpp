@@ -18,14 +18,11 @@
 
 namespace InputService {
 
-Ux360GamepadController::PollTask::PollTask() : device_(nullptr),
-	lock_(ATOMIC_FLAG_INIT) {
-	lock_.clear();
+Ux360GamepadController::PollTask::PollTask() : device_(nullptr) {
 }
 
 Task* Ux360GamepadController::PollTask::Run() {
 	device_->PollData();
-	Unlock();
 	return nullptr;
 }
 
@@ -45,13 +42,11 @@ InputChangeBuffer Ux360GamepadController::UpdateSettings() {
 	// see if task was executed
 	InputChangeBuffer buffer(0, 0);
 	if (pollTask.IsCompleted()) {
-		if (pollTask.TryLock()) {
-			buffer.first = inputEvents[currBuffer].data();
-			buffer.second = changeCount;
-			currBuffer = !currBuffer;
-			TaskSchedular::Instance().AsyncSubmit(&pollTask);
-			//pollTask.Run();
-		}
+		buffer.first = inputEvents[currBuffer].data();
+		buffer.second = changeCount;
+		currBuffer = !currBuffer;
+		TaskSchedular::Instance().AsyncSubmit(&pollTask);
+		//pollTask.Run();
 	}
 	return buffer;
 }

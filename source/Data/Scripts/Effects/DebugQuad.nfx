@@ -18,7 +18,7 @@ shader DebugQuad {
 		}
 
 		depth_stencil_state {
-			depth_state true true less_equal;
+			depth_state false false less_equal;
 			stencil_test false;
 		}
 

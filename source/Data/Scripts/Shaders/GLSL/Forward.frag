@@ -22,7 +22,7 @@ vec4 getDiffuseColor() {
 
 
 void main(void) {
-	vec3 N = varyingNormal.xyz;
+	vec3 N = normalize(varyingNormal.xyz);
 	vec3 L = normalize(omniLightPosition.xyz - posInEyeSpace.xyz);
 	vec3 E = normalize(-posInEyeSpace.xyz); // we are in Eye Coordinates, so EyePos is (0,0,0)  
 	vec3 R = normalize(-reflect(L,N));  
@@ -39,6 +39,6 @@ void main(void) {
 					 * pow(max(dot(R,E),0.0),0.3*specularIntensity);
 	Ispec = clamp(Ispec, 0.0, 1.0); 
 	
-	oFragColor = Idiff + Ispec + Iamb;
+	oFragColor = vec4(N, 1) * (Idiff + Ispec + Iamb);
 }
 

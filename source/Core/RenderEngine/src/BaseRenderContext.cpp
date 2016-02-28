@@ -122,8 +122,8 @@ void BaseRenderContext::BeginRender(RenderInfo* ri, ClearFlags cf) {
 }
 
 void BaseRenderContext::EndRender() {
-	SetCurrentTarget(0);
-	currentTarget = nullptr;
+	// SetCurrentTarget(0);
+	// currentTarget = nullptr;
 }
 
 void BaseRenderContext::UpdateObject(ContextObject* object,

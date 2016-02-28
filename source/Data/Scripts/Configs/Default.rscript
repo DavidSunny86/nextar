@@ -1,4 +1,3 @@
-
 create-buffer main {
  target color RGBA8 true;
  target depth D24S8 true;
@@ -6,13 +5,11 @@ create-buffer main {
 
 pass Forward {
 	render-to main;
-	clean-depth;
-	clean-color 0 black; 
+	clean depth;
+	clean stencil;
+	clean color; 
 }
 
-pass Debug {
-	render-to last;
-}
 
 pass Compositor {
 	material "Materials/Copy.mtl";

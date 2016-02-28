@@ -13,8 +13,7 @@
 #include <CmdRenderTo.h>
 #include <CmdSetParam.h>
 #include <CmdTarget.h>
-#include <CmdCleanDepth.h>
-#include <CmdCleanColor.h>
+#include <CmdClean.h>
 #include <CmdCreateBuffer.h>
 
 namespace RenderSystemScript {
@@ -34,8 +33,7 @@ void RenderScriptStreamer::RegisterDictionary() {
 	CommandDictionary* dict = CommandDictionaryArchive::Instance().RegisterDictionary("RenderSystem",
 			&_root);
 	dict->RegisterHandler("pass", CmdPass::InstancePtr());
-	dict->RegisterHandler("pass.clean-color", CmdCleanColor::InstancePtr());
-	dict->RegisterHandler("pass.clean-depth", CmdCleanDepth::InstancePtr());
+	dict->RegisterHandler("pass.clean", CmdClean::InstancePtr());
 	dict->RegisterHandler("pass.material", CmdMaterial::InstancePtr());
 	dict->RegisterHandler("pass.set-param", CmdSetParam::InstancePtr());
 	dict->RegisterHandler("pass.render-to", CmdRenderTo::InstancePtr());

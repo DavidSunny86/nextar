@@ -1,5 +1,5 @@
 /*
- * CmdCleanColor.h
+ * CmdClean.h
  *
  *  Created on: 20-Feb-2016
  *      Author: obhi
@@ -13,9 +13,9 @@
 
 namespace RenderSystemScript {
 
-class CmdCleanColor: public nextar::CommandHandler {
+class CmdClean: public nextar::CommandHandler {
 public:
-	NEX_SINGLE_INSTANCE(CmdCleanColor);
+	NEX_SINGLE_INSTANCE(CmdClean);
 
 	virtual void BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
 

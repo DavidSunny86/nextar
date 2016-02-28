@@ -6,13 +6,13 @@ shader Copy {
 		cbuffer Quad;
 		
 		texture_state {
-			sampler linear_sampler {
+			sampler nearest_sampler {
 				min_filter nearest_mip_nearest;
 				mag_filter nearest;
 				address_u repeat;
 				address_v repeat;
 			}
-			unit linear_sampler diffuseMap ui:Maps.TextureMap context:Object;
+			unit nearest_sampler diffuseMap ui:Maps.TextureMap context:Object;
 		}
 		
 		depth_stencil_state {

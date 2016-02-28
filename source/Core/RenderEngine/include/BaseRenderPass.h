@@ -23,6 +23,7 @@ public:
 	void SetTarget(RenderTargetName rt);
 	void SetCleanDepth(bool yesNo, float value = -1.0f);
 	void SetCleanColor(uint32 i, const Color& c);
+	void SetCleanStencil(bool yesNo, int16 value);
 	void BeginRender(CommitContext& ctx);
 	void EndRender(CommitContext& ctx);
 
@@ -62,13 +63,22 @@ inline void BaseRenderPass::SetCleanDepth(bool clean, float v) {
 		clearFlags |= ClearFlags::CLEAR_DEPTH;
 		info.info.clearDepth = v;
 	} else {
-		clearFlags &= ~ClearFlags::CLEAR_DEPTH;
+		clearFlags &=~ClearFlags::CLEAR_DEPTH;
 	}
 }
 
 inline void BaseRenderPass::SetCleanColor(uint32 i, const Color& c) {
 	clearFlags |= (ClearFlags)(1 << ((uint16)ClearFlags::CLEAR_COLOR_I + i));
 	info.info.clearColor[i] = c;
+}
+
+inline void BaseRenderPass::SetCleanStencil(bool clean, int16 value) {
+	if (clean) {
+		clearFlags |= ClearFlags::CLEAR_STENCIL;
+		info.info.clearStencil = value;
+	} else {
+		clearFlags &=~ClearFlags::CLEAR_STENCIL;
+	}
 }
 
 inline void BaseRenderPass::EndRender(CommitContext& ctx) {

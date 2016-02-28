@@ -32,7 +32,6 @@ void CompositorRenderPass::OnMaterialLoad() {
 }
 
 void CompositorRenderPass::Commit(CommitContext& context) {
-	BeginRender(context);
 	
 	if (context.rsys->GetTicket() != this->renderSystemTicket)	{
 		if (numTextureToResolve == 1) {
@@ -55,6 +54,7 @@ void CompositorRenderPass::Commit(CommitContext& context) {
 		this->renderSystemTicket = context.rsys->GetTicket();
 	}
 
+	BeginRender(context);
 	RenderPrimitive(context, (uint32)(ptrdiff_t)this, &primitive);
 	EndRender(context);
 }
