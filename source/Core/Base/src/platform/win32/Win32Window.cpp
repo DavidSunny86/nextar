@@ -51,7 +51,6 @@ LRESULT CALLBACK Win32Window::WndProc(HWND wnd, UINT message, WPARAM wparam,
 				wind->SetVisible(true);
 				WindowManager::Instance().ActivateWindow(wind);
 			}
-			wind->WindowConfigChanged();
 			break;
 		case WM_ACTIVATE:
 			// Add pause code here.

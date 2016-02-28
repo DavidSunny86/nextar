@@ -1828,7 +1828,7 @@ void RenderContext_Base_GL::SetDepthStencilState(const DepthStencilStateGL& stat
 	}
 	GL_CHECK();
 
-	if (depthStencilState.depthWrite != state.depthWrite) {
+	if (depthStencilState.depthWrite != state.depthWrite && depthStencilState.depthTest) {
 		if (state.depthWrite)
 			glDepthMask(GL_TRUE);
 		else

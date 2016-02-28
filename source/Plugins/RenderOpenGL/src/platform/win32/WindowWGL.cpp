@@ -262,7 +262,13 @@ void WindowWGL::Impl::Destroy() {
 }
 
 void WindowWGL::Impl::ApplyChangedAttributes() {
-	// todo
+	RECT position, dimension;
+	GetWindowRect(parent->GetWindowHandle(), &position);
+	GetClientRect(parent->GetWindowHandle(), &dimension);
+	this->position.x = (int16)position.left;
+	this->position.y = (int16)position.top;
+	this->dimensions.dx = (uint16)(dimension.right - dimension.left);
+	this->dimensions.dy = (uint16)(dimension.bottom - dimension.top);
 }
 
 void WindowWGL::Impl::FocusChanged() {

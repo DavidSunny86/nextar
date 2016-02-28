@@ -7,9 +7,12 @@ pass Forward {
 	render-to main;
 	clean depth;
 	clean stencil;
-	clean color; 
+	clean color 0 white; 
 }
 
+pass Debug {
+   render-to last;
+}
 
 pass Compositor {
 	material "Materials/Copy.mtl";

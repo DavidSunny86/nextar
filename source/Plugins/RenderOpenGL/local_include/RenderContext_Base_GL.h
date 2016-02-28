@@ -337,6 +337,7 @@ void RenderContext_Base_GL::CreateFBO(RenderTextureViewGL* view) {
 
 inline void RenderContext_Base_GL::DestroyFBO(FrameBufferObjectGL& fbo) {
 	GlDeleteFramebuffers(1, &fbo.frameBufferObject);
+	fbo.frameBufferObject = 0;
 	GL_CHECK();
 }
 
