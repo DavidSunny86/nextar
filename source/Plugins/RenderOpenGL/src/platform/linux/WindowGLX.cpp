@@ -174,7 +174,13 @@ void WindowGLX::Impl::Destroy() {
 }
 
 void WindowGLX::Impl::ApplyChangedAttributes() {
-	// todo
+	XWindowAttributes attribs;
+	Display* display = parent->GetDisplay();
+	Window window = parent->GetWindow();
+
+	XGetWindowAttributes(display, window, &attribs);
+	dimensions.width = attribs.width;
+	dimensions.height = attribs.height;
 }
 
 void WindowGLX::Impl::FocusChanged() {
