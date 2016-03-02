@@ -54,9 +54,10 @@ struct BlendState {
 	bool alphaToCoverage;
 	uint16 numRenderTargets;
 	RenderTargetBlendOp blendOp[(uint32) RenderConstants::MAX_RENDER_TARGETS];
+	StringID hash;
 
 	BlendState() :
-			enabled(false), alphaToCoverage(false), numRenderTargets(1) {
+			enabled(false), alphaToCoverage(false), numRenderTargets(1), hash(StringUtils::NullID) {
 	}
 };
 }

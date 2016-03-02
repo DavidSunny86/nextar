@@ -79,12 +79,14 @@ struct TextureUnitParams {
 	float minLod;
 	float maxLod;
 	Color borderColor;
+	StringID hash;
 
 	TextureUnitParams() : minFilter(TextureMinFilter::TF_MIN_NEAREST),
 		magFilter(TextureMagFilter::TF_MAG_NEAREST), uAddress(TextureAddressMode::TAM_CLAMP),
 		vAddress(TextureAddressMode::TAM_CLAMP), wAddress(TextureAddressMode::TAM_CLAMP),
 		comparisonFunc(TextureComparisonMode::TEXCOMP_NONE), 
-		unitType(MESH_TEXTURE), flags(0), maxAnisotropy(0), lodBias(0), minLod(0), maxLod(1000) {
+		unitType(MESH_TEXTURE), flags(0), maxAnisotropy(0), lodBias(0), minLod(0), maxLod(1000), 
+		hash(StringUtils::NullID) {
 	}
 };
 

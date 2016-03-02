@@ -1,0 +1,28 @@
+
+shader Debug3D {
+
+	tags debug;
+	pass Main {
+	
+		cbuffer DebugTransforms;
+		
+		depth-stencil-state {
+			depth-state test-and-write;
+			stencil-state disable;
+		}
+		
+		blend-state {
+			target (0) alpha-blending;
+         // advanced blending would be
+         // target (1) advanced source-alpha inv-source-alpha add;
+		}
+		
+		raster-state default;
+		
+		program {
+			define HAS_COLOR_CHANNEL;
+			vertex-program Debug3D;
+			fragment-program Debug3D;
+		}
+	}
+}

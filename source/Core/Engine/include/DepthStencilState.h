@@ -60,9 +60,11 @@ struct DepthStencilState {
 	StencilFaceOp front;
 	StencilFaceOp back;
 
+	StringID hash;
+
 	DepthStencilState() :
-			depthTest(true), depthWrite(true), depthCompareFunc(DSCOMP_LESS), stencilTest(
-					false) {
+		depthTest(true), depthWrite(true), depthCompareFunc(DSCOMP_LESS), 
+		stencilTest(false), hash(StringUtils::NullID) {
 	}
 };
 }

@@ -49,12 +49,15 @@ struct RasterState {
 	float slopeScaledDepthBias;
 	/* The depth bias clamp */
 	float depthBiasClamp;
+	// hash
+	StringID hash;
 
 	RasterState() :
 			trianglesAreClockwise(true), depthClip(false), usingScissors(
 			false), usingMultisample(false), usingLineAa(false), fill(FM_SOLID), cull(
-					CULL_BACK), _irrelevant_padding(0), constantDepthBias(0), slopeScaledDepthBias(
-					0), depthBiasClamp(0) {
+					CULL_BACK), _irrelevant_padding(0), constantDepthBias(0), 
+					slopeScaledDepthBias(0), depthBiasClamp(0)
+					,hash(StringUtils::NullID) {
 	}
 };
 }

@@ -1,0 +1,44 @@
+
+shader BasicDeferred {
+
+   tags deferred;
+
+   pass GBuffer {
+         
+      cbuffer ObjectProperties;
+      
+      texture-state {
+         sampler s0 linear-sampler-clampuv;
+         unit diffuseMap "Maps.DiffuseMap" s0;
+         unit specularAndGloss "Maps.SpecularAndGlossMap" s0;
+         unit normalMap "Maps.NormalMap" s0;
+      }
+
+      depth-stencil-state {
+         depth-state test-and-write;
+         stencil-state disable;
+      }
+
+      raster-state default;
+
+      blend-state disable;
+
+      program {
+         // options can be connected to predefined parameters via names
+         // if chosen names are predefined as parameters, then these names
+         // are evaluated to see if they equate to true or false depending upon their values
+         // eg: Texture units evaluate to 0 if they are not set and 1 when they are set
+         //  Scalar values evaluate to 0 if they are 0 or 1 if they are anything other than 0
+         // If the name does not match any parameter previously defined, they are added
+         // as shader option.
+         option HAS_DIFFUSE_MAP "Maps.DiffuseMap";
+			option HAS_NORMAL_MAP "Maps.NormalMap";
+			option HAS_SPECULAR_AND_GLOSS_MAP "Maps.SpecularAndGlossMap";
+			define HAS_NORMAL_CHANNEL;
+
+         vertex-program Deferred;
+         fragment-program Deferred;
+      }
+   }
+
+}

@@ -1,0 +1,5 @@
+
+material Debug3D {
+   shader "{EngineData}/Scripts/Effects/Debug3D.fxscript" Default:Default.Debug3D;
+   layer normal;
+}
