@@ -294,16 +294,7 @@ void ScriptParser::StatementContext::ParseBlock(BlockListener* listener) {
 
 String ScriptParser::StatementContext::GetTaggedParamVal(const String& tag, 
 	StringUtils::TokenIterator it) {
-	String value;
-	while (it.HasNext(value)) {
-		if (value.length()) {
-			StringPair tagVal = StringUtils::Split(value, ':');
-			if (tagVal.first == tag) {
-				return tagVal.second;
-			}
-		}
-	}
-	return StringUtils::Null;
+	return StringUtils::GetTaggedVal(tag, it);
 }
 
 void ScriptParser::StatementContext::_Clear() {

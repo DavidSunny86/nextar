@@ -11,9 +11,10 @@ ASTNode::Type ASTBlock::GetType() const {
 
 void ASTBlock::Accept(ASTVisitor* visitor) const {
 	visitor->VisitCommandBegin(this);
-	visitor->VisitBlockBegin(this);
-	for(auto& c : _commands) {
-		c->Accept(visitor);
+	if(visitor->VisitBlockBegin(this)) {
+		for(auto& c : _commands) {
+			c->Accept(visitor);
+		}
 	}
 	visitor->VisitBlockEnd(this);
 	visitor->VisitCommandEnd(this);

@@ -35,11 +35,20 @@ public:
 		return _dictionary->GetRoot();
 	}
 
+	inline const ASTDocument* GetDocument() const {
+		return _document;
+	}
+
+	inline void SetDocument(const ASTDocument* d) {
+		_document = d;
+	}
+
 protected:
 	friend class NeoCommandInterpreter;
 	void SetDictionary(CommandDictionary* dic);
 
 	CommandDictionary* _dictionary;
+	const ASTDocument* _document;
 	const CommandHandler* _activeHandler;
 };
 

@@ -10,12 +10,12 @@
 
 namespace RenderSystemScript {
 
-void CmdTarget::BeginExecute(CommandContext* pContext,
+bool CmdTarget::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
 	ConstMultiStringHelper h(command->GetParameters().AsString());
 	RenderScriptContext* c = static_cast<RenderScriptContext*>(pContext);
 	if ( c->_numTargets >= RenderConstants::MAX_RENDER_TARGETS )
-		return;
+		return true;
 	Target& data = c->_targets[c->_numTargets++];
 	auto it = h.Iterate();
 	data.format = PixelFormat::UNKNOWN;
@@ -31,6 +31,7 @@ void CmdTarget::BeginExecute(CommandContext* pContext,
 	if (it.HasNext(temp)) {
 		data.asTexture = Convert::ToBool(temp);
 	}
+	return true;
 }
 
 } /* namespace RenderSystemScript */

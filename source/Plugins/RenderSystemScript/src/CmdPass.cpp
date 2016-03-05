@@ -12,7 +12,7 @@
 namespace RenderSystemScript {
 
 
-void CmdPass::BeginExecute(CommandContext* pContext,
+bool CmdPass::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
 	RenderScriptContext* c = static_cast<RenderScriptContext*>(pContext);
 	const ASTParameterList& params = command->GetParameters();
@@ -27,6 +27,7 @@ void CmdPass::BeginExecute(CommandContext* pContext,
 	else
 		c->_pass->SetName(c->_passType);
 	c->_numUnresolvedTextures = 0;
+	return true;
 }
 
 void CmdPass::EndExecute(CommandContext* pContext,

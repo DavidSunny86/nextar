@@ -1,0 +1,12 @@
+
+cbuffer ObjectTransforms:OBJECTTRANSFORM {
+	var mat4x4 matMvp;
+	var mat4x4 matMv; // assumed orthogonal
+};
+
+cbuffer MaterialProperty context:Material {
+
+	var vec4 diffuseColor "ObjectProperties.DiffuseColor";
+	var float specularIntensity "ObjectProperties.SpecularIntensity";
+	var float gloss "ObjectProperties.Gloss";
+};

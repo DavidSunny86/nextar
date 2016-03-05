@@ -17,7 +17,7 @@ class CmdPass: public nextar::BlockCommandHandler {
 public:
 	NEX_SINGLE_INSTANCE(CmdPass);
 
-	virtual void BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
+	virtual bool BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
 	virtual void EndExecute(CommandContext* pContext, const ASTCommand* command) const;
 
 protected:

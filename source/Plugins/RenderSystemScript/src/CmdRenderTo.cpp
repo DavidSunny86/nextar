@@ -11,7 +11,7 @@
 
 namespace RenderSystemScript {
 
-void CmdRenderTo::BeginExecute(CommandContext* pContext,
+bool CmdRenderTo::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
 	ConstMultiStringHelper h(command->GetParameters().AsString());
 	RenderScriptContext* c = static_cast<RenderScriptContext*>(pContext);
@@ -23,6 +23,7 @@ void CmdRenderTo::BeginExecute(CommandContext* pContext,
 		pass->SetTarget(c->_rsys.GetTarget(NamedObject::AsyncStringID(target)));
 	else
 		pass->SetTarget(lastTarget);
+	return true;
 }
 
 } /* namespace RenderSystemScript */

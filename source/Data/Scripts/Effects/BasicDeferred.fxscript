@@ -8,15 +8,17 @@ shader BasicDeferred {
       cbuffer ObjectProperties;
       
       texture-state {
-         sampler s0 linear-sampler-clampuv;
-         unit diffuseMap "Maps.DiffuseMap" s0;
-         unit specularAndGloss "Maps.SpecularAndGlossMap" s0;
-         unit normalMap "Maps.NormalMap" s0;
+         sampler s0 linear-clamp;
+         unit diffuseMap s0 "Maps.DiffuseMap";
+         unit specularAndGloss s0 "Maps.SpecularAndGlossMap";
+         unit normalMap s0 "Maps.NormalMap";
       }
 
       depth-stencil-state {
          depth-state test-and-write;
+         // depth-state advanced test write compare 
          stencil-state disable;
+         // stencil-state advanced [front/back] stencil-function stencil-fail stencil-pass depth-pass stencil-mask stencil-ref;
       }
 
       raster-state default;
@@ -32,9 +34,9 @@ shader BasicDeferred {
          // If the name does not match any parameter previously defined, they are added
          // as shader option.
          option HAS_DIFFUSE_MAP "Maps.DiffuseMap";
-			option HAS_NORMAL_MAP "Maps.NormalMap";
-			option HAS_SPECULAR_AND_GLOSS_MAP "Maps.SpecularAndGlossMap";
-			define HAS_NORMAL_CHANNEL;
+         option HAS_NORMAL_MAP "Maps.NormalMap";
+         option HAS_SPECULAR_AND_GLOSS_MAP "Maps.SpecularAndGlossMap";
+         define HAS_NORMAL_CHANNEL;
 
          vertex-program Deferred;
          fragment-program Deferred;

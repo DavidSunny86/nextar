@@ -17,7 +17,7 @@ class CmdTarget : public CommandHandler {
 public:
 	NEX_SINGLE_INSTANCE(CmdTarget);
 
-	virtual void BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
+	virtual bool BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
 };
 
 } /* namespace RenderSystemScript */

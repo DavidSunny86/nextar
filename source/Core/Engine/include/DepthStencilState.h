@@ -62,8 +62,10 @@ struct DepthStencilState {
 
 	StringID hash;
 
+	inline void UpdateHash() {}
+
 	DepthStencilState() :
-		depthTest(true), depthWrite(true), depthCompareFunc(DSCOMP_LESS), 
+		depthTest(true), depthWrite(true), depthCompareFunc(DSCOMP_LESS_EQUAL),
 		stencilTest(false), hash(StringUtils::NullID) {
 	}
 };

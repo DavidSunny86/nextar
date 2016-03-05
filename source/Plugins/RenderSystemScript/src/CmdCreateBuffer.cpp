@@ -21,7 +21,7 @@ void CmdCreateBuffer::ParseDimension(const String& value, uint16& d, float& f) {
 	}
 }
 
-void CmdCreateBuffer::BeginExecute(CommandContext* pContext,
+bool CmdCreateBuffer::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
 	ConstMultiStringHelper h(command->GetParameters().AsString());
 	RenderScriptContext* c = static_cast<RenderScriptContext*>(pContext);
@@ -40,6 +40,7 @@ void CmdCreateBuffer::BeginExecute(CommandContext* pContext,
 	float depthFactor;
 	if (it.HasNext(temp))
 		ParseDimension(temp, c->_bufferDepth, depthFactor);
+	return true;
 }
 
 RenderTargetPtr CmdCreateBuffer::CreateTarget(RenderScriptContext* c,

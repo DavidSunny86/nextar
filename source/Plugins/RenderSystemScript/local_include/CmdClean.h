@@ -17,7 +17,7 @@ class CmdClean: public nextar::CommandHandler {
 public:
 	NEX_SINGLE_INSTANCE(CmdClean);
 
-	virtual void BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
+	virtual bool BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
 
 protected:
 	typedef map<String, Color>::type StringToColorMap;

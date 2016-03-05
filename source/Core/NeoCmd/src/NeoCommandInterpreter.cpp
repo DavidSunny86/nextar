@@ -21,6 +21,7 @@ void NeoCommandInterpreter::Execute(const String& dictionaryName,
 	try {
 		ASTDocumentPtr document = NeoScript::AsyncParse(stream, "PassScript", StringUtils::Null);
 		if (document) {
+			context->SetDocument(document);
 			CommandVisitor visitor(context);
 			document->Accept(&visitor);
 		}

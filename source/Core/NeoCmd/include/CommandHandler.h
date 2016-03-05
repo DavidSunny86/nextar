@@ -19,7 +19,7 @@ public:
 	CommandHandler(const bool isBlock = false);
 	virtual ~CommandHandler();
 
-	virtual void BeginExecute(CommandContext* pContext, const ASTCommand* command) const {}
+	virtual bool BeginExecute(CommandContext* pContext, const ASTCommand* command) const { return true; }
 	virtual void EndExecute(CommandContext* pContext, const ASTCommand* command) const {}
 
 	void SetParentBlock(BlockCommandHandler* parent) {

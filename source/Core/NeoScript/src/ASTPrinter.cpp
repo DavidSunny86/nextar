@@ -44,9 +44,10 @@ void ASTPrinter::VisitCommandEnd(const ASTCommand* command) {
 	_out << ";\n";
 }
 
-void ASTPrinter::VisitBlockBegin(const ASTBlock* block) {
+bool ASTPrinter::VisitBlockBegin(const ASTBlock* block) {
 	_out << "{\n";
 	_indention++;
+	return true;
 }
 
 void ASTPrinter::VisitBlockEnd(const ASTBlock* block) {

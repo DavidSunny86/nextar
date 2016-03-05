@@ -22,7 +22,7 @@ public:
 	virtual void VisitDocumentEnd(const ASTDocument*);
 	virtual void VisitCommandBegin(const ASTCommand*);
 	virtual void VisitCommandEnd(const ASTCommand*);
-	virtual void VisitBlockBegin(const ASTBlock*);
+	virtual bool VisitBlockBegin(const ASTBlock*);
 	virtual void VisitBlockEnd(const ASTBlock*);
 	virtual void VisitBlockRegionBegin(const ASTBlockRegion*);
 	virtual void VisitBlockRegionEnd(const ASTBlockRegion*);

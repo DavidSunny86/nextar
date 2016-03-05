@@ -13,7 +13,7 @@
 
 namespace nextar {
 
-CommandVisitor::CommandVisitor(CommandContext* context) : _context(context), popHandler(false) {
+CommandVisitor::CommandVisitor(CommandContext* context) : _context(context), popHandler(false),_dontskip(true) {
 }
 
 CommandVisitor::~CommandVisitor() {
@@ -31,7 +31,7 @@ void CommandVisitor::VisitCommandBegin(const ASTCommand* command) {
 		if (redirect) {
 			popHandler = true;
 			_context->SetActiveHandler(redirect);
-			redirect->BeginExecute(_context, command);
+			_dontskip = redirect->BeginExecute(_context, command);
 		}
 	}
 }
@@ -42,6 +42,7 @@ void CommandVisitor::VisitCommandEnd(const ASTCommand* command) {
 		const CommandHandler* handler = _context->GetActiveHandler();
 		handler->EndExecute(_context, command);
 		_context->SetActiveHandler(handler->GetParentBlock());
+		_dontskip = true;
 	}
 }
 

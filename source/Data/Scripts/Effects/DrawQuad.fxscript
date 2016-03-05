@@ -7,8 +7,8 @@ shader DrawQuad {
 		cbuffer Quad;
 
 		texture-state {
-			sampler s0 linear-sampler-repeatuv;
-			unit diffuseMap "Maps.TextureMap" s0 context:object;
+			sampler s0 nearest-repeat;
+			unit diffuseMap s0 "Maps.TextureMap" context:object;
 		}
 
 		depth-stencil-state disable;

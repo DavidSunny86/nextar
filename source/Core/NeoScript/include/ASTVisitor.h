@@ -20,7 +20,7 @@ public:
 	virtual void VisitDocumentEnd(const ASTDocument*) = 0;
 	virtual void VisitCommandBegin(const ASTCommand*) = 0;
 	virtual void VisitCommandEnd(const ASTCommand*) = 0;
-	virtual void VisitBlockBegin(const ASTBlock*) = 0;
+	virtual bool VisitBlockBegin(const ASTBlock*) = 0; // return false to skip parsing the block
 	virtual void VisitBlockEnd(const ASTBlock*) = 0;
 	virtual void VisitBlockRegionBegin(const ASTBlockRegion*) = 0;
 	virtual void VisitBlockRegionEnd(const ASTBlockRegion*) = 0;
@@ -40,7 +40,7 @@ public:
 	virtual void VisitDocumentEnd(const ASTDocument*) {}
 	virtual void VisitCommandBegin(const ASTCommand*) {}
 	virtual void VisitCommandEnd(const ASTCommand*) {}
-	virtual void VisitBlockBegin(const ASTBlock*) {}
+	virtual bool VisitBlockBegin(const ASTBlock*) { return true; }
 	virtual void VisitBlockEnd(const ASTBlock*) {}
 	virtual void VisitBlockRegionBegin(const ASTBlockRegion*) {}
 	virtual void VisitBlockRegionEnd(const ASTBlockRegion*) {}

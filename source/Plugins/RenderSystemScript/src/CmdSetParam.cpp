@@ -12,7 +12,7 @@
 
 namespace RenderSystemScript {
 
-void CmdSetParam::BeginExecute(CommandContext* pContext,
+bool CmdSetParam::BeginExecute(CommandContext* pContext,
 	const ASTCommand* command) const {
 
 	ConstMultiStringHelper h(command->GetParameters().AsString());
@@ -37,7 +37,7 @@ void CmdSetParam::BeginExecute(CommandContext* pContext,
 					if (lastTarget != RenderTargetName::RT_NONE) {
 						c->_unresolvedTextures[c->_numUnresolvedTextures++] =
 							CompositorRenderPass::TexturesToResolve{ lastTarget, entryAndOffset.second };
-						return;
+						return true;
 					}
 				}
 				ShaderParamAgent* agent = ShaderParamAgent::GetAgent(
@@ -49,6 +49,7 @@ void CmdSetParam::BeginExecute(CommandContext* pContext,
 		}
 
 	}
+	return true;
 }
 
 

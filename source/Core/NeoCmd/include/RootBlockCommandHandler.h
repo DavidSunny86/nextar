@@ -17,10 +17,10 @@ public:
 	RootBlockCommandHandler();
 	virtual ~RootBlockCommandHandler();
 
-	virtual void BeginDocument(CommandContext* pContext, const ASTDocument* pDoc) const = 0;
-	virtual void BeginExecute(CommandContext* pContext, const ASTCommand* command) const {}
+	virtual void BeginDocument(CommandContext* pContext, const ASTDocument* pDoc) const {}
+	virtual bool BeginExecute(CommandContext* pContext, const ASTCommand* command) const { return true; }
 	virtual void EndExecute(CommandContext* pContext, const ASTCommand* command) const {}
-	virtual void EndDocument(CommandContext* pContext, const ASTDocument* pDoc) const = 0;
+	virtual void EndDocument(CommandContext* pContext, const ASTDocument* pDoc) const {}
 };
 
 } /* namespace nextar */

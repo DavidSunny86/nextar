@@ -18,7 +18,7 @@ class CmdRenderTo: public nextar::CommandHandler {
 public:
 	NEX_SINGLE_INSTANCE(CmdRenderTo);
 
-	virtual void BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
+	virtual bool BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
 };
 
 } /* namespace RenderSystemScript */

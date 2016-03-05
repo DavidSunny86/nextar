@@ -11,7 +11,7 @@
 
 namespace RenderSystemScript {
 
-void CmdMaterial::BeginExecute(CommandContext* pContext,
+bool CmdMaterial::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
 
 	RenderScriptContext* c = static_cast<RenderScriptContext*>(pContext);
@@ -32,6 +32,8 @@ void CmdMaterial::BeginExecute(CommandContext* pContext,
 		MaterialAssetPtr m = MaterialAsset::Traits::Instance(id, location);
 		pass->SetMaterial( m );
 	}
+
+	return true;
 }
 
 } /* namespace RenderSystemScript */

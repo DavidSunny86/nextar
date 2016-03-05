@@ -42,6 +42,11 @@ struct RenderTargetBlendOp {
 	BlendDataSource destAlpha;
 	BlendOp alphaOp;
 
+	RenderTargetBlendOp(ColorMask m, BlendDataSource sc, BlendDataSource dc, BlendOp c,
+			BlendDataSource sa, BlendDataSource da, BlendOp a) : enabled(true), mask(m), srcCol(sc),
+			destCol(dc), colOp(c), srcAlpha(sa), destAlpha(da), alphaOp(a) {
+	}
+
 	RenderTargetBlendOp() :
 			enabled(false), mask((ColorMask) 0xff), srcCol(BDS_ZERO), destCol(
 					BDS_ZERO), colOp(BOP_NONE), srcAlpha(BDS_ZERO),
@@ -55,6 +60,8 @@ struct BlendState {
 	uint16 numRenderTargets;
 	RenderTargetBlendOp blendOp[(uint32) RenderConstants::MAX_RENDER_TARGETS];
 	StringID hash;
+
+	inline void UpdateHash() {}
 
 	BlendState() :
 			enabled(false), alphaToCoverage(false), numRenderTargets(1), hash(StringUtils::NullID) {

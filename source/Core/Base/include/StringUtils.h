@@ -59,8 +59,23 @@ struct Less { // functor for operator <
  * be initialized to 0.
  */
 typedef MultiString::Iterator TokenIterator;
+typedef ConstMultiString::Iterator ConstTokenIterator;
 typedef nextar::StringPair StringPair;
 typedef String WordList;
+
+inline String GetTaggedVal(const String& tag,
+	StringUtils::ConstTokenIterator it) {
+	String value;
+	while (it.HasNext(value)) {
+		if (value.length()) {
+			StringPair tagVal = StringUtils::Split(value, ':');
+			if (tagVal.first == tag) {
+				return tagVal.second;
+			}
+		}
+	}
+	return StringUtils::Null;
+}
 
 struct NotAsciiTest: public std::unary_function<int, bool > {
 	inline bool operator ()(char a) {

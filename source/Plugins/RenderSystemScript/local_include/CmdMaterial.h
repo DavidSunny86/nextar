@@ -17,7 +17,7 @@ class CmdMaterial: public nextar::CommandHandler {
 public:
 	NEX_SINGLE_INSTANCE(CmdMaterial);
 
-	virtual void BeginExecute(CommandContext* pContext,
+	virtual bool BeginExecute(CommandContext* pContext,
 			const ASTCommand* command) const;
 };
 

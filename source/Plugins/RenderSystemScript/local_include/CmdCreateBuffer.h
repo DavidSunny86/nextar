@@ -20,7 +20,7 @@ class CmdCreateBuffer : public nextar::BlockCommandHandler {
 public:
 	NEX_SINGLE_INSTANCE(CmdCreateBuffer);
 
-	virtual void BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
+	virtual bool BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
 	virtual void EndExecute(CommandContext* pContext, const ASTCommand* command) const;
 
 	static RenderTargetPtr CreateTarget(RenderScriptContext* context, const Target& t, uint32 index);

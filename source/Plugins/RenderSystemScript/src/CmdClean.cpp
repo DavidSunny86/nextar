@@ -12,7 +12,7 @@ namespace RenderSystemScript {
 
 CmdClean::StringToColorMap CmdClean::_colorMap;
 
-void CmdClean::BeginExecute(CommandContext* pContext,
+bool CmdClean::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
 
 	if (_colorMap.size() <= 0) {
@@ -55,6 +55,7 @@ void CmdClean::BeginExecute(CommandContext* pContext,
 			c->_pass->SetCleanStencil(true, stencil);
 		}
 	}
+	return true;
 }
 
 }

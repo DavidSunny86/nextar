@@ -1,6 +1,6 @@
 
 material Default:Default.DebugQuad {	
 	shader "{EngineData}/Scripts/Effects/DrawQuad.fxscript" Default:Default.DrawQuad;
-	enable_options HAS_DIFFUSE_MAP;
+	enable-option HAS_DIFFUSE_MAP;
 	layer normal;
 }

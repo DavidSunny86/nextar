@@ -272,7 +272,7 @@ uint32 Helper::GetShaderFlag(const String& val) {
 		{ RenderQueueFlags::DEFERRED_LIGHTING, _SS(ARG_DEFERRED_LIGHTING) },
 		{ RenderQueueFlags::FORWARD, _SS(ARG_FORWARD) },
 		{ RenderQueueFlags::OVERLAY, _SS(ARG_OVERLAY) },
-		{ RenderQueueFlags::POST_FX, _SS(ARG_POST_FX) },
+		{ RenderQueueFlags::COMPOSITOR, _SS(ARG_POST_FX) },
 		{ RenderQueueFlags::TRANSLUCENCY, _SS(ARG_TRANSLUCENT) },
 	};
 

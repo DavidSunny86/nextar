@@ -1,0 +1,41 @@
+/*
+ * CmdShader.h
+ *
+ *  Created on: 05-Mar-2016
+ *      Author: obhi
+ */
+
+#ifndef PLUGINS_SHADERSCRIPT_LOCAL_INCLUDE_CMDSHADER_H_
+#define PLUGINS_SHADERSCRIPT_LOCAL_INCLUDE_CMDSHADER_H_
+
+#include <ShaderScript.h>
+#include <BlockCommandHandler.h>
+
+namespace ShaderScript {
+
+class CmdShader: public nextar::BlockCommandHandler {
+public:
+	NEX_SINGLE_INSTANCE(CmdShader);
+
+	virtual bool BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
+	virtual void EndExecute(CommandContext* pContext, const ASTCommand* command) const;
+};
+
+class CmdTags: public nextar::CommandHandler {
+public:
+	NEX_SINGLE_INSTANCE(CmdTags);
+	map<String, uint32>::type tagsMap;
+
+	virtual bool BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
+};
+
+class CmdPass: public nextar::BlockCommandHandler {
+public:
+	NEX_SINGLE_INSTANCE(CmdPass);
+	virtual bool BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
+	virtual void EndExecute(CommandContext* pContext, const ASTCommand* command) const;
+};
+
+} /* namespace ShaderScript */
+
+#endif /* PLUGINS_SHADERSCRIPT_LOCAL_INCLUDE_CMDSHADER_H_ */

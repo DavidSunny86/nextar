@@ -12,9 +12,10 @@ shader Debug3D {
 		}
 		
 		blend-state {
-			target (0) alpha-blending;
+			target alpha-blending;
          // advanced blending would be
-         // target (1) advanced source-alpha inv-source-alpha add;
+         // target advanced source-alpha inv-source-alpha add;
+         // alpha-to-coverage [true/false];
 		}
 		
 		raster-state default;

@@ -20,10 +20,12 @@ public:
 	virtual void VisitDocumentBegin(const ASTDocument*);
 	virtual void VisitDocumentEnd(const ASTDocument*);
 
+	virtual bool VisitBlockBegin(const ASTBlock*) { return _dontskip; }
 	virtual void VisitCommandBegin(const ASTCommand* command);
 	virtual void VisitCommandEnd(const ASTCommand* command);
 
 protected:
+	bool _dontskip;
 	bool popHandler;
 	CommandContext* _context;
 };

@@ -52,6 +52,7 @@ struct RasterState {
 	// hash
 	StringID hash;
 
+	inline void UpdateHash() {}
 	RasterState() :
 			trianglesAreClockwise(true), depthClip(false), usingScissors(
 			false), usingMultisample(false), usingLineAa(false), fill(FM_SOLID), cull(
