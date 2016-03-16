@@ -7,6 +7,7 @@
 
 #include <WinKeyboardMouse.h>
 #include <WindowManager.h>
+#include <RenderWindow.h>
 
 namespace InputService {
 

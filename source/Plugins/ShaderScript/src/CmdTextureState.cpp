@@ -84,19 +84,10 @@ bool ShaderScript::CmdSampler::BeginExecute(CommandContext* pContext,
 					params.minFilter = TextureMinFilter::TF_MIN_NEAREST_MIPMAP_NEAREST;
 					params.magFilter = TextureMagFilter::TF_MAG_NEAREST;
 				}
-				if (sp.second == "repeat") {
-					params.uAddress = TextureAddressMode::TAM_WRAP;
-					params.vAddress = TextureAddressMode::TAM_WRAP;
-					params.wAddress = TextureAddressMode::TAM_WRAP;
-				} else if(sp.second == "clamp") {
-					params.uAddress = TextureAddressMode::TAM_CLAMP;
-					params.vAddress = TextureAddressMode::TAM_CLAMP;
-					params.wAddress = TextureAddressMode::TAM_CLAMP;
-				} else if(sp.second == "mirror") {
-					params.uAddress = TextureAddressMode::TAM_MIRROR;
-					params.vAddress = TextureAddressMode::TAM_MIRROR;
-					params.wAddress = TextureAddressMode::TAM_MIRROR;
-				}
+				
+				params.uAddress = 
+				params.vAddress = 
+				params.wAddress = Helper::GetTextureAddressMode(sp.second);
 			}
 		}
 		c->textureState = params;

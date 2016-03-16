@@ -1,6 +1,0 @@
-
-material Default:Default.DebugQuad {	
-	shader "{EngineData}/Scripts/Effects/DebugQuad.nfx" Default:Default.DebugQuad;
-	enable_options HAS_DIFFUSE_MAP;
-	layer normal;
-}

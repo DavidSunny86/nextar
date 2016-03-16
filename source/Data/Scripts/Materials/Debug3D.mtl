@@ -1,5 +1,0 @@
-
-material Default:Default.Debug3D {	
-	shader "{EngineData}/Scripts/Effects/Debug3D.nfx" Default:Default.Debug3D;
-	layer normal;
-}

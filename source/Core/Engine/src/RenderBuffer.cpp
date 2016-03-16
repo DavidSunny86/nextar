@@ -6,6 +6,7 @@
  */
 
 #include <RenderBuffer.h>
+#include <RenderSystem.h>
 #include <RenderContext.h>
 
 namespace nextar {

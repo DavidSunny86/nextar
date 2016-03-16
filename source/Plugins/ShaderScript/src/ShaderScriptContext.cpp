@@ -53,15 +53,15 @@ InputStreamPtr ShaderScriptContext::FetchProgram(const String& name,
 	const char* stage = 0;
 	switch(stageType) {
 	case Pass::ProgramStage::STAGE_VERTEX:
-		stage = ".vert"; break;
+		stage = ".vsglsl"; break;
 	case Pass::ProgramStage::STAGE_FRAGMENT:
-		stage = ".frag"; break;
+		stage = ".fsglsl"; break;
 	case Pass::ProgramStage::STAGE_GEOMETRY:
-		stage = ".geom"; break;
+		stage = ".gsglsl"; break;
 	case Pass::ProgramStage::STAGE_HULL:
-		stage = ".hull"; break;
+		stage = ".hsglsl"; break;
 	case Pass::ProgramStage::STAGE_DOMAIN:
-		stage = ".dom"; break;
+		stage = ".dsglsl"; break;
 	default:
 		Warn("Invalid stage: " + name);
 		return retFile;

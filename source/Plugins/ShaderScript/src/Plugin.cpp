@@ -4,7 +4,7 @@
  *  Created on: 30-Sep-2013
  *      Author: obhi
  */
-#include <CommonTypes.h>
+#include <ShaderScript.h>
 #include <BaseHeaders.h>
 #include <Plugin.h>
 

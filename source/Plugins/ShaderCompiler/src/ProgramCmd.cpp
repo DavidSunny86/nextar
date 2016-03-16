@@ -87,7 +87,7 @@ void ProgramListener::ParamCmd_Execute(int parentType, void* state,
 	desc = ctx.GetTaggedParamVal(_SS(TAG_DESC), it);
 
 	if (ctx.GetCommand() == _SS(CMD_OPTION))
-		shader->AddMacro(name, uiName, desc);
+		shader->AddMacro(uiName, name, desc);
 	else {
 		// per-define it
 		script->GetTranslator().AddMacro(script, name);

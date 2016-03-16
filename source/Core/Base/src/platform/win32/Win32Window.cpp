@@ -1,5 +1,6 @@
 #include <BaseHeaders.h>
 #include <RenderWindow.h>
+#include <WindowManager.h>
 
 #if defined(NEX_WINDOWS)
 

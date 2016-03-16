@@ -23,6 +23,8 @@ add_module(InputService)
 add_module(SimpleBehaviours)
 add_module(PBRenderEngine)
 add_module(RenderSystemScript)
+add_module(ShaderScript)
+add_module(MaterialScript)
 ## EndAdd
 
 file(APPEND ${NEX_PLUGIN_CONFIG_FILE} "</plugins>\n")

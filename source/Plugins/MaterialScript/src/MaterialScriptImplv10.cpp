@@ -47,6 +47,7 @@ void MaterialScriptImplv1_0::Load(nextar::InputStreamPtr& input,
 
 	MaterialScriptContext context(request, materialId);
 	NeoCommandInterpreter::Execute("MaterialScript", input, &context);
+	request->SetCompleted(true);
 }
 
 } /* namespace MaterialScript */

@@ -1,0 +1,10 @@
+
+
+out vec4 _oVaryingColor;
+
+void main(void)
+{
+	gl_Position = _uModelViewProj * vec4(_iGetPos() * _uObjectScale, 1);
+	_oVaryingColor = _iGetColor() * _uObjectColor;
+}
+

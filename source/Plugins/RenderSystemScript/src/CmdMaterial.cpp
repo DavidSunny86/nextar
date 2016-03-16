@@ -8,6 +8,7 @@
 #include <BaseMaterialPass.h>
 #include <CmdMaterial.h>
 #include <RenderScriptContext.h>
+#include <DeferredRenderPass.h>
 
 namespace RenderSystemScript {
 
@@ -31,6 +32,10 @@ bool CmdMaterial::BeginExecute(CommandContext* pContext,
 		BaseMaterialPass* pass = static_cast<BaseMaterialPass*>(c->_pass);
 		MaterialAssetPtr m = MaterialAsset::Traits::Instance(id, location);
 		pass->SetMaterial( m );
+	} else if (c->_passType.find("Deferred") != String::npos) {
+		DeferredRenderPass* pass = static_cast<DeferredRenderPass*>(c->_pass);
+		MaterialAssetPtr m = MaterialAsset::Traits::Instance(id, location);
+		pass->SetLightMaterial(m);
 	}
 
 	return true;

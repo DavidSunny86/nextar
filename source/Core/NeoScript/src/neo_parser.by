@@ -15,10 +15,22 @@
 {
 #include <NeoBaseDecl.h>
 #include <ParseLocation.h>
+#include <ASTParameter.h>
+#include <ASTParameterList.h>
+#include <ASTDocument.h>
+#include <ASTCommand.h>
+#include <ASTRegion.h>
+#include <ASTTextRegion.h>
+#include <ASTVisitor.h>
+#include <ASTBlock.h>
+#include <ASTBlockRegion.h>
 namespace nextar {
   class ParseLocation;
   class ParserContext;
 }
+#ifndef YY_NULLPTR
+#  define YY_NULLPTR nullptr
+#endif
 #define YY_DECL extern nextar::neo_parser_impl::symbol_type neo_lex(nextar::ParserContext& b, void* yyscanner)
 
 }

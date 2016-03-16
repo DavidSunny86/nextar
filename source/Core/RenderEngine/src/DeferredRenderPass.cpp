@@ -199,4 +199,9 @@ void DeferredRenderPass::CreateResources() {
 	PrepareMaterials();
 }
 
+void DeferredRenderPass::SetLightMaterial(MaterialAssetPtr& material) {
+	this->lightMaterial = material;
+	lightMaterial->RequestLoad();
+}
+
 } /* namespace nextar */

@@ -1,0 +1,6 @@
+
+cbuffer _cbDebugModelView {
+	declare mat4x4 _uModelViewProj:MODELVIEWPROJECTION;
+	declare vec4 _uObjectColor:DIFFUSECOLOR;
+	declare float _uObjectScale:CONSTANTSCALEFACTOR;
+};

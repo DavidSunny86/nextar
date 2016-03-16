@@ -1,0 +1,36 @@
+
+
+/******************************************************************/
+/*                           Samplers                             */
+/******************************************************************/
+#ifdef HAS_DIFFUSE_MAP
+	uniform sampler2D _sDiffuseMap;
+	vec4 _vSampleDiffuse(vec2 v) {
+		return ( texture( _sDiffuseMap, v ) );
+	}
+#else
+	vec4 _vSampleDiffuse(vec2 v) {
+		return ( vec4( 1.0 ) );
+	}
+#endif
+#ifdef HAS_NORMAL_MAP
+	uniform sampler2D _sNormalMap;
+	vec4 _vSampleNormal(vec2 v) {
+		return ( texture( _sNormalMap, v ) );
+	}
+#else
+	vec4 _vSampleNormal(vec2 v) {
+		return ( vec4( 0.0 ) );
+	}
+#endif
+#ifdef HAS_SPECULAR_AND_GLOSS_MAP
+	uniform sampler2D _sSpecularAndGlossMap;
+	vec4 _vSampleSpecularAndGloss(vec2 v) {
+		return texture(_sSpecularAndGlossMap, v).rg;
+	}
+#else
+	vec2 _vSampleSpecularAndGloss(vec2 v) {
+		return ( vec2( 0.0 ) );
+	}
+#endif
+

@@ -1,0 +1,6 @@
+
+cbuffer _cbQuad context:Object {
+  declare vec4 _uTranslationAndScale;
+  declare vec4 _uTextureOffsetAndRepeat;
+  declare vec4 _uMixColor;
+};

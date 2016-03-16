@@ -36,6 +36,7 @@ public:
 
 		void SetMaterialID(const MaterialAsset::ID& id);
 		void SetShader(SharedComponent::ID& shader, const URL& location);
+		void EnableOptions(const StringUtils::WordList& options);
 		void SetCompilationOptions(const StringUtils::WordList& options);
 		void AddParam(const String& name, const String& value);
 		void SetLayer(uint8 layer);
@@ -52,6 +53,7 @@ public:
 
 	void SetMaterialID(const MaterialAsset::ID& id);
 	void SetShader(const ShaderTemplatePtr& shader);
+	void EnableOptions(const StringUtils::WordList& options);
 	void SetCompilationOptions(const StringUtils::WordList& options);
 	void AddParam(const String& name, const String& value);
 
@@ -107,6 +109,8 @@ protected:
 	typedef NameValueMap ParamValueMap;
 
 	Layer layer;
+	StringUtils::WordList definedParams;
+	StringUtils::WordList enableOptions;
 	StringUtils::WordList compilationOptions;
 	MaterialAsset::ID assetId;
 	ParamValueMap paramValues;

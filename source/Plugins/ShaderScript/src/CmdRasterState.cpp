@@ -21,6 +21,7 @@ bool ShaderScript::CmdRasterState::BeginExecute(CommandContext* pContext,
 		c->rasterState.fill = FillMode::FM_WIREFRAME;
 	else if (!name.compare(_SS(ARG_NO_CULL)))
 		c->rasterState.cull = CullMode::CULL_NONE;
+	return true;
 }
 
 void ShaderScript::CmdRasterState::EndExecute(CommandContext* pContext,

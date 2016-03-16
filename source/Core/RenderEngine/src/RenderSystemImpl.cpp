@@ -8,6 +8,7 @@
 #include <RenderSystemImpl.h>
 #include <RenderManager.h>
 #include <ApplicationContext.h>
+#include <BaseRenderPass.h>
 
 namespace nextar {
 

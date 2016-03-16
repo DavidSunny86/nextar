@@ -14,12 +14,17 @@
 
 namespace ShaderScript {
 
+enum LanguageTranslatorType {
+	GLSL_TRANSLATOR = 0,
+	HLSL_TRANSLATOR,
+	TRANSLATOR_COUNT,
+};
 
 class ShaderScriptContext : public CommandContext {
 	NEX_LOG_HELPER(ShaderScriptContext);
 
 public:
-
+		
 	ShaderScriptContext(ShaderTemplate::LoadStreamRequest* shader, const ShaderTemplate::ID&);
 
 	typedef multimap<String, std::pair<RenderManager::ShaderLanguage, String> >::type SourceRegionMap;
@@ -43,8 +48,7 @@ public:
 	void SetRegionsAsSource(Pass::ProgramStage, const StringUtils::WordList& regionNames);
 	void AddRegion(const String& name, RenderManager::ShaderLanguage lang, String&& value);
 	void RemoveRegion(const String& name);
-
-	String transientBuffer;
+		
 	bool cbIsAutoParam;
 	SourceRegionMap regions;
 	BlendState blendState;
@@ -52,6 +56,7 @@ public:
 	RasterState rasterState;
 	TextureUnitParams textureState;
 	String samplerName;
+	String _transientBuffer[TRANSLATOR_COUNT];
 
 	ShaderTemplate::LoadStreamRequest* shader;
 	ShaderTemplate::ID shaderId;

@@ -8,6 +8,8 @@
 #include <NeoCmd.h>
 #include <CommandDictionaryArchive.h>
 #include <NeoCommandInterpreter.h>
+#include <CommandContext.h>
+#include <CommandVisitor.h>
 
 namespace nextar {
 
@@ -19,7 +21,7 @@ void NeoCommandInterpreter::Execute(const String& dictionaryName,
 		);
 
 	try {
-		ASTDocumentPtr document = NeoScript::AsyncParse(stream, "PassScript", StringUtils::Null);
+		ASTDocumentPtr document = NeoScript::AsyncParse(stream, dictionaryName, StringUtils::Null);
 		if (document) {
 			context->SetDocument(document);
 			CommandVisitor visitor(context);

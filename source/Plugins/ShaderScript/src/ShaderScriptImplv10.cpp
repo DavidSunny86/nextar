@@ -6,6 +6,7 @@
  */
 
 #include <ShaderScriptImplv10.h>
+#include <ShaderScriptContext.h>
 #include <CmdShader.h>
 #include <CmdBlendState.h>
 #include <CmdDepthStencilState.h>
@@ -36,6 +37,9 @@ void ShaderScriptImplv1_0::RegisterDictionary() {
 	dict->RegisterHandler("shader", CmdShader::InstancePtr());
 	dict->RegisterHandler("shader.tags", CmdTags::InstancePtr());
 	dict->RegisterHandler("shader.pass", CmdPass::InstancePtr());
+	dict->RegisterHandler("shader.pass.import-cbuffer", CmdImportConstBuffer::InstancePtr());
+	dict->RegisterHandler("shader.pass.cbuffer", CmdConstBuffer::InstancePtr());
+	dict->RegisterHandler("shader.pass.cbuffer.declare", CmdDeclare::InstancePtr());
 	dict->RegisterHandler("shader.pass.blend-state", CmdBlendState::InstancePtr());
 	dict->RegisterHandler("shader.pass.blend-state.target", CmdTarget::InstancePtr());
 	dict->RegisterHandler("shader.pass.blend-state.alpha-to-coverage", CmdAlphaToCoverage::InstancePtr());
@@ -68,7 +72,7 @@ void ShaderScriptImplv1_0::RegisterDictionary() {
 	dict = CommandDictionaryArchive::Instance().RegisterDictionary("ConstBufferScript",
 				&_rootTranslator);
 	dict->RegisterHandler("cbuffer", LanguageTranslator::CmdConstBuffer::InstancePtr());
-	dict->RegisterHandler("cbuffer.var", LanguageTranslator::CmdVar::InstancePtr());
+	dict->RegisterHandler("cbuffer.declare", LanguageTranslator::CmdDeclare::InstancePtr());
 }
 
 void ShaderScriptImplv1_0::Configure(const nextar::Config&) {
@@ -82,6 +86,7 @@ void ShaderScriptImplv1_0::Load(nextar::InputStreamPtr& input,
 	shaderPtr->GetID(shaderId);
 	ShaderScriptContext context(request, shaderId);
 	NeoCommandInterpreter::Execute("ShaderScript", input, &context);
+	request->SetCompleted(true);
 }
 
 } /* namespace ShaderScript */

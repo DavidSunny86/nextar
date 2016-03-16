@@ -55,18 +55,18 @@ void LanguageTranslator::EndBuffer(ShaderScriptContext* script) {
 
 void LanguageTranslator::TranslateConstantBuffer(ShaderScriptContext* script,
 		const String& name, nextar::InputStreamPtr stream) {
-	NeoCommandInterpreter::Execute("ConstBufferScript", stream, script);
+	Context context;
+	context._script = script;
+	NeoCommandInterpreter::Execute("ConstBufferScript", stream, &context);
 }
 
 void LanguageTranslator::TranslateMacro(ShaderScriptContext* script, const String& name) {
-	AddMacro(script, name);	
+	AddMacro(script, name);
 }
 
-
-bool LanguageTranslator::CmdConstBuffer::BeginExecute(CommandContext* pContext,
-		const ASTCommand* command) const {
+bool LanguageTranslator::ConstBuffer_BeginExecute(ShaderScriptContext* c,
+	const ASTCommand* command) {
 	ConstMultiStringHelper h(command->GetParameters().AsString());
-	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
 	String name;
 
 	bool determineContext = true;
@@ -99,20 +99,17 @@ bool LanguageTranslator::CmdConstBuffer::BeginExecute(CommandContext* pContext,
 
 	c->cbIsAutoParam = !determineContext;
 	LanguageTranslator::Instance().BeginBuffer(c, name);
-
-
 	return true;
 }
 
-void LanguageTranslator::CmdConstBuffer::EndExecute(CommandContext* pContext,
-		const ASTCommand* command) const {
+void LanguageTranslator::ConstBuffer_EndExecute(ShaderScriptContext* c,
+	const ASTCommand* command) {
 	LanguageTranslator::Instance().EndBuffer(c);
 }
 
-bool LanguageTranslator::CmdVar::BeginExecute(CommandContext* pContext,
-		const ASTCommand* command) const {
+bool LanguageTranslator::Declare_BeginExecute(ShaderScriptContext* c,
+	const ASTCommand* command) {
 	ConstMultiStringHelper h(command->GetParameters().AsString());
-	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
 	String name;
 
 	auto it = h.Iterate();
@@ -136,14 +133,14 @@ bool LanguageTranslator::CmdVar::BeginExecute(CommandContext* pContext,
 		size_t pos;
 		uint32 arrayCount = 1;
 		String name;
-		if ( (pos=nameSemantic.first.find_first_of('[')) != String::npos) {
+		if ((pos = nameSemantic.first.find_first_of('[')) != String::npos) {
 			//'01234567
 			//'name[10]'
-			if (nameSemantic.first.back() == ']' && pos < nameSemantic.first.length()-1) {
+			if (nameSemantic.first.back() == ']' && pos < nameSemantic.first.length() - 1) {
 				pos++;
 				arrayCount =
-						Convert::ToULong(nameSemantic.first.substr(
-								pos, nameSemantic.first.length()-1-pos));
+					Convert::ToULong(nameSemantic.first.substr(
+					pos, nameSemantic.first.length() - 1 - pos));
 				if (arrayCount == 0)
 					arrayCount = 1;
 			} else {
@@ -159,7 +156,7 @@ bool LanguageTranslator::CmdVar::BeginExecute(CommandContext* pContext,
 			std::replace(name.begin(), name.end(), '}', ']');
 		}
 
-		LanguageTranslator::Instance().AddParam(dataType, name, arrayCount);
+		LanguageTranslator::Instance().AddParam(c, dataType, name, arrayCount);
 		if (apn == AutoParamName::AUTO_INVALID_PARAM && !c->cbIsAutoParam) {
 			String uiName;
 			it.HasNext(uiName);
@@ -168,6 +165,27 @@ bool LanguageTranslator::CmdVar::BeginExecute(CommandContext* pContext,
 		}
 	}
 	return true;
+}
+
+/*******************************************************************/
+/*                          Commands                               */
+/*******************************************************************/
+bool LanguageTranslator::CmdConstBuffer::BeginExecute(CommandContext* pContext,
+		const ASTCommand* command) const {
+	LanguageTranslator::Context* t = static_cast<LanguageTranslator::Context*>(pContext);
+	return LanguageTranslator::ConstBuffer_BeginExecute(t->_script, command);
+}
+
+void LanguageTranslator::CmdConstBuffer::EndExecute(CommandContext* pContext,
+		const ASTCommand* command) const {
+	LanguageTranslator::Context* t = static_cast<LanguageTranslator::Context*>(pContext);
+	LanguageTranslator::ConstBuffer_EndExecute(t->_script, command);
+}
+
+bool LanguageTranslator::CmdDeclare::BeginExecute(CommandContext* pContext,
+		const ASTCommand* command) const {
+	LanguageTranslator::Context* t = static_cast<LanguageTranslator::Context*>(pContext);
+	return LanguageTranslator::Declare_BeginExecute(t->_script, command);
 }
 
 } /* namespace ShaderCompiler */

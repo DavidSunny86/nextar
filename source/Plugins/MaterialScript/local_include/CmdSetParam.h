@@ -14,7 +14,7 @@ namespace MaterialScript {
 
 class CmdSetParam: public nextar::CommandHandler {
 public:
-	NEX_SINGLE_INSTANCE(CmdParamValue);
+	NEX_SINGLE_INSTANCE(CmdSetParam);
 
 	virtual bool BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
 

@@ -17,15 +17,16 @@ TranslatorGLSL::TranslatorGLSL() {
 TranslatorGLSL::~TranslatorGLSL() {
 }
 
-void TranslatorGLSL::BeginBuffer(ShaderScriptContext* script, const String& name) {
-	script->transientBuffer.clear();
-	script->transientBuffer += "layout(std140) uniform " + name + " {\n";
+void TranslatorGLSL::BeginBuffer(ShaderScriptContext* _script, const String& name) {
+	String& transientBuffer = _script->_transientBuffer[GLSL_TRANSLATOR];
+	transientBuffer.clear();
+	transientBuffer += "layout(std140) uniform " + name + " {\n";
 }
 
 void TranslatorGLSL::AddParam(ShaderScriptContext* script,
 		ParamDataType dataType, const String& name,
 		uint32 arrayCount) {
-	String& transientBuffer = script->transientBuffer;
+	String& transientBuffer = script->_transientBuffer[GLSL_TRANSLATOR];
 	switch(dataType) {
 	case PDT_BOOL:
 		transientBuffer += "\t bool ";
@@ -72,7 +73,7 @@ void TranslatorGLSL::AddParam(ShaderScriptContext* script,
 }
 
 void TranslatorGLSL::EndBuffer(ShaderScriptContext* _script) {
-	String& transientBuffer = _script->transientBuffer;
+	String& transientBuffer = _script->_transientBuffer[GLSL_TRANSLATOR];
 	transientBuffer += "};\n";
 	_script->AddRegion(_SS(REG_CBUFFER), RenderManager::ShaderLanguage::SPP_GLSL,
 			std::move(transientBuffer));

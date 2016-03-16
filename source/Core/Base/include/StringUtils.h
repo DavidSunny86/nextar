@@ -63,25 +63,19 @@ typedef ConstMultiString::Iterator ConstTokenIterator;
 typedef nextar::StringPair StringPair;
 typedef String WordList;
 
-inline String GetTaggedVal(const String& tag,
-	StringUtils::ConstTokenIterator it) {
-	String value;
-	while (it.HasNext(value)) {
-		if (value.length()) {
-			StringPair tagVal = StringUtils::Split(value, ':');
-			if (tagVal.first == tag) {
-				return tagVal.second;
-			}
-		}
-	}
-	return StringUtils::Null;
-}
-
 struct NotAsciiTest: public std::unary_function<int, bool > {
 	inline bool operator ()(char a) {
 		return !isascii(a);
 	}
 };
+
+inline void PushBackWordList(String& arr, const String& what) {
+	MultiString m(arr);
+	String tmp;
+	auto it = ConstMultiStringHelper::It(what);
+	while (it.HasNext(tmp))
+		m.PushBack(tmp);
+}
 
 /**
  * Push the string at the very end of the buffer
@@ -490,6 +484,36 @@ struct NoCaseLess { // functor for operator <
 		return NoCaseCompare(_Left, _Right) < 0;
 	}
 };
+
+
+inline bool IsTagged(const String& value) {
+	return value.find_first_of(':') != String::npos;
+}
+
+inline bool IsTagged(const String& value,
+	const String& tag,
+	String& outStr) {
+	StringPair tagVal = StringUtils::Split(value, ':');
+	if (tagVal.first == tag) {
+		outStr = std::move(tagVal.second);
+		return true;
+	}
+	return false;
+}
+
+inline String GetTaggedVal(const String& tag,
+	StringUtils::ConstTokenIterator it) {
+	String value;
+	while (it.HasNext(value)) {
+		if (value.length()) {
+			StringPair tagVal = StringUtils::Split(value, ':');
+			if (tagVal.first == tag) {
+				return tagVal.second;
+			}
+		}
+	}
+	return StringUtils::Null;
+}
 
 /************************************** Legacy **************************************/
 

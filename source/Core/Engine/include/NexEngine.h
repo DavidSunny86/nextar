@@ -17,6 +17,7 @@ class RenderManager;
 class RenderDriver;
 class RenderContext;
 class RenderWindow;
+class RenderPass;
 class RenderSystem;
 class GpuBuffer;
 class VertexBuffer;

@@ -13,7 +13,10 @@
 
 namespace ShaderScript {
 
+class ShaderScriptContext;
+
 class CmdProgram: public nextar::BlockCommandHandler {
+public:
 	NEX_SINGLE_INSTANCE(CmdProgram);
 };
 

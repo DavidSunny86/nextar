@@ -5,6 +5,7 @@
 #include <DefaultLightSystem.h>
 #include <RenderTarget.h>
 #include <ApplicationContext.h>
+#include <RenderContext.h>
 
 namespace nextar {
 

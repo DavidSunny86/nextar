@@ -8,7 +8,7 @@
 #ifndef RENDERSYSTEM_H_
 #define RENDERSYSTEM_H_
 
-#include <RenderContext.h>
+#include <NexEngine.h>
 #include <RenderPass.h>
 #include <NamedObject.h>
 #include <MultiRenderTarget.h>

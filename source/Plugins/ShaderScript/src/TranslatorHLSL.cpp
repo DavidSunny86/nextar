@@ -18,14 +18,14 @@ TranslatorHLSL::~TranslatorHLSL() {
 }
 
 void TranslatorHLSL::BeginBuffer(ShaderScriptContext* _script, const String& name) {
-	String& transientBuffer = _script->transientBuffer;
+	String& transientBuffer = _script->_transientBuffer[HLSL_TRANSLATOR];
 	transientBuffer.clear();
 	transientBuffer += "cbuffer " + name + " {\n";
 }
 
 void TranslatorHLSL::AddParam(ShaderScriptContext* _script, ParamDataType dataType, const String& name,
 		uint32 arrayCount) {
-	String& transientBuffer = _script->transientBuffer;
+	String& transientBuffer = _script->_transientBuffer[HLSL_TRANSLATOR];
 	switch(dataType) {
 	case PDT_BOOL:
 		transientBuffer += "\t bool ";
@@ -72,7 +72,7 @@ void TranslatorHLSL::AddParam(ShaderScriptContext* _script, ParamDataType dataTy
 }
 
 void TranslatorHLSL::EndBuffer(ShaderScriptContext* _script) {
-	String& transientBuffer = _script->transientBuffer;
+	String& transientBuffer = _script->_transientBuffer[HLSL_TRANSLATOR];
 	transientBuffer += "}\n";
 	_script->AddRegion(_SS(REG_CBUFFER), RenderManager::ShaderLanguage::SPP_HLSL,
 			std::move(transientBuffer));

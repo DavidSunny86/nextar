@@ -57,7 +57,7 @@ void DebugRenderPass::CreateResources() {
 
 void DebugRenderPass::CreateMaterials() {
 	URL debugMaterialPath(FileSystem::ArchiveEngineData_Name, "Materials/Assets/Debug3D.asset");
-	URL debugQuadMaterialPath(FileSystem::ArchiveEngineData_Name, "Materials/Assets/DebugQuad.asset");
+	URL debugQuadMaterialPath(FileSystem::ArchiveEngineData_Name, "Materials/Assets/DrawQuad.asset");
 	try {
 		debugMaterial = Asset::AssetLoad(debugMaterialPath);
 	} catch (const GracefulErrorExcept& e) {

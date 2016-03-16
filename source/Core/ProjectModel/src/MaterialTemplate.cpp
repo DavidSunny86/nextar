@@ -27,6 +27,8 @@ StreamNotification MaterialTemplate::NotifyAssetLoadedImpl(nextar::StreamRequest
 		// request is complete
 		return StreamNotification::NOTIFY_COMPLETED;
 	}
+
+	shader->AppendCompilerOptions(definedParams, enableOptions, compilationOptions);
 	ShaderAssetPtr shaderPtr =
 			shader->GetShaderUnit(compilationOptions);
 	material = MaterialAsset::Traits::Instance(assetId);
@@ -58,13 +60,19 @@ void MaterialTemplate::SetShader(const ShaderTemplatePtr& shader) {
 	paramValues.clear();
 }
 
+void MaterialTemplate::EnableOptions(
+	const StringUtils::WordList& options) {
+	StringUtils::PushBackWordList(enableOptions, options);
+}
+
 void MaterialTemplate::SetCompilationOptions(
 		const StringUtils::WordList& options) {
-	compilationOptions = options;
+	StringUtils::PushBackWordList(compilationOptions, options);
 }
 
 void MaterialTemplate::AddParam(const String& name, const String& value) {
 	paramValues[name] = value;
+	StringUtils::PushBackWord(definedParams, name);
 }
 
 void MaterialTemplate::UnloadImpl() {
@@ -100,6 +108,12 @@ void nextar::MaterialTemplate::StreamRequest::SetShader(
 	ShaderTemplatePtr shaderPtr = ShaderTemplate::Traits::Instance(shader, location);
 	materialTemplate->SetShader(shaderPtr);
 	GetMetaInfo().AddDependency(shaderPtr);
+}
+
+void nextar::MaterialTemplate::StreamRequest::EnableOptions(const StringUtils::WordList& options) {
+	MaterialTemplate* materialTemplate = static_cast<MaterialTemplate*>(
+		GetStreamedObject());
+	materialTemplate->EnableOptions(options);
 }
 
 void nextar::MaterialTemplate::StreamRequest::SetCompilationOptions(

@@ -1,0 +1,55 @@
+
+
+layout(location = 0) out vec4 oAlbedoMap;
+layout(location = 1) out vec4 oNormalMap;
+layout(location = 2) out vec4 oSpecularAndGlossMap;
+
+#ifdef HAS_TEXCOORD0_CHANNEL
+	in vec2 _oTexCoord0;
+#endif
+
+
+#ifdef HAS_NORMAL_MAP
+vec3 GetNormal() {
+   return _vSampleNormal(_oTexCoord0).xyz;
+}
+#else
+in vec4 _oNormal;
+vec3 GetNormal() {
+   return _oNormal.xyz;
+}
+#endif
+
+
+vec4 GetDiffuseCoeff() {
+#ifdef HAS_DIFFUSE_MAP
+	return _vSampleDiffuse(_oTexCoord0);
+#else
+	return _uDiffuseColor;
+#endif
+}
+
+vec2 GetSpecularAndGlossCoeff() {
+#ifdef HAS_SPECULAR_AND_GLOSS_MAP
+   return _vSampleSpecularAndGloss(_oTexCoord0);
+#else
+	return vec2(_uSpecularIntensity, _uGloss);
+#endif
+}
+
+vec2 GetEncodedNormal(vec3 n) {
+	vec2 enc = normalize(n.xy) * (sqrt(n.z*0.5+0.5));
+	enc = enc*0.5+0.5;
+	return enc;
+}
+
+vec2 GetEncodedNormal() {
+	return GetEncodedNormal(normalize(GetNormal().xyz));
+}
+
+void main(void) {
+	oAlbedoMap = GetDiffuseCoeff();
+	oNormalMap = vec4(GetEncodedNormal(), 0, 0);
+	oSpecularAndGlossMap = vec4(GetSpecularAndGlossCoeff(), vec2(0, 0));
+}
+

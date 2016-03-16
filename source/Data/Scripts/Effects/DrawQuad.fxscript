@@ -1,14 +1,14 @@
 
 shader DrawQuad {
 
-	tags debug compositor;
+	tags compositor;
 	pass Main {
 
-		cbuffer Quad;
+		import-cbuffer Quad;
 
 		texture-state {
 			sampler s0 nearest-repeat;
-			unit diffuseMap s0 "Maps.TextureMap" context:object;
+			unit _sDiffuseMap s0 "Maps.TextureMap" context:object;
 		}
 
 		depth-stencil-state disable;
@@ -16,7 +16,7 @@ shader DrawQuad {
 		raster-state default;
 
 		program {
-			option HAS_DIFFUSE_MAP "Maps.TextureMap";
+			option "Maps.TextureMap" HAS_DIFFUSE_MAP HAS_TEXCOORD0_CHANNEL;
 			define HAS_2DVERT_CHANNEL;
 			vertex-program Quad;
 			fragment-program CopyMap;

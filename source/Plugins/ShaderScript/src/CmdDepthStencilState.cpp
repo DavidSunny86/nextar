@@ -78,10 +78,10 @@ bool ShaderScript::CmdStencilState::BeginExecute(CommandContext* pContext,
 				faceOp->stencilFunc = Helper::GetDepthStencilFunc(value);
 			}
 			if (it.HasNext(value)) {
-				faceOp->stencilFail = Helper::GetStencilOp(value);
+				faceOp->stencilPass = Helper::GetStencilOp(value);
 			}
 			if (it.HasNext(value)) {
-				faceOp->stencilPass = Helper::GetStencilOp(value);
+				faceOp->stencilFail = Helper::GetStencilOp(value);
 			}
 			if (it.HasNext(value)) {
 				faceOp->depthPass = Helper::GetStencilOp(value);

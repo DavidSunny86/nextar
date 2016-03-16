@@ -5,6 +5,7 @@
  *      Author: obhi
  */
 
+#include <RenderSystem.h>
 #include <RenderTarget.h>
 
 namespace nextar {

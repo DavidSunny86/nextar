@@ -4,11 +4,11 @@
  *  Created on: 30-Sep-2013
  *      Author: obhi
  */
-#include <CommonTypes.h>
+#include <MaterialScript.h>
 #include <BaseHeaders.h>
 #include <Plugin.h>
 
-NEX_IMPLEMENT_PLUGIN(MaterialCompiler, MaterialCompiler::Plugin);
+NEX_IMPLEMENT_PLUGIN(MaterialScript, MaterialScript::Plugin);
 
 namespace MaterialScript {
 
@@ -21,11 +21,11 @@ Plugin::~Plugin() {
 }
 
 void Plugin::Open() {
-	Trace("Loaded material compiler 1.0.");
+	Trace("Loaded material script 1.0.");
 }
 
 void Plugin::Close() {
-	Trace("Unloading material compiler 1.0.");
+	Trace("Unloading material script 1.0.");
 }
 
 void Plugin::LicenseRenewed() {

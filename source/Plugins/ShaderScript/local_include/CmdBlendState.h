@@ -13,7 +13,7 @@
 
 namespace ShaderScript {
 
-class CmdBlendState: public nextar::BlockCommandHandler {
+class CmdBlendState : public nextar::BlockCommandHandler {
 public:
 	NEX_SINGLE_INSTANCE(CmdBlendState);
 	virtual bool BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
@@ -26,6 +26,7 @@ public:
 	NEX_SINGLE_INSTANCE(CmdTarget);
 	virtual bool BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
 
+	static const RenderTargetBlendOp _preMultipliedBlending;
 	static const RenderTargetBlendOp _alphaBlending;
 };
 

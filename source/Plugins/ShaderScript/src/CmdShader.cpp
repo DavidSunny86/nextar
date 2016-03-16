@@ -7,6 +7,7 @@
 
 #include <CmdShader.h>
 #include <ShaderScriptContext.h>
+#include <LanguageTranslator.h>
 
 namespace ShaderScript {
 
@@ -38,28 +39,12 @@ bool ShaderScript::CmdTags::BeginExecute(CommandContext* pContext,
 	while (it.HasNext(value)) {
 		StringUtils::ToLower(value);
 		flags |= Helper::GetTag(value);
-		/*
-		if (!tagsMap.size()) {
-			tagsMap["background"] = RenderQueueFlags::BACKGROUND;
-			tagsMap["deferred"] = RenderQueueFlags::DEFERRED;
-			tagsMap["debug"] = RenderQueueFlags::DEBUG;
-			tagsMap["deferred-lighting"] = RenderQueueFlags::DEFERRED_LIGHTING;
-			tagsMap["forward"] = RenderQueueFlags::FORWARD;
-			tagsMap["overlay"] = RenderQueueFlags::OVERLAY;
-			tagsMap["compositor"] = RenderQueueFlags::COMPOSITOR;
-			tagsMap["translucency"] = RenderQueueFlags::TRANSLUCENCY;
-		}
-
-		auto it = tagsMap.find(value);
-		if (tagsMap.end() != it)
-			flags |= (*it).second;*/
 	}
 
 	if (flags) {
-		ShaderTemplate* shader = static_cast<ShaderTemplate*>(
-				c->shader->GetStreamedObject());
-		shader->SetRenderFlags(flags);
+		c->shader->SetRenderFlags(flags);
 	}
+	return true;
 }
 
 bool ShaderScript::CmdPass::BeginExecute(CommandContext* pContext,
@@ -75,14 +60,14 @@ void CmdPass::EndExecute(CommandContext* pContext,
 	String predefs = _SS(REG_PREDEFS);
 	String defines = _SS(REG_DEFINE);
 	String cbuffer = _SS(REG_CBUFFER);;
-
+	ShaderScriptContext* shaderScript = static_cast<ShaderScriptContext*>(pContext);
 	for (uint32 i = 0; i < Pass::STAGE_COUNT; ++i) {
 		StringUtils::WordList words;
 		String src;
 
 		switch ((Pass::ProgramStage)i) {
 		case Pass::ProgramStage::STAGE_DOMAIN:
-			src = "domain"; break;
+			src = _SS(CMD_DOMAIN_PROG); break;
 		case Pass::ProgramStage::STAGE_VERTEX:
 			src = _SS(CMD_VERTEX_PROG); break;
 		case Pass::ProgramStage::STAGE_FRAGMENT:
@@ -94,7 +79,7 @@ void CmdPass::EndExecute(CommandContext* pContext,
 
 		}
 		if (shaderScript->IsStageActive((Pass::ProgramStage)i)) {
-			shaderScript->GetTranslator().AddPredefs((Pass::ProgramStage)i, shaderScript);
+			LanguageTranslator::Instance().AddPredefs(shaderScript, (Pass::ProgramStage)i);
 			StringUtils::PushBackWord(words, predefs);
 			StringUtils::PushBackWord(words, defines);
 			StringUtils::PushBackWord(words, cbuffer);
@@ -105,6 +90,39 @@ void CmdPass::EndExecute(CommandContext* pContext,
 	}
 
 	shaderScript->RemoveRegion(cbuffer);
+}
+
+bool CmdImportConstBuffer::BeginExecute(CommandContext* pContext,
+	const ASTCommand* command) const {
+	ConstMultiStringHelper h(command->GetParameters().AsString());
+	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	auto it = h.Iterate();
+	String value;
+	while (it.HasNext(value)) {
+		InputStreamPtr is = c->FetchConstBuffer(value);
+		if (is) {
+			LanguageTranslator::Instance().TranslateConstantBuffer(c, value, is);
+		}
+	}
+	return true;
+}
+
+bool CmdConstBuffer::BeginExecute(CommandContext* pContext,
+	const ASTCommand* command) const {
+	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	return LanguageTranslator::ConstBuffer_BeginExecute(c, command);
+}
+
+void CmdConstBuffer::EndExecute(CommandContext* pContext,
+	const ASTCommand* command) const {
+	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	LanguageTranslator::ConstBuffer_EndExecute(c, command);
+}
+
+bool CmdDeclare::BeginExecute(CommandContext* pContext,
+	const ASTCommand* command) const {
+	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	return LanguageTranslator::Declare_BeginExecute(c, command);
 }
 
 } /* namespace ShaderScript */

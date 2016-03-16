@@ -1,0 +1,14 @@
+
+
+#ifdef HAS_DIFFUSE_MAP
+	smooth out vec2 _oTexCoord0;
+#endif
+
+void main(void)
+{
+	gl_Position = vec4((_iGetPos() * _uTranslationAndScale.zw) + _uTranslationAndScale.xy, -0.9f, 1);
+#ifdef HAS_DIFFUSE_MAP
+	_oTexCoord0 = ((_iGetPos() * vec2(0.5, 0.5) + vec2(0.5, 0.5)) * _uTextureOffsetAndRepeat.zw) + _uTextureOffsetAndRepeat.xy;
+#endif
+
+}

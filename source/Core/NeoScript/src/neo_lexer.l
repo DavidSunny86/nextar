@@ -3,7 +3,7 @@
 %option prefix="neo_"
 %option never-interactive
 %{
-
+#include <cstdint>
 #include <ParserContext.h>
 #include <parse.neo.hpp>
 #define YY_NO_UNISTD_H

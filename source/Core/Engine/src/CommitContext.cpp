@@ -5,6 +5,7 @@
  *      Author: obhi
  */
 #include <NexEngine.h>
+#include <RenderSystem.h>
 #include <CommitContext.h>
 #include <RenderTarget.h>
 #include <MultiRenderTarget.h>

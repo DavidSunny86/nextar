@@ -20,6 +20,7 @@ namespace nextar {
  */
 class _NexProjectAPI ShaderTemplate :
 		public AssetTemplate {
+	NEX_LOG_HELPER(ShaderTemplate);
 public:
 
 	enum Type {
@@ -29,23 +30,19 @@ public:
 
 	struct Parameter {
 		ParamDataType type;
-		String uiName;
-		String uiDescription;
-		String catagory;
+		String name;
+		String description;
 		ParameterContext context;
 	};
 
 	typedef map<String, Parameter>::type ParameterTable;
 
-	struct Macro {
-		Macro() : index(-1) {}
-		uint32 index;
-		String uiName;
-		String uiDescription;
-		String catagory;
+	struct ShaderOption {
+		String activateOptions;
+		String description;
 	};
 
-	typedef map<String, Macro>::type MacroTable;
+	typedef map<String, ShaderOption>::type ShaderOptionsTable;
 
 	struct ShaderUnit {
 		String compilationOptions;
@@ -109,9 +106,9 @@ public:
 				const String& name,
 				const String& description,
 				ParamDataType type);
-		void AddMacro(const String& param,
-				const String& name,
-				const String& description);
+		void AddMacro(const String& name,
+			const String& activateOptions,
+			const String& description);
 		void AddSemanticBinding(const String& var,
 				AutoParamName name);
 
@@ -130,6 +127,9 @@ public:
 
 	virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);
 
+	void AppendCompilerOptions(const StringUtils::WordList& definedParms, 
+		const StringUtils::WordList& enabledOptions,
+		String& outOptions);
 	ShaderAssetPtr& GetShaderUnit(const StringUtils::WordList& options);
 	ShaderAssetPtr& CreateShader(const String& hash, const StringUtils::WordList& options);
 
@@ -161,7 +161,10 @@ public:
 	virtual uint32 GetClassID() const;
 	virtual uint32 GetProxyID() const;
 
+	void RegisterOptions(const String& options);
 protected:
+
+	void _AppendCompilerOption(const String& options, String& outCompilerOptions);
 
 	class ShaderFromTemplate : public AssetLoaderImpl {
 	public:
@@ -181,14 +184,17 @@ protected:
 	friend class nextar::ShaderTemplate::LoadStreamRequest;
 	friend class nextar::ShaderTemplate::SaveStreamRequest;
 
-	String GetHashNameFromOptions(const StringUtils::WordList& );
+	String GetHashNameFromOptions(const set<String>::type&);
 
 	PassList passes;
 
+	typedef map<String, uint32>::type CompilerMacroMap;
+
+	CompilerMacroMap registeredOptions;
 	uint32 renderFlags;
 	ShaderTable shaders;
 	ParameterTable parameters;
-	MacroTable macros;
+	ShaderOptionsTable macros;
 
 };
 

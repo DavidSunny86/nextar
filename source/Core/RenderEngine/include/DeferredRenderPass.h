@@ -52,6 +52,7 @@ public:
 	virtual void CreateResources();
 	virtual void DestroyResources();
 
+	void SetLightMaterial(MaterialAssetPtr& lightMaterial);
 protected:
 		
 	void RenderLight(Light* light, uint32 passIdx, uint32 updateId, CommitContext& context);

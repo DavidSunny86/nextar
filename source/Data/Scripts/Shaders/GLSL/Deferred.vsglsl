@@ -1,0 +1,21 @@
+
+#ifndef HAS_NORMAL_MAP
+smooth out vec4 _oNormal;
+#endif
+
+#ifdef HAS_TEXCOORD0_CHANNEL
+	smooth out vec2 _oTexCoord0;
+#endif
+
+void main(void)
+{
+#ifndef HAS_NORMAL_MAP
+	_oNormal = _uModelView * vec4(_iGetNormal(), 0.0);
+#endif
+	
+#ifdef HAS_TEXCOORD0_CHANNEL
+	_oTexCoord0 =  _iGetTexCoord0();
+#endif
+	gl_Position = _uModelViewProj * vec4(_iGetPos(), 1.0);
+}
+

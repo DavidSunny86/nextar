@@ -10,7 +10,15 @@
 
 namespace ShaderScript {
 
-bool ShaderScript::CmdBlendState::BeginExecute(CommandContext* pContext,
+const RenderTargetBlendOp CmdTarget::_alphaBlending(ColorMask::MASK_ALL,
+	BlendDataSource::BDS_SRC_ALPHA, BlendDataSource::BDS_INV_DST_ALPHA, BlendOp::BOP_ADD,
+	BlendDataSource::BDS_ONE, BlendDataSource::BDS_ZERO, BlendOp::BOP_ADD);
+
+const RenderTargetBlendOp CmdTarget::_preMultipliedBlending(ColorMask::MASK_ALL,
+	BlendDataSource::BDS_SRC_ALPHA, BlendDataSource::BDS_INV_DST_ALPHA, BlendOp::BOP_ADD,
+	BlendDataSource::BDS_ONE, BlendDataSource::BDS_INV_SRC_ALPHA, BlendOp::BOP_ADD);
+
+bool CmdBlendState::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
 	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
@@ -23,14 +31,14 @@ bool ShaderScript::CmdBlendState::BeginExecute(CommandContext* pContext,
 	return true;
 }
 
-void ShaderScript::CmdBlendState::EndExecute(CommandContext* pContext,
+void CmdBlendState::EndExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
 	c->blendState.UpdateHash();
 	c->shader->SetBlendState(c->blendState);
 }
 
-bool ShaderScript::CmdTarget::BeginExecute(CommandContext* pContext,
+bool CmdTarget::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
 	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
@@ -38,7 +46,9 @@ bool ShaderScript::CmdTarget::BeginExecute(CommandContext* pContext,
 	String value;
 	auto it = h.Iterate();
 	if (it.HasNext(value)) {
-		if (!value.compare("alpha-blending"))
+		if (!value.compare("pre-multiplied-blending"))
+			blendOp = _preMultipliedBlending;
+		else if (!value.compare("alpha-blending"))
 			blendOp = _alphaBlending;
 		else if (!value.compare("advanced")) {
 			if (it.HasNext(value)) {
@@ -64,7 +74,7 @@ bool ShaderScript::CmdTarget::BeginExecute(CommandContext* pContext,
 	return true;
 }
 
-bool ShaderScript::CmdAlphaToCoverage::BeginExecute(CommandContext* pContext,
+bool CmdAlphaToCoverage::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
 	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);

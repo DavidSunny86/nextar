@@ -3,9 +3,13 @@ shader Debug3D {
 
 	tags debug;
 	pass Main {
+		  
+		cbuffer _cbDebugModelView {
+			declare mat4x4 _uModelViewProj:MODELVIEWPROJECTION;
+			declare vec4 _uObjectColor:DIFFUSECOLOR;
+			declare float _uObjectScale:CONSTANTSCALEFACTOR;
+		}
 	
-		cbuffer DebugTransforms;
-		
 		depth-stencil-state {
 			depth-state test-and-write;
 			stencil-state disable;
@@ -13,9 +17,6 @@ shader Debug3D {
 		
 		blend-state {
 			target alpha-blending;
-         // advanced blending would be
-         // target advanced source-alpha inv-source-alpha add;
-         // alpha-to-coverage [true/false];
 		}
 		
 		raster-state default;

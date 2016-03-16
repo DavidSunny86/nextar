@@ -6,6 +6,7 @@
  */
 
 #include <NexEngine.h>
+#include <RenderSystem.h>
 #include <GpuBuffer.h>
 #include <RenderContext.h>
 

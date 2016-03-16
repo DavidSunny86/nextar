@@ -20,12 +20,12 @@ public:
 	TranslatorHLSL();
 	virtual ~TranslatorHLSL();
 
-	virtual void BeginBuffer(ShaderScriptContext* script, const String& name);
-	virtual void AddParam(ShaderScriptContext* script, ParamDataType dataType, const String& name, uint32 arrayCount);
-	virtual void EndBuffer(ShaderScriptContext* _script);
+	virtual void BeginBuffer(ShaderScriptContext* script, const String& name)  override;
+	virtual void AddParam(ShaderScriptContext* script, ParamDataType dataType, const String& name, uint32 arrayCount)  override;
+	virtual void EndBuffer(ShaderScriptContext* _script)  override;
 
-	virtual void AddMacro(ShaderScriptContext* script, const String& name);
-	virtual void AddPredefs(ShaderScriptContext* script, Pass::ProgramStage stage);
+	virtual void AddMacro(ShaderScriptContext* script, const String& name) override;
+	virtual void AddPredefs(ShaderScriptContext* script, Pass::ProgramStage stage) override;
 
 protected:
 };

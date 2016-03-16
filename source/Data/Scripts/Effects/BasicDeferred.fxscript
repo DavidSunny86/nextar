@@ -5,7 +5,7 @@ shader BasicDeferred {
 
    pass GBuffer {
          
-      cbuffer ObjectProperties;
+      import-cbuffer ObjectProperties;
       
       texture-state {
          sampler s0 linear-clamp;
@@ -16,9 +16,7 @@ shader BasicDeferred {
 
       depth-stencil-state {
          depth-state test-and-write;
-         // depth-state advanced test write compare 
          stencil-state disable;
-         // stencil-state advanced [front/back] stencil-function stencil-fail stencil-pass depth-pass stencil-mask stencil-ref;
       }
 
       raster-state default;
@@ -26,16 +24,9 @@ shader BasicDeferred {
       blend-state disable;
 
       program {
-         // options can be connected to predefined parameters via names
-         // if chosen names are predefined as parameters, then these names
-         // are evaluated to see if they equate to true or false depending upon their values
-         // eg: Texture units evaluate to 0 if they are not set and 1 when they are set
-         //  Scalar values evaluate to 0 if they are 0 or 1 if they are anything other than 0
-         // If the name does not match any parameter previously defined, they are added
-         // as shader option.
-         option HAS_DIFFUSE_MAP "Maps.DiffuseMap";
-         option HAS_NORMAL_MAP "Maps.NormalMap";
-         option HAS_SPECULAR_AND_GLOSS_MAP "Maps.SpecularAndGlossMap";
+         option "Maps.DiffuseMap" HAS_DIFFUSE_MAP HAS_TEXCOORD0_CHANNEL;
+         option "Maps.NormalMap" HAS_NORMAL_MAP  HAS_TEXCOORD0_CHANNEL;
+         option "Maps.SpecularAndGlossMap" HAS_SPECULAR_AND_GLOSS_MAP  HAS_TEXCOORD0_CHANNEL;
          define HAS_NORMAL_CHANNEL;
 
          vertex-program Deferred;

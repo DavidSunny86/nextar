@@ -7,5 +7,6 @@
 #include <RenderContext_4_2_GL.h>
 #include <RenderContext_4_3_GL.h>
 #include <RenderContext_4_4_GL.h>
+#include <RenderContext_4_5_GL.h>
 
 #endif // RenderContext_AllHeaders_H_

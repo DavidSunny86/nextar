@@ -10,6 +10,7 @@
 
 #include <IncWnds.h>
 #include <NexBase.h>
+#include <Singleton.h>
 
 namespace nextar {
 

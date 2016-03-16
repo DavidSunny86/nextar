@@ -256,12 +256,12 @@ TextureAddressMode Helper::GetTextureAddressMode(const String& val) {
 uint32 Helper::GetTag(const String& val) {
 	static EnumNamePair names[] = {
 		{ RenderQueueFlags::BACKGROUND, _SS(ARG_BACKGROUND) },
-		{ RenderQueueFlags::DEFERRED, _SS(ARG_BASIC_DEFERRED) },
+		{ RenderQueueFlags::COMPOSITOR, _SS(ARG_POST_FX) },
 		{ RenderQueueFlags::DEBUG, _SS(ARG_DEBUG) },
+		{ RenderQueueFlags::DEFERRED, _SS(ARG_BASIC_DEFERRED) },
 		{ RenderQueueFlags::DEFERRED_LIGHTING, _SS(ARG_DEFERRED_LIGHTING) },
 		{ RenderQueueFlags::FORWARD, _SS(ARG_FORWARD) },
 		{ RenderQueueFlags::OVERLAY, _SS(ARG_OVERLAY) },
-		{ RenderQueueFlags::COMPOSITOR, _SS(ARG_POST_FX) },
 		{ RenderQueueFlags::TRANSLUCENCY, _SS(ARG_TRANSLUCENT) },
 	};
 
@@ -270,7 +270,7 @@ uint32 Helper::GetTag(const String& val) {
 	EnumNamePair* ptr = std::lower_bound(names, names + array_size, val,
 		EnumNameCompare());
 	if (ptr != names + array_size && !(val.compare(ptr->name) < 0))
-		return static_cast<TextureAddressMode>(ptr->val);
+		return static_cast<uint32>(ptr->val);
 	return 0;
 }
 

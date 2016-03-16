@@ -1,0 +1,10 @@
+
+in vec4 _oVaryingColor;
+
+layout(location = 0) out vec4 oDiffuseColor;
+
+void main()
+{
+	oDiffuseColor = _oVaryingColor;
+}
+

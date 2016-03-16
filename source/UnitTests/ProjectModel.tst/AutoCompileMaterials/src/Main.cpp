@@ -47,6 +47,7 @@ public:
 		ArchivePtr arch = FileSystem::Instance().OpenArchive("EngineData");
 		if (arch) {
 			arch->Scan(this, "Scripts/Materials/*.mtl");
+			arch->Scan(this, "Scripts/Materials/*.mscript");
 		}
 		ApplicationContext::Instance().QuitApplication();
 	}

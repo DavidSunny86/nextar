@@ -1,12 +1,11 @@
 
-cbuffer ObjectTransforms:OBJECTTRANSFORM {
-	var mat4x4 matMvp;
-	var mat4x4 matMv; // assumed orthogonal
+cbuffer _cbObjectTransforms:OBJECTTRANSFORM {
+	declare mat4x4 _uModelViewProj;
+	declare mat4x4 _uModelView; // assumed orthogonal
 };
 
-cbuffer MaterialProperty context:Material {
-
-	var vec4 diffuseColor "ObjectProperties.DiffuseColor";
-	var float specularIntensity "ObjectProperties.SpecularIntensity";
-	var float gloss "ObjectProperties.Gloss";
+cbuffer _cbMaterialProperty context:Material {
+	declare vec4 _uDiffuseColor "ObjectProperties.DiffuseColor";
+	declare float _uSpecularIntensity "ObjectProperties.SpecularIntensity";
+	declare float _uGloss "ObjectProperties.Gloss";
 };

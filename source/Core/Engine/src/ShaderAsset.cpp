@@ -63,7 +63,7 @@ StreamNotification ShaderAsset::NotifyAssetLoadedImpl(nextar::StreamRequest* req
 		}
 		if (renderQueue == (uint8)-1) {
 			renderQueue = 0; // default it out, may be very incorrect
-			Error("Could not determine render queue!");
+			Warn("Could not determine render queue!");
 		}
 	}
 

@@ -1,5 +1,0 @@
-
-material Default:Default.DeferredLights {	
-	shader "{EngineData}/Scripts/Effects/DeferredLights.nfx" Default:Default.DeferredLights;
-	layer normal;
-}

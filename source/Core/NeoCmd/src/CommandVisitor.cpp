@@ -32,8 +32,10 @@ void CommandVisitor::VisitCommandBegin(const ASTCommand* command) {
 			popHandler = true;
 			_context->SetActiveHandler(redirect);
 			_dontskip = redirect->BeginExecute(_context, command);
+			return;
 		}
 	}
+	popHandler = false;
 }
 
 

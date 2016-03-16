@@ -36,6 +36,26 @@ public:
 	virtual void EndExecute(CommandContext* pContext, const ASTCommand* command) const;
 };
 
+class CmdImportConstBuffer :public nextar::BlockCommandHandler {
+public:
+	NEX_SINGLE_INSTANCE(CmdImportConstBuffer);
+	virtual bool BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
+};
+
+class CmdConstBuffer :public BlockCommandHandler {
+public:
+	NEX_SINGLE_INSTANCE(CmdConstBuffer);
+	virtual bool BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
+	virtual void EndExecute(CommandContext* pContext, const ASTCommand* command) const;
+};
+
+class CmdDeclare : public CommandHandler {
+	NEX_LOG_HELPER(CmdDeclare);
+public:
+	NEX_SINGLE_INSTANCE(CmdDeclare);
+	virtual bool BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
+};
+
 } /* namespace ShaderScript */
 
 #endif /* PLUGINS_SHADERSCRIPT_LOCAL_INCLUDE_CMDSHADER_H_ */

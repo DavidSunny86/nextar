@@ -5,6 +5,7 @@
  *      Author: obhi
  */
 #include <NexEngine.h>
+#include <RenderSystem.h>
 #include <Pass.h>
 #include <CommitContext.h>
 #include <ShaderParam.h>
