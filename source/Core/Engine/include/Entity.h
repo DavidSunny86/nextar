@@ -13,6 +13,7 @@
 #include <Moveable.h>
 #include <Camera.h>
 #include <Mesh.h>
+#include <Light.h>
 #include <BVCullingSystem.h>
 
 namespace nextar {
@@ -53,7 +54,7 @@ public:
 		virtual EntityPtr AsyncCreateCameraEntity(const StringID name);
 		virtual EntityPtr AsyncCreateMeshEntity(const StringID name,
 				MeshAssetPtr mesh);
-		virtual EntityPtr AsyncCreateLightEntity(const StringID name);
+		virtual EntityPtr AsyncCreateDirectionalLightEntity(const StringID name, const Color&);
 		virtual EntityPtr AsyncCreateOmniLightEntity(const StringID name, const Color&, float range);
 
 		/* implementation */

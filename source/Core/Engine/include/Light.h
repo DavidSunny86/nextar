@@ -44,12 +44,16 @@ public:
 		return lightType;
 	}
 
+	inline void SetLightType(Type t) {
+		lightType = t;
+	}
+
 	inline void SetLightColor(const Color& c) {
-		diffuseColor = c;
+		color = c;
 	}
 
 	inline const Color& GetLightColor() const {
-		return diffuseColor;
+		return color;
 	}
 
 	virtual void SetMoveable(Moveable* ptr);
@@ -64,8 +68,8 @@ public:
 protected:
 	Type lightType;
 	uint32 sortKey;
-	Color diffuseColor;
-	Color specularColor;
+	Color color;
+	float intensity;
 	/* Fall off angle for spot lights */
 	float falloffAngle;
 	float lightRange;

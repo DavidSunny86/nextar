@@ -1,6 +1,0 @@
-
-cbuffer DebugModelView {
-	var mat4x4 modelViewProj:MODELVIEWPROJECTION;
-	var vec4 objectColor:DIFFUSECOLOR;
-	var float objectScale:CONSTANTSCALEFACTOR;
-};

@@ -1,5 +1,0 @@
-
-cbuffer ViewTransforms:VIEWTRANSFORMS {
-	var mat4x4 invProjection;
-};
-

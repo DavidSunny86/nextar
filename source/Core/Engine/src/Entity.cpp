@@ -41,8 +41,15 @@ EntityPtr Entity::Factory::AsyncCreateMeshEntity(const StringID name,
 	return ret;
 }
 
-EntityPtr Entity::Factory::AsyncCreateLightEntity(const StringID name) {
-	return AsyncCreateAndAttach(name, Light::CLASS_ID, name);
+EntityPtr Entity::Factory::AsyncCreateDirectionalLightEntity(const StringID name, const Color& color) {
+	Component* _subComponent = nullptr;
+	EntityPtr ret = AsyncCreateAndAttach(name, Light::CLASS_ID, name, &_subComponent);
+	if (_subComponent) {
+		Light* light = static_cast<Light*>(_subComponent);
+		light->SetLightColor(color);
+		light->SetLightType(Light::Type::DIRECTIONAL);
+	}
+	return ret;
 }
 
 EntityPtr Entity::Factory::AsyncCreateOmniLightEntity(const StringID name, const Color& color, float range) {
@@ -52,6 +59,7 @@ EntityPtr Entity::Factory::AsyncCreateOmniLightEntity(const StringID name, const
 		Light* light = static_cast<Light*>(_subComponent);
 		light->SetLightColor(color);
 		light->SetLightRange(range);
+		light->SetLightType(Light::Type::OMNI);
 	}
 	return ret;
 }
