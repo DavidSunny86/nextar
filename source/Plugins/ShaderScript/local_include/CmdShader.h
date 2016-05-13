@@ -21,6 +21,14 @@ public:
 	virtual void EndExecute(CommandContext* pContext, const ASTCommand* command) const;
 };
 
+class CmdInherit: public nextar::CommandHandler {
+public:
+	NEX_SINGLE_INSTANCE(CmdInherit);
+	map<String, uint32>::type tagsMap;
+
+	virtual bool BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
+};
+
 class CmdTags: public nextar::CommandHandler {
 public:
 	NEX_SINGLE_INSTANCE(CmdTags);

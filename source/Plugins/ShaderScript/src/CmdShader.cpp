@@ -16,11 +16,19 @@ bool ShaderScript::CmdShader::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
 	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
-	String name = h.Get(0);
-	SharedComponent::ID id = SharedComponent::ToID(name);
-	if (id.name == c->shaderId.name &&
-		id.group == c->shaderId.group) {
-		return true;
+	auto it = h.Iterate();
+
+	String name;
+	if (it.HasNext(name)) {
+		SharedComponent::ID id = SharedComponent::ToID(name);
+		if (!c->verifyID || (id.name == c->shaderId.name &&
+			id.group == c->shaderId.group)) {
+			String templateParams;
+			if (it.HasNext(templateParams)) {
+				c->templateParamNames = std::move(templateParams);
+			}
+			return true;
+		}
 	}
 	return false;
 }
@@ -123,6 +131,28 @@ bool CmdDeclare::BeginExecute(CommandContext* pContext,
 	const ASTCommand* command) const {
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
 	return LanguageTranslator::Declare_BeginExecute(c, command);
+}
+
+bool CmdInherit::BeginExecute(CommandContext* pContext,
+		const ASTCommand* command) const {
+	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	ConstMultiStringHelper h(command->GetParameters().AsString());
+	ShaderScriptContext context(c->shader, c->shaderId);
+	context.verifyID = false;
+	String value;
+	ConstMultiStringHelper::Iterator it =  h.Iterate();
+	URL location;
+	if (it.HasNext(value)) {
+		location = URL(value);
+		String templateValues;
+		if (it.HasNext(templateValues)) {
+			context.templateParamValues = std::move(templateValues);
+			InputStreamPtr input = FileSystem::Instance().OpenRead(location);
+			NeoCommandInterpreter::Execute("ShaderScript", input, &context);
+			return true;
+		}
+	}
+	return false;
 }
 
 } /* namespace ShaderScript */

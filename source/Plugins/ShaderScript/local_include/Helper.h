@@ -2,7 +2,6 @@
 #define COMMONTYPES_H_
 
 #include <ProjectModelHeaders.h>
-#include <ScriptParser.h>
 #include <DepthStencilState.h>
 #include <BlendState.h>
 #include <RasterState.h>
@@ -63,25 +62,6 @@ enum CommandDelegateBlock {
 	BLEND_STATE_BLOCK,
 	RASTER_STATE_BLOCK,
 	TEXTURE_STATE_BLOCK,
-};
-
-typedef void (*CommandDelegate_Execute) (int parentType, void* parentParam,
-			ScriptParser::StatementContext& statement);
-
-
-struct CommandNamePair {
-	const char* name;
-	CommandDelegate_Execute command;
-};
-
-struct CommandNameCompare {
-	bool operator ()(const CommandNamePair& enp, const String& name) const {
-		return name.compare(enp.name) > 0;
-	}
-
-	bool operator ()(const String& name, const CommandNamePair & enp) const {
-		return name.compare(enp.name) < 0;
-	}
 };
 
 class Helper {

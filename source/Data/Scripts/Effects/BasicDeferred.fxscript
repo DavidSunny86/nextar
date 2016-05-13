@@ -9,9 +9,9 @@ shader BasicDeferred {
       
       texture-state {
          sampler s0 linear-clamp;
-         unit diffuseMap s0 "Maps.DiffuseMap";
-         unit specularAndGloss s0 "Maps.SpecularAndGlossMap";
-         unit normalMap s0 "Maps.NormalMap";
+         unit _sDiffuseMap s0 "Maps.DiffuseMap";
+         unit _sSpecularAndGlossMap s0 "Maps.SpecularAndGlossMap";
+         unit _sNormalMap s0 "Maps.NormalMap";
       }
 
       depth-stencil-state {

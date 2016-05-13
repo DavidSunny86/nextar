@@ -5,6 +5,9 @@
 /******************************************************************/
 #ifdef HAS_DIFFUSE_MAP
 	uniform sampler2D _sDiffuseMap;
+	vec2 _vGetDiffuseTexCoord() {
+		return _iGetTexCoord0();
+	}
 	vec4 _vSampleDiffuse(vec2 v) {
 		return ( texture( _sDiffuseMap, v ) );
 	}
@@ -15,8 +18,15 @@
 #endif
 #ifdef HAS_NORMAL_MAP
 	uniform sampler2D _sNormalMap;
+	vec2 _vGetNormalTexCoord() {
+		return _iGetTexCoord0();
+	}
 	vec4 _vSampleNormal(vec2 v) {
 		return ( texture( _sNormalMap, v ) );
+	}
+	vec3 _vUnpackNormal(vec2 v) {
+		vec2 n = _vSampleNormal(v).xy * 2.0 - 1.0;
+		return vec3(n.x, n.y, sqrt(1 - (n.x*n.x) + (n.y*n.y)));
 	}
 #else
 	vec4 _vSampleNormal(vec2 v) {

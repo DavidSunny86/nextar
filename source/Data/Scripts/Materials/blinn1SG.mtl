@@ -1,5 +1,0 @@
-
-material #:#.blinn1SG {	
-	shader "{EngineData}/Scripts/Effects/Forward.nfx";
-	layer normal;
-}

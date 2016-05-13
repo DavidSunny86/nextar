@@ -1,0 +1,10 @@
+
+struct _sSurfaceData {
+	vec4 _uAlbedo;
+	vec3 _uNormal; // tangent space normal, when tangent space lighting is being used
+	float _uEmissive;
+	float _uSpecular;
+	float _uOcclusion;
+};
+
+void _vGetSurfaceData(inout _sSurfaceData data);
