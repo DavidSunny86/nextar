@@ -6,7 +6,7 @@
 ##---------------------------------------------------
 
 # Add definition
-create_plugin("FbxMeshImporter" "" "Lifetime" "${NEX_VERSION}" "false")
+create_plugin("FbxMeshImporter" "" "Lifetime" "${NEX_VERSION}" "project" "false")
 add_dependency(Core ProjectModel)
 find_package(FBX REQUIRED)
 if (FBX_FOUND)

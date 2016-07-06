@@ -79,6 +79,9 @@ BLANK   [ \t]
 "]"            return nextar::neo_parser_impl::make_RSQBRACKET(b.Loc());
 ","            return nextar::neo_parser_impl::make_COMMA(b.Loc());
 ";"            return nextar::neo_parser_impl::make_SEMICOLON(b.Loc());
+"("            return nextar::neo_parser_impl::make_LBRACES(b.Loc());
+")"            return nextar::neo_parser_impl::make_RBRACES(b.Loc());
+"="            return nextar::neo_parser_impl::make_ASSIGN(b.Loc());
 \"             BEGIN(STATE_STR);  b.StartContent();
 [\n]+  		  	b.Loc().Lines((nextar::uint32)yyleng); b.Loc().Step();
 {BLANK}+   	   b.Loc().Step();

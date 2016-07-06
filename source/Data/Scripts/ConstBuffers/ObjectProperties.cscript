@@ -4,8 +4,8 @@ cbuffer _cbObjectTransforms:OBJECTTRANSFORM {
 	declare mat4x4 _uModelView; // assumed orthogonal
 };
 
-cbuffer _cbMaterialProperty context:Material {
-	declare vec4 _uDiffuseColor "ObjectProperties.DiffuseColor";
-	declare float _uSpecularIntensity "ObjectProperties.SpecularIntensity";
-	declare float _uGloss "ObjectProperties.Gloss";
+cbuffer _cbMaterialProperty (context = material) {
+	declare vec4 _uDiffuseColor (nameref = "ObjectProperties.DiffuseColor");
+	declare float _uSpecularIntensity (nameref = "ObjectProperties.SpecularIntensity");
+	declare float _uGloss (nameref = "ObjectProperties.Gloss");
 };

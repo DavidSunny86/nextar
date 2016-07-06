@@ -56,9 +56,9 @@ public:
 	ASTDocumentPtr MakeDocument(ASTRegionPtr& region);
 	ASTRegionPtr MakeBlockRegion(const String& name, ASTCommandList&& commands);
 	ASTRegionPtr MakeTextRegion(const String& name, String&& contents);
-	ASTBlockPtr MakeBlock(const String& name, ASTParameterList&& params,
+	ASTBlockPtr MakeBlock(const String& name, ASTParameter&& params,
 			ASTCommandList&& commands);
-	ASTCommandPtr MakeCommand(const String& name, ASTParameterList&& params);
+	ASTCommandPtr MakeCommand(const String& name, ASTParameter&& params);
 
 	void Error(ErrorType type);
 	void Error(const ParseLocation& l, const String& err);

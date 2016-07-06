@@ -60,7 +60,8 @@ public:
 };
 
 int NextarMain(int argc, char* argv[]) {
-	UTApplicationTextureTests application;
+	UTApplicationTextureTests impl;
+	nextar::ApplicationContext application("Textures", impl);
 	application.InitializeContext(argc, argv);
 	application.Run();
 	application.DestroyContext();

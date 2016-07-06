@@ -6,7 +6,7 @@
 
 namespace nextar {
 
-class _NexEngineAPI EngineApplicationContext: public ApplicationContext {
+class _NexEngineAPI EngineApplicationContext: public ACBaseImpl {
 	NEX_LOG_HELPER(ApplicationContext)
 	;
 
@@ -18,16 +18,20 @@ public:
 		LAST_EVENT_ID,
 	};
 
-	EngineApplicationContext(const String& name);
+	EngineApplicationContext();
 	virtual ~EngineApplicationContext(void);
 
-	virtual void ReleaseResourcesImpl();
+	virtual void ReleaseResources();
+
+	ApplicationContextType GetType() const {
+		return ApplicationContextType(CONTEXT_ENGINE);
+	}
 
 protected:
 		
-	virtual void ConfigureExtendedInterfacesImpl();
-	virtual void CreateExtendedInterfacesImpl();
-	virtual void DestroyExtendedInterfacesImpl();
+	virtual void ConfigureExtendedInterfacesImpl(Config& config) override;
+	virtual void CreateExtendedInterfacesImpl() override;
+	virtual void DestroyExtendedInterfacesImpl() override;
 
 private:
 };

@@ -18,8 +18,7 @@
 namespace nextar {
 
 
-EngineApplicationContext::EngineApplicationContext(const String& name) :
-	ApplicationContext(name) {
+EngineApplicationContext::EngineApplicationContext() {
 }
 
 EngineApplicationContext::~EngineApplicationContext() {
@@ -35,27 +34,27 @@ void EngineApplicationContext::CreateExtendedInterfacesImpl() {
 	ComponentFactoryArchive::Instance().InstallDefaultFactories();
 }
 
-void EngineApplicationContext::ConfigureExtendedInterfacesImpl() {
+void EngineApplicationContext::ConfigureExtendedInterfacesImpl(Config& config) {
 	//TaskSchedular::Instance().Configure(GetConfig());
-	InputManager::Instance().Configure(GetConfig());
-	ComponentFactoryArchive::Instance().Configure(GetConfig());
-	ComponentGroupArchive::Instance().Configure(GetConfig());
+	InputManager::Instance().Configure(config);
+	ComponentFactoryArchive::Instance().Configure(config);
+	ComponentGroupArchive::Instance().Configure(config);
 	if (RenderManager::InstancePtr()) {
-		RenderManager::Instance().Configure(GetConfig());
+		RenderManager::Instance().Configure(config);
 	}
-	MeshServices::Instance().Configure(GetConfig());
+	MeshServices::Instance().Configure(config);
 }
 
-void EngineApplicationContext::ReleaseResourcesImpl() {
+void EngineApplicationContext::ReleaseResources() {
 	TaskSchedular::Instance().Close();
 	MeshServices::Instance().Close();
 	ComponentGroupArchive::Instance().AsyncDeleteAll();
 	ComponentFactoryArchive::Instance().AsyncDeleteAll();
 	if (RenderManager::InstancePtr()) {
 		VertexLayout::ClearCommonLayouts();
-		DispatchEvent(EVENT_RENDERMANAGER_PRE_CLOSE);
+		ApplicationContext::Instance().DispatchEvent(EVENT_RENDERMANAGER_PRE_CLOSE);
 		RenderManager::Instance().Close();
-		DispatchEvent(EVENT_RENDERMANAGER_POST_CLOSE);
+		ApplicationContext::Instance().DispatchEvent(EVENT_RENDERMANAGER_POST_CLOSE);
 	}
 	InputManager::Instance().Close();
 }

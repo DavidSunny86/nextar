@@ -158,10 +158,13 @@ bool LanguageTranslator::Declare_BeginExecute(ShaderScriptContext* c,
 
 		LanguageTranslator::Instance().AddParam(c, dataType, name, arrayCount);
 		if (apn == AutoParamName::AUTO_INVALID_PARAM && !c->cbIsAutoParam) {
-			String uiName;
-			it.HasNext(uiName);
-			String desc = StringUtils::GetTaggedVal(_SS(TAG_DESC), it);
-			c->shader->AddParam(name, uiName, desc, dataType);
+			ShaderTemplate::ParameterDesc desc;
+			desc.activateOption = StringUtils::GetTaggedVal("activate", it);
+			desc.description = StringUtils::GetTaggedVal("nameref", it);
+			desc.type = dataType;
+			String contextName = StringUtils::GetTaggedVal("context", it);
+			desc.context = Helper::GetContextFromName(contextName);
+			c->shader->AddParam(name, desc);
 		}
 	}
 	return true;

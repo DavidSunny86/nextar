@@ -11,29 +11,6 @@
 
 namespace ShaderScript {
 
-bool ShaderScript::CmdOption::BeginExecute(CommandContext* pContext,
-		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
-	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
-	String name, activateOptions, value;
-
-	auto it = h.Iterate();
-
-	if (it.HasNext(name)) {
-		while (it.HasNext(value)) {
-			if (StringUtils::IsTagged(value)) {
-				break;
-			} else
-				StringUtils::PushBackWord(activateOptions, value);
-		}
-
-		String desc = StringUtils::GetTaggedVal(_SS(TAG_DESC), it);
-		c->shader->AddMacro(name, activateOptions, desc);
-	}
-
-	return true;
-}
-
 bool ShaderScript::CmdDefine::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
 	ConstMultiStringHelper h(command->GetParameters().AsString());
@@ -41,9 +18,20 @@ bool ShaderScript::CmdDefine::BeginExecute(CommandContext* pContext,
 	String name;
 
 	auto it = h.Iterate();
-	while (it.HasNext(name)) {
+	if (it.HasNext(name)) {
 		// add it to predefined
-		LanguageTranslator::Instance().AddMacro(c, name);
+		if (name == "always") {
+			while (it.HasNext(name))
+				LanguageTranslator::Instance().AddMacro(c, name);
+		} else {
+
+			String value;
+			String defines;
+			MultiStringHelper options(defines);
+			while (it.HasNext(value))
+				options.PushBack(value);
+			c->shader->AddCompilerOption(name, defines);
+		}
 	}
 
 	return true;

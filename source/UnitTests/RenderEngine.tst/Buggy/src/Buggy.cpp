@@ -67,7 +67,8 @@ void Buggy::Execute(const FrameTimer& frameTimer) {
 }
 
 int NextarMain(int argc, char* argv[]) {
-	Buggy application;
+	Buggy impl;
+	nextar::ApplicationContext application("Buggy", impl);
 	application.InitializeContext(argc, argv);
 	application.Run();
 	application.DestroyContext();

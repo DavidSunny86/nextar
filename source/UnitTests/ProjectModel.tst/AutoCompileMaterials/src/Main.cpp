@@ -58,10 +58,10 @@ public:
 };
 
 int NextarMain(int argc, char* argv[]) {
-	UTApplicationAutoCompileMtl application;
+	UTApplicationAutoCompileMtl impl;
+	nextar::ApplicationContext application("AutoCompileMaterials", impl);
 	application.InitializeContext(argc, argv);
-	application.Execute();
-	application.Run();
+	impl.Execute();
 	application.DestroyContext();
 	return 0;
 }

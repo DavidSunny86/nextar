@@ -8,9 +8,9 @@ namespace nextar {
 class _NexNeoScriptAPI ASTBlock : public ASTCommand {
 public:
 	ASTBlock(const String& name) : ASTCommand(name) {}
-	ASTBlock(const String& name, ASTParameterList&& params) : ASTCommand(name,
+	ASTBlock(const String& name, ASTParameter&& params) : ASTCommand(name,
 			std::move(params)) {}
-	ASTBlock(const String& name, ASTParameterList&& params,
+	ASTBlock(const String& name, ASTParameter&& params,
 			ASTCommandList&& commands) : ASTCommand(name,
 			std::move(params)), _commands(std::move(commands)) {}
 

@@ -64,7 +64,8 @@ void TestStringsAPI(nextar::ApplicationContext& c) {
 }
 
 int NextarMain(int argc, char* argv[]) {
-	nextar::ApplicationContext application("MultiStringTest");
+	nextar::ACBaseImpl impl;
+	nextar::ApplicationContext application("MultiStringTest", impl);
 	application.InitializeContext(argc, argv);
 	TestStringsAPI(application);
 	application.DestroyContext();

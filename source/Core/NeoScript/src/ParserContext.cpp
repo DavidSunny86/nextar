@@ -34,12 +34,12 @@ ASTRegionPtr ParserContext::MakeTextRegion(const String& name,
 }
 
 ASTBlockPtr ParserContext::MakeBlock(const String& name,
-		ASTParameterList&& params, ASTCommandList&& commands) {
+		ASTParameter&& params, ASTCommandList&& commands) {
 	return Assign(NEX_NEW(ASTBlock(name, std::move(params), std::move(commands))));
 }
 
 ASTCommandPtr ParserContext::MakeCommand(const String& name,
-		ASTParameterList&& params) {
+		ASTParameter&& params) {
 	return Assign(NEX_NEW(ASTCommand(name, std::move(params))));
 }
 

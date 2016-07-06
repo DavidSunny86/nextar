@@ -11,9 +11,9 @@ public:
 
 	UTApplication();
 	~UTApplication();
-	virtual void ConfigureExtendedInterfacesImpl();
+	virtual void ConfigureExtendedInterfacesImpl(Config& config);
 
-	virtual void ReleaseResourcesImpl();
+	virtual void ReleaseResources();
 	virtual void Execute(const FrameTimer& frameTimer);
 	
 

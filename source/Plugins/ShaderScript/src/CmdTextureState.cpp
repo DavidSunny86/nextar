@@ -46,20 +46,21 @@ bool ShaderScript::CmdUnit::BeginExecute(CommandContext* pContext,
 	if (apn != AutoParamName::AUTO_INVALID_PARAM)
 		c->shader->AddSemanticBinding(unitName, apn);
 	else {
-		String name;
-
-		if(!it.HasNext(name)) {
-			Error("Missing sampler name!");
-			return false;
-		}
-		String desc = StringUtils::GetTaggedVal("desc", it);
+		ShaderTemplate::ParameterDesc desc;
+				
+		desc.activateOption = StringUtils::GetTaggedVal("activate", it);
+		desc.description = StringUtils::GetTaggedVal("desc", it);
+		desc.type = ParamDataType::PDT_TEXTURE;
 		String contextName = StringUtils::GetTaggedVal("context", it);
 		StringUtils::ToLower(contextName);
-		context = Helper::GetContextFromName(contextName);
-		c->shader->AddParam(unitName, name, desc, ParamDataType::PDT_TEXTURE);
+		desc.context = Helper::GetContextFromName(contextName);
+		
+		c->shader->AddParam(unitName, desc);
 	}
-
-	c->shader->AddTextureUnit(unitName, samplerName, context);
+	ShaderTemplate::TextureUnitDesc desc;
+	desc.context = context;
+	desc.samplerName = std::move(samplerName);
+	c->shader->AddTextureUnit(unitName, desc);
 	return true;
 }
 

@@ -2,7 +2,7 @@
 #include <UTApplication.h>
 
 UTApplication::UTApplication() :
-	EngineApplicationContext("RenderEngine.tst"), windowDimensions(800, 600) {
+	EngineApplicationContext(), windowDimensions(800, 600) {
 }
 
 UTApplication::~UTApplication() {
@@ -51,21 +51,21 @@ void UTApplication::_SetupScene(SceneAssetPtr& scene) {
 	window->CreateViewport(Camera::Traits::Cast(camera->GetSpatial()))->SetClearColor(Color(1, 1, 1, 1));
 }
 
-void UTApplication::ConfigureExtendedInterfacesImpl() {
-	EngineApplicationContext::ConfigureExtendedInterfacesImpl();
+void UTApplication::ConfigureExtendedInterfacesImpl(Config& config) {
+	EngineApplicationContext::ConfigureExtendedInterfacesImpl(config);
 	_SetupRenderDriver();
-	RegisterListener(Listener(this, 0));
-	Subscribe(ApplicationContext::EVENT_INIT_RESOURCES, SetupScene, this);
+	ApplicationContext::Instance().RegisterListener(ApplicationContext::Listener(this, 0));
+	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_INIT_RESOURCES, SetupScene, this);
 }
 
 void UTApplication::Execute(const FrameTimer& frameTimer) {
 	RenderManager::Instance().RenderFrame(frameTimer);
 }
 
-void UTApplication::ReleaseResourcesImpl() {
+void UTApplication::ReleaseResources() {
 	scene.Clear();
 	window.Clear();
-	EngineApplicationContext::ReleaseResourcesImpl();
+	EngineApplicationContext::ReleaseResources();
 }
 
 void UTApplication::_SetupRenderDriver() {

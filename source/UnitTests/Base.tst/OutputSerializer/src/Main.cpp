@@ -195,7 +195,8 @@ void TestDumpCubeMesh(nextar::ApplicationContext& application) {
 }
 
 int NextarMain(int argc, char* argv[]) {
-	nextar::ApplicationContext application("FileSystem");
+	nextar::ACBaseImpl impl;
+	nextar::ApplicationContext application("FileSystem", impl);
 	application.InitializeContext(argc, argv);
 	TestDumpCubeMesh(application);
 	application.DestroyContext();

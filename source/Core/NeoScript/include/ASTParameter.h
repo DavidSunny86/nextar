@@ -35,8 +35,11 @@ public:
 		return _value;
 	}
 
+	void SetName(const String& name);
+	
 	void Append(const String& value);
 	void Append(const ASTParameter& value);
+	bool Find(const String& name, String& oValue) const;
 
 protected:
 	String _value;

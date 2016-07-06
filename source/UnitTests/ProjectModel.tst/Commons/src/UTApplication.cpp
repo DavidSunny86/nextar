@@ -2,7 +2,7 @@
 #include <UTApplication.h>
 
 UTApplication::UTApplication() :
-	ProjectApplicationContext("ProjectModel.tst"), windowDimensions(800, 600) {
+	windowDimensions(800, 600) {
 }
 
 UTApplication::~UTApplication() {
@@ -35,21 +35,21 @@ void UTApplication::_SetupScene(SceneAssetPtr& scene) {
 	camera->AddToScene(scene);
 }
 
-void UTApplication::ConfigureExtendedInterfacesImpl() {
-	EngineApplicationContext::ConfigureExtendedInterfacesImpl();
+void UTApplication::ConfigureExtendedInterfacesImpl(Config& config) {
+	ProjectApplicationContext::ConfigureExtendedInterfacesImpl(config);
 	_SetupRenderDriver();	
-	RegisterListener(Listener(this, 0));
-	Subscribe(ApplicationContext::EVENT_INIT_RESOURCES, SetupScene, this);
+	ApplicationContext::Instance().RegisterListener(ApplicationContext::Listener(this, 0));
+	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_INIT_RESOURCES, SetupScene, this);
 }
 
 void UTApplication::Execute(const FrameTimer& frameTimer) {
 	RenderManager::Instance().RenderFrame(frameTimer);
 }
 
-void UTApplication::ReleaseResourcesImpl() {
+void UTApplication::ReleaseResources() {
 	scene.Clear();
 	window.Clear();
-	ProjectApplicationContext::ReleaseResourcesImpl();
+	ProjectApplicationContext::ReleaseResources();
 }
 
 void UTApplication::_SetupRenderDriver() {

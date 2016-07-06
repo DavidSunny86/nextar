@@ -22,7 +22,8 @@ public:
 };
 
 int NextarMain(int argc, char* argv[]) {
-	UTApplicationImageLoader application;
+	UTApplicationImageLoader impl;
+	nextar::ApplicationContext application("ScreenQuad", impl);
 	application.InitializeContext(argc, argv);
 	application.Run();
 	application.DestroyContext();

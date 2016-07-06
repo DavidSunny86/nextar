@@ -10,8 +10,8 @@ using namespace nextar;
 NEX_IMPLEMENT_PLATFORM_APP();
 
 int NextarMain(int argc, char* argv[]) {
-	UTApplication application;
-
+	UTApplication impl;
+	nextar::ApplicationContext application("KeyboardAndMouseTest", impl);
 	application.InitializeContext(argc, argv);
 
 	uint32 nController = nextar::InputManager::Instance().GetNumController();

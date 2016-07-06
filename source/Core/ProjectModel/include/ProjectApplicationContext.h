@@ -22,12 +22,16 @@ public:
 		LAST_EVENT_ID = ApplicationContext::LAST_EVENT_ID + 1,
 	};
 
-	ProjectApplicationContext(const String& name);
+	ProjectApplicationContext();
 	virtual ~ProjectApplicationContext();
+
+	ApplicationContextType GetType() const {
+		return ApplicationContextType(CONTEXT_PROJECT);
+	}
 
 protected:
 	virtual void CreateExtendedInterfacesImpl();
-	virtual void ReleaseResourcesImpl();
+	virtual void ReleaseResources();
 
 	void RegisterTemplateFactories();
 };

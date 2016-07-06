@@ -53,7 +53,8 @@ public:
 };
 
 int NextarMain(int argc, char* argv[]) {
-	UTApplicationMesh application;
+	UTApplicationMesh impl;
+	nextar::ApplicationContext application("KeyboardAndMouseTest", impl);
 	application.InitializeContext(argc, argv);
 	application.Run();
 	application.DestroyContext();

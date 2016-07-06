@@ -51,22 +51,23 @@ bool CmdTarget::BeginExecute(CommandContext* pContext,
 		else if (!value.compare("alpha-blending"))
 			blendOp = _alphaBlending;
 		else if (!value.compare("advanced")) {
-			if (it.HasNext(value)) {
+			const ASTParameter& param = command->GetParameters();
+			if (param.Find("src-color", value)) {
 				blendOp.srcCol = Helper::GetBlendSource(value);
 			}
-			if (it.HasNext(value)) {
+			if (param.Find("dest-color", value)) {
 				blendOp.destCol = Helper::GetBlendSource(value);
 			}
-			if (it.HasNext(value)) {
+			if (param.Find("color-op", value)) {
 				blendOp.colOp = Helper::GetBlendOperation(value);
 			}
-			if (it.HasNext(value)) {
+			if (param.Find("src-alpha", value)) {
 				blendOp.srcAlpha = Helper::GetBlendSource(value);
 			}
-			if (it.HasNext(value)) {
+			if (param.Find("dest-alpha", value)) {
 				blendOp.destAlpha = Helper::GetBlendSource(value);
 			}
-			if (it.HasNext(value)) {
+			if (param.Find("alpha-op", value)) {
 				blendOp.alphaOp = Helper::GetBlendOperation(value);
 			}
 		}

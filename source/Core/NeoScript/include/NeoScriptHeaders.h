@@ -4,7 +4,7 @@
 #include <NeoBaseDecl.h>
 #include <ASTNode.h>
 #include <ASTParameter.h>
-#include <ASTParameterList.h>
+#include <ASTParameter.h>
 #include <ASTCommand.h>
 #include <ASTBlock.h>
 #include <ASTRegion.h>

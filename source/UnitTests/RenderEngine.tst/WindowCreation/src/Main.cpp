@@ -16,7 +16,8 @@ void SetupDriver(RenderManager& renderManager) {
 }
 
 int NextarMain(int argc, char* argv[]) {
-	UTApplication application;
+	UTApplication impl;
+	nextar::ApplicationContext application("WindowCreation", impl);
 	application.InitializeContext(argc, argv);
 	RenderManager& renderManager = RenderManager::Instance();
 	SetupDriver(renderManager);

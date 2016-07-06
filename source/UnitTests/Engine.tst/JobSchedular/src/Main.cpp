@@ -100,7 +100,8 @@ protected:
 };
 
 int NextarMain(int argc, char* argv[]) {
-	nextar::EngineApplicationContext application("SchedularTest");
+	nextar::EngineApplicationContext impl;
+	nextar::ApplicationContext application("SchedularTest", impl);
 
 	application.InitializeContext(argc, argv);
 	TaskSchedular* schedular = TaskSchedular::InstancePtr();

@@ -41,26 +41,9 @@ void ShaderTemplate::_AppendCompilerOption(const String& options,
 
 	auto it = macros.find(options);
 	if (it != macros.end()) {
-		StringUtils::PushBackWordList(outCompilerOptions, (*it).second.activateOptions);
-	}
-}
-
-void ShaderTemplate::AppendCompilerOptions(const StringUtils::WordList& definedParms,
-	const StringUtils::WordList& enabledOptions,
-	String& outOptions) {
-
-	String value;
-	ConstMultiStringHelper::Iterator it = ConstMultiStringHelper::It(definedParms);
-	while (it.HasNext(value)) {
-		auto paramIt = parameters.find(value);
-		if (paramIt != parameters.end()) {
-			_AppendCompilerOption((*paramIt).second.name, outOptions);
-		}
-	}
-
-	auto it2 = ConstMultiStringHelper::It(enabledOptions);
-	while (it2.HasNext(value)) {
-		_AppendCompilerOption(value, outOptions);
+		ConstMultiStringHelper h((*it).second.activateDefines);
+		if (h.Length() > 0)
+			StringUtils::PushBackWordList(outCompilerOptions, (*it).second.activateDefines);
 	}
 }
 
@@ -84,35 +67,52 @@ String ShaderTemplate::GetHashNameFromOptions(const set<String>::type& opt) {
 	return hashCode;
 }
 
-ShaderAssetPtr& ShaderTemplate::GetShaderUnit(const StringUtils::WordList& options) {
+ShaderAssetPtr& ShaderTemplate::GetShaderUnit(const StringUtils::WordList& definedParms,
+	const StringUtils::WordList& enabledOptions) {
 	// clean-up the options
 	set<String>::type listOfOptions;
 	String value;
-	auto optIt = ConstMultiStringHelper::It(options);
-	while (optIt.HasNext(value))
-		listOfOptions.insert(value);
+	auto optIt = ConstMultiStringHelper::It(definedParms);
+	while (optIt.HasNext(value)) {
+		auto it = paramActivationOptions.find(value);
+		if (it != paramActivationOptions.end() && (*it).second.length() > 0) {
+			auto o = ConstMultiStringHelper::It((*it).second);
+			while (o.HasNext(value))
+				listOfOptions.insert(value);
+		}		
+	}
+
+	optIt = ConstMultiStringHelper::It(enabledOptions);
+	while (optIt.HasNext(value)) {
+		if (value.length() > 0)
+			listOfOptions.insert(value);
+	}
 
 	String hash = GetHashNameFromOptions(listOfOptions);
 	auto it = shaders.find(hash);
 	if (it != shaders.end())
 		return (*it).second.shaderObject;
-	return CreateShader(hash, options);
+	return CreateShader(hash, listOfOptions);
 }
 
 ShaderAssetPtr& ShaderTemplate::CreateShader(const String& hash,
-		const StringUtils::WordList& options) {
+	const set<String>::type& options) {
+	String compilerOptions;
+	for (auto& e : options)
+		_AppendCompilerOption(e, compilerOptions);
 	String uniqueName = GetName() + "#" + Convert::ToString((uint32)shaders.size(), ' ', std::ios::hex);
 	ShaderAssetPtr shaderObject = ShaderAsset::Traits::Instance(NamedObject::AsyncStringID(uniqueName), nullptr, GetGroup() );
 	if (!shaderObject->AsyncIsLoaded()) {
 		// load and prepare the shader object
-		ShaderFromTemplate loader(this, options);
+		
+		ShaderFromTemplate loader(this, compilerOptions);
 		InputStreamPtr input;
 		StreamInfo info(&loader, input);
 		shaderObject->RequestLoad(info);
 	}
 	ShaderUnit &unit = shaders[hash];
 	unit.shaderObject = shaderObject;
-	unit.compilationOptions = options;
+	unit.compilationOptions = compilerOptions;
 	return unit.shaderObject;
 }
 
@@ -133,12 +133,15 @@ void ShaderTemplate::UnloadImpl() {
 }
 
 void ShaderTemplate::RegisterOptions(const String& options) {
+	if (options.length() <= 0) 
+		return;
 	String value;
 	ConstMultiStringHelper::Iterator it = ConstMultiStringHelper::It(options);
 	while (it.HasNext(value)) {
 		auto it = registeredOptions.find(value);
 		if (it == registeredOptions.end())
-			registeredOptions.insert(CompilerMacroMap::value_type(value, (uint32)registeredOptions.size()));
+			registeredOptions.insert(CompilerMacroMap::value_type(value, 
+			(uint32)registeredOptions.size()));
 	}
 }
 
@@ -178,37 +181,38 @@ void ShaderTemplate::LoadStreamRequest::SetDepthStencilState(
 }
 
 void ShaderTemplate::LoadStreamRequest::AddSampler(const String& samplerName,
-		TextureUnitParams& unit) {
+		const TextureUnitParams& unit) {
 	auto& state = current->textureUnitStates[samplerName];
 	state.params = unit;
 }
 
 void ShaderTemplate::LoadStreamRequest::AddTextureUnit(const String& unitName,
-	const String& samplerName,
-	ParameterContext context) {
-	auto& state = current->textureUnitStates[samplerName];
+	const TextureUnitDesc& params) {
+	auto& state = current->textureUnitStates[params.samplerName];
 	state.unitsBound += unitName;
 	state.unitsBound += '.';
-	state.unitsBound += ShaderParameter::GetContextKey(context);
+	state.unitsBound += ShaderParameter::GetContextKey(params.context);
 	state.unitsBound += ';';
 }
 
-void ShaderTemplate::LoadStreamRequest::AddParam(const String& param,
-		const String& name, const String& description, ParamDataType type) {
+void ShaderTemplate::LoadStreamRequest::AddParam(const String& param, const ParameterDesc& pdesc) {
+	if (param.length() <= 0)
+		return;
 	ShaderTemplate* shader = static_cast<ShaderTemplate*>(GetStreamedObject());
 	auto& parameter = shader->parameters[param];
-	parameter.name = name;
-	parameter.description = description;
-	parameter.type = type;
+	parameter.context = pdesc.context;
+	parameter.description = pdesc.description;
+	parameter.type = pdesc.type;
+	shader->_BindParamToOp(param, pdesc.activateOption);
+	shader->RegisterOptions(pdesc.activateOption);
 }
 
-void ShaderTemplate::LoadStreamRequest::AddMacro(const String& name,
-		const String& options, const String& description) {
+void ShaderTemplate::LoadStreamRequest::AddCompilerOption(const String& name, const String& options) {
 	ShaderTemplate* shader = static_cast<ShaderTemplate*>(GetStreamedObject());
 	auto& macro = shader->macros[name];
-	macro.activateOptions = options;
-	macro.description = description;
-	shader->RegisterOptions(options);
+	MultiStringHelper h(macro.activateDefines);
+	h.PushBack(options);
+	shader->RegisterOptions(name);
 }
 
 void ShaderTemplate::LoadStreamRequest::AddSemanticBinding(const String& var,

@@ -1,0 +1,40 @@
+
+shader DrawQuad {
+
+	tags compositor;
+	pass Main {
+
+      // import a cscript
+		import-cbuffer Quad;
+
+      // inline cbuffer definition
+		cbuffer _cbDebugModelView {
+			declare mat4x4 _uModelViewProj:MODELVIEWPROJECTION;
+			declare vec4 _uObjectColor:DIFFUSECOLOR;
+			declare float _uObjectScale:CONSTANTSCALEFACTOR;
+		}
+
+      // cbuffer which declares properties to UI
+      cbuffer _cbMaterialProperty (context = material) {
+	      declare vec4 _uDiffuseColor (nameref = "ObjectProperties.DiffuseColor");
+	      declare float _uSpecularIntensity (nameref = "ObjectProperties.SpecularIntensity");
+	      declare float _uGloss (nameref = "ObjectProperties.Gloss");
+      };
+
+		texture-state {
+			sampler s0 nearest-repeat;
+			unit _sDiffuseMap s0 "Maps.TextureMap" context:object;
+		}
+
+		depth-stencil-state disable;
+		blend-state disable;
+		raster-state default;
+
+		program {
+			option "Maps.TextureMap" HAS_DIFFUSE_MAP HAS_TEXCOORD0_CHANNEL;
+			define HAS_2DVERT_CHANNEL;
+			vertex-program Quad;
+			fragment-program CopyMap;
+		}
+	}
+}

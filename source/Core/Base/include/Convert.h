@@ -5,6 +5,7 @@
 #include <NexMath.h>
 #include <MathTypes.h>
 #include <Color.h>
+#include <ApplicationContextType.h>
 
 namespace nextar {
 //! Generic conversion routines.
@@ -31,6 +32,11 @@ _NexBaseAPI String ToString(float num, uint16 prec = 6, char fill = ' ',
 		std::ios::fmtflags flags = std::ios::fmtflags(0),
 		std::ios::fmtflags mask = std::ios::fmtflags(0));
 _NexBaseAPI String ToString(bool val, bool yesno = false);
+
+inline String ToString(const ApplicationContextType& t) {
+	return t.ToString();
+}
+
 _NexBaseAPI String ToVersionString(VersionID);
 _NexBaseAPI String ToString(Vec4AF mat);
 _NexBaseAPI String ToString(Mat4x4F mat);
@@ -57,6 +63,13 @@ _NexBaseAPI IVector3 ToIVector3(const String&);
 _NexBaseAPI IVector4 ToIVector4(const String&);
 _NexBaseAPI Color ToColor(const String&);
 _NexBaseAPI Color32 ToColor32(const String&);
+
+inline ApplicationContextType ToApplicationContext(const String& t) {
+	ApplicationContextType ret;
+	ret.FromString(t);
+	return ret;
+}
+
 }
 }
 

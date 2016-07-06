@@ -10,12 +10,12 @@
 NEX_IMPLEMENT_PLATFORM_APP()
 ;
 using namespace nextar;
-class UTApplicationParserTest: public ApplicationContext,
+class UTApplicationParserTest: public ACBaseImpl,
 	public Archive::ScanCallback {
 	String suffix;
 	NEX_LOG_HELPER(UTApplicationParserTest);
 public:
-	UTApplicationParserTest(const String& name) : ApplicationContext(name) {
+	UTApplicationParserTest()  {
 	}
 
 	void TestParser(const String& dir, const String& suff, const String& pattern) {
@@ -47,7 +47,8 @@ public:
 };
 
 int NextarMain(int argc, char* argv[]) {
-	UTApplicationParserTest application("ParserTest");
+	UTApplicationParserTest impl;
+	nextar::ApplicationContext application("ParserTest", impl);
 	application.InitializeContext(argc, argv);
 	String inputDir("Scripts/NeoScriptUnits"), fileSuffix(".1.out"), searchPattern("*.neoscript");
 	for(int i = 1; i < argc; ++i) {
@@ -69,7 +70,7 @@ int NextarMain(int argc, char* argv[]) {
 			}
 		}
 	}
-	application.TestParser(inputDir, fileSuffix, searchPattern);
+	impl.TestParser(inputDir, fileSuffix, searchPattern);
 	application.DestroyContext();
 	std::cin.get();
 	return 0;

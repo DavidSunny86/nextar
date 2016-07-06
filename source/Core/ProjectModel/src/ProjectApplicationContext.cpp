@@ -17,8 +17,8 @@
 
 namespace nextar {
 
-ProjectApplicationContext::ProjectApplicationContext(const String& name) :
-	EngineApplicationContext(name) {
+ProjectApplicationContext::ProjectApplicationContext() :
+	EngineApplicationContext() {
 }
 
 ProjectApplicationContext::~ProjectApplicationContext() {
@@ -45,8 +45,8 @@ void ProjectApplicationContext::RegisterTemplateFactories() {
 				&MeshSaverImplv1_0::saver);
 }
 
-void ProjectApplicationContext::ReleaseResourcesImpl() {
-	EngineApplicationContext::ReleaseResourcesImpl();
+void ProjectApplicationContext::ReleaseResources() {
+	EngineApplicationContext::ReleaseResources();
 }
 
 } /* namespace nextar */

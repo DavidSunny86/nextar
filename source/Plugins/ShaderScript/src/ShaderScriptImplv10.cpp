@@ -48,7 +48,6 @@ void ShaderScriptImplv1_0::RegisterDictionary() {
 	dict->RegisterHandler("shader.pass.depth-stencil-state.stencil-state", CmdStencilState::InstancePtr());
 	dict->RegisterHandler("shader.pass.program", CmdProgram::InstancePtr());
 	dict->RegisterHandler("shader.pass.program.define", CmdDefine::InstancePtr());
-	dict->RegisterHandler("shader.pass.program.option", CmdOption::InstancePtr());
 	dict->RegisterHandler("shader.pass.program.domain-program", CmdDomainProgram::InstancePtr());
 	dict->RegisterHandler("shader.pass.program.hull-program", CmdHullProgram::InstancePtr());
 	dict->RegisterHandler("shader.pass.program.geometry-program", CmdGeometryProgram::InstancePtr());

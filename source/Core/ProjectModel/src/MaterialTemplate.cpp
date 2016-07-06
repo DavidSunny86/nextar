@@ -28,9 +28,9 @@ StreamNotification MaterialTemplate::NotifyAssetLoadedImpl(nextar::StreamRequest
 		return StreamNotification::NOTIFY_COMPLETED;
 	}
 
-	shader->AppendCompilerOptions(definedParams, enableOptions, compilationOptions);
+	//shader->AppendCompilerOptions(definedParams, enableOptions, compilationOptions);
 	ShaderAssetPtr shaderPtr =
-			shader->GetShaderUnit(compilationOptions);
+		shader->GetShaderUnit(definedParams, enableOptions);
 	material = MaterialAsset::Traits::Instance(assetId);
 	if (!material->AsyncIsLoaded()) {
 		InputStreamPtr dummy;

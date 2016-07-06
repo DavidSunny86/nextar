@@ -19,7 +19,7 @@ class ASTTextRegion;
 class ASTBlockRegion;
 class ASTDocument;
 class ASTParameter;
-class ASTParameterList;
+class ASTParameter;
 class ASTVisitor;
 
 NEX_DEFINE_REFPTR(ASTNode);

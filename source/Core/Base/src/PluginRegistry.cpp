@@ -10,10 +10,9 @@ namespace nextar {
 NEX_DEFINE_SINGLETON_PTR(PluginRegistry);
 
 PluginRegistry ::DynLib::DynLib(const String& path, const String& plug,
-		const PluginLicense& license, uint32 build, bool plgOptional) :
+	const PluginLicense& license, uint32 build, ApplicationContextType contextType, bool plgOptional) :
 		fullName(path),
-		optional(plgOptional), name(plug), libptr(0), plugin(0), buildVersion(
-				build) {
+		optional(plgOptional), name(plug), libptr(0), plugin(0), context(contextType), buildVersion(build) {
 	this->license = license;
 }
 
@@ -140,6 +139,8 @@ void PluginRegistry::_ParsePluginConfiguration(const URL& path) {
 						license,
 						Convert::ToVersion(
 								it->GetText("build", NEX_VERSION_STRING())),
+						Convert::ToApplicationContext(
+								it->GetText("context", "unknown")),
 						Convert::ToBool(it->GetText("optional", "true")));
 					it = it.Next();
 				}
@@ -155,7 +156,7 @@ void PluginRegistry::_ParsePluginConfiguration(const URL& path) {
 }
 
 void PluginRegistry::AddPlugin(const String& path, const String& name,
-		const PluginLicense& license, uint32 version, bool optional) {
+		const PluginLicense& license, uint32 version, ApplicationContextType type, bool optional) {
 
 	if (name.length() <= 0)
 		return;
@@ -165,15 +166,17 @@ void PluginRegistry::AddPlugin(const String& path, const String& name,
 			return;
 	libraries.push_back(
 			NEX_NEW(
-					DynLib(URL::GetAppendedPath(pluginSearchPath, path), name, license, version, optional)));
+			DynLib(URL::GetAppendedPath(pluginSearchPath, path), name, license, version, type, optional)));
 }
 
 void PluginRegistry::RequestPlugins(PluginLicenseType le,
 		const String& typeName,
 		bool loadPlugins) {
-
+	ApplicationContextType type = ApplicationContext::Instance().GetType();
 	for (size_t i = 0; i < libraries.size(); ++i)
-		libraries[i]->Request(le, typeName, loadPlugins);
+		if (libraries[i]->IsAccepted(type))
+			libraries[i]->Request(le, typeName, loadPlugins);
 }
+
 }
 

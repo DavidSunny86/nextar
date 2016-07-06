@@ -44,13 +44,14 @@ bool ShaderScript::CmdDepthState::BeginExecute(CommandContext* pContext,
 			depthStencil.depthTest = false;
 		} else if (!value.compare("test-and-write")) {
 		} else if (!value.compare("advanced")) {
-			if (it.HasNext(value)) {
+			const ASTParameter& param = command->GetParameters();
+			if (param.Find("depth-test", value)) {
 				depthStencil.depthTest = Convert::ToBool(value);
 			}
-			if (it.HasNext(value)) {
+			if (param.Find("depth-write", value)) {
 				depthStencil.depthWrite = Convert::ToBool(value);
 			}
-			if (it.HasNext(value)) {
+			if (param.Find("depth-compare-op", value)) {
 				depthStencil.depthCompareFunc = Helper::GetDepthStencilFunc(value);
 			}
 		}
@@ -70,26 +71,28 @@ bool ShaderScript::CmdStencilState::BeginExecute(CommandContext* pContext,
 		if (!value.compare("disable")) {
 			depthStencil.stencilTest = false;
 		} else if (!value.compare("advanced")) {
+			const ASTParameter& param = command->GetParameters();
+
 			StencilFaceOp* faceOp = &depthStencil.front;
-			if (it.HasNext(value) && value == "back") {
+			if (param.Find("face", value) && value == "back") {
 				faceOp = &depthStencil.back;
 			}
-			if (it.HasNext(value)) {
+			if (param.Find("depth-stencil-op", value)) {
 				faceOp->stencilFunc = Helper::GetDepthStencilFunc(value);
 			}
-			if (it.HasNext(value)) {
+			if (param.Find("stencil-pass", value)) {
 				faceOp->stencilPass = Helper::GetStencilOp(value);
 			}
-			if (it.HasNext(value)) {
+			if (param.Find("stencil-fail", value)) {
 				faceOp->stencilFail = Helper::GetStencilOp(value);
 			}
-			if (it.HasNext(value)) {
+			if (param.Find("depth-pass", value)) {
 				faceOp->depthPass = Helper::GetStencilOp(value);
 			}
-			if (it.HasNext(value)) {
+			if (param.Find("stencil-mask", value)) {
 				faceOp->stencilMask = Convert::ToULong(value);
 			}
-			if (it.HasNext(value)) {
+			if (param.Find("stencil-ref", value)) {
 				faceOp->stencilRef = Convert::ToULong(value);
 			}
 		}

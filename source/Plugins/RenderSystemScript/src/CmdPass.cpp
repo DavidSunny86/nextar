@@ -15,7 +15,7 @@ namespace RenderSystemScript {
 bool CmdPass::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
 	RenderScriptContext* c = static_cast<RenderScriptContext*>(pContext);
-	const ASTParameterList& params = command->GetParameters();
+	const ASTParameter& params = command->GetParameters();
 	ConstMultiStringHelper h(params.AsString());
 	// create the pass handler here
 	c->_passType = h.Get(0);

@@ -30,16 +30,18 @@ public:
 
 	struct Parameter {
 		ParamDataType type;
-		String name;
 		String description;
 		ParameterContext context;
+	};
+
+	struct ParameterDesc : public Parameter {
+		String activateOption;
 	};
 
 	typedef map<String, Parameter>::type ParameterTable;
 
 	struct ShaderOption {
-		String activateOptions;
-		String description;
+		String activateDefines;
 	};
 
 	typedef map<String, ShaderOption>::type ShaderOptionsTable;
@@ -71,6 +73,11 @@ public:
 		SourceMap sourceMap;
 	};
 
+	struct TextureUnitDesc {
+		String samplerName;
+		ParameterContext context;
+	};
+
 	typedef vector<PassUnit>::type PassList;
 
 	class LoadStreamRequest;
@@ -98,19 +105,11 @@ public:
 		void SetDepthStencilState(DepthStencilState& state);
 		void SetRenderFlags(uint32 flags);
 
-		void AddTextureUnit(const String& unitName, const String& samplerName, ParameterContext context);
-		void AddSampler(const String& samplerName,
-				TextureUnitParams& unit);
-
-		void AddParam(const String& param,
-				const String& name,
-				const String& description,
-				ParamDataType type);
-		void AddMacro(const String& name,
-			const String& activateOptions,
-			const String& description);
-		void AddSemanticBinding(const String& var,
-				AutoParamName name);
+		void AddTextureUnit(const String& unitName, const TextureUnitDesc& params);
+		void AddSampler(const String& samplerName, const TextureUnitParams& unit);
+		void AddParam(const String& param, const ParameterDesc& parameter);
+		void AddCompilerOption(const String& name, const String& activateDefines);
+		void AddSemanticBinding(const String& varName, AutoParamName name);
 
 	protected:
 
@@ -126,12 +125,9 @@ public:
 	virtual void UnloadImpl();
 
 	virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);
-
-	void AppendCompilerOptions(const StringUtils::WordList& definedParms, 
-		const StringUtils::WordList& enabledOptions,
-		String& outOptions);
-	ShaderAssetPtr& GetShaderUnit(const StringUtils::WordList& options);
-	ShaderAssetPtr& CreateShader(const String& hash, const StringUtils::WordList& options);
+	ShaderAssetPtr& GetShaderUnit(const StringUtils::WordList& definedParms,
+		const StringUtils::WordList& enabledOptions);
+	ShaderAssetPtr& CreateShader(const String& hash, const set<String>::type& options);
 
 	// inlines
 	inline uint32 GetPassCount() const {
@@ -164,6 +160,11 @@ public:
 	void RegisterOptions(const String& options);
 protected:
 
+	inline void _BindParamToOp(const String& name, const String& op) {
+		MultiStringHelper h(paramActivationOptions[name]);
+		h.PushBack(op);
+	}
+
 	void _AppendCompilerOption(const String& options, String& outCompilerOptions);
 
 	class ShaderFromTemplate : public AssetLoaderImpl {
@@ -193,6 +194,7 @@ protected:
 	CompilerMacroMap registeredOptions;
 	uint32 renderFlags;
 	ShaderTable shaders;
+	NameValueMap paramActivationOptions;
 	ParameterTable parameters;
 	ShaderOptionsTable macros;
 

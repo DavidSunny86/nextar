@@ -12,9 +12,9 @@ public:
 
 	UTApplication();
 	~UTApplication();
-	virtual void ConfigureExtendedInterfacesImpl();
+	virtual void ConfigureExtendedInterfacesImpl(Config& config) override;
 
-	virtual void ReleaseResourcesImpl();
+	virtual void ReleaseResources();
 	virtual void Execute(const FrameTimer& frameTimer);
 	
 	static void SetupScene(void* callback);

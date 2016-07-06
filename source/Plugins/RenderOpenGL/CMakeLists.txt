@@ -7,7 +7,7 @@
 
 # Add definition
 # Add plugin
-create_plugin("RenderOpenGL" "" "Lifetime" "${NEX_VERSION}" "false")
+create_plugin("RenderOpenGL" "" "Lifetime" "${NEX_VERSION}" "engine" "false")
 add_dependency(Core RenderEngine)
 
 ## Platform specific dependencies

@@ -63,6 +63,8 @@ SCRIPT_STRING(CMD_MAX_LOD, "max-lod");
 SCRIPT_STRING(CMD_LOD_BIAS, "lod-bias");
 SCRIPT_STRING(CMD_BORDER_COLOR, "border-color");
 SCRIPT_STRING(CMD_COMPARE, "compare");
+// ## parameters
+
 // ## arguments
 SCRIPT_STRING(ARG_ALWAYS, "always");
 SCRIPT_STRING(ARG_EQUAL, "equal");

@@ -9,16 +9,17 @@
 #include <Config.h>
 #include <URL.h>
 #include <EventDispatcher.h>
+#include <ApplicationContextType.h>
 
 namespace nextar {
 
 class _NexBaseAPI ApplicationContext:
 	public EventDispatcher,
 	public Singleton<ApplicationContext> {
-	NEX_LOG_HELPER(ApplicationContext)
-	;
+	NEX_LOG_HELPER(ApplicationContext);
 
 public:
+
 
 	enum EventID {
 		EVENT_INIT_RESOURCES,
@@ -63,8 +64,32 @@ public:
 		}
 	};
 
-	ApplicationContext(const String& name);
+	class Impl : public AllocGeneral {
+	public:
+		virtual ~Impl() {}
+
+		virtual ApplicationContextType GetType() const = 0;
+		virtual void CreateServices() = 0;
+		virtual void ConfigureServices(Config& ) = 0;
+		virtual void ReleaseResources() = 0;
+		virtual void DestroyServices() = 0;
+		virtual bool Step(Clock& clockTick) = 0;
+		virtual void RegisterListener(const Listener&) = 0;
+		virtual void UnregisterListener(const Listener&) = 0;
+		virtual void QuitApplication() = 0;
+		virtual void LoadConfiguration() = 0;
+		virtual void SaveConfiguration() = 0;
+		virtual void ParseCommandLine(const NameValueMap& params) = 0;
+		
+	};
+
+	
+	ApplicationContext(const String& name, Impl& pImpl);
 	virtual ~ApplicationContext(void);
+
+	inline ApplicationContextType GetType() const {
+		return _pImpl.GetType();
+	}
 
 	inline String GetAppName() const {
 		return appName;
@@ -87,7 +112,7 @@ public:
 	/* @nodoc */
 	void SetQuitting(bool value);
 	
-	void ParseCommandLineParaqms(int argc, char* argv[]);
+	void ParseCommandLineParams(int argc, char* argv[]);
 	virtual void InitializeContext(int argc, char* argv[]);
 	virtual void DestroyContext();
 	virtual void ReleaseResources();
@@ -100,34 +125,22 @@ public:
 	virtual void ShowErrorDialog(int errorCode, const String& errorText);
 
 protected:
-	void CreateServices();
+	
 	void DestroyServices();
 
 	virtual void LoadConfiguration();
-	virtual void SaveConfiguration() {
-	}
-	virtual void ConfigureServices();
-
-	virtual void ConfigureExtendedInterfacesImpl() {
-	}
-	virtual void CreateExtendedInterfacesImpl() {
-	}
-	virtual void DestroyExtendedInterfacesImpl() {
-	}
-	virtual void ReleaseResourcesImpl() {
-	}
-	virtual void ParseCommandLine(const NameValueMap& params) {
-	}
+	virtual void SaveConfiguration();
+	
 
 protected:
 
-	FrameTimer frameTimer;
-
+	
 private:
 
 	NEX_THREAD_RECURSIVE_MUTEX(appLock);
+		
 
-	typedef set<Listener>::type FrameListenerSet;
+	Impl& _pImpl;
 
 	bool quitting;
 
@@ -138,15 +151,54 @@ private:
 	URL defaultConfigPath;
 	String appName;
 
-	bool resourcesDestroyed;
+	bool _resourcesDestroyed;
 	bool runningLoop;
-	FrameListenerSet frameListenersToRemove;
-	FrameListenerSet frameListenersToAdd;
-	FrameListenerSet frameListeners;
 	// @todo Add error handler
 	ErrorHandler* errorHandler;
 	static String _configPathName;
 };
+
+class _NexBaseAPI ACBaseImpl : public ApplicationContext::Impl
+{
+public:
+
+	ACBaseImpl() : executingFrameListeners(false) {}
+
+	virtual ApplicationContextType GetType() const;
+	virtual void CreateServices();
+	virtual void ConfigureServices(Config& config);
+	virtual bool Step(Clock& clockTick);
+	virtual void ReleaseResources() {}
+	virtual void RegisterListener(const ApplicationContext::Listener&);
+	virtual void UnregisterListener(const ApplicationContext::Listener&);
+
+	virtual void DestroyServices();
+
+	virtual void LoadConfiguration() {}
+	virtual void SaveConfiguration() {}
+	virtual void ParseCommandLine(const NameValueMap& params) {}
+
+	virtual void ConfigureExtendedInterfacesImpl(Config& config) {}
+	virtual void CreateExtendedInterfacesImpl() {}
+	virtual void DestroyExtendedInterfacesImpl() {}
+	
+
+	virtual void QuitApplication();
+protected:
+
+	typedef set<ApplicationContext::Listener>::type FrameListenerSet;
+
+	FrameTimer frameTimer;
+
+	bool executingFrameListeners;
+
+	FrameListenerSet frameListenersToRemove;
+	FrameListenerSet frameListenersToAdd;
+	FrameListenerSet frameListeners;
+
+};
+
+
 
 }
 

@@ -26,12 +26,6 @@ public:
 	virtual bool BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
 };
 
-class CmdOption: public nextar::CommandHandler {
-public:
-	NEX_SINGLE_INSTANCE(CmdOption);
-	virtual bool BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
-};
-
 class SubProgramType: public nextar::CommandHandler {
 public:
 	SubProgramType(Pass::ProgramStage istage) : stage(istage) {}

@@ -30,6 +30,7 @@ namespace nextar {
  *            <basePath>${Bin}/plugins</basePath>                                                 \n
  *            <plugin>                                                                            \n
  *            	<name>PluginName</name>                                                           \n
+ *            	<context>EApplicationContextType</context>                                        \n
  *              <build>NextarBuildVersion</build>                                                 \n
  *              <type>Custom</type>				                                                  \n
  *              <optional>true</optional>                                                         \n
@@ -47,6 +48,7 @@ public:
 		uint32 buildVersion;
 		PluginLicense license;
 		FactoryPlugin* plugin;
+		ApplicationContextType context;
 
 		typedef FactoryPlugin* (*PluginCreateFactory)();
 
@@ -54,8 +56,12 @@ public:
 		;
 	public:
 
-		DynLib(const String& path, const String& name, const PluginLicense&, uint32 build, bool optional);
+		DynLib(const String& path, const String& name, const PluginLicense&, uint32 build, ApplicationContextType context, bool optional);
 		~DynLib();
+
+		_NexInline bool IsAccepted(ApplicationContextType appType) const {
+			return appType.IsAccepted(context._type);
+		}
 
 		/** @remarks Get plugin name */
 		_NexInline const String& GetName() const {
@@ -91,6 +97,7 @@ public:
 
 	/** @remarks Load plugin manually **/
 	void AddPlugin(const String& path, const String& name, const PluginLicense& li, uint32 version,
+		ApplicationContextType context,
 			bool optional = false);
 
 	/** Post a license event */

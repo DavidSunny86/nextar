@@ -356,7 +356,8 @@ void TestMathFunctions(nextar::ApplicationContext& application) {
 }
 
 int NextarMain(int argc, char* argv[]) {
-	nextar::ApplicationContext application("MathTest");
+	nextar::ACBaseImpl impl;
+	nextar::ApplicationContext application("MathTest", impl);
 	application.InitializeContext(argc, argv);
 	TestMathFunctions(application);
 	application.DestroyContext();

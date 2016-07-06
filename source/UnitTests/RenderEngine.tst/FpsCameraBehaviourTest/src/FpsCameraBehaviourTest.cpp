@@ -65,7 +65,8 @@ public:
 };
 
 int NextarMain(int argc, char* argv[]) {
-	UTApplicationFPSCamera application;
+	UTApplicationFPSCamera impl;
+	nextar::ApplicationContext application("FpsCameraTest", impl);
 	application.InitializeContext(argc, argv);
 	application.Run();
 	application.DestroyContext();

@@ -2,28 +2,28 @@
 #define ASTCOMMAND_H_
 
 #include <ASTNode.h>
-#include <ASTParameterList.h>
+#include <ASTParameter.h>
 
 namespace nextar {
 
 class _NexNeoScriptAPI ASTCommand : public ASTNode {
 public:
 	ASTCommand(const String& name) : ASTNode(name) {}
-	ASTCommand(const String& name, ASTParameterList&& params) : ASTNode(name),
+	ASTCommand(const String& name, ASTParameter&& params) : ASTNode(name),
 	_parameters(std::move(params)) {}
 
 	const String& GetName() const {
 		return GetValue();
 	}
 	
-	const ASTParameterList& GetParameters() const {
+	const ASTParameter& GetParameters() const {
 		return _parameters;
 	}
 
 	virtual Type GetType() const {return Type::AST_COMMAND;}
 	virtual void Accept(ASTVisitor*) const;
 private:
-	ASTParameterList _parameters;
+	ASTParameter _parameters;
 };
 
 }

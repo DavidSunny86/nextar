@@ -13,4 +13,20 @@ void ASTParameter::Append(const ASTParameter& p) {
 	msh.PushBack(p._value);
 }
 
+void ASTParameter::SetName(const String& name) {
+	MultiStringHelper h(_value);
+	String psuedoV = name + ":" + h.Get(0);
+	_value.swap(psuedoV);
+}
+
+bool ASTParameter::Find(const String& name, String& value) const {
+	ConstMultiStringHelper h(AsString());
+	auto it = h.Iterate();
+	while (it.HasNext(value)) {
+		if (StringUtils::IsTagged(_value, name, value))
+			return true;
+	}
+	return false;
+}
+
 }
