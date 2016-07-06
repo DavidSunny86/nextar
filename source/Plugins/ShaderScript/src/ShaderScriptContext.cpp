@@ -9,7 +9,8 @@
 
 namespace ShaderScript {
 
-ShaderScriptContext::ShaderScriptContext(ShaderTemplate::LoadStreamRequest* shader, const ShaderTemplate::ID& id) {
+ShaderScriptContext::ShaderScriptContext(ShaderTemplate::LoadStreamRequest* shader, const ShaderTemplate::ID& id) :
+	verifyID(true){
 	this->shader = shader;
 	String effectPath = shader->GetAssetLocator().GetComputedFilePath();
 	String shaderPath = effectPath + "../Shaders/";

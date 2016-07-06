@@ -5,13 +5,13 @@ shader BasicDeferred {
 
    pass GBuffer {
          
-      import-cbuffer ObjectProperties (activation = always);
+      import-cbuffer ObjectProperties;
       
       texture-state {
          sampler s0 linear-clamp;
-         unit diffuseMap s0 (activate = "Maps.DiffuseMap");
-         unit specularAndGloss s0 (activate = "Maps.SpecularAndGlossMap");
-         unit normalMap s0 (activate = "Maps.NormalMap");
+         unit _sDiffuseMap s0 "Maps.DiffuseMap";
+         unit _sSpecularAndGlossMap s0 "Maps.SpecularAndGlossMap";
+         unit _sNormalMap s0 "Maps.NormalMap";
       }
 
       depth-stencil-state {
@@ -24,11 +24,11 @@ shader BasicDeferred {
       blend-state disable;
 
       program {
-         define always HAS_NORMAL_CHANNEL;
-         define "Maps.DiffuseMap" HAS_DIFFUSE_MAP HAS_TEXCOORD0_CHANNEL;
-         define "Maps.NormalMap" HAS_NORMAL_MAP  HAS_TEXCOORD0_CHANNEL;
-         define "Maps.SpecularAndGlossMap" HAS_SPECULAR_AND_GLOSS_MAP  HAS_TEXCOORD0_CHANNEL;
-         
+         option "Maps.DiffuseMap" HAS_DIFFUSE_MAP HAS_TEXCOORD0_CHANNEL;
+         option "Maps.NormalMap" HAS_NORMAL_MAP  HAS_TEXCOORD0_CHANNEL;
+         option "Maps.SpecularAndGlossMap" HAS_SPECULAR_AND_GLOSS_MAP  HAS_TEXCOORD0_CHANNEL;
+         define HAS_NORMAL_CHANNEL;
+
          vertex-program Deferred;
          fragment-program Deferred;
       }

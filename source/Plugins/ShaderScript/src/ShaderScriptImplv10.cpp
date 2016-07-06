@@ -35,6 +35,7 @@ void ShaderScriptImplv1_0::RegisterDictionary() {
 	CommandDictionary* dict = CommandDictionaryArchive::Instance().RegisterDictionary("ShaderScript",
 			&_rootShaderScript);
 	dict->RegisterHandler("shader", CmdShader::InstancePtr());
+	dict->RegisterHandler("shader.inherit", CmdInherit::InstancePtr());
 	dict->RegisterHandler("shader.tags", CmdTags::InstancePtr());
 	dict->RegisterHandler("shader.pass", CmdPass::InstancePtr());
 	dict->RegisterHandler("shader.pass.import-cbuffer", CmdImportConstBuffer::InstancePtr());

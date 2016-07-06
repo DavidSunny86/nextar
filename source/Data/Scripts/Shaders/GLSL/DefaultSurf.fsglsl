@@ -1,0 +1,16 @@
+
+void _vGetSurfaceData(inout _sSurfaceData data) {
+
+#ifdef HAS_DIFFUSE_MAP
+	data._uAlbedo = _vSampleDiffuse( _vGetDiffuseTexCoord() );
+#else
+	data._uAlbedo = _uDiffuseColor;
+#endif
+
+
+
+#ifdef HAS_NORMAL_MAP
+	data._uNormal = _vUnpackNormal( _vGetNormalTexCoord() );
+#else
+
+}

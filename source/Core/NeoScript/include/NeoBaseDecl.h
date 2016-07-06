@@ -3,8 +3,8 @@
  * @author: obhi
  **/
 
-#ifndef NEXTAR_SCRIPTPARSER_H_
-#define NEXTAR_SCRIPTPARSER_H_
+#ifndef NEXTAR_NEOBASEDECL_H_
+#define NEXTAR_NEOBASEDECL_H_
 
 #include <BaseHeaders.h>
 #include <NeoScriptConfig.h>
@@ -36,4 +36,4 @@ typedef list<ASTBlockPtr>::type ASTBlockList;
 
 }
 
-#endif // NEXTAR_SCRIPTPARSER_H_
+#endif // NEXTAR_NEOBASEDECL_H_

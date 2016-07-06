@@ -40,6 +40,21 @@ public:
 		activeStages[(uint32)stage] = active;
 	}
 
+	inline void Resolve(String& param) {
+		if (param.length() > 0 && param[0] == '$') {
+			const char* name = param.c_str() + 1;
+			for(uint32 i = 0; i < (uint32)templateParamNames.size(); ++i) {
+				if (templateParamNames[i] == name) {
+					if (i < templateParamValues.size())
+						param = templateParamValues[i];
+					else
+						param = "";
+					return;
+				}
+			}
+		}
+	}
+
 	InputStreamPtr FetchConstBuffer(const String& name);
 	InputStreamPtr FetchProgram(const String& name,
 			RenderManager::ShaderLanguage lang,
@@ -49,6 +64,7 @@ public:
 	void AddRegion(const String& name, RenderManager::ShaderLanguage lang, String&& value);
 	void RemoveRegion(const String& name);
 		
+	bool verifyID;
 	bool cbIsAutoParam;
 	SourceRegionMap regions;
 	BlendState blendState;
@@ -60,6 +76,9 @@ public:
 
 	ShaderTemplate::LoadStreamRequest* shader;
 	ShaderTemplate::ID shaderId;
+
+	StringUtils::WordList templateParamValues;
+	StringUtils::WordList templateParamNames;
 
 	bool activeStages[Pass::ProgramStage::STAGE_COUNT];
 };
