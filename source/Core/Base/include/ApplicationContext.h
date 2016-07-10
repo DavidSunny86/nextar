@@ -20,6 +20,12 @@ class _NexBaseAPI ApplicationContext:
 
 public:
 
+	struct ApplicationDesc {
+		String _name;
+		String _projectName;
+		VersionID _version;
+	};
+
 
 	enum EventID {
 		EVENT_INIT_RESOURCES,
@@ -92,11 +98,27 @@ public:
 	}
 
 	inline String GetAppName() const {
-		return appName;
+		return _desc._name;
 	}
 
 	inline void SetAppName(const String& name) {
-		appName = name;
+		_desc._name = name;
+	}
+
+	inline String GetProjectName() const {
+		return _desc._projectName;
+	}
+
+	inline void SetProjectName(const String& name) {
+		_desc._projectName = name;
+	}
+
+	inline VersionID GetProjectVersion() const {
+		return _desc._version;
+	}
+
+	inline void SetProjectVersion(VersionID id) {
+		_desc._version = id;
 	}
 
 	inline Config& GetConfig() {
@@ -149,7 +171,9 @@ private:
 	Config config;
 	/** Application specific information */
 	URL defaultConfigPath;
-	String appName;
+	ApplicationDesc _desc;
+
+	//String appName;
 
 	bool _resourcesDestroyed;
 	bool runningLoop;

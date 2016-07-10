@@ -11,11 +11,11 @@ pass Forward {
 }
 
 pass Debug {
-   render-to last;
+	render-to last;
 }
 
 pass Compositor {
-	material "Materials/DrawQuad.mtl";
+	material "Materials/DrawQuad.mscript";
 	set-param _sDiffuseMap last.color-0;
 	set-param _uTranslationAndScale "0 0 1 1";
 	set-param _uTextureOffsetAndRepeat "0 0 1 1";

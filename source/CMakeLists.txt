@@ -231,14 +231,14 @@ macro(add_pre_build_command)
 		set(NEX_PRE_BUILD_TARGET ${NEXTAR_BINARY_NAME}_PRE_BUILD)
 		set(NEX_PRE_BUILD_DEPENDENCIES "")
 	endif()
-   set(NE_PCOMMAND ${ARGV1})
-   separate_arguments(NE_PCOMMAND)
+	set(NE_PCOMMAND ${ARGV1})
+	separate_arguments(NE_PCOMMAND)
 	add_custom_command(
-      OUTPUT ${ARGV2}
-      COMMAND ${NE_PCOMMAND}
-      DEPENDS ${ARGV0}
-   )
-   list(APPEND NEX_PRE_BUILD_DEPENDENCIES ${ARGV2})
+		OUTPUT ${ARGV2}
+		COMMAND ${NE_PCOMMAND}
+		DEPENDS ${ARGV0}
+	)
+	list(APPEND NEX_PRE_BUILD_DEPENDENCIES ${ARGV2})
 endmacro(add_pre_build_command)
 #============================================================
 # Pre build execute
@@ -520,9 +520,9 @@ macro(place_bin library)
 		set(NEX_INSTALL_DIR ${NEX_INSTALL}/Bin)
 	endif()
 	if (NEX_PRE_BUILD_STEP)
-      separate_arguments(NEX_PRE_BUILD_DEPENDENCIES)
-      message("C:  " ${NEX_PRE_BUILD_DEPENDENCIES})
-      add_custom_target(${NEX_PRE_BUILD_TARGET} DEPENDS ${NEX_PRE_BUILD_DEPENDENCIES})
+		separate_arguments(NEX_PRE_BUILD_DEPENDENCIES)
+		message("C:  " ${NEX_PRE_BUILD_DEPENDENCIES})
+		add_custom_target(${NEX_PRE_BUILD_TARGET} DEPENDS ${NEX_PRE_BUILD_DEPENDENCIES})
 		add_dependencies(${NEXTAR_TARGET} ${NEX_PRE_BUILD_TARGET})
 	endif()
 	#add_custom_command(TARGET ${NEXTAR_TARGET} POST_BUILD
@@ -608,7 +608,7 @@ macro(create_plugin pluginName pluginPath type build context optional)
 	 "  <target>${PLUG_SUBPATH}</target>\n"
 	 "  <type>${ARGV2}</type>\n"
 	 "  <build>${ARGV3}</build>\n"
-    "  <context>${ARGV4}</context>\n"
+	 "  <context>${ARGV4}</context>\n"
 	 "  <optional>${ARGV5}</optional>\n"
 	 " </plugin>\n")
 

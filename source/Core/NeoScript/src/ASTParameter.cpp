@@ -13,6 +13,14 @@ void ASTParameter::Append(const ASTParameter& p) {
 	msh.PushBack(p._value);
 }
 
+void ASTParameter::AppendExpanded(const ASTParameter& p) {
+	String value;
+	MultiStringHelper msh(_value);
+	auto it = ConstMultiStringHelper::It(p._value);
+	while (it.HasNext(value))
+		msh.PushBack(value);
+}
+
 void ASTParameter::SetName(const String& name) {
 	MultiStringHelper h(_value);
 	String psuedoV = name + ":" + h.Get(0);

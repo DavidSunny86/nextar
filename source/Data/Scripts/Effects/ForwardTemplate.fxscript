@@ -3,16 +3,17 @@ shader ForwardTemplate [Vertex, Surface, Lighting] {
 
    tags forward;
 
-   pass Light {
-      
-      option DiffuseMap SpecularAndGlossMap NormalMap DetailMap;
-            
+   pass PointLight { 
+         
+      import-cbuffer Light;
+      import-cbuffer ObjectProperties;   
+
       texture-state {
          sampler s0 linear-clamp;
-         unit _sDiffuseMap s0 "Diffuse.Texture" when:DiffuseMap;
-         unit _sSpecularAndGlossMap "SpecularAndGloss.Texture" s0 when:SpecularAndGlossMap;
-         unit _sNormalMap s0 "Normal.Texture" when:NormalMap;
-         unit _sDetailMap s0 "Detail.Texture" when:DetailMap;
+         unit _sDiffuseMap s0 (nameref=  "Diffuse.Texture", activate = DiffuseMap, contex = material);
+         unit _sSpecularAndGlossMap s0 (nameref = "Specular.Texture", activate = SpecularAndGlossMap, contex = material);
+         unit _sNormalMap s0 (nameref = "Normal.Texture", activate = NormalMap, contex = material); 
+         unit _sDetailMap s0 (nameref = "Detail.Texture", activate = DetailMap, contex = material); 
       }
 
       depth-stencil-state {
@@ -31,11 +32,12 @@ shader ForwardTemplate [Vertex, Surface, Lighting] {
          activate DetailMap HAS_DETAIL_MAP HAS_TEXCOORD0_CHANNEL;
          activate SpecularAndGlossMap HAS_SPECULAR_AND_GLOSS_MAP  HAS_TEXCOORD0_CHANNEL;
          activate always HAS_NORMAL_CHANNEL;
-         
-         import-cbuffer ObjectProperties;
+                
          
          vertex-program $Vertex Geometry;
-         fragment-program SurfaceSetup $Surface LightSetup $Lighting Fragment;
+         fragment-program SurfaceSetup $Surface LightSetup $Lighting Forward;
       }
    }
+
+
 }

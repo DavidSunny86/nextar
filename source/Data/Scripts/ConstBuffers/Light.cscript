@@ -1,0 +1,5 @@
+
+cbuffer _cbSkyLight:SKYLIGHT {
+   declare vec4 _uColor;
+   declare vec3 _uDirection;
+};

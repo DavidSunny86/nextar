@@ -39,7 +39,7 @@ public:
 					NeoScript::AsyncPrint(doc, out);
 				}
 			} catch(GracefulErrorExcept& e) {
-				Error(e.GetMsg());
+				Error(e.GetMsg(attribute.fileName.ToString().c_str()));
 			}
 		}
 

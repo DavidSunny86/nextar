@@ -10,6 +10,10 @@ const URL URL::Invalid;
 URL::URL() {
 }
 
+URL::URL(const String& objectName, const String& fileExt, const String& possibleLocations) {
+	_Determine(objectName, fileExt, possibleLocations);
+}
+
 URL::URL(const String& _path) {
 	_Parse(_path);
 }
@@ -56,18 +60,9 @@ const URL& URL::operator =(URL&& _path) {
 
 void URL::_Parse(const String& descriptor) {
 	NEX_ASSERT(descriptor.length());
-	size_t offset = 0;
+	
 	// Do we have a mount point?
-	if (descriptor[0] == '{') {
-		size_t arEn = descriptor.find_first_of('}');
-		if (arEn != String::npos) {
-			archiveName = descriptor.substr(1, arEn - 1);
-			offset = arEn + 1;
-		} else {
-			Warn("malformed path archive name: " + descriptor);
-			return;
-		}
-	}
+	size_t offset = _DetermineMountPoint(descriptor, archiveName);
 
 	if (descriptor[offset] == '/')
 		offset++;
@@ -124,8 +119,12 @@ String URL::GetAppendedPath(const String& basePath, const String& fileName) {
 		return fileName;
 	else if (!fileName.length())
 		return basePath;
-	else
-		return basePath + '/' + fileName;
+	else {
+		if (basePath.back() != '/' && fileName.front() != '/')
+			return basePath + '/' + fileName;
+		else
+			return basePath + fileName;
+	}
 }
 
 String URL::GetExtension() const {
@@ -156,6 +155,42 @@ String URL::GetComputedFilePath() const {
 		return ret;
 	} else {
 		return ret.substr(0, end + 1);
+	}
+}
+
+size_t URL::_DetermineMountPoint(const String& descriptor, String& out) {
+	size_t offset = 0;
+	// Do we have a mount point?
+	if (descriptor[0] == '{') {
+		size_t arEn = descriptor.find_first_of('}');
+		if (arEn != String::npos) {
+			out = descriptor.substr(1, arEn - 1);
+			offset = arEn + 1;
+		} else {
+			return 0;
+		}
+	}
+	return offset;
+}
+
+void URL::_Determine(const String& objectName, const String& fileExt, const String& possibleLocations) {
+	
+	String relativePathSource = objectName;
+	size_t offset = _DetermineMountPoint(relativePathSource, archiveName);
+	if (!offset) {
+		relativePathSource = GetAppendedPath(possibleLocations, objectName);
+		offset = _DetermineMountPoint(relativePathSource, archiveName);
+	}
+
+	if (relativePathSource[0] == '/')
+		offset++;
+	
+	relativePath = _Resolve(relativePathSource, offset);
+
+	if (fileExt.length() > 0 && !StringUtils::EndsWith(relativePath, fileExt)) {
+		if (fileExt[0] != '.')
+			relativePath += '.';
+		relativePath += fileExt;
 	}
 }
 

@@ -24,6 +24,7 @@ public:
 	static const URL Invalid;
 
 	URL();
+	URL(const String& objectName, const String& fileExt, const String& possibleLocations);
 	URL(const UniString& _path);
 	URL(const String&);
 	URL(const URL&);
@@ -54,7 +55,7 @@ public:
 	static String GetAppendedPath(const String& base, const String& subPath);
 	/* Reserved path */
 	static bool IsReservedPath(const char* path);
-
+		
 	/* extension */
 	String GetExtension() const;
 	String GetComputedName() const;
@@ -67,6 +68,8 @@ public:
 
 protected:
 
+	size_t _DetermineMountPoint(const String& objectName, String& out);
+	void _Determine(const String& objectName, const String& fileExt, const String& possibleLocations);
 	/* this is only called by file system */
 	static void AddMacroEntry(const String& name, const String& value) {
 		_macroTable[name] = value;

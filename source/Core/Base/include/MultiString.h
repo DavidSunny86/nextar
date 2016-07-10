@@ -270,6 +270,9 @@ public:
 
 	MultiStringTypeTmpl(StringType& object) : BaseType(object) {}
 
+	/*
+	 * Combines strings within the range and stores them in the current string.
+	 */
 	template<typename _ContIter>
 	void Combine(_ContIter beg, _ContIter end) {
 

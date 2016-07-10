@@ -1,0 +1,13 @@
+
+layout(location = 0) out vec4 oDiffuseColor;
+
+void main(void)
+{
+   _sSurfaceData data;
+   _sLight skyLight;
+
+   _vGetSurfaceData(data);
+   _vGetSkyLight(skyLight);
+
+   oDiffuseColor = _vCalculateLighting(light, data);
+}

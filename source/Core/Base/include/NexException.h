@@ -85,7 +85,7 @@ public:
 	 *   @return The file,function and line location.
 	 *
 	 */
-	virtual const char* GetMsg() const;
+	virtual const char* GetMsg(const char* source = 0) const;
 };
 
 /*! @class FatalError

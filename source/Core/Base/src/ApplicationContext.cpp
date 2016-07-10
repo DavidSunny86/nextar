@@ -14,9 +14,13 @@ NEX_DEFINE_SINGLETON_PTR(ApplicationContext);
 String ApplicationContext::_configPathName = "${EngineData}/Configs/Config.cfg";
 
 ApplicationContext::ApplicationContext(const String& name, Impl& impl) :
-appName(name), quitting(false), errorHandler(nullptr),
+quitting(false), errorHandler(nullptr),
 _resourcesDestroyed(false), _pImpl(impl) {
+
 	NEX_NEW(LogManager());
+	SetAppName(name);
+	SetProjectName(StringUtils::Default);
+	SetProjectVersion(NEX_MAKE_VERSION(1, 0, 0));
 	// initialize the pools
 #ifdef NEX_DEBUG
 	// add a default logger
@@ -51,7 +55,7 @@ void ApplicationContext::ParseCommandLineParams(int argc, char* argv[]) {
 }
 
 void ApplicationContext::InitializeContext(int argc, char* argv[]) {
-	Trace("Initializing application context: " + appName);
+	Trace("Initializing application context: " + _desc._name);
 	ParseCommandLineParams(argc, argv);
 	_pImpl.CreateServices();
 
@@ -82,7 +86,7 @@ void ApplicationContext::SaveConfiguration() {
 }
 
 void ApplicationContext::DestroyContext() {
-	Trace("Destroying application context: " + appName);
+	Trace("Destroying application context: " + _desc._name);
 	SaveConfiguration();
 	// services
 	_pImpl.DestroyServices();

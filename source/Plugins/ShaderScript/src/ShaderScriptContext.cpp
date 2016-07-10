@@ -30,16 +30,15 @@ ShaderScriptContext::ShaderScriptContext(ShaderTemplate::LoadStreamRequest* shad
 InputStreamPtr ShaderScriptContext::FetchConstBuffer(const String& name) {
 	StringUtils::TokenIterator it = ConstMultiStringHelper::It(cbufferIncludePath);
 	String store;
-	URL url;
 	InputStreamPtr retFile;
 	while(it.HasNext(store)) {
-		url = store + name + ".cscript";
+		URL url(name, ".cscript", store);
 		retFile = FileSystem::Instance().OpenRead(url);
 		if (retFile)
 			return retFile;
 	}
 
-	Warn("Could not open constant buffer file: " + name + " @location: " + url.ToString());
+	Warn("Could not open constant buffer file: " + name);
 	return retFile;
 }
 

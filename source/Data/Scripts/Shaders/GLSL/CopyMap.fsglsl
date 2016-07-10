@@ -5,11 +5,11 @@ layout(location = 0) out vec4 oFragColor;
 #ifdef HAS_DIFFUSE_MAP
 	in vec2 _oTexCoord0;
 	vec4 GetFragmentColor() {
-		return _vSampleDiffuse(_oTexCoord0) * _uMixColor;
+		return _vSampleDiffuse(_oTexCoord0) * cbQuad._uMixColor;
 	}
 #else
 	vec4 GetFragmentColor() {
-		return _uMixColor;
+		return cbQuad._uMixColor;
 	}
 #endif
 

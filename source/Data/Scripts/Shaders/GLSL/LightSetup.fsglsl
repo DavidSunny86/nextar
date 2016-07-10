@@ -1,0 +1,16 @@
+
+struct _sLight
+{
+   vec4 _uColor;
+   vec3 _uDir; // in view space
+};
+
+
+vec4 _vCalculateLighting(in _sLight light, in _sSurfaceData surface);
+
+
+void _vGetSkyLight(inout _sLight light)
+{
+   light._uColor = cbSkyLight._uColor;
+   light._uDir = cbSkyLight._uDirection;
+};

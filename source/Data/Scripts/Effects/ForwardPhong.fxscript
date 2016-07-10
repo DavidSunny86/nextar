@@ -1,4 +1,0 @@
-
-shader ForwardPhong {
-	inherit {EngineData}/Scripts/Effects/ForwardTemplate.fxscript [Empty, GenericSurf, Phong]; 
-}

@@ -18,7 +18,7 @@ bool CmdShader::BeginExecute(CommandContext* pContext, const ASTCommand* command
 	SharedComponent::ID id = SharedComponent::NullID;
 	URL location;
 	if (it.HasNext(value))
-		location = URL(value);
+		location = URL(value, "fxscript", FileSystem::ArchiveProjectData + "/Scripts/Effects");
 
 	if (it.HasNext(value))
 		id = SharedComponent::ToID(value);

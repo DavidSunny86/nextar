@@ -40,17 +40,18 @@ public:
 		activeStages[(uint32)stage] = active;
 	}
 
-	inline void Resolve(String& param) {
+	inline void Resolve(String& param) const {
 		if (param.length() > 0 && param[0] == '$') {
 			const char* name = param.c_str() + 1;
-			for(uint32 i = 0; i < (uint32)templateParamNames.size(); ++i) {
-				if (templateParamNames[i] == name) {
-					if (i < templateParamValues.size())
-						param = templateParamValues[i];
-					else
-						param = "";
+			String value;
+			auto nameIt = ConstMultiStringHelper::It(templateParamNames);
+			auto valueIt = ConstMultiStringHelper::It(templateParamValues);
+			while (nameIt.HasNext(value)) {
+				if (value == name) {
+					valueIt.HasNext(param);
 					return;
-				}
+				} else
+					++valueIt;
 			}
 		}
 	}

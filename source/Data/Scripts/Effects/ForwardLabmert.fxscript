@@ -1,0 +1,5 @@
+
+shader ForwardLambert {
+	inherit {EngineData}/Scripts/Effects/ForwardTemplate.fxscript [Empty, GenericSurf, Lambert]; 
+
+}

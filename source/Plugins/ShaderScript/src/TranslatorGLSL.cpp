@@ -21,6 +21,7 @@ void TranslatorGLSL::BeginBuffer(ShaderScriptContext* _script, const String& nam
 	String& transientBuffer = _script->_transientBuffer[GLSL_TRANSLATOR];
 	transientBuffer.clear();
 	transientBuffer += "layout(std140) uniform " + name + " {\n";
+	_cbName = name;
 }
 
 void TranslatorGLSL::AddParam(ShaderScriptContext* script,
@@ -74,7 +75,10 @@ void TranslatorGLSL::AddParam(ShaderScriptContext* script,
 
 void TranslatorGLSL::EndBuffer(ShaderScriptContext* _script) {
 	String& transientBuffer = _script->_transientBuffer[GLSL_TRANSLATOR];
-	transientBuffer += "};\n";
+	transientBuffer += "}";
+	if (_cbName[0] == '_')
+		transientBuffer += _cbName.c_str() + 1;
+	transientBuffer += ";\n";
 	_script->AddRegion(_SS(REG_CBUFFER), RenderManager::ShaderLanguage::SPP_GLSL,
 			std::move(transientBuffer));
 }

@@ -18,7 +18,7 @@ StringInternTable::~StringInternTable() {
 
 URL StringInternTable::_GetURL() {
 	return URL(
-			FileSystem::ArchiveEngineData + "/StringTable_" + name
+			FileSystem::ArchiveProjectData + "/StringTable_" + name
 					+ ".table");
 }
 

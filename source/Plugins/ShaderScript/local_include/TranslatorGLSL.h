@@ -28,6 +28,7 @@ public:
 	virtual void AddPredefs(ShaderScriptContext* script, Pass::ProgramStage stage)  override;
 
 protected:
+	String _cbName;
 };
 
 } /* namespace ShaderCompiler */

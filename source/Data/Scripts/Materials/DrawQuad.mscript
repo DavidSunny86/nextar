@@ -1,6 +1,6 @@
 
 material Default:Default.DrawQuad {	
 	shader "{EngineData}/Scripts/Effects/DrawQuad.fxscript" Default:Default.DrawQuad;
-	enable-option Maps.TextureMap;
+	enable-option TextureMap;
 	layer normal;
 }

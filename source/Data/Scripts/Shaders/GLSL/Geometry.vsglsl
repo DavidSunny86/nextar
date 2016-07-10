@@ -1,5 +1,5 @@
 
-#ifndef HAS_NORMAL_MAP
+#if !defined(HAS_NORMAL_MAP) && defined(HAS_NORMAL_CHANNEL)
 	smooth out vec4 _oNormal;
 #endif
 

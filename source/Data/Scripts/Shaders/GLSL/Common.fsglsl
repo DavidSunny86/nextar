@@ -1,4 +1,33 @@
 
+/******************************************************************/
+/*                           Channels                             */
+/******************************************************************/
+
+#if !defined(HAS_NORMAL_MAP) && defined(HAS_NORMAL_CHANNEL)
+	smooth in vec4 _oNormal;
+   vec3 _iGetNormal() { return normalize(_oNormal.xyz); }
+#endif
+
+#ifdef HAS_BINORMAL_CHANNEL
+	smooth in vec4 _oBiNormal;	
+   vec3 _iGetBiNormal() { return normalize(_oBiNormal); }
+#endif
+
+#ifdef HAS_TANGENT_CHANNEL
+	smooth in vec4 _oTangent;
+   vec3 _iGetTangent() { return normalize(_oTangent); }
+#endif
+
+#ifdef HAS_TEXCOORD0_CHANNEL
+	smooth in vec2 _oTexCoord0;
+   vec2 _iGetTexCoord0() { return _oTexCoord0;  }
+#endif
+
+#ifdef HAS_TEXCOORD1_CHANNEL
+	smooth out vec2 _oTexCoord1;
+   vec2 _iGetTexCoord1() { return _oTexCoord1;  }
+#endif
+
 
 /******************************************************************/
 /*                           Samplers                             */
@@ -12,6 +41,10 @@
 		return ( texture( _sDiffuseMap, v ) );
 	}
 #else
+	vec2 _vGetDiffuseTexCoord() {
+		return vec2( 0.0 );
+	}
+
 	vec4 _vSampleDiffuse(vec2 v) {
 		return ( vec4( 1.0 ) );
 	}
@@ -35,6 +68,10 @@
 #endif
 #ifdef HAS_SPECULAR_AND_GLOSS_MAP
 	uniform sampler2D _sSpecularAndGlossMap;
+	vec2 _vGetSpecularAndGlossTexCoord() {
+		return _iGetTexCoord0();
+	}
+
 	vec4 _vSampleSpecularAndGloss(vec2 v) {
 		return texture(_sSpecularAndGlossMap, v).rg;
 	}

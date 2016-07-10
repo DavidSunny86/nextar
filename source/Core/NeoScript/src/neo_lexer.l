@@ -31,18 +31,18 @@ BLANK   [ \t]
 
 \\\[ 		 	b.PutContent('[');
 ^\[\[          {
-   BEGIN(STATE_REGION); 
-   nextar::String content = b.GetContent(); 
-   b.StartContent(); 
-   return nextar::neo_parser_impl::make_TEXT_CONTENTS(content, b.Loc()); 
+	BEGIN(STATE_REGION); 
+	nextar::String content = b.GetContent(); 
+	b.StartContent(); 
+	return nextar::neo_parser_impl::make_TEXT_CONTENTS(content, b.Loc()); 
 }
 
 [^\\\[\n]+       b.PutContent(yytext);
 \\[^\[]+			 b.PutContent(yytext);
 
 <<EOF>>  {
-   BEGIN(INITIAL); 
-   return nextar::neo_parser_impl::make_TEXT_CONTENTS(b.GetContent(), b.Loc()); 
+	BEGIN(INITIAL); 
+	return nextar::neo_parser_impl::make_TEXT_CONTENTS(b.GetContent(), b.Loc()); 
 }
 
 }
@@ -51,13 +51,13 @@ BLANK   [ \t]
 <STATE_STR>{
 \"     			{
 	BEGIN(STATE_CONTENT);  
-   return nextar::neo_parser_impl::make_STRING_LITERAL(b.GetContent(), b.Loc());
+	return nextar::neo_parser_impl::make_STRING_LITERAL(b.GetContent(), b.Loc());
 }
 \\[0-7]{1,3}  {  
-   int result;  
-   std::sscanf( yytext + 1, "%o", &result);  
-   if ( result > 0xff )	  
-      b.PutContent(result); 
+	int result;  
+	std::sscanf( yytext + 1, "%o", &result);  
+	if ( result > 0xff )	  
+		b.PutContent(result); 
 }
 
 \\[0-9]+     	b.Error(nextar::ParserContext::BAD_ESCAPE_SEQ);
@@ -85,28 +85,28 @@ BLANK   [ \t]
 \"             BEGIN(STATE_STR);  b.StartContent();
 [\n]+  		  	b.Loc().Lines((nextar::uint32)yyleng); b.Loc().Step();
 {BLANK}+   	   b.Loc().Step();
-[^ \"\{\}\[\],;\t\n\r]+    return nextar::neo_parser_impl::make_IDENTIFIER(yytext, b.Loc());
+[^ \"\{\}\[\],;()\t\n\r]+    return nextar::neo_parser_impl::make_IDENTIFIER(yytext, b.Loc());
 
 }
 
 <STATE_REGION>{
 
 {REG} {
-   b.PutContent(yytext);
+	b.PutContent(yytext);
 }
 
 {BLANK}+  b.Loc().Step();
 
 (\.script\]\])|\]\] {
-   BEGIN(STATE_CONTENT);
-   return nextar::neo_parser_impl::make_REGION_ID(b.GetContent(), b.Loc());
+	BEGIN(STATE_CONTENT);
+	return nextar::neo_parser_impl::make_REGION_ID(b.GetContent(), b.Loc());
 }
 
 \.text\]\]  {
-   BEGIN(STATE_TEXT);
-   nextar::String value = b.GetContent();
-   b.StartContent();
-   return nextar::neo_parser_impl::make_TEXT_REGION_ID(value, b.Loc());
+	BEGIN(STATE_TEXT);
+	nextar::String value = b.GetContent();
+	b.StartContent();
+	return nextar::neo_parser_impl::make_TEXT_REGION_ID(value, b.Loc());
 }
 
 }

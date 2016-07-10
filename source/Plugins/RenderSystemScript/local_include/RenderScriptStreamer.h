@@ -27,7 +27,7 @@ public:
 	void UnregisterDictionary();
 
 	virtual bool Load(RenderSystem& s, InputStreamPtr& stream);
-	virtual bool Save(RenderSystem& s, OutputStreamPtr& stream) { return false;  }
+	virtual bool Save(RenderSystem& s, OutputStreamPtr& stream);
 
 protected:
 	RenderScriptRoot _root;

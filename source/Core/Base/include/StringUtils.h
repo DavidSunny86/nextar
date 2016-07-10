@@ -169,8 +169,8 @@ _NexBaseAPI const char* MatchTag(const char* text, const char* tag);
  *
  * @return	null if it fails, else.
  **/
-_NexBaseAPI wchar_t* NewStr(const wchar_t*);
-_NexBaseAPI char* NewStr(const char*);
+//_NexBaseAPI wchar_t* NewStr(const wchar_t*);
+//_NexBaseAPI char* NewStr(const char*);
 
 /**
  *
@@ -185,7 +185,7 @@ _NexBaseAPI char* NewStr(const char*);
  *
  * @return	null if it fails, else.
  **/
-_NexBaseAPI char* NewStr(const char*, size_t count); //
+//_NexBaseAPI char* NewStr(const char*, size_t count); //
 
 /**
  *
@@ -198,8 +198,8 @@ _NexBaseAPI char* NewStr(const char*, size_t count); //
  *
  * @return	null if it fails, else.
  **/
-_NexBaseAPI wchar_t* NewStrConv(const char*);
-_NexBaseAPI char* NewStrConv(const wchar_t*);
+//_NexBaseAPI wchar_t* NewStrConv(const char*);
+//_NexBaseAPI char* NewStrConv(const wchar_t*);
 /**
  *
  * @brief	Eat white utf 8.
@@ -513,6 +513,16 @@ inline String GetTaggedVal(const String& tag,
 		}
 	}
 	return StringUtils::Null;
+}
+
+inline bool EndsWith(const String& str, const String& suffix) {
+	return str.size() >= suffix.size() &&
+		str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
+inline bool StartsWith(const String& str, const String& prefix) {
+	return str.size() >= prefix.size() &&
+		str.compare(0, prefix.size(), prefix) == 0;
 }
 
 /************************************** Legacy **************************************/

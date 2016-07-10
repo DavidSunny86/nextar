@@ -58,9 +58,9 @@ YY_DECL;
 	LSQBRACKET "["
 	RSQBRACKET "]"
 	COMMA      ","
-   LBRACES    "("
-   RBRACES    ")"
-   ASSIGN     "="
+	LBRACES    "("
+	RBRACES    ")"
+	ASSIGN     "="
 	;
 
 %token <String> REGION_ID TEXT_REGION_ID TEXT_CONTENTS IDENTIFIER STRING_LITERAL
@@ -113,12 +113,12 @@ command: SEMICOLON                          { $$.Clear(); }
 
 parameters.0.N:                           { }
 				  | parameters.0.N parameter  { $1.Append($2); $$ = std::move($1); }
-              | parameters.0.N LBRACES special_parameters.0.N RBRACES { $1.Append($3); $$ = std::move($1); }
+				  | parameters.0.N LBRACES special_parameters.0.N RBRACES { $1.AppendExpanded($3); $$ = std::move($1); }
 				  ;
 
 special_parameters.0.N:            {  }
-         | special_parameter       { $$ = $1; }
-         | special_parameters.0.N COMMA special_parameter { $1.Append($3); $$ = std::move($1); }
+			| special_parameter       { $$ = $1; }
+			| special_parameters.0.N COMMA special_parameter { $1.Append($3); $$ = std::move($1); }
 
 special_parameter: IDENTIFIER  ASSIGN  parameter { $3.SetName($1); $$ = std::move($3); }
 
