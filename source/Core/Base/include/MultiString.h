@@ -180,6 +180,10 @@ public:
 				| ((uint32) _object[3] << 8) | ((uint32) _object[4] << 0));
 	}
 
+	inline bool IsSimpleString() const {
+		return IsSimpleString(_object);
+	}
+
 	static bool IsSimpleString(const String& value) {
 		return !_IsCted(value);
 	}

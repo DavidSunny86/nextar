@@ -1,0 +1,13 @@
+
+shader ForwardLambert {
+	inherit ForwardTemplate [Empty, GenericSurf, Lambert]; 
+}
+
+
+[[predefs.vertex-program.all.text]]
+
+// no predefs
+
+[[predefs.fragment-program.all.text]]
+
+// no predefs

@@ -20,7 +20,7 @@ void * neo_realloc (void * ptr, size_t bytes, void * yyscanner);
 void   neo_free (void * ptr, void * yyscanner);
 %}
 
-%x STATE_REGION STATE_TEXT STATE_STR STATE_CONTENT STATE_COMMENT
+%x STATE_REGION STATE_TEXT STATE_STR STATE_CONTENT STATE_COMMENT STATE_SINGLE_LINE_COMMENT
 
 REG      [a-zA-Z#_$]+
 BLANK   [ \t]
@@ -73,6 +73,7 @@ BLANK   [ \t]
 <INITIAL,STATE_CONTENT>{
 ^\[\[          BEGIN(STATE_REGION); b.StartContent();
 "/*" 		  		BEGIN(STATE_COMMENT);
+"//"           BEGIN(STATE_SINGLE_LINE_COMMENT);
 "{"            return nextar::neo_parser_impl::make_LBRACKET(b.Loc());
 "}"            return nextar::neo_parser_impl::make_RBRACKET(b.Loc());
 "["            return nextar::neo_parser_impl::make_LSQBRACKET(b.Loc());
@@ -85,7 +86,7 @@ BLANK   [ \t]
 \"             BEGIN(STATE_STR);  b.StartContent();
 [\n]+  		  	b.Loc().Lines((nextar::uint32)yyleng); b.Loc().Step();
 {BLANK}+   	   b.Loc().Step();
-[^ \"\{\}\[\],;()\t\n\r]+    return nextar::neo_parser_impl::make_IDENTIFIER(yytext, b.Loc());
+[^ \"\{\}\[\],;()\t\n\r=]+    return nextar::neo_parser_impl::make_IDENTIFIER(yytext, b.Loc());
 
 }
 
@@ -111,6 +112,11 @@ BLANK   [ \t]
 
 }
 
+
+<STATE_SINGLE_LINE_COMMENT>{
+[^\n]+		// eat comment in chunks
+\n		      b.Loc().Lines((nextar::uint32)1); BEGIN(STATE_CONTENT);
+}
 
 <STATE_COMMENT>{
 "*/" 			BEGIN(STATE_CONTENT);

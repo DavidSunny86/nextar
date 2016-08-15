@@ -87,6 +87,10 @@ public:
 		return Mat4x4Row(*worldMatrix, 3);
 	}
 
+	inline Vector3A GetDirectionVector() const {
+		return Mat4x4Row(*worldMatrix, 2);
+	}
+
 	void SetTransform(Vec3AF pos, QuatF rot, float scaling) {
 		NEX_ASSERT(!moveable);
 		*worldMatrix = Mat4x4FromScaleRotPos(scaling, rot, pos);

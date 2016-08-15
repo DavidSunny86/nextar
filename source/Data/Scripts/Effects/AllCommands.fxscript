@@ -8,22 +8,22 @@ shader DrawQuad {
 		import-cbuffer Quad;
 
       // inline cbuffer definition
-		cbuffer _cbDebugModelView {
-			declare mat4x4 _uModelViewProj:MODELVIEWPROJECTION;
-			declare vec4 _uObjectColor:DIFFUSECOLOR;
-			declare float _uObjectScale:CONSTANTSCALEFACTOR;
+		cbuffer cbDebugModelView {
+			declare mat4x4 uModelViewProj:MODELVIEWPROJECTION;
+			declare vec4 uObjectColor:DIFFUSECOLOR;
+			declare float uObjectScale:CONSTANTSCALEFACTOR;
 		}
 
       // cbuffer which declares properties to UI
-      cbuffer _cbMaterialProperty (context = material) {
-	      declare vec4 _uDiffuseColor (nameref = "ObjectProperties.DiffuseColor");
-	      declare float _uSpecularIntensity (nameref = "ObjectProperties.SpecularIntensity");
-	      declare float _uGloss (nameref = "ObjectProperties.Gloss");
+      cbuffer cbMaterialProperty (context = material) {
+	      declare vec4 uDiffuseColor (nameref = "ObjectProperties.DiffuseColor");
+	      declare float uSpecularIntensity (nameref = "ObjectProperties.SpecularIntensity");
+	      declare float uGloss (nameref = "ObjectProperties.Gloss");
       };
 
 		texture-state {
 			sampler s0 nearest-repeat;
-			unit _sDiffuseMap s0 "Maps.TextureMap" context:object;
+			unit sDiffuseMap s0 "Maps.TextureMap" context:object;
 		}
 
 		depth-stencil-state disable;

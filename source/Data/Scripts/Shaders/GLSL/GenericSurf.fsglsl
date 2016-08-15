@@ -1,28 +1,19 @@
 
-void _vGetSurfaceData(inout _sSurfaceData data) {
+void vGetSurfaceData(inout KSurfaceData data) {
 
 #ifdef HAS_DIFFUSE_MAP
-	data._uAlbedo = _vSampleDiffuse( _vGetDiffuseTexCoord() );
+	data.iAlbedo = vSampleDiffuse( vGetDiffuseTexCoord() );
 #else
-	data._uAlbedo = cbDiffuseProperty._uDiffuseColor;
+	data.iAlbedo = cbDiffuseProperty.uDiffuseColor;
 #endif
 
-#if defined( HAS_NORMAL_MAP )
-
-	data._uNormal = _vUnpackNormal( _vGetNormalTexCoord() );
-
-#elif defined( HAS_NORMAL_CHANNEL )
-	
-	data._uNormal = _vGetNormal();
-
-#endif
-
-	data._uEmissive = 0;
+	data.iNormal = vGetVertexNormal();
+	data.iEmissive = 0;
 
 #ifdef HAS_SPECULAR_AND_GLOSS_MAP
-	data._uSpecular = _vSampleSpecularAndGloss( _vGetSpecularAndGlossTexCoord() ).r;
+	data.iSpecular = vSampleSpecularAndGloss( vGetSpecularAndGlossTexCoord() ).r;
 #else
-	data._uSpecular = 0.0;
+	data.iSpecular = 0.0;
 #endif
 
 }

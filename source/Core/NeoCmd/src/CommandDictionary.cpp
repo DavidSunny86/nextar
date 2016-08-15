@@ -17,6 +17,15 @@ CommandDictionary::CommandDictionary(const String& name, RootBlockCommandHandler
 CommandDictionary::~CommandDictionary() {
 }
 
+void CommandDictionary::RegisterRegionHandler(const String& fullyQualifiedName, 
+	RegionHandler* pHandler) {
+	_regionHandlers[fullyQualifiedName] = pHandler;
+}
+
+void CommandDictionary::UnregisterRegionHandler(const String& fullyQualifiedName) {
+	_regionHandlers.erase(fullyQualifiedName);
+}
+
 void CommandDictionary::RegisterHandler(const String& fullyQualifiedName,
 		CommandHandler* handler) {
 	_root->AddHandler(fullyQualifiedName, handler);

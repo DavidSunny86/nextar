@@ -54,6 +54,7 @@ public:
 	virtual void PushLight(uint32 sortKey, Light*) = 0;
 	virtual void Sort() = 0;
 	virtual void NearbyLights(LightSet& ls, BoundingVolume*) = 0;
+	virtual Light* GetSkyLight() = 0;
 	virtual LightList& GetLights() = 0;
 };
 

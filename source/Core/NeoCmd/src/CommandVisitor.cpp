@@ -13,7 +13,7 @@
 
 namespace nextar {
 
-CommandVisitor::CommandVisitor(CommandContext* context) : _context(context), popHandler(false),_dontskip(true) {
+CommandVisitor::CommandVisitor(CommandContext* context) : _context(context), popHandler(false), _dontskip(true), _skipReg(false) {
 }
 
 CommandVisitor::~CommandVisitor() {
@@ -25,6 +25,8 @@ void CommandVisitor::VisitDocumentBegin(const ASTDocument* doc) {
 }
 
 void CommandVisitor::VisitCommandBegin(const ASTCommand* command) {
+	if (_skipReg)
+		return;
 	const CommandHandler* handler = _context->GetActiveHandler();
 	if (handler && handler->IsBlockHandler()) {
 		const CommandHandler* redirect = static_cast<const BlockCommandHandler*>(handler)->GetHandler(command->GetName());
@@ -40,6 +42,8 @@ void CommandVisitor::VisitCommandBegin(const ASTCommand* command) {
 
 
 void CommandVisitor::VisitCommandEnd(const ASTCommand* command) {
+	if (_skipReg)
+		return;
 	if (popHandler) {
 		const CommandHandler* handler = _context->GetActiveHandler();
 		handler->EndExecute(_context, command);
@@ -51,6 +55,56 @@ void CommandVisitor::VisitCommandEnd(const ASTCommand* command) {
 void CommandVisitor::VisitDocumentEnd(const ASTDocument* doc) {
 	const RootBlockCommandHandler* handler = _context->GetRoot();
 	handler->EndDocument(_context, doc);
+}
+
+void CommandVisitor::VisitBlockRegionBegin(const ASTBlockRegion* reg) {
+	if (reg->GetName() != StringUtils::Null) {
+		const RegionHandler* h = _context->GetRegionHandler(GetRefinedRegionName(reg->GetName()));
+		if (h) {
+			// @todo potential error, if no handler is found, we have no way to switch
+			// back dictionaries
+			_context->SetActiveRegionHandler(h);
+			_skipReg = h->BeginExecute(_context, reg, false);
+		} else
+			_skipReg = true;
+	}
+		
+}
+
+void CommandVisitor::VisitBlockRegionEnd(const ASTBlockRegion* reg) {
+	const RegionHandler* r = _context->GetActiveRegionHandler();
+	if (r)
+		r->EndExecute(_context, reg, true);
+	_context->SetActiveRegionHandler(nullptr);
+}
+
+void CommandVisitor::VisitTextRegionBegin(const ASTTextRegion* reg) {
+	if (reg->GetName() != StringUtils::Null) {
+		const RegionHandler* h = _context->GetRegionHandler(GetRefinedRegionName(reg->GetName()));
+		if (h) {
+			// @todo potential error, if no handler is found, we have no way to switch
+			// back dictionaries
+			_context->SetActiveRegionHandler(h);
+			_skipReg = h->BeginExecute(_context, reg, true);
+		} else {
+			_skipReg = true;
+		}
+	}
+}
+
+void CommandVisitor::VisitTextRegionEnd(const ASTTextRegion* reg) {
+	const RegionHandler* r = _context->GetActiveRegionHandler();
+	if (r)
+		r->EndExecute(_context, reg, true);
+	_context->SetActiveRegionHandler(nullptr);
+}
+
+String CommandVisitor::GetRefinedRegionName(const String& n) {
+	size_t p = n.find_first_of('.');
+	if (p != String::npos) {
+		return n.substr(0, p);
+	}
+	return n;
 }
 
 } /* namespace nextar */

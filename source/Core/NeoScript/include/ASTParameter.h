@@ -39,6 +39,7 @@ public:
 	
 	void Append(const String& value);
 	void Append(const ASTParameter& value);
+	void AppendList(const ASTParameter& value);
 	void AppendExpanded(const ASTParameter& value);
 	bool Find(const String& name, String& oValue) const;
 

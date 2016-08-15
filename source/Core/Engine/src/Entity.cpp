@@ -41,6 +41,17 @@ EntityPtr Entity::Factory::AsyncCreateMeshEntity(const StringID name,
 	return ret;
 }
 
+EntityPtr Entity::Factory::AsyncCreateSkyLightEntity(const StringID name, const Color& color) {
+	Component* _subComponent = nullptr;
+	EntityPtr ret = AsyncCreateAndAttach(name, Light::CLASS_ID, name, &_subComponent);
+	if (_subComponent) {
+		Light* light = static_cast<Light*>(_subComponent);
+		light->SetLightColor(color);
+		light->SetLightType(Light::Type::SKY);
+	}
+	return ret;
+}
+
 EntityPtr Entity::Factory::AsyncCreateDirectionalLightEntity(const StringID name, const Color& color) {
 	Component* _subComponent = nullptr;
 	EntityPtr ret = AsyncCreateAndAttach(name, Light::CLASS_ID, name, &_subComponent);

@@ -6,58 +6,97 @@
 /******************************************************************/
 #ifdef HAS_2DVERT_CHANNEL
 	in vec2 vert2DPos;
-	vec2 _iGetPos() { return vert2DPos; }
+	vec2 vGetPos() { return vert2DPos; }
 #else
 	in vec3 vertPos;
-	vec3 _iGetPos() { return vertPos; }
+	vec3 vGetPos() { return vertPos; }
 #endif
 
 #ifdef HAS_NORMAL_CHANNEL
 	in vec3 vertNorm;
-	vec3 _iGetNormal() { return vertNorm; }
+	vec3 vGetNormal() { return vertNorm; }
 #else
-	vec3 _iGetNormal() { return vec3(0, 0, 0); }
+	vec3 vGetNormal() { return vec3(0, 0, 0); }
 #endif
 
 #ifdef HAS_BINORMAL_CHANNEL
 	in vec3 vertBiNorm;
-	vec3 _iGetBiNormal() { return vertBiNorm; }
+	vec3 vGetBiNormal() { return vertBiNorm; }
 #else
-	vec3 _iGetBiNormal() { return vec3(0, 0, 0); }
+	vec3 vGetBiNormal() { return vec3(0, 0, 0); }
 #endif
 
 #ifdef HAS_TANGENT_CHANNEL
 	in vec3 vertTangent;
-	vec3 _iGetTangent() { return vertTangent; }
+	vec3 vGetTangent() { return vertTangent; }
 #else 
-	vec3 _iGetTangent() { return vec3(0, 0, 0); }
+	vec3 vGetTangent() { return vec3(0, 0, 0); }
 #endif
 
 #ifdef HAS_COLOR_CHANNEL
 	in vec4 vertColor;
-	vec4 _iGetColor() { return vertColor; }
+	vec4 vGetColor() { return vertColor; }
 #else
-	vec4 _iGetColor() { return vec4(1.0); }
+	vec4 vGetColor() { return vec4(1.0); }
 #endif
 
 #ifdef HAS_SECOND_COLOR_CHANNEL
 	in vec4 vertSecColor;
-	vec4 _iGetSecondaryColor() { return vertSecColor; }
+	vec4 vGetSecondaryColor() { return vertSecColor; }
 #else
-	vec4 _iGetSecondaryColor() { return vec4(1.0); }
+	vec4 vGetSecondaryColor() { return vec4(1.0); }
 #endif
 
 #ifdef HAS_TEXCOORD0_CHANNEL
 	in vec2 texCoord0;
-	vec2 _iGetTexCoord0() { return texCoord0; }
+	vec2 vGetTexCoord0() { return texCoord0; }
 #else
-	vec2 _iGetTexCoord0() { return vec2(0, 0); }
+	vec2 vGetTexCoord0() { return vec2(0, 0); }
 #endif
 
 #ifdef HAS_TEXCOORD1_CHANNEL
 	in vec2 texCoord1;
-	vec2 _iGetTexCoord1() { return texCoord1; }
+	vec2 vGetTexCoord1() { return texCoord1; }
 #else
-	vec2 _iGetTexCoord1() { return vec2(0, 0); }
+	vec2 vGetTexCoord1() { return vec2(0, 0); }
 #endif
 
+
+
+/******************************************************************/
+/*                        Out Channels                             */
+/******************************************************************/
+#ifdef HAS_NORMAL_CHANNEL_OUT
+	smooth out vec4 oNormal;
+   vec3 vSetNormal(vec4 n) { oNormal = n; }
+#endif
+
+#ifdef HAS_BINORMAL_CHANNEL_OUT
+	smooth out vec4 oBiNormal;	
+   vec3 vSetBiNormal(vec4 b) { oBiNormal = b; }
+#endif
+
+#ifdef HAS_TANGENT_CHANNEL_OUT
+	smooth out vec4 oTangent;
+   vec3 vSetTangent(vec4 t) { oTangent = t; }
+#endif
+
+#ifdef HAS_TEXCOORD0_CHANNEL_OUT
+	smooth out vec2 oTexCoord0;
+   vec2 vGetTexCoord0(vec2 t) { oTexCoord0 = t;  }
+#endif
+
+#ifdef HAS_TEXCOORD1_CHANNEL_OUT
+	smooth out vec2 oTexCoord1;
+   vec2 vSetTexCoord1(vec2 t) { oTexCoord1 = t;  }
+#endif
+
+#ifdef HAS_VERTEX_COLOR_CHANNEL_OUT
+   smooth out vec4 oVertexColor;
+   vec4 vSetVertexColor(vec4 t) { oVertexColor = t; }
+ #endif
+
+#ifdef HAS_EYEVERETX_CHANNEL_OUT
+	smooth out vec4 oEyeVertex;
+   vec3 vSetEyeVertex(vec4 n) { oEyeVertex = n; }
+#endif

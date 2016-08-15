@@ -13,6 +13,21 @@ void ASTParameter::Append(const ASTParameter& p) {
 	msh.PushBack(p._value);
 }
 
+void ASTParameter::AppendList(const ASTParameter& p) {
+	String value;
+	MultiStringHelper msh(_value);
+	ConstMultiStringHelper src(p._value);
+
+	if (src.IsSimpleString())
+		msh.PushBack(p._value);
+	else {
+		if (src.Length() == 1)
+			msh.PushBack(src.Get(0));
+		else
+			msh.PushBack(p._value);
+	}
+}
+
 void ASTParameter::AppendExpanded(const ASTParameter& p) {
 	String value;
 	MultiStringHelper msh(_value);

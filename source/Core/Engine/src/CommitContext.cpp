@@ -49,7 +49,7 @@ void CommitContext::_Reset() {
 	for (auto &b : paramBuffers)
 		b = nullptr;
 
-	sunLightIntensity.x = 0.4f;
+	/*sunLightIntensity.x = 0.4f;
 	sunLightIntensity.y = 0.4f;
 	sunLightIntensity.z = 0.4f;
 	sunLightIntensity.w = 1.0f;
@@ -57,7 +57,7 @@ void CommitContext::_Reset() {
 	sunLightPosition.y = 1000;
 	sunLightPosition.z = 250;
 	sunLightPosition.w = 0;
-	sunLightColor = Color::White;
+	sunLightColor = Color::White;*/
 }
 
 nextar::RenderTargetName CommitContext::ParseTargetName(

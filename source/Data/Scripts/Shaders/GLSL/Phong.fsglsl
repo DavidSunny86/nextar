@@ -1,1 +1,11 @@
 
+vec4 vCalculateLighting(in KLight light, in KSurfaceData surface)
+{
+   vec3 halfv = normalize(light.iDir - vGetEyeVertex());
+
+   vec4 diff = surface.iAlbedo * light.iColor * max(dot(surface.iNormal, light.iDir), 0.0);
+   vec4 spec = light.iColor * pow( max( dot( surface.iNormal, halfv ), 0.0 ), surface.iSpecular );
+
+   return diff + spec;
+}
+

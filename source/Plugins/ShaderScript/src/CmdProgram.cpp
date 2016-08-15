@@ -11,7 +11,7 @@
 
 namespace ShaderScript {
 
-bool ShaderScript::CmdDefine::BeginExecute(CommandContext* pContext,
+bool ShaderScript::CmdActivate::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
 	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
@@ -87,6 +87,7 @@ bool ShaderScript::SubProgramType::BeginExecute(CommandContext* pContext,
 		}
 	}
 	while (	it.HasNext(programName) )  {
+		c->Resolve(programName);
 		for(int i = 0; i < RenderManager::ShaderLanguage::SPP_COUNT; ++i) {
 			AddProgram(programName, i, src, c);
 		}
@@ -95,6 +96,54 @@ bool ShaderScript::SubProgramType::BeginExecute(CommandContext* pContext,
 	c->SetStageActive(stage, true);
 
 	return true;
+}
+
+bool RegProgramRegion::BeginExecute(CommandContext* pContext, 
+	const ASTRegion* region, bool isText) const {
+	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	if (isText) {
+		const ASTTextRegion* reg = static_cast<const ASTTextRegion*>(region);
+		String src;
+		const String& fullName = region->GetName();
+		size_t p = fullName.find_first_of('.');
+		if (p != String::npos) {
+			p++;
+			String subname = fullName.substr(0, p);
+			size_t t = fullName.find_first_of('.', p);
+			if (t != String::npos) {
+				src = fullName.substr(p, t - p) + "-" + subname;
+				p = t + 1;
+			} else
+				return false;
+		}
+		else
+			return false;
+
+		size_t n = fullName.find_first_of('.', p);
+		
+		RenderManager::ShaderLanguage l = GetLanguage(fullName.substr(p, n));
+		if (l == RenderManager::ShaderLanguage::SSP_ALL) {
+			for (uint32 i = 0; i < RenderManager::ShaderLanguage::SPP_COUNT; ++i) {
+				String v = reg->GetValue();
+				c->AddRegion(src, (RenderManager::ShaderLanguage) (i),	std::move(v));
+			}
+		} else if (l != RenderManager::ShaderLanguage::SPP_UNKNOWN) {
+			String v = reg->GetValue();
+			c->AddRegion(src, (RenderManager::ShaderLanguage) (l), std::move(v));
+		}
+	}
+	// @todo Make this true if any other region has to be handled
+	return false;
+}
+
+RenderManager::ShaderLanguage RegProgramRegion::GetLanguage(const String& v) {
+	if (v == "all")
+		return RenderManager::ShaderLanguage::SSP_ALL;
+	if (v == "hlsl")
+		return RenderManager::ShaderLanguage::SPP_HLSL;
+	if (v == "glsl")
+		return RenderManager::ShaderLanguage::SPP_GLSL;
+	return RenderManager::ShaderLanguage::SPP_UNKNOWN;
 }
 
 } /* namespace ShaderScript */

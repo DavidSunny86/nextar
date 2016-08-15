@@ -20,9 +20,9 @@ public:
 	NEX_SINGLE_INSTANCE(CmdProgram);
 };
 
-class CmdDefine: public nextar::CommandHandler {
+class CmdActivate: public nextar::CommandHandler {
 public:
-	NEX_SINGLE_INSTANCE(CmdDefine);
+	NEX_SINGLE_INSTANCE(CmdActivate);
 	virtual bool BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
 };
 
@@ -65,6 +65,14 @@ class CmdFragmentProgram: public SubProgramType {
 public:
 	NEX_SINGLE_INSTANCE(CmdFragmentProgram);
 	CmdFragmentProgram() : SubProgramType(Pass::ProgramStage::STAGE_FRAGMENT) {}
+};
+
+class RegProgramRegion : public nextar::RegionHandler {
+public:
+	NEX_SINGLE_INSTANCE(RegProgramRegion);
+	virtual bool BeginExecute(CommandContext* pContext, const ASTRegion* region, bool isText) const;
+
+	static RenderManager::ShaderLanguage GetLanguage(const String& l);
 };
 
 } /* namespace ShaderScript */

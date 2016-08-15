@@ -3,11 +3,11 @@ layout(location = 0) out vec4 oDiffuseColor;
 
 void main(void)
 {
-   _sSurfaceData data;
-   _sLight skyLight;
+   KSurfaceData data;
+   KLight skyLight;
 
-   _vGetSurfaceData(data);
-   _vGetSkyLight(skyLight);
+   vGetSurfaceData(data);
+   vGetSkyLight(skyLight);
 
-   oDiffuseColor = _vCalculateLighting(light, data);
+   oDiffuseColor = vCalculateLighting(light, data);
 }

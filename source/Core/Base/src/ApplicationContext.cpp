@@ -86,6 +86,7 @@ void ApplicationContext::SaveConfiguration() {
 }
 
 void ApplicationContext::DestroyContext() {
+	ReleaseResources();
 	Trace("Destroying application context: " + _desc._name);
 	SaveConfiguration();
 	// services
@@ -111,7 +112,6 @@ void ApplicationContext::Run() {
 	
 	
 	frameClock.StopClock();
-	ReleaseResources();
 }
 
 void ApplicationContext::RegisterListener(const Listener& l) {

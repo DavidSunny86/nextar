@@ -50,6 +50,10 @@ public:
 	virtual void EnablePass(StringID pass);
 	virtual void DisablePass(StringID pass);
 
+	virtual uint32 GetPassCount() const;
+	virtual RenderPass* GetPass(uint32 i);
+
+
 	void CreateResources();
 	void DestroyResources();
 

@@ -19,11 +19,15 @@ DefaultLightSystem::~DefaultLightSystem() {
 }
 
 void DefaultLightSystem::Prepare() {
+	skyLight = nullptr;
 	sceneLights.clear();
 }
 
 void DefaultLightSystem::PushLight(uint32 sortKey, Light* vl) {
-	sceneLights.emplace_back(sortKey, vl);
+	if (vl->GetLightType() == Light::Type::SKY)
+		skyLight = vl;
+	else
+		sceneLights.emplace_back(sortKey, vl);
 }
 
 LightList& DefaultLightSystem::GetLights() {
@@ -37,4 +41,9 @@ void DefaultLightSystem::NearbyLights(LightSet& ls, BoundingVolume*) {
 void DefaultLightSystem::Sort() {
 	std::sort(sceneLights.begin(), sceneLights.end(), LightKeyHelper());
 }
+
+Light* DefaultLightSystem::GetSkyLight() {
+	return skyLight;
+}
+
 } /* namespace nextar */

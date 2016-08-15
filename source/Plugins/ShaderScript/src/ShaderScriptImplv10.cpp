@@ -34,6 +34,8 @@ void ShaderScriptImplv1_0::UnregisterDictionary() {
 void ShaderScriptImplv1_0::RegisterDictionary() {
 	CommandDictionary* dict = CommandDictionaryArchive::Instance().RegisterDictionary("ShaderScript",
 			&_rootShaderScript);
+	dict->RegisterRegionHandler("predefs", RegProgramRegion::InstancePtr());
+	dict->RegisterRegionHandler("prefix", RegProgramRegion::InstancePtr());
 	dict->RegisterHandler("shader", CmdShader::InstancePtr());
 	dict->RegisterHandler("shader.inherit", CmdInherit::InstancePtr());
 	dict->RegisterHandler("shader.tags", CmdTags::InstancePtr());
@@ -48,7 +50,7 @@ void ShaderScriptImplv1_0::RegisterDictionary() {
 	dict->RegisterHandler("shader.pass.depth-stencil-state.depth-state", CmdDepthState::InstancePtr());
 	dict->RegisterHandler("shader.pass.depth-stencil-state.stencil-state", CmdStencilState::InstancePtr());
 	dict->RegisterHandler("shader.pass.program", CmdProgram::InstancePtr());
-	dict->RegisterHandler("shader.pass.program.define", CmdDefine::InstancePtr());
+	dict->RegisterHandler("shader.pass.program.activate", CmdActivate::InstancePtr());
 	dict->RegisterHandler("shader.pass.program.domain-program", CmdDomainProgram::InstancePtr());
 	dict->RegisterHandler("shader.pass.program.hull-program", CmdHullProgram::InstancePtr());
 	dict->RegisterHandler("shader.pass.program.geometry-program", CmdGeometryProgram::InstancePtr());

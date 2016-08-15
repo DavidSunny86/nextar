@@ -49,9 +49,9 @@ public:
 	Size targetDimension;
 	Size viewDimensions;
 
-	Vector4 sunLightIntensity;
-	Vector4 sunLightPosition;
-	Color sunLightColor;
+	//Vector4 sunLightIntensity;
+	//Vector4 sunLightPosition;
+	//Color sunLightColor;
 
 	Color color;
 

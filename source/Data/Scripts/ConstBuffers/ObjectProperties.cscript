@@ -1,19 +1,19 @@
 
 
-cbuffer _cbObjectTransforms:OBJECTTRANSFORM {
-	declare mat4x4 _uModelViewProj;
-	declare mat4x4 _uModelView; // assumed orthogonal
+cbuffer cbObjectTransforms:OBJECTTRANSFORM {
+	declare mat4x4 uModelViewProj;
+	declare mat4x4 uModelView; // assumed orthogonal
 };
 
-cbuffer _cbDiffuseProperty context:material {
-	declare vec4 _uDiffuseColor;
+cbuffer cbDiffuseProperty (context = material) {
+	declare vec4 uDiffuseColor;
 };
 
-cbuffer _cbDetailMap context:material when:Maps.DetailMap {
-	declare vec2 _uScale "Detail.Scaling";
+cbuffer cbDetailMap (context = material) {
+	declare vec2 uScale "Detail.Scaling";
 };
 
-cbuffer _cbSpecularProperty context:material when:!(Maps.SpecularAndGlossMap) {
-	declare float _uSpecularPower "Specular.Power";
-	declare float _uGloss "Specular.Gloss";
+cbuffer cbSpecularProperty (context = material) {
+	declare float uSpecularPower "Specular.Power";
+	declare float uGloss "Specular.Gloss";
 };

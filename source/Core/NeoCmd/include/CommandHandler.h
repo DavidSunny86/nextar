@@ -14,6 +14,15 @@ namespace nextar {
 
 class CommandContext;
 class BlockCommandHandler;
+
+class _NexNeoCmdAPI RegionHandler : public AllocGeneral {
+public:
+	virtual bool BeginExecute(CommandContext* pContext, const ASTRegion* region, bool isText) const { return true; }
+	virtual void EndExecute(CommandContext* pContext, const ASTRegion* command, bool isText) const {}
+
+	virtual ~RegionHandler();
+};
+
 class _NexNeoCmdAPI CommandHandler : public AllocGeneral {
 public:
 	CommandHandler(const bool isBlock = false);

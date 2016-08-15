@@ -128,7 +128,7 @@ parameter: STRING_LITERAL                 { $$ = $1; }
 			;
 
 list:  parameters.0.N                          { $$ = $1; }
-	 |  list COMMA parameters.0.N               { $1.Append($3); $$ = std::move($1); }
+	 |  list COMMA parameters.0.N               { $1.AppendList($3); $$ = std::move($1); }
 	 ;
 
 %%

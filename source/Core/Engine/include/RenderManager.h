@@ -28,7 +28,8 @@ public:
 		SPP_GLSL,
 		SPP_HLSL,
 		SPP_COUNT,
-		SPP_UNKNOWN = SPP_COUNT,
+		SSP_ALL = SPP_COUNT,
+		SPP_UNKNOWN,
 	};
 
 	enum Flags {

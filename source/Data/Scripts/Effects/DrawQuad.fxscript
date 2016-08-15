@@ -8,7 +8,7 @@ shader DrawQuad {
 
 		texture-state {
 			sampler s0 nearest-repeat;
-			unit _sDiffuseMap s0 (activate = "TextureMap", context = object);
+			unit sDiffuseMap s0 (activate = "TextureMap", context = object);
 		}
 
 		depth-stencil-state disable;

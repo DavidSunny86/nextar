@@ -26,6 +26,7 @@ bool ShaderScript::CmdShader::BeginExecute(CommandContext* pContext,
 			String templateParams;
 			if (it.HasNext(templateParams)) {
 				c->templateParamNames = std::move(templateParams);
+				
 			}
 			return true;
 		}
@@ -65,9 +66,10 @@ bool ShaderScript::CmdPass::BeginExecute(CommandContext* pContext,
 
 void CmdPass::EndExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	String predefs = _SS(REG_PREDEFS);
+	
 	String defines = _SS(REG_DEFINE);
-	String cbuffer = _SS(REG_CBUFFER);;
+	String cbuffer = _SS(REG_CBUFFER);
+	
 	ShaderScriptContext* shaderScript = static_cast<ShaderScriptContext*>(pContext);
 	for (uint32 i = 0; i < Pass::STAGE_COUNT; ++i) {
 		StringUtils::WordList words;
@@ -86,11 +88,14 @@ void CmdPass::EndExecute(CommandContext* pContext,
 			src = _SS(CMD_GEOMETRY_PROG); break;
 
 		}
+		String predefs = src + "-" + _SS(REG_PREDEFS);
+		String prefix = src + "-" + _SS(REG_PREFIX);
 		if (shaderScript->IsStageActive((Pass::ProgramStage)i)) {
 			LanguageTranslator::Instance().AddPredefs(shaderScript, (Pass::ProgramStage)i);
-			StringUtils::PushBackWord(words, predefs);
 			StringUtils::PushBackWord(words, defines);
+			StringUtils::PushBackWord(words, predefs);
 			StringUtils::PushBackWord(words, cbuffer);
+			StringUtils::PushBackWord(words, prefix);
 			StringUtils::PushBackWord(words, src);
 			shaderScript->SetRegionsAsSource((Pass::ProgramStage)i, words);
 			shaderScript->RemoveRegion(src);
@@ -143,7 +148,7 @@ bool CmdInherit::BeginExecute(CommandContext* pContext,
 	ConstMultiStringHelper::Iterator it =  h.Iterate();
 	URL location;
 	if (it.HasNext(value)) {
-		location = URL(value);
+		location = URL(value, "fxscript", FileSystem::ArchiveProjectData + "/Scripts/Effects");
 		String templateValues;
 		if (it.HasNext(templateValues)) {
 			context.templateParamValues = std::move(templateValues);

@@ -1,10 +1,10 @@
 
-struct _sSurfaceData {
-	vec4 _uAlbedo;
-	vec3 _uNormal; // tangent space normal, when tangent space lighting is being used
-	float _uEmissive;
-	float _uSpecular;
-	float _uOcclusion;
+struct KSurfaceData {
+	vec4 iAlbedo;
+	vec3 iNormal; // tangent space normal, when tangent space lighting is being used
+	float iEmissive;
+	float iSpecular;
+	float iOcclusion;
 };
 
-void _vGetSurfaceData(inout _sSurfaceData data);
+void vGetSurfaceData(inout KSurfaceData data);

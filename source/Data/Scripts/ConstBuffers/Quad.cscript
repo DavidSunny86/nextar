@@ -1,6 +1,6 @@
 
-cbuffer _cbQuad (context = object) {
-  declare vec4 _uTranslationAndScale;
-  declare vec4 _uTextureOffsetAndRepeat;
-  declare vec4 _uMixColor;
+cbuffer cbQuad (context = object) {
+  declare vec4 uTranslationAndScale;
+  declare vec4 uTextureOffsetAndRepeat;
+  declare vec4 uMixColor;
 };

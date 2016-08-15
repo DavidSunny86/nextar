@@ -3,81 +3,126 @@
 /*                           Channels                             */
 /******************************************************************/
 
-#if !defined(HAS_NORMAL_MAP) && defined(HAS_NORMAL_CHANNEL)
-	smooth in vec4 _oNormal;
-   vec3 _iGetNormal() { return normalize(_oNormal.xyz); }
+#ifdef HAS_NORMAL_CHANNEL_OUT
+	smooth in vec4 oNormal;
+   vec3 vGetNormal() { return normalize(oNormal.xyz); }
+
+   vec3 vGetVertexNormal() {   return vGetNormal();   }
+   #define F_vGetVertexNormal
+
 #endif
 
-#ifdef HAS_BINORMAL_CHANNEL
-	smooth in vec4 _oBiNormal;	
-   vec3 _iGetBiNormal() { return normalize(_oBiNormal); }
+#ifdef HAS_BINORMAL_CHANNEL_OUT
+	smooth in vec4 oBiNormal;	
+   vec3 vGetBiNormal() { return normalize(oBiNormal); }
 #endif
 
-#ifdef HAS_TANGENT_CHANNEL
-	smooth in vec4 _oTangent;
-   vec3 _iGetTangent() { return normalize(_oTangent); }
+#ifdef HAS_TANGENT_CHANNEL_OUT
+	smooth in vec4 oTangent;
+   vec3 vGetTangent() { return normalize(oTangent); }
 #endif
 
-#ifdef HAS_TEXCOORD0_CHANNEL
-	smooth in vec2 _oTexCoord0;
-   vec2 _iGetTexCoord0() { return _oTexCoord0;  }
+#ifdef HAS_TEXCOORD0_CHANNEL_OUT
+	smooth in vec2 oTexCoord0;
+   vec2 vGetTexCoord0() { return oTexCoord0;  }
 #endif
 
-#ifdef HAS_TEXCOORD1_CHANNEL
-	smooth out vec2 _oTexCoord1;
-   vec2 _iGetTexCoord1() { return _oTexCoord1;  }
+#ifdef HAS_TEXCOORD1_CHANNEL_OUT
+	smooth in vec2 oTexCoord1;
+   vec2 vGetTexCoord1() { return oTexCoord1;  }
 #endif
 
+#ifdef HAS_VERTEX_COLOR_CHANNEL_OUT
+   smooth in vec4 oVertexColor;
+   vec4 vGetVertexColor() { return oVertexColor; }
+ #endif
+
+ #ifdef HAS_EYEVERETX_CHANNEL_OUT
+	smooth in vec4 oEyeVertex;
+   vec3 vGetEyeVertex() { return oEyeVertex; }
+#endif
 
 /******************************************************************/
 /*                           Samplers                             */
 /******************************************************************/
 #ifdef HAS_DIFFUSE_MAP
-	uniform sampler2D _sDiffuseMap;
-	vec2 _vGetDiffuseTexCoord() {
-		return _iGetTexCoord0();
+	uniform sampler2D sDiffuseMap;
+	vec2 vGetDiffuseTexCoord() {
+		return vGetTexCoord0();
 	}
-	vec4 _vSampleDiffuse(vec2 v) {
-		return ( texture( _sDiffuseMap, v ) );
+	vec4 vSampleDiffuse(vec2 v) {
+		return ( texture( sDiffuseMap, v ) );
+	}
+   vec4 vGetDiffuseColor() {
+		return ( vSampleDiffuse( vGetDiffuseTexCoord() ) );
+	}
+   vec4 vGetDiffuseColor(vec4 scaled) {
+		return ( vSampleDiffuse( vGetDiffuseTexCoord() ) ) * scaled;
 	}
 #else
-	vec2 _vGetDiffuseTexCoord() {
+	vec2 vGetDiffuseTexCoord() {
 		return vec2( 0.0 );
 	}
 
-	vec4 _vSampleDiffuse(vec2 v) {
+	vec4 vSampleDiffuse(vec2 v) {
 		return ( vec4( 1.0 ) );
+	}
+   vec4 vGetDiffuseColor() {
+		return ( vSampleDiffuse( vGetDiffuseTexCoord() ) );
+	}
+   vec4 vGetDiffuseColor(vec4 scaled) {
+		return scaled;
 	}
 #endif
 #ifdef HAS_NORMAL_MAP
-	uniform sampler2D _sNormalMap;
-	vec2 _vGetNormalTexCoord() {
-		return _iGetTexCoord0();
+	uniform sampler2D sNormalMap;
+	vec2 vGetNormalTexCoord() {
+		return vGetTexCoord0();
 	}
-	vec4 _vSampleNormal(vec2 v) {
-		return ( texture( _sNormalMap, v ) );
+	vec4 vSampleNormal(vec2 v) {
+		return ( texture( sNormalMap, v ) );
 	}
-	vec3 _vUnpackNormal(vec2 v) {
-		vec2 n = _vSampleNormal(v).xy * 2.0 - 1.0;
+	vec3 vUnpackNormal(vec2 v) {
+		vec2 n = vSampleNormal(v).xy * 2.0 - 1.0;
 		return vec3(n.x, n.y, sqrt(1 - (n.x*n.x) + (n.y*n.y)));
 	}
+
+   vec3 vGetVertexNormal() {
+      return vSampleNormal(vGetNormalTexCoord()).xyz;
+   }
+   #define F_vGetVertexNormal
 #else
-	vec4 _vSampleNormal(vec2 v) {
+   vec3 vPackNormal(vec3 n) {
+      vec2 enc = normalize(n.xy) * (sqrt(n.z*0.5+0.5));
+	   enc = enc*0.5+0.5;
+	   return enc;
+   }
+
+	vec4 vSampleNormal(vec2 v) {
 		return ( vec4( 0.0 ) );
 	}
 #endif
+
 #ifdef HAS_SPECULAR_AND_GLOSS_MAP
-	uniform sampler2D _sSpecularAndGlossMap;
-	vec2 _vGetSpecularAndGlossTexCoord() {
-		return _iGetTexCoord0();
+	uniform sampler2D sSpecularAndGlossMap;
+	vec2 vGetSpecularAndGlossTexCoord() {
+		return vGetTexCoord0();
 	}
 
-	vec4 _vSampleSpecularAndGloss(vec2 v) {
-		return texture(_sSpecularAndGlossMap, v).rg;
+	vec4 vSampleSpecularAndGloss(vec2 v) {
+		return texture(sSpecularAndGlossMap, v).rg;
 	}
 #else
-	vec2 _vSampleSpecularAndGloss(vec2 v) {
+	vec2 vSampleSpecularAndGloss(vec2 v) {
 		return ( vec2( 0.0 ) );
 	}
+#endif
+
+
+/******************************************************************/
+/*                       Functionals                              */
+/******************************************************************/
+#ifndef F_vGetVertexNormal
+vec3 vGetVertexNormal() { return vec3(0.0, 0.0, 0.0); }
 #endif
 

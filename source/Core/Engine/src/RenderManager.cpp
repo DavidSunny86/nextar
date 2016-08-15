@@ -45,7 +45,7 @@ void RenderManager::DestroyResources() {
 }
 
 void RenderManager::CreateResources() {
-	URL defaultTexturePath(FileSystem::ArchiveEngineData_Name, "Textures/DefaultTexture.jpg");
+	URL defaultTexturePath(FileSystem::ArchiveEngineData_Name, "Textures/DefaultTexture.png");
 	TextureAsset::ID id(StringUtils::DefaultID);
 	defaultTexture = TextureAsset::Traits::Instance(id, defaultTexturePath);
 	defaultTexture->RequestLoad();

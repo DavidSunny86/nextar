@@ -82,8 +82,8 @@ ShaderAssetPtr& ShaderTemplate::GetShaderUnit(const StringUtils::WordList& defin
 		}		
 	}
 
-	optIt = ConstMultiStringHelper::It(enabledOptions);
-	while (optIt.HasNext(value)) {
+	auto enIt = ConstMultiStringHelper::It(enabledOptions);
+	while (enIt.HasNext(value)) {
 		if (value.length() > 0)
 			listOfOptions.insert(value);
 	}
@@ -210,8 +210,7 @@ void ShaderTemplate::LoadStreamRequest::AddParam(const String& param, const Para
 void ShaderTemplate::LoadStreamRequest::AddCompilerOption(const String& name, const String& options) {
 	ShaderTemplate* shader = static_cast<ShaderTemplate*>(GetStreamedObject());
 	auto& macro = shader->macros[name];
-	MultiStringHelper h(macro.activateDefines);
-	h.PushBack(options);
+	StringUtils::PushBackWordList(macro.activateDefines, options);
 	shader->RegisterOptions(name);
 }
 

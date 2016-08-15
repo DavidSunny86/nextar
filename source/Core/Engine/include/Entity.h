@@ -54,6 +54,7 @@ public:
 		virtual EntityPtr AsyncCreateCameraEntity(const StringID name);
 		virtual EntityPtr AsyncCreateMeshEntity(const StringID name,
 				MeshAssetPtr mesh);
+		virtual EntityPtr AsyncCreateSkyLightEntity(const StringID name, const Color&);
 		virtual EntityPtr AsyncCreateDirectionalLightEntity(const StringID name, const Color&);
 		virtual EntityPtr AsyncCreateOmniLightEntity(const StringID name, const Color&, float range);
 

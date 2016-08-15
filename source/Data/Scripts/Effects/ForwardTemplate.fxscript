@@ -5,15 +5,16 @@ shader ForwardTemplate [Vertex, Surface, Lighting] {
 
    pass PointLight { 
          
+      // @urgent FIXME It makes sense to have options, which activates certain options, not the other way round
       import-cbuffer Light;
       import-cbuffer ObjectProperties;   
-
+      
       texture-state {
          sampler s0 linear-clamp;
-         unit _sDiffuseMap s0 (nameref=  "Diffuse.Texture", activate = DiffuseMap, contex = material);
-         unit _sSpecularAndGlossMap s0 (nameref = "Specular.Texture", activate = SpecularAndGlossMap, contex = material);
-         unit _sNormalMap s0 (nameref = "Normal.Texture", activate = NormalMap, contex = material); 
-         unit _sDetailMap s0 (nameref = "Detail.Texture", activate = DetailMap, contex = material); 
+         unit sDiffuseMap s0 (nameref=  "Diffuse.Texture", activate = DiffuseMap, contex = material);
+         unit sSpecularAndGlossMap s0 (nameref = "Specular.Texture", activate = SpecularAndGlossMap, contex = material);
+         unit sNormalMap s0 (nameref = "Normal.Texture", activate = NormalMap, contex = material); 
+         unit sDetailMap s0 (nameref = "Detail.Texture", activate = DetailMap, contex = material); 
       }
 
       depth-stencil-state {
@@ -27,17 +28,65 @@ shader ForwardTemplate [Vertex, Surface, Lighting] {
 
       program {
       
-         activate DiffuseMap HAS_DIFFUSE_MAP HAS_TEXCOORD0_CHANNEL;
-         activate NormalMap HAS_NORMAL_MAP  HAS_TEXCOORD0_CHANNEL HAS_BINORMAL_CHANNEL HAS_TANGENT_CHANNEL HAS_NORMAL_CHANNEL;
-         activate DetailMap HAS_DETAIL_MAP HAS_TEXCOORD0_CHANNEL;
-         activate SpecularAndGlossMap HAS_SPECULAR_AND_GLOSS_MAP  HAS_TEXCOORD0_CHANNEL;
-         activate always HAS_NORMAL_CHANNEL;
-                
+         activate DiffuseMap FW_DIFFUSE_MAP;
+         activate NormalMap FW_NORMAL_MAP;
+         activate DetailMap HAS_DETAIL_MAP;
+         activate SpecularAndGlossMap HAS_SPECULAR_AND_GLOSS_MAP;
          
          vertex-program $Vertex Geometry;
          fragment-program SurfaceSetup $Surface LightSetup $Lighting Forward;
       }
    }
 
-
 }
+
+[[predefs.vertex-program.all.text]]
+
+#ifdef FW_DIFFUSE_MAP
+
+#define HAS_DIFFUSE_MAP
+#define HAS_TEXCOORD0_CHANNEL
+#define HAS_TEXCOORD0_CHANNEL_OUT
+
+#endif
+
+#ifdef FW_NORMAL_MAP
+
+#define HAS_NORMAL_MAP  
+#define HAS_BINORMAL_CHANNEL 
+#define HAS_BINORMAL_CHANNEL_OUT 
+#define HAS_TANGENT_CHANNEL 
+#define HAS_TANGENT_CHANNEL_OUT;
+
+#else
+
+#define HAS_NORMAL_CHANNEL
+#define HAS_NORMAL_CHANNEL_OUT
+
+#endif
+
+[[predefs.fragment-program.all.text]]
+
+#ifdef FW_DIFFUSE_MAP
+
+#define HAS_DIFFUSE_MAP
+#define HAS_TEXCOORD0_CHANNEL
+#define HAS_TEXCOORD0_CHANNEL_OUT
+
+#endif
+
+#ifdef FW_NORMAL_MAP
+
+#define HAS_NORMAL_MAP  
+#define HAS_BINORMAL_CHANNEL 
+#define HAS_BINORMAL_CHANNEL_OUT 
+#define HAS_TANGENT_CHANNEL 
+#define HAS_TANGENT_CHANNEL_OUT;
+
+#else
+
+#define HAS_NORMAL_CHANNEL
+#define HAS_NORMAL_CHANNEL_OUT
+
+#endif
+

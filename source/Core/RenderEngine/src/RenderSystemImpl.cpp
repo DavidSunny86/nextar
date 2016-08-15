@@ -211,4 +211,13 @@ void RenderSystemImpl::DestroyResources(void* thisPointer) {
 	reinterpret_cast<RenderSystemImpl*>(thisPointer)->DestroyResources();
 }
 
+uint32 RenderSystemImpl::GetPassCount() const {
+	return (uint32)renderPasses.size();
+}
+
+RenderPass* RenderSystemImpl::GetPass(uint32 i) {
+	return renderPasses[i];
+}
+
+
 } /* namespace nextar */

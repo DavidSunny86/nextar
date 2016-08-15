@@ -17,4 +17,7 @@ CommandHandler::CommandHandler(const bool isBlock) : _isBlockHandler(isBlock),
 CommandHandler::~CommandHandler() {
 }
 
+RegionHandler::~RegionHandler() {
+}
+
 } /* namespace nextar */

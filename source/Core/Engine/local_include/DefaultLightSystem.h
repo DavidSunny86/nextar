@@ -22,9 +22,11 @@ public:
 	virtual void Sort();
 	virtual void NearbyLights(LightSet& ls, BoundingVolume*);
 	virtual LightList& GetLights();
+	virtual Light* GetSkyLight();
 
 protected:
 
+	Light* skyLight;
 	LightList sceneLights;
 };
 

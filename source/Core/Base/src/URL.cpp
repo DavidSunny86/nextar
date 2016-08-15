@@ -97,6 +97,8 @@ String URL::_Resolve(const String& path, size_t offset) {
 				}
 				lastPos = macroEnd + 1;
 			}
+		} else {
+			lastPos = macroStart;
 		}
 	}
 	if (lastPos != String::npos)
@@ -182,7 +184,8 @@ void URL::_Determine(const String& objectName, const String& fileExt, const Stri
 		offset = _DetermineMountPoint(relativePathSource, archiveName);
 	}
 
-	if (relativePathSource[0] == '/')
+	if (offset < relativePathSource.length() &&
+		relativePathSource[offset] == '/')
 		offset++;
 	
 	relativePath = _Resolve(relativePathSource, offset);

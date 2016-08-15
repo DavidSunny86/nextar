@@ -43,12 +43,26 @@ public:
 		_document = d;
 	}
 
-protected:
-	friend class NeoCommandInterpreter;
+	inline void SetActiveRegionHandler(const RegionHandler* r) {
+		_activeRegionHandler = r;
+	}
+
+	inline const RegionHandler* GetActiveRegionHandler() const {
+		return _activeRegionHandler;
+	}
+
+	inline const RegionHandler* GetRegionHandler(const String& name) {
+		return _dictionary->GetRegionHandler(name);
+	}
+
 	void SetDictionary(CommandDictionary* dic);
 
+protected:
+	friend class NeoCommandInterpreter;
+	
 	CommandDictionary* _dictionary;
 	const ASTDocument* _document;
+	const RegionHandler* _activeRegionHandler;
 	const CommandHandler* _activeHandler;
 };
 

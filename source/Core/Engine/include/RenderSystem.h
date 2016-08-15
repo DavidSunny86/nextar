@@ -57,6 +57,9 @@ public:
 	virtual void EnablePass(StringID pass) = 0;
 	virtual void DisablePass(StringID pass) = 0;
 
+	virtual uint32 GetPassCount() const = 0;
+	virtual RenderPass* GetPass(uint32 i) = 0;
+
 	/* Streaming in-out */
 	virtual void Load(InputStreamPtr& stream, const String& fileType) = 0;
 	virtual void Save(OutputStreamPtr& stream, const String& fileType) = 0;

@@ -10,7 +10,8 @@
 
 namespace nextar {
 
-CommandContext::CommandContext() {
+CommandContext::CommandContext() : _activeHandler(nullptr), _activeRegionHandler(nullptr), 
+_dictionary(nullptr), _document(nullptr) {
 	// TODO Auto-generated constructor stub
 
 }

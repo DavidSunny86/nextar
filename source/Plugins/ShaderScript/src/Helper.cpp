@@ -285,7 +285,7 @@ AutoParamName Helper::GetAutoParam(const String& val) {
 		{ AutoParamName::AUTO_NORMAL_MAP, _SS(ARG_NORMAL_MAP) },
 		{ AutoParamName::AUTO_OBJECT_TRANSFORM, _SS(ARG_OBJECT_TRANSFORM) },
 		{ AutoParamName::AUTO_OMNI_LIGHT_PROPERTIES, _SS(ARG_OMNI_LIGHT_PROPERTIES) },
-		{ AutoParamName::AUTO_SCENE_LIGHT, _SS(ARG_SCENE_LIGHT) },
+		{ AutoParamName::AUTO_SKY_LIGHT, _SS(ARG_SKY_LIGHT) },
 		{ AutoParamName::AUTO_SPECULAR_AND_GLOSS_MAP, _SS(ARG_SPECULAR_AND_GLOSS_MAP) },
 	};
 

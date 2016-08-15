@@ -24,7 +24,17 @@ public:
 	virtual void VisitCommandBegin(const ASTCommand* command);
 	virtual void VisitCommandEnd(const ASTCommand* command);
 
+	virtual void VisitBlockRegionBegin(const ASTBlockRegion*);
+	virtual void VisitBlockRegionEnd(const ASTBlockRegion*);
+	virtual void VisitTextRegionBegin(const ASTTextRegion*);
+	virtual void VisitTextRegionEnd(const ASTTextRegion*);
+
+
 protected:
+
+	String GetRefinedRegionName(const String& name);
+
+	bool _skipReg;
 	bool _dontskip;
 	bool popHandler;
 	CommandContext* _context;

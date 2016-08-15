@@ -22,6 +22,7 @@ public:
 
 	virtual Type GetType() const {return Type::AST_COMMAND;}
 	virtual void Accept(ASTVisitor*) const;
+		
 private:
 	ASTParameter _parameters;
 };
