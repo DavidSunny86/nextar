@@ -29,15 +29,16 @@ void Plugin::Close() {
 }
 
 void Plugin::LicenseRenewed() {
-	AssetLoader::RegisterFactory("NFX", ShaderAsset::Traits::CLASS_ID,
+	AssetLoader::RegisterFactory("nexfx", ShaderAsset::Traits::CLASS_ID,
 			&shaderLoaderImpl);
 }
 
 bool Plugin::LicenseExpired() {
-	AssetLoader::UnregisterFactory("NFX", ShaderAsset::Traits::CLASS_ID);
+	AssetLoader::UnregisterFactory("nexfx", ShaderAsset::Traits::CLASS_ID);
 	return true;
 }
 
 void Plugin::Dispose() {
 }
+
 } /* namespace ShaderCompiler */

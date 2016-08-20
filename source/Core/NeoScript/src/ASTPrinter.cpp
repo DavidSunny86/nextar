@@ -57,7 +57,7 @@ void ASTPrinter::VisitBlockEnd(const ASTBlock* block) {
 
 void ASTPrinter::VisitBlockRegionBegin(const ASTBlockRegion* blockRegion) {
 	if (blockRegion->GetName().length() > 0)
-		_out << "[[" << blockRegion->GetName() << ".script]]\n";
+		_out << "[[" << blockRegion->GetName() << "]]\n";
 }
 
 void ASTPrinter::VisitBlockRegionEnd(const ASTBlockRegion* blockRegion) {
@@ -65,7 +65,7 @@ void ASTPrinter::VisitBlockRegionEnd(const ASTBlockRegion* blockRegion) {
 }
 
 void ASTPrinter::VisitTextRegionBegin(const ASTTextRegion* textRegion) {
-	_out << "[[" << textRegion->GetName() << ".text]]";
+	_out << "{{" << textRegion->GetName() << "}}";
 	_out << textRegion->GetContents();
 }
 

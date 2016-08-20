@@ -20,7 +20,7 @@ public:
 	TranslatorGLSL();
 	virtual ~TranslatorGLSL();
 
-	virtual void BeginBuffer(ShaderScriptContext* script, const String& name)  override;
+	virtual void BeginBuffer(ShaderScriptContext* script, const String& name, const String& modName)  override;
 	virtual void AddParam(ShaderScriptContext* script, ParamDataType dataType, const String& name, uint32 arrayCount)  override;
 	virtual void EndBuffer(ShaderScriptContext* script)  override;
 
@@ -28,6 +28,7 @@ public:
 	virtual void AddPredefs(ShaderScriptContext* script, Pass::ProgramStage stage)  override;
 
 protected:
+	String _vName;
 	String _cbName;
 };
 

@@ -10,8 +10,7 @@
 
 namespace RenderSystemScript {
 
-RenderScriptRoot::RenderScriptRoot() {
-
+RenderScriptRoot::RenderScriptRoot() : RegionHandler(&_instance) {
 }
 
 RenderScriptRoot::~RenderScriptRoot() {

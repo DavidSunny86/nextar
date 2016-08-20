@@ -17,9 +17,9 @@ public:
 	BlockCommandHandler();
 	virtual ~BlockCommandHandler();
 
-	void AddHandler(const String& qualifiedName,
+	void RegisterHandler(const String& qualifiedName,
 			CommandHandler* handler);
-	void RemoveHandler(const String& qualifiedName);
+	void UnregisterHandler(const String& qualifiedName);
 
 	virtual const CommandHandler* GetHandler(const String& name) const;
 

@@ -28,13 +28,13 @@ const CommandHandler* BlockCommandHandler::GetHandler(
 	return nullptr;
 }
 
-void BlockCommandHandler::AddHandler(const String& qualifiedName,
+void BlockCommandHandler::RegisterHandler(const String& qualifiedName,
 		CommandHandler* iHandler) {
 	StringPair p = StringUtils::Split(qualifiedName, '.');
 	if (p.second.length() > 0) {
 		CommandHandler* handler = GetHandler(p.first);
 		if (handler->IsBlockHandler()) {
-			static_cast<BlockCommandHandler*>(handler)->AddHandler(p.second, iHandler);
+			static_cast<BlockCommandHandler*>(handler)->RegisterHandler(p.second, iHandler);
 		}
 	} else {
 		auto& e = _handlers[p.first];
@@ -45,12 +45,12 @@ void BlockCommandHandler::AddHandler(const String& qualifiedName,
 	}
 }
 
-void BlockCommandHandler::RemoveHandler(const String& qualifiedName) {
+void BlockCommandHandler::UnregisterHandler(const String& qualifiedName) {
 	StringPair p = StringUtils::Split(qualifiedName, '.');
 	if (p.second.length() > 0) {
 		CommandHandler* handler = GetHandler(p.first);
 		if (handler->IsBlockHandler()) {
-			static_cast<BlockCommandHandler*>(handler)->RemoveHandler(p.second);
+			static_cast<BlockCommandHandler*>(handler)->UnregisterHandler(p.second);
 		}
 	} else {
 		_handlers.erase(p.first);

@@ -69,10 +69,25 @@ public:
 
 class RegProgramRegion : public nextar::RegionHandler {
 public:
+	
 	NEX_SINGLE_INSTANCE(RegProgramRegion);
+	RegProgramRegion() : nextar::RegionHandler(nullptr) {}
 	virtual bool BeginExecute(CommandContext* pContext, const ASTRegion* region, bool isText) const;
 
 	static RenderManager::ShaderLanguage GetLanguage(const String& l);
+};
+
+class RegShaderRegion : public nextar::RegionHandler {
+
+public:
+
+	NEX_SINGLE_INSTANCE(RegShaderRegion);
+
+	RegShaderRegion() : nextar::RegionHandler(NEX_NEW(BlockCommandHandler)) {}
+	~RegShaderRegion() { NEX_DELETE(_root); _root = nullptr; }
+
+	virtual bool BeginExecute(CommandContext* pContext, const ASTRegion* region, bool isText) const;
+
 };
 
 } /* namespace ShaderScript */

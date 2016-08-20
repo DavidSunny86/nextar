@@ -1,3 +1,4 @@
+[[main]]
 
 shader DrawQuad {
 
@@ -16,7 +17,7 @@ shader DrawQuad {
 		raster-state default;
 
 		program {
-			activate "TextureMap" HAS_DIFFUSE_MAP HAS_TEXCOORD0_CHANNEL;
+			activate "TextureMap" HAS_DIFFUSE_MAP HAS_TEXCOORD0_CHANNEL HAS_TEXCOORD0_CHANNEL_OUT;
 			activate always HAS_2DVERT_CHANNEL;
 			vertex-program Quad;
 			fragment-program CopyMap;

@@ -6,12 +6,13 @@
  */
 #include <NeoCmd.h>
 #include <CommandDictionary.h>
-#include <RootBlockCommandHandler.h>
+#include <BlockCommandHandler.h>
 
 namespace nextar {
 
-CommandDictionary::CommandDictionary(const String& name, RootBlockCommandHandler* root) : _name(name),
-	_root(root) {
+CommandDictionary::CommandDictionary(const String& name, RegionHandler* root) : _name(name) {
+	if (root)
+		RegisterRegionHandler("", root);
 }
 
 CommandDictionary::~CommandDictionary() {
@@ -24,15 +25,6 @@ void CommandDictionary::RegisterRegionHandler(const String& fullyQualifiedName,
 
 void CommandDictionary::UnregisterRegionHandler(const String& fullyQualifiedName) {
 	_regionHandlers.erase(fullyQualifiedName);
-}
-
-void CommandDictionary::RegisterHandler(const String& fullyQualifiedName,
-		CommandHandler* handler) {
-	_root->AddHandler(fullyQualifiedName, handler);
-}
-
-void CommandDictionary::UnregisterHandler(const String& fullyQualifiedName) {
-	_root->RemoveHandler(fullyQualifiedName);
 }
 
 } /* namespace nextar */

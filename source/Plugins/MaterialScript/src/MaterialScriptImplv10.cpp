@@ -15,7 +15,7 @@
 
 namespace MaterialScript {
 
-MaterialScriptImplv1_0::MaterialScriptImplv1_0() {
+MaterialScriptImplv1_0::MaterialScriptImplv1_0() : _rootHandler(&_root) {
 }
 
 MaterialScriptImplv1_0::~MaterialScriptImplv1_0() {
@@ -27,12 +27,12 @@ void MaterialScriptImplv1_0::UnregisterDictionary() {
 
 void MaterialScriptImplv1_0::RegisterDictionary() {
 	CommandDictionary* dict = CommandDictionaryArchive::Instance().RegisterDictionary("MaterialScript",
-			&_root);
-	dict->RegisterHandler("material", CmdMaterial::InstancePtr());
-	dict->RegisterHandler("material.layer", CmdLayer::InstancePtr());
-	dict->RegisterHandler("material.set-param", CmdSetParam::InstancePtr());
-	dict->RegisterHandler("material.enable-option", CmdEnableOption::InstancePtr());
-	dict->RegisterHandler("material.shader", CmdShader::InstancePtr());
+		&_rootHandler);
+	_rootHandler.RegisterHandler("material", CmdMaterial::InstancePtr());
+	_rootHandler.RegisterHandler("material.layer", CmdLayer::InstancePtr());
+	_rootHandler.RegisterHandler("material.set-param", CmdSetParam::InstancePtr());
+	_rootHandler.RegisterHandler("material.enable-option", CmdEnableOption::InstancePtr());
+	_rootHandler.RegisterHandler("material.shader", CmdShader::InstancePtr());
 }
 
 void MaterialScriptImplv1_0::Configure(const nextar::Config&) {

@@ -11,7 +11,7 @@
 #include <NeoScriptHeaders.h>
 #include <NeoCommandInterpreter.h>
 #include <CommandContext.h>
-#include <RootBlockCommandHandler.h>
+#include <BlockCommandHandler.h>
 #include <CommandDictionaryArchive.h>
 
 #endif /* CORE_NEOCMD_INCLUDE_NEOCMDHEADERS_H_ */

@@ -30,13 +30,13 @@ public:
 			ShaderTemplatePtr shader = material->GetShaderTemplate();
 			if (shader) {
 				URL locator = shader->GetAssetLocator();
-				URL shaderSaveUrl("{EngineData}/Shaders/" + locator.GetComputedName() + ".nfx");
+				URL shaderSaveUrl("{EngineData}/Shaders/" + locator.GetComputedName() + ".nexfx");
 				shader->SetAssetLocator(shaderSaveUrl);
 				material->SetAssetLocator(materialSaveUrl);
 				shader->RequestSave();
 				material->RequestSave();
 				AssetPtr asset = material;
-				Asset::AssetSave(asset, materialAssetSaveUrl, "MTL");
+				Asset::AssetSave(asset, materialAssetSaveUrl, "nexmtl");
 				return;
 			}
 		}

@@ -33,9 +33,9 @@ void LanguageTranslator::AddPredefs(ShaderScriptContext* script, Pass::ProgramSt
 	}
 }
 
-void LanguageTranslator::BeginBuffer(ShaderScriptContext* script, const String& name) {
+void LanguageTranslator::BeginBuffer(ShaderScriptContext* script, const String& name, const String& modName) {
 	for(auto& t : translators) {
-		t->BeginBuffer(script, name);
+		t->BeginBuffer(script, name, modName);
 	}
 }
 
@@ -68,6 +68,7 @@ bool LanguageTranslator::ConstBuffer_BeginExecute(ShaderScriptContext* c,
 	const ASTCommand* command) {
 	ConstMultiStringHelper h(command->GetParameters().AsString());
 	String name;
+	String modName;
 
 	bool determineContext = true;
 	auto it = h.Iterate();
@@ -83,22 +84,20 @@ bool LanguageTranslator::ConstBuffer_BeginExecute(ShaderScriptContext* c,
 		}
 	}
 
+	modName = "_";
+	modName += name;
+
 	if (determineContext) {
 		String context;
 		String contextStr = _SS(TAG_CONTEXT);
-		while ((it.HasNext(context))) {
-			if (!context.compare(0, contextStr.length(), contextStr)) {
-				StringUtils::StringPair p = StringUtils::Split(context);
-				name += "__";
-				StringUtils::ToLower(p.second);
-				name += ShaderParameter::GetContextKey(Helper::GetContextFromName(p.second));
-				break;
-			}
+		if (command->GetParameters().Find(contextStr, context)) {
+			modName += "__";
+			modName += ShaderParameter::GetContextKey(Helper::GetContextFromName(context));
 		}
 	}
 
 	c->cbIsAutoParam = !determineContext;
-	LanguageTranslator::Instance().BeginBuffer(c, name);
+	LanguageTranslator::Instance().BeginBuffer(c, name, modName);
 	return true;
 }
 

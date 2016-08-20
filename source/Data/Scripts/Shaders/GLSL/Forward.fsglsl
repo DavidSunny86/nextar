@@ -9,5 +9,5 @@ void main(void)
    vGetSurfaceData(data);
    vGetSkyLight(skyLight);
 
-   oDiffuseColor = vCalculateLighting(light, data);
+   oDiffuseColor = vCalculateLighting(skyLight, data);
 }

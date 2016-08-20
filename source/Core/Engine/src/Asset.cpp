@@ -438,7 +438,7 @@ void AssetLoader::Serialize() {
 
 	if (!impl) {
 		String ext = location.GetExtension();
-		StringUtils::ToUpper(ext);
+		StringUtils::ToLower(ext);
 		impl = GetImpl(ext, assetPtr->GetClassID());
 	}
 	if (!impl) {
@@ -484,7 +484,7 @@ void AssetSaver::Serialize() {
 	if (!impl) {
 
 		String ext = location.GetExtension();
-		StringUtils::ToUpper(ext);
+		StringUtils::ToLower(ext);
 		impl = GetImpl(ext, assetPtr->GetClassID());
 	}
 	if (!impl) {

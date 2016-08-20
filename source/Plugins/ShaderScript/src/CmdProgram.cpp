@@ -98,6 +98,12 @@ bool ShaderScript::SubProgramType::BeginExecute(CommandContext* pContext,
 	return true;
 }
 
+bool RegShaderRegion::BeginExecute(CommandContext* pContext,
+	const ASTRegion* region, bool isText) const {
+	// let the commands execute
+	return true;
+}
+
 bool RegProgramRegion::BeginExecute(CommandContext* pContext, 
 	const ASTRegion* region, bool isText) const {
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
@@ -105,11 +111,11 @@ bool RegProgramRegion::BeginExecute(CommandContext* pContext,
 		const ASTTextRegion* reg = static_cast<const ASTTextRegion*>(region);
 		String src;
 		const String& fullName = region->GetName();
-		size_t p = fullName.find_first_of('.');
+		size_t p = fullName.find_first_of(':');
 		if (p != String::npos) {
 			p++;
-			String subname = fullName.substr(0, p);
-			size_t t = fullName.find_first_of('.', p);
+			String subname = fullName.substr(0, p-1);
+			size_t t = fullName.find_first_of(':', p);
 			if (t != String::npos) {
 				src = fullName.substr(p, t - p) + "-" + subname;
 				p = t + 1;
@@ -119,16 +125,16 @@ bool RegProgramRegion::BeginExecute(CommandContext* pContext,
 		else
 			return false;
 
-		size_t n = fullName.find_first_of('.', p);
+		size_t n = fullName.find_first_of(':', p);
 		
 		RenderManager::ShaderLanguage l = GetLanguage(fullName.substr(p, n));
 		if (l == RenderManager::ShaderLanguage::SSP_ALL) {
 			for (uint32 i = 0; i < RenderManager::ShaderLanguage::SPP_COUNT; ++i) {
-				String v = reg->GetValue();
+				String v = reg->GetContents();
 				c->AddRegion(src, (RenderManager::ShaderLanguage) (i),	std::move(v));
 			}
 		} else if (l != RenderManager::ShaderLanguage::SPP_UNKNOWN) {
-			String v = reg->GetValue();
+			String v = reg->GetContents();
 			c->AddRegion(src, (RenderManager::ShaderLanguage) (l), std::move(v));
 		}
 	}

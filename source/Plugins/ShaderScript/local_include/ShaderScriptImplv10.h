@@ -24,8 +24,9 @@ public:
 	void UnregisterDictionary();
 
 protected:
-	RootBlockCommandHandler _rootShaderScript;
-	RootBlockCommandHandler _rootTranslator;
+	RegionHandler _rootShaderScript;
+	BlockCommandHandler _rootTranslatorCommandHandler;
+	RegionHandler _rootTranslator;
 };
 
 } /* namespace ShaderScript */

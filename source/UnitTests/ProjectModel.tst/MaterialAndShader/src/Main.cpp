@@ -14,9 +14,9 @@ public:
 		ShaderTemplatePtr shader;
 
 		MaterialTemplate::ID id(NamedObject::AsyncStringID("Box"));
-		URL loadUrl("{EngineData}/Scripts/Materials/Box.mtl");
-		URL saveUrl("{EngineData}/Materials/Box.mtl");
-		URL saveShaderUrl("{EngineData}/Shaders/Deferred.nfx");
+		URL loadUrl("{EngineData}/Scripts/Materials/Box.nexmtl");
+		URL saveUrl("{EngineData}/Materials/Box.nexmtl");
+		URL saveShaderUrl("{EngineData}/Shaders/Deferred.nexfx");
 		material = MaterialTemplate::Traits::Instance(id, loadUrl);
 		material->RequestLoad();
 		material->SetAssetLocator(saveUrl);
@@ -27,28 +27,28 @@ public:
 
 		// save engine lights	
 		MaterialTemplate::ID id2(NamedObject::AsyncStringID("DeferredLights"));
-		URL dlMaterialUrl("{EngineData}/Scripts/Materials/DeferredLights.mtl");
+		URL dlMaterialUrl("{EngineData}/Scripts/Materials/DeferredLights.nexmtl");
 		URL saveDlMaterialUrl("{EngineData}/Materials/Assets/DeferredLights.asset");
-		URL saveDlShaderUrl("{EngineData}/Shaders/DeferredLights.nfx");
+		URL saveDlShaderUrl("{EngineData}/Shaders/DeferredLights.nexfx");
 		material = MaterialTemplate::Traits::Instance(id2, dlMaterialUrl);
 		material->RequestLoad();
 		shader = material->GetShaderTemplate();
 		shader->SetAssetLocator(saveDlShaderUrl);
 		shader->RequestSave();
 		AssetPtr mtl = material;
-		Asset::AssetSave(mtl, saveDlMaterialUrl, "MTL");
+		Asset::AssetSave(mtl, saveDlMaterialUrl, "nexmtl");
 
 		MaterialTemplate::ID id3(NamedObject::AsyncStringID("Debug3D"));
-		URL dbMaterialUrl("{EngineData}/Scripts/Materials/Debug3D.mtl");
+		URL dbMaterialUrl("{EngineData}/Scripts/Materials/Debug3D.nexmtl");
 		URL saveDbMaterialUrl("{EngineData}/Materials/Assets/Debug3D.asset");
-		URL saveDbShaderUrl("{EngineData}/Shaders/Debug3D.nfx");
+		URL saveDbShaderUrl("{EngineData}/Shaders/Debug3D.nexfx");
 		material = MaterialTemplate::Traits::Instance(id3, dbMaterialUrl);
 		material->RequestLoad();
 		shader = material->GetShaderTemplate();
 		shader->SetAssetLocator(saveDbShaderUrl);
 		shader->RequestSave();
 		mtl = material;
-		Asset::AssetSave(mtl, saveDbMaterialUrl, "MTL");
+		Asset::AssetSave(mtl, saveDbMaterialUrl, "nexmtl");
 	}
 };
 

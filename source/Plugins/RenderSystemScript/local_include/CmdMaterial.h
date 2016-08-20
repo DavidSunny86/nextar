@@ -19,6 +19,10 @@ public:
 
 	virtual bool BeginExecute(CommandContext* pContext,
 			const ASTCommand* command) const;
+
+private:
+
+	static MaterialAssetPtr LoadMaterial(const SharedComponent::ID& id, const URL& url);
 };
 
 } /* namespace RenderSystemScript */

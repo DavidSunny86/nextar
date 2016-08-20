@@ -825,6 +825,10 @@ UniformBufferGL* RenderContext_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 		GL_CHECK();
 		// put the string construction outside the loop? we do a move for custom params however.
 		String paramName = uniName;
+		size_t np = paramName.find_first_of('.');
+		if (np != String::npos) {
+			paramName = paramName.substr(np + 1);
+		}
 		auto it = remapParams.find(paramName);
 		const AutoParam* paramDef = nullptr;
 		if (it != remapParams.end())

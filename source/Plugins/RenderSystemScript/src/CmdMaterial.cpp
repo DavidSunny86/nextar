@@ -9,6 +9,7 @@
 #include <CmdMaterial.h>
 #include <RenderScriptContext.h>
 #include <DeferredRenderPass.h>
+#include <MaterialTemplate.h>
 
 namespace RenderSystemScript {
 
@@ -28,17 +29,26 @@ bool CmdMaterial::BeginExecute(CommandContext* pContext,
 	else
 		id = Asset::ToID(location);
 
+	MaterialAssetPtr m = LoadMaterial(id, location);
 	if (c->_passType.find("Compositor") != String::npos) {
 		BaseMaterialPass* pass = static_cast<BaseMaterialPass*>(c->_pass);
-		MaterialAssetPtr m = MaterialAsset::Traits::Instance(id, location);
 		pass->SetMaterial( m );
 	} else if (c->_passType.find("Deferred") != String::npos) {
 		DeferredRenderPass* pass = static_cast<DeferredRenderPass*>(c->_pass);
-		MaterialAssetPtr m = MaterialAsset::Traits::Instance(id, location);
 		pass->SetLightMaterial(m);
 	}
 
 	return true;
+}
+
+MaterialAssetPtr CmdMaterial::LoadMaterial(const SharedComponent::ID& id, 
+	const URL& url) {
+
+	MaterialTemplatePtr mtlTemplatePtr = MaterialTemplate::Traits::Instance(id, url);
+	if (mtlTemplatePtr->RequestLoad()) {
+		return mtlTemplatePtr->GetMaterial();
+	}
+	return MaterialAssetPtr();
 }
 
 } /* namespace RenderSystemScript */

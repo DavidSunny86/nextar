@@ -50,7 +50,7 @@ int NextarMain(int argc, char* argv[]) {
 		}
 	}
 	if (filePath.length()) {
-		UTApplicationMeshExport impl(filePath, savePath.length() > 0 ? savePath : filePath + ".mesh");
+		UTApplicationMeshExport impl(filePath, savePath.length() > 0 ? savePath : filePath + ".nexmesh");
 		nextar::ApplicationContext application("MeshExport", impl);
 		application.InitializeContext(argc, argv);
 		application.Run();

@@ -8,7 +8,7 @@
 #include <NeoCmd.h>
 #include <CommandVisitor.h>
 #include <BlockCommandHandler.h>
-#include <RootBlockCommandHandler.h>
+#include <BlockCommandHandler.h>
 #include <CommandContext.h>
 
 namespace nextar {
@@ -20,8 +20,12 @@ CommandVisitor::~CommandVisitor() {
 }
 
 void CommandVisitor::VisitDocumentBegin(const ASTDocument* doc) {
-	const RootBlockCommandHandler* handler = _context->GetRoot();
-	handler->BeginDocument(_context, doc);
+	const RegionHandler* h = _context->GetDictionary()->GetRegionHandler(StringUtils::Null);
+	
+	const BlockCommandHandler* handler = h->GetRoot();
+	_context->SetActiveRegionHandler(h);
+	_context->SetActiveHandler(handler);
+	//_context->Begin(doc);
 }
 
 void CommandVisitor::VisitCommandBegin(const ASTCommand* command) {
@@ -53,22 +57,24 @@ void CommandVisitor::VisitCommandEnd(const ASTCommand* command) {
 }
 
 void CommandVisitor::VisitDocumentEnd(const ASTDocument* doc) {
-	const RootBlockCommandHandler* handler = _context->GetRoot();
-	handler->EndDocument(_context, doc);
+	_context->SetActiveRegionHandler(nullptr);
+	_context->SetActiveHandler(nullptr);
+	// _context->Finish(doc)
 }
 
 void CommandVisitor::VisitBlockRegionBegin(const ASTBlockRegion* reg) {
-	if (reg->GetName() != StringUtils::Null) {
-		const RegionHandler* h = _context->GetRegionHandler(GetRefinedRegionName(reg->GetName()));
-		if (h) {
-			// @todo potential error, if no handler is found, we have no way to switch
-			// back dictionaries
-			_context->SetActiveRegionHandler(h);
-			_skipReg = h->BeginExecute(_context, reg, false);
-		} else
-			_skipReg = true;
-	}
-		
+	const RegionHandler* h = _context->GetRegionHandler(GetRefinedRegionName(reg->GetName()));
+	if (h) {
+		// @todo potential error, if no handler is found, we have no way to switch
+		// back dictionaries
+		_context->SetActiveRegionHandler(h);
+		_skipReg = !h->BeginExecute(_context, reg, false);
+		if (!_skipReg && h->GetRoot()) {
+			_context->SetActiveHandler(h->GetRoot());
+		}
+
+	} else
+		_skipReg = true;		
 }
 
 void CommandVisitor::VisitBlockRegionEnd(const ASTBlockRegion* reg) {
@@ -76,20 +82,20 @@ void CommandVisitor::VisitBlockRegionEnd(const ASTBlockRegion* reg) {
 	if (r)
 		r->EndExecute(_context, reg, true);
 	_context->SetActiveRegionHandler(nullptr);
+	_context->SetActiveHandler(nullptr);
 }
 
 void CommandVisitor::VisitTextRegionBegin(const ASTTextRegion* reg) {
-	if (reg->GetName() != StringUtils::Null) {
-		const RegionHandler* h = _context->GetRegionHandler(GetRefinedRegionName(reg->GetName()));
-		if (h) {
-			// @todo potential error, if no handler is found, we have no way to switch
-			// back dictionaries
-			_context->SetActiveRegionHandler(h);
-			_skipReg = h->BeginExecute(_context, reg, true);
-		} else {
-			_skipReg = true;
-		}
+	const RegionHandler* h = _context->GetRegionHandler(GetRefinedRegionName(reg->GetName()));
+	if (h) {
+		// @todo potential error, if no handler is found, we have no way to switch
+		// back dictionaries
+		_context->SetActiveRegionHandler(h);
+		_skipReg = !h->BeginExecute(_context, reg, true);
+	} else {
+		_skipReg = true;
 	}
+	_context->SetActiveHandler(nullptr);
 }
 
 void CommandVisitor::VisitTextRegionEnd(const ASTTextRegion* reg) {
@@ -97,10 +103,11 @@ void CommandVisitor::VisitTextRegionEnd(const ASTTextRegion* reg) {
 	if (r)
 		r->EndExecute(_context, reg, true);
 	_context->SetActiveRegionHandler(nullptr);
+	_context->SetActiveHandler(nullptr);
 }
 
 String CommandVisitor::GetRefinedRegionName(const String& n) {
-	size_t p = n.find_first_of('.');
+	size_t p = n.find_first_of(':');
 	if (p != String::npos) {
 		return n.substr(0, p);
 	}

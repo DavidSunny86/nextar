@@ -16,9 +16,9 @@ pass Debug {
 
 pass Compositor {
 	material "Materials/DrawQuad.mscript";
-	set-param _sDiffuseMap last.color-0;
-	set-param _uTranslationAndScale "0 0 1 1";
-	set-param _uTextureOffsetAndRepeat "0 0 1 1";
-	set-param _uMixColor "1 1 1 1";
+	set-param sDiffuseMap last.color-0;
+	set-param uTranslationAndScale "0 0 1 1";
+	set-param uTextureOffsetAndRepeat "0 0 1 1";
+	set-param uMixColor "1 1 1 1";
 	render-to viewport;
 }

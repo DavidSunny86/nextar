@@ -1,4 +1,55 @@
 
+{{predefs:vertex-program:all}}
+
+#ifdef FW_DIFFUSE_MAP
+
+#define HAS_DIFFUSE_MAP
+#define HAS_TEXCOORD0_CHANNEL
+#define HAS_TEXCOORD0_CHANNEL_OUT
+
+#endif
+
+#ifdef FW_NORMAL_MAP
+
+#define HAS_NORMAL_MAP  
+#define HAS_BINORMAL_CHANNEL 
+#define HAS_BINORMAL_CHANNEL_OUT 
+#define HAS_TANGENT_CHANNEL 
+#define HAS_TANGENT_CHANNEL_OUT;
+
+#else
+
+#define HAS_NORMAL_CHANNEL
+#define HAS_NORMAL_CHANNEL_OUT
+
+#endif
+
+{{predefs:fragment-program:all}}
+
+#ifdef FW_DIFFUSE_MAP
+
+#define HAS_DIFFUSE_MAP
+#define HAS_TEXCOORD0_CHANNEL
+#define HAS_TEXCOORD0_CHANNEL_OUT
+
+#endif
+
+#ifdef FW_NORMAL_MAP
+
+#define HAS_NORMAL_MAP  
+#define HAS_BINORMAL_CHANNEL 
+#define HAS_BINORMAL_CHANNEL_OUT 
+#define HAS_TANGENT_CHANNEL 
+#define HAS_TANGENT_CHANNEL_OUT;
+
+#else
+
+#define HAS_NORMAL_CHANNEL
+#define HAS_NORMAL_CHANNEL_OUT
+
+#endif
+
+[[main]]
 shader ForwardTemplate [Vertex, Surface, Lighting] {
 
    tags forward;
@@ -39,54 +90,3 @@ shader ForwardTemplate [Vertex, Surface, Lighting] {
    }
 
 }
-
-[[predefs.vertex-program.all.text]]
-
-#ifdef FW_DIFFUSE_MAP
-
-#define HAS_DIFFUSE_MAP
-#define HAS_TEXCOORD0_CHANNEL
-#define HAS_TEXCOORD0_CHANNEL_OUT
-
-#endif
-
-#ifdef FW_NORMAL_MAP
-
-#define HAS_NORMAL_MAP  
-#define HAS_BINORMAL_CHANNEL 
-#define HAS_BINORMAL_CHANNEL_OUT 
-#define HAS_TANGENT_CHANNEL 
-#define HAS_TANGENT_CHANNEL_OUT;
-
-#else
-
-#define HAS_NORMAL_CHANNEL
-#define HAS_NORMAL_CHANNEL_OUT
-
-#endif
-
-[[predefs.fragment-program.all.text]]
-
-#ifdef FW_DIFFUSE_MAP
-
-#define HAS_DIFFUSE_MAP
-#define HAS_TEXCOORD0_CHANNEL
-#define HAS_TEXCOORD0_CHANNEL_OUT
-
-#endif
-
-#ifdef FW_NORMAL_MAP
-
-#define HAS_NORMAL_MAP  
-#define HAS_BINORMAL_CHANNEL 
-#define HAS_BINORMAL_CHANNEL_OUT 
-#define HAS_TANGENT_CHANNEL 
-#define HAS_TANGENT_CHANNEL_OUT;
-
-#else
-
-#define HAS_NORMAL_CHANNEL
-#define HAS_NORMAL_CHANNEL_OUT
-
-#endif
-

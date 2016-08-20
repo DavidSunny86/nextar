@@ -19,7 +19,6 @@ class CommandDictionaryArchive;
 class CommandContext;
 class CommandHandler;
 class BlockCommandHandler;
-class RootBlockCommandHandler;
 
 }
 

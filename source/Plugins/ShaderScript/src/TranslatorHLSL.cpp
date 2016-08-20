@@ -17,10 +17,12 @@ TranslatorHLSL::TranslatorHLSL() {
 TranslatorHLSL::~TranslatorHLSL() {
 }
 
-void TranslatorHLSL::BeginBuffer(ShaderScriptContext* _script, const String& name) {
+void TranslatorHLSL::BeginBuffer(ShaderScriptContext* _script, const String& name, const String& modName) {
 	String& transientBuffer = _script->_transientBuffer[HLSL_TRANSLATOR];
 	transientBuffer.clear();
-	transientBuffer += "cbuffer " + name + " {\n";
+	// @todo Output a struct, and then place the struct as cbuffer member with name as the member, modName can
+	// be the cbuffer name.
+	transientBuffer += "cbuffer " + modName + " {\n";
 }
 
 void TranslatorHLSL::AddParam(ShaderScriptContext* _script, ParamDataType dataType, const String& name,

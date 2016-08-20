@@ -29,12 +29,12 @@ void Plugin::Close() {
 }
 
 void Plugin::LicenseRenewed() {
-	AssetLoader::RegisterFactory("MTL", MaterialAsset::Traits::CLASS_ID,
+	AssetLoader::RegisterFactory("nexmtl", MaterialAsset::Traits::CLASS_ID,
 			&materialLoaderImpl);
 }
 
 bool Plugin::LicenseExpired() {
-	AssetLoader::UnregisterFactory("MTL", ShaderAsset::Traits::CLASS_ID);
+	AssetLoader::UnregisterFactory("nexmtl", ShaderAsset::Traits::CLASS_ID);
 	return true;
 }
 

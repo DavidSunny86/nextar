@@ -11,7 +11,7 @@ public:
 	virtual void _SetupScene(SceneAssetPtr& scene) {
 		UTApplication::_SetupScene(scene);
 
-		URL url("{EngineData}/Meshes/Box.mesh");
+		URL url("{EngineData}/Meshes/Box.nexmesh");
 		MeshAsset::ID id(NamedObject::AsyncStringID("Box"));
 		
 		MeshAssetPtr mesh = MeshAsset::Traits::Instance(id, url);

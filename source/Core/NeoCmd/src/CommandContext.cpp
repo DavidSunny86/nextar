@@ -6,7 +6,7 @@
  */
 #include <NeoCmd.h>
 #include <CommandContext.h>
-#include <RootBlockCommandHandler.h>
+#include <BlockCommandHandler.h>
 
 namespace nextar {
 
@@ -22,7 +22,8 @@ CommandContext::~CommandContext() {
 
 void CommandContext::SetDictionary(CommandDictionary* dic) {
 	_dictionary = dic;
-	_activeHandler = dic->GetRoot();
+	const RegionHandler* h = dic->GetRegionHandler(StringUtils::Null);
+	_activeHandler = h ? h->GetRoot() : nullptr;
 }
 
 } /* namespace nextar */

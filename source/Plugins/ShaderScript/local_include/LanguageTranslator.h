@@ -26,7 +26,7 @@ public:
 	virtual void AddPredefs(ShaderScriptContext* script, Pass::ProgramStage stage) = 0;
 	virtual void AddMacro(ShaderScriptContext* script, const String& name) = 0;
 	/** Constant buffer operator */
-	virtual void BeginBuffer(ShaderScriptContext* script, const String& name) = 0;
+	virtual void BeginBuffer(ShaderScriptContext* script, const String& name, const String& modName) = 0;
 	virtual void AddParam(ShaderScriptContext* script, ParamDataType dataType, const String& name, uint32 arrayCount) = 0;
 	virtual void EndBuffer(ShaderScriptContext* script) = 0;
 
@@ -67,7 +67,7 @@ public:
 	};
 
 protected:
-	virtual void BeginBuffer(ShaderScriptContext* script, const String& name);
+	virtual void BeginBuffer(ShaderScriptContext* script, const String& name, const String& modName);
 	virtual void AddParam(ShaderScriptContext* script, ParamDataType dataType, const String& name, uint32 arrayCount);
 	virtual void EndBuffer(ShaderScriptContext* script);
 

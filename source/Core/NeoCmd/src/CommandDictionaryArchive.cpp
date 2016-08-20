@@ -25,7 +25,7 @@ CommandDictionaryArchive::~CommandDictionaryArchive() {
 }
 
 CommandDictionary* CommandDictionaryArchive::RegisterDictionary(
-		const String& name, RootBlockCommandHandler* value) {
+		const String& name, RegionHandler* value) {
 	CommandDictionary* dict = NEX_NEW(CommandDictionary(name, value));
 	_scriptHandlers[name] = dict;
 	return dict;

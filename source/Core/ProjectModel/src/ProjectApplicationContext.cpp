@@ -34,13 +34,13 @@ void ProjectApplicationContext::RegisterTemplateFactories() {
 	MaterialTemplate::FactoryTraits::_InternalRegisterToArchive();
 	MeshTemplate::FactoryTraits::_InternalRegisterToArchive();
 
-	AssetSaver::RegisterFactory("MTL",
+	AssetSaver::RegisterFactory("nexmtl",
 			MaterialTemplate::Traits::CLASS_ID,
 			&MaterialSaverImplv1_0::saver);
-	AssetSaver::RegisterFactory("NFX",
+	AssetSaver::RegisterFactory("nexfx",
 			ShaderTemplate::Traits::CLASS_ID,
 			&ShaderSaverImplv1_0::saver);
-	AssetSaver::RegisterFactory("MESH",
+	AssetSaver::RegisterFactory("nexmesh",
 				MeshTemplate::Traits::CLASS_ID,
 				&MeshSaverImplv1_0::saver);
 }

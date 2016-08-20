@@ -16,28 +16,20 @@ typedef map<String, RegionHandler*>::type RegionHandlerMap;
 
 class _NexNeoCmdAPI CommandDictionary : public AllocGeneral {
 public:
-	CommandDictionary(const String& name, RootBlockCommandHandler* root);
+	CommandDictionary(const String& name, RegionHandler* unnamedRegionHandler);
 	virtual ~CommandDictionary();
 
 	void RegisterRegionHandler(const String& fullyQualifiedName, RegionHandler* pHandler);
 	void UnregisterRegionHandler(const String& fullyQualifiedName);
 
-	void RegisterHandler(const String& fullyQualifiedName, CommandHandler* pHandler);
-	void UnregisterHandler(const String& fullyQualifiedName);
-
-	inline const RootBlockCommandHandler* GetRoot() const {
-		return _root;
-	}
-
-	inline const RegionHandler* GetRegionHandler(const String& name) {
+	inline const RegionHandler* GetRegionHandler(const String& name) const {
 		auto it = _regionHandlers.find(name);
-		return it != _regionHandlers.end() ? (*it).second : nullptr;
+		return (it != _regionHandlers.end()) ? (*it).second : nullptr;
 	}
 
 protected:
 
 	RegionHandlerMap _regionHandlers;
-	RootBlockCommandHandler* _root;
 	String _name;
 };
 

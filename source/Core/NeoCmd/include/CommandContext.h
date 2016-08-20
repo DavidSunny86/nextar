@@ -13,7 +13,7 @@
 
 namespace nextar {
 
-class RootBlockCommandHandler;
+class BlockCommandHandler;
 class _NexNeoCmdAPI CommandContext {
 public:
 	CommandContext();
@@ -29,10 +29,6 @@ public:
 
 	inline void SetActiveHandler(const CommandHandler* handler) {
 		_activeHandler = handler;
-	}
-
-	inline const RootBlockCommandHandler* GetRoot() const {
-		return _dictionary->GetRoot();
 	}
 
 	inline const ASTDocument* GetDocument() const {

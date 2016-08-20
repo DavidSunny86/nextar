@@ -20,4 +20,14 @@ CommandHandler::~CommandHandler() {
 RegionHandler::~RegionHandler() {
 }
 
+
+void RegionHandler::RegisterHandler(const String& fullyQualifiedName,
+	CommandHandler* handler) {
+	_root->RegisterHandler(fullyQualifiedName, handler);
+}
+
+void RegionHandler::UnregisterHandler(const String& fullyQualifiedName) {
+	_root->UnregisterHandler(fullyQualifiedName);
+}
+
 } /* namespace nextar */

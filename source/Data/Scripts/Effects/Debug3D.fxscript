@@ -1,10 +1,11 @@
+[[main]]
 
 shader Debug3D {
 
 	tags debug;
 	pass Main {
 		  
-		cbuffer _cbDebugModelView {
+		cbuffer cbDebugModelView {
 			declare mat4x4 uModelViewProj:MODELVIEWPROJECTION;
 			declare vec4 uObjectColor:DIFFUSECOLOR;
 			declare float uObjectScale:CONSTANTSCALEFACTOR;
@@ -22,7 +23,7 @@ shader Debug3D {
 		raster-state default;
 		
 		program {
-			define HAS_COLOR_CHANNEL;
+			activate always HAS_COLOR_CHANNEL HAS_VERTEX_COLOR_CHANNEL_OUT;
 			vertex-program Debug3D;
 			fragment-program Debug3D;
 		}

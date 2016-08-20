@@ -22,7 +22,7 @@ void   neo_free (void * ptr, void * yyscanner);
 
 %x STATE_REGION STATE_TEXT STATE_STR STATE_CONTENT STATE_COMMENT STATE_SINGLE_LINE_COMMENT
 
-REG      [a-zA-Z#_$]+
+REG     [a-zA-Z#_$:\-\.]+
 BLANK   [ \t]
 %%
 
@@ -30,15 +30,16 @@ BLANK   [ \t]
 <STATE_TEXT>{
 
 \\\[ 		 	b.PutContent('[');
-^\[\[          {
+\\\{ 		 	b.PutContent('{');
+^(\[\[)|(\{\{)      {
 	BEGIN(STATE_REGION); 
 	nextar::String content = b.GetContent(); 
 	b.StartContent(); 
 	return nextar::neo_parser_impl::make_TEXT_CONTENTS(content, b.Loc()); 
 }
 
-[^\\\[\n]+       b.PutContent(yytext);
-\\[^\[]+			 b.PutContent(yytext);
+[^\\\[\n\{]+       b.PutContent(yytext);
+\\[^\[\{]+			 b.PutContent(yytext);
 
 <<EOF>>  {
 	BEGIN(INITIAL); 
@@ -71,7 +72,7 @@ BLANK   [ \t]
 }
 
 <INITIAL,STATE_CONTENT>{
-^\[\[          BEGIN(STATE_REGION); b.StartContent();
+^(\[\[)|(\{\{)          BEGIN(STATE_REGION); b.StartContent();
 "/*" 		  		BEGIN(STATE_COMMENT);
 "//"           BEGIN(STATE_SINGLE_LINE_COMMENT);
 "{"            return nextar::neo_parser_impl::make_LBRACKET(b.Loc());
@@ -98,12 +99,12 @@ BLANK   [ \t]
 
 {BLANK}+  b.Loc().Step();
 
-(\.script\]\])|\]\] {
+\]\] {
 	BEGIN(STATE_CONTENT);
 	return nextar::neo_parser_impl::make_REGION_ID(b.GetContent(), b.Loc());
 }
 
-\.text\]\]  {
+\}\}  {
 	BEGIN(STATE_TEXT);
 	nextar::String value = b.GetContent();
 	b.StartContent();

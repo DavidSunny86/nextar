@@ -45,8 +45,9 @@ void ASTParameter::SetName(const String& name) {
 bool ASTParameter::Find(const String& name, String& value) const {
 	ConstMultiStringHelper h(AsString());
 	auto it = h.Iterate();
-	while (it.HasNext(value)) {
-		if (StringUtils::IsTagged(_value, name, value))
+	String v;
+	while (it.HasNext(v)) {
+		if (StringUtils::IsTagged(v, name, value))
 			return true;
 	}
 	return false;

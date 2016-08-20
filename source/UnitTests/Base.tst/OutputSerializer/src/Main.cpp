@@ -163,7 +163,7 @@ void TestDumpCubeMesh(nextar::ApplicationContext& application) {
 	nextar::FileSystem& fileSys = nextar::FileSystem::Instance();
 
 	String version("1.0.0");
-	URL url("{EngineData}/Meshes/Box.mesh");
+	URL url("{EngineData}/Meshes/Box.nexmesh");
 	OutputStreamPtr output = fileSys.OpenWrite(url, false);
 	{
 	OutputSerializer ser(output);

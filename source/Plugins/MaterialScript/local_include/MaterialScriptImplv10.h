@@ -25,7 +25,8 @@ public:
 	virtual void Load(nextar::InputStreamPtr& input, nextar::AssetLoader& material);
 
 protected:
-	RootBlockCommandHandler _root;
+	RegionHandler _rootHandler;
+	BlockCommandHandler _root;
 };
 
 } /* namespace MaterialScript */

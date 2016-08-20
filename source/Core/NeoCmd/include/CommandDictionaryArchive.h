@@ -19,7 +19,7 @@ public:
 	CommandDictionaryArchive();
 	virtual ~CommandDictionaryArchive();
 
-	CommandDictionary* RegisterDictionary(const String& name, RootBlockCommandHandler* value);
+	CommandDictionary* RegisterDictionary(const String& name, RegionHandler* value);
 	void UnregisterDictionary(const String& name);
 
 	CommandDictionary* Get(const String& name);

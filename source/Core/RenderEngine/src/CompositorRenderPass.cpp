@@ -28,7 +28,13 @@ RenderPass* CompositorRenderPass::CreateInstance() {
 }
 
 void CompositorRenderPass::OnMaterialLoad() {
-	parameters.Prepare(material->GetShader()->GetParamTableItem(ParameterContext::CTX_OBJECT));
+	ShaderAssetPtr shader = material->GetShader();
+	if (shader) {
+		parameters.Prepare(shader->GetParamTableItem(ParameterContext::CTX_OBJECT));
+		return;
+	}
+
+	NEX_THROW_GracefulError(EXCEPT_FAILED_TO_CREATE_OBJECT);
 }
 
 void CompositorRenderPass::Commit(CommitContext& context) {

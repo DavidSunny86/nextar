@@ -20,7 +20,7 @@ public:
 	TranslatorHLSL();
 	virtual ~TranslatorHLSL();
 
-	virtual void BeginBuffer(ShaderScriptContext* script, const String& name)  override;
+	virtual void BeginBuffer(ShaderScriptContext* script, const String& name, const String& modName)  override;
 	virtual void AddParam(ShaderScriptContext* script, ParamDataType dataType, const String& name, uint32 arrayCount)  override;
 	virtual void EndBuffer(ShaderScriptContext* _script)  override;
 

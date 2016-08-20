@@ -3,7 +3,7 @@
 
 void main(void)
 {
-	gl_Position = cbObjectTransforms.uModelViewProj * vec4(vGetPos() * cbDebugModelView.uObjectScale, 1);
+	gl_Position = cbDebugModelView.uModelViewProj * vec4(vGetPos() * cbDebugModelView.uObjectScale, 1);
 	vSetVertexColor(vGetColor() * cbDebugModelView.uObjectColor);
 }
 

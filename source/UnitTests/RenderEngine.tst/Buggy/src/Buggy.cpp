@@ -47,7 +47,7 @@ void Buggy::_SetupScene(SceneAssetPtr& scene) {
 		  Entity::CLASS_ID));
 
   // load buggy and render deferred
-  URL locator = URL("{EngineData}/Meshes/Buggy.mesh");
+  URL locator = URL("{EngineData}/Meshes/Buggy.nexmesh");
   MeshAssetPtr mesh =
 	  MeshAsset::Traits::Instance(NamedObject::AsyncStringID("Buggy"),
 		  locator);

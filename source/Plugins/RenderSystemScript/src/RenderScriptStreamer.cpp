@@ -39,13 +39,13 @@ void RenderScriptStreamer::UnregisterDictionary() {
 void RenderScriptStreamer::RegisterDictionary() {
 	CommandDictionary* dict = CommandDictionaryArchive::Instance().RegisterDictionary("RenderSystem",
 			&_root);
-	dict->RegisterHandler("pass", CmdPass::InstancePtr());
-	dict->RegisterHandler("pass.clean", CmdClean::InstancePtr());
-	dict->RegisterHandler("pass.material", CmdMaterial::InstancePtr());
-	dict->RegisterHandler("pass.set-param", CmdSetParam::InstancePtr());
-	dict->RegisterHandler("pass.render-to", CmdRenderTo::InstancePtr());
-	dict->RegisterHandler("create-buffer", CmdCreateBuffer::InstancePtr());
-	dict->RegisterHandler("create-buffer.target", CmdTarget::InstancePtr());
+	_root.RegisterHandler("pass", CmdPass::InstancePtr());
+	_root.RegisterHandler("pass.clean", CmdClean::InstancePtr());
+	_root.RegisterHandler("pass.material", CmdMaterial::InstancePtr());
+	_root.RegisterHandler("pass.set-param", CmdSetParam::InstancePtr());
+	_root.RegisterHandler("pass.render-to", CmdRenderTo::InstancePtr());
+	_root.RegisterHandler("create-buffer", CmdCreateBuffer::InstancePtr());
+	_root.RegisterHandler("create-buffer.target", CmdTarget::InstancePtr());
 }
 
 bool RenderScriptStreamer::Load(RenderSystem& s, InputStreamPtr& stream) {

@@ -68,35 +68,35 @@
 /******************************************************************/
 #ifdef HAS_NORMAL_CHANNEL_OUT
 	smooth out vec4 oNormal;
-   vec3 vSetNormal(vec4 n) { oNormal = n; }
+   void vSetNormal(vec4 n) { oNormal = n; }
 #endif
 
 #ifdef HAS_BINORMAL_CHANNEL_OUT
 	smooth out vec4 oBiNormal;	
-   vec3 vSetBiNormal(vec4 b) { oBiNormal = b; }
+   void vSetBiNormal(vec4 b) { oBiNormal = b; }
 #endif
 
 #ifdef HAS_TANGENT_CHANNEL_OUT
 	smooth out vec4 oTangent;
-   vec3 vSetTangent(vec4 t) { oTangent = t; }
+   void vSetTangent(vec4 t) { oTangent = t; }
 #endif
 
 #ifdef HAS_TEXCOORD0_CHANNEL_OUT
 	smooth out vec2 oTexCoord0;
-   vec2 vGetTexCoord0(vec2 t) { oTexCoord0 = t;  }
+   void vSetTexCoord0(vec2 t) { oTexCoord0 = t;  }
 #endif
 
 #ifdef HAS_TEXCOORD1_CHANNEL_OUT
 	smooth out vec2 oTexCoord1;
-   vec2 vSetTexCoord1(vec2 t) { oTexCoord1 = t;  }
+   void vSetTexCoord1(vec2 t) { oTexCoord1 = t;  }
 #endif
 
 #ifdef HAS_VERTEX_COLOR_CHANNEL_OUT
    smooth out vec4 oVertexColor;
-   vec4 vSetVertexColor(vec4 t) { oVertexColor = t; }
+   void vSetVertexColor(vec4 t) { oVertexColor = t; }
  #endif
 
 #ifdef HAS_EYEVERETX_CHANNEL_OUT
 	smooth out vec4 oEyeVertex;
-   vec3 vSetEyeVertex(vec4 n) { oEyeVertex = n; }
+   void vSetEyeVertex(vec4 n) { oEyeVertex = n; }
 #endif
