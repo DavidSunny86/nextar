@@ -420,7 +420,8 @@ void ToUpper(StringType& str) {
 	std::transform(std::begin(str), std::end(str), std::begin(str), ::toupper);
 }
 
-/** Seperates a string pair of the format Abc:efg into 'Abc' and 'efg' */
+/** Separates a string pair of the format Abc:efg into 'Abc' and 'efg', if the separator is not present
+ *  the returned pair has the first element filled with the string */
 inline StringPair Split(const String& name, char by = ':') {
 	size_t seperator = name.find_first_of(by);
 	if (seperator != String::npos)

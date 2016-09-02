@@ -39,7 +39,11 @@ public:
 	virtual void CreateResources();
 	virtual void DestroyResources();
 
-	void AddTexturesToResolve(const TexturesToResolve* toResolve, uint32 numToResolve);
+	void AddTexturesToResolve(const TexturesToResolve* toResolve, 
+		uint32 numToResolve);
+
+	virtual void Save(RenderSystem* rsysPtr, OutputSerializer& ser);
+	virtual void Load(RenderSystem* rsysPtr, InputSerializer& ser);
 
 protected:
 

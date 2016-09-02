@@ -53,8 +53,8 @@ void MaterialLoaderImplv1_0::Load(InputStreamPtr& stream,
 		}
 
 		ser >> header.layerMask
-		>> header.shader >> header.shaderLocation
-		>> header.options;
+			>> header.shader >> header.shaderLocation
+			>> header.options;
 		request->SetLayer((Layer)header.layerMask);
 		request->SetShader(header.shader, header.shaderLocation);
 	} else {

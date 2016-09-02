@@ -69,4 +69,28 @@ void BaseRenderPass::CreateResources() {
 void BaseRenderPass::DestroyResources() {
 }
 
+void BaseRenderPass::Save(RenderSystem *renderSys, OutputSerializer& ser) {
+	uint32 vLastSubTarget = static_cast<uint32>(toLastSubTarget);
+	uint32 vClearFlags = static_cast<uint32>(clearFlags);
+	ser << enabled << vLastSubTarget << vClearFlags;
+	for (uint32 i = 0; i < RenderConstants::MAX_COLOR_TARGETS; ++i)
+		ser << info.info.clearColor[i];
+	ser << info.info.clearDepth << info.info.clearStencil;
+	ser << renderSys->GetTargetName(info.rt);
+}
+
+void BaseRenderPass::Load(RenderSystem *renderSys, InputSerializer& ser) {
+	uint32 vLastSubTarget = 0;
+	uint32 vClearFlags = 0;
+	StringID target = StringUtils::NullID;
+	ser >> enabled >> vLastSubTarget >> vClearFlags;
+	toLastSubTarget = static_cast<RenderTargetName>(vLastSubTarget);
+	clearFlags = static_cast<ClearFlags>(vClearFlags);
+	for (uint32 i = 0; i < RenderConstants::MAX_COLOR_TARGETS; ++i)
+		ser >> info.info.clearColor[i];
+	ser >> info.info.clearDepth >> info.info.clearStencil;
+	ser >> target;
+	info.rt = renderSys->GetTarget(target);
+}
+
 } /* namespace nextar */

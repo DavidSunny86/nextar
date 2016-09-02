@@ -31,10 +31,7 @@ public:
 	virtual bool Save(RenderSystem& s, OutputStreamPtr& stream);
 
 protected:
-
-	void _WritePass(RenderPass* pass, ChunkOutputStream& ostr);
-	void _WriteVersion(OutputStreamPtr& stream);
-
+	
 	RenderScriptRoot _root;
 
 };

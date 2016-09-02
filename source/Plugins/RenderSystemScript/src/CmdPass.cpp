@@ -23,7 +23,7 @@ bool CmdPass::BeginExecute(CommandContext* pContext,
 			c->_rsys.AddPass(c->_passType));
 
 	if (h.Length() > 1)
-		c->_pass->SetName(h.Get(1));
+		c->_pass->SetName(c->_passType + ":" + h.Get(1));
 	else
 		c->_pass->SetName(c->_passType);
 	c->_numUnresolvedTextures = 0;

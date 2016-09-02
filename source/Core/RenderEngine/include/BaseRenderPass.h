@@ -11,6 +11,7 @@
 #include <RenderPass.h>
 #include <CommitContext.h>
 #include <NexRenderEngine.h>
+#include <Serializer.h>
 
 namespace nextar {
 
@@ -39,6 +40,10 @@ public:
 	void SetEnabled(bool b) {
 		enabled = b;
 	}
+
+
+	virtual void Save(RenderSystem* rsysPtr, OutputSerializer& ser);
+	virtual void Load(RenderSystem* rsysPtr, InputSerializer& ser);
 
 protected:
 

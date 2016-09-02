@@ -17,11 +17,13 @@ namespace nextar {
 
 class RenderSystemImpl: public RenderSystem {
 public:
+	
 	RenderSystemImpl(Size size);
 	virtual ~RenderSystemImpl();
 
 	virtual void RegisterTarget(StringID as, RenderTargetPtr target) override;
 	virtual RenderTargetPtr GetTarget(StringID name) override;
+	virtual StringID GetTargetName(RenderTarget* name) override;
 
 	virtual void Load(InputStreamPtr& stream, const String& fileType);
 	virtual void Save(OutputStreamPtr& stream, const String& fileType);
@@ -59,11 +61,55 @@ public:
 
 
 protected:
+
+	StringID GetName(const RenderTargetPtr&);
 		
 	static void DestroyResources(void* thisPointer);
 
+	struct RenderRef {		
+		bool useAsTarget;
+		PixelFormat format;
+		StringID ref;
+	};
+
+	struct MultiRenderTargetData : public AllocGeneral {
+		uint16 numColorBuffer;
+		RenderRef depth;
+		RenderRef color[MultiRenderTarget::MAX_COLOR_TARGET];
+	};
+
+	struct BufferInfo {
+		StringID name;
+		RenderTargetType type;
+		uint16 samples;
+		float dx, dy;
+		PixelFormat format;
+		MultiRenderTargetData* mrtData;
+
+		BufferInfo();
+		BufferInfo(const BufferInfo& info);
+		BufferInfo(BufferInfo&& info);
+		~BufferInfo();
+
+		BufferInfo& operator = (const BufferInfo& other);
+		BufferInfo& operator = (BufferInfo&& other);
+	};
+
+	typedef vector<BufferInfo>::type BufferInfoList;
+
+	struct MetaInfo : public AllocGeneral {
+	public:
+
+		MetaInfo();
+		
+		bool ValidateDimensions(uint32 width, uint32 height, uint32 depth);
+		void AddBuffer(BufferInfo&& info);
+	
+		uint32 width, height, depth;
+		BufferInfoList bufferInfo;
+	};
+
 	enum Flags {
-		STORE_META_INFO = 1 << 0,
 		HAS_RELATIVE_TARGETS = 1 << 1,
 	};
 
@@ -75,10 +121,38 @@ protected:
 	
 	typedef map<StringID, BufferData>::type TargetMap;
 
+	MetaInfo* metaInfo;
 	Size currentSize;
 	uint32 flags;
 	TargetMap targets;
 	RenderPassList renderPasses;
+
+	friend class DefaultStreamer;
+
+	class DefaultStreamer : public Streamer {
+
+		NEX_LOG_HELPER(DefaultStreamer);
+	public:
+		enum RenderScriptHeaders {
+			FILE_MAGIC_RSCRIPT = 0xff817191,
+			RSCRIPT_PASS_DATA = 0x55ee,
+			RSCRIPT_BEGIN_PASS = 0x51fe,
+			RSCRIPT_BUFFER = 0x50dd,
+		};
+
+		virtual bool Load(RenderSystem& s, InputStreamPtr& stream);
+		virtual bool Save(RenderSystem& s, OutputStreamPtr& stream);
+
+	protected:
+
+		bool _ReadVersion(InputStreamPtr& stream);
+		void _ReadPass(RenderSystem* s, ChunkInputStream& ostr);
+		void _ReadBuffers(RenderSystem* s, InputSerializer& ostr);
+		void _WriteBuffers(RenderSystem* s, const MetaInfo& m, OutputSerializer& ostr);
+		void _WritePass(RenderSystem* s, RenderPass* pass, ChunkOutputStream& ostr);
+		void _WriteVersion(OutputStreamPtr& stream);
+	};
+
 };
 
 typedef RefPtr<RenderSystemImpl> RenderSystemImplPtr;

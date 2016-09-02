@@ -95,4 +95,32 @@ void CompositorRenderPass::AddTexturesToResolve(const TexturesToResolve* toResol
 	}
 }
 
+void CompositorRenderPass::Save(RenderSystem* rsysPtr, OutputSerializer& ser) {
+	parameters.AsyncSave(ser);
+	ser << numTextureToResolve;
+	TexturesToResolve* resolv = (numTextureToResolve == 1) ? &_rtJustOne : _rtBunchOf;
+	
+	for (uint32 i = 0; i < numTextureToResolve; ++i) {
+		uint32 name = (uint32)resolv[i].name;
+		uint32 offset = resolv[i].offset;
+		ser << name << offset;
+	}
+}
+
+void CompositorRenderPass::Load(RenderSystem* rsysPtr, InputSerializer& ser) {
+	parameters.AsyncLoad(ser);
+	uint32 numUnres = 0;
+	TexturesToResolve t[RenderTargetName::RT_NAME_COUNT];
+	ser >> numUnres;
+	for (uint32 i = 0; i < numUnres; ++i) {
+		uint32 name = 0;
+		uint32 offset = 0;
+		ser >> name >> offset;
+		t[i].name = (RenderTargetName)name;
+		t[i].offset = offset;
+	}
+
+	AddTexturesToResolve(t, numUnres);
+}
+
 } /* namespace nextar */

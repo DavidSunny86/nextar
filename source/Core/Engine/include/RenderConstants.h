@@ -32,7 +32,7 @@ enum RenderConstants
 NEX_ENUM_UINT(RenderConstants, uint32);
 
 
-enum RenderTargetName {
+enum RenderTargetName : uint32 {
 	LAST_RT_MT,
 	LAST_RT_COLOR_0,
 	LAST_RT_COLOR_1,

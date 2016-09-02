@@ -23,6 +23,7 @@ enum class RenderTargetType
 	RENDER_BUFFER,
 	BACK_BUFFER,
 	MULTI_RENDER_TARGET,
+	UNKNOWN_TYPE
 };
 
 // @remarks

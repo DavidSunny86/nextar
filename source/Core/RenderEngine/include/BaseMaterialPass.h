@@ -30,6 +30,9 @@ public:
 
 	virtual void CreateResources();
 	virtual void DestroyResources();
+		
+	virtual void Save(RenderSystem* rsysPtr, OutputSerializer& ser);
+	virtual void Load(RenderSystem* rsysPtr, InputSerializer& ser);
 
 protected:
 

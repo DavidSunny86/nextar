@@ -34,4 +34,14 @@ void BaseMaterialPass::DestroyResources() {
 	material.Clear();
 }
 
+void BaseMaterialPass::Save(RenderSystem* rsysPtr, OutputSerializer& ser) {
+	BaseRenderPass::Save(rsysPtr, ser);
+	ser << materialUrl;
+}
+
+void BaseMaterialPass::Load(RenderSystem* rsysPtr, InputSerializer& ser) {
+	BaseRenderPass::Load(rsysPtr, ser);
+	ser >> materialUrl;
+}
+
 } /* namespace nextar */

@@ -52,6 +52,7 @@ public:
 	virtual void Commit(CommitContext& context) = 0;
 	virtual void RegisterTarget(StringID as, RenderTargetPtr target) = 0;
 	virtual RenderTargetPtr GetTarget(StringID name) = 0;
+	virtual StringID GetTargetName(RenderTarget* target) = 0;
 		
 	virtual RenderPass* FindPass(StringID name) = 0;
 	virtual void EnablePass(StringID pass) = 0;
