@@ -23,6 +23,7 @@ add_module(PBRenderEngine)
 add_module(RenderSystemScript)
 add_module(ShaderScript)
 add_module(MaterialScript)
+add_module(ResourcePacker)
 ## EndAdd
 
 file(APPEND ${NEX_PLUGIN_CONFIG_FILE} "</plugins>\n")
