@@ -10,8 +10,11 @@
 
 #include <NexProjectModel.h>
 #include <EngineApplicationContext.h>
+#include <ProjectContext.h>
 
 namespace nextar {
+
+class ResourcePacker;
 
 /*
  *
@@ -29,11 +32,21 @@ public:
 		return ApplicationContextType(CONTEXT_PROJECT);
 	}
 
+	virtual void CreateProjectContext(const String& projectName);
+
+	ProjectContextPtr const& GetProjectContext() {
+		return _project;
+	}
+
+
 protected:
+
 	virtual void CreateExtendedInterfacesImpl();
 	virtual void ReleaseResources();
 
 	void RegisterTemplateFactories();
+		
+	ProjectContextPtr _project;
 };
 
 } /* namespace nextar */

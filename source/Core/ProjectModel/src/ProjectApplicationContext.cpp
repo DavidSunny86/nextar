@@ -14,8 +14,11 @@
 #include <MeshTemplate.h>
 #include <MaterialSaverImplv10.h>
 #include <MeshSaverImplv10.h>
+#include <ResourcePacker.h>
 
 namespace nextar {
+
+NEX_DEFINE_SINGLETON_PTR(ResourcePacker);
 
 ProjectApplicationContext::ProjectApplicationContext() :
 	EngineApplicationContext() {
