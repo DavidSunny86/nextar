@@ -78,6 +78,26 @@ inline void PushBackWordList(String& arr, const String& what) {
 }
 
 /**
+* Index of string
+* @param value The string to find
+* @param what The word list
+*/
+inline uint32 IndexOf(const String& toFind, const String& what) {
+	ConstMultiString m(what);
+	return m.IndexOf(toFind);
+}
+
+/**
+* Check if string is present
+* @param value The string to find
+* @param what The word list
+*/
+inline bool Contains(const String& toFind, const String& what) {
+	ConstMultiString m(what);
+	return m.IndexOf(toFind) != (uint32)-1;
+}
+
+/**
  * Push the string at the very end of the buffer
  * @param arr The string array container
  * @param what The string to push

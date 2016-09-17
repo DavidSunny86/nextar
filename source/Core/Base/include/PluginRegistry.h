@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   pluginManager.h
  * Author: obhi
  *
@@ -37,7 +37,8 @@ namespace nextar {
  *            </plugin>
  *         </plugins>
  */
-class PluginRegistry: public Singleton<PluginRegistry>, public AllocGeneral {
+class PluginRegistry: public Singleton<PluginRegistry>,
+public AllocGeneral {
 	NEX_LOG_HELPER (PluginRegistry);
 public:
 
@@ -45,6 +46,7 @@ public:
 		bool optional;DYN_LIB_TYPE libptr;
 		String fullName;
 		String name;
+		String serviceNames;
 		uint32 buildVersion;
 		PluginLicense license;
 		FactoryPlugin* plugin;
@@ -56,7 +58,8 @@ public:
 		;
 	public:
 
-		DynLib(const String& path, const String& name, const PluginLicense&, uint32 build, ApplicationContextType context, bool optional);
+		DynLib(const String& path, const String& name, const String& serviceName,
+			const PluginLicense&, uint32 build, ApplicationContextType context, bool optional);
 		~DynLib();
 
 		_NexInline bool IsAccepted(ApplicationContextType appType) const {
@@ -76,6 +79,8 @@ public:
 		}
 
 		void Request(PluginLicenseType pluginType, const String& name = StringUtils::Null, bool load = false);
+		void Request(bool load = false);
+		PluginService* Query(const String& name);
 
 	protected:
 
@@ -95,14 +100,25 @@ public:
 	/** @remarks Load plugin **/
 	void Configure(const Config&);
 
+	/* Add plugins from configuration */
+	void AddPlugins(const URL& pluginConfig);
+
 	/** @remarks Load plugin manually **/
-	void AddPlugin(const String& path, const String& name, const PluginLicense& li, uint32 version,
+	void AddPlugin(const String& path, const String& name, const String& services, 
+		const PluginLicense& li, uint32 version,
 		ApplicationContextType context,
 			bool optional = false);
 
 	/** Post a license event */
 	void RequestPlugins(PluginLicenseType le, const String& typeName, bool loadPlugins);
 
+  /** Query service */
+	PluginService* QueryService(const char* name);
+
+	template <typename ServiceClass>
+	inline ServiceClass* QueryService() {
+		return static_cast<ServiceCLass*>(QueryService(ServiceClass::Meta::GetName()));
+	}
 private:
 
 	static PluginLicenseType _ParsePluginLicenseType(const String& type);
@@ -116,4 +132,3 @@ private:
 }
 
 #endif	/* PLUGIN_MANAGER_H */
-

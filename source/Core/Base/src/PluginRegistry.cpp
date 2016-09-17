@@ -10,15 +10,34 @@ namespace nextar {
 NEX_DEFINE_SINGLETON_PTR(PluginRegistry);
 
 PluginRegistry ::DynLib::DynLib(const String& path, const String& plug,
+	const String& serviceName,
 	const PluginLicense& license, uint32 build, ApplicationContextType contextType, bool plgOptional) :
 		fullName(path),
-		optional(plgOptional), name(plug), libptr(0), plugin(0), context(contextType), buildVersion(build) {
+		optional(plgOptional), name(plug), serviceNames(serviceName), libptr(0), plugin(0), context(contextType), buildVersion(build) {
 	this->license = license;
 }
 
 PluginRegistry::DynLib::~DynLib() {
 	if (libptr)
 		_UnloadLib();
+}
+
+void PluginRegistry::DynLib::Request(
+	bool load) {
+	if (load) {
+		if (!plugin) {
+			if (!_LoadLib()) {
+				Warn(String("Plugin failed to load: ") + this->name);
+				if (!optional)
+					NEX_THROW_FatalError(EXCEPT_FAILED_TO_LOADLIB);
+			}
+			plugin->LicenseRenewed();
+		}
+	} else {
+
+		if (plugin && plugin->LicenseExpired())
+			_UnloadLib();
+	}
 }
 
 void PluginRegistry::DynLib::Request(PluginLicenseType pluginType,
@@ -28,21 +47,7 @@ void PluginRegistry::DynLib::Request(PluginLicenseType pluginType,
 	if (license.type == pluginType) {
 		if (name.length() && name != license.customType)
 			return;
-		if (load) {
-
-			if (!plugin && !_LoadLib()) {
-				Warn(String("Plugin failed to load: ") + this->name);
-				if (!optional)
-					NEX_THROW_FatalError(EXCEPT_FAILED_TO_LOADLIB);
-			}
-
-			plugin->LicenseRenewed();
-
-		} else {
-
-			if (plugin && plugin->LicenseExpired())
-				_UnloadLib();
-		}
+		Request(load);
 	}
 }
 
@@ -91,6 +96,16 @@ void PluginRegistry::DynLib::_UnloadLib() {
 	libptr = 0;
 }
 
+
+PluginService* PluginRegistry::DynLib::Query(const String& name) {
+	if (serviceNames.find(name) != String::npos) {
+		Request(true);
+		if (plugin)
+			return plugin->Query(name.c_str());
+	}
+	return nullptr;
+}
+
 PluginRegistry::PluginRegistry() {
 }
 
@@ -115,6 +130,10 @@ void PluginRegistry::Configure(const Config& config) {
 	_ParsePluginConfiguration(configFile);
 }
 
+void PluginRegistry::AddPlugins(const URL& file) {
+	_ParsePluginConfiguration(file);
+}
+
 void PluginRegistry::_ParsePluginConfiguration(const URL& path) {
 	FileSystem& fileSys = FileSystem::Instance();
 	InputStreamPtr xmlFile = fileSys.OpenRead(path);
@@ -136,6 +155,7 @@ void PluginRegistry::_ParsePluginConfiguration(const URL& path) {
 					
 					AddPlugin(NEX_MODULE_NAME(it->GetText("target")), 
 						static_cast<xml::Element*>(*it)->GetAttributeValue("name"), 
+						it->GetText("services", StringUtils::Null),
 						license,
 						Convert::ToVersion(
 								it->GetText("build", NEX_VERSION_STRING())),
@@ -156,7 +176,9 @@ void PluginRegistry::_ParsePluginConfiguration(const URL& path) {
 }
 
 void PluginRegistry::AddPlugin(const String& path, const String& name,
-		const PluginLicense& license, uint32 version, ApplicationContextType type, bool optional) {
+	const String& services,
+	const PluginLicense& license, uint32 version, 
+	ApplicationContextType type, bool optional) {
 
 	if (name.length() <= 0)
 		return;
@@ -166,7 +188,7 @@ void PluginRegistry::AddPlugin(const String& path, const String& name,
 			return;
 	libraries.push_back(
 			NEX_NEW(
-			DynLib(URL::GetAppendedPath(pluginSearchPath, path), name, license, version, type, optional)));
+			DynLib(URL::GetAppendedPath(pluginSearchPath, path), name, services, license, version, type, optional)));
 }
 
 void PluginRegistry::RequestPlugins(PluginLicenseType le,
@@ -177,6 +199,8 @@ void PluginRegistry::RequestPlugins(PluginLicenseType le,
 		if (libraries[i]->IsAccepted(type))
 			libraries[i]->Request(le, typeName, loadPlugins);
 }
+
+void PluginRegistry::
 
 }
 

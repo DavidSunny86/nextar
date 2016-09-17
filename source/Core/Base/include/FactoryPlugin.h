@@ -2,6 +2,7 @@
 #define NEXTAR_PLUGIN_H__
 
 #include <NexBase.h>
+#include <NamedObject.h>
 
 namespace nextar {
 
@@ -19,11 +20,19 @@ struct PluginLicense {
 	String customType;
 };
 
+class _NexBaseAPI PluginService {
+public:
+
+	virtual ~PluginService() {}
+
+	virtual void Destroy() = 0;
+
+};
 /**
  * @remarks Classes derived from this one will be
  *          the main plugin interfaces
  **/
-class FactoryPlugin {
+class _NexBaseAPI FactoryPlugin {
 public:
 
 	virtual ~FactoryPlugin() {
@@ -48,6 +57,9 @@ public:
 
 	/** @remarks Dispose should free up the pointer, implements delete this as appropriate */
 	virtual void Dispose() = 0;
+
+	/** @remarks Query service supported */
+	virtual PluginService* Query(const char* name) = 0;
 };
 
 #define NEX_DECLARE_PLUGIN(pluginClass) static pluginClass plugin

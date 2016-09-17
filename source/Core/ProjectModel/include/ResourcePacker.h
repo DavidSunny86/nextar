@@ -2,11 +2,11 @@
 #ifndef RESOURCEPACKER_H_
 #define RESOURCEPACKER_H_
 
-#include <Singleton.h>
+#include <NexBase.h>
 
 namespace nextar {
 
-class _NexProjectAPI ResourcePacker : public Singleton<ResourcePacker>,
+class _NexProjectAPI ResourcePacker :
 	public AllocGeneral {
 public:
 
