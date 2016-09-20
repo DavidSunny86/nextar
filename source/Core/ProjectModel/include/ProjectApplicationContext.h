@@ -32,7 +32,7 @@ public:
 		return ApplicationContextType(CONTEXT_PROJECT);
 	}
 
-	virtual void CreateProjectContext(const String& projectName);
+	virtual void CreateProjectContext(const String& projectName, const String& basePath);
 
 	ProjectContextPtr const& GetProjectContext() {
 		return _project;

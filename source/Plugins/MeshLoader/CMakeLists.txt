@@ -6,7 +6,7 @@
 ##---------------------------------------------------
 
 # Add definition
-create_plugin("MeshLoader" "" "Lifetime" "${NEX_VERSION}" "engine" "false")
+create_plugin("MeshLoader" "" "Preload" "${NEX_VERSION}" "engine" "false" "")
 add_dependency(Core Engine)
 
 # Add plugin

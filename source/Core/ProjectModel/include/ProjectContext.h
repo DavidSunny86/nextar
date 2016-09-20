@@ -8,6 +8,7 @@
 namespace nextar {
 
 class _NexProjectAPI ProjectContext : public AllocGeneral {
+public:
 
 	ProjectContext();
 	ProjectContext(const String& name, const String& basePath);
@@ -17,9 +18,14 @@ class _NexProjectAPI ProjectContext : public AllocGeneral {
 		_resourceLocations[type] = path;
 	}
 
-	const String& GetResourcePath(ProjectResourceType type) const {
+	String GetResourceFullPath(ProjectResourceType type) const {
 		return URL::GetAppendedPath(_basePath, _resourceLocations[type]);
 	}
+
+	const String& GetResourcePath(ProjectResourceType type) const {
+		return _resourceLocations[type];
+	}
+
 
 protected:
 
@@ -30,7 +36,7 @@ protected:
 	String _projectName;
 };
 
-typedef UniquePtr<ProjectContext> ProjectContextPtr;
+typedef UniquePtr<ProjectContext>::type ProjectContextPtr;
 
 }
 

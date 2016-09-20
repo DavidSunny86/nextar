@@ -1,11 +1,12 @@
 /*
  * Plugin.cpp
  *
- *  Created on: 30-Sep-2013
+ *  Created on: Sep 18, 2016
  *      Author: obhi
  */
-#include <BaseHeaders.h>
+
 #include <Plugin.h>
+#include <ResourcePackerServiceImpl.h>
 
 NEX_IMPLEMENT_PLUGIN(ResourcePacker, ResourcePacker::Plugin);
 
@@ -18,11 +19,13 @@ Plugin::~Plugin() {
 }
 
 void Plugin::Open() {
-	Trace("Loading resource packer version 1.0");
+	Trace("Loaded resource packer 1.0.");
 }
 
 void Plugin::Close() {
-	Trace("Unloading resource packer version 1.0");
+	if (_packerServiceImpl.IsInUse())
+		NEX_THROW_FatalError(EXCEPT_UNLOAD_FAILED_DUE_TO_DANGLING_REF);
+	Trace("Unloading resource packer 1.0.");
 }
 
 void Plugin::LicenseRenewed() {
@@ -35,4 +38,12 @@ bool Plugin::LicenseExpired() {
 void Plugin::Dispose() {
 }
 
+PluginService* Plugin::Query(const char* name) {
+	if (_packerServiceImpl.GetMeta().IsNamed(name)) {
+		_packerServiceImpl.IncrementUsage();
+		return &_packerServiceImpl;
+	}
+
+	return nullptr;
+}
 } /* namespace ResourcePacker */

@@ -8,9 +8,7 @@ namespace nextar {
 
 enum PluginLicenseType {
 	/* Opens after app begin, closes before app exits. */
-	PLUG_TYPE_LIFETIME,
-	/* Opens after render manager is ready, and closes before the context is deleted. */
-	PLUG_TYPE_GRAPHICS,
+	PLUG_TYPE_PRELOAD,
 	/* Custom load */
 	PLUG_TYPE_CUSTOM,
 };
@@ -59,7 +57,7 @@ public:
 	virtual void Dispose() = 0;
 
 	/** @remarks Query service supported */
-	virtual PluginService* Query(const char* name) = 0;
+	virtual PluginService* Query(const char* name) { return nullptr; }
 };
 
 #define NEX_DECLARE_PLUGIN(pluginClass) static pluginClass plugin
@@ -115,6 +113,20 @@ public:
 
 #define NEX_IMPLEMENT_FACTORY(Class)	\
 		Class::FactoryMap Class::sImplMap;
+
+#define NEX_DECLARE_SERVICE_INTERFACE(Class)	\
+		struct Meta {  \
+			const char* GetName() const {		\
+				return #Class;	\
+			}	\
+			bool IsNamed(const char* name) const { \
+				return std::strcmp(GetName(), name) == 0; \
+			} \
+		};	\
+		static const Meta& GetMeta() {	\
+			static Meta _m;	\
+			return _m;	\
+		}
 
 }
 

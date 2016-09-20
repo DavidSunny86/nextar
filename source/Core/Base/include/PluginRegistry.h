@@ -112,16 +112,20 @@ public:
 	/** Post a license event */
 	void RequestPlugins(PluginLicenseType le, const String& typeName, bool loadPlugins);
 
-  /** Query service */
+	/** Query service */
 	PluginService* QueryService(const char* name);
+
+	/** Unload */
+	void UnloadPlugins();
 
 	template <typename ServiceClass>
 	inline ServiceClass* QueryService() {
-		return static_cast<ServiceCLass*>(QueryService(ServiceClass::Meta::GetName()));
+		return static_cast<ServiceClass*>(QueryService(ServiceClass::GetMeta().GetName()));
 	}
 private:
 
 	static PluginLicenseType _ParsePluginLicenseType(const String& type);
+	void _ParseAndLoadPlugins(const URL&);
 	void _ParsePluginConfiguration(const URL&);
 
 	typedef vector<DynLib*>::type DynLibList;

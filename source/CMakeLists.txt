@@ -594,7 +594,7 @@ endmacro(create_ut)
 #============================================================
 # Create_Plugin
 #============================================================
-macro(create_plugin pluginName pluginPath type build context optional)
+macro(create_plugin pluginName pluginPath type build context optional services)
 	set(NEX_INSTALL_PLUGIN ON)
 	create_library()
 	if (ARGV1 MATCHES "")
@@ -610,6 +610,7 @@ macro(create_plugin pluginName pluginPath type build context optional)
 	 "  <build>${ARGV3}</build>\n"
 	 "  <context>${ARGV4}</context>\n"
 	 "  <optional>${ARGV5}</optional>\n"
+	 "  <services>${ARGV6}</services>\n"
 	 " </plugin>\n")
 
 	set(NEX_INSTALL_PLUGIN OFF)

@@ -26,6 +26,7 @@ void BaseRenderManager::ConfigureImpl(const NameValueMap& c) {
 	CreateDefaultRenderPassFactories();
 	CreateRenderQueues(c);
 	RegisterAutoParams();
+	RegisterRenderScriptStreamer();
 	RegisterRenderSystemConfig(c);
 }
 
@@ -102,6 +103,7 @@ void BaseRenderManager::RegisterRenderContext(RenderContextPtr& ptr) {
 }
 
 void BaseRenderManager::Close() {
+	UnregisterRenderScriptStreamer();
 	CloseImpl();
 		
 #if NEX_MULTIGPU_BUILD
@@ -244,8 +246,14 @@ void BaseRenderManager::CreateDefaultRenderPassFactories()  {
 }
 
 RenderSystemPtr BaseRenderManager::CreateRenderSystem(const String& configName, Size initialDim) {
-	URL firstUrl(FileSystem::ArchiveProjectData_Name, "Configs/" + configName + ".rsys");
+
 	bool bCompiled = true;
+	URL firstUrl(configName);
+	InputStreamPtr input = FileSystem::Instance().OpenRead(firstUrl);
+	if (!input)
+		firstUrl = URL(FileSystem::ArchiveProjectData_Name, "Configs/" + configName + ".nexrsys");
+	else if (firstUrl.HasExtension("rscript"))
+		bCompiled = false;
 	InputStreamPtr input = FileSystem::Instance().OpenRead(firstUrl);
 	if (!input) {
 		URL secondUrl(FileSystem::ArchiveProjectData_Name, "Scripts/Configs/" + configName + ".rscript");
@@ -255,12 +263,21 @@ RenderSystemPtr BaseRenderManager::CreateRenderSystem(const String& configName, 
 
 	if (input) {
 		RenderSystemImplPtr rsys = Assign(NEX_NEW(RenderSystemImpl(initialDim)));
-		rsys->Load(input, bCompiled ? "RSYS" : "RSCRIPT");
+		rsys->Load(input, bCompiled ? "nexrsys" : "rscript");
 		rsys->CreateResources();
 		return rsys;
 	}
 
 	return RenderSystemPtr();
+}
+
+void BaseRenderManager::RegisterRenderScriptStreamer() {
+	static RenderSystemImpl::DefaultStreamer _streamer;
+	AddRenderStreamer("NEXRSYS", &_streamer);
+}
+
+void BaseRenderManager::UnregisterRenderScriptStreamer() {
+	RemoveRenderStreamer("NEXRSYS");
 }
 
 }

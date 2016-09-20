@@ -10,6 +10,7 @@ namespace nextar {
 namespace debug {
 }
 
+class PluginService;
 class FactoryPlugin;
 class PluginRegistry;
 class Config;
@@ -56,4 +57,4 @@ enum class BaseConstants
 
 }
 
-#endif //NEXBASE_H__
+#endif //NEXBASE_H__

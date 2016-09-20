@@ -52,6 +52,8 @@ protected:
 	void RegisterAutoParams();
 	void RegisterRenderSystemConfig(const NameValueMap&);
 	void CreateDefaultRenderPassFactories();
+	void RegisterRenderScriptStreamer();
+	void UnregisterRenderScriptStreamer();
 
 	/* The first registered context is always the primary context, other
 	 * contexts are present if usingMultiGpuSetup is true */

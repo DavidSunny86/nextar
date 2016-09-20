@@ -134,7 +134,11 @@ String URL::GetExtension() const {
 	if (p == String::npos)
 		return StringUtils::Null;
 	return relativePath.substr(p + 1);
+}
 
+bool URL::HasExtension(const String& what) const {
+	String ext = std::move(GetExtension());
+	return StringUtils::NoCaseCompare(ext.c_str(), what.c_str()) == 0;
 }
 
 String URL::GetComputedName() const {

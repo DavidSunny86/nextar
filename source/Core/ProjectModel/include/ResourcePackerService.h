@@ -2,19 +2,22 @@
 #ifndef RESOURCEPACKER_H_
 #define RESOURCEPACKER_H_
 
-#include <NexBase.h>
+#include <BaseHeaders.h>
 
 namespace nextar {
 
-class _NexProjectAPI ResourcePacker :
+class _NexProjectAPI ResourcePackerService :
+	public PluginService,
 	public AllocGeneral {
 public:
 
-	virtual ~ResourcePacker() {}
+	NEX_DECLARE_SERVICE_INTERFACE(ResourcePackerService);
+
+	virtual ~ResourcePackerService() {}
 	virtual void BuildMaterials(ProjectContextPtr const &context) = 0;
 	virtual void BuildRenderScripts(ProjectContextPtr const &context) = 0;
-	virtual void BuildShaders(ProjectContextPtr const &context) = 0;
 	virtual void BuildProject(ProjectContextPtr const &context) = 0;
+	virtual void Destroy() override = 0;
 };
 
 }

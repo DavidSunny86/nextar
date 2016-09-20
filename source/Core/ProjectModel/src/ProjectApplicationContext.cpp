@@ -14,7 +14,7 @@
 #include <MeshTemplate.h>
 #include <MaterialSaverImplv10.h>
 #include <MeshSaverImplv10.h>
-#include <ResourcePacker.h>
+#include <ResourcePackerService.h>
 
 namespace nextar {
 
@@ -32,18 +32,23 @@ void ProjectApplicationContext::CreateExtendedInterfacesImpl() {
 	RegisterTemplateFactories();
 }
 
+void ProjectApplicationContext::CreateProjectContext(
+		const String& projectName, const String& path) {
+	_project = NEX_NEW(ProjectContext(projectName, path));
+}
+
 void ProjectApplicationContext::RegisterTemplateFactories() {
 	ShaderTemplate::FactoryTraits::_InternalRegisterToArchive();
 	MaterialTemplate::FactoryTraits::_InternalRegisterToArchive();
 	MeshTemplate::FactoryTraits::_InternalRegisterToArchive();
 
-	AssetSaver::RegisterFactory("nexmtl",
+	AssetSaver::RegisterFactory("NEXMTL",
 			MaterialTemplate::Traits::CLASS_ID,
 			&MaterialSaverImplv1_0::saver);
-	AssetSaver::RegisterFactory("nexfx",
+	AssetSaver::RegisterFactory("NEXFX",
 			ShaderTemplate::Traits::CLASS_ID,
 			&ShaderSaverImplv1_0::saver);
-	AssetSaver::RegisterFactory("nexmesh",
+	AssetSaver::RegisterFactory("NEXMESH",
 				MeshTemplate::Traits::CLASS_ID,
 				&MeshSaverImplv1_0::saver);
 }

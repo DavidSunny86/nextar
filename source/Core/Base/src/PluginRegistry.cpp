@@ -115,10 +115,8 @@ PluginRegistry::~PluginRegistry() {
 }
 
 PluginLicenseType PluginRegistry::_ParsePluginLicenseType(const String& type) {
-	if (type == "Lifetime")
-		return PLUG_TYPE_LIFETIME;
-	else if (type == "Graphics")
-		return PLUG_TYPE_GRAPHICS;
+	if (type == "Preload")
+		return PLUG_TYPE_PRELOAD;
 	else
 		return PLUG_TYPE_CUSTOM;
 }
@@ -127,11 +125,17 @@ void PluginRegistry::Configure(const Config& config) {
 
 	String configFile = config.GetValue("Engine", "PluginConfigurations",
 			"${Bin}/Plugins.xml");
-	_ParsePluginConfiguration(configFile);
+	_ParseAndLoadPlugins(configFile);
 }
 
 void PluginRegistry::AddPlugins(const URL& file) {
-	_ParsePluginConfiguration(file);
+	_ParseAndLoadPlugins(configFile);
+}
+
+void PluginRegistry::_ParseAndLoadPlugins(const URL& path) {
+	_ParsePluginConfiguration(configFile);
+	RequestPlugins(PLUG_TYPE_PRELOAD,
+				StringUtils::Null, true);
 }
 
 void PluginRegistry::_ParsePluginConfiguration(const URL& path) {
@@ -200,7 +204,21 @@ void PluginRegistry::RequestPlugins(PluginLicenseType le,
 			libraries[i]->Request(le, typeName, loadPlugins);
 }
 
-void PluginRegistry::
+PluginService* PluginRegistry::QueryService(const char* name) {
+	for (size_t i = 0; i < libraries.size(); ++i) {
+		PluginService* service = libraries[i]->Query(name);
+		if (service)
+			return service;
+	}
+	return nullptr;
+}
+
+void PluginRegistry::UnloadPlugins() {
+	RequestPlugins(PLUG_TYPE_PRELOAD,
+			StringUtils::Null, false);
+	RequestPlugins(PLUG_TYPE_CUSTOM,
+				StringUtils::Null, false);
+}
 
 }
 

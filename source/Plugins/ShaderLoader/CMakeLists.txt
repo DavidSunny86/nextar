@@ -5,6 +5,6 @@
 # 5:56 PM 9/25/2011
 ##---------------------------------------------------
 # Add plugin
-create_plugin("ShaderLoader" "" "Lifetime" "${NEX_VERSION}" "engine" "false")
+create_plugin("ShaderLoader" "" "Preload" "${NEX_VERSION}" "engine" "false" "")
 add_dependency(Core RenderEngine)
 

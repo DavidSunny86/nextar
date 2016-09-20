@@ -157,9 +157,6 @@ void ACBaseImpl::ConfigureServices(Config& config) {
 	FileSystem::Instance().Configure(config);
 	// load plugins
 	PluginRegistry::Instance().Configure(config);
-
-	PluginRegistry::Instance().RequestPlugins(PLUG_TYPE_LIFETIME,
-		StringUtils::Null, true);
 	ConfigureExtendedInterfacesImpl(config);
 }
 
@@ -218,10 +215,8 @@ void ACBaseImpl::DestroyServices() {
 	// NEX_DELETE(ComponentFactoryArchive::InstancePtr());
 	NEX_DELETE(BackgroundStreamer::InstancePtr());
 	NEX_DELETE(WindowManager::InstancePtr());
-
 	// unload plugins
-	PluginRegistry::Instance().RequestPlugins(PLUG_TYPE_LIFETIME,
-		StringUtils::Null, false);
+	PluginRegistry::Instance().UnloadPlugins();
 
 	NEX_DELETE(PluginRegistry::InstancePtr());
 	// just save the strings

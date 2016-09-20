@@ -26,7 +26,7 @@ FileSystem::FileSystem() {
 	AddArchive(ArchiveEngineData_Name, Archive::TYPE_DIR,
 			moduleLocation + "/../Data");
 	AddArchive(ArchiveProjectData_Name, Archive::TYPE_DIR,
-		moduleLocation + "/../Project");
+		moduleLocation + "/../Data");
 }
 
 FileSystem::~FileSystem() {

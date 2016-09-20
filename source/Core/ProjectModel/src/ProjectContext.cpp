@@ -7,6 +7,8 @@ ProjectContext::ProjectContext() :
 _projectName(StringUtils::Default),
 _basePath(FileSystem::ArchiveProjectData) {
 
+	_resourceLocations[RESOURCE_MESH] = "Meshes";
+	_resourceLocations[RESOURCE_MESH] = "Meshes";
 }
 
 ProjectContext::ProjectContext(const String& name, const String& basePath) :

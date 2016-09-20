@@ -29,12 +29,12 @@ void Plugin::Close() {
 }
 
 void Plugin::LicenseRenewed() {
-	AssetLoader::RegisterFactory("nexfx", ShaderAsset::Traits::CLASS_ID,
+	AssetLoader::RegisterFactory("NEXFX", ShaderAsset::Traits::CLASS_ID,
 			&shaderLoaderImpl);
 }
 
 bool Plugin::LicenseExpired() {
-	AssetLoader::UnregisterFactory("nexfx", ShaderAsset::Traits::CLASS_ID);
+	AssetLoader::UnregisterFactory("NEXFX", ShaderAsset::Traits::CLASS_ID);
 	return true;
 }
 

@@ -15,4 +15,6 @@
 #include <MaterialTemplate.h>
 #include <MeshTemplate.h>
 
+#include <ResourcePackerService.h>
+
 #endif /* PROJECTMODELHEADERS_H_ */

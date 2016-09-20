@@ -6,7 +6,7 @@
 ##---------------------------------------------------
 
 # Add definition
-create_plugin("ImageLoader" "" "Lifetime" "${NEX_VERSION}" "engine" "false")
+create_plugin("ImageLoader" "" "Preload" "${NEX_VERSION}" "engine" "false" "")
 add_dependency(Core Engine)
 
 ## Find dependencies

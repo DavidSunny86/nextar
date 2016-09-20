@@ -544,6 +544,7 @@ RenderSystemImpl::BufferInfo& RenderSystemImpl::BufferInfo::operator = (RenderSy
 		NEX_DELETE(mrtData);
 	mrtData = info.mrtData;
 	info.mrtData = nullptr;
+	return *this;
 }
 
 /***************************************************************/

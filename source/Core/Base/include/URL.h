@@ -55,9 +55,11 @@ public:
 	static String GetAppendedPath(const String& base, const String& subPath);
 	/* Reserved path */
 	static bool IsReservedPath(const char* path);
-		
+
 	/* extension */
 	String GetExtension() const;
+	bool HasExtension(const String& what) const;
+	// returns the file path
 	String GetComputedName() const;
 	// returns the relative path where the file exists.
 	// For Eg: If URL is {Archive}/mesh/file.fbx, this function returns -> {Archive}/mesh/
