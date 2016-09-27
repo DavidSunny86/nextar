@@ -44,7 +44,7 @@ StreamNotification ShaderAsset::NotifyAssetLoadedImpl(nextar::StreamRequest* req
 
 	for (uint32 passIndex = 0; passIndex < spl.size(); ++passIndex) {
 		spl[passIndex].compileParams.passIndex = passIndex;
-		passes.emplace_back(spl[passIndex].name);
+		passes.emplace_back(spl[passIndex].name, (uint16)passIndex);
 		_CompilePass(passes.back(), spl[passIndex],
 				creationParams->compilationOptions);
 	}

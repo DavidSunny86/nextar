@@ -2,6 +2,7 @@
 #define NAMEDOBJECT_H_
 
 #include <StringUtils.h>
+#include <Convert.h>
 
 namespace nextar {
 
@@ -53,7 +54,7 @@ public:
 	}
 
 	inline String GetNameID() const {
-		return Convert::ToString((uint32) name);
+		return Convert::ToString(name);
 	}
 
 	static void PushContext(const String& name) {

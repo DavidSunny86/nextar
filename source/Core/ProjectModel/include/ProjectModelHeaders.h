@@ -14,7 +14,7 @@
 #include <ShaderTemplate.h>
 #include <MaterialTemplate.h>
 #include <MeshTemplate.h>
-
+#include <ProjectContext.h>
 #include <ResourcePackerService.h>
 
 #endif /* PROJECTMODELHEADERS_H_ */

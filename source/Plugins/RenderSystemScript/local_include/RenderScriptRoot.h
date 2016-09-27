@@ -18,8 +18,8 @@ public:
 	RenderScriptRoot();
 	virtual ~RenderScriptRoot();
 
-	virtual void BeginDocument(CommandContext* pContext, const ASTDocument* pDoc) const;
-	virtual void EndDocument(CommandContext* pContext, const ASTDocument* pDoc) const;
+	virtual bool BeginExecute(CommandContext* pContext, const ASTRegion* region, bool isText) const;
+	virtual void EndExecute(CommandContext* pContext, const ASTRegion* command, bool isText) const;
 
 	nextar::BlockCommandHandler _instance;
 };

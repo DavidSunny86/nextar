@@ -145,6 +145,13 @@ _NexBaseAPI bool IsPow2(uint32);
 //-------------------------------------------------------
 // inlined functions
 // wrap angle between -pi & +pi
+template <typename IntType>
+inline IntType RoundUp(IntType number, IntType multiple) {
+	IntType remainder = number % multiple;
+	if (remainder == 0)
+		return number;
+	return number + multiple - remainder;
+}
 
 inline float WrapPi(float theta) {
 	theta += Math::PI;

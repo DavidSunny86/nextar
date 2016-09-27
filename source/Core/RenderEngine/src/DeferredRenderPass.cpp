@@ -169,7 +169,7 @@ void DeferredRenderPass::RenderLight(Light* light, uint32 passIdx, uint32 update
 		context.shader = shader;
 		// deferred pass at 0
 		Pass& pass = context.shader->GetPass(passIdx);
-		context.passNumber = pass.GetID();
+		context.passNumber = pass.GetPassNumber();
 		context.pass = static_cast<Pass::View*>(context.renderContext->GetView(&pass));
 		context.paramBuffers[(uint32)ParameterContext::CTX_PASS] = &shader->GetParameters();
 		context.pass->SwitchAndUpdateParams(context);

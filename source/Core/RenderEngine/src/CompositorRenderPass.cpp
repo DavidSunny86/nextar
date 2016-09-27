@@ -30,7 +30,9 @@ RenderPass* CompositorRenderPass::CreateInstance() {
 void CompositorRenderPass::OnMaterialLoad() {
 	ShaderAssetPtr shader = material->GetShader();
 	if (shader) {
-		parameters.Prepare(shader->GetParamTableItem(ParameterContext::CTX_OBJECT));
+		const ParamEntryTableItem& peti = shader->GetParamTableItem(ParameterContext::CTX_OBJECT);
+		if (!(flags & PARAMS_LOADED) || !parameters.Validate(peti))
+			parameters.Prepare(peti);
 		return;
 	}
 
@@ -96,6 +98,7 @@ void CompositorRenderPass::AddTexturesToResolve(const TexturesToResolve* toResol
 }
 
 void CompositorRenderPass::Save(RenderSystem* rsysPtr, OutputSerializer& ser) {
+	BaseMaterialPass::Save(rsysPtr, ser);
 	parameters.AsyncSave(ser);
 	ser << numTextureToResolve;
 	TexturesToResolve* resolv = (numTextureToResolve == 1) ? &_rtJustOne : _rtBunchOf;
@@ -108,7 +111,9 @@ void CompositorRenderPass::Save(RenderSystem* rsysPtr, OutputSerializer& ser) {
 }
 
 void CompositorRenderPass::Load(RenderSystem* rsysPtr, InputSerializer& ser) {
+	BaseMaterialPass::Load(rsysPtr, ser);
 	parameters.AsyncLoad(ser);
+	flags |= PARAMS_LOADED;
 	uint32 numUnres = 0;
 	TexturesToResolve t[RenderTargetName::RT_NAME_COUNT];
 	ser >> numUnres;

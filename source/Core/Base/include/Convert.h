@@ -64,6 +64,10 @@ _NexBaseAPI IVector4 ToIVector4(const String&);
 _NexBaseAPI Color ToColor(const String&);
 _NexBaseAPI Color32 ToColor32(const String&);
 
+inline String ToString(const StringID& s) {
+	return Convert::ToString((uint32)s._value);
+}
+
 inline ApplicationContextType ToApplicationContext(const String& t) {
 	ApplicationContextType ret;
 	ret.FromString(t);

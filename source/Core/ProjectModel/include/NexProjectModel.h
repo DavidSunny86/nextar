@@ -9,6 +9,7 @@
 #define NEXPROJECTMODEL_H_
 
 #include <ProjectModelConfig.h>
+#include <EngineHeaders.h>
 #include <NexEngine.h>
 
 namespace nextar {

@@ -102,7 +102,7 @@ NEX_ENUM_FLAGS(ColorMask, uint8);
 // todo May be entirely useless
 enum class Constants
 	: uint32 {
-		INVALID_VERSION_ID = 0xffffffff,
+	INVALID_VERSION_ID = 0xffffffff,
 	INVALID_SIZE = 0xffffffff,
 	MAX_LOADER_THREAD = 2,
 };
@@ -142,5 +142,31 @@ return ((NEX_GET_VER_MAJOR(present) == NEX_GET_VER_MAJOR(query))
 
 #include <Containers.h>
 #include <ErrorDefs.h>
+
+namespace nextar {
+
+struct StringID {
+	uint32 _value;
+
+	StringID(const StringID& i) : _value(i._value) {}
+	StringID() : _value(0) {}
+	explicit StringID(uint32 v) : _value(v) {}
+
+	friend inline bool operator < (const StringID first, const StringID second) {
+		return (first._value < second._value) != 0;
+	}
+	friend inline bool operator > (const StringID first, const StringID second) {
+		return (first._value > second._value) != 0;
+	}
+	friend inline bool operator == (const StringID first, const StringID second) {
+		return (first._value == second._value) != 0;
+	}
+
+	friend inline bool operator != (const StringID first, const StringID second) {
+		return (first._value != second._value) != 0;
+	}
+};
+
+}
 
 #endif //NEXTAR_BASE_DEF_H//

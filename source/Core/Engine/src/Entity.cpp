@@ -85,7 +85,7 @@ EntityPtr Entity::Factory::AsyncCreateAndAttach(const StringID name,
 		if (_subComponent)
 			*_subComponent = subComponent;
 	} else {
-		Warn("Failed to create subcomponent for entity: " + name);
+		Warn("Failed to create subcomponent for entity: " + Convert::ToString(name));
 	}
 	return ent;
 }

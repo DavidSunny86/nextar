@@ -1,6 +1,7 @@
 #ifndef ENGINEHEADERS_H_
 #define ENGINEHEADERS_H_
 
+#include <BaseHeaders.h>
 #include <NexEngine.h>
 
 #include <Component.h>

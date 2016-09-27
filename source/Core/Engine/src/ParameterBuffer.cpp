@@ -36,6 +36,13 @@ void ParameterBuffer::Clear() {
 	assetRefs.clear();
 }
 
+bool ParameterBuffer::Validate(const ParamEntryTableItem& table) {
+	paramTable = table;
+	if (size != table.totalParamBufferSize)
+		return false;
+	return true;
+}
+
 void ParameterBuffer::Prepare(const ParamEntryTableItem& table) {
 	paramTable = table;
 	size = table.totalParamBufferSize;

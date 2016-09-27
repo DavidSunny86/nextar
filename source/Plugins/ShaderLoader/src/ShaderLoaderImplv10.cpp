@@ -247,7 +247,7 @@ void ShaderLoaderImplv1_0::Load(InputStreamPtr& stream,
 	do {
 		ser >> chunk;
 		if (InputSerializer::IsValid(chunk)) {
-			switch (chunk.first.first) {
+			switch (chunk.GetHeader()) {
 			case SHADER_PASS_BLOCK:
 				if (!ReadPass(request, ser)) {
 					request->SetCompleted(false);

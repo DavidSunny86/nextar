@@ -37,7 +37,7 @@ namespace nextar {
  *            </plugin>
  *         </plugins>
  */
-class PluginRegistry: public Singleton<PluginRegistry>,
+class _NexBaseAPI PluginRegistry: public Singleton<PluginRegistry>,
 public AllocGeneral {
 	NEX_LOG_HELPER (PluginRegistry);
 public:

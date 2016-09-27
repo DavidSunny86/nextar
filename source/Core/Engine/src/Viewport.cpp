@@ -86,6 +86,15 @@ void Viewport::CommitPrimitives(RenderContext* renderCtx, const FrameTimer&  fra
 	visibleSet.SortSet();
 
 	// @todo A lot of redundancy here
+	commitContext.shader = nullptr;
+	commitContext.material = nullptr;
+	commitContext.primitive = nullptr;
+	commitContext.lightSystem = nullptr;
+	commitContext.pass = nullptr;
+	commitContext.passNumber = -1;
+	commitContext.light = nullptr;
+	commitContext.paramGroup = nullptr;
+
 	commitContext.camera = camera;
 	commitContext.viewMatrix = &camera->GetViewMatrix();
 	commitContext.viewProjectionMatrix = &camera->GetViewProjectionMatrix();

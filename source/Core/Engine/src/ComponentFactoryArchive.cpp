@@ -95,8 +95,8 @@ void ComponentFactoryArchive::Configure(const Config& config) {
 	auto en = componentFactories.end();
 	StringID current = StringUtils::NullID;
 	for (; it != en; ++it) {
-		if ((*it).first.second != current) {	
-			current = (*it).first.second;
+		if ((*it).first.first != current) {	
+			current = (*it).first.first;
 			if((*it).second)
 				(*it).second->Configure(config);
 		}

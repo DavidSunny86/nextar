@@ -128,8 +128,12 @@ public:
 	// implemented
 	Pass(Pass&& p);
 	// not implemented
-	Pass(StringID name);
+	Pass(StringID name, uint16 number);
 	virtual ~Pass();
+
+	inline uint16 GetPassNumber() const {
+		return passNumber;
+	}
 
 	inline bool IsProgramDataInited() const {
 		return flags & PROGRAM_DATA_INITED;
@@ -172,6 +176,7 @@ protected:
 	/* Unique number representing this pass */
 	//uint16 inputLayoutUniqueID;
 	uint16 flags;
+	uint16 passNumber;
 
 	//static AutoParam autoParams[AutoParamName::AUTO_COUNT];
 	static ParamProcessorProc customConstantProcessor;

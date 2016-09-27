@@ -34,6 +34,7 @@ public:
 	~ParameterBuffer();
 
 	void Clear();
+	bool Validate(const ParamEntryTableItem& table);
 	void Prepare(const ParamEntryTableItem& table);
 	void Prepare(void* data, uint32 size);
 	void Prepare(BufferPtr&& data, uint32 size);

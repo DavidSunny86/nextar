@@ -17,14 +17,13 @@ RenderScriptRoot::~RenderScriptRoot() {
 
 }
 
-void RenderScriptRoot::BeginDocument(CommandContext* pContext,
-		const ASTDocument* pDoc) const {
+bool RenderScriptRoot::BeginExecute(CommandContext* pContext, const ASTRegion* region, bool isText) const {
 	RenderScriptContext* c = static_cast<RenderScriptContext*>(pContext);
 	c->_rsys.BeginConfig(true);
+	return true;
 }
 
-void RenderScriptRoot::EndDocument(CommandContext* pContext,
-		const ASTDocument* pDoc) const {
+void RenderScriptRoot::EndExecute(CommandContext* pContext, const ASTRegion* command, bool isText) const {
 	RenderScriptContext* c = static_cast<RenderScriptContext*>(pContext);
 	c->_rsys.EndConfig();
 }

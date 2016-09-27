@@ -216,7 +216,7 @@ void BaseRenderManager::CreateRenderQueues(const NameValueMap& section) {
 			if (it2 != section.end()) {
 				StringVector v = StringUtils::Tokenize((*it2).second, ",");
 				if (v.size() > 1) {
-					StringID nameId = Convert::ToULong(v[0]);
+					StringID nameId( Convert::ToULong(v[0]) );
 					uint32 priority = Convert::ToULong(v[1]);
 					RenderQueueFlags flags = RenderQueueFlags::SORT_ENABLED | RenderQueueFlags::DEFERRED;
 					if (v.size() > 2) {
@@ -254,7 +254,7 @@ RenderSystemPtr BaseRenderManager::CreateRenderSystem(const String& configName, 
 		firstUrl = URL(FileSystem::ArchiveProjectData_Name, "Configs/" + configName + ".nexrsys");
 	else if (firstUrl.HasExtension("rscript"))
 		bCompiled = false;
-	InputStreamPtr input = FileSystem::Instance().OpenRead(firstUrl);
+	input = FileSystem::Instance().OpenRead(firstUrl);
 	if (!input) {
 		URL secondUrl(FileSystem::ArchiveProjectData_Name, "Scripts/Configs/" + configName + ".rscript");
 		input = FileSystem::Instance().OpenRead(secondUrl);
@@ -263,7 +263,7 @@ RenderSystemPtr BaseRenderManager::CreateRenderSystem(const String& configName, 
 
 	if (input) {
 		RenderSystemImplPtr rsys = Assign(NEX_NEW(RenderSystemImpl(initialDim)));
-		rsys->Load(input, bCompiled ? "nexrsys" : "rscript");
+		rsys->Load(input, bCompiled ? "NEXRSYS" : "RSCRIPT");
 		rsys->CreateResources();
 		return rsys;
 	}

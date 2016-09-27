@@ -20,7 +20,7 @@ void ResourcePackerServiceImpl::BuildMaterials(
 	ArchivePtr arch = FileSystem::Instance().OpenArchive(FileSystem::ArchiveProjectData_Name);
 	if (arch) {
 		MaterialLoad loader;
-		String mpath = context->GetResourcePath(ProjectResourceType::RESOURCE_MATERIAL);
+		String mpath = context->GetResourcePath(ProjectResourceType::RESOURCE_SCRIPT_MATERIAL);
 		mpath += "/*.mscript";
 		arch->Scan(&loader,  mpath);
 	}
@@ -30,8 +30,8 @@ void ResourcePackerServiceImpl::BuildRenderScripts(
 		const ProjectContextPtr& context) {
 	ArchivePtr arch = FileSystem::Instance().OpenArchive(FileSystem::ArchiveProjectData_Name);
 	if (arch) {
-		MaterialLoad loader;
-		String mpath = context->GetResourcePath(ProjectResourceType::RESOURCE_RENDERSCRIPT);
+		RenderScriptLoad loader;
+		String mpath = context->GetResourcePath(ProjectResourceType::RESOURCE_SCRIPT_RENDERSYS);
 		mpath += "/*.rscript";
 		arch->Scan(&loader,  mpath);
 	}
@@ -81,9 +81,9 @@ void ResourcePacker::ResourcePackerServiceImpl::RenderScriptLoad::FoundFile(
 
 	RenderSystemPtr rsys = RenderManager::Instance().CreateRenderSystem(renderScript,
 			Size(800, 600));
-	URL saveUrl("{ProjectData}/Config/" + attribute.fileName.GetComputedName() + ".nexrsys");
+	URL saveUrl("{ProjectData}/Configs/" + attribute.fileName.GetComputedName() + ".nexrsys");
 	OutputStreamPtr output = FileSystem::Instance().OpenWrite(saveUrl);
-	rsys->Save(output, "nexrsys");
+	rsys->Save(output, "NEXRSYS");
 }
 
 } /* namespace ResourcePacker */

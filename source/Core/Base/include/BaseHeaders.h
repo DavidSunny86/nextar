@@ -22,5 +22,6 @@
 #include <FileSystem.h>
 #include <Serializer.h>
 #include <NamedObject.h>
+#include <PluginRegistry.h>
 
 #endif //NEXTAR_NEXBASE_STDHEADERS_H__

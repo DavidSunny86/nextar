@@ -215,6 +215,10 @@ inline OutputSerializer& OutputSerializer::operator <<(
 	return *this;
 }
 
+inline OutputSerializer& OutputSerializer::operator <<(const StringID object) {
+	return *this << object._value;
+}
+
 inline void OutputSerializer::Flush() {
 	if (full) {
 		totalSizeWritten += full;
@@ -381,6 +385,10 @@ inline InputSerializer& InputSerializer::operator >>(DoubleArray& object) {
 	return *this;
 }
 
+inline InputSerializer& InputSerializer::operator >>(StringID& object) {
+	return (*this) >> object._value;
+}
+
 inline void InputSerializer::Fill() {
 	if (left)
 		inStream->Seek(-left, std::ios_base::cur);
@@ -397,15 +405,15 @@ inline bool InputSerializer::IsEndOfStream() const {
 }
 
 inline bool InputSerializer::IsValid(const InputSerializer::Chunk& c) {
-	return c.first.first != MARKER_INVALID_CHUNK;
+	return c.header.headerName != MARKER_INVALID_CHUNK;
 }
 
 inline void InputSerializer::Skip(Chunk& object) {
 	// rewind and tell
 	left = 0;
-	if (inStream->Seek(object.second + object.first.second, std::ios_base::beg))
+	if (inStream->Seek(object.startInFile + object.header.chunkSize, std::ios_base::beg))
 		streamSize = inStream->GetSize()
-				- (object.second + object.first.second);
+				- (object.startInFile + object.header.chunkSize);
 	else
 		Error("Seeking stream!");
 }

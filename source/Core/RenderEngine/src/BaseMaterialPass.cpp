@@ -20,13 +20,19 @@ BaseMaterialPass::~BaseMaterialPass() {
 void BaseMaterialPass::SetMaterial(MaterialAssetPtr& material) {
 	this->material = material;
 	material->RequestLoad();
+	materialUrl = material->GetAssetLocator();
+	material->GetID(materialId);
 	OnMaterialLoad();
 }
 
 void BaseMaterialPass::CreateResources() {
 	if (!material) {
-		material = Asset::AssetLoad(materialUrl);
-		OnMaterialLoad();
+		material = MaterialAsset::Traits::Instance(materialId, materialUrl);
+		if (material) {
+			material->RequestLoad();
+			OnMaterialLoad();
+		} else
+			Error("Failed to load material: " + materialUrl.ToString());
 	}
 }
 
@@ -36,12 +42,12 @@ void BaseMaterialPass::DestroyResources() {
 
 void BaseMaterialPass::Save(RenderSystem* rsysPtr, OutputSerializer& ser) {
 	BaseRenderPass::Save(rsysPtr, ser);
-	ser << materialUrl;
+	ser << materialId << materialUrl;
 }
 
 void BaseMaterialPass::Load(RenderSystem* rsysPtr, InputSerializer& ser) {
 	BaseRenderPass::Load(rsysPtr, ser);
-	ser >> materialUrl;
+	ser >> materialId >> materialUrl;
 }
 
 } /* namespace nextar */

@@ -7,7 +7,6 @@
 #include <StringUtils.h>
 
 namespace nextar {
-typedef uint32 StringID;
 
 class _NexBaseAPI StringInternTable: public AllocGeneral {
 	NEX_LOG_HELPER(StringInternTable)

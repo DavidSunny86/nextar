@@ -13,6 +13,7 @@
 namespace nextar {
 
 class _NexRenderAPI BaseMaterialPass : public BaseRenderPass {
+	NEX_LOG_HELPER(BaseMaterialPass);
 public:
 	BaseMaterialPass();
 	virtual ~BaseMaterialPass();
@@ -37,6 +38,7 @@ public:
 protected:
 
 	URL materialUrl;
+	MaterialAsset::ID materialId;
 	MaterialAssetPtr material;
 };
 

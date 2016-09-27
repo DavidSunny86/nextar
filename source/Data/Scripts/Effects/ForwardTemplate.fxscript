@@ -62,10 +62,10 @@ shader ForwardTemplate [Vertex, Surface, Lighting] {
       
       texture-state {
          sampler s0 linear-clamp;
-         unit sDiffuseMap s0 (nameref=  "Diffuse.Texture", activate = DiffuseMap, contex = material);
-         unit sSpecularAndGlossMap s0 (nameref = "Specular.Texture", activate = SpecularAndGlossMap, contex = material);
-         unit sNormalMap s0 (nameref = "Normal.Texture", activate = NormalMap, contex = material); 
-         unit sDetailMap s0 (nameref = "Detail.Texture", activate = DetailMap, contex = material); 
+         unit sDiffuseMap s0 (nameref=  "Diffuse.Texture", activate = DiffuseMap, context = material);
+         unit sSpecularAndGlossMap s0 (nameref = "Specular.Texture", activate = SpecularAndGlossMap, context = material);
+         unit sNormalMap s0 (nameref = "Normal.Texture", activate = NormalMap, context = material); 
+         unit sDetailMap s0 (nameref = "Detail.Texture", activate = DetailMap, context = material); 
       }
 
       depth-stencil-state {

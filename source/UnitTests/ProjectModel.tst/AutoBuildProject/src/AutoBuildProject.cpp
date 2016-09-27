@@ -3,7 +3,7 @@
  * Created on: Wed Sep 21 01:05:06 IST 2016
  * @author: obhi
  */
-#include <ProjectModelHeaders.h>.h>
+#include <ProjectModelHeaders.h>
 #include <UTApplication.h>
 
 NEX_IMPLEMENT_APP()

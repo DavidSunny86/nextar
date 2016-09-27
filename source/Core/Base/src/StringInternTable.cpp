@@ -31,7 +31,7 @@ StringID StringInternTable::AsyncStringID(const String& value) {
 		return (*it).second;
 	auto insertIt =
 			forwardMap.emplace(
-					(StringID) (forwardMap.size()
+					StringID((uint32)forwardMap.size()
 							+ StringUtils::STRING_ID_START_OFFSET), value).first;
 	saveToCache = true;
 	reverseMap.emplace(std::cref((*insertIt).second), (*insertIt).first);

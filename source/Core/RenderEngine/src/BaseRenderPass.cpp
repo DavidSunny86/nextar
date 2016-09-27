@@ -12,7 +12,7 @@ namespace nextar {
 
 BaseRenderPass::BaseRenderPass() :
 clearFlags(ClearFlags::CLEAR_NONE)
-,enabled(true)
+,flags(PASS_ENABLED)
 ,toLastSubTarget(RT_NONE) {
 	info.info.clearDepth = 1.0f;
 
@@ -24,14 +24,9 @@ BaseRenderPass::~BaseRenderPass() {
 void BaseRenderPass::BeginRender(CommitContext& ctx) {
 	if (info.rt) {
 		ctx.renderContext->BeginRender(&info, clearFlags);
-		ctx.lastRenderTarget = info.rt;
 	} else if (toLastSubTarget != RenderTargetName::RT_NONE) {
 		info.rt = ctx.GetTargetByName(toLastSubTarget);
 		ctx.renderContext->BeginRender(&info, clearFlags);
-		if (info.rt) {
-			ctx.lastRenderTarget = info.rt;
-			info.rt = nullptr;
-		}
 	}
 }
 
@@ -45,7 +40,7 @@ void BaseRenderPass::RenderPrimitive(
 		context.shader = shader;
 		// deferred pass at 0
 		Pass& pass = context.shader->GetPass(0);
-		context.passNumber = pass.GetID();
+		context.passNumber = pass.GetPassNumber();
 		context.pass = static_cast<Pass::View*>(context.renderContext->GetView(&pass));
 		context.paramBuffers[(uint32)ParameterContext::CTX_PASS] = &shader->GetParameters();
 		context.pass->SwitchAndUpdateParams(context);
@@ -72,7 +67,7 @@ void BaseRenderPass::DestroyResources() {
 void BaseRenderPass::Save(RenderSystem *renderSys, OutputSerializer& ser) {
 	uint32 vLastSubTarget = static_cast<uint32>(toLastSubTarget);
 	uint32 vClearFlags = static_cast<uint32>(clearFlags);
-	ser << enabled << vLastSubTarget << vClearFlags;
+	ser << flags << vLastSubTarget << vClearFlags;
 	for (uint32 i = 0; i < RenderConstants::MAX_COLOR_TARGETS; ++i)
 		ser << info.info.clearColor[i];
 	ser << info.info.clearDepth << info.info.clearStencil;
@@ -83,7 +78,7 @@ void BaseRenderPass::Load(RenderSystem *renderSys, InputSerializer& ser) {
 	uint32 vLastSubTarget = 0;
 	uint32 vClearFlags = 0;
 	StringID target = StringUtils::NullID;
-	ser >> enabled >> vLastSubTarget >> vClearFlags;
+	ser >> flags >> vLastSubTarget >> vClearFlags;
 	toLastSubTarget = static_cast<RenderTargetName>(vLastSubTarget);
 	clearFlags = static_cast<ClearFlags>(vClearFlags);
 	for (uint32 i = 0; i < RenderConstants::MAX_COLOR_TARGETS; ++i)

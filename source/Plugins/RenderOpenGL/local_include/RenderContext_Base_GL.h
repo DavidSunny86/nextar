@@ -147,6 +147,9 @@ public:
 	inline void Unmap(GLenum target);
 	inline void* MapRange(GLenum target, GLintptr offset, GLsizeiptr length,
 						  GLbitfield access);
+	inline void SetCurrentUBO(GLuint buffer);
+	
+
 	inline void SetTexture(uint32 texIdx, GLuint samplerObject,
 						   TextureViewGL* tu);
 	inline Size GetTextureParams(GLenum target);
@@ -232,11 +235,12 @@ public:
 	VertexSemanticDataGL GetInputSemanticsDataFromID(VertexSemanticID id);
 protected:
 	void DetermineShaderTarget();
+	void DetermineConstants();
 	GLuint CreateSamplerFromParams(const TextureUnitParams& params);
 
-	UniformBufferGL* CreateUniformBuffer(PassViewGL* pass, uint32 passIndex,
-										 const String& name, GLint blockIndex, GLuint prog, GLuint numParams,
-										 uint32 size, const Pass::VarToAutoParamMap& remapParams);
+	void InitializeUniformBuffer(UniformBufferGL& ub, PassViewGL* pass, uint32 passIndex,
+							 const char* name, GLint blockIndex, GLuint prog, GLuint numParams,
+							uint32 size, const Pass::VarToAutoParamMap& remapParams);
 	static void PrepareParamTable(const UniformBufferGL& buffer, uint32 passIndex, ParamEntryTable* table);
 
 	enum {
@@ -261,6 +265,7 @@ protected:
 	virtual void DestroyResources();
 	virtual void InitializeExtensions();
 
+	GLuint currentBoundUniformBuffer;
 	uint32 currentCountOfColorAttachments;
 
 	BaseExtensionsGL extensions;
@@ -271,7 +276,7 @@ protected:
 	/* uniform buffer table */
 	typedef unordered_map<String, UniformBufferGL>::type UniformBufferMap;
 
-	UniformBufferMap uniformBufferMap;
+	UniformBufferPoolGL uniformBufferPool;
 	RenderDriver::ContextCreationParams contextCreationParams;
 	RenderTarget* currentWindow;
 
@@ -456,7 +461,6 @@ inline void* RenderContext_Base_GL::MapRange(GLenum target, GLintptr offset,
 
 inline void RenderContext_Base_GL::Unmap(GLenum target) {
 	GlUnmapBuffer(target);
-	GlBindBuffer(target, 0);
 }
 
 inline void RenderContext_Base_GL::SetTexture(uint32 texIdx, GLuint samplerObject,
@@ -616,6 +620,13 @@ inline void RenderContext_Base_GL::SetFiltering(
 	TextureMagFilter magFilter) {
 	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GetGlMagFilter(magFilter));
 	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GetGlMinFilter(minFilter));
+}
+
+inline void RenderContext_Base_GL::SetCurrentUBO(GLuint b) {
+	if (currentBoundUniformBuffer != b) {
+		GlBindBuffer(GL_UNIFORM_BUFFER, b);
+		currentBoundUniformBuffer = b;
+	}
 }
 
 }

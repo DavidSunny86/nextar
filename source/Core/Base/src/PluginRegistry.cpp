@@ -103,6 +103,7 @@ PluginService* PluginRegistry::DynLib::Query(const String& name) {
 		if (plugin)
 			return plugin->Query(name.c_str());
 	}
+
 	return nullptr;
 }
 
@@ -129,11 +130,11 @@ void PluginRegistry::Configure(const Config& config) {
 }
 
 void PluginRegistry::AddPlugins(const URL& file) {
-	_ParseAndLoadPlugins(configFile);
+	_ParseAndLoadPlugins(file);
 }
 
-void PluginRegistry::_ParseAndLoadPlugins(const URL& path) {
-	_ParsePluginConfiguration(configFile);
+void PluginRegistry::_ParseAndLoadPlugins(const URL& file) {
+	_ParsePluginConfiguration(file);
 	RequestPlugins(PLUG_TYPE_PRELOAD,
 				StringUtils::Null, true);
 }

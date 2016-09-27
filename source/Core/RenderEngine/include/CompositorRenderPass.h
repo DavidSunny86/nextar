@@ -14,6 +14,10 @@ namespace nextar {
 
 class _NexRenderAPI CompositorRenderPass: public BaseMaterialPass {
 public:
+	enum Flags {
+		PARAMS_LOADED = BaseMaterialPass::LAST_FLAG << 0,
+	};
+
 	struct TexturesToResolve {
 		RenderTargetName name;
 		uint32 offset;

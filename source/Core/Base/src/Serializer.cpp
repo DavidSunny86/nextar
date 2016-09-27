@@ -16,12 +16,18 @@ enum {
  * InputSerializer
 *********************************************************/
 InputSerializer& InputSerializer::operator >>(Chunk& object) {
-	if (object.first.first != MARKER_INVALID_CHUNK)
+	if (object.header.headerName != MARKER_INVALID_CHUNK)
 		Skip(object);
 	uint16 globalMarker;
+	if (left < 2)
+		Fill();
+	if (left < 2) {
+		object = Invalid;
+		return *this;
+	}
 	(*this) >> globalMarker;
 	if (globalMarker == MARKER_GLOBAL_CHUNK_ID) {
-		(*this) >> object.first.first >> object.first.second;
+		(*this) >> object.header.headerName >> object.header.chunkSize;
 		// rewind and tell
 		//if (left) {
 		//	inStream->Seek(-left, std::ios_base::cur);
@@ -29,7 +35,7 @@ InputSerializer& InputSerializer::operator >>(Chunk& object) {
 		//	left = 0;
 		//}
 		//object.second = inStream->Tell();
-		object.second = inStream->Tell()-left;
+		object.startInFile = inStream->Tell()-left;
 	} else
 		object = Invalid;
 	return *this;
@@ -94,8 +100,8 @@ ChunkInputStream& ChunkInputStream::ReadChunk(uint16 header,
 	read = prevChunk;
 	do {
 		*this >> read;
-	} while (read.first.first != MARKER_INVALID_CHUNK
-			&& read.first.first != header);
+	} while (read.header.headerName != MARKER_INVALID_CHUNK
+			&& read.header.headerName != header);
 
 	return (*this);
 }

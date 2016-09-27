@@ -9,7 +9,7 @@ const String Default("Default");
 const String DefaultSymbol("#");
 const UniString UniNull;
 const String Unknown("<?>");
-const StringID NullID(0);
+const StringID NullID;
 const StringID DefaultID(1);
 const StringRef NullRef(Null);
 const StringRef DefaultRef(Default);

@@ -21,7 +21,9 @@ namespace nextar {
 NEX_DEFINE_SINGLETON_PTR(ResourcePacker);
 
 ProjectApplicationContext::ProjectApplicationContext() :
-	EngineApplicationContext() {
+	EngineApplicationContext()
+	, _project(NEX_NEW(ProjectContext())) {
+	
 }
 
 ProjectApplicationContext::~ProjectApplicationContext() {
@@ -34,7 +36,7 @@ void ProjectApplicationContext::CreateExtendedInterfacesImpl() {
 
 void ProjectApplicationContext::CreateProjectContext(
 		const String& projectName, const String& path) {
-	_project = NEX_NEW(ProjectContext(projectName, path));
+	_project.reset(NEX_NEW(ProjectContext(projectName, path)));
 }
 
 void ProjectApplicationContext::RegisterTemplateFactories() {

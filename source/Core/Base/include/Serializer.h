@@ -84,6 +84,7 @@ public:
 	inline OutputSerializer& operator <<(uint64 object);
 	inline OutputSerializer& operator <<(float object);
 	inline OutputSerializer& operator <<(double object);
+	inline OutputSerializer& operator <<(const StringID object);
 
 	inline OutputSerializer& operator <<(const ByteArray& object);
 	inline OutputSerializer& operator <<(const UByteArray& object);
@@ -133,8 +134,31 @@ public:
 	typedef std::pair<uint64*, uint32> UInt64Array;
 	typedef std::pair<float*, uint32> FloatArray;
 	typedef std::pair<double*, uint32> DoubleArray;
-	typedef std::pair<uint16, uint32> ChunkHeader;
-	typedef std::pair<ChunkHeader, std::streamoff> Chunk;
+
+	struct ChunkHeader {
+		uint16 headerName;
+		uint32 chunkSize;
+
+		ChunkHeader() : headerName(MARKER_INVALID_CHUNK), chunkSize(0) {}
+		ChunkHeader(uint16 name, uint32 size) : headerName(name), chunkSize(size) {}
+	};
+	
+	struct Chunk {
+		ChunkHeader header;
+		std::streamoff startInFile;
+
+		inline bool HasHeader(uint16 value) const {
+			return (header.headerName == value) != 0;
+		}
+
+		inline uint16 GetHeader() const {
+			return header.headerName;
+		}
+
+		Chunk() : startInFile(-1) {}
+		Chunk(const ChunkHeader& h, std::streamoff off) : header(h), startInFile(off) {}
+	};
+	
 
 	static const Chunk First;
 	static const Chunk Invalid;
@@ -154,6 +178,7 @@ public:
 	inline InputSerializer& operator >>(uint64& object);
 	inline InputSerializer& operator >>(float& object);
 	inline InputSerializer& operator >>(double& object);
+	inline InputSerializer& operator >>(StringID& object);
 
 	inline InputSerializer& operator >>(ByteArray& object);
 	inline InputSerializer& operator >>(UByteArray& object);
@@ -208,8 +233,8 @@ public:
 	 *           file pointer right after that
 	 **/
 	inline ChunkInputStream& MoveAfter(const Chunk& v) {
-		if (IsValid(v) && (int32)v.first.second >= 0) {
-			inStream->Seek(v.second + v.first.second, std::ios_base::beg);
+		if (IsValid(v) && (int32)v.header.chunkSize >= 0) {
+			inStream->Seek(v.startInFile + v.header.chunkSize, std::ios_base::beg);
 			streamSize = inStream->GetSize() - inStream->Tell();
 		}
 		return *this;

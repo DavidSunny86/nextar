@@ -15,9 +15,10 @@ namespace nextar {
 
 Pass::AutoParamList Pass::autoParams;
 
-Pass::Pass(StringID name) :
-		NamedObject(name),
-		ContextObject(TYPE_PASS, 0)
+Pass::Pass(StringID name, uint16 number) :
+		NamedObject(name)
+		,ContextObject(TYPE_PASS, 0)
+		,passNumber(number)
 		//,inputLayoutUniqueID(-1)
 		,flags(0) {
 }
@@ -25,6 +26,7 @@ Pass::Pass(StringID name) :
 Pass::Pass(Pass&& p) :
 	NamedObject(p.GetID())
 	,ContextObject(std::move(*static_cast<ContextObject*>(&p)))
+	, passNumber(p.passNumber)
 	,flags(0) {
 }
 
@@ -76,7 +78,7 @@ void Pass::AddParamDef(AutoParamName autoName, ParamDataType type, ParameterCont
  /****************************************************/
 Pass::View::View() :
 		samplers(nullptr), numSamplerCount(0),
-		viewNumber(0), frameNumber(0), passNumber(0) {
+		viewNumber(0), frameNumber(0), passNumber(-1) {
 }
 
 void Pass::View::Update(RenderContext* rc, uint32 msg, ContextParamPtr param) {
@@ -134,7 +136,8 @@ void Pass::View::SwitchAndUpdateParams(CommitContext& context) {
 		UpdateParams(context, ParameterContext::CTX_VIEW, context.viewNumber);
 		viewNumber = context.viewNumber;
 	}
-	if (passNumber != context.passNumber) {
+	//if (passNumber != context.passNumber)
+	{
 		UpdateParams(context, ParameterContext::CTX_PASS, context.passNumber);
 		passNumber = context.passNumber;
 	}

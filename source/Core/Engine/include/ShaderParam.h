@@ -85,6 +85,10 @@ public:
 		return ConstantParameter::At(parameter, index);
 	}
 
+	inline void InvalidateContents() {
+		lastUpdateId = -1;
+	}
+
 	virtual void* Map(RenderContext* rc) = 0;
 	virtual void SetRawBuffer(RenderContext* rc, const ConstantParameter& desc,
 			const void* data) = 0;

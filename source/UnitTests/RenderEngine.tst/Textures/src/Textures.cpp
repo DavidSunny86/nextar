@@ -29,7 +29,7 @@ public:
 		UTApplication::_SetupScene(scene);
 		// load textures and display
 		// test a png image
-		DisplayImage("{EngineData}/Textures/DefaultTexture.png", 0, 0);
+		DisplayImage("{EngineData}/Textures/Default.png", 0, 0);
 		// test a jpg load
 		DisplayImage("{EngineData}/Textures/Water.jpg", 0.25f, 0);
 		// test a tga load

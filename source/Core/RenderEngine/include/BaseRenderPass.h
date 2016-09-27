@@ -17,6 +17,11 @@ namespace nextar {
 
 class _NexRenderAPI BaseRenderPass: public RenderPass {
 public:
+	enum Flags {
+		PASS_ENABLED = 1 << 0,
+		LAST_FLAG = 1 << 1,
+	};
+
 	BaseRenderPass();
 	virtual ~BaseRenderPass();
 
@@ -34,11 +39,14 @@ public:
 	void RenderPrimitive(CommitContext& ctx, uint32 key, VisiblePrimitive* vis);
 
 	bool IsEnabled() const {
-		return enabled;
+		return (flags & PASS_ENABLED) != 0;
 	}
 
 	void SetEnabled(bool b) {
-		enabled = b;
+		if (b)
+			flags |= PASS_ENABLED;
+		else
+			flags &= ~PASS_ENABLED;
 	}
 
 
@@ -47,7 +55,7 @@ public:
 
 protected:
 
-	bool enabled;
+	uint8 flags;
 	RenderTargetName toLastSubTarget;
 	ClearFlags clearFlags;
 	RenderInfo info;
@@ -88,6 +96,9 @@ inline void BaseRenderPass::SetCleanStencil(bool clean, int16 value) {
 
 inline void BaseRenderPass::EndRender(CommitContext& ctx) {
 	ctx.renderContext->EndRender();
+	ctx.lastRenderTarget = info.rt;
+	if (toLastSubTarget != RenderTargetName::RT_NONE)
+		info.rt = nullptr;
 }
 
 } /* namespace nextar */

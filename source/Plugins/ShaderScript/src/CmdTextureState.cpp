@@ -53,7 +53,7 @@ bool ShaderScript::CmdUnit::BeginExecute(CommandContext* pContext,
 		desc.type = ParamDataType::PDT_TEXTURE;
 		String contextName = StringUtils::GetTaggedVal("context", it);
 		StringUtils::ToLower(contextName);
-		desc.context = Helper::GetContextFromName(contextName);
+		context = desc.context = Helper::GetContextFromName(contextName);
 		
 		c->shader->AddParam(unitName, desc);
 	}

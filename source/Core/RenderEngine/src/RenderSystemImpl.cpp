@@ -51,12 +51,18 @@ StringID RenderSystemImpl::GetTargetName(RenderTarget* name) {
 
 void RenderSystemImpl::Load(InputStreamPtr& stream, const String& fileType) {
 	RenderSystem::Streamer* streamer = RenderManager::Instance().GetRenderStreamer(fileType);
-	streamer->Load(*this, stream);
+	if (streamer)
+		streamer->Load(*this, stream);
+	else
+		Error("Failed to load render system for type: " + fileType);
 }
 
 void RenderSystemImpl::Save(OutputStreamPtr& stream, const String& fileType) {
 	RenderSystem::Streamer* streamer = RenderManager::Instance().GetRenderStreamer(fileType);
-	streamer->Save(*this, stream);
+	if (streamer)
+		streamer->Save(*this, stream);
+	else
+		Error("Failed to save render system for type: " + fileType);
 }
 
 void RenderSystemImpl::BeginConfig(bool bStoreMetaInfo) {
@@ -307,8 +313,7 @@ void RenderSystemImpl::DefaultStreamer::_WriteVersion(OutputStreamPtr& stream) {
 	ser << magic << versionInfo;
 }
 
-bool RenderSystemImpl::DefaultStreamer::_ReadVersion(InputStreamPtr& stream) {
-	InputSerializer ser(stream);
+bool RenderSystemImpl::DefaultStreamer::_ReadVersion(InputSerializer& ser) {
 	uint32 magic;
 	String versionInfo;
 	ser >> magic >> versionInfo;
@@ -359,9 +364,9 @@ void RenderSystemImpl::DefaultStreamer::_WriteBuffers(RenderSystem* s,
 	for (auto& e : m.bufferInfo) {
 		uint32 pixelFormat = (uint32)e.format;
 		uint32 type = (uint32)e.type;
-		uint16 numColorBuffer = e.mrtData->numColorBuffer;
 		ostr << e.name << e.dx << e.dy << pixelFormat << e.samples << type;
 		if (e.mrtData) {
+			uint16 numColorBuffer = e.mrtData->numColorBuffer;
 #define NEX_DUMP_BUFFER_INFO(info) info.ref << static_cast<uint32>(info.format) << info.useAsTarget
 			ostr << true << numColorBuffer << NEX_DUMP_BUFFER_INFO(e.mrtData->depth);
 			for (uint32 i = 0; i < numColorBuffer; ++i) {
@@ -376,6 +381,10 @@ void RenderSystemImpl::DefaultStreamer::_WriteBuffers(RenderSystem* s,
 void RenderSystemImpl::DefaultStreamer::_ReadBuffers(RenderSystem* s,
 	InputSerializer& ostr) {
 
+	bool metaInfo;
+	ostr >> metaInfo;
+	if (!metaInfo)
+		return;
 	uint32 width, height, depth, bufferCount;
 	ostr >> width >> height >> depth >> bufferCount;
 	for (uint32 i = 0; i < bufferCount; ++i) {
@@ -383,7 +392,8 @@ void RenderSystemImpl::DefaultStreamer::_ReadBuffers(RenderSystem* s,
 		float dx, dy;
 		uint32 pixelFormat, type;
 		uint16 samples;
-		ostr >> name >> dx >> dy >> pixelFormat >> samples >> type;
+		bool hasMrtData;
+		ostr >> name >> dx >> dy >> pixelFormat >> samples >> type >> hasMrtData;
 		switch ((RenderTargetType)type) {
 		case RenderTargetType::TEXTURE: {
 			RenderTexture::CreateParams params;
@@ -405,15 +415,15 @@ void RenderSystemImpl::DefaultStreamer::_ReadBuffers(RenderSystem* s,
 		}
 			break;
 		case RenderTargetType::MULTI_RENDER_TARGET: {
-			bool hasMrtData = false;
+			
 			uint16 numColorBuffer;
 			MultiRenderTarget::CreateParams params;
 			params.dimensions = Size(width, height);
-			ostr >> hasMrtData;
+			
 			if (hasMrtData) {
 				ostr >> numColorBuffer;
 				StringID subName;
-				PixelFormat subFormat;
+				//PixelFormat subFormat;
 				bool useAsTexture = false;
 #define NEX_READ_BUFFER_INFO(targParams) { \
 					ostr >> subName >> pixelFormat >> useAsTexture; targParams.format = (PixelFormat)pixelFormat; \
@@ -446,6 +456,15 @@ bool RenderSystemImpl::DefaultStreamer::Save(RenderSystem& s, OutputStreamPtr& s
 	_WriteVersion(stream);
 	ChunkOutputStream ostr(stream);
 
+	OutputSerializer& bufSer = ostr.BeginChunk(RSCRIPT_BUFFER);
+	RenderSystemImpl* impl = static_cast<RenderSystemImpl*>(&s);
+	if (impl->metaInfo) {
+		bufSer << true;
+		_WriteBuffers(&s, *impl->metaInfo, bufSer);
+	} else
+		bufSer << false;
+	ostr.EndChunk();
+
 	OutputSerializer& ser = ostr.BeginChunk(RSCRIPT_PASS_DATA);
 
 	uint32 passCount = s.GetPassCount();
@@ -456,20 +475,23 @@ bool RenderSystemImpl::DefaultStreamer::Save(RenderSystem& s, OutputStreamPtr& s
 
 	ostr.EndChunk();
 
-	OutputSerializer& bufSer = ostr.BeginChunk(RSCRIPT_BUFFER);
-	RenderSystemImpl* impl = static_cast<RenderSystemImpl*>(&s);
-	if (impl->metaInfo)
-		_WriteBuffers(&s, *impl->metaInfo, bufSer);
-	ostr.EndChunk();
-	return false;
+
+	return true;
 }
 
 bool RenderSystemImpl::DefaultStreamer::Load(RenderSystem& s, InputStreamPtr& stream) {
-	if (_ReadVersion(stream))
+	ChunkInputStream ser(stream);
+	if (!_ReadVersion(ser))
 		return false;
 	InputSerializer::Chunk chunk = ChunkInputStream::First;
-	ChunkInputStream istr(stream);
-	ChunkInputStream& passStr = istr.ReadChunk(RSCRIPT_PASS_DATA, chunk, chunk);
+
+	ChunkInputStream& buffStr = ser.ReadChunk(RSCRIPT_BUFFER, chunk, chunk);
+	if (InputSerializer::IsValid(chunk)) {
+		_ReadBuffers(&s, buffStr);
+	} else
+		return false;
+
+	ChunkInputStream& passStr = ser.ReadChunk(RSCRIPT_PASS_DATA, chunk, chunk);
 	if (InputSerializer::IsValid(chunk)) {
 		uint32 passCount;
 		passStr >> passCount;
@@ -479,11 +501,6 @@ bool RenderSystemImpl::DefaultStreamer::Load(RenderSystem& s, InputStreamPtr& st
 	} else
 		return false;
 
-	ChunkInputStream& buffStr = istr.ReadChunk(RSCRIPT_PASS_DATA, chunk, chunk);
-	if (InputSerializer::IsValid(chunk)) {
-		_ReadBuffers(&s, buffStr);
-	} else
-		return false;
 	return true;
 }
 
@@ -531,6 +548,7 @@ RenderSystemImpl::BufferInfo& RenderSystemImpl::BufferInfo::operator = (const Re
 	if (!mrtData)
 		mrtData = NEX_NEW(MultiRenderTargetData);
 	*mrtData = *info.mrtData;
+	return *this;
 }
 
 RenderSystemImpl::BufferInfo& RenderSystemImpl::BufferInfo::operator = (RenderSystemImpl::BufferInfo&& info) {
@@ -545,6 +563,11 @@ RenderSystemImpl::BufferInfo& RenderSystemImpl::BufferInfo::operator = (RenderSy
 	mrtData = info.mrtData;
 	info.mrtData = nullptr;
 	return *this;
+}
+
+RenderSystemImpl::BufferInfo::~BufferInfo() {
+	if (mrtData)
+		NEX_DELETE(mrtData);
 }
 
 /***************************************************************/

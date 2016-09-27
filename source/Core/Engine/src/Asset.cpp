@@ -438,12 +438,12 @@ void AssetLoader::Serialize() {
 
 	if (!impl) {
 		String ext = location.GetExtension();
-		StringUtils::ToLower(ext);
+		StringUtils::ToUpper(ext);
 		impl = GetImpl(ext, assetPtr->GetClassID());
 	}
 	if (!impl) {
 		request->SetCompleted(false);
-		Error("No loader for type.");
+		Error("No loader for type: " + location.GetExtension());
 		NEX_THROW_GracefulError(EXCEPT_MISSING_PLUGIN);
 	}
 
@@ -484,7 +484,7 @@ void AssetSaver::Serialize() {
 	if (!impl) {
 
 		String ext = location.GetExtension();
-		StringUtils::ToLower(ext);
+		StringUtils::ToUpper(ext);
 		impl = GetImpl(ext, assetPtr->GetClassID());
 	}
 	if (!impl) {

@@ -35,6 +35,7 @@ GLenum RenderContext_Base_GL::s_attachmentMap[] = {
 RenderContext_Base_GL::RenderContext_Base_GL(RenderDriverGL* _driver) :
 BaseRenderContext(_driver)
 , currentWindow(0)
+, currentBoundUniformBuffer(0)
 , currentCountOfColorAttachments(0)
 , contextFlags(0) {
 	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyResources, this);
@@ -59,6 +60,7 @@ void RenderContext_Base_GL::PostWindowCreation(RenderWindow* gw) {
 		if (!AreExtensionsReady()) {
 			InitializeExtensions();
 			DetermineShaderTarget();
+			DetermineConstants();
 			contextFlags |= EXTENSIONS_READY;
 			SetCurrentWindow(static_cast<RenderWindowImpl*>(gw->GetImpl()));
 			currentWindow = static_cast<RenderWindowImpl*>(gw->GetImpl());
@@ -433,6 +435,13 @@ bool RenderContext_Base_GL::ValidateFBO() {
 void RenderContext_Base_GL::EndRender() {
 }
 
+void RenderContext_Base_GL::DetermineConstants() {
+	GLint uniformBufferAlignSize = 0;
+	GLint uniformBufferMinSize = 0;
+	glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &uniformBufferAlignSize);
+	glGetIntegerv(GL_UNIFORM_BLOCK_DATA_SIZE, &uniformBufferMinSize);
+	uniformBufferPool.SetAlignmentAndMinSize(uniformBufferAlignSize, uniformBufferMinSize);
+}
 
 void RenderContext_Base_GL::DetermineShaderTarget() {
 	VersionGL ver = GetContextVersion();
@@ -651,33 +660,20 @@ void RenderContext_Base_GL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
 		if (numParams == 0) {
 			continue;
 		}
-		String uniName = name;
 		//bool shareUb = true;
-		UniformBufferGL* ubPtr = nullptr;
-		UniformBufferMap::iterator it = uniformBufferMap.find(uniName);
-		if (it != uniformBufferMap.end()) {
-			ubPtr = &(*it).second;
-			if (!(ubPtr && ubPtr->numParams == numParams && ubPtr->size == size)) {
-				Warn(
-					String(
-					"Uniform buffer cannot be registered"
-					" (name already registered with different contents): ")
-					+ uniName);
-				ubPtr = 0;
-				// we can surely register it as unshared ub
-				continue;
-			}
+		UniformBufferGL* ubPtr = uniformBufferPool.Acquire(this, name, size);
+		if (!ubPtr) {
+			Warn(String("Could not allocate uniform buffer: ") + name);
+			continue;
+		}
+			
+		if (ubPtr->ref.numOfRef == 1) {
+			// populate
+			InitializeUniformBuffer(*ubPtr, pass, passIndex, name, i, program,
+										numParams, size, remapParams);
 		}
 
-		if (!ubPtr) {
-			// create a new uniform buffer
-			ubPtr = CreateUniformBuffer(pass, passIndex, uniName, i, program,
-										numParams, size, remapParams);
-			GL_CHECK();
-		}
-		if (ubPtr) {
-			PrepareParamTable(*ubPtr, passIndex, paramTable);
-		}
+		PrepareParamTable(*ubPtr, passIndex, paramTable);
 
 		ubList.push_back({ (uint32)i, ubPtr });
 	}
@@ -716,15 +712,14 @@ void RenderContext_Base_GL::PrepareParamTable(const UniformBufferGL& u, uint32 p
 
 }
 
-UniformBufferGL* RenderContext_Base_GL::CreateUniformBuffer(PassViewGL* pass,
-															uint32 passIndex, const String& name, GLint blockIndex, GLuint prog,
-															GLuint numParams, uint32 size, const Pass::VarToAutoParamMap& remapParams
-															) {
+void RenderContext_Base_GL::InitializeUniformBuffer(
+	UniformBufferGL& u, PassViewGL* pass,
+	uint32 passIndex, const char* name, GLint blockIndex, GLuint prog,
+	GLuint numParams, uint32 size, const Pass::VarToAutoParamMap& remapParams
+	) {
 
 	NEX_ASSERT(size > 0);
 	uint16 numUnmappedParams = 0;
-	UniformBufferGL& u = uniformBufferMap[name];
-	u.ubNameGl = GL_INVALID_VALUE;
 	u.size = size;
 	u.numParams = numParams;
 	u.lastUpdateId = -1;
@@ -732,13 +727,6 @@ UniformBufferGL* RenderContext_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 	u.type = ParamDataType::PDT_STRUCT;
 	u.parameter = nullptr;
 	u.processor = nullptr;
-
-	GlGenBuffers(1, &u.ubNameGl);
-	GL_CHECK();
-	if (u.ubNameGl == GL_INVALID_VALUE) {
-		Error("Failed to generate buffer name");
-		NEX_THROW_GracefulError(EXCEPT_INVALID_CALL);
-	}
 
 	bool parseIndividualParams = true;
 	const AutoParam* autoParam = nullptr;
@@ -761,15 +749,9 @@ UniformBufferGL* RenderContext_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 	}
 
 	u.size = size;
-	GlBindBuffer(GL_UNIFORM_BUFFER, u.ubNameGl);
-	GL_CHECK();
-	GlBufferData(GL_UNIFORM_BUFFER, size, NULL, GL_DYNAMIC_DRAW);
-	GL_CHECK();
-	GlBindBuffer(GL_UNIFORM_BUFFER, 0);
-	GL_CHECK();
 		
 	if (!parseIndividualParams)
-		return &u;
+		return;
 
 	void* tempBuffer = NEX_ALLOC(sizeof(GLint) * numParams * 7 + 128,
 								 MEMCAT_GENERAL);
@@ -840,7 +822,7 @@ UniformBufferGL* RenderContext_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 			else if (chosen != paramDef->context
 					 && paramDef->context != ParameterContext::CTX_UNKNOWN) {
 				Warn(
-					"Parameters from different contexts cannot be mixed for buffer: "
+					String("Parameters from different contexts cannot be mixed for buffer: ")
 					+ name + "with parameter: " + paramName);
 				// discard??
 			}
@@ -867,7 +849,7 @@ UniformBufferGL* RenderContext_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 		chosen = GuessContextByName(name);
 	if (chosen == ParameterContext::CTX_UNKNOWN) {
 		Warn(
-			"Buffer context could not be determined, assigning material context: "
+			String("Buffer context could not be determined, assigning material context: ")
 			+ name);
 		chosen = ParameterContext::CTX_MATERIAL;
 	}
@@ -895,8 +877,6 @@ UniformBufferGL* RenderContext_Base_GL::CreateUniformBuffer(PassViewGL* pass,
 	}
 
 	NEX_FREE(tempBuffer, MEMCAT_GENERAL);
-
-	return &u;
 }
 
 GLuint RenderContext_Base_GL::CreateSamplerFromParams(const TextureUnitParams& params) {
@@ -1151,7 +1131,7 @@ void RenderContext_Base_GL::SwitchPass(CommitContext& context, Pass::View* passV
 	ParameterGroupList& paramList = passViewGl->GetSharedParameters();
 	for (uint32 i = 0; i < paramList.size(); ++i) {
 		UniformBufferGL* ubPtr = static_cast<UniformBufferGL*>(paramList[i].group);
-		GlBindBufferBase(GL_UNIFORM_BUFFER, i, ubPtr->ubNameGl);
+		GlBindBufferRange(GL_UNIFORM_BUFFER, i, ubPtr->ref.ubNameGl, ubPtr->ref.offset, ubPtr->ref.size);
 		GL_CHECK();
 		GlUniformBlockBinding(program, paramList[i].data, i);
 		GL_CHECK();
@@ -1949,7 +1929,6 @@ void RenderContext_Base_GL::InitializeExtensions() {
 }
 
 void RenderContext_Base_GL::CloseImpl() {
-	uniformBufferMap.clear();
 }
 
 void RenderContext_Base_GL::DestroyResources(void* pThis) {
@@ -1957,10 +1936,7 @@ void RenderContext_Base_GL::DestroyResources(void* pThis) {
 }
 
 void RenderContext_Base_GL::DestroyResources() {
-	auto& ubMap = uniformBufferMap;
-	for (auto& e : ubMap) {
-		e.second.Destroy(this);
-	}
+	uniformBufferPool.Destroy(this);
 }
 
 RenderWindow* RenderContext_Base_GL::CreateRenderWindowImpl() {

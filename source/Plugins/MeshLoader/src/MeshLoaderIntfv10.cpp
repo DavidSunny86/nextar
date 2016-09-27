@@ -172,7 +172,7 @@ MeshVertexData* MeshLoaderIntfv1_0::ReadVertexData(
 	// the first chunk should be vertex elements, if not shared
 	InputSerializer::Chunk chunk = InputSerializer::Invalid;
 	ser >> chunk;
-	if (chunk.first.first != MCID_VERTEX_ELEMENT_DATA && !vertexElements 
+	if (chunk.HasHeader(MCID_VERTEX_ELEMENT_DATA) && !vertexElements 
 		&& type == VertexLayoutType::CUSTOM_LAYOUT) {
 		Error(String("Vertex element data missing: ") + request->GetName());
 		NEX_DELETE(vertexData);
@@ -180,7 +180,7 @@ MeshVertexData* MeshLoaderIntfv1_0::ReadVertexData(
 	}
 
 	// read vertex elements if availabe, hence not shared
-	if (chunk.first.first == MCID_VERTEX_ELEMENT_DATA) {
+	if (chunk.HasHeader(MCID_VERTEX_ELEMENT_DATA)) {
 		// read
 		uint16 layoutType;
 		ReadVertexElementData(request, ser,
@@ -196,7 +196,7 @@ MeshVertexData* MeshLoaderIntfv1_0::ReadVertexData(
 	size_t i = 0;
 	do {
 		ser >> chunk;
-		switch (chunk.first.first) {
+		switch (chunk.GetHeader()) {
 		case MCID_VERTEX_BUFFER_DATA:
 			ReadVertexBufferData(request, ser, vertexData);
 			i++;
@@ -267,7 +267,7 @@ void MeshLoaderIntfv1_0::ReadSubMesh(MeshAsset::StreamRequest* request,
 	do {
 		ser >> chunk;
 		if (InputSerializer::IsValid(chunk)) {
-			switch (chunk.first.first) {
+			switch (chunk.GetHeader()) {
 			case MCID_SUBMESH_INFO:
 				ser >> primType;
 				request->SetPrimitiveType(subMesh, (PrimitiveType)primType);
@@ -334,7 +334,7 @@ void MeshLoaderIntfv1_0::ReadMeshChunk(MeshAsset::StreamRequest* request,
 	do {
 		ser >> chunk;
 		if (InputSerializer::IsValid(chunk)) {
-			switch (chunk.first.first) {
+			switch (chunk.GetHeader()) {
 			case MCID_VERTEX_DATA:
 				if (headersRead && !subMeshesRead)
 					request->SetSharedVertexData(

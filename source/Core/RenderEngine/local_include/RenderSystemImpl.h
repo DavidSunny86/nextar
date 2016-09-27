@@ -16,7 +16,9 @@
 namespace nextar {
 
 class RenderSystemImpl: public RenderSystem {
+	NEX_LOG_HELPER(RenderSystemImpl);
 public:
+		
 	
 	RenderSystemImpl(Size size);
 	virtual ~RenderSystemImpl();
@@ -127,8 +129,9 @@ protected:
 	TargetMap targets;
 	RenderPassList renderPasses;
 
+public:
 	friend class DefaultStreamer;
-
+		
 	class DefaultStreamer : public Streamer {
 
 		NEX_LOG_HELPER(DefaultStreamer);
@@ -145,7 +148,7 @@ protected:
 
 	protected:
 
-		bool _ReadVersion(InputStreamPtr& stream);
+		bool _ReadVersion(InputSerializer& stream);
 		void _ReadPass(RenderSystem* s, ChunkInputStream& ostr);
 		void _ReadBuffers(RenderSystem* s, InputSerializer& ostr);
 		void _WriteBuffers(RenderSystem* s, const MetaInfo& m, OutputSerializer& ostr);
