@@ -25,8 +25,8 @@ public:
 	virtual void Close();
 	virtual void Dispose();
 
+	PluginService* Query(const String& name, const String& impl);
 protected:
-	RenderManagerGL* renderManagerGl;
 };
 
 } /* namespace RenderOpenGL */

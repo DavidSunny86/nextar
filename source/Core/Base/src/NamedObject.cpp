@@ -76,6 +76,8 @@ void NamedObject::TableStack::OnExit() {
 		_current = nullptr;
 		_tables.pop_back();
 	}
+	StringTableList s;
+	_tables.swap(s);
 }
 
 NamedObject::NamedObject(const String& _name) :

@@ -96,12 +96,31 @@ void PluginRegistry::DynLib::_UnloadLib() {
 	libptr = 0;
 }
 
+String PluginRegistry::DynLib::GetImpl(const char* serv) {
+	size_t p = serviceNames.find(name);
+	if (p != String::npos) {
+		p = serviceNames.find_first_of(':', p);
+		if (p != String::npos) {
+			size_t en = serviceNames.find_first_of(';', p);
+			if (en != String::npos)
+				en = en - (p+1);
+			return serviceNames.substr(p+1, en);
+		}
+	}
+	return StringUtils::Null;
+}
 
-PluginService* PluginRegistry::DynLib::Query(const String& name) {
-	if (serviceNames.find(name) != String::npos) {
-		Request(true);
-		if (plugin)
-			return plugin->Query(name.c_str());
+PluginService* PluginRegistry::DynLib::Query(const String& name, const String& impl) {
+	size_t p = serviceNames.find(name);
+	if (p != String::npos) {
+		p = serviceNames.find_first_of(':', p);
+		if (p != String::npos) {
+			if (!impl.length() || !serviceNames.compare(p+1, impl.size(), impl)) {
+				Request(true);
+				if (plugin)
+					return plugin->Query(name, impl);
+			}
+		}
 	}
 
 	return nullptr;
@@ -205,13 +224,25 @@ void PluginRegistry::RequestPlugins(PluginLicenseType le,
 			libraries[i]->Request(le, typeName, loadPlugins);
 }
 
-PluginService* PluginRegistry::QueryService(const char* name) {
+PluginService* PluginRegistry::QueryService(const char* name, const char* impl) {
+	String serviceName = name;
+	String serviceImpl = (!impl || impl[0] == 0) ? StringUtils::Null : impl;
 	for (size_t i = 0; i < libraries.size(); ++i) {
-		PluginService* service = libraries[i]->Query(name);
+		PluginService* service = libraries[i]->Query(serviceName, serviceImpl);
 		if (service)
 			return service;
 	}
 	return nullptr;
+}
+
+StringUtils::WordList PluginRegistry::EnumImplementations(const char* serviceName) {
+	StringUtils::WordList serviceImpl;
+	for (size_t i = 0; i < libraries.size(); ++i) {
+		String impl = libraries[i]->GetImpl(serviceName);
+		if (impl.length() > 0)
+			StringUtils::PushBackWord(serviceImpl, impl);
+	}
+	return serviceImpl;
 }
 
 void PluginRegistry::UnloadPlugins() {

@@ -119,7 +119,8 @@ add_ref_and_ret:
 
 void UniformBufferPoolGL::Release(RenderContext_Base_GL* rc, UniformBufferGL* buff) {
 
-	for (auto& it = ubBlocks.begin(); it != ubBlocks.end(); ++it) {
+	auto en = ubBlocks.end();
+	for (auto it = ubBlocks.begin(); it != en; ++it) {
 		auto& e = (*it);
 		UniformBufferGL** ref = &e.head;
 		UniformBufferGL* buffer = e.head;

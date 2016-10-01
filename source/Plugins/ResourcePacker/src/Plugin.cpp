@@ -38,7 +38,7 @@ bool Plugin::LicenseExpired() {
 void Plugin::Dispose() {
 }
 
-PluginService* Plugin::Query(const char* name) {
+PluginService* Plugin::Query(const String& name, const String&) {
 	if (_packerServiceImpl.GetMeta().IsNamed(name)) {
 		_packerServiceImpl.IncrementUsage();
 		return &_packerServiceImpl;

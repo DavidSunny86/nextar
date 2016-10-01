@@ -11,7 +11,8 @@ using namespace nextar;
 NEX_IMPLEMENT_PLATFORM_APP();
 
 int NextarMain(int argc, char* argv[]) {
-	EngineApplicationContext application("GenSymMap");
+	EngineApplicationContext applImpl;
+	nextar::ApplicationContext application("GenSymMap", applImpl);
 	application.InitializeContext(argc, argv);
 
 	URL path = URL(FileSystem::ArchiveEngineData_Name, "Configs/UxKeySyms.dat");

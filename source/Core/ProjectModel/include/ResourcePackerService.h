@@ -13,6 +13,8 @@ public:
 
 	NEX_DECLARE_SERVICE_INTERFACE(ResourcePackerService);
 
+public:
+
 	virtual ~ResourcePackerService() {}
 	virtual void BuildMaterials(ProjectContextPtr const &context) = 0;
 	virtual void BuildRenderScripts(ProjectContextPtr const &context) = 0;

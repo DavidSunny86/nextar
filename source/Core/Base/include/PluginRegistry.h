@@ -10,6 +10,7 @@
 
 #include <FactoryPlugin.h>
 #include <OsDefs.h>
+#include <StringUtils.h>
 
 namespace nextar {
 
@@ -80,7 +81,8 @@ public:
 
 		void Request(PluginLicenseType pluginType, const String& name = StringUtils::Null, bool load = false);
 		void Request(bool load = false);
-		PluginService* Query(const String& name);
+		PluginService* Query(const String& name, const String& impl);
+		String GetImpl(const char* serv);
 
 	protected:
 
@@ -113,15 +115,17 @@ public:
 	void RequestPlugins(PluginLicenseType le, const String& typeName, bool loadPlugins);
 
 	/** Query service */
-	PluginService* QueryService(const char* name);
+	PluginService* QueryService(const char* name, const char* impl);
+	StringUtils::WordList EnumImplementations(const char* serviceName);
 
 	/** Unload */
 	void UnloadPlugins();
 
 	template <typename ServiceClass>
 	inline ServiceClass* QueryService() {
-		return static_cast<ServiceClass*>(QueryService(ServiceClass::GetMeta().GetName()));
+		return static_cast<ServiceClass*>(QueryService(ServiceClass::GetMeta().GetName(), 0));
 	}
+
 private:
 
 	static PluginLicenseType _ParsePluginLicenseType(const String& type);

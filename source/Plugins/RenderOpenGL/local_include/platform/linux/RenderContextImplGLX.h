@@ -53,7 +53,16 @@ public:
 
 	private:
 
-		GLXFBConfig GetConfig(int baseAttribs[], int maxAttribs[]);
+		enum AttribComparison : uint8 {
+			eBitCompare,
+			eEquate,
+			eLessThan,
+			eLessEqual,
+			eMoreThan,
+			eMoreEqual,
+		};
+
+		GLXFBConfig GetConfig(int baseAttribs[], int maxAttribs[], const AttribComparison c[]);
 		void UnreadyContext();
 		void EnumVideoModes(VideoModeList&);
 		bool IsXRandrSupported();

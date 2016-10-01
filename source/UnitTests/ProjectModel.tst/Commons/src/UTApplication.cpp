@@ -37,6 +37,8 @@ void UTApplication::_SetupScene(SceneAssetPtr& scene) {
 
 void UTApplication::ConfigureExtendedInterfacesImpl(Config& config) {
 	ProjectApplicationContext::ConfigureExtendedInterfacesImpl(config);
+	if (!RenderManager::QueryService(config))
+		NEX_THROW_FatalError(EXCEPT_ASSERTION_FAILED);
 	_SetupRenderDriver();	
 	ApplicationContext::Instance().RegisterListener(ApplicationContext::Listener(this, 0));
 	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_INIT_RESOURCES, SetupScene, this);
@@ -50,9 +52,11 @@ void UTApplication::ReleaseResources() {
 	scene.Clear();
 	window.Clear();
 	ProjectApplicationContext::ReleaseResources();
+	RenderManager::Instance().Destroy();
 }
 
 void UTApplication::_SetupRenderDriver() {
+
 	RenderManager::DriverCreationParams dcp;
 	dcp.gpuIndex = 0;
 	dcp.createDefaultContext = true;
@@ -67,7 +71,7 @@ void UTApplication::_SetupRenderDriver() {
 	dcp.defaultContextParams.multiSamples = 0;
 	dcp.defaultContextParams.stereo = false;
 	dcp.defaultContextParams.reqOpenGLVersionMajor = 4;
-	dcp.defaultContextParams.reqOpenGLVersionMinor = 3;
+	dcp.defaultContextParams.reqOpenGLVersionMinor = 1;
 	dcp.defaultContextParams.sharedContextIndex = -1;
 	dcp.defaultContextParams.extraParams["IsMainWindow"] = "true";
 	dcp.defaultContextParams.extraParams["ExitOnClose"] = "true";

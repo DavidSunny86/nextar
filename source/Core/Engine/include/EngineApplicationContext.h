@@ -13,7 +13,8 @@ class _NexEngineAPI EngineApplicationContext: public ACBaseImpl {
 public:
 
 	enum EventIDs {
-		EVENT_RENDERMANAGER_PRE_CLOSE = ApplicationContext::LAST_EVENT_ID + 1,
+		EVENT_RENDERMANAGER_CREATED = ApplicationContext::LAST_EVENT_ID + 1,
+		EVENT_RENDERMANAGER_PRE_CLOSE,
 		EVENT_RENDERMANAGER_POST_CLOSE,
 		LAST_EVENT_ID,
 	};

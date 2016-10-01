@@ -103,6 +103,18 @@ void RenderContextImplGLX::SetCreationParams(
 		None
 	};
 
+	AttribComparison comp[] = {
+			eBitCompare,
+			eBitCompare,
+			eEquate,
+			eLessEqual,
+			eLessEqual,
+			eLessEqual,
+			eLessEqual,
+			eLessEqual,
+			eLessEqual
+	};
+
 	int attrib = 18;
 	if (contextCreationParams.stereo) {
 		preferredAttribs[attrib++] = GLX_STEREO;
@@ -119,7 +131,7 @@ void RenderContextImplGLX::SetCreationParams(
 			None
 	};
 
-	frameBufferConfig = GetConfig(baseAttribs, preferredAttribs);
+	frameBufferConfig = GetConfig(baseAttribs, preferredAttribs, comp);
 
 	// lets check for glx extensions
 	ReadyGlxExtensions();
@@ -265,7 +277,8 @@ void RenderContextImplGLX::EnumVideoModes(VideoModeList& videoModes) {
 	}
 }
 
-GLXFBConfig RenderContextImplGLX::GetConfig(int baseAttribs[], int maxAttribs[]) {
+GLXFBConfig RenderContextImplGLX::GetConfig(int baseAttribs[], int maxAttribs[],
+		const AttribComparison comp[]) {
 
 	int fbcount = 0;
 	GLXFBConfig *fbconfigs = glXChooseFBConfig(display, screenIndex,
@@ -287,16 +300,40 @@ GLXFBConfig RenderContextImplGLX::GetConfig(int baseAttribs[], int maxAttribs[])
 			if (samples < attrib_val || chosen < 0) {
 				// check if we exceed expectations
 				if (chosen >= 0) {
-					bool exceeds = false;
+					bool failed = false;
 					for (int k = 0; maxAttribs[k * 2] != None; ++k) {
 						glXGetFBConfigAttrib(display, fbconfigs[i],
 								maxAttribs[k * 2], &attrib_val);
-						if (maxAttribs[k * 2 + 1] < attrib_val) {
-							exceeds = true;
+						switch(comp[k]){
+						case eBitCompare:
+							if (!(maxAttribs[k * 2 + 1] & attrib_val))
+								failed = true;
+							break;
+						case eEquate:
+							if (!(maxAttribs[k * 2 + 1] == attrib_val))
+								failed = true;
+							break;
+						case eLessThan:
+							if (!(maxAttribs[k * 2 + 1] < attrib_val))
+								failed = true;
+							break;
+						case eLessEqual:
+							if (!(maxAttribs[k * 2 + 1] <= attrib_val))
+								failed = true;
+							break;
+						case eMoreThan:
+							if (!(maxAttribs[k * 2 + 1] > attrib_val))
+								failed = true;
+							break;
+						case eMoreEqual:
+							if (!(maxAttribs[k * 2 + 1] >= attrib_val))
+								failed = true;
 							break;
 						}
+						if (failed)
+							break;
 					}
-					if (!exceeds)
+					if (!failed)
 						chosen = i;
 				} else
 					chosen = i;

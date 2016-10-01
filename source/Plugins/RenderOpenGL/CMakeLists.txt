@@ -7,7 +7,7 @@
 
 # Add definition
 # Add plugin
-create_plugin("RenderOpenGL" "" "Preload" "${NEX_VERSION}" "engine" "false" "")
+create_plugin("RenderOpenGL" "" "Custom" "${NEX_VERSION}" "engine" "false" "RenderManager:OpenGL")
 add_dependency(Core RenderEngine)
 
 ## Platform specific dependencies
@@ -17,6 +17,7 @@ if ( ${CMAKE_SYSTEM_NAME} MATCHES "Linux" )
 # package requirements Xrandr
 find_package(X11 REQUIRED)
 if (X11_Xrandr_FOUND)
+    message("Xrandr found!")
 	add_external_dependency("${X11_Xrandr_INCLUDE_DIR}" "${X11_Xrandr_LIB}")
 endif (X11_Xrandr_FOUND)
 

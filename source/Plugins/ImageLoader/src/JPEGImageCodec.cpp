@@ -8,6 +8,7 @@
 #include <EngineHeaders.h>
 #include <JPEGImageCodec.h>
 
+#define DONT_USE_EXTERN_C
 extern "C" {
 #include <jconfig.h>
 #include <jpeglib.h>

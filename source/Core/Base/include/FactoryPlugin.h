@@ -57,7 +57,7 @@ public:
 	virtual void Dispose() = 0;
 
 	/** @remarks Query service supported */
-	virtual PluginService* Query(const char* name) { return nullptr; }
+	virtual PluginService* Query(const String& name, const String& impl) { return nullptr; }
 };
 
 #define NEX_DECLARE_PLUGIN(pluginClass) static pluginClass plugin
@@ -115,6 +115,7 @@ public:
 		Class::FactoryMap Class::sImplMap;
 
 #define NEX_DECLARE_SERVICE_INTERFACE(Class)	\
+	public:	\
 		struct Meta {  \
 			const char* GetName() const {		\
 				return #Class;	\
@@ -122,11 +123,15 @@ public:
 			bool IsNamed(const char* name) const { \
 				return std::strcmp(GetName(), name) == 0; \
 			} \
+			bool IsNamed(const String& name) const { \
+				return name.compare(GetName()) == 0; \
+			} \
 		};	\
 		static const Meta& GetMeta() {	\
 			static Meta _m;	\
 			return _m;	\
-		}
+		} \
+	private:
 
 }
 

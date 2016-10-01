@@ -64,7 +64,9 @@ public:
 			NEX_DELETE((*it).second);
 			++it;
 		}
+		PropertyDictionaryMap dm;
 		dictionaryMap.clear();
+		dictionaryMap.swap(dm);
 	}
 
 protected:
@@ -75,7 +77,8 @@ protected:
 #else // defined(NEX_HAS_CONCURRENT_CONTAINERS)
 	/* Dictionary map */
 	typedef unordered_map<String, PropertyDictionary*>::type PropertyDictionaryMap;
-	PropertyDictionaryMap dictionaryMap;NEX_THREAD_MUTEX(dictionaryMtx);
+	PropertyDictionaryMap dictionaryMap;
+	NEX_THREAD_MUTEX(dictionaryMtx);
 #endif // defined(NEX_HAS_CONCURRENT_CONTAINERS)
 };
 

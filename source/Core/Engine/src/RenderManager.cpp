@@ -12,6 +12,8 @@
 #include <Viewport.h>
 #include <VideoMode.h>
 #include <Geometry.h>
+#include <PluginRegistry.h>
+#include <EngineApplicationContext.h>
 
 namespace nextar {
 
@@ -25,6 +27,18 @@ RenderManager::RenderManager() {
 
 RenderManager::~RenderManager() {
 	VertexSemantic::ClearSemanticMap();
+}
+
+bool RenderManager::QueryService(const Config& config) {
+	RenderManager* service = PluginRegistry::Instance().QueryService<RenderManager>();
+	if (!service)
+		return false;
+	service->Configure(config);
+	return true;
+}
+
+void RenderManager::Destroy() {
+	NEX_DELETE(this);
 }
 
 void RenderManager::DestroyResources(void* renderSystem) {
@@ -57,6 +71,7 @@ void RenderManager::CreateResources() {
 void RenderManager::Configure(const Config& config) {
 	const NameValueMap& nv = config.GetSectionMap("RenderManager");
 	ConfigureImpl(nv);
+	ApplicationContext::Instance().DispatchEvent(EngineApplicationContext::EVENT_RENDERMANAGER_CREATED);
 }
 
 void RenderManager::AddRenderQueue(const StringID name, uint16 priority,

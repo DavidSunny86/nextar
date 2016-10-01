@@ -38,7 +38,7 @@ public:
 	/** @remarks Dispose should free up the pointer, implements delete this as appropriate */
 	virtual void Dispose();
 	/** @remarks Query service supported */
-	virtual PluginService* Query(const char* name);
+	virtual PluginService* Query(const String& name, const String& impl);
 
 protected:
 	ResourcePackerServiceImpl _packerServiceImpl;

@@ -32,11 +32,10 @@ void PluginGL::Open() {
 }
 
 void PluginGL::LicenseRenewed() {
-	renderManagerGl = NEX_NEW(RenderManagerGL());
+
 }
 
 bool PluginGL::LicenseExpired() {
-	NEX_DELETE(renderManagerGl);
 	return true;
 }
 
@@ -47,4 +46,13 @@ void PluginGL::Close() {
 void PluginGL::Dispose() {
 
 }
+
+PluginService* PluginGL::Query(const String& name, const String& impl) {
+	if (RenderManager::GetMeta().IsNamed(name)) {
+		RenderManagerGL* service = NEX_NEW(RenderManagerGL());
+		return service;
+	}
+	return nullptr;
+}
+
 }

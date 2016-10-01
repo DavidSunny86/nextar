@@ -18,9 +18,11 @@
 namespace nextar {
 
 class _NexEngineAPI RenderManager: public Singleton<RenderManager>,
+		public PluginService,
 		public AllocGraphics {
-	NEX_LOG_HELPER(RenderManager)
-	;
+
+	NEX_DECLARE_SERVICE_INTERFACE(RenderManager);
+	NEX_LOG_HELPER(RenderManager);
 public:
 
 	/** indexing dependency, needs to be consequtive starting from 0 */
@@ -53,6 +55,9 @@ public:
 	RenderManager();
 	virtual ~RenderManager();
 
+	static bool QueryService(const Config& config);
+
+	virtual void Destroy() override;
 	inline const RenderSettings& GetRenderSettings() const {
 		return renderSettings;
 	}

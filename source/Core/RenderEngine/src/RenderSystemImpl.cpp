@@ -524,8 +524,10 @@ samples(info.samples),
 dx(info.dx), dy(info.dy),
 format(info.format),
 mrtData(nullptr) {
-	mrtData = NEX_NEW(MultiRenderTargetData);
-	*mrtData = *info.mrtData;
+	if (info.mrtData) {
+		mrtData = NEX_NEW(MultiRenderTargetData);
+		*mrtData = *info.mrtData;
+	}
 }
 
 RenderSystemImpl::BufferInfo::BufferInfo(BufferInfo&& info) :

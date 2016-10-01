@@ -14,7 +14,8 @@
 using namespace nextar;
 namespace RenderSystemScript {
 
-class Plugin: public FactoryPlugin {
+class Plugin:
+		public FactoryPlugin {
 	NEX_LOG_HELPER(Plugin)
 	;
 public:
@@ -38,6 +39,10 @@ public:
 	virtual void Close();
 	/** @remarks Dispose should free up the pointer, implements delete this as appropriate */
 	virtual void Dispose();
+
+	static void RenderManagerCreated(void* );
+	static void RenderManagerDestroyed(void*);
+
 protected:
 	RenderScriptStreamer _streamer;
 };
