@@ -1,0 +1,6 @@
+
+material Triangle {
+   shader ForwardLambert;
+   set-param sDiffuseMap "{EngineData}/Textures/Angel.tga";
+   set-param uDiffuseColor "0.4 0.4 0.4 1";
+};

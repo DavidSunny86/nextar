@@ -92,22 +92,22 @@ public:
 
 	inline
 	uint32 ToRgba() const {
-		return (red << 24) | (green << 16) | (blue << 8) | alpha;
+		return ((uint32)red << 24) | ((uint32)green << 16) | ((uint32)blue << 8) | (uint32)alpha;
 	}
 
 	inline
 	uint32 ToArgb() const {
-		return (alpha << 24) | (red << 16) | (green << 8) | blue;
+		return ((uint32)alpha << 24) | ((uint32)red << 16) | ((uint32)green << 8) | (uint32)blue;
 	}
 
 	inline
 	uint32 ToBgra() const {
-		return (blue << 24) | (green << 16) | (red << 8) | alpha;
+		return ((uint32)blue << 24) | ((uint32)green << 16) | ((uint32)red << 8) | (uint32)alpha;
 	}
 
 	inline
 	uint32 ToAbgr() const {
-		return (alpha << 24) | (blue << 16) | (green << 8) | red;
+		return ((uint32)alpha << 24) | ((uint32)blue << 16) | ((uint32)green << 8) | (uint32)red;
 	}
 
 	// todo Not very efficient

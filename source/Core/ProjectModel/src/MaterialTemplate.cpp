@@ -94,6 +94,10 @@ uint32 MaterialTemplate::GetProxyID() const {
 	return MaterialAsset::CLASS_ID;
 }
 
+String MaterialTemplate::GetPoxyAssetExtension() const {
+	return "nexmtl";
+}
+
 /********************************************
  * MaterialTemplate::StreamRequest
  *********************************************/

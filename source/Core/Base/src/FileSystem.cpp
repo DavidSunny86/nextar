@@ -164,6 +164,11 @@ void FileSystem::_AddArchive(const String& name, uint32 type,
 	d.archiveParam = path;
 }
 
+bool FileSystem::DoesFileExists(const URL& fileName) {
+	if (OpenRead(fileName))
+		return true;
+	return false;
+}
 void FileSystem::RemoveArchive(const String& name) {
 	descriptorMap.erase(name);
 }

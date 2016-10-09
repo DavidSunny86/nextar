@@ -124,7 +124,7 @@ void MeshSaverImplv1_0::WriteMaterialData(const MaterialTemplatePtr& material,
 		ChunkOutputStream& outStream) {
 	OutputSerializer& ser = outStream.BeginChunk(MCID_MATERIAL_DATA);
 	MaterialAsset::ID id = material->GetMaterialID();
-	URL location = material->GetAssetLocator();
+	URL location = material->GetProxyAssetLocator();
 	ser << id << location;
 	outStream.EndChunk();
 }

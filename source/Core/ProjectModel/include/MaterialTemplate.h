@@ -83,6 +83,7 @@ public:
 	// load a shader
 	virtual uint32 GetClassID() const;
 	virtual uint32 GetProxyID() const;
+	virtual String GetPoxyAssetExtension() const;
 
 	inline MaterialAsset::ID GetMaterialID() const {
 		return assetId;

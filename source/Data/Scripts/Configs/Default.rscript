@@ -12,6 +12,7 @@ pass Forward {
 
 pass Debug {
 	render-to last;
+   enabled true;
 }
 
 pass Compositor {

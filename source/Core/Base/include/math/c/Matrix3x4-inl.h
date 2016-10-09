@@ -64,4 +64,12 @@ inline Matrix3x4 Mat3x4FromViewUp(Vec3AF viewDir, Vec3AF upDir) {
 	ret.Row(1) = Vec3ACross(ret.Row(2), ret.Row(0));
 	return ret;
 }
+
+inline Vector3A Mat3x4TransVec3A(Vec3AF v, Mat3x4F m) {
+	Quad r = Vec3AMul(v.SplatZ(), m.Row(2));
+	r = Vec3AMulAdd(v.SplatY(), m.Row(1), r);
+	r = Vec3AMulAdd(v.SplatX(), m.Row(0), r);
+	return r;
+}
+
 } // namespace nextar

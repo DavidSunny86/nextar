@@ -244,7 +244,8 @@ void RenderSystemImpl::Commit(CommitContext& context) {
 
 	context.rsys = this;
 	for (auto& p : renderPasses) {
-		p->Commit(context);
+		if (p->IsEnabled())
+			p->Commit(context);
 	}
 }
 

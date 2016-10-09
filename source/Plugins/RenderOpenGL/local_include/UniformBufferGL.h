@@ -42,8 +42,8 @@ struct UBRef {
 	GLuint ubNameGl;
 	UniformBufferGL* nextInList;
 
-	UBRef(uint16 index, uint32 offsetInBuff, uint32 size, GLuint name, UniformBufferGL* next = nullptr) : objectIndex(index),
-		numOfRef(0), offset(offsetInBuff), ubNameGl(name), nextInList(next) {}
+	UBRef(uint16 index, uint32 offsetInBuff, uint32 isize, GLuint name, UniformBufferGL* next = nullptr) : objectIndex(index),
+		numOfRef(0), offset(offsetInBuff), size(isize), ubNameGl(name), nextInList(next) {}
 };
 
 typedef vector<UBObject>::type UBObjectList;
@@ -52,6 +52,7 @@ class UniformBufferPoolGL : public AllocGeneral {
 public:
 	enum {
 		UB_MAX_NAME_LENGTH = 48,
+		UB_PREFERRED_BLOCK_SIZE = 1024
 	};
 
 	UniformBufferPoolGL();
@@ -64,9 +65,9 @@ public:
 		uniformBufferAlignSize = algn;
 		uniformBufferMinSize = minSize;
 		if (!uniformBufferAlignSize)
-			blockSize = 2048;
+			blockSize = UB_PREFERRED_BLOCK_SIZE;
 		else
-			blockSize = (2048 / uniformBufferAlignSize) * uniformBufferAlignSize;
+			blockSize = (UB_PREFERRED_BLOCK_SIZE / uniformBufferAlignSize) * uniformBufferAlignSize;
 	}
 
 protected:

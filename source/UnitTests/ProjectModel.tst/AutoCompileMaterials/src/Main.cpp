@@ -22,7 +22,7 @@ public:
 		String materialName = attribute.fileName.GetComputedName();
 
 		MaterialTemplate::ID id(NamedObject::AsyncStringID(materialName));
-		URL materialSaveUrl("{EngineData}/Materials/" + materialName + ".mtl");
+		URL materialSaveUrl("{EngineData}/Materials/" + materialName + ".nexmtl");
 		URL materialAssetSaveUrl("{EngineData}/Materials/Assets/" + materialName + ".asset");
 		MaterialTemplatePtr material = MaterialTemplate::Traits::Instance(id, attribute.fileName);
 		material->RequestLoad();

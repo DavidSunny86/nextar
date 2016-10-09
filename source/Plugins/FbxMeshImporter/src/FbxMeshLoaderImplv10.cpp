@@ -308,7 +308,7 @@ void CopyVertexChannel(FbxMesh* pMesh, FbxLayerType* layer,
 					uint32 vertexId = p * 3 + j;
 					int id = layer->GetIndexArray().GetAt(vertexId);
 					value = Convert<SrcType, DstType>(
-							layer->GetDirectArray().GetAt(vertexId));
+							layer->GetDirectArray().GetAt(id));
 				}
 					break;
 				default:
@@ -486,20 +486,28 @@ MaterialTemplatePtr FbxMeshLoaderImplv1_0::CreateMaterial(FbxSurfaceMaterial* pF
 		NamedObject::AsyncStringID(name),
 		StringUtils::DefaultID,
 		StringUtils::DefaultID);
+	bool bMaterialExists = false;
 	MaterialTemplatePtr material;
 	const FbxProperty lProperty = pFbxMat->FindProperty("NFX_Material");
 	if (lProperty.IsValid()) {
 		FbxString kMtlPath = lProperty.Get<FbxString>();
 		String url = (const char*)kMtlPath;
 		URL path = URL(url);
-		material = MaterialTemplate::Traits::Instance(id, path);
-		return material;
+		if (FileSystem::Instance().DoesFileExists(path)) {
+			material = MaterialTemplate::Traits::Instance(id, path);
+			return material;
+		}
+		
 	} else {
-		String path = "Materials/";
+		String path = "Scripts/Materials/";
 		path += name;
-		path += ".mtl";
+		path += ".mscript";
 		URL url = URL(FileSystem::ArchiveProjectData_Name, path);
-		material = MaterialTemplate::Traits::Instance(id, url);
+		if (FileSystem::Instance().DoesFileExists(url)) {
+			material = MaterialTemplate::Traits::Instance(id, url);
+			return material;
+		}
+		// request a load if material is already present
 	}
 
 	if (material->AsyncIsCreated()) {

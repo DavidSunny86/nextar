@@ -18,4 +18,18 @@ AssetTemplate::AssetTemplate(const StringID name, const StringID factory) :
 AssetTemplate::~AssetTemplate() {
 }
 
+URL AssetTemplate::GetProxyAssetLocator() const {
+	const URL& url = GetAssetLocator();
+	String relativePath = url.GetRelativePath();
+	StringUtils::Replace(relativePath, "Scripts/", "");
+	size_t p = relativePath.find_last_of('.');
+	if (p != String::npos) {
+		relativePath.replace(p + 1, String::npos, GetPoxyAssetExtension());
+	} else {
+		relativePath += '.';
+		relativePath += GetPoxyAssetExtension();
+	}
+	return URL(url.GetArchiveName(), relativePath);
+}
+
 } /* namespace nextar */

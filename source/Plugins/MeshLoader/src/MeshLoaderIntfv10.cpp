@@ -172,7 +172,8 @@ MeshVertexData* MeshLoaderIntfv1_0::ReadVertexData(
 	// the first chunk should be vertex elements, if not shared
 	InputSerializer::Chunk chunk = InputSerializer::Invalid;
 	ser >> chunk;
-	if (chunk.HasHeader(MCID_VERTEX_ELEMENT_DATA) && !vertexElements 
+	
+	if (!chunk.HasHeader(MCID_VERTEX_ELEMENT_DATA) && !vertexElements 
 		&& type == VertexLayoutType::CUSTOM_LAYOUT) {
 		Error(String("Vertex element data missing: ") + request->GetName());
 		NEX_DELETE(vertexData);

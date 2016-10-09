@@ -36,6 +36,10 @@ uint32 ShaderTemplate::GetProxyID() const {
 	return ShaderAsset::CLASS_ID;
 }
 
+String ShaderTemplate::GetPoxyAssetExtension() const {
+	return "nexfx";
+}
+
 void ShaderTemplate::_AppendCompilerOption(const String& options,
 	String& outCompilerOptions) {
 
@@ -203,8 +207,10 @@ void ShaderTemplate::LoadStreamRequest::AddParam(const String& param, const Para
 	parameter.context = pdesc.context;
 	parameter.description = pdesc.description;
 	parameter.type = pdesc.type;
-	shader->_BindParamToOp(param, pdesc.activateOption);
-	shader->RegisterOptions(pdesc.activateOption);
+	if (pdesc.activateOption.length() > 0)	{ 
+		shader->_BindParamToOp(param, pdesc.activateOption);
+		shader->RegisterOptions(pdesc.activateOption);
+	}
 }
 
 void ShaderTemplate::LoadStreamRequest::AddCompilerOption(const String& name, const String& options) {

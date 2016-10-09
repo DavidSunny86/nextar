@@ -50,6 +50,7 @@ public:
 	void AddArchive(const String& name, uint32 type, const String& param);
 	void RemoveArchive(const String& name);
 
+	bool DoesFileExists(const URL& fileName);
 	static void CopyStream(InputStreamPtr& input, OutputStreamPtr& output);
 
 protected:

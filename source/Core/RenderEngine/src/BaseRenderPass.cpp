@@ -12,7 +12,6 @@ namespace nextar {
 
 BaseRenderPass::BaseRenderPass() :
 clearFlags(ClearFlags::CLEAR_NONE)
-,flags(PASS_ENABLED)
 ,toLastSubTarget(RT_NONE) {
 	info.info.clearDepth = 1.0f;
 
@@ -54,7 +53,7 @@ void BaseRenderPass::RenderPrimitive(
 	}
 
 	context.paramBuffers[(uint32)ParameterContext::CTX_OBJECT] = vis->GetParameters();
-	context.pass->UpdateParams(context, ParameterContext::CTX_OBJECT, key + context.frameNumber);
+	context.pass->UpdateParams(context, ParameterContext::CTX_OBJECT, (((uint16)key) << 16) | ((uint16)context.frameNumber));
 	context.renderContext->Draw(vis->GetStreamData(), context);
 }
 

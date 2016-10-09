@@ -15,7 +15,7 @@ const VertexElement Layout_POSITION_NORMAL_0[] = {
 const VertexElement Layout_POSITION_NORMAL_UV_0[] = {
 	VertexElement(VertexDesc( VertexSemantic(COMP_POSITION, 0, COMP_TYPE_FLOAT3), 0 ), 0, 0),
 	VertexElement(VertexDesc( VertexSemantic(COMP_NORMAL, 0, COMP_TYPE_FLOAT3), 12 ), 0, 0),
-	VertexElement(VertexDesc( VertexSemantic(COMP_TEXTURE_COORDINATE, 0, COMP_TYPE_FLOAT2), 12 ), 0, 0)
+	VertexElement(VertexDesc( VertexSemantic(COMP_TEXTURE_COORDINATE, 0, COMP_TYPE_FLOAT2), 24 ), 0, 0)
 };
 
 const VertexElement Layout_POSITION_0_NORMAL_1[] = {
@@ -26,7 +26,7 @@ const VertexElement Layout_POSITION_0_NORMAL_1[] = {
 const VertexElement Layout_POSITION_0_NORMAL_UV_1[] = {
 	VertexElement(VertexDesc( VertexSemantic(COMP_POSITION, 0, COMP_TYPE_FLOAT3), 0 ), 0, 0),
 	VertexElement(VertexDesc( VertexSemantic(COMP_NORMAL, 0, COMP_TYPE_FLOAT3), 12 ), 1, 0),
-	VertexElement(VertexDesc( VertexSemantic(COMP_TEXTURE_COORDINATE, 0, COMP_TYPE_FLOAT2), 12 ), 1, 0)
+	VertexElement(VertexDesc( VertexSemantic(COMP_TEXTURE_COORDINATE, 0, COMP_TYPE_FLOAT2), 24 ), 1, 0)
 };
 
 const VertexElement Layout_POSITION_COLOR_0[] = {

@@ -18,10 +18,12 @@ void SkyLightApply(CommitContext& context, const ShaderParameter* d) {
 	Light* light = context.lightSystem->GetSkyLight();
 	if (light) {
 		Vector4A v = light->GetDirectionVector();
+		v = Vec3ANegate(Mat4x4RotateVec3A(v, *context.viewMatrix));
 		context.paramGroup->WriteRawData(context.renderContext, light->GetLightColor().AsFloatArray(), 0, 16);
 		context.paramGroup->WriteRawData(context.renderContext, &v, 16, 12);
 	} else {
 		Vector3A v = Vec3ASet(0, -1, 0);
+		v = Vec3ANegate(Mat4x4RotateVec3A(v, *context.viewMatrix));
 		context.paramGroup->WriteRawData(context.renderContext, Color::White.AsFloatArray(), 0, 16);
 		context.paramGroup->WriteRawData(context.renderContext, &v, 16, 12);
 	}

@@ -22,6 +22,18 @@ inline AxisAlignedBox Mat4x4TransAABox(AABoxF box, Mat4x4F m) {
 	return ret;
 }
 
+inline Vector3A Mat4x4RotateVec3A(Vec3AF v, Mat4x4F m) {
+	Quad vRes = _mm_shuffle_ps(v, v, _MM_SHUFFLE(0, 0, 0, 0));
+	vRes = _mm_mul_ps(vRes, m.r[0]);
+	Quad vTemp = _mm_shuffle_ps(v, v, _MM_SHUFFLE(1, 1, 1, 1));
+	vTemp = _mm_mul_ps(vTemp, m.r[1]);
+	vRes = _mm_add_ps(vRes, vTemp);
+	vTemp = _mm_shuffle_ps(v, v, _MM_SHUFFLE(2, 2, 2, 2));
+	vTemp = _mm_mul_ps(vTemp, m.r[2]);
+	vRes = _mm_add_ps(vRes, vTemp);
+	return vRes;
+}
+
 inline void Mat4x4TransVec3(Vector4* outstream, uint32 outstride,
 		const Vector3* inpstream, uint32 inpstride, uint32 count, Mat4x4F m) {
 	NEX_ASSERT(outstream);

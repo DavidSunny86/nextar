@@ -79,7 +79,7 @@ UniformBufferGL* UniformBufferPoolGL::Acquire(RenderContext_Base_GL* rc, const c
 	_ModifyName(name, isize, modName);
 	// find
 	isize = std::max((uint32)uniformBufferMinSize, isize);
-	uint32 size = Math::RoundUp(uniformBufferMinSize, uniformBufferAlignSize);
+	uint32 size = Math::RoundUp(isize, (uint32)uniformBufferAlignSize);
 	UBObjectList::reverse_iterator it, en;
 
 	if ((ret = _Find(modName)))

@@ -29,11 +29,11 @@ public:
 		UTApplication::_SetupScene(scene);
 		// load textures and display
 		// test a png image
-		DisplayImage("{EngineData}/Textures/Default.png", 0, 0);
-		// test a jpg load
-		DisplayImage("{EngineData}/Textures/Water.jpg", 0.25f, 0);
+		DisplayImage("{EngineData}/Textures/Buggy/Buggy_diff.tga", 0, 0);
 		// test a tga load
-		DisplayImage("{EngineData}/Textures/Angel.tga", 0.5f, 0);
+		DisplayImage("{EngineData}/Textures/Angel.tga", 0.25f, 0);
+		// test a jpg load
+		/*DisplayImage("{EngineData}/Textures/Water.jpg", 0.5f, 0);
 		// test a dds load
 		DisplayImage("{EngineData}/Textures/Bottle.dds", 0.75f, 0);
 		// next batch
@@ -55,7 +55,7 @@ public:
 		// test a compressed dds load
 		// test a tga save
 		// test coordinate system
-
+		*/
 	}
 };
 

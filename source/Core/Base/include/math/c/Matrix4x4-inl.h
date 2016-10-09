@@ -495,4 +495,12 @@ inline Matrix4x4 Mat4x4Inverse(Mat4x4F m) {
 	return inv;
 }
 
+
+inline Vector3A Mat4x4RotateVec3A(Vec3AF v, Mat4x4F m) {
+	Quad r = Vec3AMul(v.SplatZ(), m.Row(2));
+	r = Vec3AMulAdd(v.SplatY(), m.Row(1), r);
+	r = Vec3AMulAdd(v.SplatX(), m.Row(0), r);
+	return r;
+}
+
 }  // namespace nextar

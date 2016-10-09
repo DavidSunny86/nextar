@@ -1,6 +1,6 @@
 
 material Buggy {
    shader ForwardLambert;
-   set-param _sDiffuseMap "{EngineData}/Textures/Buggy/Buggy_diff.tga";
-   set-param cbDiffuseProperty._uDiffuseColor [0.4 0.4 0.4 1];
+   set-param sDiffuseMap "{EngineData}/Textures/Buggy/Buggy_diff.tga";
+   set-param uDiffuseColor "0.4 0.4 0.4 1";
 };

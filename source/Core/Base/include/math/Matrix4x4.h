@@ -69,7 +69,8 @@ inline Matrix4x4 Mat4x4FromPerspective(float fieldOfView, float aspectRatio,
 		float nearPlane, float farPlane);
 /** @urgent generic matrix inverse */
 inline Matrix4x4 Mat4x4Inverse(Mat4x4F m);
-
+/** @brief rotate vector **/
+inline Vector3A Mat4x4RotateVec3A(Vec3AF v, Mat3x4F m);
 
 }
 

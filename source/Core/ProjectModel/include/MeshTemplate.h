@@ -104,7 +104,8 @@ public:
 	virtual StreamNotification NotifyAssetLoadedImpl(StreamRequest* request);
 
 	virtual uint32 GetClassID() const;
-
+	virtual uint32 GetProxyID() const;
+	virtual String GetPoxyAssetExtension() const;
 
 protected:
 

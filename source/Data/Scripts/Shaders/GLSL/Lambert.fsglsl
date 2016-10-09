@@ -1,6 +1,6 @@
 
 vec4 vCalculateLighting(in KLight light, in KSurfaceData surface)
 {
-   return surface.iAlbedo * light.iColor * max(dot(surface.iNormal, light.iDir), 0.0);
+   return surface.iAlbedo * max(dot(surface.iNormal, light.iDir), 0.0);
 }
 

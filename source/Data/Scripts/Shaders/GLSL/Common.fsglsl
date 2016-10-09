@@ -110,7 +110,7 @@
 	}
 
 	vec4 vSampleSpecularAndGloss(vec2 v) {
-		return texture(sSpecularAndGlossMap, v).rg;
+		return texture(sSpecularAndGlossMap, v);
 	}
 #else
 	vec2 vSampleSpecularAndGloss(vec2 v) {

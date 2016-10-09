@@ -156,6 +156,7 @@ public:
 	
 	virtual uint32 GetClassID() const;
 	virtual uint32 GetProxyID() const;
+	virtual String GetPoxyAssetExtension() const;
 
 	void RegisterOptions(const String& options);
 protected:

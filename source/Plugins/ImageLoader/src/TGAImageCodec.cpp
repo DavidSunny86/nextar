@@ -66,16 +66,18 @@ void TGAImageCodec::Spread(uint8* data, uint32 width, uint32 height) {
 
 	uint8* source = data;
 	uint32* dest = reinterpret_cast<uint32*>(data);
-	Color32 prev, cur;
-	prev.alpha = 255;
-#define READ_SRC_PX(src, c) c.red = source[0]; c.green = source[1]; c.blue = source[2]; source+=3;
-	READ_SRC_PX(src, prev);
-	for (uint32 i = 1; i < width*height; ++i) {
-		READ_SRC_PX(src, cur);
-		dest[i-1] = prev.ToRgba();
-		prev = cur;
+	size_t n = width * height;
+	uint8* src = (uint8*)NEX_ALLOC(n*3, MEMCAT_GENERAL);
+	std::memcpy(src, source, n*3);
+	Color32 prev;
+	for (uint32 i = 0; i < n; ++i) {
+		prev.red = src[i * 3 + 2];
+		prev.green = src[i * 3 + 1];
+		prev.blue = src[i * 3 + 0]; 
+		dest[i] = prev.ToArgb();
 	}
-	dest[width*height - 1] = prev.ToRgba();
+
+	NEX_FREE(src, MEMCAT_GENERAL);
 }
 
 ImageData TGAImageCodec::ReadUncompressed(InputSerializer& ser, const ImageParams& params, ImageCodecMetaInfo& metaInfo) {

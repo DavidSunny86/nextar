@@ -6,6 +6,7 @@
  */
 #include <NexProjectModel.h>
 #include <MeshTemplate.h>
+#include <MeshAsset.h>
 
 namespace nextar {
 
@@ -31,6 +32,14 @@ StreamNotification MeshTemplate::NotifyAssetLoadedImpl(
 
 uint32 MeshTemplate::GetClassID() const {
 	return CLASS_ID;
+}
+
+uint32 MeshTemplate::GetProxyID() const {
+	return MeshAsset::CLASS_ID;
+}
+
+String MeshTemplate::GetPoxyAssetExtension() const {
+	return "nexmesh";
 }
 
 StreamRequest* MeshTemplate::CreateStreamRequestImpl(bool load) {

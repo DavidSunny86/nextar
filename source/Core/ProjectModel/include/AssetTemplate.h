@@ -33,6 +33,9 @@ public:
 		return modification != lastSavedModification;
 	}
 
+	URL GetProxyAssetLocator() const;
+	virtual String GetPoxyAssetExtension() const = 0;
+
 protected:
 	// std::chrono::time_point lastSaveTime;
 	uint32 lastSavedModification;

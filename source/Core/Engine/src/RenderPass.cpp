@@ -9,7 +9,8 @@
 
 namespace nextar {
 
-RenderPass::RenderPass() {
+RenderPass::RenderPass() :
+ flags(PASS_ENABLED) {
 }
 
 RenderPass::~RenderPass() {

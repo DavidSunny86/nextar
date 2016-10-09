@@ -9,7 +9,7 @@
 
 namespace nextar {
 
-DefaultLightSystem::DefaultLightSystem() {
+DefaultLightSystem::DefaultLightSystem() : skyLight(nullptr) {
 	// TODO Auto-generated constructor stub
 
 }

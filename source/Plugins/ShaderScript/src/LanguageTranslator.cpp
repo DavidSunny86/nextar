@@ -77,9 +77,10 @@ bool LanguageTranslator::ConstBuffer_BeginExecute(ShaderScriptContext* c,
 		if (semantic.second != StringUtils::Null) {
 			AutoParamName apn = Helper::GetAutoParam(semantic.second);
 			if (apn != AutoParamName::AUTO_INVALID_PARAM) {
-				c->shader->AddSemanticBinding(semantic.first, apn);
-				determineContext = false;
 				name = std::move(semantic.first);
+				c->shader->AddSemanticBinding("_" + name, apn);
+				determineContext = false;
+				
 			}
 		}
 	}

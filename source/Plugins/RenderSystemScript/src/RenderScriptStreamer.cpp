@@ -14,6 +14,7 @@
 #include <CmdSetParam.h>
 #include <CmdTarget.h>
 #include <CmdClean.h>
+#include <CmdEnabled.h>
 #include <CmdCreateBuffer.h>
 #include <BaseRenderPass.h>
 
@@ -40,6 +41,7 @@ void RenderScriptStreamer::RegisterDictionary() {
 	_root.RegisterHandler("pass.material", CmdMaterial::InstancePtr());
 	_root.RegisterHandler("pass.set-param", CmdSetParam::InstancePtr());
 	_root.RegisterHandler("pass.render-to", CmdRenderTo::InstancePtr());
+	_root.RegisterHandler("pass.enabled", CmdEnabled ::InstancePtr());
 	_root.RegisterHandler("create-buffer", CmdCreateBuffer::InstancePtr());
 	_root.RegisterHandler("create-buffer.target", CmdTarget::InstancePtr());
 }
