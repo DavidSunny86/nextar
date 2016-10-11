@@ -293,7 +293,7 @@ protected:
 
 #define NEX_ENABLE_MEMORY_POOLS 1
 
-template<const size_t NumPerBlock, typename Mutex, typename Allocator>
+template<const size_t NumPerBlock, typename Allocator, typename Mutex>
 class MemoryPool {
 	typedef Pool<NumPerBlock, Allocator> TPool;
 
@@ -381,6 +381,31 @@ public:
 #else
 		return _objectSize;
 #endif
+	}
+
+};
+
+template <typename T, const size_t NumPerBlock, typename Allocator, typename Mutex>
+class TypedMemoryPool {
+	// deleted
+	TypedMemoryPool(const TypedMemoryPool&);
+public:
+	typedef MemoryPool<NumPerBlock, Mutex, Allocator> MemoryPoolType;
+
+protected:
+
+	MemoryPoolType impl;
+
+public:
+	TypedMemoryPool() : impl(sizeof(T)) {}
+	TypedMemoryPool(TypedMemoryPool&& other) : impl(std::move(other.impl)) {}
+
+	T* AllocType() {
+		return static_cast<T*>(impl.Alloc());
+	}
+
+	void FreeType(T* t) {
+		impl.Free(t);
 	}
 
 };

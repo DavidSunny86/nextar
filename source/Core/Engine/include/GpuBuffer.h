@@ -10,7 +10,7 @@ class _NexEngineAPI GpuBuffer: public ContextObject,
 		public Referenced<GpuBuffer, AllocGeneral> {
 public:
 	enum RelocationPolicy
-		: uint32 {
+		: uint8 {
 		INVALID_POLICY,
 		// Forever: Static meshes, immutable
 		NEVER_RELEASED,
@@ -29,20 +29,20 @@ public:
 	struct CreateParams {
 		const uint8* sourceData;
 		RelocationPolicy policy;
-		size_t size;
+		uint32 size;
 		uint32 elementStride;
 	};
 
 	struct ReadParams {
 		void* bufferPtr;
-		size_t offset;
-		size_t size;
+		uint32 offset;
+		uint32 size;
 	};
 
 	struct WriteParams {
 		const void* bufferPtr;
-		size_t offset;
-		size_t size;
+		uint32 offset;
+		uint32 size;
 	};
 
 	struct MapResult {
@@ -53,14 +53,14 @@ public:
 	protected:
 		virtual void Update(nextar::RenderContext*, uint32 msg,
 				ContextParamPtr);
-		virtual void Create(RenderContext* rc, size_t size,
+		virtual void Create(RenderContext* rc, uint32 size,
 				uint32 elementStride,
 				const void* dataPtr, RelocationPolicy policy) = 0;
-		virtual void Read(RenderContext* rc, void *dest, size_t offset,
-				size_t size) = 0;
-		virtual void Write(RenderContext* rc, const void *src, size_t offset,
-				size_t size) = 0;
-		virtual MapResult Map(RenderContext* rc, size_t offset = 0, size_t size = 0) = 0;
+		virtual void Read(RenderContext* rc, void *dest, uint32 offset,
+				uint32 size) = 0;
+		virtual void Write(RenderContext* rc, const void *src, uint32 offset,
+				uint32 size) = 0;
+		virtual MapResult Map(RenderContext* rc, uint32 offset = 0, uint32 size = 0) = 0;
 		virtual void Unmap(RenderContext* rc) = 0;
 	};
 
@@ -74,11 +74,11 @@ public:
 	}
 	/** This function will fail unless a local copy of the data exists. The local
 	 * copy is created if the CPU_READ flag is set. **/
-	virtual void Read(void *dest, size_t offset = 0, size_t size = 0);
+	virtual void Read(void *dest, uint32 offset = 0, uint32 size = 0);
 	/** Write to buffer */
-	virtual void Write(const void *src, size_t offset = 0, size_t size = 0);
+	virtual void Write(const void *src, uint32 offset = 0, uint32 size = 0);
 
-	inline size_t GetSize() const {
+	inline uint32 GetSize() const {
 		return size;
 	}
 
@@ -90,7 +90,7 @@ public:
 	}
 
 protected:
-	size_t size;
+	uint32 size;
 };
 
 }

@@ -13,6 +13,7 @@
 #include <RenderBufferViewGL.h>
 #include <GpuBufferViewGL.h>
 #include <RenderTextureViewGL.h>
+#include <GpuBufferPoolGL.h>
 
 namespace RenderOpenGL {
 
@@ -160,6 +161,8 @@ public:
 	inline GLenum ClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout);
 	inline void DeleteSync(GLsync sync);
 	inline GLsync FenceSync(GLenum condition, GLbitfield flags);
+	inline std::pair<GLenum, GpuBufferPoolGL*> GetUsage(GpuBuffer::RelocationPolicy policy, GLenum type);
+
 
 	inline GLuint CreateRenderBuffer(
 		Size dim,
@@ -288,6 +291,15 @@ protected:
 
 	VertexSemanticListGL vertexSemanticBlob;
 	VertexSemanticListElementList registeredSignatures;
+
+	enum {
+		BUFFER_TYPE_STATIC,
+		BUFFER_TYPE_STREAM,
+		BUFFER_TYPE_DYNAMIC,
+	};
+
+	GpuBufferPoolGL _poolIndexBuffer[3];
+	GpuBufferPoolGL _poolVertexBuffer[3];
 
 	static GLenum s_attachmentMap[(uint32)FrameBuffer::FBTYPE_COUNT];
 };
@@ -627,6 +639,23 @@ inline void RenderContext_Base_GL::SetCurrentUBO(GLuint b) {
 		GlBindBuffer(GL_UNIFORM_BUFFER, b);
 		currentBoundUniformBuffer = b;
 	}
+}
+
+inline std::pair<GLenum, GpuBufferPoolGL*>
+RenderContext_Base_GL::GetUsage(GpuBuffer::RelocationPolicy policy,GLenum type) {
+	std::pair<GLenum, GpuBufferPoolGL*> ret;
+	ret.first = GL_STATIC_DRAW;
+	uint32 i = BUFFER_TYPE_STATIC;
+
+	if (policy == GpuBuffer::REGULARLY_RELEASED) {
+		ret.first = GL_STREAM_DRAW;
+		i = BUFFER_TYPE_STREAM;
+	} else if (policy != GpuBuffer::NEVER_RELEASED) {
+		ret.first = GL_DYNAMIC_DRAW;
+		i = BUFFER_TYPE_DYNAMIC;
+	}
+	ret.second = (type == GL_ARRAY_BUFFER) ? &_poolVertexBuffer[i] : &_poolIndexBuffer[i];
+	return ret;
 }
 
 }

@@ -19,7 +19,7 @@ GpuBuffer::GpuBuffer(GpuBuffer&& other) :
 	other.size = 0;
 }
 
-void GpuBuffer::Read(void* dest, size_t offset, size_t amount) {
+void GpuBuffer::Read(void* dest, uint32 offset, uint32 amount) {
 	ReadParams p;
 	p.bufferPtr = dest;
 	p.offset = offset;
@@ -28,7 +28,7 @@ void GpuBuffer::Read(void* dest, size_t offset, size_t amount) {
 			reinterpret_cast<ContextObject::ContextParamPtr>(&p));
 }
 
-void GpuBuffer::Write(const void* dest, size_t offset, size_t amount) {
+void GpuBuffer::Write(const void* dest, uint32 offset, uint32 amount) {
 	WriteParams p;
 	p.bufferPtr = dest;
 	p.offset = offset;

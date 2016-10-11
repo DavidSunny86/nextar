@@ -10,13 +10,13 @@ namespace nextar {
 // Typically we want a single uniform pool for same sized objects.
 // Current Implementation however uses multiple pools per object type,
 // So we move the implementation of PooledAllocator to PoolProvider
-template<const size_t ObjectSize, const size_t NumPerBlock, enum MemoryCategory Catagory>
+template<const size_t ObjectSize, const size_t NumPerBlock, enum MemoryCategory Catagory, typename MutexType = Mutex>
 class PoolProvider {
 	typedef AllocatorBase<Catagory> BaseAllocator;
-	typedef MemoryPool<NumPerBlock, Mutex, BaseAllocator> MPool;
+	typedef MemoryPool<NumPerBlock, BaseAllocator, MutexType> MPool;
 	MPool pool;
 public:
-	typedef PoolProvider<ObjectSize, NumPerBlock, Catagory> Type;
+	typedef PoolProvider<ObjectSize, NumPerBlock, Catagory, MutexType> Type;
 
 	PoolProvider() :
 		pool(ObjectSize) {
@@ -65,13 +65,13 @@ protected:
 	}
 };
 
-template<typename T, const size_t NumPerBlock, enum MemoryCategory Catagory>
+template<typename T, const size_t NumPerBlock, enum MemoryCategory Catagory, typename MutexType = Mutex>
 class PooledAllocator {
 	typedef T ObjectType;
-	typedef PoolProvider<sizeof(T), NumPerBlock, Catagory> ProviderSpecialization;
+	typedef PoolProvider<sizeof(T), NumPerBlock, Catagory, MutexType> ProviderSpecialization;
 public:
 	typedef ProviderSpecialization Provider;
-	typedef PooledAllocator<T, NumPerBlock, Catagory> Type;
+	typedef PooledAllocator<T, NumPerBlock, Catagory, MutexType> Type;
 
 	PooledAllocator() {
 	}
@@ -121,21 +121,21 @@ protected:
 };
 
 template<typename T, const size_t NumPerBlock = (size_t)BaseConstants::NUM_EVENT_PER_BLOCK,
-		enum MemoryCategory Catagory = MEMCAT_GENERAL>
+		enum MemoryCategory Catagory = MEMCAT_GENERAL, typename MutexType = Mutex>
 class STDPoolAllocator: public std::allocator<T> {
 public:
 	//    typedefs
 
 	typedef typename std::allocator<T>::pointer pointer;
 	typedef typename std::allocator<T>::size_type size_type;
-	typedef PooledAllocator<T, NumPerBlock, Catagory> BaseAllocator;
+	typedef PooledAllocator<T, NumPerBlock, Catagory, MutexType> BaseAllocator;
 
 public:
 	//    convert an allocator<T> to allocator<U>
 
 	template<typename U>
 	struct rebind {
-		typedef STDPoolAllocator<U, NumPerBlock, Catagory> other;
+		typedef STDPoolAllocator<U, NumPerBlock, Catagory, MutexType> other;
 	};
 
 public:
@@ -148,7 +148,7 @@ public:
 
 	/*	inline explicit STLAllocator(STLAllocator const&) {}*/
 	template<typename U>
-	inline STDPoolAllocator(STDPoolAllocator<U, NumPerBlock, Catagory> const&) {
+	inline STDPoolAllocator(STDPoolAllocator<U, NumPerBlock, Catagory, MutexType> const&) {
 	}
 
 	//    memory allocation

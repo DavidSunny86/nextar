@@ -13,18 +13,41 @@
 
 namespace RenderOpenGL {
 
+class GpuBufferPoolGL;
+class GpuObject;
+
+struct GpuBufferRef {
+	uint32 offset;
+	uint32 allocatedSize;
+	GLuint bufferId;
+	GpuObject* container;
+	static GpuBufferRef Null;
+};
+
+struct GpuSyncedBuffer {
+	GLsync fence;
+	GpuBufferRef buffer;
+	GpuSyncedBuffer* nextInList;
+
+	inline GpuSyncedBuffer(GLsync _fence, const GpuBufferRef& _buffer) :
+	fence(_fence)
+	,buffer(_buffer)
+	,nextInList(nullptr) {}
+};
+
 class GpuBufferViewGL : public GpuBuffer::View {
 public:
 	GpuBufferViewGL(GLenum type);
 	virtual ~GpuBufferViewGL();
-	virtual void Create(RenderContext* rc, size_t size,
+
+	virtual void Create(RenderContext* rc, uint32 size,
 			uint32 elementStride,
 			const void* dataPtr, GpuBuffer::RelocationPolicy policy);
-	virtual void Read(RenderContext* rc, void *dest, size_t offset,
-			size_t size);
-	virtual void Write(RenderContext* rc, const void *src, size_t offset,
-			size_t size);
-	virtual GpuBuffer::MapResult Map(RenderContext* rc, size_t offset = 0, size_t size = 0);
+	virtual void Read(RenderContext* rc, void *dest, uint32 offset,
+			uint32 size);
+	virtual void Write(RenderContext* rc, const void *src, uint32 offset,
+			uint32 size);
+	virtual GpuBuffer::MapResult Map(RenderContext* rc, uint32 offset = 0, uint32 size = 0);
 	virtual void Unmap(RenderContext* rc);
 	virtual void Destroy(RenderContext* rc);
 
@@ -37,8 +60,8 @@ public:
 	}
 
 	GLuint GetBufferId() const {
-		NEX_ASSERT(bufferId);
-		return bufferId;
+		NEX_ASSERT(ref.bufferId);
+		return ref.bufferId;
 	}
 
 	GLenum GetUsage() const {
@@ -46,13 +69,15 @@ public:
 	}
 
 protected:
-	GpuBuffer::RelocationPolicy policy;
 	bool syncRequired;
-	size_t totalSize;
-	GLenum type;
-	GLenum usage; // either GL_DYNAMIC_DRAW or GL_STATIC_DRAW
+	GpuBuffer::RelocationPolicy policy;
+	GpuBufferRef ref;
+	GLenum usage;
+	uint32 size;
 	GLuint elementStride;
-	GLuint bufferId;
+	GLenum type;
+
+	GpuBufferPoolGL* pool;
 };
 
 class GpuTransientBufferViewGL : public GpuBufferViewGL {
@@ -60,31 +85,18 @@ class GpuTransientBufferViewGL : public GpuBufferViewGL {
 public:
 	GpuTransientBufferViewGL(GLenum type);
 
-	virtual void Create(RenderContext* rc, size_t size,
+	virtual void Create(RenderContext* rc, uint32 size,
 			uint32 elementStride,
 			const void* dataPtr, GpuBuffer::RelocationPolicy policy);
-	virtual GpuBuffer::MapResult Map(RenderContext* rc, size_t offset = 0, size_t size = 0);
+	virtual GpuBuffer::MapResult Map(RenderContext* rc, uint32 offset = 0, uint32 size = 0);
 	virtual void Destroy(RenderContext* rc);
 	void Sync(RenderContext_Base_GL* rc);
 
 protected:
-	struct Buffer;
 
-	GLuint GetWritable(RenderContext_Base_GL* rc);
-
-	struct Buffer {
-		GLsync fence;
-		GLuint buffer;
-
-		inline Buffer(GLsync _fence, GLuint _buffer) : fence(_fence), buffer(_buffer) {}
-	};
-
-	typedef STDPoolAllocator<Buffer,
-			16,
-			MEMCAT_GENERAL> BufferAllocator;
-
-	typedef list<Buffer, AllocatorGeneral, BufferAllocator>::type BufferList;
-	BufferList allocatedList;
+	void GetWritable(RenderContext_Base_GL* rc);
+	uint32 numSyncBuffers;
+	GpuSyncedBuffer* posInList;
 };
 
 } /* namespace RenderOpenGL */

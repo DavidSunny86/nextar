@@ -11,7 +11,7 @@ VertexBuffer::VertexBuffer(RelocationPolicy _policy) :
 GpuBuffer(TYPE_VERTEX_BUFFER, policy), policy(_policy) {
 }
 
-void VertexBuffer::CreateBuffer(size_t bufferSize, uint32 stride, const uint8* dataPtr) {
+void VertexBuffer::CreateBuffer(uint32 bufferSize, uint32 stride, const uint8* dataPtr) {
 	GpuBuffer::CreateParams params;
 	params.size = bufferSize;
 	params.sourceData = dataPtr;

@@ -49,6 +49,15 @@ RenderContext_Base_GL::~RenderContext_Base_GL() {
 void RenderContext_Base_GL::CreateImpl(
 	const RenderDriver::ContextCreationParams& ctxParams) {
 	SetCreationParams(ctxParams);
+	auto it = ctxParams.extraParams.find("BufferBlockSize");
+	uint32 blockSize = 1024 * 1024;
+	if (it != ctxParams.extraParams.end())
+		blockSize = Convert::ToULong((*it));
+
+	_poolIndexBuffer.SetBlockSize(blockSize);
+	_poolDynamicBuffer.SetBlockSize(blockSize);
+	_poolStreamBuffer.SetBlockSize(blockSize);
+	_poolStaticBuffer.SetBlockSize(blockSize);
 }
 
 void RenderContext_Base_GL::PostWindowCreation(RenderWindow* gw) {
