@@ -7,6 +7,7 @@
 
 
 #include <GpuBufferPoolGL.h>
+#include <RenderContext_Base_GL.h>
 
 namespace RenderOpenGL {
 
@@ -126,12 +127,16 @@ void GpuBufferPoolGL::DestroyBuffer(RenderContext_Base_GL* gl,
 	GpuObject* container = buffer.container;
 	buffer.bufferId = 0;
 	container->freedSize += buffer.allocatedSize;
-	if (container->freedSize == container->allocatedSize) {
+	if (container->freedSize == container->freeOffset) {
 		_FreeContainer(gl, container);
 		return;
 	}
-	if (container->freeOffset == buffer.offset + buffer.allocatedSize)
+	if (container->freeOffset == buffer.offset + buffer.allocatedSize) {
 		container->freeOffset -= buffer.allocatedSize;
+		container->freedSize -= buffer.allocatedSize;
+		if (!container->freeOffset)
+			_FreeContainer(gl, container);
+	}
 	else {
 		GpuFreeBufferNode* freeNode = _allocatorFreeNode.AllocType();
 		freeNode->offset = buffer.offset;

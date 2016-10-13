@@ -390,7 +390,7 @@ class TypedMemoryPool {
 	// deleted
 	TypedMemoryPool(const TypedMemoryPool&);
 public:
-	typedef MemoryPool<NumPerBlock, Mutex, Allocator> MemoryPoolType;
+	typedef MemoryPool<NumPerBlock, Allocator, Mutex> MemoryPoolType;
 
 protected:
 
@@ -401,7 +401,7 @@ public:
 	TypedMemoryPool(TypedMemoryPool&& other) : impl(std::move(other.impl)) {}
 
 	T* AllocType() {
-		return static_cast<T*>(impl.Alloc());
+		return reinterpret_cast<T*>(impl.Alloc());
 	}
 
 	void FreeType(T* t) {

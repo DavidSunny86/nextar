@@ -62,13 +62,13 @@ public:
 	void DestroySyncedBuffer(RenderContext_Base_GL* gl, GpuSyncedBuffer*);
 	void Cleanup(RenderContext_Base_GL* gl);
 
+	GpuBufferPoolGL();
+	~GpuBufferPoolGL();
 protected:
 
 	GpuObject* _AllocContainer(RenderContext_Base_GL* gl, uint32 size, GLenum usage, GLenum type);
 	void _FreeContainer(RenderContext_Base_GL* gl, GpuObject* object);
 
-	GpuBufferPoolGL();
-	~GpuBufferPoolGL();
 
 protected:
 

@@ -11,7 +11,7 @@
 
 namespace RenderOpenGL {
 
-GpuBufferRef GpuBufferRef::Null = { 0, 0, 0, 0, 0 };
+GpuBufferRef GpuBufferRef::Null = { 0 };
 /********************************
  * GpuBufferGL
  ********************************/

@@ -52,12 +52,12 @@ void RenderContext_Base_GL::CreateImpl(
 	auto it = ctxParams.extraParams.find("BufferBlockSize");
 	uint32 blockSize = 1024 * 1024;
 	if (it != ctxParams.extraParams.end())
-		blockSize = Convert::ToULong((*it));
+		blockSize = Convert::ToULong((*it).second);
 
-	_poolIndexBuffer.SetBlockSize(blockSize);
-	_poolDynamicBuffer.SetBlockSize(blockSize);
-	_poolStreamBuffer.SetBlockSize(blockSize);
-	_poolStaticBuffer.SetBlockSize(blockSize);
+	//for (uint32 i = 0; i < 3; ++i)
+	//	_poolIndexBuffer[i].SetBlockSize(blockSize);
+	//for (uint32 i = 0; i < 3; ++i)
+	//	_poolVertexBuffer[i].SetBlockSize(blockSize);
 }
 
 void RenderContext_Base_GL::PostWindowCreation(RenderWindow* gw) {
