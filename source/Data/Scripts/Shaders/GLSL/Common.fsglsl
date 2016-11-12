@@ -42,6 +42,11 @@
    vec3 vGetEyeVertex() { return oEyeVertex; }
 #endif
 
+#ifdef HAS_CUBEENVMAP_TEXCOORD_CHANNEL_OUT
+	smooth in vec3 oCubicEnvTexCoord;
+	vec3 vGetCubicEnvMapTexCoord() { return oCubicEnvTexCoord; }
+#endif
+
 /******************************************************************/
 /*                           Samplers                             */
 /******************************************************************/
@@ -118,6 +123,21 @@
 	}
 #endif
 
+#ifdef HAS_ENVIORNMENT_SKY_MAP
+	uniform samplerCube sSkyMap;
+
+   vec3 vGetSkyMapTexCoord() {
+      return vGetCubicEnvMapTexCoord();
+   }
+
+   vec4 vSampleSkyMap(vec3 v) {
+      return texture(sSkyMap, v);
+   }
+#else 
+   vec4 vSampleSkyMap(vec3 v) {
+      return vec4(1, 0, 0, 0);
+   }
+#endif
 
 /******************************************************************/
 /*                       Functionals                              */

@@ -1,0 +1,9 @@
+
+
+layout(location = 0) out vec4 oFragColor;
+
+
+void main()
+{
+	oFragColor = vSampleSkyMap(vGetSkyMapTexCoord());
+}

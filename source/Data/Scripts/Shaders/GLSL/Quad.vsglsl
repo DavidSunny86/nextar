@@ -2,10 +2,17 @@
 
 void main(void)
 {
-	gl_Position = vec4((vGetPos() * cbQuad.uTranslationAndScale.zw) + cbQuad.uTranslationAndScale.xy, -0.9f, 1);
 #ifdef HAS_TEXCOORD0_CHANNEL_OUT
 	vec2 outTexCoord0 = ((vGetPos() * vec2(0.5, 0.5) + vec2(0.5, 0.5)) * cbQuad.uTextureOffsetAndRepeat.zw) + cbQuad.uTextureOffsetAndRepeat.xy;
    vSetTexCoord0(outTexCoord0);
 #endif
+
+#if defined(HAS_CUBEENVMAP_TEXCOORD_CHANNEL_OUT)
+   vec2 tPos = (vGetPos() * cbQuadTransform.uTranslationAndScale.zw) + cbQuadTransform.uTranslationAndScale.xy;
+   vSetCubicEnvMapTexCoord(vGetEyeDirectionFromQuadVertex(vec4(tPos, 0, 0), cbQuadTransform.uInvProjectionView));
+#else
+   vec2 tPos = (vGetPos() * cbQuad.uTranslationAndScale.zw) + cbQuad.uTranslationAndScale.xy;
+#endif
+	gl_Position = vec4(tPos, -0.9f, 1);
 
 }

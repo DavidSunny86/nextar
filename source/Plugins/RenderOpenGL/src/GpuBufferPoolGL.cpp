@@ -11,6 +11,8 @@
 
 namespace RenderOpenGL {
 
+GpuBufferRef GpuBufferRef::Null = { 0 };
+
 GpuBufferPoolGL::GpuBufferPoolGL() : _blockSize(0), _gpuObjects(nullptr) {
 }
 

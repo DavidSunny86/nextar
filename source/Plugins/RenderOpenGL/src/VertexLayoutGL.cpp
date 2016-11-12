@@ -159,6 +159,7 @@ GLuint VertexLayoutStaticGL::CreateLayout(RenderContext_Base_GL* gl,
 		uint32 stream = -1;
 		uint32 stride = 0;
 		GLuint vao = gl->CreateVAO();
+		uint32 offset = 0;
 		gl->EnableVertexArrayObject(vao);
 
 		for (uint32 j = 0; j < numMapped; ++j) {
@@ -169,9 +170,10 @@ GLuint VertexLayoutStaticGL::CreateLayout(RenderContext_Base_GL* gl,
 				GpuBufferViewGL* bufferView = static_cast<GpuBufferViewGL*>(
 											gl->GetView(binding.GetBufferPtr(stream)));
 				stride = bufferView->GetStride();
+				offset = bufferView->GetOffset();
 				gl->SetVertexBuffer(bufferView);
 			}
-			gl->EnableVertexAttribute(data.rawArray[j].index, stride, vegl);
+			gl->EnableVertexAttribute(data.rawArray[j].index, stride, offset, vegl);
 		}
 		return vao;
 	}
@@ -232,7 +234,8 @@ void VertexLayoutFlexibleGL::Enable(VertexBufferBinding& binding,
 	for (uint32 stream = 0; stream < binding.GetBufferCount(); ++stream) {
 		GpuBufferViewGL* buffer = static_cast<GpuBufferViewGL*>(
 			rc->GetView(binding.GetBufferPtr(stream)));
-		rc->BindVertexBuffer(stream, binding.GetBufferOffset(stream), buffer);
+		rc->BindVertexBuffer(stream, binding.GetBufferOffset(stream) + buffer->GetOffset()
+			, buffer);
 		if (buffer->IsSyncRequired())
 			transients[numSyncRequired++] = buffer;
 	}
@@ -263,7 +266,7 @@ GLuint VertexLayoutFlexibleGL::CreateLayout(RenderContext_Base_GL* gl,
 			NEX_ASSERT(data.rawArray[j].index < (uint16)-1);
 			VertexAttribGL& vegl = attributes[outElements[j]];
 			gl->VertexAttribBinding(data.rawArray[j].index, vegl.element.streamIndex);
-			gl->EnableVertexAttribute(data.rawArray[j].index, vegl);
+			gl->EnableVertexAttribute(data.rawArray[j].index, 0, vegl);
 		}
 		return vao;
 	}
@@ -329,6 +332,7 @@ void VertexLayoutDynamicGL::Enable(VertexBufferBinding& binding,
 	uint16 numAttributes = cached->numAttributes;
 	uint16 stream = -1;
 	uint32 stride = 0;
+	uint32 offset = 0;
 	numSyncRequired = 0;
 	rc->EnableVertexArrayObject(cached->layout);
 	for (uint16 s = 0; s < numAttributes; ++s) {
@@ -339,11 +343,13 @@ void VertexLayoutDynamicGL::Enable(VertexBufferBinding& binding,
 			GpuBufferViewGL* buffer = static_cast<GpuBufferViewGL*>(
 								rc->GetView(binding.GetBufferPtr(stream)));
 			stride = buffer->GetStride();
+			offset = buffer->GetOffset();
 			rc->SetVertexBuffer(buffer);
+			
 			if (buffer->IsSyncRequired())
 				transients[numSyncRequired++] = buffer;
 		}
-		rc->EnableVertexAttribute(mva.index, stride, vegl);
+		rc->EnableVertexAttribute(mva.index, stride, offset, vegl);
 	}
 }
 

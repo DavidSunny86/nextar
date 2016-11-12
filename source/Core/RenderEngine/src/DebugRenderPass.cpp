@@ -145,7 +145,8 @@ uint32 DebugRenderPass::_Register(const Frustum& frustum,
 
 uint32 DebugRenderPass::_Register(const Box2D& rect,
 	const Color& color, Vec4AF textureOffsetAndRepeat, TextureBase* textured, bool border,
-	float expiryTimeInSec) {
+	float expiryTimeInSec,
+	MaterialAssetPtr material) {
 	// remap rect
 	Box2D remapped(rect);
 	remapped.min -= Vector2(0.5f, 0.5f);
@@ -162,7 +163,7 @@ uint32 DebugRenderPass::_Register(const Box2D& rect,
 	}
 
 	DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
-	primitive->SetDebugMaterial(debugQuadMaterial);
+	primitive->SetDebugMaterial(material ? material : debugQuadMaterial);
 	primitive->SetStreamData(&quadDataStream);
 	ParameterBuffer* b = primitive->GetParameters();
 	if (!textured)

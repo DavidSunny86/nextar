@@ -4,3 +4,8 @@ cbuffer cbQuad (context = object) {
   declare vec4 uTextureOffsetAndRepeat;
   declare vec4 uMixColor;
 };
+
+cbuffer cbQuadTransform (context = object) {
+   declare vec4 uTranslationAndScale;
+   declare mat4x4 uInvProjectionView;
+};

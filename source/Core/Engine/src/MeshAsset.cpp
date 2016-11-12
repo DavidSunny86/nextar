@@ -77,7 +77,7 @@ void MeshAsset::_FillVertexData(MeshVertexData* data,
 			++stream, ++vertexBufferIt) {
 		MeshBufferData::Stream& byteData = (*vertexBufferIt);
 		VertexBufferPtr buffer = VertexBuffer::Create(GpuBuffer::RelocationPolicy::NEVER_RELEASED);
-		buffer->CreateBuffer(byteData.buffer.size(), byteData.stride, byteData.buffer.data());
+		buffer->CreateBuffer((uint32)byteData.buffer.size(), byteData.stride, byteData.buffer.data());
 		data->binding.BindBuffer(stream, buffer, 0);
 	}
 
@@ -88,7 +88,7 @@ void MeshAsset::_FillIndexData(MeshIndexData* data,
 		MeshBufferData::BufferList::iterator& indexBufferIt) {
 	MeshBufferData::Stream& byteData = (*indexBufferIt);
 	data->ibdata = IndexBuffer(GpuBuffer::RelocationPolicy::NEVER_RELEASED);
-	data->ibdata.CreateBuffer(byteData.buffer.size(), byteData.stride == 2 ?
+	data->ibdata.CreateBuffer((uint32)byteData.buffer.size(), byteData.stride == 2 ?
 			IndexBuffer::TYPE_16BIT : IndexBuffer::TYPE_32BIT, byteData.buffer.data());
 	indexBufferIt++;
 }

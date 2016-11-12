@@ -3,11 +3,14 @@ create-buffer main {
  target depth D24S8 true;
 }
 
-pass Forward {
+pass Compositor {
 	render-to main;
-	clean depth;
-	clean stencil;
-	clean color 0 white; 
+   material "Materials/Skybox.mscript";
+   set-param sSkyMap "Textures/Violentdays.dds";
+}
+
+pass Forward {
+	render-to last;
 }
 
 pass Debug {

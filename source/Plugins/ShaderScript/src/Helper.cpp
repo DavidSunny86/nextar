@@ -241,7 +241,7 @@ TextureAddressMode Helper::GetTextureAddressMode(const String& val) {
 		{ TAM_BORDER, _SS(ARG_BORDER) },
 		{ TAM_CLAMP, _SS(ARG_CLAMP) },
 		{ TAM_MIRROR, _SS(ARG_MIRROR) },
-		{ TAM_WRAP, _SS(ARG_WARP) },
+		{ TAM_WRAP, _SS(ARG_REPEAT) },
 	};
 
 	const size_t array_size = sizeof(names) / sizeof(names[0]);

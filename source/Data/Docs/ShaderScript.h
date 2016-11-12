@@ -63,11 +63,11 @@
 				value:- Valid values are:-
 					<filter>-<wrap-mode>:- Formatted sampling state.
 						filter:- nearest, linear.
-						wrap-mode:- default, border, clamp, mirror, warp.
+						wrap-mode:- default, border, clamp, mirror, repeat.
 					advanced:- Allows inner commands.
 					
 					@subsection address <u-address> <v-address> <w-address>;
-						x-address:- default, border, clamp, mirror, warp.
+						x-address:- default, border, clamp, mirror, repeat.
 					
 					@subsection anisotropy <value>;
 						Integer value.

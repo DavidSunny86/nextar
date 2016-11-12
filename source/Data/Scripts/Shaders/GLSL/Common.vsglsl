@@ -62,7 +62,6 @@
 #endif
 
 
-
 /******************************************************************/
 /*                        Out Channels                             */
 /******************************************************************/
@@ -100,3 +99,17 @@
 	smooth out vec4 oEyeVertex;
    void vSetEyeVertex(vec4 n) { oEyeVertex = n; }
 #endif
+
+#ifdef HAS_CUBEENVMAP_TEXCOORD_CHANNEL_OUT
+	smooth out vec3 oCubicEnvTexCoord;
+	void vSetCubicEnvMapTexCoord(vec3 t) { oCubicEnvTexCoord = t; }
+#endif
+
+/******************************************************************/
+/*                       Helper Functions                          */
+/******************************************************************/
+vec3 vGetEyeDirectionFromQuadVertex(in vec4 screenVertex, 
+   in mat4 invProjectionViewRotation) {
+   vec4 res = invProjectionViewRotation * screenVertex;
+   return res.xyz;
+}

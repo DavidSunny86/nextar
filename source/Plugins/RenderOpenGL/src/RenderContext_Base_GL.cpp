@@ -54,10 +54,10 @@ void RenderContext_Base_GL::CreateImpl(
 	if (it != ctxParams.extraParams.end())
 		blockSize = Convert::ToULong((*it).second);
 
-	//for (uint32 i = 0; i < 3; ++i)
-	//	_poolIndexBuffer[i].SetBlockSize(blockSize);
-	//for (uint32 i = 0; i < 3; ++i)
-	//	_poolVertexBuffer[i].SetBlockSize(blockSize);
+	for (uint32 i = 0; i < 3; ++i)
+		_poolIndexBuffer[i].SetBlockSize(blockSize);
+	for (uint32 i = 0; i < 3; ++i)
+		_poolVertexBuffer[i].SetBlockSize(blockSize);
 }
 
 void RenderContext_Base_GL::PostWindowCreation(RenderWindow* gw) {
@@ -139,6 +139,7 @@ void RenderContext_Base_GL::Draw(StreamData* streamData, CommitContext& ctx) {
 	if (ibuffer) {
 		GpuBufferViewGL* buffer = static_cast<GpuBufferViewGL*>(GetView(ibuffer));
 		GLint indexsize = buffer->GetStride();
+		uint32 offset = buffer->GetOffset();
 		// hack
 		NEX_STATIC_ASSERT(GL_UNSIGNED_INT == GL_UNSIGNED_SHORT + 2);
 		GLenum indextype = GL_UNSIGNED_SHORT + (indexsize - 2);
@@ -147,22 +148,22 @@ void RenderContext_Base_GL::Draw(StreamData* streamData, CommitContext& ctx) {
 		if (vd.start == 0) {
 			if (streamData->instanceCount == 1)
 				glDrawElements(primtype, streamData->indices.count, indextype,
-					reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start));
+					reinterpret_cast<const GLvoid*> ((indexsize * (GLint)streamData->indices.start) + offset));
 			else
 				GlDrawElementsInstanced(primtype, streamData->indices.count,
 				indextype,
-				reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start),
+				reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start + offset),
 				streamData->instanceCount);
 		} else {
 			if (streamData->instanceCount == 1)
 				GlDrawElementsBaseVertex(primtype, streamData->indices.count,
 				indextype,
-				reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start),
+				reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start + offset),
 				vd.start);
 			else
 				GlDrawElementsInstancedBaseVertex(primtype,
 				streamData->indices.count, indextype,
-				reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start),
+				reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start + offset),
 				streamData->instanceCount, vd.start);
 		}
 	} else {
@@ -232,7 +233,7 @@ void RenderContext_Base_GL::SetCurrentTarget(RenderTarget* canvas) {
 				GlDrawBuffers(currentCountOfColorAttachments, s_attachmentMap + 6);
 			contextFlags |= CURRENT_TARGET_FBO;
 		}
-													break;
+			break;
 		}
 	}
 }

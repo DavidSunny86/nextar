@@ -1,9 +1,9 @@
 /*
- * GpuBufferGL.cpp
- *
- *  Created on: 15-Jun-2014
- *      Author: obhi
- */
+* GpuBufferGL.cpp
+*
+*  Created on: 15-Jun-2014
+*      Author: obhi
+*/
 #include <RenderOpenGL.h>
 #include <RenderContext_Base_GL.h>
 #include <GpuBufferViewGL.h>
@@ -11,18 +11,17 @@
 
 namespace RenderOpenGL {
 
-GpuBufferRef GpuBufferRef::Null = { 0 };
 /********************************
- * GpuBufferGL
- ********************************/
+* GpuBufferGL
+********************************/
 GpuBufferViewGL::GpuBufferViewGL(GLenum _type) :
-		type(_type),
-		elementStride(0),
-		policy(GpuBuffer::NEVER_RELEASED),
-		syncRequired(false),
-		pool(nullptr),
-		usage(0),
-		size(0) {
+type(_type),
+elementStride(0),
+policy(GpuBuffer::NEVER_RELEASED),
+syncRequired(false),
+pool(nullptr),
+usage(0),
+size(0) {
 	ref.bufferId = 0;
 	ref.offset = 0;
 }
@@ -36,14 +35,14 @@ void GpuBufferViewGL::Destroy(RenderContext* rc) {
 }
 
 void GpuBufferViewGL::Create(RenderContext* rc, uint32 size,
-		uint32 elementStride,
-		const void* dataPtr, GpuBuffer::RelocationPolicy policy) {
+	uint32 elementStride,
+	const void* dataPtr, GpuBuffer::RelocationPolicy policy) {
 	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	this->policy = policy;
 	auto usageAndPool = gl->GetUsage(policy, type);
 	usage = usageAndPool.first;
 	pool = usageAndPool.second;
-	ref = pool->CreateBuffer(gl, size, policy, type);
+	ref = pool->CreateBuffer(gl, size, usage, type);
 	this->elementStride = elementStride;
 	if (dataPtr) {
 		gl->Bind(type, ref.bufferId);
@@ -52,20 +51,20 @@ void GpuBufferViewGL::Create(RenderContext* rc, uint32 size,
 }
 
 void GpuBufferViewGL::Read(RenderContext* rc, void *dest, uint32 offset,
-		uint32 size) {
+	uint32 size) {
 	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
 }
 
 void GpuBufferViewGL::Write(RenderContext* rc, const void *src, uint32 offset,
-		uint32 size) {
+	uint32 size) {
 	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	gl->Bind(type, ref.bufferId);
 	gl->WriteBuffer(type, size, usage, src, ref.offset + offset, size);
 }
 
 GpuBuffer::MapResult GpuBufferViewGL::Map(RenderContext* rc,
-		uint32 offset, uint32 size) {
+	uint32 offset, uint32 size) {
 	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	GpuBuffer::MapResult result;
 	result.data = static_cast<uint8*>(gl->MapRange(type, ref.offset + offset, size, GL_MAP_WRITE_BIT));
@@ -78,17 +77,17 @@ void GpuBufferViewGL::Unmap(RenderContext* rc) {
 }
 
 /********************************
- * GpuTransientBufferGL
- ********************************/
+* GpuTransientBufferGL
+********************************/
 GpuTransientBufferViewGL::GpuTransientBufferViewGL(GLenum type) :
-		GpuBufferViewGL(type), posInList(nullptr), numSyncBuffers(0) {
+GpuBufferViewGL(type), posInList(nullptr), numSyncBuffers(0) {
 }
 
 void GpuTransientBufferViewGL::Create(RenderContext* rc, uint32 size,
-		uint32 elementStride,
-		const void* dataPtr, GpuBuffer::RelocationPolicy policy) {
-	NEX_ASSERT (policy == GpuBuffer::REGULARLY_RELEASED ||
-			policy == GpuBuffer::IMMEDIATELY_RELEASED);
+	uint32 elementStride,
+	const void* dataPtr, GpuBuffer::RelocationPolicy policy) {
+	NEX_ASSERT(policy == GpuBuffer::REGULARLY_RELEASED ||
+		policy == GpuBuffer::IMMEDIATELY_RELEASED);
 	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	this->policy = policy;
 	this->elementStride = elementStride;
@@ -106,14 +105,14 @@ void GpuTransientBufferViewGL::Create(RenderContext* rc, uint32 size,
 }
 
 GpuBuffer::MapResult GpuTransientBufferViewGL::Map(RenderContext* rc,
-		uint32 offset, uint32 size) {
+	uint32 offset, uint32 size) {
 	NEX_ASSERT(!syncRequired);
 	RenderContext_Base_GL* gl = static_cast<RenderContext_Base_GL*>(rc);
 	if (!syncRequired || ref.bufferId == 0)
 		GetWritable(gl);
 	gl->Bind(type, ref.bufferId);
 	GpuBuffer::MapResult result;
-	result.data = static_cast<uint8*>(gl->MapRange(type, ref.offset + offset, size, GL_MAP_WRITE_BIT|GL_MAP_UNSYNCHRONIZED_BIT));
+	result.data = static_cast<uint8*>(gl->MapRange(type, ref.offset + offset, size, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT));
 	syncRequired = true;
 	return result;
 }
@@ -142,7 +141,7 @@ void GpuTransientBufferViewGL::Destroy(RenderContext* rc) {
 			prev = cur;
 			cur = cur->nextInList;
 			pool->DestroySyncedBuffer(gl, prev);
-		} while(prev != posInList );
+		} while (prev != posInList);
 		posInList = nullptr;
 	}
 }
@@ -152,7 +151,7 @@ void GpuTransientBufferViewGL::Sync(RenderContext_Base_GL* rc) {
 	syncRequired = false;
 	GpuSyncedBuffer* head = syncedBuffer;
 
-	if(posInList) {
+	if (posInList) {
 		head = posInList->nextInList;
 		posInList->nextInList = syncedBuffer;
 		numSyncBuffers++;
@@ -172,7 +171,7 @@ void GpuTransientBufferViewGL::GetWritable(RenderContext_Base_GL* rc) {
 			GLenum result;
 			do {
 				result = rc->ClientWaitSync(cur->fence, 0, 0);
-			} while ( (result == GL_TIMEOUT_EXPIRED || result == GL_WAIT_FAILED) && explicitSync );
+			} while ((result == GL_TIMEOUT_EXPIRED || result == GL_WAIT_FAILED) && explicitSync);
 			if (result == GL_ALREADY_SIGNALED || result == GL_CONDITION_SATISFIED) {
 				ref = std::move(cur->buffer);
 				pool->DestroySyncedBuffer(rc, cur);
@@ -186,12 +185,12 @@ void GpuTransientBufferViewGL::GetWritable(RenderContext_Base_GL* rc) {
 			}
 			prev = cur;
 			cur = cur->nextInList;
-		} while( prev != posInList );
+		} while (prev != posInList);
 
 	}
 	// we either need to allocate or wait till the last one is
 	// finished.
-	ref = pool->CreateBuffer(rc, size, policy, type);
+	ref = pool->CreateBuffer(rc, size, usage, type);
 	return;
 }
 

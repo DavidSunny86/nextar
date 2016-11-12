@@ -37,7 +37,7 @@ public:
 		return *this;
 	}
 
-	virtual void CreateBuffer(size_t bufferSize, Type type, const uint8* dataPtr);
+	virtual void CreateBuffer(uint32 bufferSize, Type type, const uint8* dataPtr);
 
 private:
 

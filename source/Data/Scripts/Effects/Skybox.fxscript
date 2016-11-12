@@ -1,0 +1,37 @@
+{{predefs:vertex-program:all}}
+
+// no predefs
+
+{{predefs:fragment-program:all}}
+
+// no predefs
+
+[[main]]
+shader Skybox {
+
+   tags compositor;
+
+   pass Main {
+
+	   import-cbuffer Quad;
+
+      texture-state {
+         sampler s0 linear-repeat;
+         unit sSkyMap s0 (nameref = "SkyMap.Texture", activate = SkyMap, context = object);
+      }
+
+      depth-stencil-state disable;
+      blend-state disable;
+	   raster-state default;
+
+      program {
+
+		   activate SkyMap HAS_ENVIORNMENT_SKY_MAP HAS_CUBEENVMAP_TEXCOORD_CHANNEL_OUT;
+         activate always HAS_2DVERT_CHANNEL;
+
+		   vertex-program Quad;
+		   fragment-program Skybox;
+	   }
+
+   }
+}

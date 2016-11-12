@@ -1,0 +1,13 @@
+
+
+layout(location = 0) out vec4 oFragColor;
+
+vec4 GetFragmentColor() {
+	vec2 v = vGetDiffuseTexCoord();
+	return vSampleSkyMap(vec3(v.x, v.y, cbQuad.uMixColor.a));
+}
+
+void main()
+{
+	oFragColor = GetFragmentColor();
+}

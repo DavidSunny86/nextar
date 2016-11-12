@@ -40,8 +40,8 @@ protected:
 		float expiryTimeInSec = 0.0f) = 0;
 	virtual uint32 _Register(const Box2D& rect, const Color& color,
 		Vec4AF textureOffsetAndRepeat,
-		TextureBase* textured = 0, bool border = true,
-		float expiryTimeInSec = 0.0f) = 0;
+		TextureBase* textured, bool border,
+		float expiryTimeInSec, MaterialAssetPtr material) = 0;
 
 	virtual void _RemovePrimitive(uint32 id) = 0;
 
@@ -100,9 +100,10 @@ public:
 	static inline uint32 Register(const Box2D& rect, const Color& color,
 		Vec4AF textureOffsetAndRepeat,
 		TextureBase* textured = 0, bool border = true,
-		float expiryTimeInSec = 0.0f) {
+		float expiryTimeInSec = 0.0f,
+		MaterialAssetPtr material = MaterialAssetPtr()) {
 		if (DebugDisplay::InstancePtr())
-			return DebugDisplay::Instance()._Register(rect, color, textureOffsetAndRepeat, textured, border, expiryTimeInSec);
+			return DebugDisplay::Instance()._Register(rect, color, textureOffsetAndRepeat, textured, border, expiryTimeInSec, material);
 		return -1;
 	}
 

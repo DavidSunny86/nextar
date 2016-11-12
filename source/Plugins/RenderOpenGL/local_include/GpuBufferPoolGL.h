@@ -8,9 +8,32 @@
 #ifndef PLUGINS_RENDEROPENGL_LOCAL_INCLUDE_GPUBUFFERPOOLGL_H_
 #define PLUGINS_RENDEROPENGL_LOCAL_INCLUDE_GPUBUFFERPOOLGL_H_
 
-#include <GpuBufferViewGL.h>
+#include <RenderOpenGL.h>
+#include <GpuBuffer.h>
 
 namespace RenderOpenGL {
+
+class GpuBufferPoolGL;
+class GpuObject;
+
+struct GpuBufferRef {
+	uint32 offset;
+	uint32 allocatedSize;
+	GLuint bufferId;
+	GpuObject* container;
+	static GpuBufferRef Null;
+};
+
+struct GpuSyncedBuffer {
+	GLsync fence;
+	GpuBufferRef buffer;
+	GpuSyncedBuffer* nextInList;
+
+	inline GpuSyncedBuffer(GLsync _fence, const GpuBufferRef& _buffer) :
+		fence(_fence)
+		, buffer(_buffer)
+		, nextInList(nullptr) {}
+};
 
 struct GpuFreeBufferNode {
 	uint32 offset;

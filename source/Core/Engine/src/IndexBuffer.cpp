@@ -7,7 +7,7 @@ IndexBuffer::IndexBuffer(IndexBuffer&& other) :
 	GpuBuffer(std::move(other)), indexType(other.indexType), policy(other.policy) {
 }
 
-void IndexBuffer::CreateBuffer(size_t bufferSize,
+void IndexBuffer::CreateBuffer(uint32 bufferSize,
 		IndexBuffer::Type type, const uint8* dataPtr) {
 	GpuBuffer::CreateParams params;
 	this->indexType = type;

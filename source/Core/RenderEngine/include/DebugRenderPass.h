@@ -104,8 +104,8 @@ protected:
 		float expiryTimeInSec = 0.0f) override;
 	virtual uint32 _Register(const Box2D& rect, const Color& color,
 		Vec4AF textureOffsetAndRepeat,
-		TextureBase* textured = 0, bool border = true,
-		float expiryTimeInSec = 0.0f) override;
+		TextureBase* textured, bool border,
+		float expiryTimeInSec, MaterialAssetPtr material) override;
 
 	virtual void _RemovePrimitive(uint32 id);
 

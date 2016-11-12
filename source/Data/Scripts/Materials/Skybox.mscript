@@ -1,0 +1,6 @@
+
+material Default:Default.Skybox {	
+	shader "{EngineData}/Scripts/Effects/Skybox.fxscript" Default:Default.Skybox;
+   enable-option SkyMap;
+	layer normal;
+}

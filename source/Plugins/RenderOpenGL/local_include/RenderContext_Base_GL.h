@@ -133,8 +133,10 @@ public:
 	inline void VertexAttribBinding(GLuint, GLuint);
 	inline void EnableVertexAttribute(const GLuint location,
 									  uint32 stride,
+									  uint32 offset,
 									  const VertexAttribGL& vegl);
 	inline void EnableVertexAttribute(const GLuint location,
+									  uint32 offset,
 									  const VertexAttribGL& vegl);
 	inline void DisableVertexAttribute(const GLuint location);
 	inline void ReadBuffer(GLenum target, void* dest, size_t offset,
@@ -377,14 +379,15 @@ inline void RenderContext_Base_GL::SetVertexBuffer(GpuBufferViewGL* vbGL) {
 }
 
 inline void RenderContext_Base_GL::EnableVertexAttribute(const GLuint sem,
+														 uint32 offset,
 														 const VertexAttribGL& vegl) {
 	if (vegl.integer)
 		extensions.GlVertexAttribIFormat(sem, vegl.elementCount, vegl.dttype,
-		(std::size_t) (vegl.element.desc.offset));
+		(std::size_t) (vegl.element.desc.offset + offset));
 	else
 		extensions.GlVertexAttribFormat(sem, vegl.elementCount, vegl.dttype,
 		vegl.normalize,
-		(std::size_t) (vegl.element.desc.offset));
+		(std::size_t) (vegl.element.desc.offset + offset));
 	GL_CHECK();
 	GlEnableVertexAttribArray(sem);
 	GL_CHECK();
@@ -392,15 +395,16 @@ inline void RenderContext_Base_GL::EnableVertexAttribute(const GLuint sem,
 
 inline void RenderContext_Base_GL::EnableVertexAttribute(const GLuint sem,
 														 uint32 stride,
+														 uint32 offset,
 														 const VertexAttribGL& vegl) {
 	if (vegl.integer)
 		GlVertexAttribIPointer(sem, vegl.elementCount, vegl.dttype,
 		stride,
-		(const GLvoid*)(std::size_t) (vegl.element.desc.offset));
+		(const GLvoid*)(std::size_t) (vegl.element.desc.offset + offset));
 	else
 		GlVertexAttribPointer(sem, vegl.elementCount, vegl.dttype,
 		vegl.normalize, stride,
-		(const GLvoid*)(std::size_t) (vegl.element.desc.offset));
+		(const GLvoid*)(std::size_t) (vegl.element.desc.offset + offset));
 	GL_CHECK();
 	GlEnableVertexAttribArray(sem);
 	GL_CHECK();
