@@ -47,7 +47,7 @@
 
 #ifdef NEX_CROSS_COMPILE
 // Prespecified architecture
-	#define NEX_ARCH NEX_ARCH_X86_64
+	#define NEX_ARCH NEX_ARCH_X64
 // Determine architecture
 #endif
 #ifndef NEX_ARCH

@@ -97,8 +97,8 @@ option(NEX_CROSS_COMPILE "Cross compile for different architecture." ON)
 option(NEX_UNITY_BUILD "Unity build." ON)
 option(NEX_USE_VECTOR_INSTRUCTIONS "Use vector instructions for math library." ON)
 set(NEX_UNITY_FILE_LIMIT 40 CACHE STRING "Number of files per unit in unity build")
-set(NEX_ARCHITECTURE_NAME "x86_64" CACHE STRING "Architecture chosen for cross compilation.")
-set(NEX_SUPPORTED_ARCHITECTURE_LIST "x86;x86_64;ia64;ppc;alpha")
+set(NEX_ARCHITECTURE_NAME "x64" CACHE STRING "Architecture chosen for cross compilation.")
+set(NEX_SUPPORTED_ARCHITECTURE_LIST "x86;x64;ia64;ppc;alpha")
 set_property(CACHE NEX_ARCHITECTURE_NAME PROPERTY STRINGS ${NEX_SUPPORTED_ARCHITECTURE_LIST})
 
 if(${NEX_UNITY_BUILD})
@@ -147,11 +147,19 @@ endif()
 #============================================================
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	set(NEX_OS "Windows")
+	set(NEX_PLATFORM_NAME "win")
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	set(NEX_OS "Linux")
+	set(NEX_PLATFORM_NAME "linux")
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(NEX_OS "MacOSX")
+	set(NEX_PLATFORM_NAME "osx")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+
+## Platform identifier
+#============================================================
+set(NEX_PLATFORM_ID "${NEX_PLATFORM_NAME}_${NEX_ARCHITECTURE_NAME}")
+set(CMAKE_LIBRARY_ARCHITECTURE "${NEX_ARCHITECTURE_NAME}")
 
 ## Platform specific stuff
 #============================================================
@@ -170,7 +178,7 @@ set(NEX_INSTALL_PLUGIN OFF)
 macro(copy_binary_to_out binFolder)
 	add_custom_command(TARGET "${NEXTAR_TARGET}" POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_directory
-			"${ARGV0}"
+			"${ARGV0}/${NEX_PLATFORM_ID}"
 			${NEX_INSTALL}/Bin)
 endmacro(copy_binary_to_out)
 #============================================================

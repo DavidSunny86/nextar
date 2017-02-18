@@ -70,6 +70,7 @@ else (LIBJPEG_LIBRARIES AND LIBJPEG_INCLUDE_DIRS)
       /opt/local/lib
       /sw/lib
 	  ${LIBJPEG_ROOT}/lib
+	  ${LIBJPEG_ROOT}/lib/${CMAKE_LIBRARY_ARCHITECTURE}
     NO_DEFAULT_PATH
   )
   find_path(LIBJPEG_STATIC_DIR
@@ -87,6 +88,7 @@ else (LIBJPEG_LIBRARIES AND LIBJPEG_INCLUDE_DIRS)
       /opt/local/lib
       /sw/lib
 	  ${LIBJPEG_ROOT}/lib
+	  ${LIBJPEG_ROOT}/lib/${CMAKE_LIBRARY_ARCHITECTURE}
     NO_DEFAULT_PATH
   )
   set(LIBJPEG_INCLUDE_DIRS

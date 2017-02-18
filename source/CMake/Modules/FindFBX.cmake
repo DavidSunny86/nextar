@@ -6,6 +6,7 @@
 # FBX_LIBRARY - as library path
 # FBX_LIBRARY_DEBUG - as debug library path
 
+
 if(APPLE)
 	set(FBX_LIBDIR "gcc4/ub")
 elseif(CMAKE_COMPILER_IS_GNUCXX)
@@ -18,10 +19,12 @@ elseif(MSVC10)
 	set(FBX_LIBDIR "vs2010")
 elseif(MSVC11)
 	set(FBX_LIBDIR "vs2012")
-elseif(MSVC12 OR MSVC_VERSION>1800)
+elseif(MSVC12)
 	set(FBX_LIBDIR "vs2013")
+elseif(${MSVC_VERSION} GREATER 1800)
+	set(FBX_LIBDIR "vs2015")
 endif()
-	
+
 if(APPLE)
     # do nothing
 elseif(CMAKE_CL_64)
@@ -42,6 +45,8 @@ endif()
 
 set( FBX_SEARCH_PATHS
 	    $ENV{FBX_DIR}
+		"$ENV{ProgramW6432}/Autodesk/FBX/FBX SDK/2017.1"
+		"$ENV{PROGRAMFILES}/Autodesk/FBX/FBX SDK/2017.1"
 	    "$ENV{ProgramW6432}/Autodesk/FBX/FBX SDK/2015.2"
 	    "$ENV{PROGRAMFILES}/Autodesk/FBX/FBX SDK/2015.2"
 		"$ENV{ProgramW6432}/Autodesk/FBX/FBX SDK/2015.1"
