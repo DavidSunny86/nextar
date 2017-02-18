@@ -20,6 +20,7 @@ public:
 	static void SetupScene(void* callback);
 protected:
 
+	virtual String GetRenderSystemsToInstantiate() const;
 	virtual void SetupScene();
 	virtual void _SetupScene(SceneAssetPtr&);
 	virtual void _SetupRenderDriver();

@@ -10,9 +10,10 @@
 
 namespace nextar {
 
-BaseRenderPass::BaseRenderPass() :
+BaseRenderPass::BaseRenderPass(const Meta* meta) :
 clearFlags(ClearFlags::CLEAR_NONE)
-,toLastSubTarget(RT_NONE) {
+,toLastSubTarget(RT_NONE)
+,_meta(meta) {
 	info.info.clearDepth = 1.0f;
 
 }

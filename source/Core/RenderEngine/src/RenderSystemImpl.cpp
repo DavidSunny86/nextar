@@ -212,8 +212,8 @@ RenderTargetPtr RenderSystemImpl::CreateRenderBuffer(StringID name,
 RenderPass* RenderSystemImpl::AddPass(const String& type) {
 
 	renderSystemTicket++;
-
-	RenderPass* r = RenderManager::Instance().CreateRenderPass(type);
+	RenderPass* r = RenderManager::Instance().CreateRenderPass(
+		StringUtils::GetStringID(type));
 	renderPasses.push_back(r);
 	return r;
 }
@@ -327,9 +327,9 @@ void RenderSystemImpl::DefaultStreamer::_WritePass(RenderSystem* s,
 	RenderPass* pass, ChunkOutputStream& ostr) {
 	OutputSerializer& ser = ostr.BeginChunk(RSCRIPT_BEGIN_PASS);
 	BaseRenderPass* basePass = static_cast<BaseRenderPass*>(pass);
-	StringPair name = StringUtils::Split(basePass->GetName());
+	String name = basePass->GetPassType();
 	StringID nameId = basePass->GetID();
-	ser << name.first;
+	ser << name;
 	ser << nameId;
 	basePass->Save(s, ser);
 	ostr.EndChunk();

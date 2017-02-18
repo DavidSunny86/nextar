@@ -9,10 +9,11 @@ const String Default("Default");
 const String DefaultSymbol("#");
 const UniString UniNull;
 const String Unknown("<?>");
-const StringID NullID;
-const StringID DefaultID(1);
+const StringID NullID(Hash(""));
+const StringID DefaultID(Hash("Default"));
 const StringRef NullRef(Null);
 const StringRef DefaultRef(Default);
+#define HASH_COLLISION_CHECK
 
 _NexBaseAPI char* NewStr(const char* str) {
 	size_t s;
@@ -302,6 +303,27 @@ _NexBaseAPI String FormatName(const String& str) {
 		return FormatUnderscoreString(str);
 	else
 		return FormatCamelCaseString(str);
+}
+
+_NexBaseAPI hash64 Hash(const utf8* v) {
+	hash64 h = 1125899906842597UL; // prime
+	while (*v) {
+		h = 31 * h + *(v++);
+	}
+
+#ifdef HASH_COLLISION_CHECK
+	static NEX_THREAD_MUTEX(contentLock);
+	static std::map<std::string, hash64> mapped;
+	std::string tStr = (const char*)v;
+	NEX_THREAD_LOCK_GUARD_MUTEX(contentLock);
+	auto it = mapped.find(tStr);
+	if (it != mapped.end() && (*it).second != h) {
+
+		NEX_THROW_FatalError(EXCEPT_COLLISION);
+	}
+
+#endif
+	return h;
 }
 
 }

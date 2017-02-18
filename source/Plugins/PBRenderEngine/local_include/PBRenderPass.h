@@ -10,7 +10,7 @@ using namespace nextar;
 class PBRenderPass : public nextar::BaseRenderPass
 {
 public:
-  PBRenderPass();
+  PBRenderPass(const Meta* );
   virtual ~PBRenderPass();
   
   

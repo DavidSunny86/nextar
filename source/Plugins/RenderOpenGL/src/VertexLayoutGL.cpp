@@ -217,6 +217,8 @@ void VertexLayoutFlexibleGL::Enable(VertexBufferBinding& binding,
 		PassViewGL* pass, RenderContext_Base_GL* rc) {
 	numSyncRequired = 0;
 	uint32 id = pass->GetInputLayoutID();
+	NEX_ASSERT(id != 0xffffffff);
+		
 	uint32 numPairs = (uint32)passVertexArrayPairs.size();
 	uint32 count = 0;
 	for (;

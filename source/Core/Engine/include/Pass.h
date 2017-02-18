@@ -150,7 +150,7 @@ public:
 	//const TextureUnitParams* GetTextureUnit(const String& name) const;
 
 	static void AddParamDef(AutoParamName autoName, ParamDataType type, ParameterContext context,
-		ParamProcessorProc processor, const String& desc);
+		ParamProcessorProc processor, uint32 size/*, const String& desc*/);
 
 	static const AutoParam* MapParam(AutoParamName name);
 

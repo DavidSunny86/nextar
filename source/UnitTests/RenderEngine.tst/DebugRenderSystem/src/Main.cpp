@@ -8,10 +8,14 @@ using namespace nextar;
 
 class UTApplicationMesh: public UTApplication {
 public:
+	virtual String GetRenderSystemsToInstantiate() const override {
+		return "Debug";
+	}
+
 	virtual void _SetupScene(SceneAssetPtr& scene) {
 		UTApplication::_SetupScene(scene);
 		AxisAlignedBox box =  AxisAlignedBox(-10, -10, -10, 10,  10,  10);
-		//DebugDisplay::Register(box, Color::Blue);
+		DebugDisplay::Register(box, Color::Blue);
 		Matrix4x4 m = Matrix4x4::IdentityMatrix;
 		m = Mat4x4Scale(4, m);
 		DebugDisplay::Register(m);

@@ -19,7 +19,7 @@ void UTApplication::SetupScene() {
 
 SceneAssetPtr UTApplication::_CreateDefaultScene() {
 	return SceneAsset::Traits::Instance(
-			NamedObject::AsyncStringID("UTScene"),
+			StringUtils::GetStringID("UTScene"),
 			StringUtils::DefaultID,
 			StringUtils::DefaultID
 			);
@@ -30,10 +30,10 @@ void UTApplication::_SetupScene(SceneAssetPtr& scene) {
 			static_cast<Entity::Factory*>(ComponentFactoryArchive::Instance().AsyncFindFactory(
 					Entity::CLASS_ID));
 	CullingSystem* culler = static_cast<CullingSystem*>(
-		entityManager->AsyncCreate(Component::CLASS_BV_CULLER, NamedObject::AsyncStringID("MainCuller")));
+		entityManager->AsyncCreate(Component::CLASS_BV_CULLER, StringUtils::GetStringID("MainCuller")));
 	scene->SetCullingSystem(culler);
 	EntityPtr camera = entityManager->AsyncCreateCameraEntity(
-			NamedObject::AsyncStringID("MainCamera"));
+			StringUtils::GetStringID("MainCamera"));
 	// A camera at 50,0,50 looking at 0,0,0
 	Quaternion rotation = QuatFromAxisAng(Vector3::XAxis, Math::PI_BY_4);
 	camera->SetTransform(Vec3ASet(0, 50,-50), rotation, 1);

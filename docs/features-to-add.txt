@@ -26,3 +26,7 @@ Project Editor:
 Electron based -> http://electron.atom.io/
 What we are looking for is Windowless Plugin for Chromium: --> https://www.chromium.org/developers/design-documents/plugin-architecture
 Also the UI elements need to talk with the plugin instance/context.
+
+Shader Framework:
+Support for global options affecting all shaders.
+Support for shader options being pushed from render config/pass system or other settings.

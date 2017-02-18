@@ -34,7 +34,7 @@ void ComponentGroupSet::ReleaseLock() {
 void ComponentGroupSet::Add(SharedComponentPtr& c) {
 	/** Delete all components make sure they are destructible */
 	Debug(
-			GetName() + ": Number of components = "
+			GetNameID() + ": Number of components = "
 					+ Convert::ToString((uint32) componentMap.size()));
 	StringID name = c->GetID();
 	componentMap.insert(ComponentMap::value_type(name, c));

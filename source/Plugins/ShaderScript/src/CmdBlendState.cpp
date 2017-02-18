@@ -20,12 +20,12 @@ const RenderTargetBlendOp CmdTarget::_preMultipliedBlending(ColorMask::MASK_ALL,
 
 bool CmdBlendState::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	auto h = command->GetParameters().Iterate(c->templateResolver);
 	BlendState defaultState;
 	c->blendState = defaultState;
-	String param = h.Get(0);
-	if (!Helper::IsDefault(param) && !Helper::IsDisabled(param))
+	String param;
+	if (h.HasNext(param) && !Helper::IsDefault(param) && !Helper::IsDisabled(param))
 		c->blendState.enabled = true;
 	c->blendState.numRenderTargets = 0;
 	return true;
@@ -40,11 +40,10 @@ void CmdBlendState::EndExecute(CommandContext* pContext,
 
 bool CmdTarget::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 	auto& blendOp = c->blendState.blendOp[c->blendState.numRenderTargets++];
 	String value;
-	auto it = h.Iterate();
 	if (it.HasNext(value)) {
 		if (!value.compare("pre-multiplied-blending"))
 			blendOp = _preMultipliedBlending;
@@ -77,9 +76,8 @@ bool CmdTarget::BeginExecute(CommandContext* pContext,
 
 bool CmdAlphaToCoverage::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
-	auto it = h.Iterate();
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 	String value;
 
 	c->blendState.alphaToCoverage = true;

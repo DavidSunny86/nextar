@@ -14,6 +14,9 @@ namespace nextar {
 
 class _NexRenderAPI CompositorRenderPass: public BaseMaterialPass {
 public:
+
+	typedef MetaType<CompositorRenderPass>::Type MetaType;
+
 	enum Flags {
 		PARAMS_LOADED = BaseMaterialPass::LAST_FLAG << 0,
 	};
@@ -23,9 +26,7 @@ public:
 		uint32 offset;
 	};
 
-	static RenderPass* CreateInstance();
-
-	CompositorRenderPass();
+	CompositorRenderPass(const Meta* meta);
 	virtual ~CompositorRenderPass();
 
 	virtual void OnMaterialLoad();

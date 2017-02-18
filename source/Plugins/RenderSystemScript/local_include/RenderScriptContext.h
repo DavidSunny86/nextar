@@ -37,6 +37,7 @@ public:
 	String _passType;
 	String _bufferName;
 	RenderSystem& _rsys;
+	ASTParameter::Resolver _resolver;
 };
 
 } /* namespace RenderSystemScript */

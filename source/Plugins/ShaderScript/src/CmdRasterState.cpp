@@ -12,15 +12,17 @@ namespace ShaderScript {
 
 bool ShaderScript::CmdRasterState::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
-	String name = h.Get(0);
+	auto it = command->GetParameters().Iterate(c->templateResolver);
+	String name;
 	RasterState defaultState;
 	c->rasterState = defaultState;
-	if (!name.compare(_SS(ARG_WIREFRAME)))
-		c->rasterState.fill = FillMode::FM_WIREFRAME;
-	else if (!name.compare(_SS(ARG_NO_CULL)))
-		c->rasterState.cull = CullMode::CULL_NONE;
+	if (it.HasNext(name)) {
+		if (!name.compare(_SS(ARG_WIREFRAME)))
+			c->rasterState.fill = FillMode::FM_WIREFRAME;
+		else if (!name.compare(_SS(ARG_NO_CULL)))
+			c->rasterState.cull = CullMode::CULL_NONE;
+	}
 	return true;
 }
 
@@ -33,10 +35,9 @@ void ShaderScript::CmdRasterState::EndExecute(CommandContext* pContext,
 
 bool ShaderScript::CmdDepthClip::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 	String value;
-	auto it = h.Iterate();
 	auto& rasterState = c->rasterState;
 	rasterState.depthClip = true;
 	if (it.HasNext(value)) {
@@ -47,10 +48,9 @@ bool ShaderScript::CmdDepthClip::BeginExecute(CommandContext* pContext,
 
 bool ShaderScript::CmdDepthBias::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 	String value;
-	auto it = h.Iterate();
 	auto& rasterState = c->rasterState;
 	rasterState.usingScissors = true;
 	if (it.HasNext(value)) {
@@ -67,10 +67,9 @@ bool ShaderScript::CmdDepthBias::BeginExecute(CommandContext* pContext,
 
 bool ShaderScript::CmdScissor::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 	String value;
-	auto it = h.Iterate();
 	auto& rasterState = c->rasterState;
 	rasterState.usingScissors = true;
 	if (it.HasNext(value)) {
@@ -81,10 +80,9 @@ bool ShaderScript::CmdScissor::BeginExecute(CommandContext* pContext,
 
 bool ShaderScript::CmdRaster::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 	String value;
-	auto it = h.Iterate();
 	auto& rasterState = c->rasterState;
 	if (it.HasNext(value)) {
 		rasterState.fill = Helper::GetFillMode(value);
@@ -100,10 +98,9 @@ bool ShaderScript::CmdRaster::BeginExecute(CommandContext* pContext,
 
 bool ShaderScript::CmdAntiAliasing::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 	String value;
-	auto it = h.Iterate();
 	auto& rasterState = c->rasterState;
 	rasterState.usingMultisample = true;
 	if (it.HasNext(value)) {

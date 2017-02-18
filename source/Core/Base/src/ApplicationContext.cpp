@@ -64,8 +64,6 @@ void ApplicationContext::InitializeContext(int argc, char* argv[]) {
 	_pImpl.ConfigureServices(config);
 
 	DispatchEvent(EVENT_INIT_RESOURCES);
-	// in case it was loaded
-	NamedObject::OnFlushStrings();
 }
 
 void ApplicationContext::LoadConfiguration() {
@@ -219,8 +217,6 @@ void ACBaseImpl::DestroyServices() {
 	PluginRegistry::Instance().UnloadPlugins();
 
 	NEX_DELETE(PluginRegistry::InstancePtr());
-	// just save the strings
-	NamedObject::OnExit();
 	// destroy dictionaries
 	PropertyInterface::DestroyDictionaries();
 	NEX_DELETE(FileSystem::InstancePtr());

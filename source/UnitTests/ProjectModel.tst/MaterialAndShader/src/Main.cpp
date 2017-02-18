@@ -13,7 +13,7 @@ public:
 		MaterialTemplatePtr material;
 		ShaderTemplatePtr shader;
 
-		MaterialTemplate::ID id(NamedObject::AsyncStringID("Box"));
+		MaterialTemplate::ID id(StringUtils::GetStringID("Box"));
 		URL loadUrl("{EngineData}/Scripts/Materials/Box.nexmtl");
 		URL saveUrl("{EngineData}/Materials/Box.nexmtl");
 		URL saveShaderUrl("{EngineData}/Shaders/Deferred.nexfx");
@@ -26,7 +26,7 @@ public:
 		material->RequestSave();
 
 		// save engine lights	
-		MaterialTemplate::ID id2(NamedObject::AsyncStringID("DeferredLights"));
+		MaterialTemplate::ID id2(StringUtils::GetStringID("DeferredLights"));
 		URL dlMaterialUrl("{EngineData}/Scripts/Materials/DeferredLights.nexmtl");
 		URL saveDlMaterialUrl("{EngineData}/Materials/Assets/DeferredLights.asset");
 		URL saveDlShaderUrl("{EngineData}/Shaders/DeferredLights.nexfx");
@@ -38,7 +38,7 @@ public:
 		AssetPtr mtl = material;
 		Asset::AssetSave(mtl, saveDlMaterialUrl, "nexmtl");
 
-		MaterialTemplate::ID id3(NamedObject::AsyncStringID("Debug3D"));
+		MaterialTemplate::ID id3(StringUtils::GetStringID("Debug3D"));
 		URL dbMaterialUrl("{EngineData}/Scripts/Materials/Debug3D.nexmtl");
 		URL saveDbMaterialUrl("{EngineData}/Materials/Assets/Debug3D.asset");
 		URL saveDbShaderUrl("{EngineData}/Shaders/Debug3D.nexfx");

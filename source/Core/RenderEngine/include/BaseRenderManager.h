@@ -54,13 +54,13 @@ protected:
 	void CreateDefaultRenderPassFactories();
 	void RegisterRenderScriptStreamer();
 	void UnregisterRenderScriptStreamer();
-
+	void RegisterGlobalShaderOptions(const NameValueMap&);
 	/* The first registered context is always the primary context, other
 	 * contexts are present if usingMultiGpuSetup is true */
 	RenderDriverPtr primaryDriver;
 	RenderContextPtr primaryContext;
 	// Render systems
-
+	StringUtils::WordList shaderOptions;
 	String renderSystemConfigs;
 #if NEX_MULTIGPU_BUILD
 	typedef vector<RenderDriverPtr>::type RenderDriverList;

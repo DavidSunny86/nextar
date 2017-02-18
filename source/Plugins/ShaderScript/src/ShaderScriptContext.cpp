@@ -9,7 +9,8 @@
 
 namespace ShaderScript {
 
-ShaderScriptContext::ShaderScriptContext(ShaderTemplate::LoadStreamRequest* shader, const ShaderTemplate::ID& id) :
+ShaderScriptContext::ShaderScriptContext(ShaderTemplate::LoadStreamRequest* shader, const ShaderTemplate::ID& id, const ShaderScriptConfig& config) :
+	_config(config),
 	verifyID(true){
 	this->shader = shader;
 	String effectPath = shader->GetAssetLocator().GetComputedFilePath();
@@ -50,31 +51,16 @@ InputStreamPtr ShaderScriptContext::FetchProgram(const String& name,
 	String store;
 	URL url;
 	InputStreamPtr retFile;
-	const char* stage = 0;
-	switch(stageType) {
-	case Pass::ProgramStage::STAGE_VERTEX:
-		stage = ".vsglsl"; break;
-	case Pass::ProgramStage::STAGE_FRAGMENT:
-		stage = ".fsglsl"; break;
-	case Pass::ProgramStage::STAGE_GEOMETRY:
-		stage = ".gsglsl"; break;
-	case Pass::ProgramStage::STAGE_HULL:
-		stage = ".hsglsl"; break;
-	case Pass::ProgramStage::STAGE_DOMAIN:
-		stage = ".dsglsl"; break;
-	default:
-		Warn("Invalid stage: " + name);
-		return retFile;
-	}
+	
 
 	while(it.HasNext(store)) {
 
 		switch (lang) {
 		case RenderManager::SPP_GLSL:
-			url = store + "GLSL/" + name + stage;
+			url = store + "GLSL/" + name + ".glsl";
 			break;
 		case RenderManager::SPP_HLSL:
-			url = store + "HLSL/" + name + stage;
+			url = store + "HLSL/" + name + ".glsl";
 			break;
 		}
 

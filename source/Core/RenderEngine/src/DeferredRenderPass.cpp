@@ -62,15 +62,10 @@ void GBuffer::Setup(Size dimensions) {
 /************************************************************************/
 /* DeferredRenderPass                                                 */
 /************************************************************************/
-DeferredRenderPass::DeferredRenderPass() : BaseRenderPass() {
+DeferredRenderPass::DeferredRenderPass(const Meta* meta) : BaseRenderPass(meta) {
 }
 
 DeferredRenderPass::~DeferredRenderPass() {
-}
-
-
-RenderPass* DeferredRenderPass::CreateInstance() {
-	return NEX_NEW(DeferredRenderPass());
 }
 
 

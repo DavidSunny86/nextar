@@ -24,6 +24,7 @@ typedef std::uint8_t uint8;
 typedef std::uint16_t uint16;
 typedef std::uint32_t uint32;
 typedef std::uint64_t uint64;
+typedef std::size_t hash64;
 
 typedef uint8 byte;
 typedef uint8 utf8;
@@ -143,14 +144,13 @@ return ((NEX_GET_VER_MAJOR(present) == NEX_GET_VER_MAJOR(query))
 #include <Containers.h>
 #include <ErrorDefs.h>
 
+
 namespace nextar {
 
 struct StringID {
-	uint32 _value;
-
 	StringID(const StringID& i) : _value(i._value) {}
 	StringID() : _value(0) {}
-	explicit StringID(uint32 v) : _value(v) {}
+	explicit StringID(hash64 v) : _value(v) {}
 
 	friend inline bool operator < (const StringID first, const StringID second) {
 		return (first._value < second._value) != 0;
@@ -165,6 +165,8 @@ struct StringID {
 	friend inline bool operator != (const StringID first, const StringID second) {
 		return (first._value != second._value) != 0;
 	}
+
+	hash64 _value;
 };
 
 }

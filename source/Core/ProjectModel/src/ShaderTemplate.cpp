@@ -104,8 +104,8 @@ ShaderAssetPtr& ShaderTemplate::CreateShader(const String& hash,
 	String compilerOptions;
 	for (auto& e : options)
 		_AppendCompilerOption(e, compilerOptions);
-	String uniqueName = GetName() + "#" + Convert::ToString((uint32)shaders.size(), ' ', std::ios::hex);
-	ShaderAssetPtr shaderObject = ShaderAsset::Traits::Instance(NamedObject::AsyncStringID(uniqueName), nullptr, GetGroup() );
+	String uniqueName = GetNameID() + "#" + Convert::ToString((uint32)shaders.size(), ' ', std::ios::hex);
+	ShaderAssetPtr shaderObject = ShaderAsset::Traits::Instance(StringID(StringUtils::Hash(uniqueName)), nullptr, GetGroup() );
 	if (!shaderObject->AsyncIsLoaded()) {
 		// load and prepare the shader object
 		

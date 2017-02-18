@@ -28,7 +28,7 @@ public:
 		Matrix4x4 m = Matrix4x4::IdentityMatrix;
 		m = Mat4x4Scale(4, m);
 		DebugDisplay::Register(m);
-		entity = scene->FindComponent(NamedObject::AsyncStringID("MainCamera"));
+		entity = scene->FindComponent(StringUtils::GetStringID("MainCamera"));
 		if (entity) {
 			Entity* e = static_cast<Entity*>(entity);
 			// create a behaviour
@@ -53,8 +53,8 @@ public:
 			}
 			Behaviour* b = static_cast<Behaviour*>(Component::Instance(
 				Component::CLASS_FPS_BEHAVIOR,
-				NamedObject::AsyncStringID("FPSBehaviour")));
-			Moveable* mv = Component::Instance<Moveable>(NamedObject::AsyncStringID("CameraTransform"));
+				StringUtils::GetStringID("FPSBehaviour")));
+			Moveable* mv = Component::Instance<Moveable>(StringUtils::GetStringID("CameraTransform"));
 			Quaternion rotation = QuatFromAxisAng(Vector3::XAxis, Math::PI_BY_4);
 			mv->SetTransform(Vec3ASet(0, 50, -50), rotation, 1);
 			e->AttachComponent(mv);

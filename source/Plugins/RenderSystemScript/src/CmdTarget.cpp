@@ -12,12 +12,11 @@ namespace RenderSystemScript {
 
 bool CmdTarget::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	RenderScriptContext* c = static_cast<RenderScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->_resolver);
 	if ( c->_numTargets >= RenderConstants::MAX_RENDER_TARGETS )
 		return true;
 	Target& data = c->_targets[c->_numTargets++];
-	auto it = h.Iterate();
 	data.format = PixelFormat::UNKNOWN;
 	data.asTexture = true;
 	data.isDepthTarget = false;

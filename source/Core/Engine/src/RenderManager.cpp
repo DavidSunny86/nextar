@@ -88,7 +88,7 @@ void RenderManager::AddRenderQueue(const StringID name, uint16 priority,
 	std::sort(renderQueues.begin(), renderQueues.end());
 }
 
-RenderPass* RenderManager::CreateRenderPass(const String& name) {
+RenderPass* RenderManager::CreateRenderPass(StringID name) {
 	auto it = renderSystemFactories.find(name);
 	if (it != renderSystemFactories.end() && (*it).second)
 		return (*it).second();

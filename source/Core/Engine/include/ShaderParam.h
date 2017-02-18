@@ -139,7 +139,7 @@ struct AutoParam: public AllocGeneral {
 	AutoParamName autoName;
 	ParameterContext context;
 	ParamProcessorProc processor;
-	String desc;
+	uint32 size;
 
 	AutoParam() : autoName(AutoParamName::AUTO_INVALID_PARAM),
 			processor(nullptr),

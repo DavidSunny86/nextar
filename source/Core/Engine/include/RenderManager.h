@@ -66,7 +66,7 @@ public:
 		return renderQueues;
 	}
 
-	void AddRenderPassFactory(const String& name, RenderPass::CreateInstance ci) {
+	void AddRenderPassFactory(StringID name, RenderPass::CreateInstance ci) {
 		renderSystemFactories[name] = ci;
 	}
 
@@ -112,7 +112,7 @@ public:
 	void RemoveRenderStreamer(const String& name);
 	RenderSystem::Streamer* GetRenderStreamer(const String& name);
 
-	RenderPass* CreateRenderPass(const String& name);
+	RenderPass* CreateRenderPass(StringID name);
 
 	virtual RenderSystemPtr CreateRenderSystem(const String& configName, Size initialViewDimensions) = 0;
 
@@ -127,7 +127,7 @@ protected:
 	void GenerateStreamDataForQuad();
 		
 	typedef map<String, RenderSystem::Streamer*>::type RenderSystemStreamerMap;
-	typedef map<String, RenderPass::CreateInstance>::type RenderPassFactoryMap;
+	typedef map<StringID, RenderPass::CreateInstance>::type RenderPassFactoryMap;
 
 	virtual RenderDriverPtr CreateDriverImpl(DriverCreationParams&) = 0;
 	virtual void ConfigureImpl(const NameValueMap&) = 0;

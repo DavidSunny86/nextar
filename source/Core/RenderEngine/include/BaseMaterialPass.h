@@ -15,7 +15,7 @@ namespace nextar {
 class _NexRenderAPI BaseMaterialPass : public BaseRenderPass {
 	NEX_LOG_HELPER(BaseMaterialPass);
 public:
-	BaseMaterialPass();
+	BaseMaterialPass(const Meta* meta);
 	virtual ~BaseMaterialPass();
 
 	void SetMaterialLocation(const URL& materialUrl) {

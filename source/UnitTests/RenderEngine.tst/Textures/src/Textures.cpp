@@ -18,7 +18,7 @@ public:
 
 	void DisplayImage(const String& path, float x, float y, float tileX = 1, float tileY = 1) {
 		URL texturePath(path);
-		TextureAsset::ID id(NamedObject::AsyncStringID(texturePath.GetComputedName()));
+		TextureAsset::ID id(StringUtils::GetStringID(texturePath.GetComputedName()));
 		TextureAssetPtr texture = TextureAsset::Traits::Instance(id, texturePath);
 		Box2D box1(x, y, x + 0.25f, y + 0.25f);
 		texture->RequestLoad();

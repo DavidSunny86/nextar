@@ -14,10 +14,8 @@ namespace ShaderScript {
 
 bool ShaderScript::CmdShader::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
-	auto it = h.Iterate();
-
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 	String name;
 	if (it.HasNext(name)) {
 		SharedComponent::ID id = SharedComponent::ToID(name);
@@ -25,8 +23,7 @@ bool ShaderScript::CmdShader::BeginExecute(CommandContext* pContext,
 			id.group == c->shaderId.group)) {
 			String templateParams;
 			if (it.HasNext(templateParams)) {
-				c->templateParamNames = std::move(templateParams);
-				
+				c->templateResolver.SetParamNames(std::move(templateParams));
 			}
 			return true;
 		}
@@ -40,9 +37,8 @@ void ShaderScript::CmdShader::EndExecute(CommandContext* pContext,
 
 bool ShaderScript::CmdTags::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
-	auto it = h.Iterate();
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 	uint32 flags = 0;
 	String value;
 	while (it.HasNext(value)) {
@@ -58,9 +54,11 @@ bool ShaderScript::CmdTags::BeginExecute(CommandContext* pContext,
 
 bool ShaderScript::CmdPass::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
-	c->shader->AddPass(NamedObject::AsyncStringID(h.Get(0)));
+	auto it = command->GetParameters().Iterate(c->templateResolver);
+	String name;
+	StringID nameID = it.HasNext(name) ? StringUtils::GetStringID(name) : StringUtils::DefaultID;
+	c->shader->AddPass(nameID);
 	return true;
 }
 
@@ -107,9 +105,8 @@ void CmdPass::EndExecute(CommandContext* pContext,
 
 bool CmdImportConstBuffer::BeginExecute(CommandContext* pContext,
 	const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
-	auto it = h.Iterate();
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 	String value;
 	while (it.HasNext(value)) {
 		InputStreamPtr is = c->FetchConstBuffer(value);
@@ -141,17 +138,20 @@ bool CmdDeclare::BeginExecute(CommandContext* pContext,
 bool CmdInherit::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
-	ConstMultiStringHelper h(command->GetParameters().AsString());
-	ShaderScriptContext context(c->shader, c->shaderId);
+	auto it = command->GetParameters().Iterate(c->templateResolver);
+	ShaderScriptContext context(c->shader, c->shaderId, c->_config);
 	context.verifyID = false;
 	String value;
-	ConstMultiStringHelper::Iterator it =  h.Iterate();
 	URL location;
 	if (it.HasNext(value)) {
 		location = URL(value, "fxscript", FileSystem::ArchiveProjectData + "/Scripts/Effects");
 		String templateValues;
 		if (it.HasNext(templateValues)) {
-			context.templateParamValues = std::move(templateValues);
+			// note that the names will be read after the values, in the next
+			// script, so if we have read some values for template, we keep them
+			// in order and the next script will have some names to work with 
+			// those values.
+			context.templateResolver.SetParamValues(std::move(templateValues));
 			InputStreamPtr input = FileSystem::Instance().OpenRead(location);
 			NeoCommandInterpreter::Execute("ShaderScript", input, &context);
 			return true;

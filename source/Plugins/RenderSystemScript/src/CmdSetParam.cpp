@@ -15,13 +15,12 @@ namespace RenderSystemScript {
 bool CmdSetParam::BeginExecute(CommandContext* pContext,
 	const ASTCommand* command) const {
 
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	RenderScriptContext* c = static_cast<RenderScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->_resolver);
 	if (c->_passType.find("Compositor") != String::npos) {
 		CompositorRenderPass* pass = static_cast<CompositorRenderPass*>(c->_pass);
 		String temp;
 		ParameterBuffer& pb = pass->GetParameterBuffer();
-		auto it = h.Iterate();
 		if (it.HasNext(temp)) {
 			auto entryAndOffset = pb.GetParamEntryAndOffset(temp);
 			if (entryAndOffset.first) {

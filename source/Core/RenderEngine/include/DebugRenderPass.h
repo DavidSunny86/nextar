@@ -78,15 +78,15 @@ class _NexRenderAPI DebugRenderPass:
 
 public:
 		
-	DebugRenderPass();
+	typedef MetaType<DebugRenderPass>::Type MetaType;
+
+	DebugRenderPass(const Meta* meta);
 	virtual ~DebugRenderPass();
 
 	virtual void Commit(CommitContext& context);
 
 	virtual void CreateResources();
 	virtual void DestroyResources();
-
-	static RenderPass* CreateInstance();
 
 protected:
 

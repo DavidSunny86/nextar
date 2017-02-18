@@ -31,13 +31,13 @@ const CommandHandler* BlockCommandHandler::GetHandler(
 void BlockCommandHandler::RegisterHandler(const String& qualifiedName,
 		CommandHandler* iHandler) {
 	StringPair p = StringUtils::Split(qualifiedName, '.');
-	if (p.second.length() > 0) {
+	if (p.first.length() > 0) {
 		CommandHandler* handler = GetHandler(p.first);
 		if (handler->IsBlockHandler()) {
 			static_cast<BlockCommandHandler*>(handler)->RegisterHandler(p.second, iHandler);
 		}
 	} else {
-		auto& e = _handlers[p.first];
+		auto& e = _handlers[p.second];
 		if (e)
 			e->SetParentBlock(nullptr);
 		e = iHandler;
@@ -47,13 +47,13 @@ void BlockCommandHandler::RegisterHandler(const String& qualifiedName,
 
 void BlockCommandHandler::UnregisterHandler(const String& qualifiedName) {
 	StringPair p = StringUtils::Split(qualifiedName, '.');
-	if (p.second.length() > 0) {
+	if (p.first.length() > 0) {
 		CommandHandler* handler = GetHandler(p.first);
 		if (handler->IsBlockHandler()) {
 			static_cast<BlockCommandHandler*>(handler)->UnregisterHandler(p.second);
 		}
 	} else {
-		_handlers.erase(p.first);
+		_handlers.erase(p.second);
 		//auto it = _handlers.find(p.first);
 		//if (it != _handlers.end()) {
 			//NEX_DELETE((*it).second);

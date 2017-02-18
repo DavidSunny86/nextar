@@ -21,15 +21,15 @@ namespace nextar {
 class _NexRenderAPI ForwardRenderPass: public nextar::BaseRenderPass {
 public:
 
-	ForwardRenderPass();
+	typedef MetaType<ForwardRenderPass>::Type MetaType;
+
+	ForwardRenderPass(const Meta* meta);
 	virtual ~ForwardRenderPass();
 
 	virtual void Commit(CommitContext& context);
 
 	virtual void CreateResources();
 	virtual void DestroyResources();
-
-	static RenderPass* CreateInstance();
 
 protected:
 

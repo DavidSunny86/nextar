@@ -12,6 +12,12 @@
 
 namespace nextar {
 
+
+CompositorRenderPass::MetaType CompositorRenderPass::MetaType::_instance("Compositor");
+DeferredRenderPass::MetaType DeferredRenderPass::MetaType::_instance("Deferred");
+ForwardRenderPass::MetaType ForwardRenderPass::MetaType::_instance("Forward");
+DebugRenderPass::MetaType DebugRenderPass::MetaType::_instance("Debug");
+
 BaseRenderManager::BaseRenderManager() {
 #if NEX_MULTIGPU_BUILD
 	emptySlot = 0;
@@ -28,6 +34,7 @@ void BaseRenderManager::ConfigureImpl(const NameValueMap& c) {
 	RegisterAutoParams();
 	RegisterRenderScriptStreamer();
 	RegisterRenderSystemConfig(c);
+	RegisterGlobalShaderOptions(c);
 }
 
 void BaseRenderManager::CreateResources() {
@@ -36,13 +43,6 @@ void BaseRenderManager::CreateResources() {
 
 void BaseRenderManager::DestroyResources() {
 	RenderManager::DestroyResources();
-}
-
-void BaseRenderManager::RegisterRenderSystemConfig(const NameValueMap& c) {
-	auto it = c.find("RenderSystems");
-	if (it != c.end()) {
-		renderSystemConfigs = StringUtils::TokenizeToMultiString((*it).second, ",");
-	}
 }
 
 ContextID BaseRenderManager::RequestObjectCreate(ContextObject::Type type, uint32 hint) {
@@ -230,19 +230,27 @@ void BaseRenderManager::CreateRenderQueues(const NameValueMap& section) {
 	} 
 	
 	if (!queuesAdded) {
-		AddRenderQueue(NamedObject::AsyncStringID("Background"), 110, RenderQueueFlags::BACKGROUND);
-		AddRenderQueue(NamedObject::AsyncStringID("Deferred"), 111, RenderQueueFlags::DEFERRED | RenderQueueFlags::SORT_ENABLED);
-		AddRenderQueue(NamedObject::AsyncStringID("Forward"), 112, RenderQueueFlags::FORWARD | RenderQueueFlags::SORT_ENABLED);
-		AddRenderQueue(NamedObject::AsyncStringID("Transparent"), 113, RenderQueueFlags::TRANSLUCENCY | RenderQueueFlags::SORT_ENABLED);
-		AddRenderQueue(NamedObject::AsyncStringID("Overlay"), 114, RenderQueueFlags::OVERLAY);
+		AddRenderQueue(StringUtils::GetStringID("Background"), 110, RenderQueueFlags::BACKGROUND);
+		AddRenderQueue(StringUtils::GetStringID("Deferred"), 111, RenderQueueFlags::DEFERRED | RenderQueueFlags::SORT_ENABLED);
+		AddRenderQueue(StringUtils::GetStringID("Forward"), 112, RenderQueueFlags::FORWARD | RenderQueueFlags::SORT_ENABLED);
+		AddRenderQueue(StringUtils::GetStringID("Transparent"), 113, RenderQueueFlags::TRANSLUCENCY | RenderQueueFlags::SORT_ENABLED);
+		AddRenderQueue(StringUtils::GetStringID("Overlay"), 114, RenderQueueFlags::OVERLAY);
 	}
 }
 
 void BaseRenderManager::CreateDefaultRenderPassFactories()  {
-	AddRenderPassFactory("Compositor", &CompositorRenderPass::CreateInstance);
-	AddRenderPassFactory("Deferred", &DeferredRenderPass::CreateInstance);
-	AddRenderPassFactory("Forward", &ForwardRenderPass::CreateInstance);
-	AddRenderPassFactory("Debug", &DebugRenderPass::CreateInstance);
+	AddRenderPassFactory(
+		StringUtils::GetStringID(CompositorRenderPass::MetaType::_instance._type), 
+		CompositorRenderPass::MetaType::_instance._instantiator);
+	AddRenderPassFactory(
+		StringUtils::GetStringID(DeferredRenderPass::MetaType::_instance._type), 
+		DeferredRenderPass::MetaType::_instance._instantiator);
+	AddRenderPassFactory(
+		StringUtils::GetStringID(ForwardRenderPass::MetaType::_instance._type),
+		ForwardRenderPass::MetaType::_instance._instantiator);
+	AddRenderPassFactory(
+		StringUtils::GetStringID(DebugRenderPass::MetaType::_instance._type),
+		DebugRenderPass::MetaType::_instance._instantiator);
 }
 
 RenderSystemPtr BaseRenderManager::CreateRenderSystem(const String& configName, Size initialDim) {
@@ -278,6 +286,20 @@ void BaseRenderManager::RegisterRenderScriptStreamer() {
 
 void BaseRenderManager::UnregisterRenderScriptStreamer() {
 	RemoveRenderStreamer("NEXRSYS");
+}
+
+void BaseRenderManager::RegisterRenderSystemConfig(const NameValueMap& c) {
+	auto it = c.find("RenderSystems");
+	if (it != c.end()) {
+		renderSystemConfigs = StringUtils::TokenizeToMultiString((*it).second, ",");
+	}
+}
+
+void BaseRenderManager::RegisterGlobalShaderOptions(const NameValueMap &c) {
+	auto it = c.find("ShaderOptions");
+	if (it != c.end()) {
+		shaderOptions = StringUtils::TokenizeToMultiString((*it).second, ",");
+	}
 }
 
 }

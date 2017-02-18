@@ -23,13 +23,13 @@ void CmdCreateBuffer::ParseDimension(const String& value, uint16& d, float& f) {
 
 bool CmdCreateBuffer::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	RenderScriptContext* c = static_cast<RenderScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->_resolver);
+
 	c->_numTargets = 0;
 	c->_bufferDim.combined = 0;
 	c->_bufferDepth = 1;
 	c->_bufferDimFactor = Vector2(1, 1);
-	auto it = h.Iterate();
 	String temp;
 	if (it.HasNext(temp))
 		c->_bufferName = temp;
@@ -53,7 +53,7 @@ RenderTargetPtr CmdCreateBuffer::CreateTarget(RenderScriptContext* c,
 		name += ".color-";
 		name += Convert::ToString(index);
 	}
-	StringID nameId = NamedObject::AsyncStringID(name);
+	StringID nameId = StringUtils::GetStringID(name);
 	if (t.asTexture) {
 		RenderTexture::CreateParams params;
 		params.depth = c->_bufferDepth;
@@ -84,7 +84,7 @@ void CmdCreateBuffer::EndExecute(CommandContext* pContext,
 		c->_bufferName += Convert::ToString(c->_rsys.GetRenderTargetCount());
 	}
 
-	StringID bufferNameId = NamedObject::AsyncStringID(c->_bufferName);
+	StringID bufferNameId = StringUtils::GetStringID(c->_bufferName);
 
 	if (c->_numTargets == 1) {
 		RenderTargetPtr r = CreateTarget(c, c->_targets[0], 0);

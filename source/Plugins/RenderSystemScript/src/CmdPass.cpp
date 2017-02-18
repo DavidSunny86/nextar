@@ -16,14 +16,14 @@ bool CmdPass::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
 	RenderScriptContext* c = static_cast<RenderScriptContext*>(pContext);
 	const ASTParameter& params = command->GetParameters();
-	ConstMultiStringHelper h(params.AsString());
+	auto it = command->GetParameters().Iterate(c->_resolver);
 	// create the pass handler here
-	c->_passType = h.Get(0);
+	it.HasNext(c->_passType);
 	c->_pass = static_cast<BaseRenderPass*>(
 			c->_rsys.AddPass(c->_passType));
-
-	if (h.Length() > 1)
-		c->_pass->SetName(c->_passType + ":" + h.Get(1));
+	String name;
+	if (it.HasNext(name))
+		c->_pass->SetName(c->_passType + ":" + name);
 	else
 		c->_pass->SetName(c->_passType);
 	c->_numUnresolvedTextures = 0;

@@ -483,7 +483,7 @@ void FbxMeshLoaderImplv1_0::BuildMesh(MeshTemplate::MeshBuilder* pMesh) {
 MaterialTemplatePtr FbxMeshLoaderImplv1_0::CreateMaterial(FbxSurfaceMaterial* pFbxMat, const URL& kAssetLoc) {
 	String name = pFbxMat->GetName();
 	MaterialTemplate::ID id(
-		NamedObject::AsyncStringID(name),
+		StringUtils::GetStringID(name),
 		StringUtils::DefaultID,
 		StringUtils::DefaultID);
 	bool bMaterialExists = false;

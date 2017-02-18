@@ -25,7 +25,8 @@ class ShaderScriptContext : public CommandContext {
 
 public:
 		
-	ShaderScriptContext(ShaderTemplate::LoadStreamRequest* shader, const ShaderTemplate::ID&);
+
+	ShaderScriptContext(ShaderTemplate::LoadStreamRequest* shader, const ShaderTemplate::ID&, const ShaderScriptConfig& params);
 
 	typedef multimap<String, std::pair<RenderManager::ShaderLanguage, String> >::type SourceRegionMap;
 
@@ -40,20 +41,8 @@ public:
 		activeStages[(uint32)stage] = active;
 	}
 
-	inline void Resolve(String& param) const {
-		if (param.length() > 0 && param[0] == '$') {
-			const char* name = param.c_str() + 1;
-			String value;
-			auto nameIt = ConstMultiStringHelper::It(templateParamNames);
-			auto valueIt = ConstMultiStringHelper::It(templateParamValues);
-			while (nameIt.HasNext(value)) {
-				if (value == name) {
-					valueIt.HasNext(param);
-					return;
-				} else
-					++valueIt;
-			}
-		}
+	inline const StringUtils::WordList& GetProgramPrefix(Pass::ProgramStage stage) {
+		return _config.programPrefix[stage];
 	}
 
 	InputStreamPtr FetchConstBuffer(const String& name);
@@ -67,6 +56,8 @@ public:
 		
 	bool verifyID;
 	bool cbIsAutoParam;
+
+	ASTParameter::Resolver templateResolver;
 	SourceRegionMap regions;
 	BlendState blendState;
 	DepthStencilState depthStencilState;
@@ -75,11 +66,9 @@ public:
 	String samplerName;
 	String _transientBuffer[TRANSLATOR_COUNT];
 
+	const ShaderScriptConfig& _config;
 	ShaderTemplate::LoadStreamRequest* shader;
 	ShaderTemplate::ID shaderId;
-
-	StringUtils::WordList templateParamValues;
-	StringUtils::WordList templateParamNames;
 
 	bool activeStages[Pass::ProgramStage::STAGE_COUNT];
 };

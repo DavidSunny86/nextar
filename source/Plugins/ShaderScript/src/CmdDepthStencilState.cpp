@@ -12,12 +12,12 @@ namespace ShaderScript {
 
 bool ShaderScript::CmdDepthStencilState::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	auto h = command->GetParameters().Iterate(c->templateResolver);
 	DepthStencilState defaultState;
 	c->depthStencilState = defaultState;
-	String param = h.Get(0);
-	if (Helper::IsDisabled(param)) {
+	String param;
+	if (h.HasNext(param) && Helper::IsDisabled(param)) {
 		c->depthStencilState.depthTest = false;
 		c->depthStencilState.stencilTest = false;
 	}
@@ -33,10 +33,9 @@ void ShaderScript::CmdDepthStencilState::EndExecute(CommandContext* pContext,
 
 bool ShaderScript::CmdDepthState::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 	String value;
-	auto it = h.Iterate();
 	auto& depthStencil = c->depthStencilState;
 	if (it.HasNext(value)) {
 		// expected and set
@@ -61,10 +60,9 @@ bool ShaderScript::CmdDepthState::BeginExecute(CommandContext* pContext,
 
 bool ShaderScript::CmdStencilState::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 	String value;
-	auto it = h.Iterate();
 	auto& depthStencil = c->depthStencilState;
 	if (it.HasNext(value)) {
 		// expected and set

@@ -30,7 +30,7 @@ void DebugPrimitive::SetDebugMaterial(MaterialAssetPtr& m) {
 	}
 }
 
-DebugRenderPass::DebugRenderPass() : BaseRenderPass() {
+DebugRenderPass::DebugRenderPass(const Meta* meta) : BaseRenderPass(meta) {
 
 	idCounter = 0;
 	boxDataGenerated = false;
@@ -40,10 +40,6 @@ DebugRenderPass::DebugRenderPass() : BaseRenderPass() {
 
 DebugRenderPass::~DebugRenderPass() {
 	ReleaseObjects();
-}
-
-RenderPass* DebugRenderPass::CreateInstance() {
-	return NEX_NEW(DebugRenderPass());
 }
 
 void DebugRenderPass::DestroyResources() {
@@ -296,7 +292,7 @@ void DebugRenderPass::GenerateStreamDataForAxis() {
 	vertexBuffer->CreateBuffer(vbsize, stride, reinterpret_cast<const uint8*>(pVData));
 
 	IndexBufferPtr indexBuffer = Assign(NEX_NEW(IndexBuffer(GpuBuffer::NEVER_RELEASED)));
-	indexBuffer->CreateBuffer(main.topology.size() * 2, IndexBuffer::Type::TYPE_16BIT,
+	indexBuffer->CreateBuffer(static_cast<uint32>(main.topology.size()) << 1, IndexBuffer::Type::TYPE_16BIT,
 		reinterpret_cast<const uint8*>(main.topology.data()));
 
 	StreamData* stream = &axisData;
@@ -340,7 +336,7 @@ void DebugRenderPass::GenerateStreamDataForBox() {
 	vertexBuffer->CreateBuffer(vbsize, stride, reinterpret_cast<const uint8*>(pVData));
 
 	IndexBufferPtr indexBuffer = Assign(NEX_NEW(IndexBuffer(GpuBuffer::NEVER_RELEASED)));
-	indexBuffer->CreateBuffer(boxData.topology.size()*2, IndexBuffer::Type::TYPE_16BIT,
+	indexBuffer->CreateBuffer(static_cast<uint32>(boxData.topology.size()) << 1, IndexBuffer::Type::TYPE_16BIT,
 		reinterpret_cast<const uint8*>(boxData.topology.data()));
 
 	StreamData* stream = &boxDataStream;

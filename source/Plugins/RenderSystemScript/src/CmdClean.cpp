@@ -23,15 +23,14 @@ bool CmdClean::BeginExecute(CommandContext* pContext,
 		_colorMap["white"] = Color::White;
 	}
 
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	RenderScriptContext* c = static_cast<RenderScriptContext*>(pContext);
-	auto it = h.Iterate();
+	auto it = command->GetParameters().Iterate(c->_resolver);
 	String value;
 	if (it.HasNext(value)) {
 		if (value == "depth") {
 			float cleanDepthValue = 1.0f;
 			if (it.HasNext(value))
-				cleanDepthValue = Convert::ToFloat(h.Get(0));
+				cleanDepthValue = Convert::ToFloat(value);
 			c->_pass->SetCleanDepth(true, cleanDepthValue);
 		} else if (value == "color") {
 			uint16 index = 0;

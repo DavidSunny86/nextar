@@ -13,11 +13,11 @@ namespace ShaderScript {
 
 bool ShaderScript::CmdActivate::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
+
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 	String name;
 
-	auto it = h.Iterate();
 	if (it.HasNext(name)) {
 		// add it to predefined
 		if (name == "always") {
@@ -57,11 +57,10 @@ InputStreamPtr ShaderScript::SubProgramType::AddProgram(
 
 bool ShaderScript::SubProgramType::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 	auto& blendOp = c->blendState.blendOp[c->blendState.numRenderTargets++];
 	String programName;
-	auto it = h.Iterate();
 
 	String src;
 	switch (stage) {
@@ -80,14 +79,16 @@ bool ShaderScript::SubProgramType::BeginExecute(CommandContext* pContext,
 
 	if (it.HasNext(programName)) {
 		if (programName != _SS(ARG_NO_COMMON)) {
-			it = h.Iterate();
+			it = command->GetParameters().Iterate(c->templateResolver);
 			for(int i = 0; i < RenderManager::ShaderLanguage::SPP_COUNT; ++i) {
-				AddProgram("Common", i, src, c);
+				String commonProgName;
+				auto programIt = ConstMultiStringHelper::It(c->GetProgramPrefix(stage));
+				while(it.HasNext(commonProgName))
+					AddProgram(commonProgName, i, src, c);
 			}
 		}
 	}
 	while (	it.HasNext(programName) )  {
-		c->Resolve(programName);
 		for(int i = 0; i < RenderManager::ShaderLanguage::SPP_COUNT; ++i) {
 			AddProgram(programName, i, src, c);
 		}

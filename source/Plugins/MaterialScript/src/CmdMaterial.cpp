@@ -13,14 +13,18 @@ namespace MaterialScript {
 bool CmdMaterial::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
 
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	MaterialScriptContext* c = static_cast<MaterialScriptContext*>(pContext);
-	String name = h.Get(0);
-	SharedComponent::ID id = SharedComponent::ToID(name);
-	if (id.name == c->materialId.name &&
-		id.group == c->materialId.group) {
-		c->material->SetMaterialID(id);
-		return true;
+	auto it = command->GetParameters().Iterate(c->templateResolver);
+	String name;
+	if (it.HasNext(name)) {
+		SharedComponent::ID id = SharedComponent::ToID(name);
+		if (id.name == c->materialId.name &&
+			id.group == c->materialId.group) {
+			c->material->SetMaterialID(id);
+			return true;
+		}
+	} else {
+		// log we have a problem
 	}
 	return false;
 }

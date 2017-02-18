@@ -58,13 +58,11 @@ Component* Component::Instance(uint32 classId, StringID name,
 Component::ID Component::ParseID(const String& name) {
 	Component::ID ret;
 	auto factoryNamePair = StringUtils::Split(name, ':');
-	if (factoryNamePair.first.length() && factoryNamePair.second.length()) {
-		ret.factory = NamedObject::AsyncStringID(factoryNamePair.first);
-	} else {
-		factoryNamePair.second = std::move(factoryNamePair.first);
-	}
+	if (factoryNamePair.first.length()) {
+		ret.factory = StringUtils::GetStringID(factoryNamePair.first);
+	} 
 	if (factoryNamePair.second.length()) {
-		ret.name = NamedObject::AsyncStringID(factoryNamePair.second);
+		ret.name = StringUtils::GetStringID(factoryNamePair.second);
 	}
 
 	return ret;
@@ -162,18 +160,14 @@ void SharedComponent::RemoveFromGroup() {
 SharedComponent::ID SharedComponent::ToID(const String& name) {
 	SharedComponent::ID ret;
 	auto factoryNamePair = StringUtils::Split(name, ':');
-	if (factoryNamePair.second.length()) {
-		ret.factory = NamedObject::AsyncStringID(factoryNamePair.first);
-	} else {
-		factoryNamePair.second = std::move(factoryNamePair.first);
-	}
+	if (factoryNamePair.first.length()) {
+		ret.factory = StringUtils::GetStringID(factoryNamePair.first);
+	} 
 	if (factoryNamePair.second.length()) {
 		auto groupNamePair = StringUtils::Split(factoryNamePair.second, '.');
-		if (groupNamePair.second.length())
-			ret.group = NamedObject::AsyncStringID(groupNamePair.first);
-		else
-			groupNamePair.second = std::move(groupNamePair.first);
-		ret.name = NamedObject::AsyncStringID(groupNamePair.second);
+		if (groupNamePair.first.length())
+			ret.group = StringUtils::GetStringID(groupNamePair.first);
+		ret.name = StringUtils::GetStringID(groupNamePair.second);
 	}
 
 	return ret;

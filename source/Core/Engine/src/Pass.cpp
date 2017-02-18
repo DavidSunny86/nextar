@@ -64,11 +64,12 @@ uint32 Pass::MapSamplerParams(const String& name,
 }
 
 void Pass::AddParamDef(AutoParamName autoName, ParamDataType type, ParameterContext context,
-	ParamProcessorProc processor, const String& desc) {
+	ParamProcessorProc processor, uint32 size/*, const String& desc*/) {
 	auto& param = autoParams[autoName];
 	param.autoName = autoName;
 	param.context = context;
-	param.desc = desc;
+	param.size = size;
+	//param.desc = desc;
 	param.processor = processor;
 	param.type = type;
 }

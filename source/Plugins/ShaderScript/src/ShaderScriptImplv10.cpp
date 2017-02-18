@@ -18,12 +18,9 @@
 namespace ShaderScript {
 
 ShaderScriptImplv1_0::ShaderScriptImplv1_0() : _rootTranslator(&_rootTranslatorCommandHandler), _rootShaderScript(nullptr) {
-	// TODO Auto-generated constructor stub
-
 }
 
 ShaderScriptImplv1_0::~ShaderScriptImplv1_0() {
-	// TODO Auto-generated destructor stub
 }
 
 void ShaderScriptImplv1_0::UnregisterDictionary() {
@@ -79,7 +76,23 @@ void ShaderScriptImplv1_0::RegisterDictionary() {
 	_rootTranslator.RegisterHandler("cbuffer.declare", LanguageTranslator::CmdDeclare::InstancePtr());
 }
 
-void ShaderScriptImplv1_0::Configure(const nextar::Config&) {
+void ShaderScriptImplv1_0::Configure(const nextar::Config& config) {
+	const NameValueMap& nvm = config.GetSectionMap("ShaderScript");
+	auto it = nvm.find("VertexProgramPrefix");
+	if (it != nvm.end())
+		_config.programPrefix[Pass::ProgramStage::STAGE_VERTEX] = StringUtils::TokenizeToMultiString((*it).second, ",");
+	it = nvm.find("FragmentProgramPrefix");
+	if (it != nvm.end())
+		_config.programPrefix[Pass::ProgramStage::STAGE_FRAGMENT] = StringUtils::TokenizeToMultiString((*it).second, ",");
+	it = nvm.find("GeometryProgramPrefix");
+	if (it != nvm.end())
+		_config.programPrefix[Pass::ProgramStage::STAGE_GEOMETRY] = StringUtils::TokenizeToMultiString((*it).second, ",");
+	it = nvm.find("DomainProgramPrefix");
+	if (it != nvm.end())
+		_config.programPrefix[Pass::ProgramStage::STAGE_DOMAIN] = StringUtils::TokenizeToMultiString((*it).second, ",");
+	it = nvm.find("HullProgramPrefix");
+	if (it != nvm.end())
+		_config.programPrefix[Pass::ProgramStage::STAGE_HULL] = StringUtils::TokenizeToMultiString((*it).second, ",");
 }
 
 void ShaderScriptImplv1_0::Load(nextar::InputStreamPtr& input,
@@ -88,7 +101,7 @@ void ShaderScriptImplv1_0::Load(nextar::InputStreamPtr& input,
 	auto shaderPtr = static_cast<ShaderTemplate*>(request->GetStreamedObject());
 	ShaderTemplate::ID shaderId;
 	shaderPtr->GetID(shaderId);
-	ShaderScriptContext context(request, shaderId);
+	ShaderScriptContext context(request, shaderId, _config);
 	NeoCommandInterpreter::Execute("ShaderScript", input, &context);
 	request->SetCompleted(true);
 }

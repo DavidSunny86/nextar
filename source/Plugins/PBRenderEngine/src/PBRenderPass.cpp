@@ -3,7 +3,7 @@
 namespace PBRenderEngine
 {
 
-PBRenderPass::PBRenderPass() {
+PBRenderPass::PBRenderPass(const Meta* meta) : nextar::BaseRenderPass(meta) {
 }
 
 PBRenderPass::~PBRenderPass() {

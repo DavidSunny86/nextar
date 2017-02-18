@@ -31,6 +31,7 @@
 #include <atomic>
 #include <chrono>
 #include <type_traits>
+#include <functional>
 
 #undef max
 #undef min

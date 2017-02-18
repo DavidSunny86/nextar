@@ -66,12 +66,12 @@ void LanguageTranslator::TranslateMacro(ShaderScriptContext* script, const Strin
 
 bool LanguageTranslator::ConstBuffer_BeginExecute(ShaderScriptContext* c,
 	const ASTCommand* command) {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
+	auto it = command->GetParameters().Iterate(c->templateResolver);
+
 	String name;
 	String modName;
 
 	bool determineContext = true;
-	auto it = h.Iterate();
 	if (it.HasNext(name)) {
 		StringPair semantic = StringUtils::Split(name, ':');
 		if (semantic.second != StringUtils::Null) {
@@ -92,7 +92,7 @@ bool LanguageTranslator::ConstBuffer_BeginExecute(ShaderScriptContext* c,
 		String context;
 		String contextStr = _SS(TAG_CONTEXT);
 		if (command->GetParameters().Find(contextStr, context)) {
-			modName += "__";
+			modName += "_cx";
 			modName += ShaderParameter::GetContextKey(Helper::GetContextFromName(context));
 		}
 	}
@@ -109,10 +109,8 @@ void LanguageTranslator::ConstBuffer_EndExecute(ShaderScriptContext* c,
 
 bool LanguageTranslator::Declare_BeginExecute(ShaderScriptContext* c,
 	const ASTCommand* command) {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 	String name;
-
-	auto it = h.Iterate();
 
 	ParamDataType dataType;
 	String value;
@@ -159,10 +157,10 @@ bool LanguageTranslator::Declare_BeginExecute(ShaderScriptContext* c,
 		LanguageTranslator::Instance().AddParam(c, dataType, name, arrayCount);
 		if (apn == AutoParamName::AUTO_INVALID_PARAM && !c->cbIsAutoParam) {
 			ShaderTemplate::ParameterDesc desc;
-			desc.activateOption = StringUtils::GetTaggedVal("activate", it);
-			desc.description = StringUtils::GetTaggedVal("nameref", it);
+			desc.activateOption = it.GetTaggedVal("activate");
+			desc.description = it.GetTaggedVal("nameref");
 			desc.type = dataType;
-			String contextName = StringUtils::GetTaggedVal("context", it);
+			String contextName = it.GetTaggedVal("context");
 			desc.context = Helper::GetContextFromName(contextName);
 			c->shader->AddParam(name, desc);
 		}

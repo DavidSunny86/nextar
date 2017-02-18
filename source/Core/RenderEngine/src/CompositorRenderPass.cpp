@@ -11,9 +11,10 @@
 
 namespace nextar {
 
-CompositorRenderPass::CompositorRenderPass() : 
+CompositorRenderPass::CompositorRenderPass(const Meta* meta) :
 numTextureToResolve(0)
-, renderSystemTicket(-1) {
+, renderSystemTicket(-1)
+, BaseMaterialPass(meta) {
 	_rtBunchOf = nullptr;
 }
 
@@ -21,10 +22,6 @@ CompositorRenderPass::~CompositorRenderPass() {
 	if (numTextureToResolve > 1 && _rtBunchOf) {
 		NEX_FREE(_rtBunchOf, MEMCAT_GENERAL);
 	}
-}
-
-RenderPass* CompositorRenderPass::CreateInstance() {
-	return NEX_NEW(CompositorRenderPass());
 }
 
 void CompositorRenderPass::OnMaterialLoad() {

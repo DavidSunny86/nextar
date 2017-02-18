@@ -21,7 +21,7 @@ Asset::~Asset() {
 
 Asset::ID Asset::ToID(const URL& url) {
 	Asset::ID id;
-	id.name = NamedObject::AsyncStringID(url.GetComputedName());
+	id.name = StringUtils::GetStringID(url.GetComputedName());
 	return id;
 }
 

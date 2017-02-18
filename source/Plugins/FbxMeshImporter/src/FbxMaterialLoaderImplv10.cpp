@@ -52,7 +52,7 @@ bool FbxMaterialLoaderImplv1_0::ParseMap(FbxSurfaceMaterial* pFbxMat,
 					NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
 				} else
 					kPath = pRelativePath;
-				id.name = NamedObject::AsyncStringID(kName);
+				id.name = StringUtils::GetStringID(kName);
 				location = URL(relativePathOfMesh + kPath);
 				return true;
 	        }
@@ -73,7 +73,7 @@ bool FbxMaterialLoaderImplv1_0::ParseMap(FbxSurfaceMaterial* pFbxMat,
 						NEX_THROW_FatalError(EXCEPT_NOT_IMPLEMENTED);
 					} else
 						kPath = pRelativePath;
-					id.name = NamedObject::AsyncStringID(kName);
+					id.name = StringUtils::GetStringID(kName);
 					location = URL(relativePathOfMesh + kPath);
 					return true;
 	            }

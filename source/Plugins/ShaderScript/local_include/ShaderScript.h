@@ -32,6 +32,10 @@ using namespace nextar;
 
 namespace ShaderScript {
 
+struct ShaderScriptConfig {
+	StringUtils::WordList programPrefix[Pass::ProgramStage::STAGE_COUNT];
+};
+
 }
 
 

@@ -12,7 +12,6 @@
 #include <Endian.h>
 #include <MemUtils.h>
 #include <StringUtils.h>
-#include <StringInternTable.h>
 #include <Convert.h>
 #include <Randomizer.h>
 #include <NameValueMap.h>

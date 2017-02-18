@@ -22,12 +22,10 @@ void ShaderScript::CmdTextureState::EndExecute(CommandContext* pContext,
 
 bool ShaderScript::CmdUnit::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 	String samplerName;
 	String unitName;
-
-	auto it = h.Iterate();
 	if(!it.HasNext(unitName)) {
 		Error("Missing unit name!");
 		return false;
@@ -48,10 +46,10 @@ bool ShaderScript::CmdUnit::BeginExecute(CommandContext* pContext,
 	else {
 		ShaderTemplate::ParameterDesc desc;
 				
-		desc.activateOption = StringUtils::GetTaggedVal("activate", it);
-		desc.description = StringUtils::GetTaggedVal("desc", it);
+		desc.activateOption = it.GetTaggedVal("activate");
+		desc.description = it.GetTaggedVal("desc");
 		desc.type = ParamDataType::PDT_TEXTURE;
-		String contextName = StringUtils::GetTaggedVal("context", it);
+		String contextName = it.GetTaggedVal("context");
 		StringUtils::ToLower(contextName);
 		context = desc.context = Helper::GetContextFromName(contextName);
 		
@@ -66,11 +64,10 @@ bool ShaderScript::CmdUnit::BeginExecute(CommandContext* pContext,
 
 bool ShaderScript::CmdSampler::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 
 	String value;
-	auto it = h.Iterate();
 	if (it.HasNext(value)) {
 		c->samplerName = value;
 		TextureUnitParams params;
@@ -110,11 +107,10 @@ void ShaderScript::CmdSampler::EndExecute(CommandContext* pContext,
 
 bool ShaderScript::CmdAddress::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 
 	String value;
-	auto it = h.Iterate();
 	if (it.HasNext(value) && !Helper::IsDefault(value)) {
 		c->textureState.uAddress = Helper::GetTextureAddressMode(value);
 	}
@@ -129,11 +125,10 @@ bool ShaderScript::CmdAddress::BeginExecute(CommandContext* pContext,
 
 bool ShaderScript::CmdAnisotropy::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 
 	String value;
-	auto it = h.Iterate();
 	if (it.HasNext(value)) {
 		c->textureState.maxAnisotropy = (uint32)Convert::ToULong(value);
 	}
@@ -142,11 +137,10 @@ bool ShaderScript::CmdAnisotropy::BeginExecute(CommandContext* pContext,
 
 bool ShaderScript::CmdTextureLod::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 
 	String value;
-	auto it = h.Iterate();
 	if (it.HasNext(value) && !Helper::IsDefault(value)) {
 		c->textureState.minLod = Convert::ToFloat(value);
 	}
@@ -162,11 +156,10 @@ bool ShaderScript::CmdTextureLod::BeginExecute(CommandContext* pContext,
 
 bool ShaderScript::CmdCompare::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 
 	String value;
-	auto it = h.Iterate();
 	if (it.HasNext(value) && !Helper::IsDefault(value)) {
 		c->textureState.comparisonFunc = Helper::GetTextureCompareFunc(value);
 	}
@@ -176,11 +169,10 @@ bool ShaderScript::CmdCompare::BeginExecute(CommandContext* pContext,
 
 bool ShaderScript::CmdFilter::BeginExecute(CommandContext* pContext,
 		const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	ShaderScriptContext* c = static_cast<ShaderScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 
 	String value;
-	auto it = h.Iterate();
 	if (it.HasNext(value) && !Helper::IsDefault(value)) {
 		c->textureState.minFilter = Helper::GetMinFilter(value);
 	}

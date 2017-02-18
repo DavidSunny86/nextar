@@ -11,10 +11,9 @@
 namespace MaterialScript {
 
 bool CmdShader::BeginExecute(CommandContext* pContext, const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	MaterialScriptContext* c = static_cast<MaterialScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 	String value;
-	ConstMultiStringHelper::Iterator it =  h.Iterate();
 	SharedComponent::ID id = SharedComponent::NullID;
 	URL location;
 	if (it.HasNext(value))

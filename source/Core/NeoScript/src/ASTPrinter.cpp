@@ -31,8 +31,7 @@ void ASTPrinter::VisitDocumentEnd(const ASTDocument* document) {
 void ASTPrinter::VisitCommandBegin(const ASTCommand* command) {
 	Indent() << command->GetName() << " ";
 
-	StringUtils::ConstMultiString m(command->GetParameters().AsString());
-	auto it =  m.Iterate();
+	auto it = command->GetParameters().Iterate();
 	String temp;
 	while(it.HasNext(temp)) {
 		PrintString(temp);

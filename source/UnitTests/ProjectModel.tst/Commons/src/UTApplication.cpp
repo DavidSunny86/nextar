@@ -19,7 +19,7 @@ void UTApplication::SetupScene() {
 
 SceneAssetPtr UTApplication::_CreateDefaultScene() {
 	return SceneAsset::Traits::Instance(
-			NamedObject::AsyncStringID("UTScene"),
+			StringUtils::GetStringID("UTScene"),
 			StringUtils::DefaultID,
 			StringUtils::DefaultID
 			);
@@ -31,7 +31,7 @@ void UTApplication::_SetupScene(SceneAssetPtr& scene) {
 					Entity::CLASS_ID));
 
 	EntityPtr camera = entityManager->AsyncCreateCameraEntity(
-			NamedObject::AsyncStringID("Main"));
+			StringUtils::GetStringID("Main"));
 	camera->AddToScene(scene);
 }
 

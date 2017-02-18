@@ -35,7 +35,9 @@ public:
 class _NexRenderAPI DeferredRenderPass: public nextar::BaseRenderPass {
 public:
 
-	DeferredRenderPass();
+	typedef MetaType<DeferredRenderPass>::Type MetaType;
+
+	DeferredRenderPass(const Meta* meta);
 	virtual ~DeferredRenderPass();
 
 	virtual void Commit(CommitContext& context);
@@ -46,8 +48,6 @@ public:
 		gbuffer.Destroy();
 		lightMaterial.Clear();
 	}
-
-	static RenderPass* CreateInstance();
 
 	virtual void CreateResources();
 	virtual void DestroyResources();

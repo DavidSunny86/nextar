@@ -1,0 +1,11 @@
+create-buffer main {
+ target color RGBA8 true;
+ target depth D24S8 true;
+}
+
+pass Debug {
+	render-to viewport;
+	clean depth;
+	clean color 0 white;
+}
+

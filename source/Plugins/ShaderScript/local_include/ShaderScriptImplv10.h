@@ -24,6 +24,7 @@ public:
 	void UnregisterDictionary();
 
 protected:
+	ShaderScriptConfig _config;
 	RegionHandler _rootShaderScript;
 	BlockCommandHandler _rootTranslatorCommandHandler;
 	RegionHandler _rootTranslator;

@@ -6,13 +6,13 @@
 
 namespace nextar {
 
-#define MAKE_AUTO_PARAM_REGISTER(variable, autoName, type, context, description)	\
-	Pass::AddParamDef(autoName, type, context, &variable, description)
+#define MAKE_AUTO_PARAM_REGISTER(variable, autoName, type, context, size, description)	\
+	Pass::AddParamDef(autoName, type, context, &variable, size/*, description*/)
 
 #define MAKE_AUTO_PARAM_REF(Class)		Class##Apply
 
-#define MAKE_AUTO_PARAM(Class, variableName, type, context, description)	\
-	MAKE_AUTO_PARAM_REGISTER(MAKE_AUTO_PARAM_REF(Class), variableName, type, context, description)
+#define MAKE_AUTO_PARAM(Class, variableName, type, context, size, description)	\
+	MAKE_AUTO_PARAM_REGISTER(MAKE_AUTO_PARAM_REF(Class), variableName, type, context, size, description)
 
 void SkyLightApply(CommitContext& context, const ShaderParameter* d) {
 	Light* light = context.lightSystem->GetSkyLight();
@@ -126,27 +126,27 @@ void ConstantScaleFactorApply(CommitContext& context, const ShaderParameter* par
 void BaseRenderManager::RegisterAutoParams() {
 
 	MAKE_AUTO_PARAM(ModelViewProjection, AutoParamName::AUTO_MODEL_VIEW_PROJECTION, PDT_MAT4x4,
-		ParameterContext::CTX_OBJECT, "Model view projection matrix.");
+		ParameterContext::CTX_OBJECT, 64, "Model view projection matrix.");
 	MAKE_AUTO_PARAM(DiffuseColor, AutoParamName::AUTO_DIFFUSE_COLOR, PDT_VEC4,
-		ParameterContext::CTX_OBJECT, "Diffuse color.");
+		ParameterContext::CTX_OBJECT, 16, "Diffuse color.");
 	MAKE_AUTO_PARAM(ObjectTransforms, AutoParamName::AUTO_OBJECT_TRANSFORM, PDT_STRUCT,
-		ParameterContext::CTX_OBJECT, "Model view projection and model view matrix.");
+		ParameterContext::CTX_OBJECT, 128, "Model view projection and model view matrix.");
 	MAKE_AUTO_PARAM(SkyLight, AutoParamName::AUTO_SKY_LIGHT, PDT_STRUCT,
-		ParameterContext::CTX_FRAME, "Sky lighting.");
+		ParameterContext::CTX_FRAME, 28, "Sky lighting.");
 	MAKE_AUTO_PARAM(InvProjectionTransform, AutoParamName::AUTO_INV_PROJECTION, PDT_MAT4x4,
-		ParameterContext::CTX_VIEW, "Inverse projection matrix.");
+		ParameterContext::CTX_VIEW, 64, "Inverse projection matrix.");
 	MAKE_AUTO_PARAM(OmniLightProperties, AutoParamName::AUTO_OMNI_LIGHT_PROPERTIES, PDT_STRUCT,
-		ParameterContext::CTX_OBJECT, "Omni light properties.");
+		ParameterContext::CTX_OBJECT, 32, "Omni light properties.");
 	MAKE_AUTO_PARAM(AlbedoMap, AutoParamName::AUTO_ALBEDO_MAP, PDT_TEXTURE,
-		ParameterContext::CTX_PASS, "GBuffer albedo map.");
+		ParameterContext::CTX_PASS, sizeof(TextureUnit), "GBuffer albedo map.");
 		MAKE_AUTO_PARAM(SpecularAndGlossMap, AutoParamName::AUTO_SPECULAR_AND_GLOSS_MAP, PDT_TEXTURE,
-			ParameterContext::CTX_PASS, "GBuffer specular map.");
+			ParameterContext::CTX_PASS, sizeof(TextureUnit), "GBuffer specular map.");
 	MAKE_AUTO_PARAM(NormalMap, AutoParamName::AUTO_NORMAL_MAP, PDT_TEXTURE,
-		ParameterContext::CTX_PASS, "GBuffer normal map.");
+		ParameterContext::CTX_PASS, sizeof(TextureUnit), "GBuffer normal map.");
 	MAKE_AUTO_PARAM(DepthMap, AutoParamName::AUTO_DEPTH_MAP, PDT_TEXTURE,
-		ParameterContext::CTX_PASS, "GBuffer depth map.");
+		ParameterContext::CTX_PASS, sizeof(TextureUnit), "GBuffer depth map.");
 	MAKE_AUTO_PARAM(ConstantScaleFactor, AutoParamName::AUTO_CONSTANT_SCALE_FACTOR, PDT_FLOAT,
-		ParameterContext::CTX_OBJECT, "Constant scale factor.");
+		ParameterContext::CTX_OBJECT, 4, "Constant scale factor.");
 }
 
 }

@@ -148,22 +148,22 @@ void RenderContext_Base_GL::Draw(StreamData* streamData, CommitContext& ctx) {
 		if (vd.start == 0) {
 			if (streamData->instanceCount == 1)
 				glDrawElements(primtype, streamData->indices.count, indextype,
-					reinterpret_cast<const GLvoid*> ((indexsize * (GLint)streamData->indices.start) + offset));
+					reinterpret_cast<const GLvoid*> (static_cast<size_t>(indexsize * (GLint)streamData->indices.start) + offset));
 			else
 				GlDrawElementsInstanced(primtype, streamData->indices.count,
 				indextype,
-				reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start + offset),
+				reinterpret_cast<const GLvoid*> (static_cast<size_t>(indexsize * (GLint)streamData->indices.start) + offset),
 				streamData->instanceCount);
 		} else {
 			if (streamData->instanceCount == 1)
 				GlDrawElementsBaseVertex(primtype, streamData->indices.count,
 				indextype,
-				reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start + offset),
+				reinterpret_cast<const GLvoid*> (static_cast<size_t>(indexsize * (GLint)streamData->indices.start) + offset),
 				vd.start);
 			else
 				GlDrawElementsInstancedBaseVertex(primtype,
 				streamData->indices.count, indextype,
-				reinterpret_cast<const GLvoid*> (indexsize * (GLint)streamData->indices.start + offset),
+				reinterpret_cast<const GLvoid*> (static_cast<size_t>(indexsize * (GLint)streamData->indices.start) + offset),
 				streamData->instanceCount, vd.start);
 		}
 	} else {
@@ -730,7 +730,8 @@ void RenderContext_Base_GL::InitializeUniformBuffer(
 
 	NEX_ASSERT(size > 0);
 	uint16 numUnmappedParams = 0;
-	u.size = size;
+	u.blockSize = size;
+	u.size = 0;
 	u.numParams = numParams;
 	u.lastUpdateId = -1;
 	u.arrayCount = 1;
@@ -750,6 +751,7 @@ void RenderContext_Base_GL::InitializeUniformBuffer(
 		u.context = autoParam->context;
 		u.processor = autoParam->processor;
 		u.type = ParamDataType::PDT_STRUCT;
+		u.size = autoParam->size;
 		if (u.processor)
 			parseIndividualParams = false;
 	} else {
@@ -758,10 +760,10 @@ void RenderContext_Base_GL::InitializeUniformBuffer(
 		u.type = ParamDataType::PDT_UNKNOWN;
 	}
 
-	u.size = size;
 		
 	if (!parseIndividualParams)
 		return;
+	u.size = 0;
 
 	void* tempBuffer = NEX_ALLOC(sizeof(GLint) * numParams * 7 + 128,
 								 MEMCAT_GENERAL);
@@ -852,7 +854,7 @@ void RenderContext_Base_GL::InitializeUniformBuffer(
 		uform.arrayCount = uint16(arraynum[i]);
 		uform.size = GetShaderParamSize(uform.typeGl) * uform.arrayCount;
 		uform.type = GetShaderParamType(uform.typeGl);
-
+		u.size += uform.size;
 	}
 
 	if (chosen == ParameterContext::CTX_UNKNOWN)
@@ -1652,9 +1654,9 @@ ParameterContext RenderContext_Base_GL::GuessContextByName(const String& name,
 														   ParameterContext defaultContex) {
 	String lowerName = name;
 	StringUtils::ToLower(lowerName);
-	size_t p = lowerName.find("__");
-	if (p != String::npos && p + 2 < lowerName.length()) {
-		ParameterContext c = ShaderParameter::GetContextFromKey(lowerName[p + 2]);
+	size_t p = lowerName.find("_cx");
+	if (p != String::npos && p + 3 < lowerName.length()) {
+		ParameterContext c = ShaderParameter::GetContextFromKey(lowerName[p + 3]);
 		if (c >= 0 && c <= ParameterContext::CTX_COUNT)
 			return c;
 	}

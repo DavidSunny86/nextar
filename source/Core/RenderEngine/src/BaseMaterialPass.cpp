@@ -9,7 +9,8 @@
 
 namespace nextar {
 
-BaseMaterialPass::BaseMaterialPass() {
+BaseMaterialPass::BaseMaterialPass(const Meta* meta) : 
+	BaseRenderPass(meta) {
 
 }
 

@@ -36,35 +36,50 @@ FileSystem::~FileSystem() {
 
 void FileSystem::Configure(const Config& config) {
 	// load all macros
-	const NameValueMap& macros = config.GetSectionMap("FileSys.Macros");
-	for (NameValueMap::const_iterator it = macros.begin(); it != macros.end();
-			++it) {
-		URL::AddMacroEntry((*it).first, (*it).second);
-	}
+	const NameValueMap& fileSys = config.GetSectionMap("FileSys");
+	const String& macros = StringUtils::Find(fileSys, "Macros");
+
+	size_t pos = 0;
+
+	do {
+		size_t p = macros.find_first_of(';', pos);
+		StringPair macro = StringUtils::Split(macros.substr(pos, p != String::npos ?
+			p - pos : String::npos));
+		if (macro.first.length() > 0 && macro.second.length() > 0)
+			URL::AddMacroEntry(macro.first, macro.second);
+		pos = p == String::npos ? String::npos : p + 1;
+	} while (pos != String::npos);
 
 	// load all archives
 	// format:
-	// archiveName = #type:path;
-	const NameValueMap& archives = config.GetSectionMap("FileSys.Archives");
-	for (NameValueMap::const_iterator it = archives.begin();
-			it != archives.end(); ++it) {
+	// Name@type:path;
+	const String& archives = StringUtils::Find(fileSys, "Archives");
+	
+	pos = 0;
+	do {
 		uint32 type = Archive::TYPE_DIR;
-		const String& path = (*it).second;
-		if (path.length()) {
-			size_t pos = 0;
-			if (path[0] == '#') {
-				pos = path.find_first_of(':');
-				if (pos != String::npos && pos == 4) {
-					type = (path[0] << 24) | (path[1] << 16) | (path[2] << 8)
-							| 0;
-					pos = 5;
-				} else {
-					pos = 0;
-				}
-			}
-			AddArchive((*it).first, type, pos ? path.substr(pos) : path);
+		size_t end = archives.find_first_of(';', pos);
+		String archive = archives.substr(pos, end != String::npos ?
+			end - pos : String::npos);
+		String name;
+		pos = 0;
+		size_t p = archive.find_first_of('@');
+		size_t nameIdx = p;
+		if (p == String::npos) {
+			p = archive.find_first_of(':');
+			nameIdx = p;
+		} else {
+			name = archive.substr(p+1, 3);
+			type = (name[0] << 24) | (name[1] << 16) | (name[2] << 8) | 0;
+			p = archive.find_first_of(':');
 		}
-	}
+
+		if (p != String::npos) {
+			name = archive.substr(0, nameIdx);
+			AddArchive(name, type, archive.substr(p+1));
+		}
+		pos = (end == String::npos) ? String::npos : end + 1;
+	} while (pos != String::npos);
 }
 
 void FileSystem::AddFactory(uint32 type, Archive::Factory* factory) {

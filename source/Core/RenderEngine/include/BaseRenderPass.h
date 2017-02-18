@@ -17,7 +17,30 @@ namespace nextar {
 
 class _NexRenderAPI BaseRenderPass: public RenderPass {
 public:
-	BaseRenderPass();
+
+	struct Meta {
+		const char* _type;
+		RenderPass::CreateInstance _instantiator;
+
+		Meta(const char* type, RenderPass::CreateInstance instance) : 
+			_type(type),
+			_instantiator(instance) {
+		}
+	};
+
+	template <typename PassClass>
+	struct MetaType : public Meta {
+		typedef MetaType<PassClass> Type;
+		static Type _instance;
+
+		static nextar::RenderPass* CreateInstanceFunc() {
+			return NEX_NEW(PassClass(&_instance));
+		}
+
+		MetaType(const char* pName) : Meta(pName, &Type::CreateInstanceFunc) {}
+	};
+
+	BaseRenderPass(const Meta* meta);
 	virtual ~BaseRenderPass();
 
 	void SetTarget(RenderTarget* target);
@@ -36,8 +59,13 @@ public:
 	virtual void Save(RenderSystem* rsysPtr, OutputSerializer& ser);
 	virtual void Load(RenderSystem* rsysPtr, InputSerializer& ser);
 
+	inline const char* GetPassType() const {
+		return _meta->_type;
+	}
+
 protected:
 		
+	const Meta* _meta;
 	RenderTargetName toLastSubTarget;
 	ClearFlags clearFlags;
 	RenderInfo info;

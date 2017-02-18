@@ -257,6 +257,10 @@ typedef unsigned short wchar_t;
 #ifdef NEX_MSVC
 //#	pragma	warning(disable : 4250 4275 4355 4251)
 #	pragma	warning(disable : 4275 4355 4251 4661 4800)
+// Disable _crt_secure_no_warnings warnings
+#	pragma	warning(disable : 4996)
+// Disable 'decorated name far exceeded lenght
+#	pragma	warning(disable : 4503)
 #endif
 
 /** Helper macros **/

@@ -188,6 +188,7 @@ public:
 		return !_IsCted(value);
 	}
 
+	/* @remarks Returns the index of this string in the array */
 	uint32 IndexOf(ConstType& what) const {
 		Iterator it = Iterate();
 		uint32 i = 0;
@@ -200,6 +201,7 @@ public:
 		return -1;
 	}
 
+	/* @remarks Returns the iterator that represents the given string within the array */
 	Iterator IteratorOf(ConstType& what) const {
 		Iterator it = Iterate();
 		while (it) {

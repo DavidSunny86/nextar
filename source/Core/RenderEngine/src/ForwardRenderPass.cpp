@@ -15,14 +15,10 @@ namespace nextar {
 /************************************************************************/
 /* ForwardRenderPass                                                 */
 /************************************************************************/
-ForwardRenderPass::ForwardRenderPass() : BaseRenderPass()  {
+ForwardRenderPass::ForwardRenderPass(const Meta* meta) : BaseRenderPass(meta)  {
 }
 
 ForwardRenderPass::~ForwardRenderPass() {
-}
-
-RenderPass* ForwardRenderPass::CreateInstance() {
-	return NEX_NEW(ForwardRenderPass());
 }
 
 void ForwardRenderPass::PrepareMaterials() {

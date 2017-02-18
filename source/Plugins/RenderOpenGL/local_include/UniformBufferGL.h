@@ -100,6 +100,9 @@ public:
 protected:
 	char name[UniformBufferPoolGL::UB_MAX_NAME_LENGTH];
 	UBRef ref;
+	// block size may be different from the ParameterGroup::size,
+	// because of padding (even in std140).
+	uint32 blockSize;
 	//GLuint ubBindingGl;
 	//GLuint ubNameGl;
 

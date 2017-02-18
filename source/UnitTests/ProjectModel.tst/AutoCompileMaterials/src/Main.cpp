@@ -21,7 +21,7 @@ public:
 		Trace("File: " + attribute.fileName.ToString());
 		String materialName = attribute.fileName.GetComputedName();
 
-		MaterialTemplate::ID id(NamedObject::AsyncStringID(materialName));
+		MaterialTemplate::ID id(StringUtils::GetStringID(materialName));
 		URL materialSaveUrl("{EngineData}/Materials/" + materialName + ".nexmtl");
 		URL materialAssetSaveUrl("{EngineData}/Materials/Assets/" + materialName + ".asset");
 		MaterialTemplatePtr material = MaterialTemplate::Traits::Instance(id, attribute.fileName);

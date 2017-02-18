@@ -233,8 +233,8 @@ void ParameterBuffer::AsyncLoad(InputSerializer& ser, AssetStreamRequest* reques
 					TextureAssetPtr assetPtr = TextureAsset::Traits::Instance(id, url);
 					if (request)
 						request->GetMetaInfo().AddDependency(assetPtr);
-					else
-						assetPtr->AsyncRequestLoad();
+					else // we block till its loaded.
+						assetPtr->RequestLoad();
 					tu->texture = assetPtr;
 					assetRefs.push_back(assetPtr);
 				} else

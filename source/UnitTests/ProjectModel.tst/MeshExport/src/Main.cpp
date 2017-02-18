@@ -20,7 +20,7 @@ public:
 		UTApplication::_SetupScene(scene);
 		
 		URL location(FileSystem::ArchiveEngineData_Name, filePath);
-		MeshTemplate::ID id(NamedObject::AsyncStringID(location.GetComputedName()));
+		MeshTemplate::ID id(StringUtils::GetStringID(location.GetComputedName()));
 		
 		MeshTemplatePtr mesh =
 				MeshTemplate::Traits::Instance(id,

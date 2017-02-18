@@ -11,10 +11,9 @@
 namespace MaterialScript {
 
 bool CmdSetParam::BeginExecute(CommandContext* pContext, const ASTCommand* command) const {
-	ConstMultiStringHelper h(command->GetParameters().AsString());
 	MaterialScriptContext* c = static_cast<MaterialScriptContext*>(pContext);
+	auto it = command->GetParameters().Iterate(c->templateResolver);
 	String value;
-	ConstMultiStringHelper::Iterator it =  h.Iterate();
 	String name;
 	if (it.HasNext(name)) {
 		String value, valueTmp;

@@ -5,13 +5,13 @@
 //@ Oct 13 07
 //@ Dec 3 08
 
-#ifndef NEXTAR_NSTR_H
-#define NEXTAR_NSTR_H
+#ifndef NEX_STRINGUTILS_H_
+#define NEX_STRINGUTILS_H_
 
 #include <NexBase.h>
 #include <MemUtils.h>
-#include <StringInternTable.h>
 #include <MultiString.h>
+#include <NameValueMap.h>
 
 // some macros
 #define NEX_DEFAULT_UCHAR	0xFFFD
@@ -33,7 +33,6 @@ enum {
 NEX_EXTERN_SYM _NexBaseAPI const String Null;
 NEX_EXTERN_SYM _NexBaseAPI const String Default;
 NEX_EXTERN_SYM _NexBaseAPI const String Unknown;
-NEX_EXTERN_SYM _NexBaseAPI const String DefaultSymbol;
 NEX_EXTERN_SYM _NexBaseAPI const UniString UniNull;
 NEX_EXTERN_SYM _NexBaseAPI const StringID NullID;
 NEX_EXTERN_SYM _NexBaseAPI const StringID DefaultID;
@@ -141,7 +140,7 @@ inline size_t Compare(const wchar_t* s1, const wchar_t* s2, size_t n) {
 }
 
 /**
- * @brief	special copy string, returns the pointer of str1 pointing to null
+ * @brief	special copy string, returns the pointer of str1 pointing to '\0'
  *
  * @author	Abhishek Dey
  * @date	11/9/2009
@@ -365,7 +364,8 @@ inline int32 NoCaseCompare(const char* s1, const char* s2) {
  * @date	11/9/2009
  *
  * @param [in,out]	ptr	If non-null, the pointer.
- **/_NexBaseAPI void FreeStr(char* ptr);
+ **/
+_NexBaseAPI void FreeStr(char* ptr);
 _NexBaseAPI void FreeStr(wchar_t* ptr);
 
 template<typename T> inline void SafeFreeString(T*& ptr) {
@@ -427,6 +427,28 @@ inline void ToLower(StringType& str) {
 	std::transform(std::begin(str), std::end(str), std::begin(str), ::tolower);
 }
 
+/* String hash */
+_NexBaseAPI hash64 Hash(const utf8* str);
+
+/* Use the string hasher to find hash */
+inline hash64 Hash(const char* v) {
+	return Hash(reinterpret_cast<const utf8*>(v));
+}
+
+/* Use the string hasher to find hash */
+inline hash64 Hash(const String& v) {
+	return Hash(v.c_str());
+}
+
+/* String hash */
+inline StringID GetStringID(const char* name) {
+	return StringID(Hash(name));
+}
+
+inline StringID GetStringID(const String& name) {
+	return StringID(Hash(name.c_str()));
+}
+
 /**
 * @brief	Convert string to upper case.
 *
@@ -441,13 +463,26 @@ void ToUpper(StringType& str) {
 }
 
 /** Separates a string pair of the format Abc:efg into 'Abc' and 'efg', if the separator is not present
+*  the returned pair has the first element filled with the string */
+inline void Split(StringPair& ret, const String& name, char by = ':') {
+	size_t seperator = name.find_first_of(by);
+	if (seperator != String::npos) {
+		ret.first = name.substr(0, seperator);
+		ret.second = name.substr(seperator + 1);
+	} else {
+		ret.first = Null;
+		ret.second = name;
+	}
+}
+
+/** Separates a string pair of the format Abc:efg into 'Abc' and 'efg', if the separator is not present
  *  the returned pair has the first element filled with the string */
 inline StringPair Split(const String& name, char by = ':') {
 	size_t seperator = name.find_first_of(by);
 	if (seperator != String::npos)
 		return StringPair(name.substr(0, seperator), name.substr(seperator + 1));
 	else
-		return StringPair(name, Null);
+		return StringPair(Null, name);
 }
 
 inline StringVector Tokenize(const String& value, const String& seperators) {
@@ -638,7 +673,34 @@ inline int32 DecodeSizeUtf8(const utf8* buf, int32 len) {
 }
 
 
+
+inline const String& Find(const NameValueMap& nvm, const String& name, const String& defaultValue = StringUtils::Null) {
+	auto it = nvm.find(name);
+	if (it != nvm.end()) {
+		return (*it).second;
+	}
+	return defaultValue;
+}
+
+
+inline const String& Find(const HashValueMap& nvm, const nextar::hash64 name, const String& defaultValue = StringUtils::Null) {
+	auto it = nvm.find(name);
+	if (it != nvm.end()) {
+		return (*it).second;
+	}
+	return defaultValue;
+}
+
+
+inline const String& Find(const HashValueMap& nvm, const String& name, const String& defaultValue = StringUtils::Null) {
+	auto it = nvm.find(Hash(name));
+	if (it != nvm.end()) {
+		return (*it).second;
+	}
+	return defaultValue;
+}
+
 }
 }
 
-#endif //NEXTAR_NSTR_H
+#endif //NEX_STRINGUTILS_H_

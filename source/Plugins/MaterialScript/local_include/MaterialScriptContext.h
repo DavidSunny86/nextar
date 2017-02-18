@@ -18,6 +18,7 @@ public:
 	MaterialScriptContext(MaterialTemplate::StreamRequest* req, const MaterialAsset::ID& id);
 	virtual ~MaterialScriptContext();
 
+	ASTParameter::Resolver templateResolver;
 	MaterialTemplate::StreamRequest* material;
 	MaterialAsset::ID materialId;
 };
