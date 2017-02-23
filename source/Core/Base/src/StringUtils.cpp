@@ -2,6 +2,8 @@
 #include <NexBase.h>
 #include <StringUtils.h>
 
+extern uint32_t MurmurHash3_x86_32(const void * key, int len, uint32_t seed);
+
 namespace nextar {
 namespace StringUtils {
 const String Null;
@@ -19,7 +21,7 @@ _NexBaseAPI char* NewStr(const char* str) {
 	size_t s;
 	char* str2;
 	s = StringUtils::Length(str) + 2;
-	str2 = (char*) NEX_ALLOC(s, MEMCAT_STRINGPOOL);
+	str2 = (char*) NEX_ALLOC(s, MEMCAT_GENERAL);
 	std::memcpy(str2, str, s);
 	//str2[s-1] = 0;
 	return str2;
@@ -27,7 +29,7 @@ _NexBaseAPI char* NewStr(const char* str) {
 
 _NexBaseAPI char* NewStr(const char* str, size_t count) {
 	char* str2;
-	str2 = (char*) NEX_ALLOC(count + 1, MEMCAT_STRINGPOOL);
+	str2 = (char*) NEX_ALLOC(count + 1, MEMCAT_GENERAL);
 	std::memcpy(str2, str, count);
 	str2[count] = 0;
 	return str2;
@@ -38,7 +40,7 @@ _NexBaseAPI wchar_t* NewStr(const wchar_t* str) {
 	wchar_t* str2;
 
 	s = wcslen(str) + 1;
-	str2 = (wchar_t*) NEX_ALLOC(s * sizeof(wchar_t), MEMCAT_STRINGPOOL);
+	str2 = (wchar_t*) NEX_ALLOC(s * sizeof(wchar_t), MEMCAT_GENERAL);
 	std::memcpy(str2, str, s);
 	//str2[s-1] = 0;
 	return str2;
@@ -55,7 +57,7 @@ _NexBaseAPI char* NewStrConv(const wchar_t* str) {
 #else
 	s = wcstombs(str2, str, s);
 #endif
-	ret = (char*) NEX_ALLOC(s, MEMCAT_STRINGPOOL);
+	ret = (char*) NEX_ALLOC(s, MEMCAT_GENERAL);
 	std::memcpy(ret, str2, s);
 	NEX_FREE(str2, MEMCAT_GENERAL);
 	return ret;
@@ -71,7 +73,7 @@ _NexBaseAPI wchar_t* NewStrConv(const char* str) {
 #else
 	s = mbstowcs(str2, str, s);
 #endif
-	ret = (wchar_t*) NEX_ALLOC(s, MEMCAT_STRINGPOOL);
+	ret = (wchar_t*) NEX_ALLOC(s, MEMCAT_GENERAL);
 	std::memcpy(ret, str2, s);
 	NEX_FREE(str2, MEMCAT_GENERAL);
 	return ret;
@@ -254,11 +256,11 @@ bool checkcase) {
 }
 
 _NexBaseAPI void FreeStr(char* ptr) {
-	NEX_FREE(ptr, MEMCAT_STRINGPOOL);
+	NEX_FREE(ptr, MEMCAT_GENERAL);
 }
 
 _NexBaseAPI void FreeStr(wchar_t* ptr) {
-	NEX_FREE(ptr, MEMCAT_STRINGPOOL);
+	NEX_FREE(ptr, MEMCAT_GENERAL);
 }
 
 String FormatUnderscoreString(const String& str) {
@@ -305,15 +307,12 @@ _NexBaseAPI String FormatName(const String& str) {
 		return FormatCamelCaseString(str);
 }
 
-_NexBaseAPI hash64 Hash(const utf8* v) {
-	hash64 h = 1125899906842597UL; // prime
-	while (*v) {
-		h = 31 * h + *(v++);
-	}
+_NexBaseAPI hash_t Hash(const utf8* v, uint32 length, uint32 seed) {
+	hash_t h = MurmurHash3_x86_32(v, (int)length, seed);
 
 #ifdef HASH_COLLISION_CHECK
 	static NEX_THREAD_MUTEX(contentLock);
-	static std::map<std::string, hash64> mapped;
+	static std::map<std::string, hash_t> mapped;
 	std::string tStr = (const char*)v;
 	NEX_THREAD_LOCK_GUARD_MUTEX(contentLock);
 	auto it = mapped.find(tStr);

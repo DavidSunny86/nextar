@@ -66,7 +66,7 @@ struct RenderQueueDesc : public NamedObject {
 };
 
 typedef vector<RenderQueueDesc>::type RenderQueueDescList;
-class RenderQueue: public AllocScene {
+class RenderQueue: public AllocGeneral {
 public:
 
 	RenderQueueFlags flags;
@@ -109,7 +109,7 @@ public:
 };
 
 typedef vector<RenderQueue>::type RenderQueueList;
-class VisibilitySet: public AllocScene {
+class VisibilitySet: public AllocGeneral {
 
 public:
 

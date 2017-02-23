@@ -24,7 +24,7 @@ typedef std::uint8_t uint8;
 typedef std::uint16_t uint16;
 typedef std::uint32_t uint32;
 typedef std::uint64_t uint64;
-typedef std::uint64_t hash64;
+typedef std::uint32_t hash_t;
 
 typedef uint8 byte;
 typedef uint8 utf8;
@@ -150,7 +150,7 @@ namespace nextar {
 struct StringID {
 	StringID(const StringID& i) : _value(i._value) {}
 	StringID() : _value(0) {}
-	explicit StringID(hash64 v) : _value(v) {}
+	explicit StringID(hash_t v) : _value(v) {}
 
 	friend inline bool operator < (const StringID first, const StringID second) {
 		return (first._value < second._value) != 0;
@@ -166,7 +166,7 @@ struct StringID {
 		return (first._value != second._value) != 0;
 	}
 
-	hash64 _value;
+	hash_t _value;
 };
 
 }

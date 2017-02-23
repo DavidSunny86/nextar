@@ -120,7 +120,7 @@ void WriteBoundsInfo(ChunkOutputStream& outStream) {
 
 void WriteMaterialData(ChunkOutputStream& outStream) {
 	OutputSerializer& ser = outStream.BeginChunk(MCID_MATERIAL_DATA);
-	StringID name(StringUtils::GetStringID("Box")), factory(StringUtils::DefaultID), group(StringUtils::DefaultID);
+	StringID name(NEX_CSTR_ID("Box")), factory(StringUtils::DefaultID), group(StringUtils::DefaultID);
 	URL path("{EngineData}/Materials/Box.mtl");
 	ser << name << factory << group << path;
 	outStream.EndChunk();

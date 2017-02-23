@@ -178,7 +178,7 @@ set(NEX_INSTALL_PLUGIN OFF)
 macro(copy_binary_to_out binFolder)
 	add_custom_command(TARGET "${NEXTAR_TARGET}" POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_directory
-			"${ARGV0}/${NEX_PLATFORM_ID}"
+			"${ARGV0}"
 			${NEX_INSTALL}/Bin)
 endmacro(copy_binary_to_out)
 #============================================================

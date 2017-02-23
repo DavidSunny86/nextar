@@ -81,7 +81,7 @@ struct SemanticDef {
 	}
 };
 
-struct _NexEngineAPI VertexSemantic: public AllocGraphics {
+struct _NexEngineAPI VertexSemantic: public AllocGeneral {
 	/* Indicates if this is an instance/vertex data*/
 	bool instanceData;
 	/* Semantic index for elements with same semantic but diff indices
@@ -170,7 +170,7 @@ struct _NexEngineAPI VertexSemantic: public AllocGraphics {
 		uint32 numElements, uint16* outElements);
 };
 
-struct VertexDesc: public AllocGraphics {
+struct VertexDesc: public AllocGeneral {
 	/* Basic vertex semantic */
 	VertexSemantic semantic;
 	/* Offset of this element within a single vertex of a vertex buffer */
@@ -190,7 +190,7 @@ struct VertexDesc: public AllocGraphics {
  * The layout is build upon this, and the vertex buffer should also
  * bind to the output via that same index (or bind point) as specified.
  */
-struct VertexElement: public AllocGraphics {
+struct VertexElement: public AllocGeneral {
 
 	enum {
 		MAX_VERTEX_ELEMENT = (uint32) RenderConstants::MAX_VERTEX_ELEMENT,

@@ -11,7 +11,7 @@
 
 // Specialize allocator
 namespace nextar {
-
+/*
 #if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE
 template<> class AllocatorBase<MEMCAT_MATH_CORE> : public AllocatorSimdAligned {
 };
@@ -26,6 +26,7 @@ template <> class AllocatorBase<MEMCAT_MATH_CORE> : public AllocatorGeneral {
 #else
 #error Define allocator
 #endif
+*/
 
 template<typename T, const size_t NumPerBlock>
 class AllocMathPool: public AllocPooledObjectBase<

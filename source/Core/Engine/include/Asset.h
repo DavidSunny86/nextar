@@ -607,4 +607,4 @@ protected:
 
 }
 
-#endif //NEXTAR_ASSET_H
+#endif //NEXTAR_ASSET_H

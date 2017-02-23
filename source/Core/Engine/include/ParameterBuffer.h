@@ -19,7 +19,7 @@ class ParamterItearator;
 /*
  *
  */
-class _NexEngineAPI ParameterBuffer: public AllocGraphics {
+class _NexEngineAPI ParameterBuffer: public AllocGeneral {
 public:
 	typedef BasicUniquePtr<uint8, MEMCAT_CACHEALIGNED>::type BufferPtr;
 	typedef STDPoolAllocator<AssetPtr,

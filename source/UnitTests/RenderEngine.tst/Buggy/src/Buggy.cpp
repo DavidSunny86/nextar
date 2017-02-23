@@ -17,7 +17,7 @@ void Buggy::_SetupScene(SceneAssetPtr& scene) {
   DebugDisplay::Register(box, Color::Blue);
   Matrix4x4 m = Matrix4x4::IdentityMatrix;
   DebugDisplay::Register(m, 2);
-  cameraEntity = scene->FindComponent(StringUtils::GetStringID("MainCamera"));
+  cameraEntity = scene->FindComponent(NEX_CSTR_ID("MainCamera"));
 
   if (cameraEntity) {
 	Entity* e = static_cast<Entity*>(cameraEntity);
@@ -33,8 +33,8 @@ void Buggy::_SetupScene(SceneAssetPtr& scene) {
 	}
 	Behaviour* b = static_cast<Behaviour*>(Component::Instance(
 	  Component::CLASS_FPS_BEHAVIOR,
-	  StringUtils::GetStringID("FPSBehaviour")));
-	Moveable* mv = Component::Instance<Moveable>(StringUtils::GetStringID("CameraTransform"));
+	  NEX_CSTR_ID("FPSBehaviour")));
+	Moveable* mv = Component::Instance<Moveable>(NEX_CSTR_ID("CameraTransform"));
 	Quaternion rotation = QuatFromAxisAng(Vector3::XAxis, Math::PI_BY_4);
 	mv->SetTransform(Vec3ASet(10, 50, -50), rotation, 1);
 	e->AttachComponent(mv);
@@ -49,11 +49,11 @@ void Buggy::_SetupScene(SceneAssetPtr& scene) {
   // load buggy and render deferred
   URL locator = URL("{EngineData}/Meshes/Buggy.nexmesh");
   MeshAssetPtr mesh =
-	  MeshAsset::Traits::Instance(StringUtils::GetStringID("Buggy"),
+	  MeshAsset::Traits::Instance(NEX_CSTR_ID("Buggy"),
 		  locator);
   mesh->RequestLoad();
   EntityPtr meshEnt = entityFactory->AsyncCreateMeshEntity(
-	  StringUtils::GetStringID("Buggy"), mesh);
+	  NEX_CSTR_ID("Buggy"), mesh);
   meshEnt->SetTransform(Vec3ASet(0,0,0), QuatIdentity(), 0.05f);
   meshEnt->Update(this->frameTimer);
   meshEnt->AddToScene(scene);

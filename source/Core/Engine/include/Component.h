@@ -29,7 +29,7 @@ namespace nextar {
  * can be attached to the other component. Components may override this behaviour and
  * thus disallow attachment to specific components.
  */
-class _NexEngineAPI Component: public NamedObject, public AllocComponent {
+class _NexEngineAPI Component: public NamedObject, public AllocGeneral {
 	NEX_LOG_HELPER(Component)
 	;
 public:

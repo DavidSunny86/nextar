@@ -46,4 +46,4 @@ private:
 typedef RefPtr<Config> ConfigPtr;
 }
 
-#endif //NEXTAR_NEXCONF_H
+#endif //NEXTAR_NEXCONF_H

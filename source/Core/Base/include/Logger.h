@@ -87,7 +87,7 @@ public:
  *  This class can redirect output from a perticualar stream to itself.
  *  Mostly logging is done to std::ostream.
  */
-class _NexBaseAPI Logger: public LoggerBase, public AllocLogger {
+class _NexBaseAPI Logger: public LoggerBase, public AllocGeneral {
 public:
 	typedef vector<LogListener*>::type LogListenerList;
 
@@ -136,7 +136,7 @@ public:
  * @author Abhishek Dey
  * @date 10/29/2009
  **/
-class _NexBaseAPI LogManager: public Singleton<LogManager>, public AllocLogger {
+class _NexBaseAPI LogManager: public Singleton<LogManager>, public AllocGeneral {
 	typedef vector<LoggerBase*>::type LoggerBaseList;
 	LoggerBaseList loggers;
 	LoggerBase* defaultLogger;NEX_THREAD_MUTEX(accessLock);
@@ -203,4 +203,4 @@ public:
 
 }
 
-#endif //NEXTAR_NEXREPORT_H__
+#endif //NEXTAR_NEXREPORT_H__

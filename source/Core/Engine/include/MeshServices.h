@@ -18,7 +18,7 @@ namespace nextar {
  *
  */
 class MeshServices : public Singleton<MeshServices>,
-	public AllocGraphics {
+	public AllocGeneral {
 public:
 
 	StreamData* GetUnitOmniVolume();

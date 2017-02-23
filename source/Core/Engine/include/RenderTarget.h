@@ -28,7 +28,7 @@ enum class RenderTargetType
 
 // @remarks
 // Sub-classed by @RenderTexture, @MultiRenderTarget and @RenderBuffer
-class _NexEngineAPI RenderTarget: public Referenced<RenderTarget, AllocGraphics> {
+class _NexEngineAPI RenderTarget: public Referenced<RenderTarget, AllocGeneral> {
 public:
 
 	RenderTarget(RenderTargetType type);

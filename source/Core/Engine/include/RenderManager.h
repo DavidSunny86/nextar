@@ -19,7 +19,7 @@ namespace nextar {
 
 class _NexEngineAPI RenderManager: public Singleton<RenderManager>,
 		public PluginService,
-		public AllocGraphics {
+		public AllocGeneral {
 
 	NEX_DECLARE_SERVICE_INTERFACE(RenderManager);
 	NEX_LOG_HELPER(RenderManager);

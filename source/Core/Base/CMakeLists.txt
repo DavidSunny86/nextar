@@ -18,7 +18,7 @@ if(NEX_OS MATCHES "Windows")
  if((NOT ZLIB_ROOT) AND (NOT ENV{ZLIB_ROOT}))
   message("-->> Defaulting to dependencies/zlib")
   set(ZLIB_ROOT ${NEX_DEPENDENCIES}/zlib)
-  copy_binary_to_out(${ZLIB_ROOT}/bin)
+  copy_binary_to_out(${ZLIB_ROOT}/bin/${NEX_ARCHITECTURE_NAME})
  endif((NOT ZLIB_ROOT) AND (NOT ENV{ZLIB_ROOT}))
 endif(NEX_OS MATCHES "Windows")
 

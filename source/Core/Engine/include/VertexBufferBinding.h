@@ -14,7 +14,7 @@ namespace nextar {
 // what would be a good size of NUM_FIXED_BUFFER
 // @optimize Most pointers are of few bytes size. Can be taken as object.
 // Need better data structures to account for small object pointers here.
-class _NexEngineAPI VertexBufferBinding : public AllocGraphics {
+class _NexEngineAPI VertexBufferBinding : public AllocGeneral {
 public:
 	enum {
 		NUM_FIXED_BUFFER = 1,

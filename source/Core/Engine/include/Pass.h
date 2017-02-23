@@ -21,7 +21,7 @@ namespace nextar {
 
 class _NexEngineAPI Pass: public ContextObject,
 		public NamedObject,
-		public AllocGraphics {
+		public AllocGeneral {
 	
 	NEX_LOG_HELPER(Pass); 
 

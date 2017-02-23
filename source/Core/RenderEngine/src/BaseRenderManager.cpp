@@ -230,11 +230,11 @@ void BaseRenderManager::CreateRenderQueues(const NameValueMap& section) {
 	} 
 	
 	if (!queuesAdded) {
-		AddRenderQueue(StringUtils::GetStringID("Background"), 110, RenderQueueFlags::BACKGROUND);
-		AddRenderQueue(StringUtils::GetStringID("Deferred"), 111, RenderQueueFlags::DEFERRED | RenderQueueFlags::SORT_ENABLED);
-		AddRenderQueue(StringUtils::GetStringID("Forward"), 112, RenderQueueFlags::FORWARD | RenderQueueFlags::SORT_ENABLED);
-		AddRenderQueue(StringUtils::GetStringID("Transparent"), 113, RenderQueueFlags::TRANSLUCENCY | RenderQueueFlags::SORT_ENABLED);
-		AddRenderQueue(StringUtils::GetStringID("Overlay"), 114, RenderQueueFlags::OVERLAY);
+		AddRenderQueue(NEX_CSTR_ID("Background"), 110, RenderQueueFlags::BACKGROUND);
+		AddRenderQueue(NEX_CSTR_ID("Deferred"), 111, RenderQueueFlags::DEFERRED | RenderQueueFlags::SORT_ENABLED);
+		AddRenderQueue(NEX_CSTR_ID("Forward"), 112, RenderQueueFlags::FORWARD | RenderQueueFlags::SORT_ENABLED);
+		AddRenderQueue(NEX_CSTR_ID("Transparent"), 113, RenderQueueFlags::TRANSLUCENCY | RenderQueueFlags::SORT_ENABLED);
+		AddRenderQueue(NEX_CSTR_ID("Overlay"), 114, RenderQueueFlags::OVERLAY);
 	}
 }
 

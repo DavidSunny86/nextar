@@ -7,7 +7,7 @@
 
 namespace nextar {
 
-class _NexBaseAPI RenderWindow : public AllocGraphics {
+class _NexBaseAPI RenderWindow : public AllocGeneral {
 
 	NEX_LOG_HELPER (RenderWindow);
 
@@ -141,4 +141,4 @@ protected:
 
 }
 
-#endif //NEXTAR_GRAPHICS_WINDOW_H
+#endif //NEXTAR_GRAPHICS_WINDOW_H

@@ -10,14 +10,25 @@ namespace nextar {
  * @todo Need more diagonistic infos regarding pool data, like average allocations for a specific type,
  * total number of allocations per run of experience.
  */
-template<const size_t _NumChunkPerBlock, typename Allocator>
+template<const MemoryCategory MemCat = MEMCAT_GENERAL>
 class Pool {
 
 private:
 	Pool(const Pool& p);
 
+	// A block is
+	// [ Alignment Size | chunk 0 | chunk 1 | chunk n... ]
+	// Alignment Size = [ block-size, next-block ... ]
+	// block-size = n * chunk size
+	// total-block-size = block-size + block-offset
 public:
-	Pool(Pool&& p) {
+	typedef AllocatorBase<MemCat> Allocator;
+	static const size_t BlockHeaderSize = sizeof(void*) + sizeof(size_t);
+	static const size_t BlockOffset = AllocatorBase<MemCat>::Offset<BlockHeaderSize>::_value;
+
+	Pool(Pool&& p) : 
+		_ChunkSize(p._ChunkSize)
+		, _NumChunkPerBlock(p._NumChunkPerBlock) {
 	#ifdef NEX_DEBUG
 		_TotalBlockAllocations = p._TotalBlockAllocations;
 		_TotalChunksAskedFor = p._TotalChunksAskedFor;
@@ -30,20 +41,22 @@ public:
 		p._CurrentTotalChunks = 0;
 		p._MaxActiveChunks = 0;
 	#endif
-		_ChunkSize = p._ChunkSize;
-		_BlockSize = p._BlockSize;
 		freeBlock = p.freeBlock;
 		usedBlock = p.usedBlock;
 		freeChunk = p.freeChunk;
 		p._ChunkSize = 0;
-		p._BlockSize = 0;
+		p._NumChunkPerBlock = 0;
 		p.freeBlock = 0;
 		p.usedBlock = 0;
 		p.freeChunk = 0;
 	}
 	/** */
-	Pool(const size_t chunkSize, size_t numInitialBlocks = 0) :
-			freeBlock(nullptr), usedBlock(nullptr), freeChunk(nullptr) {
+	Pool(uint32 chunkSize, uint32 numChunks, uint32 numInitialBlocks = 0) :
+		_ChunkSize(chunkSize)
+		, _NumChunkPerBlock(numChunks)
+		, freeBlock(nullptr)
+		, usedBlock(nullptr)
+		, freeChunk(nullptr) {
 #ifdef NEX_DEBUG
 		_TotalBlockAllocations = 0;
 		_TotalChunksAskedFor = 0;
@@ -51,11 +64,9 @@ public:
 		_CurrentTotalChunks = 0;
 		_MaxActiveChunks = 0;
 #endif
-		_ChunkSize = chunkSize;
-		_BlockSize = chunkSize * _NumChunkPerBlock;
 		NEX_ASSERT(chunkSize >= sizeof(void*));
 		for (size_t i = 0; i < numInitialBlocks; ++i) {
-			_AddToFreeBlocks(_AllocBlock());
+			_AddToFreeBlocks(_AllocBlock(_ChunkSize*_NumChunkPerBlock));
 		}
 	}
 
@@ -63,15 +74,19 @@ public:
 		FreePool();
 	}
 
-	inline size_t GetChunkSize() const {
+	inline uint32 GetChunkSize() const {
 		return _ChunkSize;
+	}
+
+	inline uint32 GetDefaultNumChunksPerBlock() const {
+		return _NumChunkPerBlock;
 	}
 
 	inline void* Alloc() {
 		return _Alloc();
 	}
 
-	inline void* Alloc(size_t n) {
+	inline void* Alloc(uint32 n) {
 		return _Alloc(n);
 	}
 
@@ -79,7 +94,7 @@ public:
 		_Free(ptr);
 	}
 
-	inline void Free(void* ptr, size_t n) {
+	inline void Free(void* ptr, uint32 n) {
 		_Free(ptr, n);
 	}
 
@@ -95,25 +110,35 @@ public:
 
 protected:
 
-	void*& _NextBlock(void* const block) {
+	inline void*& _NextBlock(void* const block) {
 		void* _next =
-				static_cast<void*>(static_cast<uint8*>(block) + _BlockSize);
+				static_cast<void*>(static_cast<uint8*>(block) + sizeof(size_t));
 		return *static_cast<void**>(_next);
 	}
 
-	void*& _Next(void* const chunk) {
+	inline void*& _Next(void* const chunk) {
 		return *static_cast<void**>(chunk);
 	}
 
-	void*& _Last(void* const block) {
-		void* _last = static_cast<void*>(static_cast<uint8*>(block) + _BlockSize
-				- _ChunkSize);
+	inline size_t& _BlockSize(void* const block) {
+		return *static_cast<size_t*>(block);
+	}
+
+	inline void*& _First(void* const block) {
+		void* _first = static_cast<void*>(static_cast<uint8*>(block) + BlockOffset);
+		return *static_cast<void**>(_first);
+	}
+
+	inline void*& _Last(void* const block) {
+		size_t offset = _BlockSize(block) + BlockOffset
+			- _ChunkSize;
+		void* _last = static_cast<uint8*>(block) + offset;
 		return *static_cast<void**>(_last);
 	}
 
 	void* _Alloc() {
 		if (!freeChunk) {
-			_AddFreeChunks();
+			_AddFreeChunks(_NumChunkPerBlock);
 		}
 		NEX_ASSERT(freeChunk);
 		void* v = freeChunk;
@@ -127,13 +152,11 @@ protected:
 		return v;
 	}
 
-	void* _Alloc(size_t n) {
-		NEX_ASSERT(_NumChunkPerBlock >= n);
-
+	void* _Alloc(uint32 n) {
 		/** Add a new block and consider it as a series of new
 		 * chunks. */
-		_AddFreeChunks();
-		void* v = static_cast<uint8*>(freeChunk) + _ChunkSize * n;
+		_AddFreeChunks(std::max(n, _NumChunkPerBlock));
+		void* v = static_cast<uint8*>(freeChunk) + static_cast<size_t>(_ChunkSize) * n;
 		freeChunk = v;
 #ifdef NEX_DEBUG
 		_CurrentTotalChunks+=n;
@@ -148,24 +171,34 @@ protected:
 		_Next(chunk) = freeChunk;
 		NEX_ASSERT(_Next(chunk) != chunk); // cyclic
 		freeChunk = chunk;
+#ifdef NEX_DEBUG
 		_TotalChunksFreed++;
 		_CurrentTotalChunks--;
+#endif
 	}
 
-	void _Free(void* ptr, size_t n) {
-		NEX_ASSERT(_NumChunkPerBlock >= n);
-		for (size_t i = 0; i < n; ++i) {
-			_Free(ptr);
-			ptr = static_cast<uint8*>(ptr) + _ChunkSize;
+	void _Free(void* ptr, uint32 n) {
+		if (n >= _NumChunkPerBlock) {
+			// a free block is available
+			uint8* block = static_cast<uint8*>(ptr) - BlockOffset;
+			_RemoveFromUsedBlocks(block);
+			_UpdateFreeChunks(block, nullptr);
+			_AddToFreeBlocks(block);
+		} else {
+			for (uint32 i = 0; i < n; ++i) {
+				_Free(ptr);
+				ptr = static_cast<uint8*>(ptr) + _ChunkSize;
+			}
 		}
+#ifdef NEX_DEBUG
 		_TotalChunksFreed+=n;
 		_CurrentTotalChunks-=n;
+#endif
 	}
 
-	inline void _AddFreeChunks() {
-
+	inline void _AddFreeChunks(uint32 n) {
 		if (!freeBlock) {
-			void* block = _AllocBlock(nullptr);
+			void* block = _AllocBlock(n*_ChunkSize, nullptr);
 			_AddToFreeBlocks(block);
 		}
 
@@ -178,10 +211,14 @@ protected:
 		}
 	}
 
-	inline void* _AllocBlock(void* const end = nullptr) {
-		void* block = NEX_ALLOCATOR_ALLOC(_BlockSize + sizeof(void*),
+	inline void* _AllocBlock(size_t blockSize, void* const end = nullptr) {
+		void* block = NEX_ALLOCATOR_ALLOC(blockSize + BlockOffset,
 				Allocator);
+		_BlockSize(block) = blockSize;
 		_UpdateFreeChunks(block, end);
+#ifdef NEX_DEBUG
+		_TotalBlockAllocations++;
+#endif
 		return block;
 	}
 
@@ -193,11 +230,21 @@ protected:
 	inline void _AddToUsedBlocks(void * const block) {
 		_NextBlock(block) = usedBlock;
 		usedBlock = block;
-#ifdef NEX_DEBUG
-		_TotalBlockAllocations++;
-#endif
 	}
 
+	inline void _RemoveFromUsedBlocks(void * const block) {
+		void **prev = &usedBlock;
+		void *cur = usedBlock;
+		while (cur) {
+			if (cur == block) {
+				*prev = _NextBlock(block);
+				return;
+			}
+			prev = &_NextBlock(cur);
+			cur = _NextBlock(cur);
+		}
+	}
+	
 	inline void _AddToFreeChunks(void* const chunk) {
 		_Next(chunk) = freeChunk;
 		NEX_ASSERT(_Next(chunk) != chunk); // cyclic
@@ -216,11 +263,13 @@ protected:
 	}
 
 	void _UpdateFreeChunks(void * const block, void* const end) {
-		uint8* last = (static_cast<uint8*>(block) + (_BlockSize - _ChunkSize));
+		uint8* last = static_cast<uint8*>(_Last(block));
+		uint8* first = static_cast<uint8*>(_First(block));
+
 		_Next(last) = end;
 		NEX_ASSERT(_Next(last) != last); // cyclic
 		/**todo Pointer comparison, might cause portability issue! */
-		for (uint8* it = last - _ChunkSize; it >= block; last = it, it -=
+		for (uint8* it = last - _ChunkSize; it >= first; last = it, it -=
 			_ChunkSize) {
 			_Next(it) = last;
 			NEX_ASSERT(_Next(it) != it); // cyclic
@@ -284,8 +333,9 @@ protected:
 	size_t _CurrentTotalChunks;
 	size_t _MaxActiveChunks;
 #endif
-	size_t _BlockSize;
-	size_t _ChunkSize;
+	const uint32 _NumChunkPerBlock;
+	const uint32 _ChunkSize;
+
 	void* freeBlock;
 	void* usedBlock;
 	void* freeChunk;
@@ -293,13 +343,13 @@ protected:
 
 #define NEX_ENABLE_MEMORY_POOLS 1
 
-template<const size_t NumPerBlock, typename Allocator, typename Mutex>
+template<const MemoryCategory MemCat, typename Mutex>
 class MemoryPool {
-	typedef Pool<NumPerBlock, Allocator> TPool;
+	typedef Pool<MemCat> TPool;
 
 	struct PoolType: public TPool, public Mutex {
-		PoolType(size_t objectSize) :
-				TPool(objectSize, 0) {
+		PoolType(uint32 objectSize, uint32 numObj) :
+				TPool(objectSize, numObj, 0) {
 		}
 	};
 
@@ -321,9 +371,9 @@ public:
 	{
 	}
 
-	MemoryPool(size_t objectSize) :
+	MemoryPool(uint32 objectSize, uint32 numObjectInArr) :
 #if NEX_ENABLE_MEMORY_POOLS
-		pool(objectSize)
+		pool(objectSize, numObjectInArr)
 #else
 		_objectSize(objectSize)
 #endif
@@ -343,7 +393,7 @@ public:
 	void* Alloc(size_t numOfObject) {
 #if NEX_ENABLE_MEMORY_POOLS
 		NEX_THREAD_LOCK_GUARD_MUTEX_T(PoolType, pool);
-		return pool.Alloc(numOfObject);
+		return pool.Alloc((uint32)numOfObject);
 #else
 	return NEX_ALLOCATOR_ALLOC(_objectSize*numOfObject,
 				Allocator);
@@ -362,7 +412,7 @@ public:
 	void Free(void* o, size_t numOfObject) {
 #if NEX_ENABLE_MEMORY_POOLS
 		NEX_THREAD_LOCK_GUARD_MUTEX_T(PoolType, pool);
-		pool.Free(o, numOfObject);
+		pool.Free(o, (uint32)numOfObject);
 #else
 		NEX_ALLOCATOR_FREE(o, Allocator);
 #endif
@@ -375,7 +425,7 @@ public:
 #endif
 	}
 
-	inline size_t GetChunkSize() const {
+	inline uint32 GetChunkSize() const {
 #if NEX_ENABLE_MEMORY_POOLS
 		return pool.GetChunkSize();
 #else
@@ -383,21 +433,29 @@ public:
 #endif
 	}
 
+	inline uint32 GetDefaultNumChunksPerBlock() const {
+#if NEX_ENABLE_MEMORY_POOLS
+		return pool.GetDefaultNumChunksPerBlock();
+#else
+		return 0;
+#endif
+	}
+
 };
 
-template <typename T, const size_t NumPerBlock, typename Allocator, typename Mutex>
+template <typename T, const MemoryCategory MemCat, typename Mutex>
 class TypedMemoryPool {
 	// deleted
 	TypedMemoryPool(const TypedMemoryPool&);
 public:
-	typedef MemoryPool<NumPerBlock, Allocator, Mutex> MemoryPoolType;
+	typedef MemoryPool<MemCat, Mutex> MemoryPoolType;
 
 protected:
 
 	MemoryPoolType impl;
 
 public:
-	TypedMemoryPool() : impl(sizeof(T)) {}
+	TypedMemoryPool(uint32 numPerBlock) : impl(sizeof(T), numPerBlock) {}
 	TypedMemoryPool(TypedMemoryPool&& other) : impl(std::move(other.impl)) {}
 
 	T* AllocType() {
@@ -408,6 +466,14 @@ public:
 		impl.Free(t);
 	}
 
+
+	T* AllocType(uint32 n) {
+		return reinterpret_cast<T*>(impl.Alloc(n));
+	}
+
+	void FreeType(T* t, uint32 n) {
+		impl.Free(t, n);
+	}
 };
 
 }

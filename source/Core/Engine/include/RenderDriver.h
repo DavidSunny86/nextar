@@ -8,7 +8,7 @@ namespace nextar {
 /**
  * One instance per gpu
  **/
-class _NexEngineAPI RenderDriver: public Referenced<RenderDriver, AllocGraphics> {
+class _NexEngineAPI RenderDriver: public Referenced<RenderDriver, AllocGeneral> {
 public:
 
 	/* Driver info */

@@ -6,6 +6,7 @@
 #include <BackgroundStreamer.h>
 #include <BackgroundStreamerImpl.h>
 #include <NamedObject.h>
+#include <MemoryManager.h>
 
 namespace nextar {
 

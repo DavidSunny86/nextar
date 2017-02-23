@@ -20,7 +20,7 @@ namespace nextar {
 
 class CommitContext;
 
-class _NexEngineAPI DebugDisplay: public AllocGraphics,
+class _NexEngineAPI DebugDisplay: public AllocGeneral,
 	public Singleton<DebugDisplay> {
 	
 protected:

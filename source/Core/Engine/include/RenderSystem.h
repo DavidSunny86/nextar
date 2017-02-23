@@ -18,7 +18,7 @@
 namespace nextar {
 
 class _NexEngineAPI RenderSystem:
-	public Referenced<RenderSystem, AllocGraphics> {
+	public Referenced<RenderSystem, AllocGeneral> {
 public:
 	class Streamer {
 	public:

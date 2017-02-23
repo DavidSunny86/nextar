@@ -33,7 +33,7 @@ public:
 		TYPE_PASS,
 	};
 
-	class _NexEngineAPI View : public AllocGraphics {
+	class _NexEngineAPI View : public AllocGeneral {
 	public:
 		//View(ContextObject* _parent) : parentObject(_parent) {}
 		/*

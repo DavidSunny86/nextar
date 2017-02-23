@@ -26,8 +26,8 @@
 
 namespace nextar {
 // stl types
-typedef STDAllocator<char, AllocatorString> STLAllocString;
-typedef STDAllocator<char16_t, AllocatorString> STLAllocUniString;
+typedef STDAllocator<char, AllocatorGeneral> STLAllocString;
+typedef STDAllocator<char16_t, AllocatorGeneral> STLAllocUniString;
 
 typedef std::basic_string<char, std::char_traits<char>, STLAllocString> String;
 typedef std::basic_string<char16_t, std::char_traits<char16_t>,

@@ -21,7 +21,7 @@ struct FrameStats {
 
 class StreamData;
 class _NexEngineAPI RenderContext: public Referenced<RenderContext,
-		AllocGraphics> {
+		AllocGeneral> {
 public:
 	RenderContext(void);
 	virtual ~RenderContext(void);
@@ -69,4 +69,4 @@ public:
 
 }
 
-#endif //RENDERCONTEXT_H_
+#endif //RENDERCONTEXT_H_

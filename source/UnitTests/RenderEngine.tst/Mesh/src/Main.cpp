@@ -12,7 +12,7 @@ public:
 		UTApplication::_SetupScene(scene);
 
 		URL url("{EngineData}/Meshes/Box.nexmesh");
-		MeshAsset::ID id(StringUtils::GetStringID("Box"));
+		MeshAsset::ID id(NEX_CSTR_ID("Box"));
 		
 		MeshAssetPtr mesh = MeshAsset::Traits::Instance(id, url);
 		if (mesh) {
@@ -24,9 +24,9 @@ public:
 						Entity::CLASS_ID));
 
 		EntityPtr meshEnt = entityFactory->AsyncCreateMeshEntity(
-				StringUtils::GetStringID("BoxEntity"), mesh);
+				NEX_CSTR_ID("BoxEntity"), mesh);
 		EntityPtr lightEnt = entityFactory->AsyncCreateOmniLightEntity(
-				StringUtils::GetStringID("OmniLightEntity"), Color::White, 100);
+				NEX_CSTR_ID("OmniLightEntity"), Color::White, 100);
 		lightEnt->SetTransform(Vec3ASet(10,100,10), QuatIdentity(), 1);
 		meshEnt->SetTransform(Vec3ASet(0,0,0), QuatIdentity(), 20);
 		lightEnt->Update(this->frameTimer);

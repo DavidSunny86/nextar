@@ -19,10 +19,10 @@
 #define NEX_LAST_UCHAR		0x10FFFF
 
 namespace nextar {
-typedef vector<String, AllocatorString>::type StringVector;
+typedef vector<String, AllocatorGeneral>::type StringVector;
 typedef std::pair<String, String> StringPair;
 
-
+#define NEX_CSTR_ID(str) StringUtils::GetStringID(str, sizeof(str) - 1) 
 namespace StringUtils {
 // const char* operator
 //! Exported constants
@@ -428,25 +428,25 @@ inline void ToLower(StringType& str) {
 }
 
 /* String hash */
-_NexBaseAPI hash64 Hash(const utf8* str);
+_NexBaseAPI hash_t Hash(const utf8* str, uint32 length, uint32 seed = 0);
 
 /* Use the string hasher to find hash */
-inline hash64 Hash(const char* v) {
-	return Hash(reinterpret_cast<const utf8*>(v));
+inline hash_t Hash(const char* v, uint32 length, uint32 seed = 0) {
+	return Hash(reinterpret_cast<const utf8*>(v), length, seed);
 }
 
 /* Use the string hasher to find hash */
-inline hash64 Hash(const String& v) {
-	return Hash(v.c_str());
+inline hash_t Hash(const String& v, uint32 seed = 0) {
+	return Hash(v.c_str(), (uint32)v.length(), seed);
 }
 
 /* String hash */
-inline StringID GetStringID(const char* name) {
-	return StringID(Hash(name));
+inline StringID GetStringID(const char* name, uint32 length) {
+	return StringID(Hash(name, length));
 }
 
 inline StringID GetStringID(const String& name) {
-	return StringID(Hash(name.c_str()));
+	return StringID(Hash(name));
 }
 
 /**
@@ -683,7 +683,7 @@ inline const String& Find(const NameValueMap& nvm, const String& name, const Str
 }
 
 
-inline const String& Find(const HashValueMap& nvm, const nextar::hash64 name, const String& defaultValue = StringUtils::Null) {
+inline const String& Find(const HashValueMap& nvm, const nextar::hash_t name, const String& defaultValue = StringUtils::Null) {
 	auto it = nvm.find(name);
 	if (it != nvm.end()) {
 		return (*it).second;

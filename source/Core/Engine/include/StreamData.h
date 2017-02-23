@@ -28,7 +28,7 @@ enum PrimitiveType : uint8 {
 	PT_TRI_FAN
 };
 
-class VertexData: public AllocGraphics {
+class VertexData: public AllocGeneral {
 public:
 	uint32 start;
 	uint32 count;

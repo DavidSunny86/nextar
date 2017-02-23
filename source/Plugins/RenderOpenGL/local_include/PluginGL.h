@@ -12,7 +12,7 @@
 
 namespace RenderOpenGL {
 
-class PluginGL: public nextar::FactoryPlugin, public nextar::AllocGraphics {
+class PluginGL: public nextar::FactoryPlugin, public nextar::AllocGeneral {
 public:
 	NEX_DECLARE_PLUGIN(PluginGL);
 

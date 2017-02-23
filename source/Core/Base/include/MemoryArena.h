@@ -8,7 +8,7 @@ namespace nextar {
 
 // this is a non-threadsafe memory pool which can be used in a single context/
 // operation for quick allocations.
-template <typename T, const uint32 BlockSize = 32, typename Allocator = AllocatorGeneral>
+template <typename T, const uint32 BlockSize = 32, const MemoryCatagory MemCat = MEMCAT_CACHEALIGNED>
 class MemoryArena {
 
 public:
@@ -21,7 +21,7 @@ public:
   }
 
   inline void Push() {
-    poolStack.emplace_back(sizeof(T));
+    poolStack.emplace_back((uint32)sizeof(T), BlockSize);
   }
 
   inline void Pop() {
@@ -48,7 +48,7 @@ private:
     poolStack.back().Free(p);
   }
   
-  typedef MemoryPool<BlockSize, NullMutex, Allocator> MemoryPoolType;
+  typedef MemoryPool<MemCat, NullMutex> MemoryPoolType;
   typedef vector<MemoryPoolType>::type PoolStack;
 
   PoolStack poolStack;

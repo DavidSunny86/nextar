@@ -32,24 +32,12 @@ namespace nextar {
 enum MemoryCategory {
 	//! Indicates basic memory catagory.
 	MEMCAT_GENERAL,
-	//! Indicates memory for scene objects
-	MEMCAT_SCENE,
-	//! Indicates memory for graphics objects
-	MEMCAT_GRAPHICS,
-	//! Indicates memory for loggers.
-	MEMCAT_LOGGERS,
-	//! Memory for strings used in strsets.
-	MEMCAT_STRINGPOOL,
 	//! Memory catagory cache aligned
 	MEMCAT_CACHEALIGNED,
 	//! Memory catagory general SIMD
 	MEMCAT_SIMDALIGNED,
-	//! Memory catagory general MMX
-	MEMCAT_MMXALIGNED,
 	//! Memory catagory math core
 	MEMCAT_MATH_CORE,
-	//! Memory catagory for components
-	MEMCAT_COMPONENT,
 	//! Cpu loaded vertex/index/texture data
 	MEMCAT_BUFFER_DATA,
 };
@@ -60,29 +48,53 @@ enum MemoryCategory {
  */
 template<enum MemoryCategory cat>
 class AllocatorBase: public allocator::Default {
+public:
+	template <const size_t offset>
+	struct Offset {
+		enum : size_t {
+			_value = offset
+		};
+	};
 };
 
 template<> class AllocatorBase<MEMCAT_CACHEALIGNED> : public allocator::Aligned<
 		16> {
+public:
+	template <const size_t offset>
+	struct Offset {
+		enum : size_t {
+			_value = offset + (16 - (offset % 16))
+		};
+	};
+
 };
 
 template<> class AllocatorBase<MEMCAT_SIMDALIGNED> : public allocator::Aligned<
 		16> {
+public:
+	template <const size_t offset>
+	struct Offset {
+		enum : size_t {
+			_value = offset + (16 - (offset % 16))
+		};
+	};
 };
 
-template<> class AllocatorBase<MEMCAT_MMXALIGNED> : public allocator::Aligned<8> {
+template<> class AllocatorBase<MEMCAT_MATH_CORE> : public allocator::Aligned<
+	16> {
+public:
+	template <const size_t offset>
+	struct Offset {
+		enum : size_t {
+			_value = offset + (16 - (offset % 16))
+		};
+	};
 };
 
 typedef AllocatorBase<MEMCAT_GENERAL> AllocatorGeneral;
-typedef AllocatorBase<MEMCAT_SCENE> AllocatorScene;
-typedef AllocatorBase<MEMCAT_GRAPHICS> AllocatorGraphics;
-typedef AllocatorBase<MEMCAT_LOGGERS> AllocatorLogger;
-typedef AllocatorBase<MEMCAT_GENERAL> AllocatorString;
 typedef AllocatorBase<MEMCAT_CACHEALIGNED> AllocatorCacheAligned;
 typedef AllocatorBase<MEMCAT_SIMDALIGNED> AllocatorSimdAligned;
-typedef AllocatorBase<MEMCAT_MMXALIGNED> AllocatorMmxAligned;
 typedef AllocatorBase<MEMCAT_MATH_CORE> AllocatorMathCore;
-typedef AllocatorBase<MEMCAT_COMPONENT> AllocatorComponent;
 typedef AllocatorBase<MEMCAT_BUFFER_DATA> AllocatorBufferData;
 
 /**! \include Include inside namespace nextar. */
@@ -139,15 +151,9 @@ typedef AllocatorBase<MEMCAT_BUFFER_DATA> AllocatorBufferData;
 #	define NEX_SAFE_DELETE_ARRAY( pointer ) if ( pointer ) { NEX_DELETE_ARRAY(pointer); pointer = nullptr; }
 //! AllocObjectBase classes
 typedef AllocObjectBase<AllocatorGeneral> AllocGeneral;
-typedef AllocObjectBase<AllocatorScene> AllocScene;
-typedef AllocObjectBase<AllocatorGraphics> AllocGraphics;
-typedef AllocObjectBase<AllocatorLogger> AllocLogger;
-typedef AllocObjectBase<AllocatorString> AllocString;
 typedef AllocObjectBase<AllocatorSimdAligned> AllocSimdAligned;
-typedef AllocObjectBase<AllocatorMmxAligned> AllocMmxAligned;
 typedef AllocObjectBase<AllocatorMathCore> AllocMathCore;
 typedef AllocObjectBase<AllocatorCacheAligned> AllocCacheAligned;
-typedef AllocObjectBase<AllocatorComponent> AllocComponent;
 typedef AllocObjectBase<AllocatorBufferData> AllocBufferData;
 
 template<typename T, enum MemoryCategory category = MEMCAT_GENERAL>

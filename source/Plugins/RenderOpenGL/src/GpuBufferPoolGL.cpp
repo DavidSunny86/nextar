@@ -13,7 +13,8 @@ namespace RenderOpenGL {
 
 GpuBufferRef GpuBufferRef::Null = { 0 };
 
-GpuBufferPoolGL::GpuBufferPoolGL() : _blockSize(0), _gpuObjects(nullptr) {
+GpuBufferPoolGL::GpuBufferPoolGL() : _allocatorSyncedNodes(64), _allocatorFreeNode(NUM_FREEDNODE_PER_BLOCK), 
+_blockSize(0), _gpuObjects(nullptr) {
 }
 
 GpuBufferPoolGL::~GpuBufferPoolGL() {

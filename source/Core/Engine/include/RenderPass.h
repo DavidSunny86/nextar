@@ -15,7 +15,7 @@ namespace nextar {
 
 class _NexEngineAPI RenderPass: 
 	public NamedObject,
-	public AllocGraphics {
+	public AllocGeneral {
 public:
 	enum Flags {
 		PASS_ENABLED = 1 << 0,

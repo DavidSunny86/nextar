@@ -25,7 +25,7 @@ namespace nextar {
 	 * 2. The buffer is bound to the context for rendering. <br/>
 	 **/
 	class _NexEngineAPI BufferManager: public Singleton<BufferManager>,
-public AllocGraphics {
+public AllocGeneral {
 
 	public:
 		BufferManager(size_t memoryBudget, uint32 releaseFrameThreshold);

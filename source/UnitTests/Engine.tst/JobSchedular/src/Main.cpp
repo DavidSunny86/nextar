@@ -110,6 +110,5 @@ int NextarMain(int argc, char* argv[]) {
 	task.Wait();
 	application.DestroyContext();
 
-	std::cin.get();
 	return 0;
 }

@@ -72,8 +72,8 @@ public:
 		PERCENT_SIZE_LIMIT = 125,
 	};
 
-	typedef TypedMemoryPool<GpuFreeBufferNode, NUM_FREEDNODE_PER_BLOCK, AllocatorGeneral, NullMutex> FreeNodeAllocator;
-	typedef TypedMemoryPool<GpuSyncedBuffer, 64, AllocatorGeneral, NullMutex> SyncedBufferAllocator;
+	typedef TypedMemoryPool<GpuFreeBufferNode, MEMCAT_GENERAL, NullMutex> FreeNodeAllocator;
+	typedef TypedMemoryPool<GpuSyncedBuffer, MEMCAT_GENERAL, NullMutex> SyncedBufferAllocator;
 
 	inline void SetBlockSize(uint32 size) {
 		_blockSize = size;
