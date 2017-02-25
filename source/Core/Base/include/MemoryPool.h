@@ -21,11 +21,18 @@ private:
 	// Alignment Size = [ block-size, next-block ... ]
 	// block-size = n * chunk size
 	// total-block-size = block-size + block-offset
+	// Chunks store pointer-diff to next chunk
+	// If the ptr-diff value is less than chunk-size, then it indicates two things:
+	//  if value == chunk-size - 1
+	//    next chunk holds the count of continuous block from this chunk
+	// else if value == chunk-size - 2
+	//    next chunk holds ptr-diff to another discontinuous chunk
+	// else
+	//    error
 public:
 	typedef AllocatorBase<MemCat> Allocator;
 	static const size_t BlockHeaderSize = sizeof(void*) + sizeof(size_t);
 	static const size_t BlockOffset = AllocatorBase<MemCat>::Offset<BlockHeaderSize>::_value;
-
 	Pool(Pool&& p) : 
 		_ChunkSize(p._ChunkSize)
 		, _NumChunkPerBlock(p._NumChunkPerBlock) {
@@ -100,12 +107,15 @@ public:
 
 	void FreePool() {
 #ifdef NEX_DEBUG
-		_PrintDebug();
+		if (freeBlock || usedBlock || freeChunk)
+			_PrintDebug();
 #endif
 		_FreeBlocks(freeBlock);
 		_FreeBlocks(usedBlock);
 		freeBlock = nullptr;
 		usedBlock = nullptr;
+		freeChunk = nullptr;
+
 	}
 
 protected:
@@ -116,24 +126,65 @@ protected:
 		return *static_cast<void**>(_next);
 	}
 
-	inline void*& _Next(void* const chunk) {
-		return *static_cast<void**>(chunk);
-	}
-
 	inline size_t& _BlockSize(void* const block) {
 		return *static_cast<size_t*>(block);
 	}
 
+	inline void* _FirstPtr(void* const block) {
+		return static_cast<void*>(static_cast<uint8*>(block) + BlockOffset);
+	}
+
 	inline void*& _First(void* const block) {
-		void* _first = static_cast<void*>(static_cast<uint8*>(block) + BlockOffset);
-		return *static_cast<void**>(_first);
+		void* first = _FirstPtr(block);
+		return *static_cast<void**>(first);
+	}
+
+	inline void* _LastPtr(void* const block) {
+		size_t offset = _BlockSize(block) + BlockOffset
+			- _ChunkSize;
+		return static_cast<uint8*>(block) + offset;
 	}
 
 	inline void*& _Last(void* const block) {
-		size_t offset = _BlockSize(block) + BlockOffset
-			- _ChunkSize;
-		void* _last = static_cast<uint8*>(block) + offset;
-		return *static_cast<void**>(_last);
+		void* last = _LastPtr(block);
+		return *static_cast<void**>(last);
+	}
+
+	inline bool _IsSentinelCh(void* const chunk) {
+		if (*static_cast<ptrdiff_t*>((chunk)) == _CunkSize - 1)
+			return true;
+		else {
+			NEX_ASSERT(*static_cast<ptrdiff_t*>((chunk)) >= _ChunkSize);
+			return false;
+		}
+	}
+
+	inline ptrdiff_t _CountCh(void* const chunk) {
+		return (*static_cast<ptrdiff_t*>(static_cast<uint8*>(chunk) + _ChunkSize));
+	}
+
+	inline void _Count(void* const chunk, size_t n) {
+		NEX_ASSERT(n >= 3);
+		*static_cast<ptrdiff_t*>((chunk)) = ContinuousChunkIndicator;
+		*static_cast<size_t*>(static_cast<uint8*>(chunk) + _ChunkSize) = n;
+	}
+
+
+	inline void*& _Next(void* const chunk) {
+		return *static_cast<void**>(chunk);
+	}
+
+	inline void _UpdateNext(void** store, void* const chunk) {
+		if ((*static_cast<ptrdiff_t*>(chunk)) == ContinuousChunkIndicator) {
+			uint8* next = static_cast<uint8*>(chunk) + _ChunkSize);
+			size_t c = (*static_cast<size_t*>(next) - 1;
+			if (c > 2) {
+				_Count(next, c);
+			}
+			*store = next;
+		}
+		else
+			*store = _Next(chunk);
 	}
 
 	void* _Alloc() {
@@ -142,7 +193,7 @@ protected:
 		}
 		NEX_ASSERT(freeChunk);
 		void* v = freeChunk;
-		freeChunk = _Next(freeChunk);
+		_UpdateNext(&freeChunk, freeChunk);
 #ifdef NEX_DEBUG
 		_CurrentTotalChunks++;
 		_TotalChunksAskedFor++;
@@ -152,12 +203,27 @@ protected:
 		return v;
 	}
 
+	bool _Consequetive(int32 n) {
+		void* fc = freeChunk;
+		while (n-- && fc) {
+			void* next = static_cast<uint8*>(fc) + _ChunkSize;
+			if (*((void**)fc) != next)
+				return false;
+			fc = next;
+		}
+		if (n == -1)
+			return true;
+		return false;
+	}
+
 	void* _Alloc(uint32 n) {
+
 		/** Add a new block and consider it as a series of new
 		 * chunks. */
-		_AddFreeChunks(std::max(n, _NumChunkPerBlock));
-		void* v = static_cast<uint8*>(freeChunk) + static_cast<size_t>(_ChunkSize) * n;
-		freeChunk = v;
+		if (!freeChunk || !_Consequetive(n) )
+			_AddFreeChunks(std::max(n, _NumChunkPerBlock));
+		void* v = static_cast<uint8*>(freeChunk);
+		freeChunk = static_cast<uint8*>(v) + static_cast<size_t>(_ChunkSize) * n;
 #ifdef NEX_DEBUG
 		_CurrentTotalChunks+=n;
 		_TotalChunksAskedFor+=n;
@@ -182,8 +248,10 @@ protected:
 			// a free block is available
 			uint8* block = static_cast<uint8*>(ptr) - BlockOffset;
 			_RemoveFromUsedBlocks(block);
-			_UpdateFreeChunks(block, nullptr);
+			_UpdateFreeChunks(block, n, nullptr);
 			_AddToFreeBlocks(block);
+			//or 
+			// NEX_ALLOCATOR_FREE(block, Allocator);
 		} else {
 			for (uint32 i = 0; i < n; ++i) {
 				_Free(ptr);
@@ -207,7 +275,7 @@ protected:
 			freeBlock = _NextBlock(freeBlock);
 			_AddToUsedBlocks(block);
 			_Last(block) = freeChunk;
-			freeChunk = block;
+			freeChunk = _FirstPtr(block);
 		}
 	}
 
@@ -262,18 +330,19 @@ protected:
 		}
 	}
 
-	void _UpdateFreeChunks(void * const block, void* const end) {
-		uint8* last = static_cast<uint8*>(_Last(block));
-		uint8* first = static_cast<uint8*>(_First(block));
-
+	void _UpdateFreeChunks(void * const block, size_t n, void* const end) {
+		uint8* last = static_cast<uint8*>(_LastPtr(block));
+		uint8* first = static_cast<uint8*>(_FirstPtr(block));
+		if (last != first)
+			_Count(first, n);
 		_Next(last) = end;
 		NEX_ASSERT(_Next(last) != last); // cyclic
 		/**todo Pointer comparison, might cause portability issue! */
-		for (uint8* it = last - _ChunkSize; it >= first; last = it, it -=
+		/*for (uint8* it = last - _ChunkSize; it >= first; last = it, it -=
 			_ChunkSize) {
 			_Next(it) = last;
 			NEX_ASSERT(_Next(it) != it); // cyclic
-		}
+		}*/
 	}
 
 #ifdef NEX_DEBUG

@@ -59,9 +59,20 @@ void MemoryManager::ReleaseEverything() {
 	std::swap(memPools, empty);
 }
 
-StaticMemoryPoolBase* MemoryManager::AcquirePoolInstance(const MemoryCategory memCat, 
+StaticMemoryPoolBase* MemoryManager::AcquirePoolInstance(MemoryCategory memCat, 
 	uint32 objectSize, uint32 numPerBlock) {
-	
+	switch (memCat) {
+	case MEMCAT_GENERAL:
+	case MEMCAT_SIMDALIGNED:
+	case MEMCAT_MATH_CORE:
+	case MEMCAT_BUFFER_DATA:
+	case MEMCAT_CACHEALIGNED:
+		break;
+	default:
+		memCat = MEMCAT_CACHEALIGNED;
+		break;
+	}
+
 	uint64 id = GetPoolID(objectSize, numPerBlock, memCat);
 	auto it = memPools.find(id);
 	if (it != memPools.end()) {
@@ -72,15 +83,19 @@ StaticMemoryPoolBase* MemoryManager::AcquirePoolInstance(const MemoryCategory me
 	switch (memCat)	{
 	case MEMCAT_GENERAL:
 		ret = NEX_NEW(StaticMemoryPoolImpl<MEMCAT_GENERAL>(objectSize, numPerBlock));
+		break;
 	case MEMCAT_SIMDALIGNED:
 		ret = NEX_NEW(StaticMemoryPoolImpl<MEMCAT_SIMDALIGNED>(objectSize, numPerBlock));
+		break;
 	case MEMCAT_MATH_CORE:
-		ret = NEX_NEW(StaticMemoryPoolImpl<MEMCAT_SIMDALIGNED>(objectSize, numPerBlock));
+		ret = NEX_NEW(StaticMemoryPoolImpl<MEMCAT_MATH_CORE>(objectSize, numPerBlock));
+		break;
 	case MEMCAT_BUFFER_DATA:
-		ret = NEX_NEW(StaticMemoryPoolImpl<MEMCAT_SIMDALIGNED>(objectSize, numPerBlock));
+		ret = NEX_NEW(StaticMemoryPoolImpl<MEMCAT_BUFFER_DATA>(objectSize, numPerBlock));
+		break;
 	case MEMCAT_CACHEALIGNED:
 	default:
-		ret = NEX_NEW(StaticMemoryPoolImpl<MEMCAT_SIMDALIGNED>(objectSize, numPerBlock));
+		ret = NEX_NEW(StaticMemoryPoolImpl<MEMCAT_CACHEALIGNED>(objectSize, numPerBlock));
 		break;
 	}
 

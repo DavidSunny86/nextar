@@ -221,7 +221,6 @@ typedef unsigned short wchar_t;
 #if	_MSC_VER >= 1400
 #	include <intrin.h>
 #endif
-#	define inline __inline
 #	if !defined( NEX_DEBUG ) && defined( NEX_USE_INTRINSICS )
 #		if defined( NEX_ARCH_X86 )
 #			pragma intrinsic (memset, memcpy, memcmp)

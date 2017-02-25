@@ -91,7 +91,7 @@ public:
 
 	void ReleaseEverything();
 
-	StaticMemoryPoolBase* AcquirePoolInstance(const MemoryCategory memCat, uint32 objectSize, uint32 numPerBlock);
+	StaticMemoryPoolBase* AcquirePoolInstance(MemoryCategory memCat, uint32 objectSize, uint32 numPerBlock);
 	void ReleasePoolInstance(StaticMemoryPoolBase* memPool);
 
 protected:
