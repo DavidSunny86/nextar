@@ -11,6 +11,7 @@ NEX_MATH_RANDOM_SEED
 
 namespace nextar {
 
+uint32 RandomizerSeed::seed = 2147483647;
 template class PooledAllocator< _Matrix3x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE >;
 template class PooledAllocator< _Matrix4x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE >;
 template class PooledAllocator<Vector3A, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;

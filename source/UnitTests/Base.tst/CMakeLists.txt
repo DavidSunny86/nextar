@@ -12,3 +12,5 @@ add_unit_test(MultiStringTest)
 
 # Added test ApplicationContext: Wed Sep 28 01:43:19 IST 2016
 add_unit_test(ApplicationContext)
+# Added test ApplicationContext: Wed Feb 25 16:37:00 IST 2016
+add_unit_test(MemoryPool)
