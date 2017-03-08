@@ -23,7 +23,6 @@ class GpuBuffer;
 class VertexBuffer;
 class IndexBuffer;
 class Viewport;
-class ShaderAsset;
 class TextureBase;
 class RenderTarget;
 class RenderTexture;
@@ -34,6 +33,7 @@ class DebugDisplay;
 class Pass;
 class ContextObject;
 class VertexLayout;
+class RenderState;
 
 class Component;
 class SharedComponent;
@@ -64,6 +64,7 @@ class AssetSaverImpl;
 
 class TextureAsset;
 class ShaderAsset;
+class EffectAsset;
 class MaterialAsset;
 class MeshAsset;
 
@@ -83,6 +84,7 @@ typedef RefPtr<MultiRenderTarget> MultiRenderTargetPtr;
 typedef RefPtr<RenderBuffer> RenderBufferPtr;
 typedef RefPtr<VertexLayout> VertexLayoutPtr;
 typedef RefPtr<RenderSystem> RenderSystemPtr;
+typedef RefPtr<RenderState> RenderStatePtr;
 
 typedef RefPtr<SharedComponent> SharedComponentPtr;
 typedef RefPtr<Asset> AssetPtr;
@@ -90,6 +92,7 @@ typedef RefPtr<TextureAsset> TextureAssetPtr;
 typedef RefPtr<ShaderAsset> ShaderAssetPtr;
 typedef RefPtr<MaterialAsset> MaterialAssetPtr;
 typedef RefPtr<MeshAsset> MeshAssetPtr;
+typedef RefPtr<EffectAsset> EffectAssetPtr;
 
 typedef RefPtr<Entity> EntityPtr;
 typedef RefPtr<SceneAsset> SceneAssetPtr;

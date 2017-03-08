@@ -29,21 +29,20 @@ VertexComponentBaseType VertexSemantic::GetComponentBaseType(
 
 void VertexSemantic::BuildSemanticMap() {
 	/* Custom pre-declared names */
-	AddSemantic("vertPos", SemanticDef(COMP_POSITION, 0));
-	AddSemantic("vert2DPos", SemanticDef(COMP_2D_POSITION, 0));
-	AddSemantic("vertNorm", SemanticDef(COMP_NORMAL, 0));
-	AddSemantic("vertBiNorm", SemanticDef(COMP_BINORMAL, 0));
-	AddSemantic("vertTangent", SemanticDef(COMP_TANGENT, 0));
-	AddSemantic("vertColor", SemanticDef(COMP_COLOR, 0));
-	AddSemantic("vertSecColor", SemanticDef(COMP_COLOR, 1));
-	AddSemantic("texCoord0", SemanticDef(COMP_TEXTURE_COORDINATE, 0));
-	AddSemantic("texCoord1", SemanticDef(COMP_TEXTURE_COORDINATE, 1));
-	AddSemantic("texCoord2", SemanticDef(COMP_TEXTURE_COORDINATE, 2));
-	AddSemantic("texCoord3", SemanticDef(COMP_TEXTURE_COORDINATE, 3));
-	AddSemantic("texCoord4", SemanticDef(COMP_TEXTURE_COORDINATE, 4));
-	AddSemantic("texCoord5", SemanticDef(COMP_TEXTURE_COORDINATE, 5));
-	AddSemantic("texCoord6", SemanticDef(COMP_TEXTURE_COORDINATE, 6));
-	AddSemantic("texCoord7", SemanticDef(COMP_TEXTURE_COORDINATE, 7));
+	AddSemantic("_vPos", SemanticDef(COMP_POSITION, 0));
+	AddSemantic("_v2DPos", SemanticDef(COMP_2D_POSITION, 0));
+	AddSemantic("_vNormal", SemanticDef(COMP_NORMAL, 0));
+	AddSemantic("_vBinormal", SemanticDef(COMP_BINORMAL, 0));
+	AddSemantic("_vTangent", SemanticDef(COMP_TANGENT, 0));
+	AddSemantic("_vColor", SemanticDef(COMP_COLOR, 0));
+	AddSemantic("_vTexCoord0", SemanticDef(COMP_TEXTURE_COORDINATE, 0));
+	AddSemantic("_vTexCoord1", SemanticDef(COMP_TEXTURE_COORDINATE, 1));
+	AddSemantic("_vTexCoord2", SemanticDef(COMP_TEXTURE_COORDINATE, 2));
+	AddSemantic("_vTexCoord3", SemanticDef(COMP_TEXTURE_COORDINATE, 3));
+	AddSemantic("_vTexCoord4", SemanticDef(COMP_TEXTURE_COORDINATE, 4));
+	AddSemantic("_vTexCoord5", SemanticDef(COMP_TEXTURE_COORDINATE, 5));
+	AddSemantic("_vTexCoord6", SemanticDef(COMP_TEXTURE_COORDINATE, 6));
+	AddSemantic("_vTexCoord7", SemanticDef(COMP_TEXTURE_COORDINATE, 7));
 }
 
 void VertexSemantic::ClearSemanticMap() {

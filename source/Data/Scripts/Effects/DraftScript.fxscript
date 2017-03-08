@@ -1,0 +1,50 @@
+
+{{predefs:vertex-program:all}}
+
+{{predefs:fragment-program:all}}
+
+
+
+[[main]]
+
+import CommonResource;
+
+shader DrawQuad {
+
+	tags compositor;
+	pass Main {
+
+      // import a cscript
+		import-cbuffer Quad;
+
+      // inline cbuffer definition
+		cbuffer cbDebugModelView {
+			declare mat4x4 uModelViewProj:MODELVIEWPROJECTION;
+			declare vec4 uObjectColor:DIFFUSECOLOR;
+			declare float uObjectScale:CONSTANTSCALEFACTOR;
+		}
+
+      // cbuffer which declares properties to UI
+      cbuffer cbMaterialProperty (context = material) {
+	      declare vec4 uDiffuseColor (nameref = "ObjectProperties.DiffuseColor");
+	      declare float uSpecularIntensity (nameref = "ObjectProperties.SpecularIntensity");
+	      declare float uGloss (nameref = "ObjectProperties.Gloss");
+      };
+
+		texture-state {
+			sampler s0 nearest-repeat;
+			unit sDiffuseMap s0 "Maps.TextureMap" context:object;
+		}
+
+		depth-stencil-state disable;
+		blend-state disable;
+		raster-state default;
+
+		program {
+			option "Maps.TextureMap" HAS_DIFFUSE_MAP HAS_TEXCOORD0_CHANNEL;
+			define HAS_2DVERT_CHANNEL;
+			vertex-program Quad;
+			fragment-program CopyMap;
+		}
+	}
+}

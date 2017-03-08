@@ -5,14 +5,6 @@
 
 namespace RenderOpenGL {
 
-GLenum PassViewGL::stagesMap[Pass::STAGE_COUNT] = {
-	GL_VERTEX_SHADER,
-	GL_TESS_CONTROL_SHADER,
-	GL_TESS_EVALUATION_SHADER,
-	GL_GEOMETRY_SHADER,
-	GL_FRAGMENT_SHADER,
-};
-
 PassViewGL::PassViewGL() : iGlProgram(0), inputLayoutId(-1) {
 }
 
@@ -27,12 +19,20 @@ PassViewGL::~PassViewGL() {
 void PassViewGL::Compile(nextar::RenderContext* rc,
 		const Pass::CompileParams& params) {
 	RenderContext_Base_GL* ctx = static_cast<RenderContext_Base_GL*>(rc);
-	GLuint programStages[Pass::STAGE_COUNT] = { 0 };
-	for (nextar::uint32 i = 0; i < Pass::STAGE_COUNT; ++i) {
+	GLuint programStages[Pass::ProgramStage::STAGE_COUNT] = { 0 };
+	String flowIndicator;
+	Pass::ProgramStage::Type lastActive = Pass::ProgramStage::STAGE_COUNT;
+	for (nextar::uint32 i = 0; i < Pass::ProgramStage::STAGE_COUNT; ++i) {
 		if (params.programSources[i].length() > 1) {
+			if (lastActive < Pass::ProgramStage::STAGE_COUNT) {
+				flowIndicator = Pass::ProgramStage::GetName(lastActive);
+				flowIndicator += "To";
+				flowIndicator += Pass::ProgramStage::GetName(static_cast<Pass::ProgramStage::Type>(i));
+			}
 			GpuProgramGL& shader = programs[i];
-			if (!shader.Compile(stagesMap[i], rc,
+			if (!shader.Compile((Pass::ProgramStage::Type)i, rc,
 					params.programSources[i].c_str(),
+					flowIndicator,
 					params.compileOptions ?
 							*params.compileOptions : StringUtils::Null)) {
 				Error(
@@ -40,6 +40,7 @@ void PassViewGL::Compile(nextar::RenderContext* rc,
 				return;
 			}
 			programStages[i] = shader.GetShaderObject();
+			lastActive = static_cast<Pass::ProgramStage::Type>(i);
 		}
 	}
 
@@ -190,7 +191,7 @@ void PassViewGL::SetTexture(RenderContext* rc, const SamplerParameter& desc,
 }
 
 void PassViewGL::Destroy(RenderContext* _ctx) {
-	for (nextar::uint32 i = 0; i < Pass::STAGE_COUNT; ++i) {
+	for (nextar::uint32 i = 0; i < Pass::ProgramStage::STAGE_COUNT; ++i) {
 		programs[i].Destroy(_ctx);
 	}
 

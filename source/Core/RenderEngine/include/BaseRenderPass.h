@@ -63,9 +63,17 @@ public:
 		return _meta->_type;
 	}
 
+	virtual const StringUtils::WordList& GetShaderOptions() {
+		return shaderOptions;
+	}
+
 protected:
 		
 	const Meta* _meta;
+
+	RenderStatePtr renderState;
+	StringUtils::WordList shaderOptions;
+
 	RenderTargetName toLastSubTarget;
 	ClearFlags clearFlags;
 	RenderInfo info;

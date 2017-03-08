@@ -33,11 +33,31 @@ public:
 		return modification != lastSavedModification;
 	}
 
+	inline void SetName(const String& name) {
+		this->name = name;
+	}
+
+	inline const String& GetName() const {
+		return name;
+	}
+
+	inline void SetDescription(const String& desc) {
+		this->description = desc;
+	}
+
+	inline const String& GetDescription() const {
+		return description;
+	}
+
 	URL GetProxyAssetLocator() const;
 	virtual String GetPoxyAssetExtension() const = 0;
 
 protected:
 	// std::chrono::time_point lastSaveTime;
+
+	String name;
+	String description;
+
 	uint32 lastSavedModification;
 	uint32 modification;
 };

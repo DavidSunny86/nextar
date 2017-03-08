@@ -30,10 +30,11 @@ typedef void(*ParamProcessorProc) (CommitContext& context, const ShaderParameter
 class _NexEngineAPI ShaderParameter: public AllocGeneral {
 public:
 	ParamProcessorProc processor;
-	ParamDataType type;
-	uint16 arrayCount;
-	AutoParamName autoName;
+	uint32 arrayCount;
 	uint32 size;
+	ParamDataType type;
+	ParameterContext context;
+	AutoParamName autoName;
 
 	static ParamDataType MapParamType(const String& typeName);
 	static ParamDataBaseType GetBaseType(ParamDataType type);
@@ -58,8 +59,10 @@ public:
 				+ index * ConstantParameter::stride);
 	}
 
-	static uint32 stride;
+	// This is the buffer offset in GPU buffer
+	// it is supposed to be the offset in uniform buffer
 	uint32 bufferOffset;
+	static uint32 stride;
 };
 
 class _NexEngineAPI SamplerParameter: public ShaderParameter {
@@ -74,7 +77,6 @@ public:
 				+ index * SamplerParameter::stride);
 	}
 
-	ParameterContext context;
 	static uint32 stride;
 };
 
@@ -97,9 +99,8 @@ public:
 	virtual void WriteRawData(RenderContext* rc, const void* data,
 			size_t offset, size_t size) = 0;
 
-	uint32 lastUpdateId;
-	ParameterContext context;
 	ConstantParameter* parameter;
+	uint32 lastUpdateId;
 	uint32 numParams;
 
 protected:
@@ -108,10 +109,11 @@ protected:
 };
 
 struct ParameterGroupData {
-	// @note this might result in loosing cache alignment,
-	// we can test it out, but i guess that would be premature without profiling
-	uint32 data;
 	ParameterGroup* group;
+	// Internally this might refer to the actual index, where
+	// this buffer is bound for the current pass, because
+	// a single buffer might be shared by multiple passes.
+	ptrdiff_t _reserved;
 
 	inline ParameterGroup* operator ->() {
 		return group;
@@ -124,6 +126,8 @@ struct ParameterGroupData {
 typedef vector<ParameterGroupData>::type ParameterGroupList;
 
 struct ParameterGroupItem {
+	// Given a paramter buffer, this will give us the offset
+	// at which point the series of data belongs to this set of groups
 	uint32 offsetInParamBuffer;
 	ParameterGroupList::iterator beginIt;
 	ParameterGroupList::iterator endIt;
@@ -132,30 +136,67 @@ struct ParameterGroupItem {
 
 };
 
+struct SamplerDesc {
+	// comma/space seperated units bound to this sampler
+	String unitsBound;
+	TextureUnitParams texUnitParams;
+};
+
+typedef vector<SamplerDesc>::type TextureDescMap;
 typedef array<ParameterGroupItem, (size_t) ParameterContext::CTX_COUNT>::type ParameterGroupEntries;
 
-struct AutoParam: public AllocGeneral {
+struct _NexEngineAPI AutoParam: public AllocGeneral {
 	ParamDataType type;
 	AutoParamName autoName;
 	ParameterContext context;
 	ParamProcessorProc processor;
 	uint32 size;
 
+
+	static ParamProcessorProc customConstantProcessor;
+	static ParamProcessorProc customTextureProcessor;
+	static ParamProcessorProc customStructProcessor;
+
+	typedef array<AutoParam, (size_t)AutoParamName::AUTO_COUNT>::type AutoParamList;
+	static AutoParamList autoParams;
+
 	AutoParam() : autoName(AutoParamName::AUTO_INVALID_PARAM),
-			processor(nullptr),
-			type(PDT_UNKNOWN),
-			context(ParameterContext::CTX_UNKNOWN) {
+				processor(nullptr),
+				type(PDT_UNKNOWN),
+				context(ParameterContext::CTX_UNKNOWN),
+				size(0) {
 	}
+
+	static inline ParamProcessorProc GetStructProcessor() {
+		return customStructProcessor;
+	}
+
+	static inline ParamProcessorProc GetConstantProcessor() {
+		return customConstantProcessor;
+	}
+
+	static inline ParamProcessorProc GetTextureProcessor() {
+		return customTextureProcessor;
+	}
+
+
+	static void AddParamDef(AutoParamName autoName, ParamDataType type, ParameterContext context,
+		ParamProcessorProc processor, uint32 size/*, const String& desc*/);
+
+	static const AutoParam* MapParam(AutoParamName name);
+
+	static uint32 MapSamplerParams(const String& name,
+			const TextureDescMap& texMap, ParameterContext& context);
+
 };
 
 struct ParamEntry {
 	ParameterContext context;
-	uint8 passIndex;
-	AutoParamName autoName;
 	ParamDataType type;
-	uint16 arrayCount;
+	AutoParamName autoName;
+	uint32 arrayCount;
 	uint32 maxSize;
-	const String* name;
+	StringID name;
 };
 
 typedef vector<ParamEntry>::type ParamEntryTable;
@@ -164,6 +205,7 @@ struct ParamEntryTableItem {
 	ParamEntryTable::const_iterator endIt;
 	uint32 totalParamBufferSize;
 };
+
 
 } // namespace nextar
 #endif // SHADERPARAM_H_

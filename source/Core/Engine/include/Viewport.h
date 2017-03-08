@@ -88,7 +88,7 @@ public:
 		return vp1->priority - vp2->priority;
 	}
 
-	Viewport(Camera *cam, RenderTarget *rt, const String& renderSystem = StringUtils::Default,
+	Viewport(Camera *cam, RenderTarget *rt,
 		float x = 0.f, float y = 0.f,
 		float width = 1.f, float height = 1.f, int32 priority = 0,
 		uint32 flags = ACTIVE, StringID optName = StringUtils::NullID,
@@ -228,7 +228,7 @@ protected:
 
 	VisibilitySet visibleSet;
 	ViewportCallbackList callbacks;
-	RenderSystemPtr renderSystem;
+
 private:
 
 	/* next viewport in the list */

@@ -39,6 +39,10 @@ public:
 
 	virtual RenderSystemPtr CreateRenderSystem(const String& configName, Size initialViewDimensions);
 
+	inline const StringUtils::WordList& GetShaderOptions(Pass::ProgramStage::Type stage) {
+		return shaderOptions[stage];
+	}
+
 protected:
 
 	virtual void DestroyResources();
@@ -59,8 +63,10 @@ protected:
 	 * contexts are present if usingMultiGpuSetup is true */
 	RenderDriverPtr primaryDriver;
 	RenderContextPtr primaryContext;
+	// materials will be regenrated upon modification to render
+	// system, this is not supported right now
+	// uint32 materialModification;
 	// Render systems
-	StringUtils::WordList shaderOptions;
 	String renderSystemConfigs;
 #if NEX_MULTIGPU_BUILD
 	typedef vector<RenderDriverPtr>::type RenderDriverList;

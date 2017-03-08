@@ -33,22 +33,22 @@ public:
 	StringUtils::WordList programIncludePath;
 	StringUtils::WordList cbufferIncludePath;
 
-	inline bool IsStageActive(Pass::ProgramStage stage) const {
+	inline bool IsStageActive(Pass::ProgramStage::Type stage) const {
 		return activeStages[(uint32)stage];
 	}
 
-	inline void SetStageActive(Pass::ProgramStage stage, bool active) {
+	inline void SetStageActive(Pass::ProgramStage::Type stage, bool active) {
 		activeStages[(uint32)stage] = active;
 	}
 
-	inline const StringUtils::WordList& GetProgramPrefix(Pass::ProgramStage stage) {
+	inline const StringUtils::WordList& GetProgramPrefix(Pass::ProgramStage::Type stage) {
 		return _config.programPrefix[stage];
 	}
 
 	InputStreamPtr FetchConstBuffer(const String& name);
 	InputStreamPtr FetchProgram(const String& name,
 			RenderManager::ShaderLanguage lang,
-			Pass::ProgramStage stageType);
+			Pass::ProgramStage::Type stageType);
 
 	void SetRegionsAsSource(Pass::ProgramStage, const StringUtils::WordList& regionNames);
 	void AddRegion(const String& name, RenderManager::ShaderLanguage lang, String&& value);

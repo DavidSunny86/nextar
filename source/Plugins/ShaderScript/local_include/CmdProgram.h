@@ -28,8 +28,8 @@ public:
 
 class SubProgramType: public nextar::CommandHandler {
 public:
-	SubProgramType(Pass::ProgramStage istage) : stage(istage) {}
-	Pass::ProgramStage stage;
+	SubProgramType(Pass::ProgramStage::Type istage) : stage(istage) {}
+	Pass::ProgramStage::Type stage;
 	virtual bool BeginExecute(CommandContext* pContext, const ASTCommand* command) const;
 
 private:

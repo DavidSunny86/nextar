@@ -45,7 +45,7 @@ InputStreamPtr ShaderScriptContext::FetchConstBuffer(const String& name) {
 
 InputStreamPtr ShaderScriptContext::FetchProgram(const String& name,
 		RenderManager::ShaderLanguage lang,
-		Pass::ProgramStage stageType) {
+		Pass::ProgramStage::Type stageType) {
 
 	StringUtils::TokenIterator it = ConstMultiStringHelper::It(programIncludePath);
 	String store;
@@ -73,7 +73,7 @@ InputStreamPtr ShaderScriptContext::FetchProgram(const String& name,
 	return retFile;
 }
 
-void ShaderScriptContext::SetRegionsAsSource(Pass::ProgramStage type,
+void ShaderScriptContext::SetRegionsAsSource(Pass::ProgramStage::Type type,
 		const StringUtils::WordList& regionNames) {
 	StringUtils::TokenIterator regIt = ConstMultiStringHelper::It(regionNames);
 	String name;

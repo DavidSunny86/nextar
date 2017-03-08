@@ -2,6 +2,7 @@
 #define NEXTAR_DEPTHSTENCILSTATE_H
 
 #include <NexBase.h>
+#include <RenderStateDesc.h>
 
 namespace nextar {
 
@@ -47,7 +48,7 @@ struct StencilFaceOp {
 	}
 };
 
-struct DepthStencilState {
+struct _NexEngineAPI DepthStencilState : public RenderStateBase<DepthStencilState> {
 	/* true to enable depth test */
 	bool depthTest;
 	/* true to enable depth write */
@@ -60,15 +61,14 @@ struct DepthStencilState {
 	StencilFaceOp front;
 	StencilFaceOp back;
 
-	StringID hash;
-
 	inline void UpdateHash() {}
 
 	DepthStencilState() :
 		depthTest(true), depthWrite(true), depthCompareFunc(DSCOMP_LESS_EQUAL),
-		stencilTest(false), hash(StringUtils::NullID) {
+		stencilTest(false) {
 	}
 };
+
 }
 
 #endif //NEXTAR_DEPTHSTENCILSTATE_H

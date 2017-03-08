@@ -92,11 +92,11 @@ public:
 	uint32 ReadProgramSemantics(GLuint program,
 								VertexSemanticGL* inputSemantics);
 	/* Read uniform data */
-	void ReadUniforms(PassViewGL*, uint32 passIndex, GLuint program,
+	void ReadUniforms(PassViewGL*, GLuint program,
 					  const Pass::VarToAutoParamMap& remapParams,
 					  ParamEntryTable*);
 	/* Read sampler information */
-	void ReadSamplers(PassViewGL*, uint32 passIndex, GLuint program,
+	void ReadSamplers(PassViewGL*, GLuint program,
 					  const Pass::VarToAutoParamMap& remapParams,
 					  ParamEntryTable*, const Pass::TextureDescMap& texMap);
 
@@ -243,10 +243,10 @@ protected:
 	void DetermineConstants();
 	GLuint CreateSamplerFromParams(const TextureUnitParams& params);
 
-	void InitializeUniformBuffer(UniformBufferGL& ub, PassViewGL* pass, uint32 passIndex,
+	void InitializeUniformBuffer(UniformBufferGL& ub, PassViewGL* pass,
 							 const char* name, GLint blockIndex, GLuint prog, GLuint numParams,
 							uint32 size, const Pass::VarToAutoParamMap& remapParams);
-	static void PrepareParamTable(const UniformBufferGL& buffer, uint32 passIndex, ParamEntryTable* table);
+	static void PrepareParamTable(const UniformBufferGL& buffer, ParamEntryTable* table);
 
 	enum {
 		CONTEXT_READY = 1 << 0,

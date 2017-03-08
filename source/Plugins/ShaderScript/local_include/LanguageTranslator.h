@@ -23,7 +23,7 @@ public:
 	};
 
 	/** Macro operator */
-	virtual void AddPredefs(ShaderScriptContext* script, Pass::ProgramStage stage) = 0;
+	virtual void AddPredefs(ShaderScriptContext* script, Pass::ProgramStage::Type stage) = 0;
 	virtual void AddMacro(ShaderScriptContext* script, const String& name) = 0;
 	/** Constant buffer operator */
 	virtual void BeginBuffer(ShaderScriptContext* script, const String& name, const String& modName) = 0;
@@ -42,7 +42,7 @@ public:
 
 public:
 	virtual void AddMacro(ShaderScriptContext* script, const String& name);
-	virtual void AddPredefs(ShaderScriptContext* script, Pass::ProgramStage stage);
+	virtual void AddPredefs(ShaderScriptContext* script, Pass::ProgramStage::Type stage);
 	void TranslateConstantBuffer(ShaderScriptContext* script, const String& name, nextar::InputStreamPtr);
 	void TranslateMacro(ShaderScriptContext* script, const String& name);
 

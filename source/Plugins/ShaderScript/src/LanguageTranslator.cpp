@@ -27,7 +27,7 @@ void LanguageTranslator::AddMacro(ShaderScriptContext* script, const String& nam
 	}
 }
 
-void LanguageTranslator::AddPredefs(ShaderScriptContext* script, Pass::ProgramStage stage) {
+void LanguageTranslator::AddPredefs(ShaderScriptContext* script, Pass::ProgramStage::Type stage) {
 	for (auto& t : translators) {
 		t->AddPredefs(script, stage);
 	}

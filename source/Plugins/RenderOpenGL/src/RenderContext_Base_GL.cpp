@@ -536,7 +536,7 @@ void RenderContext_Base_GL::DestroyShader(GLuint sh) {
 GLuint RenderContext_Base_GL::CreateProgram(GLuint shaders[]) {
 	/* create the program object */
 	GLuint program = GlCreateProgram();
-	for (nextar::uint32 i = 0; i < Pass::STAGE_COUNT; ++i) {
+	for (nextar::uint32 i = 0; i < Pass::ProgramStage::STAGE_COUNT; ++i) {
 		if (shaders[i]) {
 			GlAttachShader(program, shaders[i]);
 			GL_CHECK();
@@ -645,7 +645,7 @@ uint32 RenderContext_Base_GL::ReadProgramSemantics(GLuint program,
 	return (uint32)inpCount;
 }
 
-void RenderContext_Base_GL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
+void RenderContext_Base_GL::ReadUniforms(PassViewGL* pass,
 										 GLuint program,
 										 const Pass::VarToAutoParamMap& remapParams,
 										 ParamEntryTable* paramTable) {
@@ -679,13 +679,13 @@ void RenderContext_Base_GL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
 			
 		if (ubPtr->ref.numOfRef == 1) {
 			// populate
-			InitializeUniformBuffer(*ubPtr, pass, passIndex, name, i, program,
+			InitializeUniformBuffer(*ubPtr, pass, name, i, program,
 										numParams, size, remapParams);
 		}
 
-		PrepareParamTable(*ubPtr, passIndex, paramTable);
+		PrepareParamTable(*ubPtr, paramTable);
 
-		ubList.push_back({ (uint32)i, ubPtr });
+		ubList.push_back({ ubPtr, i });
 	}
 	// sort ublist by context
 	std::sort(ubList.begin(), ubList.end(), [](const ParameterGroupData& p1, const ParameterGroupData& p2){
@@ -693,7 +693,7 @@ void RenderContext_Base_GL::ReadUniforms(PassViewGL* pass, uint32 passIndex,
 	});
 }
 
-void RenderContext_Base_GL::PrepareParamTable(const UniformBufferGL& u, uint32 passIndex, ParamEntryTable* table) {
+void RenderContext_Base_GL::PrepareParamTable(const UniformBufferGL& u, ParamEntryTable* table) {
 	// parameter parsing is not important if the
 	// the auto param is well defined and understood
 	// by the engine
@@ -714,7 +714,6 @@ void RenderContext_Base_GL::PrepareParamTable(const UniformBufferGL& u, uint32 p
 			pe.maxSize = uform.size;
 			pe.name = &uform.name;
 			pe.type = uform.type;
-			pe.passIndex = passIndex;
 			pe.context = u.context;
 			table->push_back(pe);
 		}
@@ -724,7 +723,7 @@ void RenderContext_Base_GL::PrepareParamTable(const UniformBufferGL& u, uint32 p
 
 void RenderContext_Base_GL::InitializeUniformBuffer(
 	UniformBufferGL& u, PassViewGL* pass,
-	uint32 passIndex, const char* name, GLint blockIndex, GLuint prog,
+	const char* name, GLint blockIndex, GLuint prog,
 	GLuint numParams, uint32 size, const Pass::VarToAutoParamMap& remapParams
 	) {
 
@@ -939,7 +938,7 @@ GLuint RenderContext_Base_GL::CreateSamplerFromParams(const TextureUnitParams& p
 	return sampler;
 }
 
-void RenderContext_Base_GL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
+void RenderContext_Base_GL::ReadSamplers(PassViewGL* pass,
 										 GLuint program,
 										 const Pass::VarToAutoParamMap& remapParams,
 										 ParamEntryTable* paramTable,
@@ -1035,7 +1034,6 @@ void RenderContext_Base_GL::ReadSamplers(PassViewGL* pass, uint32 passIndex,
 				pe.context = ss.context;
 				pe.maxSize = ss.size;
 				pe.name = &ss.name;
-				pe.passIndex = passIndex;
 				pe.type = ParamDataType::PDT_TEXTURE;
 				paramTable->push_back(pe);
 			}
@@ -1145,7 +1143,7 @@ void RenderContext_Base_GL::SwitchPass(CommitContext& context, Pass::View* passV
 		UniformBufferGL* ubPtr = static_cast<UniformBufferGL*>(paramList[i].group);
 		GlBindBufferRange(GL_UNIFORM_BUFFER, i, ubPtr->ref.ubNameGl, ubPtr->ref.offset, ubPtr->ref.size);
 		GL_CHECK();
-		GlUniformBlockBinding(program, paramList[i].data, i);
+		GlUniformBlockBinding(program, paramList[i]._reserved, i);
 		GL_CHECK();
 	}
 }

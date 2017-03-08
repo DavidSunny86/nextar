@@ -40,41 +40,33 @@ String ShaderTemplate::GetPoxyAssetExtension() const {
 	return "nexfx";
 }
 
-void ShaderTemplate::_AppendCompilerOption(const String& options,
-	String& outCompilerOptions) {
+hash_t ShaderTemplate::GetHashFromOptions(const String& allOptions, String& oLongName) {
 
-	auto it = macros.find(options);
-	if (it != macros.end()) {
-		ConstMultiStringHelper h((*it).second.activateDefines);
-		if (h.Length() > 0)
-			StringUtils::PushBackWordList(outCompilerOptions, (*it).second.activateDefines);
-	}
-}
-
-String ShaderTemplate::GetHashNameFromOptions(const set<String>::type& opt) {
-	String word;
-	String hashCode;
-	set<uint32>::type listOfUniques;
-	for (auto& e : opt) {
-		auto it = registeredOptions.find(e);
-		if (it != registeredOptions.end()) {
-			listOfUniques.insert((*it).second);
-		} else {
-			Error("Option not registered or not supported: " + e);
-		}
-	}
-	for(auto i : listOfUniques) {
-		String intVal = Convert::ToString(i, ' ', std::ios::hex)+".";
-		hashCode += intVal;
+	NameValueMap sanitizer;
+	String value;
+	auto optIt = ConstMultiStringHelper::It(allOptions);
+	while(optIt.HasNext(value)) {
+		StringPair nameVal = StringUtils::Split(value);
+		sanitizer[nameVal.first] = nameVal.second;
 	}
 
-	return hashCode;
+	oLongName = "";
+	for (auto& e : sanitizer) {
+		oLongName += e.first;
+		oLongName += "=";
+		oLongName += e.second.length() == 0? "1" : e.second;
+		oLongName += ' ';
+	}
+
+	return StringUtils::Hash(oLongName);
 }
 
 ShaderAssetPtr& ShaderTemplate::GetShaderUnit(const StringUtils::WordList& definedParms,
 	const StringUtils::WordList& enabledOptions) {
 	// clean-up the options
-	set<String>::type listOfOptions;
+	String listOfOptions;
+	String longName;
+	MultiStringHelper msh(listOfOptions);
 	String value;
 	auto optIt = ConstMultiStringHelper::It(definedParms);
 	while (optIt.HasNext(value)) {
@@ -82,29 +74,28 @@ ShaderAssetPtr& ShaderTemplate::GetShaderUnit(const StringUtils::WordList& defin
 		if (it != paramActivationOptions.end() && (*it).second.length() > 0) {
 			auto o = ConstMultiStringHelper::It((*it).second);
 			while (o.HasNext(value))
-				listOfOptions.insert(value);
+				msh.PushBack(value);
 		}		
 	}
 
-	auto enIt = ConstMultiStringHelper::It(enabledOptions);
-	while (enIt.HasNext(value)) {
-		if (value.length() > 0)
-			listOfOptions.insert(value);
-	}
+	msh.PushBack(enabledOptions);
 
-	String hash = GetHashNameFromOptions(listOfOptions);
+	hash_t hash = GetHashFromOptions(listOfOptions, longName);
 	auto it = shaders.find(hash);
-	if (it != shaders.end())
+	if (it != shaders.end()) {
+		ShaderUnit& su = (*it).second;
+		if (longName != su.longName) {
+			NEX_THROW_FatalError(EXCEPT_COLLISION);
+		}
+
 		return (*it).second.shaderObject;
+	}
 	return CreateShader(hash, listOfOptions);
 }
 
-ShaderAssetPtr& ShaderTemplate::CreateShader(const String& hash,
-	const set<String>::type& options) {
-	String compilerOptions;
-	for (auto& e : options)
-		_AppendCompilerOption(e, compilerOptions);
-	String uniqueName = GetNameID() + "#" + Convert::ToString((uint32)shaders.size(), ' ', std::ios::hex);
+ShaderAssetPtr& ShaderTemplate::CreateShader(hash_t hash,
+		const String& compilerOptions) {
+	String uniqueName = GetName() + "#" + Convert::ToString((uint32)shaders.size(), ' ', std::ios::hex);
 	ShaderAssetPtr shaderObject = ShaderAsset::Traits::Instance(StringID(StringUtils::Hash(uniqueName)), nullptr, GetGroup() );
 	if (!shaderObject->AsyncIsLoaded()) {
 		// load and prepare the shader object
@@ -116,7 +107,6 @@ ShaderAssetPtr& ShaderTemplate::CreateShader(const String& hash,
 	}
 	ShaderUnit &unit = shaders[hash];
 	unit.shaderObject = shaderObject;
-	unit.compilationOptions = compilerOptions;
 	return unit.shaderObject;
 }
 
@@ -133,20 +123,6 @@ void ShaderTemplate::UnloadImpl() {
 	passes.clear();
 	shaders.clear();
 	parameters.clear();
-	macros.clear();
-}
-
-void ShaderTemplate::RegisterOptions(const String& options) {
-	if (options.length() <= 0) 
-		return;
-	String value;
-	ConstMultiStringHelper::Iterator it = ConstMultiStringHelper::It(options);
-	while (it.HasNext(value)) {
-		auto it = registeredOptions.find(value);
-		if (it == registeredOptions.end())
-			registeredOptions.insert(CompilerMacroMap::value_type(value, 
-			(uint32)registeredOptions.size()));
-	}
 }
 
 /********************************************
@@ -157,6 +133,11 @@ ShaderTemplate::LoadStreamRequest::LoadStreamRequest(ShaderTemplate* shaderTempl
 		current(nullptr) {
 }
 
+void ShaderTemplate::LoadStreamRequest::SetName(const String& name) {
+	ShaderTemplate* shader = static_cast<ShaderTemplate*>(GetStreamedObject());
+	shader->SetName(name);
+}
+
 void ShaderTemplate::LoadStreamRequest::AddPass(StringID name) {
 	ShaderTemplate* shader = static_cast<ShaderTemplate*>(GetStreamedObject());
 	auto& passes = shader->passes;
@@ -165,7 +146,7 @@ void ShaderTemplate::LoadStreamRequest::AddPass(StringID name) {
 	current->name = name;
 }
 
-void ShaderTemplate::LoadStreamRequest::SetProgramSource(Pass::ProgramStage stage,
+void ShaderTemplate::LoadStreamRequest::SetProgramSource(Pass::ProgramStage::Type stage,
 		RenderManager::ShaderLanguage lang, String&& source) {
 	current->sourceMap.emplace(lang,
 			std::pair<Pass::ProgramStage, String>(stage, std::move(source)));
@@ -186,13 +167,13 @@ void ShaderTemplate::LoadStreamRequest::SetDepthStencilState(
 
 void ShaderTemplate::LoadStreamRequest::AddSampler(const String& samplerName,
 		const TextureUnitParams& unit) {
-	auto& state = current->textureUnitStates[samplerName];
+	SamplerUnit& state = current->textureUnitStates[samplerName];
 	state.params = unit;
 }
 
 void ShaderTemplate::LoadStreamRequest::AddTextureUnit(const String& unitName,
 	const TextureUnitDesc& params) {
-	auto& state = current->textureUnitStates[params.samplerName];
+	SamplerUnit& state = current->textureUnitStates[params.samplerName];
 	state.unitsBound += unitName;
 	state.unitsBound += '.';
 	state.unitsBound += ShaderParameter::GetContextKey(params.context);
@@ -211,13 +192,6 @@ void ShaderTemplate::LoadStreamRequest::AddParam(const String& param, const Para
 		shader->_BindParamToOp(param, pdesc.activateOption);
 		shader->RegisterOptions(pdesc.activateOption);
 	}
-}
-
-void ShaderTemplate::LoadStreamRequest::AddCompilerOption(const String& name, const String& options) {
-	ShaderTemplate* shader = static_cast<ShaderTemplate*>(GetStreamedObject());
-	auto& macro = shader->macros[name];
-	StringUtils::PushBackWordList(macro.activateDefines, options);
-	shader->RegisterOptions(name);
 }
 
 void ShaderTemplate::LoadStreamRequest::AddSemanticBinding(const String& var,

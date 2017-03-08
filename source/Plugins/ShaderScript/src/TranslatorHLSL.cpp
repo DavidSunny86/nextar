@@ -88,7 +88,7 @@ void TranslatorHLSL::AddMacro(ShaderScriptContext* script, const String& name) {
 		std::move(val));
 }
 
-void TranslatorHLSL::AddPredefs(ShaderScriptContext* script, Pass::ProgramStage stage) {
+void TranslatorHLSL::AddPredefs(ShaderScriptContext* script, Pass::ProgramStage::Type stage) {
 
 }
 

@@ -13,7 +13,7 @@
 namespace nextar {
 
 enum ParamDataType
-	: uint16 {
+	: uint8 {
 	PDT_UNKNOWN,
 	PDT_BOOL,
 	PDT_UINT,

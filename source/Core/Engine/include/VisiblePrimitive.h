@@ -16,8 +16,12 @@
 
 namespace nextar {
 
+
+
 class _NexEngineAPI VisiblePrimitive : public AllocGeneral {
 public:
+
+	struct RenderInformation {};
 
 	VisiblePrimitive() :
 		renderFlags(0)
@@ -25,7 +29,8 @@ public:
 		,bounds(nullptr)
 		,worldMatrices(nullptr)
 		,streamData(nullptr)
-		,parameters(nullptr) {
+		,parameters(nullptr)
+		,_reserved(nullptr){
 	}
 
 	virtual ~VisiblePrimitive() {}
@@ -92,6 +97,8 @@ protected:
 	MaterialAssetPtr material;
 	/** stream data to render */
 	StreamData* streamData;
+	/* Draw information */
+	DrawInformation* _reserved;
 	/* object parameters */
 	ParameterBuffer* parameters;
 };

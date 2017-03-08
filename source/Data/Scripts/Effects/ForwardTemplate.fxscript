@@ -1,7 +1,7 @@
 
 {{predefs:vertex-program:all}}
 
-#ifdef FW_DIFFUSE_MAP
+#ifdef DiffuseMap
 
 #define HAS_DIFFUSE_MAP
 #define HAS_TEXCOORD0_CHANNEL
@@ -9,7 +9,7 @@
 
 #endif
 
-#ifdef FW_NORMAL_MAP
+#ifdef NormalMap
 
 #define HAS_NORMAL_MAP  
 #define HAS_BINORMAL_CHANNEL 
@@ -62,10 +62,10 @@ shader ForwardTemplate [Vertex, Surface, Lighting] {
       
       texture-state {
          sampler s0 linear-clamp;
-         unit sDiffuseMap s0 (nameref=  "Diffuse.Texture", activate = DiffuseMap, context = material);
-         unit sSpecularAndGlossMap s0 (nameref = "Specular.Texture", activate = SpecularAndGlossMap, context = material);
-         unit sNormalMap s0 (nameref = "Normal.Texture", activate = NormalMap, context = material); 
-         unit sDetailMap s0 (nameref = "Detail.Texture", activate = DetailMap, context = material); 
+         unit sDiffuseMap s0 (nameref=  "Diffuse.Texture", set = [DiffuseMap = 1, DiffuseScaleAndStuff = 2], context = material);
+         unit sSpecularAndGlossMap s0 (nameref = "Specular.Texture", set = SpecularAndGlossMap = 1, context = material);
+         unit sNormalMap s0 (nameref = "Normal.Texture", set = NormalMap:1, context = material); 
+         unit sDetailMap s0 (nameref = "Detail.Texture", set = DetailMap:1, context = material); 
       }
 
       depth-stencil-state {
@@ -77,13 +77,7 @@ shader ForwardTemplate [Vertex, Surface, Lighting] {
 
       blend-state disable;
 
-      program {
-      
-         activate DiffuseMap FW_DIFFUSE_MAP;
-         activate NormalMap FW_NORMAL_MAP;
-         activate DetailMap HAS_DETAIL_MAP;
-         activate SpecularAndGlossMap HAS_SPECULAR_AND_GLOSS_MAP;
-         
+      program {         
          vertex-program $Vertex Geometry;
          fragment-program SurfaceSetup $Surface LightSetup $Lighting Forward;
       }

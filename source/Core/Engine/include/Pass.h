@@ -5,8 +5,8 @@
  *      Author: obhi
  */
 
-#ifndef PASS_H_
-#define PASS_H_
+#ifndef ASPASS_H_
+#define ASPASS_H_
 
 #include <DepthStencilState.h>
 #include <BlendState.h>
@@ -27,14 +27,18 @@ class _NexEngineAPI Pass: public ContextObject,
 
 public:
 
-	enum ProgramStage
-		: uint16 {
-		STAGE_VERTEX,
-		STAGE_HULL,
-		STAGE_DOMAIN,
-		STAGE_GEOMETRY,
-		STAGE_FRAGMENT,
-		STAGE_COUNT,
+	struct ProgramStage {
+		enum Type : uint16 {
+			STAGE_VERTEX,
+			STAGE_HULL,
+			STAGE_DOMAIN,
+			STAGE_GEOMETRY,
+			STAGE_FRAGMENT,
+			STAGE_GPGPU,
+			STAGE_COUNT,
+		};
+
+		static const char* GetName(ProgramStage::Type type);
 	};
 
 	enum Flags {
@@ -45,13 +49,6 @@ public:
 		MSG_PASS_COMPILE, MSG_PASS_UPDATE_PARAMBUFFER_OFFSET
 	};
 
-	struct SamplerDesc {
-		// comma/space seperated units bound to this sampler
-		String unitsBound;
-		TextureUnitParams texUnitParams;
-	};
-
-	typedef vector<SamplerDesc>::type TextureDescMap;
 
 	struct ParamBufferOffsetParams {
 		uint32 offset[(size_t) ParameterContext::CTX_COUNT];
@@ -75,7 +72,7 @@ public:
 		VarToAutoParamMap autoNames;
 		//uint16* inputLayoutId;
 		uint32 passIndex;
-		String programSources[Pass::STAGE_COUNT];
+		String programSources[Pass::ProgramStage::STAGE_COUNT];
 
 		CompileParams() : passIndex(-1),
 				compileOptions(nullptr), parameters(nullptr) {
@@ -149,27 +146,8 @@ public:
 	//TextureBase* GetDefaultTexture(const String& name, uint32 index) const;
 	//const TextureUnitParams* GetTextureUnit(const String& name) const;
 
-	static void AddParamDef(AutoParamName autoName, ParamDataType type, ParameterContext context,
-		ParamProcessorProc processor, uint32 size/*, const String& desc*/);
-
-	static const AutoParam* MapParam(AutoParamName name);
-
-	static uint32 MapSamplerParams(const String& name,
-			const TextureDescMap& texMap, ParameterContext& context);
-
 	// Set texture states, called during pass creation
 
-	static inline ParamProcessorProc GetStructProcessor() {
-		return customStructProcessor;
-	}
-
-	static inline ParamProcessorProc GetConstantProcessor() {
-		return customConstantProcessor;
-	}
-
-	static inline ParamProcessorProc GetTextureProcessor() {
-		return customTextureProcessor;
-	}
 
 protected:
 
@@ -179,12 +157,7 @@ protected:
 	uint16 passNumber;
 
 	//static AutoParam autoParams[AutoParamName::AUTO_COUNT];
-	static ParamProcessorProc customConstantProcessor;
-	static ParamProcessorProc customTextureProcessor;
-	static ParamProcessorProc customStructProcessor;
 
-	typedef array<AutoParam, (size_t)AutoParamName::AUTO_COUNT>::type AutoParamList;
-	static AutoParamList autoParams;
 	friend class ShaderAsset;
 
 private:

@@ -70,7 +70,7 @@ YY_DECL;
 %type <ASTRegionPtr> named_region unnamed_region
 %type <ASTCommandPtr> command
 %type <ASTCommandList> commands.0.N commands.1.N
-%type <ASTParameter> special_parameter special_parameters.0.N parameters.0.N parameter list
+%type <ASTParameter> special_parameter special_parameters.0.N parameters.0.N parameter list.0.N list
 
 %printer { yyoutput << $$; } <String>
 
@@ -124,12 +124,16 @@ special_parameter: IDENTIFIER  ASSIGN  parameter { $3.SetName($1); $$ = std::mov
 
 parameter: STRING_LITERAL                 { $$ = $1; }
 			| IDENTIFIER                        { $$ = $1; }
-			| LSQBRACKET list RSQBRACKET     { $$ = std::move($2); }
+			| LSQBRACKET list.0.N RSQBRACKET     { $$ = std::move($2); }
 			;
 
-list:  parameters.0.N                          { $$ = $1; }
-	 |  list COMMA parameters.0.N               { $1.AppendList($3); $$ = std::move($1); }
-	 ;
+list: parameters.0.N
+	| special_parameter
+    ;
+	
+list.0.N:  parameters.0.N                { $$ = $1; }
+	    |  list.0.N COMMA list           { $1.AppendList($3); $$ = std::move($1); }
+	    ;
 
 %%
 /*============================================================================*/

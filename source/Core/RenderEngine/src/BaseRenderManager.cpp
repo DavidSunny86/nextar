@@ -297,9 +297,8 @@ void BaseRenderManager::RegisterRenderSystemConfig(const NameValueMap& c) {
 
 void BaseRenderManager::RegisterGlobalShaderOptions(const NameValueMap &c) {
 	auto it = c.find("ShaderOptions");
-	if (it != c.end()) {
+	if (it != c.end())
 		shaderOptions = StringUtils::TokenizeToMultiString((*it).second, ",");
-	}
 }
 
 }

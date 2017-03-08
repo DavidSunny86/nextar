@@ -83,8 +83,31 @@ public:
 		}
 	}
 
+	Pool() :
+			_ChunkSize(0)
+			, _NumChunkPerBlock(0)
+			, freeBlock(nullptr)
+			, usedBlock(nullptr)
+			, freeChunk(nullptr) {
+	#ifdef NEX_DEBUG
+			_TotalBlockAllocations = 0;
+			_TotalChunksAskedFor = 0;
+			_TotalChunksFreed = 0;
+			_CurrentTotalChunks = 0;
+			_MaxActiveChunks = 0;
+	#endif
+	}
+
 	~Pool() {
 		FreePool();
+	}
+
+	inline void InitPool(uint32 chunkSize, uint32 numChunks) {
+		NEX_ASSERT(chunkSize >= MIN_OBJECT_SIZE && !_ChunkSize);
+		NEX_ASSERT(numChunks >= MIN_BUCKET_SIZE && !_NumChunkPerBlock);
+		_NumChunkPerBlock = numChunks;
+		_ChunkSize = chunkSize;
+
 	}
 
 	inline uint32 GetChunkSize() const {
@@ -360,12 +383,6 @@ protected:
 		}
 	}
 	
-	inline void _AddToFreeChunks(void* const chunk) {
-		_Next(chunk) = freeChunk;
-		NEX_ASSERT(_Next(chunk) != chunk); // cyclic
-		freeChunk = chunk;
-	}
-
 	void _FreeBlocks(void* const block) {
 		size_t deleteCount = 0;
 		void* it = block;
@@ -403,8 +420,8 @@ protected:
 	size_t _CurrentTotalChunks;
 	size_t _MaxActiveChunks;
 #endif
-	const uint32 _NumChunkPerBlock;
-	const uint32 _ChunkSize;
+	uint32 _NumChunkPerBlock;
+	uint32 _ChunkSize;
 
 	void* freeBlock;
 	void* usedBlock;
@@ -448,6 +465,24 @@ public:
 		_objectSize(objectSize)
 #endif
 	{
+	}
+
+	MemoryPool() :
+#if NEX_ENABLE_MEMORY_POOLS
+		pool()
+#else
+		_objectSize(0)
+#endif
+	{
+	}
+
+	inline void InitPool(uint32 objSize, uint32 numObjInArr) {
+#if NEX_ENABLE_MEMORY_POOLS
+		pool.InitPool(objSize, numObjInArr)
+#else
+		NEX_ASSERT(!_objectSize);
+		_objectSize = objSize;
+#endif
 	}
 
 	void* Alloc() {

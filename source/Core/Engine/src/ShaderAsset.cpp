@@ -187,7 +187,7 @@ ShaderAsset::StreamRequest::StreamRequest(ShaderAsset* shader) :
 ShaderAsset::StreamRequest::~StreamRequest() {
 }
 
-void ShaderAsset::StreamRequest::SetProgramSource(Pass::ProgramStage stage,
+void ShaderAsset::StreamRequest::SetProgramSource(Pass::ProgramStage::Type stage,
 		String&& src) {
 	(*currentPass).compileParams.programSources[stage] = std::move(src);
 }

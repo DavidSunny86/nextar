@@ -159,7 +159,9 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 ## Platform identifier
 #============================================================
 set(NEX_PLATFORM_ID "${NEX_PLATFORM_NAME}_${NEX_ARCHITECTURE_NAME}")
-set(CMAKE_LIBRARY_ARCHITECTURE "${NEX_ARCHITECTURE_NAME}")
+if(NEX_OS MATCHES "Windows")
+	set(CMAKE_LIBRARY_ARCHITECTURE "${NEX_ARCHITECTURE_NAME}")
+endif()
 
 ## Platform specific stuff
 #============================================================

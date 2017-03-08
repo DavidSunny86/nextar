@@ -10,8 +10,9 @@
 
 #include <Asset.h>
 #include <ShaderParam.h>
-#include <ShaderAsset.h>
+#include <EffectAsset.h>
 #include <ParameterBuffer.h>
+#include <Material.h>
 
 namespace nextar {
 
@@ -28,6 +29,16 @@ public:
 		CATAGORY = COMPONENT_CAT(CLASS_ID),
 	};
 
+	enum Mask : uint32 {
+		BACKGROUND = 1 << 0,
+		OPAQUE = 1 << 1,
+		TRANSLUCENT = 1 << 3,
+		OVERLAY = 1 << 4,
+		SHADOW_CASTER = 1 << 5,
+		SHADOW_RECEIVER = 1 << 6,
+		ALL = 0xffffffff
+	};
+
 	class MaterialLoadRequest;
 
 	typedef AssetTraits<MaterialAsset> Traits;
@@ -41,15 +52,18 @@ public:
 		MaterialLoadRequest(Asset*);
 		~MaterialLoadRequest();
 
-		void SetShader(ShaderAssetPtr& shader);
-		void SetShader(const ShaderAsset::ID& id, const URL& location);
-		ParameterBuffer* PrepareParamBuffer(const ParamEntryTableItem& table);
+		void SetEffect(EffectAssetPtr& shader);
+		void SetEffect(const EffectAsset::ID& id, const URL& location);
 		void SetParamValue(uint32 offset, const void* data, uint32 amount);
 		void SetTextureValue(uint32 offset, const TextureUnit* texture);
 		void SetParameterBuffer(ParameterBuffer&& buff);
 		void SetLayer(Layer layer);
+		void SetMask(uint32 mask);
+		void SetShaderOptions(StringUtils::WordList&& options);
 
 	protected:
+
+		StringUtils::WordList shaderOptions;
 		friend class MaterialAsset;
 	};
 
@@ -57,21 +71,28 @@ public:
 	virtual ~MaterialAsset();
 
 	inline const ShaderAssetPtr& GetShader() const {
-		return shader;
+		return effect;
 	}
 
 	inline ShaderAssetPtr& GetShader() {
-		return shader;
+		return effect;
 	}
 
-	inline uint8 GetLayerMask() const {
-		return layerMask;
+	inline uint8 GetLayer() const {
+		return layer;
 	}
 
-	inline void SetLayerMask(uint8 layer) {
-		layerMask = layer;
+	inline void SetLayer(uint8 layer) {
+		this->layer = layer;
 	}
 
+	inline uint8 GetMask() const {
+		return mask;
+	}
+
+	inline void SetMask(uint32 layer) {
+		this->mask = layer;
+	}
 
 	virtual uint32 GetClassID() const;
 
@@ -87,7 +108,6 @@ protected:
 	virtual void NotifyAssetUnloaded() override;
 	virtual void NotifyAssetUpdated() override;
 
-
 	virtual void UnloadImpl();
 
 	virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);
@@ -97,14 +117,16 @@ protected:
 	void SetParamData(const void* data, uint32 offset, uint32 size);
 	void SetParamData(const TextureUnit* data, uint32 offset);
 	void SetParameterBuffer(ParameterBuffer&& buff);
-	void SetShader(ShaderAssetPtr& shader);
+	void SetEffect(EffectAssetPtr& shader);
 
 	// used as sort key
-	uint8 layerMask;
-	ShaderAssetPtr shader;
-	//ConstantBufferPtr materialParameters;
-	// todo
-	ParameterBuffer materialParamData;
+	uint8 layer;
+	// mask
+	uint32 mask;
+	// shader asset
+	EffectAssetPtr effect;
+	// material
+	Material material;
 
 	friend class MaterialLoadRequest;
 };

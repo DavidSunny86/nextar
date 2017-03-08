@@ -14,12 +14,13 @@
 #include <Geometry.h>
 #include <PluginRegistry.h>
 #include <EngineApplicationContext.h>
+#include <RenderInfo_Material.h>
 
 namespace nextar {
 
 NEX_DEFINE_SINGLETON_PTR(RenderManager);
 
-RenderManager::RenderManager() {
+RenderManager::RenderManager() : _materialRenderInfoPool(nullptr) {
 	VertexSemantic::BuildSemanticMap();
 	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_INIT_RESOURCES, CreateResources, this);
 	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyResources, this);
@@ -27,6 +28,8 @@ RenderManager::RenderManager() {
 
 RenderManager::~RenderManager() {
 	VertexSemantic::ClearSemanticMap();
+	if (_materialRenderInfoPool)
+		NEX_DELETE(_materialRenderInfoPool);
 }
 
 bool RenderManager::QueryService(const Config& config) {
@@ -144,6 +147,18 @@ void RenderManager::GenerateStreamDataForQuad() {
 	stream->instanceCount = 1;
 
 	NEX_FREE(pVData, MEMCAT_GENERAL);
+}
+
+RenderSystemPtr RenderManager::CreateRenderSystem(const String& configName, Size viewDimensions) {
+	if (activeRenderSystem) {
+		NEX_THROW_FatalError(EXCEPT_INVALID_CALL);
+	}
+	activeRenderSystem = CreateRenderSystemImpl(configName, viewDimensions);
+	if (activeRenderSystem) {
+		uint32 objectSize = sizeof(RenderInfo_Material) * activeRenderSystem->GetPassCount();
+		_materialRenderInfoPool.InitPool(objectSize, 32);
+	}
+	return activeRenderSystem;
 }
 
 } /* namespace nextar */

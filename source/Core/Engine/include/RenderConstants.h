@@ -9,6 +9,7 @@
 #define RENDERCONSTANTS_H_
 
 #include <NexBase.h>
+#include <EngineConfig.h>
 
 namespace nextar {
 
@@ -92,6 +93,22 @@ enum class FrameBuffer : uint32 {
 	FRONT = FRONT_LEFT,
 	BACK = BACK_LEFT,
 };
+
+struct _NexEngineAPI PipelineStage {
+	enum Name : uint32 {
+		VERTEX_STAGE,
+		HULL_STAGE,
+		DOMAIN_STAGE,
+		GEOMETRY_STAGE,
+		FRAGMENT_STAGE,
+		EFFECT_STAGE_COUNT,
+		GPGPU_STAGE,
+	};
+
+	static const char* ToString(PipelineStage::Name name);
+};
+
+typedef uint8 ShaderUnitHandle;
 
 }
 

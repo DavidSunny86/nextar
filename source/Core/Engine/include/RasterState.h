@@ -2,6 +2,7 @@
 #define NEXTAR_RASTERSTATE_H
 
 #include <NexBase.h>
+#include <RenderStateDesc.h>
 
 namespace nextar {
 
@@ -26,7 +27,7 @@ enum CullMode : uint8 {
  * @author	Abhishek Dey
  * @date	12/25/2010
  */
-struct RasterState {
+struct _NexEngineAPI RasterState : public RenderStateDesc<RasterState> {
 	/* true if triangles are clockwise */
 	bool trianglesAreClockwise;
 	/* true to depth clip */
@@ -50,15 +51,12 @@ struct RasterState {
 	/* The depth bias clamp */
 	float depthBiasClamp;
 	// hash
-	StringID hash;
-
-	inline void UpdateHash() {}
 	RasterState() :
 			trianglesAreClockwise(true), depthClip(false), usingScissors(
 			false), usingMultisample(false), usingLineAa(false), fill(FM_SOLID), cull(
 					CULL_BACK), _irrelevant_padding(0), constantDepthBias(0), 
 					slopeScaledDepthBias(0), depthBiasClamp(0)
-					,hash(StringUtils::NullID) {
+					 {
 	}
 };
 }

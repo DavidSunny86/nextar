@@ -62,13 +62,14 @@ protected:
 	}
 };
 
-template<typename T, const size_t NumPerBlock, enum MemoryCategory Catagory>
+template<typename T, const size_t NumPerBlock, enum MemoryCategory Catagory = MemoryCategory::MEMCAT_GENERAL>
 class PooledAllocator {
 	typedef T ObjectType;
 	typedef SingletonPoolProvider<sizeof(T), NumPerBlock, Catagory> ProviderSpecialization;
 public:
 	typedef ProviderSpecialization Provider;
 	typedef PooledAllocator<T, NumPerBlock, Catagory> Type;
+	typedef AllocObjectBase<Type> AllocObjectType;
 
 	PooledAllocator() {
 	}

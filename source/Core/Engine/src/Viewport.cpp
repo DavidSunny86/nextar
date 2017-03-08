@@ -9,7 +9,7 @@
 
 namespace nextar {
 
-Viewport::Viewport(Camera* cam, RenderTarget* rt, const String& rsys,
+Viewport::Viewport(Camera* cam, RenderTarget* rt,
 		float x, float y, float width,
 		float height, int32 priority, uint32 flags, StringID optName,
 		Viewport* nextVp) : NamedObject(optName) {
@@ -31,11 +31,6 @@ Viewport::Viewport(Camera* cam, RenderTarget* rt, const String& rsys,
 		lastTargetSize = renderTarget->GetDimensions();
 		viewportSizeInPixels = Size((uint16)(lastTargetSize.dx * width),
 				(uint16)(lastTargetSize.dy * height));
-	}
-
-	if (rsys.length() > 0) {
-		Size what = GetViewportPixelDimensions();
-		this->renderSystem = RenderManager::Instance().CreateRenderSystem(rsys, what);
 	}
 }
 

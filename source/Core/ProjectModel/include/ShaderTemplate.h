@@ -40,25 +40,19 @@ public:
 
 	typedef map<String, Parameter>::type ParameterTable;
 
-	struct ShaderOption {
-		String activateDefines;
-	};
-
-	typedef map<String, ShaderOption>::type ShaderOptionsTable;
-
 	struct ShaderUnit {
-		String compilationOptions;
+		String longName;
 		ShaderAssetPtr shaderObject;
 	};
 
-	typedef map<String, ShaderUnit>::type ShaderTable;
+	typedef map<hash_t, ShaderUnit>::type ShaderTable;
 
 	struct SamplerUnit {
 		String unitsBound;
 		TextureUnitParams params;
 	};
 
-	typedef map<String, SamplerUnit>::type SamplerMap;
+	typedef map<hash_t, SamplerUnit>::type SamplerMap;
 
 	typedef multimap<RenderManager::ShaderLanguage, std::pair<Pass::ProgramStage, String>>::type SourceMap;
 	typedef Pass::VarToAutoParamMap VarToAutoParamMap;
@@ -95,8 +89,9 @@ public:
 	public:
 
 		LoadStreamRequest(ShaderTemplate* shaderTemplate);
+		void SetName(const String& name);
 		void AddPass(StringID name);
-		void SetProgramSource(Pass::ProgramStage stage,
+		void SetProgramSource(Pass::ProgramStage::Type stage,
 				RenderManager::ShaderLanguage lang,
 				String&& source);
 
@@ -108,7 +103,6 @@ public:
 		void AddTextureUnit(const String& unitName, const TextureUnitDesc& params);
 		void AddSampler(const String& samplerName, const TextureUnitParams& unit);
 		void AddParam(const String& param, const ParameterDesc& parameter);
-		void AddCompilerOption(const String& name, const String& activateDefines);
 		void AddSemanticBinding(const String& varName, AutoParamName name);
 
 	protected:
@@ -126,8 +120,8 @@ public:
 
 	virtual nextar::StreamRequest* CreateStreamRequestImpl(bool load);
 	ShaderAssetPtr& GetShaderUnit(const StringUtils::WordList& definedParms,
-		const StringUtils::WordList& enabledOptions);
-	ShaderAssetPtr& CreateShader(const String& hash, const set<String>::type& options);
+		const StringUtils::WordList& shaderOptions);
+	ShaderAssetPtr& CreateShader(hash_t, const String& options);
 
 	// inlines
 	inline uint32 GetPassCount() const {
@@ -158,15 +152,13 @@ public:
 	virtual uint32 GetProxyID() const;
 	virtual String GetPoxyAssetExtension() const;
 
-	void RegisterOptions(const String& options);
+	uint32 RegisterOptions(const String& options);
 protected:
 
 	inline void _BindParamToOp(const String& name, const String& op) {
 		MultiStringHelper h(paramActivationOptions[name]);
 		h.PushBack(op);
 	}
-
-	void _AppendCompilerOption(const String& options, String& outCompilerOptions);
 
 	class ShaderFromTemplate : public AssetLoaderImpl {
 	public:
@@ -186,18 +178,16 @@ protected:
 	friend class nextar::ShaderTemplate::LoadStreamRequest;
 	friend class nextar::ShaderTemplate::SaveStreamRequest;
 
-	String GetHashNameFromOptions(const set<String>::type&);
+	static hash_t GetHashFromOptions(const String& allOptions, String& oLongName);
 
 	PassList passes;
 
-	typedef map<String, uint32>::type CompilerMacroMap;
+	typedef map<String, hash_t>::type OptionHash;
 
-	CompilerMacroMap registeredOptions;
 	uint32 renderFlags;
 	ShaderTable shaders;
 	NameValueMap paramActivationOptions;
 	ParameterTable parameters;
-	ShaderOptionsTable macros;
 
 };
 

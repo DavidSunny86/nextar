@@ -72,6 +72,8 @@ foreach(search ${_ZLIB_SEARCHES})
   find_path(ZLIB_INCLUDE_DIR NAMES zlib.h ${${search}} PATH_SUFFIXES include)
 endforeach()
 
+find_library(ZLIB_LIBRARY_RELEASE NAMES zlib zlib1 PATHS "/usr/lib" PATH_SUFFIXES lib lib/${CMAKE_LIBRARY_ARCHITECTURE})
+
 # Allow ZLIB_LIBRARY to be set manually, as the location of the zlib library
 if(NOT ZLIB_LIBRARY)
   foreach(search ${_ZLIB_SEARCHES})

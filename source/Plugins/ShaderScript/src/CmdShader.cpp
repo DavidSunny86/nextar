@@ -69,7 +69,7 @@ void CmdPass::EndExecute(CommandContext* pContext,
 	String cbuffer = _SS(REG_CBUFFER);
 	
 	ShaderScriptContext* shaderScript = static_cast<ShaderScriptContext*>(pContext);
-	for (uint32 i = 0; i < Pass::STAGE_COUNT; ++i) {
+	for (uint32 i = 0; i < Pass::ProgramStage::STAGE_COUNT; ++i) {
 		StringUtils::WordList words;
 		String src;
 

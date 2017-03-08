@@ -91,7 +91,7 @@ void TranslatorGLSL::AddMacro(ShaderScriptContext* script, const String& name) {
 		std::move(val));
 }
 
-void TranslatorGLSL::AddPredefs(ShaderScriptContext* script, Pass::ProgramStage stage) {
+void TranslatorGLSL::AddPredefs(ShaderScriptContext* script, Pass::ProgramStage::Type stage) {
 }
 
 } /* namespace ShaderCompiler */

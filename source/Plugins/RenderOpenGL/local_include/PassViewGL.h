@@ -152,8 +152,7 @@ protected:
 	BlendStateGL blendState;
 			
 
-	GpuProgramGL programs[Pass::STAGE_COUNT];
-	static GLenum stagesMap[Pass::STAGE_COUNT];
+	GpuProgramGL programs[Pass::ProgramStage::STAGE_COUNT];
 	friend class RenderContext_Base_GL;
 };
 

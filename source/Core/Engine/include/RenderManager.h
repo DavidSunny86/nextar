@@ -14,6 +14,7 @@
 #include <RenderPass.h>
 #include <RenderConstants.h>
 #include <RenderSystem.h>
+#include <MemoryPool.h>
 
 namespace nextar {
 
@@ -114,7 +115,24 @@ public:
 
 	RenderPass* CreateRenderPass(StringID name);
 
-	virtual RenderSystemPtr CreateRenderSystem(const String& configName, Size initialViewDimensions) = 0;
+	virtual RenderSystemPtr CreateRenderSystem(const String& configName, Size viewDimensions);
+	virtual RenderSystemPtr CreateRenderSystemImpl(const String& configName, Size viewDimensions) = 0;
+
+	RenderSystemPtr GetActiveRenderSystem() const {
+		return activeRenderSystem;
+	}
+
+	const StringUtils::WordList& GetGlobalShaderOptions() const {
+		return shaderOptions;
+	}
+
+	Material::RenderInfo* AllocMaterialRenderInfo() {
+		return reinterpret_cast<Material::RenderInfo*>(_materialRenderInfoPool.Alloc());
+	}
+
+	void FreeMaterialRenderInfo(Material::RenderInfo* info) {
+		_materialRenderInfoPool.Free(info);
+	}
 
 protected:
 
@@ -133,9 +151,11 @@ protected:
 	virtual void ConfigureImpl(const NameValueMap&) = 0;
 
 	NEX_THREAD_MUTEX(accessLock);
-	
+
+	typedef MemoryPool<MEMCAT_GENERAL, NullMutex> PoolType;
 	/* bool loadDefaultTexture; */
 
+	PoolType _materialRenderInfoPool;
 	/* */
 	StreamData fullScreenQuad;
 	/* Global render options */
@@ -144,10 +164,15 @@ protected:
 	RenderQueueDescList renderQueues;	
 	// Default texture
 	TextureAssetPtr defaultTexture;
+	// active render system
+	RenderSystemPtr activeRenderSystem;
 	// Render pass factory map
 	RenderPassFactoryMap renderSystemFactories;
 	// Render streamers
 	RenderSystemStreamerMap renderSystemStreamers;
+	// Global shader options
+	StringUtils::WordList shaderOptions;
+
 
 };
 

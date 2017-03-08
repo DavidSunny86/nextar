@@ -25,7 +25,7 @@ public:
 	virtual void EndBuffer(ShaderScriptContext* _script)  override;
 
 	virtual void AddMacro(ShaderScriptContext* script, const String& name) override;
-	virtual void AddPredefs(ShaderScriptContext* script, Pass::ProgramStage stage) override;
+	virtual void AddPredefs(ShaderScriptContext* script, Pass::ProgramStage::Type stage) override;
 
 protected:
 };

@@ -17,7 +17,9 @@ namespace nextar {
  * Material
  ****************************************/
 MaterialAsset::MaterialAsset(const StringID name, const StringID factory) :
-		Asset(name, factory), layerMask(0) {
+Asset(name, factory)
+,layerMask(0)
+,_reserved(nullptr) {
 }
 
 MaterialAsset::~MaterialAsset() {
@@ -33,6 +35,7 @@ StreamNotification MaterialAsset::NotifyAssetLoadedImpl(StreamRequest* request) 
 	MaterialAsset::MaterialLoadRequest* req =
 			static_cast<MaterialAsset::MaterialLoadRequest*>(request);
 	PrepareMaterial(req);
+	effect->AsyncReleaseData();
 	return StreamNotification::NOTIFY_COMPLETED_AND_READY;
 }
 
@@ -52,7 +55,8 @@ void MaterialAsset::NotifyAssetUpdated() {
 }
 
 void MaterialAsset::PrepareMaterial(MaterialAsset::MaterialLoadRequest* req) {
-	const ParamEntryTableItem& item = shader->GetParamTableItem(ParameterContext::CTX_MATERIAL);
+	effect->ResolveMaterial(req->shaderOptions);
+	const ParamEntryTableItem& item = effect->GetParamTableItem(ParameterContext::CTX_MATERIAL);
 	materialParamData.SetParamEntryTable(item);
 }
 
@@ -82,8 +86,8 @@ void MaterialAsset::SetParameterBuffer(ParameterBuffer&& buff) {
 	materialParamData = std::move(buff);
 }
 
-void MaterialAsset::SetShader(ShaderAssetPtr& shader) {
-	this->shader = shader;
+void MaterialAsset::SetEffect(EffectAssetPtr& shader) {
+	this->effect = shader;
 }
 
 /*****************************************************/
@@ -96,28 +100,24 @@ MaterialAsset::MaterialLoadRequest::MaterialLoadRequest(Asset *asset) :
 MaterialAsset::MaterialLoadRequest::~MaterialLoadRequest() {
 }
 
-void MaterialAsset::MaterialLoadRequest::SetShader(ShaderAssetPtr& shader) {
+void MaterialAsset::MaterialLoadRequest::SetEffect(EffectAssetPtr& shader) {
 	// construct the name, it will be of the form
 	// Factory:Group.Name
 	MaterialAsset* material = static_cast<MaterialAsset*>(GetStreamedObject());
-	material->SetShader(shader);
+	material->SetEffect(shader);
+	shader->AsyncAcquireData();
 	GetMetaInfo().AddDependency(shader);
 }
 
-void MaterialAsset::MaterialLoadRequest::SetShader(const ShaderAsset::ID& id,
+void MaterialAsset::MaterialLoadRequest::SetEffect(const EffectAsset::ID& id,
 		const URL& location) {
-	ShaderAssetPtr shader = ShaderAsset::Traits::Instance(id, location);
+	EffectAssetPtr shader = EffectAsset::Traits::Instance(id, location);
 	if (!shader) {
 		Warn("Failed to load shader for material: "
-						+ shader->GetNameID());
+						+ location.ToString());
 		NEX_THROW_GracefulError(EXCEPT_COULD_NOT_LOAD_ASSET);
 	} else
-		SetShader(shader);
-}
-
-ParameterBuffer* MaterialAsset::MaterialLoadRequest::PrepareParamBuffer(const ParamEntryTableItem& table) {
-	MaterialAsset* material = static_cast<MaterialAsset*>(GetStreamedObject());
-	return material->PrepareParamBuffer(table);
+		SetEffect(shader);
 }
 
 void MaterialAsset::MaterialLoadRequest::SetParamValue(uint32 offset,
@@ -144,7 +144,16 @@ void MaterialAsset::MaterialLoadRequest::SetParameterBuffer(ParameterBuffer&& bu
 
 void MaterialAsset::MaterialLoadRequest::SetLayer(Layer l) {
 	MaterialAsset* material = static_cast<MaterialAsset*>(GetStreamedObject());
-	material->SetLayerMask((uint8)l);
+	material->SetLayer((uint8)l);
+}
+
+void MaterialAsset::MaterialLoadRequest::SetMask(uint32 l) {
+	MaterialAsset* material = static_cast<MaterialAsset*>(GetStreamedObject());
+	material->SetMask(l);
+}
+
+void MaterialAsset::MaterialLoadRequest::SetShaderOptions(StringUtils::WordList&& options) {
+	shaderOptions = std::move(options);
 }
 
 } /* namespace nextar */

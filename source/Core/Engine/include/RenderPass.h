@@ -39,7 +39,7 @@ public:
 			flags &= ~PASS_ENABLED;
 	}
 
-		
+	virtual const StringUtils::WordList& GetShaderOptions() = 0;
 	virtual void Commit(CommitContext& context) = 0;
 
 protected:

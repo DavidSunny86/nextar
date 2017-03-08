@@ -84,7 +84,7 @@ public:
 
 		/* Pass related */
 		void SetCompilationOptions(const String& options);
-		void SetProgramSource(Pass::ProgramStage stage, String&& src);
+		void SetProgramSource(Pass::ProgramStage::Type stage, String&& src);
 		void SetRasterState(RasterState& state);
 		void SetBlendState(BlendState& state);
 		void SetDepthStencilState(DepthStencilState& state);
