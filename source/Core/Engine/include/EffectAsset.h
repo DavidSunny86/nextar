@@ -85,15 +85,17 @@ class _NexEngineAPI EffectAsset: public Asset {
 
 
 	void ResolveMaterial(const StringUtils::WordList& options, Material& m);
+	void ResolveMaterialSingle(const StringUtils::WordList& options,
+		const StringUtils::WordList& renderPassOptions, Material& m);
 
 	void AsyncAcquireData();
 	void AsyncReleaseData();
 
-
 protected:
 
 	ShaderData& _GetShaderData();
-	int32 _CreateUnit(const String& id, hash_t h, const ShaderOptions&);
+	int32 _FindUnit(const String& id, hash_t h);
+	int32 _CreateUnit(const String& id, hash_t h, const ShaderOptions&, const RenderPass::Info&);
 
 	atomic_uint acquireRef;
 

@@ -58,6 +58,10 @@ void EffectAsset::StreamRequest::SetDepthStencilState(
 void EffectAsset::StreamRequest::SetRenderQueueFlags(uint32 flags) {
 }
 
+
+//****************************************
+//            EffectAsset
+//****************************************
 void EffectAsset::ResolveMaterial(
 		const StringUtils::WordList& options,
 		Material& m) {
@@ -71,20 +75,25 @@ void EffectAsset::ResolveMaterial(
 	shaderOptions.Append(baseOptions);
 	shaderOptions.Append(options);
 
-	if (!m._reserved)
+	if (!m._reserved) {
 		m._reserved = RenderManager::Instance().AllocMaterialRenderInfo();
-
+		m.flags |= Material::RENDER_INFO_PER_PASS;
+	}
+	
 	RenderInfo_Material* info = static_cast<RenderInfo_Material*>(m._reserved);
 	uint32 count = renderSys->GetPassCount();
 
 	for (uint32 i = 0; i < count; ++i) {
-		ShaderOptions newOptions(	renderSys->GetPass(i)->GetShaderOptions() );
+		RenderPass* pass = renderSys->GetPass(i);
+		RenderPass::Info info = pass->GetPassInfo();
+
+		ShaderOptions newOptions( info._options ? *info._options : StringUtils::Null );
 		newOptions.Append(shaderOptions);
 		newOptions.ToString(strOptions);
 		hash_t h = StringUtils::Hash(strOptions);
 		int32 unit = _FindUnit(strOptions, h);
 		if (unit < 0) {
-			unit = _CreateUnit(strOptions, h, newOptions);
+			unit = _CreateUnit(strOptions, h, newOptions, info);
 		}
 		info[i].shaderUnit = unit;
 	}

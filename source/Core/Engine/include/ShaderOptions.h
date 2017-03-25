@@ -17,6 +17,11 @@ namespace nextar {
 class _NexEngineAPI ShaderOptions : public AllocGeneral {
 public:
 
+	inline ShaderOptions() {}
+	inline ShaderOptions(const StringUtils::WordList& values) { Append(values); }
+	inline ShaderOptions(const ShaderOptions& other) : options(other.options) {}
+	inline ShaderOptions(ShaderOptions&& other) : options(std::move(other.options)) {}
+
 	void Append(const ShaderOptions& other);
 	void Append(const StringUtils::WordList& other);
 	void Append(const String& name, const String& value) {
