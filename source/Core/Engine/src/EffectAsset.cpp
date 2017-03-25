@@ -13,22 +13,31 @@ namespace nextar {
 
 
 void EffectAsset::ReloadRequest::SetProgramSource(
-		Pass::ProgramStage::Type stage, String&& src) {
+	PipelineStage::Name stage, String&& src) {
+	_data.programSources[stage] = std::move(src);
 }
 
 void EffectAsset::ReloadRequest::SetSemanticMap(
-		const Pass::VarToAutoParamMap& m) {
+		VarToAutoParamMap&& m) {
+	_data.autoNames = std::move(m);
 }
 
 void EffectAsset::ReloadRequest::AddSamplerUnit(TextureUnitParams& unit,
-		const String& boundUnitNames) {
+	StringUtils::WordList&& boundUnitNames) {
+	_data.textureStates.push_back(SamplerDesc());
+	SamplerDesc& sd = _data.textureStates.back();
+	sd.texUnitParams = unit;
+	sd.unitsBound = std::move(boundUnitNames);
 }
 
 void EffectAsset::ReloadRequest::AddAutoNameMapping(
 		const String& varName, AutoParamName name) {
+	_data.autoNames[StringUtils::Hash(varName)] = name;
 }
 
-EffectAsset::StreamRequest::StreamRequest(EffectAsset* owner) : renderQueueFlags(0) {
+EffectAsset::StreamRequest::StreamRequest(EffectAsset* owner) : 
+ReloadRequest(owner),
+renderQueueFlags(0) {
 }
 
 EffectAsset::StreamRequest::~StreamRequest() {

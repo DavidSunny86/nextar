@@ -2,7 +2,7 @@
 #define NEXTAR_BLENDING_H
 
 #include <NexBase.h>
-#include <RenderStateBase.h>
+#include <RenderStateDesc.h>
 
 namespace nextar {
 
@@ -54,7 +54,7 @@ struct RenderTargetBlendOp {
 	}
 };
 
-struct _NexEngineAPI BlendState : pubRenderStateBasetate<BlendState> {
+struct _NexEngineAPI BlendState : public RenderStateDesc<BlendState> {
 	bool enabled;
 	bool alphaToCoverage;
 	uint16 numRenderTargets;

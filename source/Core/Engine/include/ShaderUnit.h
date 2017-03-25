@@ -22,7 +22,6 @@ public AllocGeneral {
 
 public:
 
-
 	struct SamplerDesc {
 		StringUtils::WordList unitsBound;
 		TextureUnitParams texUnitParams;
@@ -49,8 +48,20 @@ public:
 	};
 
 	ShaderUnit(hash_t hash);
+	
+	class View : public ContextObject::View {
+	public:
 
+		virtual void Compile(RenderContext*,
+			const ShaderUnit::CompileParams&) = 0;
+		// Bind texture to a shader parameter. The number of units must match the desc->numUnits count.
+		virtual void SetTexture(RenderContext* rc, const SamplerParameter& desc,
+			TextureBase* t) = 0;
 
+		virtual void Update(nextar::RenderContext*, uint32 msg,
+			ContextParamPtr);
+
+	};
 
 protected:
 	friend class EffectAsset;

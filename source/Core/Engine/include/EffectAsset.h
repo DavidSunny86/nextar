@@ -39,15 +39,16 @@ class _NexEngineAPI EffectAsset: public Asset {
 	typedef ShaderUnit::TextureDescMap TextureDescMap;
 	typedef ShaderUnit::VarToAutoParamMap VarToAutoParamMap;
 	typedef ShaderUnit::ShaderData ShaderData;
+	typedef ShaderUnit::SamplerDesc SamplerDesc;
 
 	class _NexEngineAPI ReloadRequest: public AssetStreamRequest {
+	public:
+		ReloadRequest(EffectAsset*);
 		// source
-		void SetProgramSource(Pass::ProgramStage::Type stage, String&& src);
-		void SetSemanticMap(const Pass::VarToAutoParamMap& m);
-		// If called multiple times for the same unit, the texture will be appended in a
-		// list and if the sampler is an array
+		void SetProgramSource(PipelineStage::Name stage, String&& src);
+		void SetSemanticMap(VarToAutoParamMap&& m);
 		void AddSamplerUnit(TextureUnitParams& unit,
-				const String& boundUnitNames);
+				StringUtils::WordList&& boundUnitNames);
 		void AddAutoNameMapping(const String& varName, AutoParamName name);
 	protected:
 		ShaderData _data;
@@ -61,13 +62,23 @@ class _NexEngineAPI EffectAsset: public Asset {
 		~StreamRequest();
 
 		/* Pass related */
-		void SetRasterState(const RasterState& state);
-		void SetBlendState(const BlendState& state);
-		void SetDepthStencilState(const DepthStencilState& state);
-		void SetRenderQueueFlags(uint32 flags);
+		inline void SetRasterState(const RasterState& state) {
+			this->state.raster = state;
+			this->state.raster.UpdateHash();
+		}
+		inline void SetBlendState(const BlendState& state) {
+			this->state.blend = state;
+			this->state.blend.UpdateHash();
+		}
+		inline void SetDepthStencilState(const DepthStencilState& state) {
+			this->state.dethStencil = state;
+			this->state.dethStencil.UpdateHash();
+		}
+		inline void SetRenderQueueFlags(uint32 flags) {
+			renderQueueFlags = flags;
+		}
 
 	protected:
-
 		uint32 renderQueueFlags;
 		RenderState::Params state;
 	};

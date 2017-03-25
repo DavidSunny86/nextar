@@ -5,8 +5,8 @@
  *      Author: obhi
  */
 
-#ifndef CORE_ENGINE_INCLUDE_RENDERSTATE_H_
-#define CORE_ENGINE_INCLUDE_RENDERSTATE_H_
+#ifndef CORE_ENGINE_INCLUDE_RENDERSTATEDESC_H_
+#define CORE_ENGINE_INCLUDE_RENDERSTATEDESC_H_
 
 #include <NexBase.h>
 #include <RenderConstants.h>
@@ -28,4 +28,4 @@ public:
 
 
 
-#endif /* CORE_ENGINE_INCLUDE_RENDERSTATE_H_ */
+#endif /* CORE_ENGINE_INCLUDE_RENDERSTATEDESC_H_ */
