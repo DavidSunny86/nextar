@@ -48,7 +48,7 @@ struct StencilFaceOp {
 	}
 };
 
-struct _NexEngineAPI DepthStencilState : public RenderStateBase<DepthStencilState> {
+struct _NexEngineAPI DepthStencilState : public RenderStateDesc<DepthStencilState> {
 	/* true to enable depth test */
 	bool depthTest;
 	/* true to enable depth write */

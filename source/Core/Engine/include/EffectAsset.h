@@ -12,6 +12,7 @@
 #include <ShaderOptions.h>
 #include <ShaderUnit.h>
 #include <RenderState.h>
+#include <RenderPass.h>
 #include <Material.h>
 
 namespace nextar {
@@ -26,6 +27,9 @@ namespace nextar {
  * */
 class _NexEngineAPI EffectAsset: public Asset {
 
+	NEX_LOG_HELPER(EffectAsset);
+
+public:
 	enum {
 		CLASS_ID = Asset::CLASS_ASSET_EFFECT,
 	};
@@ -93,9 +97,12 @@ class _NexEngineAPI EffectAsset: public Asset {
 
 protected:
 
+	bool _IsCompileAllowed(const ShaderData& data, const RenderPass::Info& info);
+	int32 _Resolve(const StringUtils::WordList& options);
+	
 	ShaderData& _GetShaderData();
 	int32 _FindUnit(const String& id, hash_t h);
-	int32 _CreateUnit(const String& id, hash_t h, const ShaderOptions&, const RenderPass::Info&);
+	int32 _CreateUnit(const String& id, hash_t h, const ShaderOptions&);
 
 	atomic_uint acquireRef;
 

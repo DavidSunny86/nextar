@@ -75,27 +75,30 @@ void EffectAsset::ResolveMaterial(
 	shaderOptions.Append(baseOptions);
 	shaderOptions.Append(options);
 
-	if (!m._reserved) {
-		m._reserved = RenderManager::Instance().AllocMaterialRenderInfo();
+	if (!m._reserved_p) {
+		m._reserved_p = RenderManager::Instance().AllocMaterialRenderInfo();
 		m.flags |= Material::RENDER_INFO_PER_PASS;
 	}
 	
-	RenderInfo_Material* info = static_cast<RenderInfo_Material*>(m._reserved);
+	RenderInfo_Material* rinfo = static_cast<RenderInfo_Material*>(m._reserved_p);
 	uint32 count = renderSys->GetPassCount();
 
 	for (uint32 i = 0; i < count; ++i) {
 		RenderPass* pass = renderSys->GetPass(i);
 		RenderPass::Info info = pass->GetPassInfo();
+		const ShaderData& data = _GetShaderData();
 
-		ShaderOptions newOptions( info._options ? *info._options : StringUtils::Null );
-		newOptions.Append(shaderOptions);
-		newOptions.ToString(strOptions);
-		hash_t h = StringUtils::Hash(strOptions);
-		int32 unit = _FindUnit(strOptions, h);
-		if (unit < 0) {
-			unit = _CreateUnit(strOptions, h, newOptions, info);
-		}
-		info[i].shaderUnit = unit;
+		if (_IsCompileAllowed(data, info)) {
+			// we can call @_Resolve with the effect from this pass
+			// but we do not do that for now.
+			rinfo[i].shaderUnit = -1;
+		} else {
+
+			ShaderOptions newOptions(info._options ? *info._options : StringUtils::Null);
+			newOptions.Append(shaderOptions);
+			newOptions.ToString(strOptions);
+			rinfo[i].shaderUnit = _Resolve(strOptions);
+		}			
 	}
 	// combine options
 	// for each render pass
@@ -106,10 +109,39 @@ void EffectAsset::ResolveMaterial(
 
 }
 
+void EffectAsset::ResolveMaterialSingle(const StringUtils::WordList & options, 
+	const StringUtils::WordList & renderPassOptions, Material & m) {
+}
+
 void EffectAsset::AsyncAcquireData() {
 }
 
 void EffectAsset::AsyncReleaseData() {
+}
+
+bool EffectAsset::_IsCompileAllowed(const ShaderData & data, const RenderPass::Info & info) {
+	if (info.flags & RenderPass::PASS_OVERRIDES_MATERIAL)
+		return false;
+	if (std::find(data.tags.begin(), data.tags.end(), info.tag) != data.tags.end())
+		return true;
+	return false;
+}
+
+int32 EffectAsset::_Resolve(const StringUtils::WordList & options) {
+	hash_t h = StringUtils::Hash(options);
+	int32 unit = _FindUnit(options, h);
+	if (unit < 0) {
+		unit = _CreateUnit(options, h, options);
+	}
+	return unit;
+}
+
+EffectAsset::ShaderData& EffectAsset::_GetShaderData() {
+	// TODO: insert return statement here
+}
+
+int32 EffectAsset::_FindUnit(const String & id, hash_t h) {
+	return int32();
 }
 
 int32 EffectAsset::_CreateUnit(const String& id, hash_t h, const ShaderOptions& options) {
@@ -117,8 +149,13 @@ int32 EffectAsset::_CreateUnit(const String& id, hash_t h, const ShaderOptions& 
 	ShaderUnit& unit = shaderUnits.back();
 
 	const ShaderData& data = _GetShaderData();
-	unit.Compile(data, options);
 
+	if (!unit.Compile(data, options)) {
+		shaderUnits.pop_back();
+		Error("Failed to compile shader!");
+		return -1;
+	}
+		
 	return (int32)shaderUnits.size() - 1;
 }
 

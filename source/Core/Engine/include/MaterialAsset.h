@@ -31,7 +31,6 @@ public:
 
 	enum Mask : uint32 {
 		BACKGROUND = 1 << 0,
-		OPAQUE = 1 << 1,
 		TRANSLUCENT = 1 << 3,
 		OVERLAY = 1 << 4,
 		SHADOW_CASTER = 1 << 5,

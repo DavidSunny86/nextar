@@ -13,7 +13,7 @@
 namespace nextar {
 
 struct RenderInfo_Material : public Material::RenderInfo {
-	uint32 shaderUnit;
+	int16 shaderUnit;
 };
 
 }

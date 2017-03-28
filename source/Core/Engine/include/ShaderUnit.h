@@ -11,7 +11,7 @@
 #include <NexBase.h>
 #include <ShaderParam.h>
 #include <ParameterBuffer.h>
-
+#include <FixedArray.h>
 
 namespace nextar {
 
@@ -29,8 +29,10 @@ public:
 
 	typedef vector<SamplerDesc>::type TextureDescMap;
 	typedef map<hash_t, AutoParamName>::type VarToAutoParamMap;
+	typedef vector<hash_t>::type TagList;
 
 	struct ShaderData {
+		TagList tags;
 		VarToAutoParamMap autoNames;
 		TextureDescMap textureStates;
 		String programSources[PipelineStage::EFFECT_STAGE_COUNT];
@@ -47,8 +49,7 @@ public:
 		CompiledOutput _outData;
 	};
 
-	ShaderUnit(hash_t hash);
-	
+		
 	class View : public ContextObject::View {
 	public:
 
@@ -62,6 +63,15 @@ public:
 			ContextParamPtr);
 
 	};
+
+	// API
+	//***************************************
+
+	ShaderUnit(hash_t hash);
+
+	// returns true on success
+	bool Compile(const ShaderData& data, const ShaderOptions& options);
+
 
 protected:
 	friend class EffectAsset;

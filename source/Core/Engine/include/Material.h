@@ -23,13 +23,13 @@ public:
 	struct RenderInfo {
 	};
 
-	Material() : _reserved(nullptr), flags(0) {}
+	Material() : _reserved_p(nullptr), flags(0) {}
 	~Material();
 
 	uint32 flags;
 	union {
-		RenderInfo* _reserved;
-		uint32 _singleUnit;
+		RenderInfo* _reserved_p;
+		uint32 _reserved_i;
 	};
 
 	//ConstantBufferPtr materialParameters;
