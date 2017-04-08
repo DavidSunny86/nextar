@@ -3,12 +3,27 @@
 #include <MeshBuffer.h>
 
 namespace nextar {
-
+using namespace Math;
 template <typename Vec>
 class VertexChannelTempl : public VertexChannel {
 public:
-	typedef typename vector<Vec>::type VertexArray;
+	typedef typename vector<Vec, AllocatorMathCore>::type VertexArray;
 
+	struct Hasher {
+		inline static uint32 Hash(float v) {
+			return (uint32)(v * 100);
+		}
+		inline static uint32 Hash(TraitsVec2::pref v) {
+			return (uint32)(Vec2Op::Hadd(v) * 100);
+		}
+		inline static uint32 Hash(TraitsVec3::pref v) {
+			return (uint32)(Vec3Op::Hadd(v) * 100);
+		}
+		inline static uint32 Hash(TraitsVec4::pref v) {
+			return (uint32)(Vec4Op::Hadd(v) * 100);
+		}
+
+	};
 
 	VertexChannelTempl(VertexComponentSemantic _semantic, uint32 _index, VertexComponentType _type, uint32 streamIdx) :
 		VertexChannel(_semantic, _index, _type, Math::Traits<Vec>::Size(), streamIdx) {
@@ -19,7 +34,7 @@ public:
 	}
 
 	virtual uint32 Hash(uint32 i) const {
-		return Math::Traits<Vec>::Hash(vertices[i]);
+		return Hasher::Hash(vertices[i]);
 	}
 
 	virtual void Reserve(uint32 count) {

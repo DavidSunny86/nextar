@@ -11,18 +11,34 @@
 
 namespace nextar {
 
+//****************************************
 
-void EffectAsset::ReloadRequest::SetProgramSource(
+EffectAsset::SourceLoadRequest::SourceLoadRequest(EffectAsset *asset) :
+	AssetStreamRequest(asset) {
+}
+
+void EffectAsset::SourceLoadRequest::AddTags(const StringUtils::WordList & tags) {
+	ConstMultiStringHelper cms(tags);
+
+	_data.tags.reserve(cms.Length());
+	auto it = cms.Iterate();
+	String v;
+	
+	while (it.HasNext(v))
+		AddTag(StringUtils::Hash(v));
+}
+
+void EffectAsset::SourceLoadRequest::SetProgramSource(
 	PipelineStage::Name stage, String&& src) {
 	_data.programSources[stage] = std::move(src);
 }
 
-void EffectAsset::ReloadRequest::SetSemanticMap(
+void EffectAsset::SourceLoadRequest::SetSemanticMap(
 		VarToAutoParamMap&& m) {
 	_data.autoNames = std::move(m);
 }
 
-void EffectAsset::ReloadRequest::AddSamplerUnit(TextureUnitParams& unit,
+void EffectAsset::SourceLoadRequest::AddSamplerUnit(TextureUnitParams& unit,
 	StringUtils::WordList&& boundUnitNames) {
 	_data.textureStates.push_back(SamplerDesc());
 	SamplerDesc& sd = _data.textureStates.back();
@@ -30,38 +46,31 @@ void EffectAsset::ReloadRequest::AddSamplerUnit(TextureUnitParams& unit,
 	sd.unitsBound = std::move(boundUnitNames);
 }
 
-void EffectAsset::ReloadRequest::AddAutoNameMapping(
+void EffectAsset::SourceLoadRequest::AddAutoNameMapping(
 		const String& varName, AutoParamName name) {
 	_data.autoNames[StringUtils::Hash(varName)] = name;
 }
 
-EffectAsset::StreamRequest::StreamRequest(EffectAsset* owner) : 
-ReloadRequest(owner),
+//****************************************
+
+EffectAsset::FullLoadRequest::FullLoadRequest(EffectAsset* owner) :
+SourceLoadRequest(owner),
 renderQueueFlags(0) {
 }
 
-EffectAsset::StreamRequest::~StreamRequest() {
+EffectAsset::FullLoadRequest::~FullLoadRequest() {
 }
-
-void EffectAsset::StreamRequest::SetRasterState(
-		const RasterState& state) {
-}
-
-void EffectAsset::StreamRequest::SetBlendState(
-		const BlendState& state) {
-}
-
-void EffectAsset::StreamRequest::SetDepthStencilState(
-		const DepthStencilState& state) {
-}
-
-void EffectAsset::StreamRequest::SetRenderQueueFlags(uint32 flags) {
-}
-
 
 //****************************************
 //            EffectAsset
 //****************************************
+EffectAsset::EffectAsset(const StringID name, const StringID factory) :
+Asset(name, factory), acquireRef(0) {
+}
+
+EffectAsset::~EffectAsset() {
+}
+
 void EffectAsset::ResolveMaterial(
 		const StringUtils::WordList& options,
 		Material& m) {
@@ -79,16 +88,17 @@ void EffectAsset::ResolveMaterial(
 		m._reserved_p = RenderManager::Instance().AllocMaterialRenderInfo();
 		m.flags |= Material::RENDER_INFO_PER_PASS;
 	}
-	
+
+	const ShaderData* data = _GetShaderData();
+	if (!data)
+		return;
+
 	RenderInfo_Material* rinfo = static_cast<RenderInfo_Material*>(m._reserved_p);
 	uint32 count = renderSys->GetPassCount();
-
 	for (uint32 i = 0; i < count; ++i) {
 		RenderPass* pass = renderSys->GetPass(i);
 		RenderPass::Info info = pass->GetPassInfo();
-		const ShaderData& data = _GetShaderData();
-
-		if (_IsCompileAllowed(data, info)) {
+		if (_CanCompile(*data, info)) {
 			// we can call @_Resolve with the effect from this pass
 			// but we do not do that for now.
 			rinfo[i].shaderUnit = -1;
@@ -98,7 +108,7 @@ void EffectAsset::ResolveMaterial(
 			newOptions.Append(shaderOptions);
 			newOptions.ToString(strOptions);
 			rinfo[i].shaderUnit = _Resolve(strOptions);
-		}			
+		}
 	}
 	// combine options
 	// for each render pass
@@ -114,15 +124,36 @@ void EffectAsset::ResolveMaterialSingle(const StringUtils::WordList & options,
 }
 
 void EffectAsset::AsyncAcquireData() {
+	if (!acquireRef.fetch_add(1)) {
+		std::lock_guard<spinlock_mutex> g(_lock);
+		// reset the asset state
+		assetState = ASSET_CREATED;
+		// create a load request object
+		loadRequest = WasLoaded() ? NEX_NEW(SourceLoadRequest(this)) : NEX_NEW(FullLoadRequest(this));
+		// request a load
+		AsyncRequestLoad();
+	}
 }
 
 void EffectAsset::AsyncReleaseData() {
+	if (!acquireRef.fetch_sub(1) == 1) {
+		std::lock_guard<spinlock_mutex> g(_lock);
+		if (loadRequest) {
+			NEX_DELETE(loadRequest);
+		}
+	}
 }
 
-bool EffectAsset::_IsCompileAllowed(const ShaderData & data, const RenderPass::Info & info) {
+StreamRequest* EffectAsset::CreateStreamRequestImpl(bool load) {
+	if (load)
+		return loadRequest;
+	return nullptr;
+}
+
+bool EffectAsset::_CanCompile(const ShaderData & data, const RenderPass::Info & info) {
 	if (info.flags & RenderPass::PASS_OVERRIDES_MATERIAL)
 		return false;
-	if (std::find(data.tags.begin(), data.tags.end(), info.tag) != data.tags.end())
+	if (info.tag == 0 || std::find(data.tags.begin(), data.tags.end(), info.tag) != data.tags.end())
 		return true;
 	return false;
 }
@@ -136,21 +167,38 @@ int32 EffectAsset::_Resolve(const StringUtils::WordList & options) {
 	return unit;
 }
 
-EffectAsset::ShaderData& EffectAsset::_GetShaderData() {
-	// TODO: insert return statement here
+EffectAsset::ShaderData* EffectAsset::_GetShaderData() {
+	if (this->loadRequest)
+		return &this->loadRequest->GetData();
+	return nullptr;
 }
 
 int32 EffectAsset::_FindUnit(const String & id, hash_t h) {
-	return int32();
+	int32 n = (int32)shaderUnits.size();
+	for (int32 i = 0; i < n; ++i) {
+		auto& su = shaderUnits[i];
+		if (su.GetOptionHash() == h) {
+#ifdef NEX_DEBUG
+			if (su.VerifyId(id))
+				return i;
+#endif
+		}
+	}
+	return int32(-1);
 }
 
 int32 EffectAsset::_CreateUnit(const String& id, hash_t h, const ShaderOptions& options) {
 	shaderUnits.emplace_back(h);
 	ShaderUnit& unit = shaderUnits.back();
 
-	const ShaderData& data = _GetShaderData();
+#ifdef NEX_DEBUG
+	unit.SetId(id);
+#endif
 
-	if (!unit.Compile(data, options)) {
+	const ShaderData* data = _GetShaderData();
+	if (data == nullptr)
+		return -1;
+	if (!unit.Compile(*data, options)) {
 		shaderUnits.pop_back();
 		Error("Failed to compile shader!");
 		return -1;

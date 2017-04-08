@@ -289,14 +289,21 @@ public:
 		memoryCost = c;
 	}
 
-	/** @remarks Returns the asset locator definition **/
+	/** @remarks Returns the asset locator definition
+	 **/
 	inline const URL& GetAssetLocator() const {
 		return assetLocator;
 	}
 
-	/***/
+	/**
+	 * @remarks Set the asset locator.
+	 * Note: this function is not thread safe, and should be invoked
+	 * with care (i.e. Not while the object is being loaded, but certainly
+	 * before that.
+	 */
 	inline void SetAssetLocator(const URL& value) {
-		assetLocator = value;
+		if (assetState.load(std::memory_order_seq_cst) == ASSET_CREATED)
+			assetLocator = value;
 	}
 
 	inline void AddAssetCallback(AssetCallback* assetCallback) {
@@ -388,7 +395,6 @@ public:
 
 protected:
 
-	
 	virtual StreamRequest* CreateStreamRequestImpl(bool load) = 0;
 
 	/* return true if the loading was completed */

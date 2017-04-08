@@ -1,21 +1,23 @@
 #ifndef NEXCORE_SSE_CONSTANTS_H
 #define NEXCORE_SSE_CONSTANTS_H
 
-#include <NexMath.h>
+#if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE
 
 namespace nextar {
+namespace Math {
+
 
 struct _ConstF32 {
 	union {
 		float f[4];
-		Quad v;
+		_Quad v;
 	};
 };
 
 struct _ConstI32 {
 	union {
 		nextar::uint32 f[4];
-		Quad v;
+		_Quad v;
 	};
 };
 
@@ -24,18 +26,18 @@ typedef __declspec(align(16)) _ConstF32 ConstF32;
 typedef __declspec(align(16)) _ConstI32 ConstI32;
 #else
 using ConstF32 alignas(16) = _ConstF32;
-	using ConstI32 alignas(16) = _ConstI32;
+using ConstI32 alignas(16) = _ConstI32;
 #endif
-	#define NEXCORE_DEFINE_MASK(maskname) NEX_EXTERN_SYM _NexBaseAPI const ConstI32  maskname
-	#define NEXCORE_DEFINE_F32C(_f32const_) NEX_EXTERN_SYM _NexBaseAPI const ConstF32  _f32const_
+#define NEXCORE_DEFINE_MASK(maskname) NEX_EXTERN_SYM _NexBaseAPI const ConstI32  maskname
+#define NEXCORE_DEFINE_F32C(_f32const_) NEX_EXTERN_SYM _NexBaseAPI const ConstF32  _f32const_
 
-	/**
-	 * @remarks Constants used for SIMD operations
-	 **/
-	// some bit masks and there description
-	// This mask with andps will clear sign bit
-	// for aligned float vectors
-	NEXCORE_DEFINE_MASK(N3D_ClearSign);
+/**
+ * @remarks Constants used for SIMD operations
+ **/
+ // some bit masks and there description
+ // This mask with andps will clear sign bit
+ // for aligned float vectors
+NEXCORE_DEFINE_MASK(N3D_ClearSign);
 // These masks can be used as defined hereunder:
 // Notion: X indicates 1 and O indicates 0
 // In actuallity 1 in the MSB indicates negetive.
@@ -79,6 +81,10 @@ NEXCORE_DEFINE_F32C(N3D_Infinite);
 
 #undef NEXCORE_DEFINE_MASK
 #undef NEXCORE_DEFINE_F32C
+
 }
+}
+
+#endif
 
 #endif //NEXCORE_SSE_CONSTANTS_H

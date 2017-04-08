@@ -59,9 +59,10 @@ bool Asset::AsyncSetLoadInfo(const StreamInfo& request) {
 		if (_savedRequestPtr->flags & StreamRequest::ASSET_STREAM_REQUEST) {
 			AssetStreamRequest* assetRequest = static_cast<AssetStreamRequest*>(_savedRequestPtr);
 			assetRequest->SetStreamerInfo(request.manualStreamer);
-			// @todo potentially dangerous because this value might
+			// was potentially dangerous because this value might
 			// be written from outside using SetAssetLocator, when
-			// GetAssetLocator is called, may be guard the calls using a spinlock
+			// GetAssetLocator is called, currently we restrict
+			// SetAssetLocator call to only asset creation.
 			if (request.locator != URL::Invalid)
 				assetRequest->SetAssetLocator(request.locator);
 			else

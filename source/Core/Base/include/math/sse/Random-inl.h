@@ -3,18 +3,25 @@
  *	    Code from intel website: Fast random number generator
  *	    http://software.intel.com/en-us/articles/fast-random-number-generator-on-the-intel-pentiumr-4-processor/
  **/
-#define NEX_MATH_RANDOMIZER_DEFINED
 #define NEX_MATH_RANDOM_SEED _NexBaseAPI NEX_EFFICIENT_ALIGN(__m128i nextar::MathRandomizer::curSeed);
 
 namespace nextar {
 
-class MathRandomizer {
-	_NexBaseAPI
-	static __m128i curSeed;
+template<> class RandomizerBase<RANDCLASS_CORE> {
+	_NexBaseAPI	static __m128i curSeed;
 public:
+	enum {
+		MAX_VAL = 0xffffffff
+	};
 
-	static inline void Seed(unsigned int seed) {
+	static inline void Seed(uint32 seed) {
 		curSeed = _mm_set_epi32(seed, seed + 1, seed, seed + 1);
+	}
+
+	static inline uint32 Rand() {
+		unsigned int ret;
+		RandSSE(&ret);
+		return ret;
 	}
 
 	static inline void RandSSE(unsigned int* result) {

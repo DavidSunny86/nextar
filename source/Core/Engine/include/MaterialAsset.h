@@ -69,11 +69,11 @@ public:
 	MaterialAsset(const StringID name, const StringID factory);
 	virtual ~MaterialAsset();
 
-	inline const ShaderAssetPtr& GetShader() const {
+	inline const EffectAssetPtr& GetEffect() const {
 		return effect;
 	}
 
-	inline ShaderAssetPtr& GetShader() {
+	inline EffectAssetPtr& GetEffect() {
 		return effect;
 	}
 

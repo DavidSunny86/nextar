@@ -35,7 +35,8 @@ public:
 	};
 
 	enum Flags {
-		SOURCES_LOADED = 1 << 0,
+		WAS_LOADED = Asset::LAST_FLAG << 0,
+		LAST_FLAG = Asset::LAST_FLAG << 1,
 	};
 
 	typedef AssetTraits<EffectAsset> Traits;
@@ -45,25 +46,34 @@ public:
 	typedef ShaderUnit::ShaderData ShaderData;
 	typedef ShaderUnit::SamplerDesc SamplerDesc;
 
-	class _NexEngineAPI ReloadRequest: public AssetStreamRequest {
+	class _NexEngineAPI SourceLoadRequest: public AssetStreamRequest {
 	public:
-		ReloadRequest(EffectAsset*);
+		SourceLoadRequest(EffectAsset*);
 		// source
+		void AddTags(const StringUtils::WordList& tags);
+		void AddTag(hash_t tag) {
+			_data.tags.push_back(tag);
+		}
+		ShaderData& GetData() {
+			return _data;
+		}
 		void SetProgramSource(PipelineStage::Name stage, String&& src);
 		void SetSemanticMap(VarToAutoParamMap&& m);
 		void AddSamplerUnit(TextureUnitParams& unit,
 				StringUtils::WordList&& boundUnitNames);
 		void AddAutoNameMapping(const String& varName, AutoParamName name);
+		
+
 	protected:
 		ShaderData _data;
 	};
 
-	class _NexEngineAPI StreamRequest: public ReloadRequest {
-		NEX_LOG_HELPER(ShaderAsset::StreamRequest)
+	class _NexEngineAPI FullLoadRequest: public SourceLoadRequest {
+		NEX_LOG_HELPER(ShaderAsset::FullLoadRequest)
 		;
 	public:
-		StreamRequest(EffectAsset*);
-		~StreamRequest();
+		FullLoadRequest(EffectAsset*);
+		~FullLoadRequest();
 
 		/* Pass related */
 		inline void SetRasterState(const RasterState& state) {
@@ -88,6 +98,13 @@ public:
 	};
 
 
+	EffectAsset(const StringID name, const StringID factory);
+	virtual ~EffectAsset();
+
+	inline bool WasLoaded() const {
+		return (flags & WAS_LOADED);
+	}
+
 	void ResolveMaterial(const StringUtils::WordList& options, Material& m);
 	void ResolveMaterialSingle(const StringUtils::WordList& options,
 		const StringUtils::WordList& renderPassOptions, Material& m);
@@ -97,15 +114,18 @@ public:
 
 protected:
 
-	bool _IsCompileAllowed(const ShaderData& data, const RenderPass::Info& info);
+	virtual StreamRequest* CreateStreamRequestImpl(bool load) override;
+
+	bool _CanCompile(const ShaderData& data, const RenderPass::Info& info);
 	int32 _Resolve(const StringUtils::WordList& options);
 	
-	ShaderData& _GetShaderData();
+	ShaderData* _GetShaderData();
 	int32 _FindUnit(const String& id, hash_t h);
 	int32 _CreateUnit(const String& id, hash_t h, const ShaderOptions&);
 
+	spinlock_mutex _lock;
 	atomic_uint acquireRef;
-
+	SourceLoadRequest* loadRequest;
 	ShaderUnitList shaderUnits;
 	RenderStatePtr renderState;
 };

@@ -11,7 +11,6 @@
 #include <NexBase.h>
 #include <ShaderParam.h>
 #include <ParameterBuffer.h>
-#include <FixedArray.h>
 
 namespace nextar {
 
@@ -43,12 +42,10 @@ public:
 	};
 
 	struct CompileParams {
-
 		const ShaderData* _data;
 		const ShaderOptions* _options;
 		CompiledOutput _outData;
 	};
-
 		
 	class View : public ContextObject::View {
 	public:
@@ -72,6 +69,9 @@ public:
 	// returns true on success
 	bool Compile(const ShaderData& data, const ShaderOptions& options);
 
+	inline hash_t GetOptionHash() const {
+		return optionHash;
+	}
 
 protected:
 	friend class EffectAsset;

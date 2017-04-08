@@ -31,7 +31,6 @@ public:
 		seed = (214013 * seed + 2531011);
 		return (seed >> 16) & 0x7FFF;
 	}
-	;
 };
 
 template<const RandClass randClass = RANDCLASS_FAST>
@@ -89,6 +88,7 @@ public:
 	}
 	;
 };
+
 }
 
 #endif //NEXTAR_RANDOMIZER_H

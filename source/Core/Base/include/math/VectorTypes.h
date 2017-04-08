@@ -8,21 +8,66 @@
 #ifndef VECTORTYPES_H_
 #define VECTORTYPES_H_
 
-#if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE
-#	include "math/sse/SSE_VectorTypes.h"
-#elif NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_FALLBACK
-#	include "math/c/C_VectorTypes.h"
-#else
-#endif
 #include <NexBase.h>
 #include <PooledAllocator.h>
+
 namespace nextar {
+namespace Math {
 
 struct _Matrix3x4;
 struct _Matrix4x4;
 struct _AxisAlignedBox;
+struct _PolarCoord;
+struct _AxisAngle;
+struct _EulerAngles;
+struct _Rect;
 
-#if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE
+#if NEX_VECTOR_MATH_TYPE_IS_SSE
+typedef __m128 _Quad;
+#else
+struct alignas(16) _Quad {
+	typedef _Vec2 type;
+	union {
+		struct {
+			float x;
+			float y;
+			float z;
+			float w;
+		};
+		float v[4];
+	};
+};
+#endif
+
+typedef _Quad Quad;
+
+struct _Vec2 {
+	typedef _Vec2 type; 
+	union { 
+		struct { 
+			float x, y; 
+		};
+		float v[2]; 
+	};
+};
+
+struct _Vec3 { 
+	typedef _Vec3 type; 
+	union {
+		struct {
+			float x, y, z;
+		};
+		float v[3];
+	};
+};
+
+struct _Vec3A { typedef _Quad type; };
+struct _Vec4 { typedef _Quad type; };
+struct _Plane { typedef _Quad type; };
+struct _Quat { typedef _Quad type; };
+struct _AxisAngle { typedef _Quad type; };
+struct _EulerAngles { typedef _Quad type; };
+struct _PolarCoord { typedef _Vec2 type; };
 
 #ifdef _MSC_VER
 typedef __declspec(align(16)) _Matrix3x4 Matrix3x4;
@@ -34,11 +79,16 @@ using Matrix4x4 alignas(16) = _Matrix4x4;
 using AxisAlignedBox alignas(16) = _AxisAlignedBox;
 #endif
 
-#else
-using Matrix3x4 = _Matrix3x4;
-using Matrix4x4 = _Matrix4x4;
-using AxisAlignedBox = _AxisAlignedBox;
-#endif
+
+typedef _Vec2::type Vector2;
+typedef _Vec3::type Vector3;
+typedef _Vec3A::type Vector3A;
+typedef _Vec4::type Vector4;
+typedef _Plane::type Plane;
+typedef _Quat::type Quaternion;
+typedef _AxisAngle::type AxisAngle;
+typedef _EulerAngles::type EulerAngles;
+typedef _PolarCoord::type PolarCoord;
 
 typedef AllocMathPool< _Matrix3x4, NEX_MATRIX_POOL_NUM_PER_BLOCK > AllocMatrix3x4;
 typedef AllocMathPool< _Matrix4x4, NEX_MATRIX_POOL_NUM_PER_BLOCK > AllocMatrix4x4;
@@ -46,11 +96,9 @@ typedef AllocMathPool< _AxisAlignedBox, NEX_MATRIX_POOL_NUM_PER_BLOCK > AllocAAB
 typedef PooledAllocator< _AxisAlignedBox, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE > AllocatorAABox;
 typedef PooledAllocator< _Matrix3x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE > AllocatorMatrix3x4;
 typedef PooledAllocator< _Matrix4x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE > AllocatorMatrix4x4;
-typedef PooledAllocator<Vector3A, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE> AllocatorVector3A;
-typedef PooledAllocator<Vector4A, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE> AllocatorVector4A;
-typedef PooledAllocator<Quaternion, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE> AllocatorQuaternion;
-
-struct _NexBaseAPI _Matrix3x4 : public AllocMatrix3x4 {
+typedef PooledAllocator<_Quad, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE> AllocatorQuad;
+struct alignas(16) _Matrix3x4 : public AllocMatrix3x4 {
+	typedef Matrix3x4 type;
 
 	union {
 		struct {
@@ -66,40 +114,12 @@ struct _NexBaseAPI _Matrix3x4 : public AllocMatrix3x4 {
 		float m[12];
 		Vector3A r[3];
 	};
-
-	/* functions */
-	inline _Matrix3x4() {
-	}
-
-	inline const float operator [](size_t i) const {
-		return m[i];
-	}
-
-	inline float& operator [](size_t i) {
-		return m[i];
-	}
-
-	inline float& operator ()(int i, int j) {
-		return m[i * 4 + j];
-	}
-
-	inline Vector3A& Row(int i) {
-		return r[i];
-	}
-
-	inline Vector3A Row(int i) const {
-		return r[i];
-	}
-
-	inline float operator ()(int i, int j) const {
-		return m[i * 4 + j];
-	}
-
-	inline _Matrix3x4& operator =(const Matrix3x4&);
 };
 
-struct _NexBaseAPI _Matrix4x4: public AllocMatrix4x4 {
-	static const Matrix4x4 IdentityMatrix;
+struct alignas(16) _Matrix4x4 : public AllocMatrix4x4 {
+	typedef Matrix4x4 type;
+
+	static _NexBaseAPI const Matrix4x4 IdentityMatrix;
 
 	union {
 		struct {
@@ -109,49 +129,28 @@ struct _NexBaseAPI _Matrix4x4: public AllocMatrix4x4 {
 			float m30, m31, m32, m33;
 		};
 		float m[16];
-		Vector4A r[4];
+		Vector3A r[4];
 	};
 
-	/* functions */
-	inline _Matrix4x4() {
-	}
-
-	inline _Matrix4x4(const Matrix3x4&, const Vector4A&);
-
-	inline _Matrix4x4(float m00, float m01, float m02, float m03, float m10,
-			float m11, float m12, float m13, float m20, float m21, float m22,
-			float m23, float m30, float m31, float m32, float m33);
-
-	inline const float operator [](size_t i) const {
-		return m[i];
-	}
-
-	inline float& operator [](size_t i) {
-		return m[i];
-	}
-
-	inline float& operator ()(int i, int j) {
-		return m[i * 4 + j];
-	}
-
-	inline float operator ()(int i, int j) const {
-		return m[i * 4 + j];
-	}
-
-	inline Vector3A& Row(int i) {
-		return r[i];
-	}
-
-	inline Vector3A Row(int i) const {
-		return r[i];
-	}
-
-	inline Matrix4x4 & operator =(const Matrix4x4&);
 };
 
-struct _NexBaseAPI _AxisAlignedBox : public AllocAABox {
-	static const AxisAlignedBox LargestBox;
-	static const AxisAlignedBox InvalidBox;
+struct _Rect { 
+	typedef _Rect type; 
+	union {
+		struct {
+			Vector2 leftTop;
+			Vector2 rightBottom;
+		};
+		Vector2 extremes[2];
+		Vector2 r[2];
+	};
+};
+
+struct alignas(16) _AxisAlignedBox : public AllocAABox {
+
+	typedef AxisAlignedBox type;
+	static _NexBaseAPI const AxisAlignedBox LargestBox;
+	static _NexBaseAPI const AxisAlignedBox InvalidBox;
 
 	union {
 		struct {
@@ -159,49 +158,48 @@ struct _NexBaseAPI _AxisAlignedBox : public AllocAABox {
 			Vector3A maxPoint;
 		};
 		Vector3A extremes[2];
+		Vector3A r[2];
 	};
-
-	inline _AxisAlignedBox() {}
-	inline _AxisAlignedBox(float minX, float minY, float minZ, float maxX, float maxY, float maxZ);
-	_AxisAlignedBox(const Vector3A& minPoint, const Vector3A& maxPoint) {
-		this->minPoint = minPoint;
-		this->maxPoint = maxPoint;
-	}
-	_AxisAlignedBox(const Vector3A& point) {
-		this->minPoint = point;
-		this->maxPoint = point;
-	}
 };
 
-typedef const AxisAlignedBox& AABoxF;
-typedef const AxisAlignedBox& AABoxR;
+typedef _Rect::type Rect;
+template <const uint32 n>
+struct _IVecN {
+	typedef _IVecN<n> type;
+	std::array<int32, n> v;
+};
 
-typedef const Matrix3x4& Mat3x4F;
-typedef const Matrix3x4& Mat3x4R;
+typedef _IVecN<2> IVector2;
+typedef _IVecN<3> IVector3;
+typedef _IVecN<4> IVector4;
 
-typedef const Matrix4x4& Mat4x4F;
-typedef const Matrix4x4& Mat4x4R;
-
-}
-
-#include <math/Vector3A.h>
-#include <math/Vector4A.h>
-#include <math/Quaternion.h>
-#include <math/Plane.h>
-#include <math/Matrix3x4.h>
-#include <math/Matrix4x4.h>
-#include <math/AxisAlignedBox.h>
-
-namespace nextar {
-
+typedef Traits<_Vec2> TraitsVec2;
+typedef Traits<_Vec3> TraitsVec3;
+typedef Traits<_Vec3A> TraitsVec3A;
+typedef Traits<_Vec4> TraitsVec4;
+typedef Traits<_Plane> TraitsPlane;
+typedef Traits<_Quat> TraitsQuat;
+typedef Traits<_Matrix3x4> TraitsMat3x4;
+typedef Traits<_Matrix4x4> TraitsMat4x4;
+typedef Traits<_AxisAlignedBox> TraitsAABox;
+typedef Traits<_Rect> TraitsRect;
+typedef Traits<_AxisAngle> TraitsAxisAngle;
+typedef Traits<_EulerAngles> TraitsEulerAngles;
+typedef Traits<_PolarCoord> TraitsPolarCoord;
+typedef Traits<IVector2> TraitsIVector2;
+typedef Traits<IVector3> TraitsIVector3;
+typedef Traits<IVector4> TraitsIVector4;
 
 _NexTemplateExtern template class _NexBaseAPI PooledAllocator< _Matrix3x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE >;
 _NexTemplateExtern template class _NexBaseAPI PooledAllocator< _Matrix4x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE >;
-_NexTemplateExtern template class _NexBaseAPI PooledAllocator<Vector3A, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;
+_NexTemplateExtern template class _NexBaseAPI PooledAllocator< Vector4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;
 _NexTemplateExtern template class _NexBaseAPI PooledAllocator<_AxisAlignedBox, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;
-//_NexTemplateExtern template class _NexBaseAPI PooledAllocator<Vector4A, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;
-//_NexTemplateExtern template class _NexBaseAPI PooledAllocator<Quaternion, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;
-
 
 }
+}
+
+#include <math/VectorMethods.h>
+#include <math/VectorTraits.h>
+#include <math/VectorDefinitions.h>
+
 #endif /* VECTORTYPES_H_ */

@@ -54,6 +54,13 @@ static constexpr float MAX_RELATIVE_ERROR = 0.005f;
 
 using namespace ::nextar;
 
+enum class VectorImpl {
+	VI_GENERIC,
+	VI_SSE2,
+	VI_SSE3,
+	VI_SSE4,
+	VI_SSE4_1,
+};
 /** Math function overrides */
 
 inline float Floor(float value) {
