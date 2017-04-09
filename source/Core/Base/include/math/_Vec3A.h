@@ -1,9 +1,9 @@
 #pragma once
-using namespace nextar
+using namespace nextar;
 using namespace nextar::Math;
 
 
-inline VecOp<_Vec3A, _Vec3A>::type VecOp<_Vec3A, _Vec3A>::Cross(pref v1, pref v2) {
+inline _VecOp<_Vec3A, _Vec3A>::type _VecOp<_Vec3A, _Vec3A>::Cross(pref vec1, pref vec2) {
 #ifdef NEX_VECTOR_MATH_TYPE_IS_SSE
 	// y1,z1,x1,w1
 	Quad vTemp1 = _mm_shuffle_ps(vec1, vec1, _MM_SHUFFLE(3, 0, 2, 1));
@@ -27,7 +27,7 @@ inline VecOp<_Vec3A, _Vec3A>::type VecOp<_Vec3A, _Vec3A>::Cross(pref v1, pref v2
 #endif
 }
 
-inline VecOp<_Vec3A, _Vec3A>::type VecOp<_Vec3A, _Vec3A>::Normalize(pref vec) {
+inline _VecOp<_Vec3A, _Vec3A>::type _VecOp<_Vec3A, _Vec3A>::Normalize(pref vec) {
 #ifdef NEX_VECTOR_MATH_TYPE_IS_SSE
 #if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE4
 	Quad q = _mm_dp_ps(vec, vec, 0x7F);
@@ -66,8 +66,7 @@ inline VecOp<_Vec3A, _Vec3A>::type VecOp<_Vec3A, _Vec3A>::Normalize(pref vec) {
 #endif
 }
 
-
-inline VecOp<_Vec3A, _Vec3A>::type VecOp<_Vec3A, _Vec3A>::VDot(pref q1, pref q2) {
+inline _VecOp<_Vec3A, _Vec3A>::type _VecOp<_Vec3A, _Vec3A>::VDot(pref vec1, pref vec2) {
 #ifdef NEX_VECTOR_MATH_TYPE_IS_SSE
 #if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE4
 	return _mm_dp_ps(vec1, vec2, 0x7F);
@@ -95,7 +94,7 @@ inline VecOp<_Vec3A, _Vec3A>::type VecOp<_Vec3A, _Vec3A>::VDot(pref q1, pref q2)
 #endif
 }
 
-inline VecOp<_Vec3A, _Vec3A>::base_type VecOp<_Vec3A, _Vec3A>::Dot(pref q1, pref q2) {
+inline _VecOp<_Vec3A, _Vec3A>::base_type _VecOp<_Vec3A, _Vec3A>::Dot(pref q1, pref q2) {
 #ifdef NEX_VECTOR_MATH_TYPE_IS_SSE
 	return GetX(VDot(q1, q2));
 #else
@@ -107,23 +106,23 @@ inline VecOp<_Vec3A, _Vec3A>::base_type VecOp<_Vec3A, _Vec3A>::Dot(pref q1, pref
 }
 
 
-inline bool VecOp<_Vec3A, _Vec3A>::GreaterAny(pref q1, pref q2) {
+inline bool _VecOp<_Vec3A, _Vec3A>::GreaterAny(pref q1, pref q2) {
 	return ((_mm_movemask_ps(_mm_cmpgt_ps(q1, q2))) & 0x7) != 0;
 }
 
-inline bool VecOp<_Vec3A, _Vec3A>::GreaterAll(pref q1, pref q2) {
+inline bool _VecOp<_Vec3A, _Vec3A>::GreaterAll(pref q1, pref q2) {
 	return ((_mm_movemask_ps(_mm_cmpgt_ps(q1, q2)) & 0x7) == 0x7);
 }
 
-inline bool VecOp<_Vec3A, _Vec3A>::LesserAny(pref q1, pref q2) {
+inline bool _VecOp<_Vec3A, _Vec3A>::LesserAny(pref q1, pref q2) {
 	return GreaterAny(q2, q1);
 }
 
-inline bool VecOp<_Vec3A, _Vec3A>::LesserAll(pref q1, pref q2) {
+inline bool _VecOp<_Vec3A, _Vec3A>::LesserAll(pref q1, pref q2) {
 	return GreaterAll(q2, q1);
 }
 
-inline VecOp<_Vec3A, _Vec3A>::type VecOp<_Vec3A, _Vec3A>::Mul(pref v, TraitsMat4x4::pref m) {
+inline _VecOp<_Vec3A, _Vec3A>::type _VecOp<_Vec3A, _Vec3A>::Mul(pref v, TraitsMat4x4::pref m) {
 #ifdef NEX_VECTOR_MATH_TYPE_IS_SSE
 	Quad ret;
 	ret = _mm_shuffle_ps(v, v, _MM_SHUFFLE(0, 0, 0, 0));

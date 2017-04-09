@@ -50,6 +50,7 @@
 	#define NEX_ARCH NEX_ARCH_X64
 // Determine architecture
 #endif
+
 #ifndef NEX_ARCH
 	#if defined(_M_ALPHA) || defined(__alpha__)
 		#define NEX_ARCH NEX_ARCH_ALPHA
@@ -73,6 +74,17 @@
 #endif
 
 
+/** Predefined vector architecture */
+#define NEX_VECTOR_MATH_TYPE_GENERIC    0
+#define NEX_VECTOR_MATH_TYPE_SSE2		1
+#define NEX_VECTOR_MATH_TYPE_SSE3		2
+#define NEX_VECTOR_MATH_TYPE_SSE4		4
+#define NEX_VECTOR_MATH_TYPE_SSE4_1		8
+#define NEX_VECTOR_MATH_TYPE_SSE4_2		16
+#define NEX_VECTOR_MATH_TYPE_3DNOW		17
+#define NEX_VECTOR_MATH_TYPE_VMX128		118
+
+/* #undef NEX_VECTOR_MATH_TYPE */
 /** 
  * @remarks Basic configuration file, controlled by CMake variables,
  * Alterable via UI.
@@ -147,7 +159,14 @@
 /* #undef NEX_USE_TBB */
 /* Use vector instructions for math library. */
 #define NEX_USE_VECTOR_INSTRUCTIONS
+#define NEX_PREFER_SPEED_OVER_ACCURACY
 
+#ifdef NEX_USE_VECTOR_INSTRUCTIONS
+// Prespecified vector instruction type
+	#define NEX_VECTOR_MATH_TYPE NEX_VECTOR_MATH_TYPE_SSE4
+#else
+	#define NEX_VECTOR_MATH_TYPE NEX_VECTOR_MATH_TYPE_GENERIC
+#endif
 
 /* Endianness */
 #define NEX_ENDIAN_LITTLE   0

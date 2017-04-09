@@ -84,14 +84,6 @@
 #define NEX_VECTOR_MATH_TYPE_3DNOW		17
 #define NEX_VECTOR_MATH_TYPE_VMX128		118
 
-
-#ifdef NEX_USE_VECTOR_INSTRUCTIONS
-// Prespecified vector instruction type
-	#define NEX_VECTOR_MATH_TYPE NEX_VECTOR_MATH_TYPE_@NEX_VECTOR_MATH_TYPE_NAME@
-#else
-	#define NEX_VECTOR_MATH_TYPE NEX_VECTOR_MATH_TYPE_GENERIC
-#endif
-
 #cmakedefine NEX_VECTOR_MATH_TYPE
 /** 
  * @remarks Basic configuration file, controlled by CMake variables,
@@ -168,6 +160,13 @@
 /* Use vector instructions for math library. */
 #cmakedefine NEX_USE_VECTOR_INSTRUCTIONS
 #cmakedefine NEX_PREFER_SPEED_OVER_ACCURACY
+
+#ifdef NEX_USE_VECTOR_INSTRUCTIONS
+// Prespecified vector instruction type
+	#define NEX_VECTOR_MATH_TYPE NEX_VECTOR_MATH_TYPE_@NEX_VECTOR_MATH_TYPE_NAME@
+#else
+	#define NEX_VECTOR_MATH_TYPE NEX_VECTOR_MATH_TYPE_GENERIC
+#endif
 
 /* Endianness */
 #define NEX_ENDIAN_LITTLE   0

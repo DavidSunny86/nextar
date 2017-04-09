@@ -1,7 +1,6 @@
 #ifndef NEXCORE_SSE_CONSTANTS_H
 #define NEXCORE_SSE_CONSTANTS_H
-
-#if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE
+#ifdef NEX_VECTOR_MATH_TYPE_IS_SSE
 
 namespace nextar {
 namespace Math {
@@ -86,5 +85,4 @@ NEXCORE_DEFINE_F32C(N3D_Infinite);
 }
 
 #endif
-
 #endif //NEXCORE_SSE_CONSTANTS_H

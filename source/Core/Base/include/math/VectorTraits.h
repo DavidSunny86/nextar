@@ -118,7 +118,12 @@ public:
 };
 
 template <>
-class TraitsBase<_EulerAngles> : public TraitsBase<_Quad> {
+class TraitsBase<_EulerAngles> : public TraitsBase<_Vec3> {
+public:
+};
+
+template <>
+class TraitsBase<_AxisAngle> : public TraitsBase<_Quad> {
 public:
 };
 
@@ -166,6 +171,7 @@ template <>
 class TraitsBase<IVector4> : public TraitsIntVec<4> {
 public:
 };
+
 
 }
 }

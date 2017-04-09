@@ -29,6 +29,8 @@ struct TraitsBase {
 
 	enum : uint32 {
 		_count = sizeof(type) / sizeof(base_type),
+		_rows = 1,
+		_columns = _count,
 	};
 
 	inline static bool Equals(pref v1, pref v2) {

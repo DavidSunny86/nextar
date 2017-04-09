@@ -66,9 +66,8 @@ struct _Vec4 { typedef _Quad type; };
 struct _Plane { typedef _Quad type; };
 struct _Quat { typedef _Quad type; };
 struct _AxisAngle { typedef _Quad type; };
-struct _EulerAngles { typedef _Quad type; };
 struct _PolarCoord { typedef _Vec2 type; };
-
+struct _EulerAngles { typedef _Vec3 type; };
 #ifdef _MSC_VER
 typedef __declspec(align(16)) _Matrix3x4 Matrix3x4;
 typedef __declspec(align(16)) _Matrix4x4 Matrix4x4;
@@ -97,6 +96,16 @@ typedef PooledAllocator< _AxisAlignedBox, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_
 typedef PooledAllocator< _Matrix3x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE > AllocatorMatrix3x4;
 typedef PooledAllocator< _Matrix4x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE > AllocatorMatrix4x4;
 typedef PooledAllocator<_Quad, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE> AllocatorQuad;
+template <const uint32 n>
+struct _IVecN {
+	typedef _IVecN<n> type;
+	std::array<int32, n> v;
+};
+
+typedef _IVecN<2> IVector2;
+typedef _IVecN<3> IVector3;
+typedef _IVecN<4> IVector4;
+
 struct alignas(16) _Matrix3x4 : public AllocMatrix3x4 {
 	typedef Matrix3x4 type;
 
@@ -134,8 +143,8 @@ struct alignas(16) _Matrix4x4 : public AllocMatrix4x4 {
 
 };
 
-struct _Rect { 
-	typedef _Rect type; 
+struct _Rect {
+	typedef _Rect type;
 	union {
 		struct {
 			Vector2 leftTop;
@@ -163,15 +172,6 @@ struct alignas(16) _AxisAlignedBox : public AllocAABox {
 };
 
 typedef _Rect::type Rect;
-template <const uint32 n>
-struct _IVecN {
-	typedef _IVecN<n> type;
-	std::array<int32, n> v;
-};
-
-typedef _IVecN<2> IVector2;
-typedef _IVecN<3> IVector3;
-typedef _IVecN<4> IVector4;
 
 typedef Traits<_Vec2> TraitsVec2;
 typedef Traits<_Vec3> TraitsVec3;
@@ -181,6 +181,7 @@ typedef Traits<_Plane> TraitsPlane;
 typedef Traits<_Quat> TraitsQuat;
 typedef Traits<_Matrix3x4> TraitsMat3x4;
 typedef Traits<_Matrix4x4> TraitsMat4x4;
+typedef TraitsMat4x4 TraitsMat4;
 typedef Traits<_AxisAlignedBox> TraitsAABox;
 typedef Traits<_Rect> TraitsRect;
 typedef Traits<_AxisAngle> TraitsAxisAngle;
@@ -198,8 +199,8 @@ _NexTemplateExtern template class _NexBaseAPI PooledAllocator<_AxisAlignedBox, N
 }
 }
 
-#include <math/VectorMethods.h>
 #include <math/VectorTraits.h>
+#include <math/VectorMethods.h>
 #include <math/VectorDefinitions.h>
 
 #endif /* VECTORTYPES_H_ */
