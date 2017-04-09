@@ -172,6 +172,60 @@ class TraitsBase<IVector4> : public TraitsIntVec<4> {
 public:
 };
 
+template <typename M, const unsigned R, const unsigned C, 
+	typename RowType>
+class _TraitsBaseMat {
+public:
+	typedef M type;
+	typedef const type& pref;
+	typedef RowType row_type_id;
+	typedef Traits<RowType> row_type_traits;
+	typedef row_type_traits::type row_type;
+	typedef row_type_traits::base_type base_type;
+	typedef float float_type;
+
+	enum : uint32 {
+		_count = R*C,
+		_rows = R,
+		_columns = C,
+	};
+
+	inline static bool Equals(pref v1, pref v2) {
+		for (unsigned int i = 0; i < _rows; ++i) {
+			if (!row_type_traits::Equals(v1.r[i], v2.r[i]))
+				return false;
+		}
+		return true;
+	}
+
+	inline static bool IsNan(pref v) {
+		return false;
+	}
+
+	inline static bool IsInf(pref v) {
+		return false;
+	}
+};
+
+template <>
+class TraitsBase<_Matrix4x4> : public _TraitsBaseMat<_Matrix4x4, 4, 4, _Vec3A> {
+public:
+};
+
+template <>
+class TraitsBase<_Matrix4x4> : public _TraitsBaseMat<_Matrix4x4, 3, 4, _Vec3A> {
+public:
+};
+
+template <>
+class TraitsBase<_AxisAlignedBox> : public _TraitsBaseMat<_AxisAlignedBox, 2, 4, _Vec3A> {
+public:
+};
+
+template <>
+class TraitsBase<_Rect> : public _TraitsBaseMat<_Rect, 2, 2, _Vec2> {
+public:
+};
 
 }
 }

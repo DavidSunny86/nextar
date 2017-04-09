@@ -18,7 +18,7 @@ inline _VecOp<_Quat, _Quat>::type _VecOp<_Quat, _Quat>::FromAxisAngle(TraitsVec3
 }
 
 inline _VecOp<_Quat, _Quat>::type _VecOp<_Quat, _Quat>::FromAxisAngle(TraitsAxisAngle::pref axis) {
-#ifdef NEX_VECTOR_MATH_TYPE_IS_SSE
+#if NEX_VECTOR_MATH_TYPE_IS_SSE
 #if NEX_CORE_DEBUG_CHECKS == 1
 	float len = 1; //\todo Find length of axis
 	NEX_ASSERT(NEX_FLOAT_TOLERANCE_EQUAL(len, 1, Math::EPSILON_MED));
@@ -119,7 +119,7 @@ inline _VecOp<_Quat, _Quat>::type _VecOp<_Quat, _Quat>::Slerp(pref from, pref to
 }
 
 inline _VecOp<_Quat, _Quat>::type nextar::Math::_VecOp<_Quat, _Quat>::Inverse(pref q) {
-#ifdef NEX_VECTOR_MATH_TYPE_IS_SSE
+#if NEX_VECTOR_MATH_TYPE_IS_SSE
 	return _mm_xor_ps(q, N3D_OXXX.v);
 #else
 	return Set(-q.x, -q.y, -q.z, q.w);

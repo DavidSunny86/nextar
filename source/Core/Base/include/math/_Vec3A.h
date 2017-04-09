@@ -4,7 +4,7 @@ using namespace nextar::Math;
 
 
 inline _VecOp<_Vec3A, _Vec3A>::type _VecOp<_Vec3A, _Vec3A>::Cross(pref vec1, pref vec2) {
-#ifdef NEX_VECTOR_MATH_TYPE_IS_SSE
+#if NEX_VECTOR_MATH_TYPE_IS_SSE
 	// y1,z1,x1,w1
 	Quad vTemp1 = _mm_shuffle_ps(vec1, vec1, _MM_SHUFFLE(3, 0, 2, 1));
 	// z2,x2,y2,w2
@@ -28,7 +28,7 @@ inline _VecOp<_Vec3A, _Vec3A>::type _VecOp<_Vec3A, _Vec3A>::Cross(pref vec1, pre
 }
 
 inline _VecOp<_Vec3A, _Vec3A>::type _VecOp<_Vec3A, _Vec3A>::Normalize(pref vec) {
-#ifdef NEX_VECTOR_MATH_TYPE_IS_SSE
+#if NEX_VECTOR_MATH_TYPE_IS_SSE
 #if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE4
 	Quad q = _mm_dp_ps(vec, vec, 0x7F);
 	// Get the reciprocal
@@ -67,7 +67,7 @@ inline _VecOp<_Vec3A, _Vec3A>::type _VecOp<_Vec3A, _Vec3A>::Normalize(pref vec) 
 }
 
 inline _VecOp<_Vec3A, _Vec3A>::type _VecOp<_Vec3A, _Vec3A>::VDot(pref vec1, pref vec2) {
-#ifdef NEX_VECTOR_MATH_TYPE_IS_SSE
+#if NEX_VECTOR_MATH_TYPE_IS_SSE
 #if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE4
 	return _mm_dp_ps(vec1, vec2, 0x7F);
 #elif NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE3
@@ -95,7 +95,7 @@ inline _VecOp<_Vec3A, _Vec3A>::type _VecOp<_Vec3A, _Vec3A>::VDot(pref vec1, pref
 }
 
 inline _VecOp<_Vec3A, _Vec3A>::base_type _VecOp<_Vec3A, _Vec3A>::Dot(pref q1, pref q2) {
-#ifdef NEX_VECTOR_MATH_TYPE_IS_SSE
+#if NEX_VECTOR_MATH_TYPE_IS_SSE
 	return GetX(VDot(q1, q2));
 #else
 	float r = 0;
@@ -123,7 +123,7 @@ inline bool _VecOp<_Vec3A, _Vec3A>::LesserAll(pref q1, pref q2) {
 }
 
 inline _VecOp<_Vec3A, _Vec3A>::type _VecOp<_Vec3A, _Vec3A>::Mul(pref v, TraitsMat4x4::pref m) {
-#ifdef NEX_VECTOR_MATH_TYPE_IS_SSE
+#if NEX_VECTOR_MATH_TYPE_IS_SSE
 	Quad ret;
 	ret = _mm_shuffle_ps(v, v, _MM_SHUFFLE(0, 0, 0, 0));
 	ret = _mm_mul_ps(ret, m.r[0]);

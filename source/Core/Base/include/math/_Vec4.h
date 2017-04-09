@@ -4,7 +4,7 @@ using namespace nextar::Math;
 
 
 inline _VecOp<_Vec4, _Vec4>::type _VecOp<_Vec4, _Vec4>::Mul(pref v, TraitsMat4x4::pref m) {
-#ifdef NEX_VECTOR_MATH_TYPE_IS_SSE
+#if NEX_VECTOR_MATH_TYPE_IS_SSE
 	Quad ret, vTemp;
 	ret = _mm_shuffle_ps(v, v, _MM_SHUFFLE(0, 0, 0, 0));
 	ret = _mm_mul_ps(ret, m.r[0]);

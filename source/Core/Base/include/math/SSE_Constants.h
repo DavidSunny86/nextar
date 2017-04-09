@@ -1,6 +1,6 @@
 #ifndef NEXCORE_SSE_CONSTANTS_H
 #define NEXCORE_SSE_CONSTANTS_H
-#ifdef NEX_VECTOR_MATH_TYPE_IS_SSE
+#if NEX_VECTOR_MATH_TYPE_IS_SSE
 
 namespace nextar {
 namespace Math {

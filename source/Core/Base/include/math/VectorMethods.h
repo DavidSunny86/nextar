@@ -200,7 +200,6 @@ public:
 template <typename T>
 class MatBaseOp {
 public:
-	typedef MatOp<T> matop;
 	typedef Traits<T> traits;
 	typedef traits::type type;
 	typedef traits::ref ref;
@@ -209,6 +208,9 @@ public:
 	typedef traits::base_type base_type;
 	typedef traits::row_type row_type;
 	typedef traits::float_type float_type;
+	typedef traits::row_type_traits row_type_traits;
+	typedef traits::row_type_id row_type_id;
+	typedef VecOp<row_type_id> row_op;
 
 	enum {
 		_count = traits::_count,
@@ -216,8 +218,10 @@ public:
 		_columns = traits::_columns,
 	};
 
-	static inline row_type Row(pref m, uint32 i) const;
-	static inline base_type Get(pref m, uint32 i, uint32 j) const;
+	static inline row_type Row(pref m, uint32 i);
+	static inline base_type Get(pref m, uint32 i, uint32 j);
+	static inline type Add(pref m1, pref m2);
+	static inline type Sub(pref m1, pref m2);
 };
 
 
@@ -234,22 +238,20 @@ public:
 	static inline type FromVectorMapping(TraitsVec3::pref v1, TraitsVec3::pref v2);
 	// @brief rotate vector in place
 	static inline void Rotate(pref m,
-		TraitsVec3::type* iStream, uint32 inStride, uint32 count);
+		TraitsVec3::type* ioStream, uint32 inStride, uint32 count);
 	// @brief rotate vector
 	static inline TraitsVec3A::type Rotate(pref m, TraitsVec3A::pref v);
-	// @brief Create a rotation matrix from quaternion
-	static inline type FromQuat(TraitsQuat::pref rot);
-	// @brief Create a rotation matrix from quaternion
-	static inline type FromRot(TraitsQuat::pref rot);
+	// @brief Set a rotation for a given matrix
+	static inline void SetRot(ref m, TraitsQuat::pref rot);
 	// @brief Returns a look at matrix based on a look at vector and up position 
-	static inline type FromViewAndUp(TraitsVec3A::pref viewDir, TraitsVec3A::pref up);
+	static inline void SetViewAndUp(ref m, TraitsVec3A::pref viewDir, TraitsVec3A::pref up);
 };
 
 template <>
 class MatOp<_Matrix4x4> : public _Mat4Op<_Matrix4x4> {
 public:
 	// @brief Full matrix multiplication
-	static inline type Mul(pref m1, pref m2) const;
+	static inline type Mul(pref m1, pref m2);
 	// @brief Transform vertices assuming orthogonal matrix
 	static inline void TransformOrtho(pref m,
 		const TraitsVec3::type* iStream, uint32 inStride, uint32 count,
@@ -260,7 +262,7 @@ public:
 		TraitsVec3::type* oStream, uint32 outStride);
 	// @brief Transform vertices in place, assuming orthogonal matrix
 	static inline void TransformOrtho(pref m,
-		TraitsVec3::type* iStream, uint32 inStride, uint32 count);
+		TraitsVec3::type* ioStream, uint32 inStride, uint32 count);
 	// @brief Transform vertices and project the w coord as 1.0.
 	static inline void Transform(pref m,
 		const TraitsVec3::type* iStream, uint32 inStride, uint32 count,
@@ -277,6 +279,10 @@ public:
 	static inline type FromScaleRotPos(float_type scale, TraitsQuat::pref rot, TraitsVec3A::pref pos);
 	static inline type FromScale(TraitsVec3A::pref scale);
 	static inline type FromPos(TraitsVec3A::pref pos);
+	// @brief Create a rotation matrix from quaternion
+	static inline type FromQuat(TraitsQuat::pref rot);
+	// @brief Create a rotation matrix from quaternion
+	static inline type FromRot(TraitsQuat::pref rot);
 	// @brief Create a view matrix from camera world matrix
 	static inline type FromWorldToView(pref m);
 	// @brief Matrix4x4 Creates a camera look at matrix 
@@ -299,6 +305,10 @@ template <>
 class MatOp<_Matrix3x4> : public _Mat4Op<_Matrix3x4> {
 public:
 	static inline type Transpose(pref m);
+	// @brief Create a rotation matrix from quaternion
+	static inline type FromQuat(TraitsQuat::pref rot);
+	// @brief Create a rotation matrix from quaternion
+	static inline type FromRot(TraitsQuat::pref rot);
 };
 
 template <>
@@ -329,17 +339,6 @@ typedef MatOp<_Matrix4x4> Mat4Op;
 typedef Mat4Op Mat4x4Op;
 typedef MatOp<_Rect> RectOp;
 
-
-
-template<typename T>
-inline type _Mat4Op<T>::FromRot(TraitsQuat::pref rot) {
-	return type();
-}
-
-template<typename T>
-inline type _Mat4Op<T>::FromViewAndUp(TraitsVec3A::pref viewDir, TraitsVec3A::pref up) {
-	return type();
-}
 
 }
 }
