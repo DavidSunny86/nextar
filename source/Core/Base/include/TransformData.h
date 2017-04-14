@@ -16,11 +16,11 @@ NEX_MATRIX_POOL_NUM_PER_BLOCK> {
 	};
 
 	/* World rotation */
-	Quaternion rotation;
+	Quat::type rotation;
 	/* World postion */
-	Vector3A translation;
+	Vec3A::type translation;
 	/* Cached matrix */
-	Matrix4x4 matrix;
+	Mat4::type matrix;
 	/* variable placement takes into account the alignment */
 	float scale;
 
@@ -37,7 +37,7 @@ public:
 		rotation = QuatIdentity();
 		translation = Vec3AZero();
 		scale = 1.0f;
-		matrix = Matrix4x4::IdentityMatrix;
+		matrix = Mat4::type::IdentityMatrix;
 		matrixState++;
 		flags |= IDENTITY_TRANSFORM;
 	}
@@ -60,19 +60,19 @@ public:
 		return matrixState;
 	}
 
-	inline const Matrix4x4& GetMatrix() const {
+	inline const Mat4::type& GetMatrix() const {
 		return matrix;
 	}
 
-	inline Matrix4x4& GetMatrix() {
+	inline Mat4::type& GetMatrix() {
 		return matrix;
 	}
 
-	inline Vec3AF GetTranslation() const {
+	inline Vec3A::pref GetTranslation() const {
 		return translation;
 	}
 
-	inline QuatF GetRotation() const {
+	inline Quat::pref GetRotation() const {
 		return rotation;
 	}
 
@@ -80,11 +80,11 @@ public:
 		return scale;
 	}
 
-	inline void SetRotation(QuatF q) {
+	inline void SetRotation(Quat::pref q) {
 		rotation = q;
 	}
 
-	inline void SetTranslation(Vec3AF t) {
+	inline void SetTranslation(Vec3A::pref t) {
 		translation = t;
 	}
 

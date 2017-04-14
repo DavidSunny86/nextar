@@ -244,8 +244,8 @@ BoundsInfo MeshLoaderIntfv1_0::ReadBoundsInfo(MeshAsset::StreamRequest* mesh,
 	InputSerializer::FloatArray extends(extendsAndCenter, 6);
 	ser >> radius >> extends;
 	bv.radius = radius;
-	bv.center = Vector3(extendsAndCenter);
-	bv.extends = Vector3(extendsAndCenter + 3);
+	bv.center = Vec3::type(extendsAndCenter);
+	bv.extends = Vec3::type(extendsAndCenter + 3);
 	return bv;
 }
 

@@ -165,13 +165,13 @@ uint32 MeshBuffer::AddVertexChannel(
 		channel = NEX_NEW(VertexChannelTempl<float>(_semantic, _semanticIdx, _type, streamIdx));
 		break;
 	case COMP_TYPE_FLOAT2:
-		channel = NEX_NEW(VertexChannelTempl<Vector2>(_semantic, _semanticIdx, _type, streamIdx));
+		channel = NEX_NEW(VertexChannelTempl<Vec2::type>(_semantic, _semanticIdx, _type, streamIdx));
 		break;
 	case COMP_TYPE_FLOAT3:
-		channel = NEX_NEW(VertexChannelTempl<Vector3>(_semantic, _semanticIdx, _type, streamIdx));
+		channel = NEX_NEW(VertexChannelTempl<Vec3::type>(_semantic, _semanticIdx, _type, streamIdx));
 		break;
 	case COMP_TYPE_FLOAT4:
-		channel = NEX_NEW(VertexChannelTempl<Vector4>(_semantic, _semanticIdx, _type, streamIdx));
+		channel = NEX_NEW(VertexChannelTempl<Vec4::type>(_semantic, _semanticIdx, _type, streamIdx));
 		break;
 	case COMP_TYPE_UNSIGNED_INT:
 	case COMP_TYPE_COLOR:
@@ -201,9 +201,9 @@ BoundsInfo MeshBuffer::ComputeBounds() const {
 	BoundsInfo bounds;
 	VertexChannel* vc = GetVertexChannel(COMP_POSITION, 0);
 	if (vc && vc->GetType() == COMP_TYPE_FLOAT3) {
-		const Vector3* v = reinterpret_cast<const Vector3*>(vc->GetVertex(0));
+		const Vec3::type* v = reinterpret_cast<const Vec3::type*>(vc->GetVertex(0));
 		uint32 nCount = vc->GetVertexCount();
-		Vector3 minPoint(Math::SCALAR_MAX), maxPoint(-Math::SCALAR_MAX);
+		Vec3::type minPoint(Math::SCALAR_MAX), maxPoint(-Math::SCALAR_MAX);
 		for(uint32 i = 0; i < nCount; ++i) {
 			v[i].GetMinElements(minPoint);
 			v[i].GetMaxElements(maxPoint);

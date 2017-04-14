@@ -15,41 +15,41 @@ Moveable::~Moveable() {
 	transform = nullptr;
 }
 
-void Moveable::LocalApplyCameraMotion(const Vector2& moveXZ, 
-	const Vector2& rotateXY) {
-	Quaternion rotation = transform->GetRotation();
-	Vector3A position = transform->GetTranslation();
+void Moveable::LocalApplyCameraMotion(const Vec2::type& moveXZ, 
+	const Vec2::type& rotateXY) {
+	Quat::type rotation = transform->GetRotation();
+	Vec3A::type position = transform->GetTranslation();
 	
-	Quaternion nrotX = QuatFromAxisAng(Vec3ASet(1.0f, 0.0f, 0.0f), rotateXY.x);
-	Quaternion nrotY = QuatFromAxisAng(Vec3ASet(0.0f, 1.0f, 0.0f), rotateXY.y);
-	rotation = QuatMul(QuatMul(nrotX, rotation), nrotY);
-	position = Vec3AAdd(position, QuatTransVec3A(rotation, Vec3ASet(moveXZ.x, 0.0f, -moveXZ.y)));
+	Quat::type nrotX = Quat::FromAxisAngle(Vec3::Set(1.0f, 0.0f, 0.0f), rotateXY.x);
+	Quat::type nrotY = Quat::FromAxisAngle(Vec3::Set(0.0f, 1.0f, 0.0f), rotateXY.y);
+	rotation = Quat::Mul(Quat::Mul(nrotX, rotation), nrotY);
+	position = Vec3A::Add(position, Quat::Transform(rotation, Vec3A::Set(moveXZ.x, 0.0f, -moveXZ.y)));
 	transform->SetTranslation(position);
 	transform->SetRotation(rotation);
 	transform->SetMatrixDirty(true);
 	SetUpdateRequired(true);
 }
 
-void Moveable::LocalApplyCameraMotionOnLocal(const Vector2& moveXZ,
-	const Vector2& rotateXY) {
-	Quaternion rotation = transform->GetRotation();
-	Vector3A position = transform->GetTranslation();
+void Moveable::LocalApplyCameraMotionOnLocal(const Vec2::type& moveXZ,
+	const Vec2::type& rotateXY) {
+	Quat::type rotation = transform->GetRotation();
+	Vec3A::type position = transform->GetTranslation();
 
-	Quaternion nrotX = QuatFromAxisAng(Vec3ASet(1.0f, 0.0f, 0.0f), rotateXY.x);
-	Quaternion nrotY = QuatFromAxisAng(Vec3ASet(0.0f, 1.0f, 0.0f), rotateXY.y);
-	rotation = QuatMul(nrotY, QuatMul(nrotX, rotation));
-	position = Vec3AAdd(position, QuatTransVec3A(rotation, Vec3ASet(moveXZ.x, 0.0f, -moveXZ.y)));
+	Quat::type nrotX = Quat::FromAxisAngle(Vec3::Set(1.0f, 0.0f, 0.0f), rotateXY.x);
+	Quat::type nrotY = Quat::FromAxisAngle(Vec3::Set(0.0f, 1.0f, 0.0f), rotateXY.y);
+	rotation = Quat::Mul(nrotY, Quat::Mul(nrotX, rotation));
+	position = Vec3A::Add(position, Quat::Transform(rotation, Vec3A::Set(moveXZ.x, 0.0f, -moveXZ.y)));
 	transform->SetTranslation(position);
 	transform->SetRotation(rotation);
 	transform->SetMatrixDirty(true);
 	SetUpdateRequired(true);
 }
 
-void Moveable::LocalApplyDeltaTransform(Vec3AF t, QuatF q) {
-	Quaternion r = transform->GetRotation();
-	Vector3A dt = QuatTransVec3A(r, t);
-	transform->SetTranslation(Vec3AAdd(dt, transform->GetTranslation()));
-	transform->SetRotation(QuatMul(r, q));
+void Moveable::LocalApplyDeltaTransform(Vec3A::pref t, Quat::pref q) {
+	Quat::type r = transform->GetRotation();
+	Vec3A::type dt = Quat::Transform(r, t);
+	transform->SetTranslation(Vec3A::Add(dt, transform->GetTranslation()));
+	transform->SetRotation(Quat::Mul(r, q));
 	transform->SetMatrixDirty(true);
 	SetUpdateRequired(true);
 }

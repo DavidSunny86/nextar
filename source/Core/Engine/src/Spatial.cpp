@@ -9,8 +9,8 @@ namespace nextar {
 Spatial::Spatial(const StringID name, const StringID factory,  Component* parent) :
 		Component(name, factory, parent), cullingData(0), moveable(nullptr), culler(
 				nullptr), matrixState(0) {
-	worldMatrix = NEX_NEW(Matrix4x4);
-	*worldMatrix = Matrix4x4::IdentityMatrix;
+	worldMatrix = NEX_NEW(Mat4::type);
+	*worldMatrix = Mat4::type::IdentityMatrix;
 }
 
 Spatial::~Spatial() {
@@ -31,8 +31,8 @@ void Spatial::SetMoveable(Moveable* moveable) {
 		worldMatrix = &moveable->GetWorldMatrix();
 	} else {
 		if (!worldMatrix)
-			worldMatrix = NEX_NEW(Matrix4x4);
-		*worldMatrix = Matrix4x4::IdentityMatrix;
+			worldMatrix = NEX_NEW(Mat4::type);
+		*worldMatrix = Mat4::type::IdentityMatrix;
 	}
 
 	matrixState = 0;

@@ -1,7 +1,6 @@
-#include "VectorMethods.h"
 #pragma once
-using namespace nextar;
-using namespace nextar::Math;
+namespace nextar {
+namespace Math {
 
 inline _VecOp<_Quat, _Quat>::type _VecOp<_Quat, _Quat>::Identity() {
 	return Set(0, 0, 0, 1);
@@ -23,12 +22,12 @@ inline _VecOp<_Quat, _Quat>::type _VecOp<_Quat, _Quat>::FromAxisAngle(TraitsAxis
 	float len = 1; //\todo Find length of axis
 	NEX_ASSERT(NEX_FLOAT_TOLERANCE_EQUAL(len, 1, Math::EPSILON_MED));
 #endif
-	Quad N = _mm_and_ps(axis, N3D_FFFO.v);
+	_Quad N = _mm_and_ps(axis, N3D_FFFO.v);
 	N = _mm_or_ps(N, N3D_0001.v);
 
 	float f, c;
 	Math::SinCos(QuatOp::GetW(axis) * .5f, f, c);
-	Quad vSineCosine = QuadOp::Set(f, f, f, c);
+	_Quad vSineCosine = QuadOp::Set(f, f, f, c);
 	return _mm_mul_ps(N, vSineCosine);
 #else
 	float s, c;
@@ -126,3 +125,5 @@ inline _VecOp<_Quat, _Quat>::type nextar::Math::_VecOp<_Quat, _Quat>::Inverse(pr
 #endif
 }
 
+}
+}

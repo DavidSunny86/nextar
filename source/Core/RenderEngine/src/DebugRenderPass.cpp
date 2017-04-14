@@ -12,9 +12,9 @@
 namespace nextar {
 
 DebugPrimitive::DebugPrimitive(uint32 primId,
-	float timeToExpiry) : id(primId), timeToDeath(timeToExpiry), color(Color::White), worldMatrix(NEX_NEW(Matrix4x4)), constantSize(0.0f) {
+	float timeToExpiry) : id(primId), timeToDeath(timeToExpiry), color(Color::White), worldMatrix(NEX_NEW(Mat4::type)), constantSize(0.0f) {
 	this->worldMatrices = worldMatrix;
-	*(worldMatrix) = Matrix4x4::IdentityMatrix;
+	*(worldMatrix) = Mat4::type::IdentityMatrix;
 	parameters = &_parameters;
 }
 
@@ -90,7 +90,7 @@ VisiblePrimitiveList& DebugRenderPass::_GetPrimitives(CommitContext& context) {
 	return alivePrimitives;
 }
 
-uint32 DebugRenderPass::_Register(AABoxF box,
+uint32 DebugRenderPass::_Register(AABox::pref box,
 	const Color& color, float expiryTimeInSec) {
 	if (!boxDataGenerated) {
 		GenerateStreamDataForBox();
@@ -107,7 +107,7 @@ uint32 DebugRenderPass::_Register(AABoxF box,
 	return idCounter;
 }
 
-uint32 DebugRenderPass::_Register(Mat4x4R tform,
+uint32 DebugRenderPass::_Register(Mat4::pref tform,
 	float screenSpaceFactor,
 	const Color& color, float expiryTimeInSec) {
 	if (!axisDataGenerated) {
@@ -125,7 +125,7 @@ uint32 DebugRenderPass::_Register(Mat4x4R tform,
 	return idCounter;
 }
 
-uint32 DebugRenderPass::_Register(PlaneF plane,
+uint32 DebugRenderPass::_Register(Plane::pref plane,
 	const Color& color, float expiryTimeInSec) {
 	//DebugPrimitive* primitive = NEX_NEW(DebugPrimitive(++idCounter, expiryTimeInSec));
 	//alivePrimitives.push_back(primitive);
@@ -139,20 +139,18 @@ uint32 DebugRenderPass::_Register(const Frustum& frustum,
 	return idCounter;
 }
 
-uint32 DebugRenderPass::_Register(const Box2D& rect,
-	const Color& color, Vec4AF textureOffsetAndRepeat, TextureBase* textured, bool border,
+uint32 DebugRenderPass::_Register(Rect::pref rect,
+	const Color& color, Vec4::pref textureOffsetAndRepeat, TextureBase* textured, bool border,
 	float expiryTimeInSec,
 	MaterialAssetPtr material) {
 	// remap rect
-	Box2D remapped(rect);
-	remapped.min -= Vector2(0.5f, 0.5f);
-	remapped.max -= Vector2(0.5f, 0.5f);
-	remapped.min *= 2;
-	remapped.max *= 2;
+	Rect::type remapped;
+	remapped.min = Vec2::Mul(Vec2::Sub(rect.min, Vec2::type{ 0.5f, 0.5f }), 2.0f);
+	remapped.max = Vec2::Mul(Vec2::Sub(rect.max, Vec2::type{ 0.5f, 0.5f }), 2.0f);
 	
 	// actual size is 2,2
-	Vector2 size = remapped.GetSize() * 0.5;
-	Vector2 center = remapped.GetCenter();
+	Vec2::type size = Rect::GetHalfSize(remapped);
+	Vec2::type center = Rect::GetCenter(remapped);
 	if (!quadDataGenerated) {
 		GenerateStreamDataForQuad();
 		quadDataGenerated = true;
@@ -164,15 +162,15 @@ uint32 DebugRenderPass::_Register(const Box2D& rect,
 	ParameterBuffer* b = primitive->GetParameters();
 	if (!textured)
 		textured = RenderManager::Instance().GetDefaultTexture();
-	Vector4A translationAndScale[3] = {
-		Vec4ASet(	center.x, center.y, size.x, size.y	),
+	Vec4::type translationAndScale[3] = {
+		Vec4::Set(	center.x, center.y, size.x, size.y	),
 		textureOffsetAndRepeat,
-		Vec4ASet(color.red, color.green, color.blue, color.alpha)
+		Vec4::Set(color.red, color.green, color.blue, color.alpha)
 	};
 	TextureUnit textureData;
 	textureData.texture = textured;
-	b->SetData(translationAndScale, 0, sizeof(Vector4A)*3);
-	b->SetData(&textureData, sizeof(Vector4A)*3);
+	b->SetData(translationAndScale, 0, sizeof(Vec4::type)*3);
+	b->SetData(&textureData, sizeof(Vec4::type)*3);
 	alivePrimitives.push_back(primitive);
 	
 	return idCounter;
@@ -226,8 +224,8 @@ void DebugRenderPass::Commit(CommitContext& context) {
 }
 
 Geometry DebugRenderPass::GenerateAxis(float radius, float alpha, int color) {
-	Quaternion q;
-	Matrix4x4 m;
+	Quat::type q;
+	Mat4::type m;
 	Color baseColor(alpha, 0.1f, 0.1f, 0.1f);
 	Color fullColor(alpha, 0.1f, 0.1f, 0.1f);
 	Color halfColor(alpha, 0.1f, 0.1f, 0.1f);
@@ -251,8 +249,8 @@ void DebugRenderPass::GenerateStreamDataForAxis() {
 
 	float alpha = 0.7f;
 	float radius = 2.0f;
-	Quaternion q;
-	Matrix4x4 m;
+	Quat::type q;
+	Mat4::type m;
 
 	Geometry yAxis = GenerateAxis(radius, alpha, 1);
 	Geometry xAxis = GenerateAxis(radius, alpha, 0);

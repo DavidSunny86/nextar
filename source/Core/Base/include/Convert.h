@@ -38,14 +38,14 @@ inline String ToString(const ApplicationContextType& t) {
 }
 
 _NexBaseAPI String ToVersionString(VersionID);
-_NexBaseAPI String ToString(Vec4AF mat);
-_NexBaseAPI String ToString(Mat4x4F mat);
-_NexBaseAPI String ToString(Mat3x4F mat);
-_NexBaseAPI String ToString(const Vector3& mat);
-_NexBaseAPI String ToString(const Vector2& mat);
-_NexBaseAPI String ToString(const nextar::IVector2& v);
-_NexBaseAPI String ToString(const nextar::IVector3& v);
-_NexBaseAPI String ToString(const nextar::IVector4& v);
+_NexBaseAPI String ToString(Vec4::pref mat);
+_NexBaseAPI String ToString(Mat4::pref mat);
+_NexBaseAPI String ToString(Mat3::pref mat);
+_NexBaseAPI String ToString(const Vec3::type& mat);
+_NexBaseAPI String ToString(const Vec2::type& mat);
+_NexBaseAPI String ToString(const IVec2::type& v);
+_NexBaseAPI String ToString(const IVec3::type& v);
+_NexBaseAPI String ToString(const IVec4::type& v);
 _NexBaseAPI String ToString(const Color& mat);
 _NexBaseAPI String ToString(const Color32& mat);
 _NexBaseAPI int32 ToLong(const String&);
@@ -53,14 +53,14 @@ _NexBaseAPI uint32 ToULong(const String&);
 _NexBaseAPI float ToFloat(const String&);
 _NexBaseAPI bool ToBool(const String&);
 _NexBaseAPI VersionID ToVersion(const String&);
-_NexBaseAPI Matrix4x4 ToMat4x4(const String&);
-_NexBaseAPI Matrix3x4 ToMat3x4(const String&);
-_NexBaseAPI Vector4 ToVector4(const String&);
-_NexBaseAPI Vector3 ToVector3(const String&);
-_NexBaseAPI Vector2 ToVector2(const String&);
-_NexBaseAPI IVector2 ToIVector2(const String&);
-_NexBaseAPI IVector3 ToIVector3(const String&);
-_NexBaseAPI IVector4 ToIVector4(const String&);
+_NexBaseAPI Mat4::type ToMat4x4(const String&);
+_NexBaseAPI Mat3::type ToMat3x4(const String&);
+_NexBaseAPI Vec4::type ToVector4(const String&);
+_NexBaseAPI Vec3::type ToVector3(const String&);
+_NexBaseAPI Vec2::type ToVector2(const String&);
+_NexBaseAPI IVec2::type ToIVector2(const String&);
+_NexBaseAPI IVec3::type ToIVector3(const String&);
+_NexBaseAPI IVec4::type ToIVector4(const String&);
 _NexBaseAPI Color ToColor(const String&);
 _NexBaseAPI Color32 ToColor32(const String&);
 
@@ -77,4 +77,4 @@ inline ApplicationContextType ToApplicationContext(const String& t) {
 }
 }
 
-#endif //NEXTAR_NEXCONV_H
+#endif //NEXTAR_NEXCONV_H

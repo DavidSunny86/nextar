@@ -212,7 +212,7 @@ void Entity::RemoveFromScene(bool removeFromGroup) {
 		RemoveFromGroup();
 }
 
-void Entity::SetTransform(Vec3AF position, QuatF rotation, float scaling) {
+void Entity::SetTransform(Vec3A::pref position, Quat::pref rotation, float scaling) {
 
 	if (moveable) {
 		moveable->SetTransform(position, rotation, scaling);

@@ -18,8 +18,8 @@ NEX_IMPLEMENT_PLATFORM_APP();
 using namespace nextar;
 
 static unsigned MAX_DEPTH = 20;
-Matrix4x4 RandomMatrix() {
-	Matrix4x4 temp;
+Mat4::type RandomMatrix() {
+	Mat4::type temp;
 	for(uint32 i = 0; i < 4; ++i)
 		for(uint32 j = 0; j < 4; ++j)
 			temp(i,j) = RandomGen::RangeFloat(0, Math::PI);
@@ -29,8 +29,8 @@ Matrix4x4 RandomMatrix() {
 class SubTask : public Task {
 public:
 	SubTask(const String& name, uint32 depth) : Task(name) {
-		result = NEX_NEW(Matrix4x4);
-		*result = Matrix4x4::IdentityMatrix;
+		result = NEX_NEW(Mat4::type);
+		*result = Mat4::type::IdentityMatrix;
 		next = nullptr;
 		this->depth = depth;
 	}
@@ -61,7 +61,7 @@ public:
 
 	uint32 depth;
 
-	Matrix4x4* result;
+	Mat4::type* result;
 	uint32 count;
 protected:
 	SubTask* next;

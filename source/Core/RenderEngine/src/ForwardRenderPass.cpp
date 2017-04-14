@@ -26,8 +26,8 @@ void ForwardRenderPass::PrepareMaterials() {
 
 void ForwardRenderPass::Commit(CommitContext& context) {
 
-	/*context.sunLightIntensity = Vector4(1, 1, 1, 1);
-	context.sunLightPosition = Vector4(0, 400, 0, 1);
+	/*context.sunLightIntensity = Vec4::type(1, 1, 1, 1);
+	context.sunLightPosition = Vec4::type(0, 400, 0, 1);
 	context.sunLightColor = Color(0.8f, 0.8f, 0.4f, 1);*/
 
 	BeginRender(context);

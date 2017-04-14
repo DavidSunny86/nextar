@@ -26,7 +26,7 @@ public:
 
 	Size _bufferDim;
 	uint16 _bufferDepth;
-	Vector2 _bufferDimFactor;
+	Vec2::type _bufferDimFactor;
 
 	Target _targets[RenderConstants::MAX_RENDER_TARGETS+1];
 	uint32 _numTargets;

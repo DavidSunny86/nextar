@@ -1,11 +1,11 @@
 #pragma once
-using namespace nextar;
-using namespace nextar::Math;
+namespace nextar {
+namespace Math {
 
 
 inline _VecOp<_Vec4, _Vec4>::type _VecOp<_Vec4, _Vec4>::Mul(pref v, TraitsMat4x4::pref m) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
-	Quad ret, vTemp;
+	_Quad ret, vTemp;
 	ret = _mm_shuffle_ps(v, v, _MM_SHUFFLE(0, 0, 0, 0));
 	ret = _mm_mul_ps(ret, m.r[0]);
 	vTemp = _mm_shuffle_ps(v, v, _MM_SHUFFLE(1, 1, 1, 1));
@@ -19,7 +19,7 @@ inline _VecOp<_Vec4, _Vec4>::type _VecOp<_Vec4, _Vec4>::Mul(pref v, TraitsMat4x4
 	ret = _mm_add_ps(ret, vTemp);
 	return ret;
 #else
-	Quad r, x, y, z, w;
+	_Quad r, x, y, z, w;
 
 	z = SplatZ(v);
 	y = SplatY(v);
@@ -33,4 +33,8 @@ inline _VecOp<_Vec4, _Vec4>::type _VecOp<_Vec4, _Vec4>::Mul(pref v, TraitsMat4x4
 
 	return r;
 #endif
+}
+
+
+}
 }

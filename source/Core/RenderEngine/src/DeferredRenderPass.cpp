@@ -114,13 +114,13 @@ void DeferredRenderPass::Commit(CommitContext& context) {
 	//Image imageObj(std::move(image));
 	/* Display Image */
 	if (DebugDisplay::InstancePtr()) {
-		Box2D box(0, 0, 0.25f, 0.25f);
+		Rect::type box(0, 0, 0.25f, 0.25f);
 		DebugDisplay::Instance().Register(box, Color::White, Vec4ASet(0, 0, 1, 1), gbuffer.albedoMap, false, -1);
-		Box2D box2(0.25f, 0, 0.5f, 0.25f);
+		Rect::type box2(0.25f, 0, 0.5f, 0.25f);
 		DebugDisplay::Instance().Register(box2, Color::White, Vec4ASet(0, 0, 1, 1), gbuffer.normalMap, false, -1);
-		Box2D box3(0.5f, 0.0f, 0.75f, 0.25f);
+		Rect::type box3(0.5f, 0.0f, 0.75f, 0.25f);
 		DebugDisplay::Instance().Register(box3, Color::White, Vec4ASet(0, 0, 1, 1), gbuffer.specularAndGlossMap, false, -1);
-		Box2D box4(0.75f, 0.0f, 1.0f, 0.25f);
+		Rect::type box4(0.75f, 0.0f, 1.0f, 0.25f);
 		DebugDisplay::Instance().Register(box4, Color::White, Vec4ASet(0, 0, 1, 1), gbuffer.depth, false, -1);
 	}
 

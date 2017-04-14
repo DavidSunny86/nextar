@@ -73,15 +73,15 @@ inline void _Mat4Op<T>::Rotate(pref m, TraitsVec3::type * iStream, uint32 inStri
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	uint8* outVec = (uint8*)iStream;
 	union {
-		Quad v;
+		_Quad v;
 		float_type s[4];
 	}store;
 	
 
 	for (uint32 i = 0; i < count; i++) {
-		Quad x = _mm_load_ps1(&reinterpret_cast<const Vector3*>(inpVec)->x);
-		Quad y = _mm_load_ps1(&reinterpret_cast<const Vector3*>(inpVec)->y);
-		Quad res = _mm_load_ps1(&reinterpret_cast<const Vector3*>(inpVec)->z);
+		_Quad x = _mm_load_ps1(&reinterpret_cast<const Vector3*>(inpVec)->x);
+		_Quad y = _mm_load_ps1(&reinterpret_cast<const Vector3*>(inpVec)->y);
+		_Quad res = _mm_load_ps1(&reinterpret_cast<const Vector3*>(inpVec)->z);
 		res = _mm_mul_ps(res, m.r[2]);
 		y = _mm_mul_ps(y, m.r[1]);
 		res = _mm_add_ps(res, y);
@@ -96,7 +96,7 @@ inline void _Mat4Op<T>::Rotate(pref m, TraitsVec3::type * iStream, uint32 inStri
 		inpVec += inStride;
 	}
 #else
-	Quad x, y, z, r;
+	_Quad x, y, z, r;
 	for (uint32 i = 0; i < count; i++) {
 		x = QuadOp::Set(((float_type*)inpVec)[0]);
 		y = QuadOp::Set(((float_type*)inpVec)[1]);
@@ -118,9 +118,9 @@ inline void _Mat4Op<T>::Rotate(pref m, TraitsVec3::type * iStream, uint32 inStri
 template<typename T>
 inline TraitsVec3A::type _Mat4Op<T>::Rotate(pref m, TraitsVec3A::pref v) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
-	Quad vRes = _mm_shuffle_ps(v, v, _MM_SHUFFLE(0, 0, 0, 0));
+	_Quad vRes = _mm_shuffle_ps(v, v, _MM_SHUFFLE(0, 0, 0, 0));
 	vRes = _mm_mul_ps(vRes, m.r[0]);
-	Quad vTemp = _mm_shuffle_ps(v, v, _MM_SHUFFLE(1, 1, 1, 1));
+	_Quad vTemp = _mm_shuffle_ps(v, v, _MM_SHUFFLE(1, 1, 1, 1));
 	vTemp = _mm_mul_ps(vTemp, m.r[1]);
 	vRes = _mm_add_ps(vRes, vTemp);
 	vTemp = _mm_shuffle_ps(v, v, _MM_SHUFFLE(2, 2, 2, 2));
@@ -128,7 +128,7 @@ inline TraitsVec3A::type _Mat4Op<T>::Rotate(pref m, TraitsVec3A::pref v) {
 	vRes = _mm_add_ps(vRes, vTemp);
 	return vRes;
 #else
-	Quad r = Vec3AOp::Mul(Vec3AOp::SplatZ(v), Row(m, 2));
+	_Quad r = Vec3AOp::Mul(Vec3AOp::SplatZ(v), Row(m, 2));
 	r = Vec3AOp::Madd(Vec3AOp::SplatY(v), Row(m, 1), r);
 	r = Vec3AOp::Madd(Vec3AOp::SplatX(v), Row(m, 0), r);
 	return r;
@@ -138,9 +138,9 @@ inline TraitsVec3A::type _Mat4Op<T>::Rotate(pref m, TraitsVec3A::pref v) {
 template<typename T>
 inline void _Mat4Op<T>::SetRot(ref ret, TraitsQuat::pref rot) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
-	Quad r0, r1, r2;
-	Quad q0, q1;
-	Quad v0, v1, v2;
+	_Quad r0, r1, r2;
+	_Quad q0, q1;
+	_Quad v0, v1, v2;
 
 	q0 = _mm_add_ps(rot, rot);
 	q1 = _mm_mul_ps(rot, q0);

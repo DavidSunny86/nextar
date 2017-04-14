@@ -1,4 +1,4 @@
-
+	
 #include <RenderEngineHeaders.h>
 #include <NexRenderEngine.h>
 #include <AutoParamDefs.h>
@@ -17,13 +17,13 @@ namespace nextar {
 void SkyLightApply(CommitContext& context, const ShaderParameter* d) {
 	Light* light = context.lightSystem->GetSkyLight();
 	if (light) {
-		Vector4A v = light->GetDirectionVector();
-		v = Vec3ANegate(Mat4x4RotateVec3A(v, *context.viewMatrix));
+		Vec4::type v = light->GetDirectionVector();
+		v = Vec3A::Negate(Mat4::Rotate(*context.viewMatrix, v));
 		context.paramGroup->WriteRawData(context.renderContext, light->GetLightColor().AsFloatArray(), 0, 16);
 		context.paramGroup->WriteRawData(context.renderContext, &v, 16, 12);
 	} else {
-		Vector3A v = Vec3ASet(0, -1, 0);
-		v = Vec3ANegate(Mat4x4RotateVec3A(v, *context.viewMatrix));
+		Vec3A::type v = Vec3A::Set(0, -1, 0);
+		v = Vec3A::Negate(Mat4::Rotate(*context.viewMatrix, v));
 		context.paramGroup->WriteRawData(context.renderContext, Color::White.AsFloatArray(), 0, 16);
 		context.paramGroup->WriteRawData(context.renderContext, &v, 16, 12);
 	}
@@ -31,19 +31,19 @@ void SkyLightApply(CommitContext& context, const ShaderParameter* d) {
 
 void ObjectTransformsApply(CommitContext& context, const ShaderParameter* d) {
 	NEX_ASSERT(context.primitive);
-	const Matrix4x4* m = context.primitive->GetWorldMatrices();
-	const Matrix4x4* vp = context.viewProjectionMatrix;
-	Matrix4x4 mvp = Mat4x4Mul(*m, *vp);
+	const Mat4::type* m = context.primitive->GetWorldMatrices();
+	const Mat4::type* vp = context.viewProjectionMatrix;
+	Mat4::type mvp = Mat4::Mul(*m, *vp);
 	context.paramGroup->WriteRawData(context.renderContext, &mvp, 0, 16 * 4);
-	Matrix4x4 modelView = Mat4x4Mul(*m, *context.viewMatrix);
+	Mat4::type modelView = Mat4::Mul(*m, *context.viewMatrix);
 	context.paramGroup->WriteRawData(context.renderContext, &modelView, 16 * 4, 16 * 4);
 }
 
 void ModelViewProjectionApply(CommitContext& context, const ShaderParameter* d) {
 	NEX_ASSERT(context.primitive);
-	const Matrix4x4* m = context.primitive->GetWorldMatrices();
-	const Matrix4x4* vp = context.viewProjectionMatrix;
-	Matrix4x4 mvp = Mat4x4Mul(*m, *vp);
+	const Mat4::type* m = context.primitive->GetWorldMatrices();
+	const Mat4::type* vp = context.viewProjectionMatrix;
+	Mat4::type mvp = Mat4::Mul(*m, *vp);
 	const ConstantParameter* constParam =
 		reinterpret_cast<const ConstantParameter*>(d);
 	context.paramGroup->SetRawBuffer(context.renderContext, *constParam,
@@ -58,7 +58,7 @@ void DiffuseColorApply(CommitContext& context, const ShaderParameter* d) {
 }
 
 void InvProjectionTransformApply(CommitContext& context, const ShaderParameter* param) {
-	const Matrix4x4* m = context.invProjectionMatrix;
+	const Mat4::type* m = context.invProjectionMatrix;
 	const ConstantParameter* constParam =
 		static_cast<const ConstantParameter*>(param);
 	context.paramGroup->SetRawBuffer(context.renderContext, *constParam, m);
@@ -66,10 +66,10 @@ void InvProjectionTransformApply(CommitContext& context, const ShaderParameter* 
 
 void OmniLightPropertiesApply(CommitContext& context, const ShaderParameter* param) {
 	NEX_ASSERT(context.light);
-	Vector4A params[2];
+	Vec4::type params[2];
 	const Color& color = context.light->GetLightColor();
-	params[0] = Vec4ASet(color.red, color.green, color.blue, color.alpha);
-	params[1] = Vec4ASetW(context.light->GetTranslation(),
+	params[0] = Vec4::Set(color.red, color.green, color.blue, color.alpha);
+	params[1] = Vec4::SetW(context.light->GetTranslation(),
 		context.light->GetRadius());
 	const ParameterGroup* constParam =
 		static_cast<const ParameterGroup*>(param);
@@ -109,12 +109,12 @@ void ConstantScaleFactorApply(CommitContext& context, const ShaderParameter* par
 	const ConstantParameter* constParam =
 		static_cast<const ConstantParameter*>(param);
 
-	const Matrix4x4* m = context.primitive->GetWorldMatrices();
+	const Mat4::type* m = context.primitive->GetWorldMatrices();
 	float constantSize = context.primitive->GetConstantSize();
 	if (m && constantSize > 0.0f && context.camera) {
-		Vector3A first = Vec3AFromVec4A(Mat4x4Row(*m, 3));
-		Vector3A second = context.camera->GetTranslation();
-		float distance = Vec3ADistance(second, first);
+		Vec3A::type first = Mat4::Row(*m, 3);
+		Vec3A::type second = context.camera->GetTranslation();
+		float distance = Vec3A::Distance(second, first);
 		float distanceScale = constantSize * distance * 0.001f;
 		context.paramGroup->SetRawBuffer(context.renderContext, *constParam, &distanceScale);
 	} else {

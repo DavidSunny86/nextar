@@ -102,7 +102,7 @@ public:
 
 	virtual void Update(const FrameTimer& frameTimer);
 
-	void SetTransform(Vec3AF position, QuatF rotation, float scaling);
+	void SetTransform(Vec3A::pref position, Quat::pref rotation, float scaling);
 
 protected:
 

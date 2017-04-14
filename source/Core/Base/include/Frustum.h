@@ -19,12 +19,12 @@ public:
 
 private:
 
-	Plane* planes;
+	Plane::type* planes;
 	size_t numPlanes;
 
 public:
 
-	Frustum(Plane* planes = nullptr, size_t numPlanes = 0);
+	Frustum(Plane::type* planes = nullptr, size_t numPlanes = 0);
 	~Frustum();
 
 	void SetupPlanes(size_t numPlanes);
@@ -33,12 +33,12 @@ public:
 		return numPlanes;
 	}
 
-	_NexInline Plane GetPlane(size_t i) const {
+	_NexInline Plane::type GetPlane(size_t i) const {
 		NEX_ASSERT(i < numPlanes);
 		return planes[i];
 	}
 
-	_NexInline void SetPlane(PlaneF plane, size_t i) {
+	_NexInline void SetPlane(Plane::pref plane, size_t i) {
 		NEX_ASSERT(i < numPlanes);
 		planes[i] = plane;
 	}
@@ -47,14 +47,14 @@ public:
 	 * @remarks Construct from a Transpose(view*projection) matrix
 	 * @param mat Transpose(View*Projection) or Transpose(Proj)*Transpose(View) matrix
 	 */
-	void ConstructFrom(Mat4x4F mat);
+	void ConstructFrom(Mat4::pref mat);
 
-	void SetPlanes(Plane* planes, size_t numPlanes) {
+	void SetPlanes(Plane::type* planes, size_t numPlanes) {
 		this->planes = planes;
 		this->numPlanes = numPlanes;
 	}
 
-	const Plane* GetPlanes() const {
+	const Plane::type* GetPlanes() const {
 		return planes;
 	}
 };

@@ -25,7 +25,7 @@ public:
 		UTApplication::_SetupScene(scene);
 		AxisAlignedBox box = AxisAlignedBox(-10, -10, -10, 10, 10, 10);
 		DebugDisplay::Register(box, Color::Blue);
-		Matrix4x4 m = Matrix4x4::IdentityMatrix;
+		Mat4::type m = Mat4::type::IdentityMatrix;
 		m = Mat4x4Scale(4, m);
 		DebugDisplay::Register(m);
 		entity = scene->FindComponent(NEX_CSTR_ID("MainCamera"));
@@ -55,7 +55,7 @@ public:
 				Component::CLASS_FPS_BEHAVIOR,
 				NEX_CSTR_ID("FPSBehaviour")));
 			Moveable* mv = Component::Instance<Moveable>(NEX_CSTR_ID("CameraTransform"));
-			Quaternion rotation = QuatFromAxisAng(Vector3::XAxis, Math::PI_BY_4);
+			Quat::type rotation = QuatFromAxisAng(Vec3::type::XAxis, Math::PI_BY_4);
 			mv->SetTransform(Vec3ASet(0, 50, -50), rotation, 1);
 			e->AttachComponent(mv);
 			e->AttachComponent(b);

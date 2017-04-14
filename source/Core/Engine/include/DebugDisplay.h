@@ -28,18 +28,18 @@ protected:
 	/** 0 seconds of expiry time means it will live forever
 	  * negetive value for expiry time means lifetime is 1 frame
 	 ** @returns Returns the primitive id, can be used to remove it */
-	virtual uint32 _Register(AABoxF box, const Color& color,
+	virtual uint32 _Register(AABox::pref box, const Color& color,
 		float expiryTimeInSec = 0.0f) = 0;
-	virtual uint32 _Register(Mat4x4R tform, float screenSpaceFactor = 0.8f, const Color& color = Color::White,
+	virtual uint32 _Register(Mat4::pref tform, float screenSpaceFactor = 0.8f, const Color& color = Color::White,
 		float expiryTimeInSec = 0.0f) = 0;
-	virtual uint32 _Register(PlaneF plane, const Color& color,
+	virtual uint32 _Register(Plane::pref plane, const Color& color,
 		float expiryTimeInSec = 0.0f) = 0;
 	virtual uint32 _Register(const Frustum& frustum, const Color& color,
 		float expiryTimeInSec = 0.0f) = 0;
 	virtual uint32 _Register(const Geometry& triList, const Color& color,
 		float expiryTimeInSec = 0.0f) = 0;
-	virtual uint32 _Register(const Box2D& rect, const Color& color,
-		Vec4AF textureOffsetAndRepeat,
+	virtual uint32 _Register(const Rect::type& rect, const Color& color,
+		Vec4::pref textureOffsetAndRepeat,
 		TextureBase* textured, bool border,
 		float expiryTimeInSec, MaterialAssetPtr material) = 0;
 
@@ -61,14 +61,14 @@ public:
 	/** 0 seconds of expiry time means it will live forever
 	* negetive value for expiry time means lifetime is 1 frame
 	** @returns Returns the primitive id, can be used to remove it */
-	static inline uint32 Register(AABoxF box, const Color& color,
+	static inline uint32 Register(AABox::pref box, const Color& color,
 		float expiryTimeInSec = 0.0f) {
 		if (DebugDisplay::InstancePtr())
 			return DebugDisplay::Instance()._Register(box, color, expiryTimeInSec);
 		return -1;
 	}
 
-	static inline uint32 Register(Mat4x4R tform, float screenSpaceFactor = 0.8f,
+	static inline uint32 Register(Mat4::pref tform, float screenSpaceFactor = 0.8f,
 		const Color& color = Color::White,
 		float expiryTimeInSec = 0.0f) {
 		if (DebugDisplay::InstancePtr())
@@ -76,7 +76,7 @@ public:
 		return -1;
 	}
 
-	static inline uint32 Register(PlaneF plane, const Color& color,
+	static inline uint32 Register(Plane::pref plane, const Color& color,
 		float expiryTimeInSec = 0.0f) {
 		if (DebugDisplay::InstancePtr())
 			return DebugDisplay::Instance()._Register(plane, color, expiryTimeInSec);
@@ -97,8 +97,8 @@ public:
 		return -1;
 	}
 
-	static inline uint32 Register(const Box2D& rect, const Color& color,
-		Vec4AF textureOffsetAndRepeat,
+	static inline uint32 Register(const Rect::type& rect, const Color& color,
+		Vec4::pref textureOffsetAndRepeat,
 		TextureBase* textured = 0, bool border = true,
 		float expiryTimeInSec = 0.0f,
 		MaterialAssetPtr material = MaterialAssetPtr()) {

@@ -60,32 +60,32 @@ public:
 	};
 
 	struct Matrix: public AllocMathCore {
-		Matrix4x4 view;
-		Matrix4x4 projection;
-		Matrix4x4 viewProjection;
-		Matrix4x4 invProjection;
-		Matrix4x4 invViewProjection;
+		Mat4::type view;
+		Mat4::type projection;
+		Mat4::type viewProjection;
+		Mat4::type invProjection;
+		Mat4::type invViewProjection;
 		/* frustum corners in projection space */
-		Vector3A projCorners[8];
+		Vec3A::type projCorners[8];
 		/* frustum corners in world space */
-		Vector3A corners[8];
+		Vec3A::type corners[8];
 		/* typical camera planes, used in frustum */
-		Plane camPlanes[6];
+		Plane::type camPlanes[6];
 	};
 
 	Camera(const StringID name, const StringID factory,  Component* parent = nullptr);
 	virtual ~Camera();
 
 	/** This is basically the inverse of the world transform */
-	inline const Matrix4x4& GetViewMatrix();
+	inline const Mat4::type& GetViewMatrix();
 	/* Projection matrix as determined by the current projection parameters */
-	inline const Matrix4x4& GetProjectionMatrix();
+	inline const Mat4::type& GetProjectionMatrix();
 	/* Pre-multiplied view projection matrix */
-	inline const Matrix4x4& GetViewProjectionMatrix();
+	inline const Mat4::type& GetViewProjectionMatrix();
 	/* Inverse projection */
-	inline const Matrix4x4& GetInvProjectionMatrix();
+	inline const Mat4::type& GetInvProjectionMatrix();
 	/* Inverse view projection */
-	inline const Matrix4x4& GetInvViewProjectionMatrix();
+	inline const Mat4::type& GetInvViewProjectionMatrix();
 
 	/* Projection type */
 	inline uint8 GetProjectionType() const;
@@ -108,14 +108,14 @@ public:
 	inline uint32 GetCullMask() const;
 	inline void SetVisibilityMask(VisibilityMask visibilityMask);
 	inline VisibilityMask GetVisibilityMask() const;
-	inline float GetDepth(Vec3AF ofPoint);
-	inline float GetNormalizedDepth(Vec3AF ofPoint);
+	inline float GetDepth(Vec3A::pref ofPoint);
+	inline float GetNormalizedDepth(Vec3A::pref ofPoint);
 
 	/** Visibility tests */
 	inline bool IsVisible(const BoundingVolume& vol,
 			std::ptrdiff_t& coherencyData) const;
 	inline bool IsVisible(const BoundingVolume& vol) const;
-	inline bool IsVisible(Vec3AF center, float radius) const;
+	inline bool IsVisible(Vec3A::pref center, float radius) const;
 
 	void UpdateProjection();
 	void UpdateFrustum();
@@ -124,22 +124,22 @@ public:
 	void SetOrthographicParams(const OrthographicParams& params);
 	void SetAsymmetricParams(const AsymmetricParams& params);
 
-	inline Vector3A GetRightDirection() const;
-	inline Vector3A GetUpDirection() const;
-	inline Vector3A GetViewDirection() const;
-	inline Vector3A GetEyePosition() const;
+	inline Vec3A::type GetRightDirection() const;
+	inline Vec3A::type GetUpDirection() const;
+	inline Vec3A::type GetViewDirection() const;
+	inline Vec3A::type GetEyePosition() const;
 
 	// The point must be a vector of type (x, y, z, 1)
 	// Returned coordinates are normalized to -1, 1 in all axes (ClipSpace).
-	inline Vector4A GetWorldToClipCoord(Vector4A point);
+	inline Vec4::type GetWorldToClipCoord(Vec4::type point);
 	// Coordinates are expected to be normalized between -1, 1 in all axes (ClipSpace).
-	inline Vector4A GetClipToWorldCoord(Vector4A point);
+	inline Vec4::type GetClipToWorldCoord(Vec4::type point);
 	// Returned coordinates in screen/clip space with w divided (NDC)
-	inline Vector3A GetWorldToScreenCoord(Vector3A point);
+	inline Vec3A::type GetWorldToScreenCoord(Vec3A::type point);
 	// Get point in world coordinate from clip space (NDC)
-	inline Vector3A GetScreenToWorldCoord(Vector3A point);
+	inline Vec3A::type GetScreenToWorldCoord(Vec3A::type point);
 
-	const Vector3A* GetCorners();
+	const Vec3A::type* GetCorners();
 	/** @remarks Called to update the render queue with renderable data. */
 	virtual void Visit(SceneTraversal & traversal) override;
 	/** @remarks Update camera */
@@ -186,23 +186,23 @@ protected:
 };
 
 /************************************************************/
-inline const Matrix4x4& Camera::GetViewMatrix() {
+inline const Mat4::type& Camera::GetViewMatrix() {
 	return static_cast<Camera::Matrix*>(matrixData)->view;
 }
 
-inline const Matrix4x4& Camera::GetProjectionMatrix() {
+inline const Mat4::type& Camera::GetProjectionMatrix() {
 	return static_cast<Camera::Matrix*>(matrixData)->projection;
 }
 
-inline const Matrix4x4& Camera::GetViewProjectionMatrix() {
+inline const Mat4::type& Camera::GetViewProjectionMatrix() {
 	return static_cast<Camera::Matrix*>(matrixData)->viewProjection;
 }
 
-inline const Matrix4x4& Camera::GetInvProjectionMatrix() {
+inline const Mat4::type& Camera::GetInvProjectionMatrix() {
 	return static_cast<Camera::Matrix*>(matrixData)->invProjection;
 }
 
-inline const Matrix4x4& Camera::GetInvViewProjectionMatrix() {
+inline const Mat4::type& Camera::GetInvViewProjectionMatrix() {
 	return static_cast<Camera::Matrix*>(matrixData)->invViewProjection;
 }
 
@@ -229,7 +229,7 @@ inline const Frustum& Camera::GetFrustum() const {
 	return viewFrustum;
 }
 
-inline bool Camera::IsVisible(Vec3AF center, float radius) const {
+inline bool Camera::IsVisible(Vec3A::pref center, float radius) const {
 	return Intersect::BoundingSphereFrustum(center, radius, GetFrustum())
 			!= Intersect::IR_OUTSIDE;
 }
@@ -290,43 +290,43 @@ inline bool Camera::IsViewDimOutOfDate() const {
 	return IsFlagSet(VIEW_DIM_OUTDATED);
 }
 
-inline Vector3A Camera::GetRightDirection() const {
+inline Vec3A::type Camera::GetRightDirection() const {
 	return Mat4x4Row(*worldMatrix, 0);
 }
 
-inline Vector3A Camera::GetUpDirection() const {
+inline Vec3A::type Camera::GetUpDirection() const {
 	return Mat4x4Row(*worldMatrix, 1);
 }
 
-inline Vector3A Camera::GetViewDirection() const {
+inline Vec3A::type Camera::GetViewDirection() const {
 	return Mat4x4Row(*worldMatrix, 2);
 }
 
-inline Vector3A Camera::GetEyePosition() const {
+inline Vec3A::type Camera::GetEyePosition() const {
 	return GetTranslation();
 }
 
-inline float Camera::GetDepth(Vec3AF ofPoint) {
+inline float Camera::GetDepth(Vec3A::pref ofPoint) {
 	return Vec3ASqDistance(ofPoint, GetEyePosition());
 }
 
-inline float Camera::GetNormalizedDepth(Vec3AF ofPoint) {
+inline float Camera::GetNormalizedDepth(Vec3A::pref ofPoint) {
 	return GetDepth(ofPoint) * recipDistanceInView;
 }
 
-inline Vector3A Camera::GetWorldToScreenCoord(Vector3A point) {
+inline Vec3A::type Camera::GetWorldToScreenCoord(Vec3A::type point) {
 	return Mat4x4TransAndProjVec3A(point, GetViewProjectionMatrix());
 }
 
-inline Vector3A Camera::GetScreenToWorldCoord(Vector3A point) {
+inline Vec3A::type Camera::GetScreenToWorldCoord(Vec3A::type point) {
 	return Mat4x4TransAndProjVec3A(point, GetInvViewProjectionMatrix());
 }
 
-inline Vector4A Camera::GetWorldToClipCoord(Vector4A point) {
+inline Vec4::type Camera::GetWorldToClipCoord(Vec4::type point) {
 	return Vec4AMulMat4x4(point, GetViewProjectionMatrix());
 }
 
-inline Vector4A Camera::GetClipToWorldCoord(Vector4A point) {
+inline Vec4::type Camera::GetClipToWorldCoord(Vec4::type point) {
 	return Vec4AMulMat4x4(point, GetInvViewProjectionMatrix());
 
 }

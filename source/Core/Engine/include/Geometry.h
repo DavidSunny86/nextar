@@ -23,9 +23,9 @@ public:
 	};
 	// @note All faces are counter-clockwise oriented
 	// Consider top-left as -1,-1 and right-bottom as 1,1
-	typedef vector<Vector3>::type PointList;
+	typedef vector<Vec3::type>::type PointList;
 	typedef vector<Color>::type ColorList;
-	typedef vector<Vector2>::type Point2DList;
+	typedef vector<Vec2::type>::type Point2DList;
 	typedef vector<uint16>::type IndexList;
 
 	inline Geometry() : type(TRIANGLES) {}
@@ -52,7 +52,7 @@ public:
 		points(std::move(g.points)), normals(std::move(g.normals)), uv(std::move(g.uv)), colors(std::move(g.colors)) {}
 
 	bool Merge(const Geometry& second);
-	void Transform(Mat4x4R m);
+	void Transform(Mat4::pref m);
 
 
 	static Geometry CreateSphere(uint32 density, float radius,

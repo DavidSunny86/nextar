@@ -47,7 +47,7 @@ public:
 		return numWorldMatrices;
 	}
 
-	const Matrix4x4* GetWorldMatrices() const {
+	const Mat4::type* GetWorldMatrices() const {
 		return worldMatrices;
 	}
 
@@ -55,7 +55,7 @@ public:
 		streamData = stream;
 	}
 
-	void SetWorldMatrices(const Matrix4x4* matrices, int16 numMatrices) {
+	void SetWorldMatrices(const Mat4::type* matrices, int16 numMatrices) {
 		worldMatrices = matrices;
 		numWorldMatrices = numMatrices;
 	}
@@ -92,7 +92,7 @@ protected:
 	/* bounding volume */
 	const BoundingVolume* bounds;
 	/* The current world matrices */
-	const Matrix4x4* worldMatrices;
+	const Mat4::type* worldMatrices;
 	/* Material */
 	MaterialAssetPtr material;
 	/** stream data to render */

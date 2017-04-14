@@ -14,7 +14,7 @@ Camera::Camera(const StringID name, const StringID factory,  Component* parent) 
 		Spatial(name, factory, parent), projectMatrixNumber(0),
 		visibilityMask(VisibilityMask::VISIBILITY_ALL) {
 	Camera::Matrix* matrix = NEX_NEW(Camera::Matrix);
-	matrix->view = Matrix4x4::IdentityMatrix;
+	matrix->view = Mat4::type::IdentityMatrix;
 	_SetCameraMatrixDataPtr(matrix);
 }
 
@@ -53,7 +53,7 @@ void Camera::UpdateFrustum() {
 
 	Camera::Matrix* m = static_cast<Camera::Matrix*>(matrixData);
 	bool updateFrustum = false;
-	const Matrix4x4& worldData = GetWorldMatrix();
+	const Mat4::type& worldData = GetWorldMatrix();
 	//if (viewMatrixNumber != GetMatrixNumber()) {
 
 	m->view = Mat4x4ViewFromWorld(worldData);
@@ -75,10 +75,10 @@ void Camera::UpdateFrustum() {
 	UnsetFlag(FRUSTUM_OUTDATED);
 }
 
-const Vector3A* Camera::GetCorners() {
+const Vec3A::type* Camera::GetCorners() {
 	Camera::Matrix* m = static_cast<Camera::Matrix*>(matrixData);
-	Vector3A* transCorners = m->corners;
-	const Matrix4x4& worldData = GetWorldMatrix();
+	Vec3A::type* transCorners = m->corners;
+	const Mat4::type& worldData = GetWorldMatrix();
 	if (IsBoundsOutOfDate()) {
 		// || viewMatrixNumber != GetMatrixNumber()) {
 
@@ -86,7 +86,7 @@ const Vector3A* Camera::GetCorners() {
 		if (IsViewDimOutOfDate())
 			_CalculateViewDimensions();
 		/* transform bounds */
-		Vector3A* corners = m->projCorners;
+		Vec3A::type* corners = m->projCorners;
 
 		for (int i = 0; i < 8; ++i)
 			transCorners[i] = Mat4x4TransVec3A(corners[i], worldData);
@@ -98,7 +98,7 @@ const Vector3A* Camera::GetCorners() {
 void Camera::_CalculateViewDimensions() {
 
 	Camera::Matrix* m = static_cast<Camera::Matrix*>(matrixData);
-	Vector3A* corners = m->projCorners;
+	Vec3A::type* corners = m->projCorners;
 	float leftNear, leftFar;
 	float rightNear, rightFar;
 	float topNear, topFar;

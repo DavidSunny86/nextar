@@ -50,10 +50,10 @@ template <typename T>
 class Traits : public TraitsBase<T> {
 public:
 
-	typedef TraitsBase<T>::type type;
-	typedef TraitsBase<T>::pref pref;
-	typedef TraitsBase<T>::base_type;
-	typedef TraitsBase<T>::row_type row_type;
+	typedef typename TraitsBase<T>::type type;
+	typedef typename TraitsBase<T>::pref pref;
+	typedef typename TraitsBase<T>::base_type;
+	typedef typename TraitsBase<T>::row_type row_type;
 	
 	typedef type& ref;
 	typedef const ref cref;

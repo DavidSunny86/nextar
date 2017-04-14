@@ -75,23 +75,23 @@ public:
 		SetFlag(UPDATE_BOUNDS, v);
 	}
 
-	inline Matrix4x4& GetWorldMatrix() {
+	inline Mat4::type& GetWorldMatrix() {
 		return *worldMatrix;
 	}
 
-	inline const Matrix4x4& GetWorldMatrix() const {
+	inline const Mat4::type& GetWorldMatrix() const {
 		return *worldMatrix;
 	}
 
-	inline Vector3A GetTranslation() const {
+	inline Vec3A::type GetTranslation() const {
 		return Mat4x4Row(*worldMatrix, 3);
 	}
 
-	inline Vector3A GetDirectionVector() const {
+	inline Vec3A::type GetDirectionVector() const {
 		return Mat4x4Row(*worldMatrix, 2);
 	}
 
-	void SetTransform(Vec3AF pos, QuatF rot, float scaling) {
+	void SetTransform(Vec3A::pref pos, Quat::pref rot, float scaling) {
 		NEX_ASSERT(!moveable);
 		*worldMatrix = Mat4x4FromScaleRotPos(scaling, rot, pos);
 		SetUpdateRequired(true);
@@ -122,7 +122,7 @@ protected:
 	std::ptrdiff_t cullingData;
 	/* This is either a part of the moveable or the spatial owns it */
 	uint32 matrixState;
-	Matrix4x4* worldMatrix;
+	Mat4::type* worldMatrix;
 	/* This is a moveable attached to the entity */
 	Moveable* moveable;
 };

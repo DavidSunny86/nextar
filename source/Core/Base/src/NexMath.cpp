@@ -1,8 +1,6 @@
 #include <BaseHeaders.h>
 #include <MathBase.h>
 #include <MathTypes.h>
-#include "math/Matrix3x3.cpp"
-#include "math/EularAngles.cpp"
 
 #ifdef NEX_MATH_RANDOMIZER_DEFINED
 NEX_MATH_RANDOM_SEED
@@ -10,23 +8,31 @@ NEX_MATH_RANDOM_SEED
 #endif
 
 namespace nextar {
-
+using namespace Math;
 uint32 RandomizerSeed::seed = 2147483647;
 template class PooledAllocator< _Matrix3x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE >;
 template class PooledAllocator< _Matrix4x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE >;
-template class PooledAllocator<Vector3A, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;
-//template class PooledAllocator<Vector4A, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;
-//template class PooledAllocator<Quaternion, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;
+template class PooledAllocator<Vec3A::type, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;
+//template class PooledAllocator<Vec4::type, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;
+//template class PooledAllocator<Quat::type, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE>;
 
-const Vector3 Vector3::XAxis(1, 0, 0);
-const Vector3 Vector3::YAxis(0, 1, 0);
-const Vector3 Vector3::ZAxis(0, 0, 1);
-const Vector3 Vector3::Origin(0, 0, 0);
-const Vector2 Vector2::Origin(0, 0);
-const Vector4 Vector4::Origin(0, 0, 0, 0);
-_NexBaseAPI const Matrix4x4 Matrix4x4::IdentityMatrix(1, 0, 0, 0, 0, 1, 0, 0, 0,
-		0, 1, 0, 0, 0, 0, 1);
-_NexBaseAPI const AxisAlignedBox AxisAlignedBox::LargestBox(-Math::SCALAR_MAX, -Math::SCALAR_MAX, -Math::SCALAR_MAX, Math::SCALAR_MAX,  Math::SCALAR_MAX,  Math::SCALAR_MAX);
+const Vec3::type Vec3::type::XAxis = { 1, 0, 0 };
+const Vec3::type Vec3::type::YAxis = { 0, 1, 0 };
+const Vec3::type Vec3::type::ZAxis = { 0, 0, 1 };
+const Vec3::type Vec3::type::Origin = { 0, 0, 0 };
+const Vec2::type Vec2::type::Origin = { 0, 0 };
+_NexBaseAPI const Mat4::type Mat4::type::IdentityMatrix = { 	
+	1, 0, 0, 0,
+	0, 1, 0, 0,
+	0, 0, 1, 0,
+	0, 0, 0, 1	
+};
+
+_NexBaseAPI const AxisAlignedBox AxisAlignedBox::LargestBox = {
+	-Math::SCALAR_MAX, -Math::SCALAR_MAX, -Math::SCALAR_MAX, 1,
+	 Math::SCALAR_MAX,  Math::SCALAR_MAX,  Math::SCALAR_MAX, 1
+};
+
 _NexBaseAPI const AxisAlignedBox AxisAlignedBox::InvalidBox( Math::SCALAR_MAX,  Math::SCALAR_MAX,  Math::SCALAR_MAX,-Math::SCALAR_MAX, -Math::SCALAR_MAX, -Math::SCALAR_MAX);
 
 namespace Math {
@@ -53,7 +59,7 @@ _NexBaseAPI bool IsPow2(uint32 from) {
 }
 }
 
-#if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE
+#if NEX_VECTOR_MATH_TYPE_IS_SSE
 
 #define NEXCORE_DEFINE_MASK(maskname) const _ConstI32  maskname
 #define NEXCORE_DEFINE_F32C(_f32const_) const _ConstF32  _f32const_

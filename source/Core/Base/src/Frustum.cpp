@@ -9,7 +9,7 @@
 
 namespace nextar {
 
-Frustum::Frustum(Plane* _planes, size_t num) :
+Frustum::Frustum(Plane::type* _planes, size_t num) :
 		planes(_planes), numPlanes(num) {
 	if (!planes && num > 0)
 		SetupPlanes(num);
@@ -28,11 +28,11 @@ void Frustum::SetupPlanes(size_t num) {
 			NEX_FREE(planes, MEMCAT_MATH_CORE);
 	}
 	numPlanes = num;
-	planes = static_cast<Plane*>(NEX_ALLOC(num * sizeof(Plane),
+	planes = static_cast<Plane::type*>(NEX_ALLOC(num * sizeof(Plane::type),
 			MEMCAT_MATH_CORE));
 }
 
-void Frustum::ConstructFrom(Mat4x4F combo) {
+void Frustum::ConstructFrom(Mat4::pref combo) {
 	// Left clipping planeT
 	planes[PLANE_LEFT] = PlaneNormalize(
 	Vec4ANegate(Vec4AAdd(Mat4x4Row(combo, 0), Mat4x4Row(combo, 3))));

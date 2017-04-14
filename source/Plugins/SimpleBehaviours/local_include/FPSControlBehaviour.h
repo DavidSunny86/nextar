@@ -22,8 +22,8 @@ class FPSControlBehaviour:
 		public AllocGeneral {
 	public:
 		
-		Vector2 moveSpeedXZ;
-		Vector2 rotateSpeedXY;
+		Vec2::type moveSpeedXZ;
+		Vec2::type rotateSpeedXY;
 
 		ControlMap() : moveSpeedXZ(0, 0), rotateSpeedXY(0, 0) { }
 

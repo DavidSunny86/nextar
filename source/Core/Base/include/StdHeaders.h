@@ -32,6 +32,7 @@
 #include <chrono>
 #include <type_traits>
 #include <functional>
+#include <initializer_list>
 
 #undef max
 #undef min

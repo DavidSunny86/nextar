@@ -41,12 +41,12 @@ public:
 		return false;
 	}
 
-	inline void SetTransform(Vec3AF scale, QuatF rot, Vec3AF loc) {
+	inline void SetTransform(Vec3A::pref scale, Quat::pref rot, Vec3A::pref loc) {
 		*worldMatrix = Mat4x4Mul(Mat4x4Mul(Mat4x4FromScale(scale), Mat4x4FromRot(rot)),
 			Mat4x4FromPos(loc));
 	}
 
-	inline void SetTransform(Mat4x4R tform) {
+	inline void SetTransform(Mat4::pref tform) {
 		*worldMatrix = tform;
 	}
 
@@ -63,7 +63,7 @@ public:
 
 protected:
 	ParameterBuffer _parameters;
-	Matrix4x4* worldMatrix;
+	Mat4::type* worldMatrix;
 	float constantSize;
 	Color color;
 	uint32 id;
@@ -92,18 +92,18 @@ protected:
 
 	virtual VisiblePrimitiveList& _GetPrimitives(CommitContext& context);
 
-	virtual uint32 _Register(AABoxF box, const Color& color,
+	virtual uint32 _Register(AABox::pref box, const Color& color,
 		float expiryTimeInSec = 0.0f) override;
-	virtual uint32 _Register(Mat4x4R tform, float screenSpaceFactor, const Color& color = Color::Black,
+	virtual uint32 _Register(Mat4::pref tform, float screenSpaceFactor, const Color& color = Color::Black,
 		float expiryTimeInSec = 0.0f) override;
-	virtual uint32 _Register(PlaneF plane, const Color& color,
+	virtual uint32 _Register(Plane::pref plane, const Color& color,
 		float expiryTimeInSec = 0.0f) override;
 	virtual uint32 _Register(const Frustum& frustum, const Color& color,
 		float expiryTimeInSec = 0.0f) override;
 	virtual uint32 _Register(const Geometry& triList, const Color& color,
 		float expiryTimeInSec = 0.0f) override;
-	virtual uint32 _Register(const Box2D& rect, const Color& color,
-		Vec4AF textureOffsetAndRepeat,
+	virtual uint32 _Register(Rect::pref rect, const Color& color,
+		Vec4::pref textureOffsetAndRepeat,
 		TextureBase* textured, bool border,
 		float expiryTimeInSec, MaterialAssetPtr material) override;
 

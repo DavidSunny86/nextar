@@ -15,7 +15,7 @@ void Buggy::_SetupScene(SceneAssetPtr& scene) {
   UTApplication::_SetupScene(scene);
   AxisAlignedBox box = AxisAlignedBox(-10, -10, -10, 10, 10, 10);
   DebugDisplay::Register(box, Color::Blue);
-  Matrix4x4 m = Matrix4x4::IdentityMatrix;
+  Mat4::type m = Mat4::type::IdentityMatrix;
   DebugDisplay::Register(m, 2);
   cameraEntity = scene->FindComponent(NEX_CSTR_ID("MainCamera"));
 
@@ -35,7 +35,7 @@ void Buggy::_SetupScene(SceneAssetPtr& scene) {
 	  Component::CLASS_FPS_BEHAVIOR,
 	  NEX_CSTR_ID("FPSBehaviour")));
 	Moveable* mv = Component::Instance<Moveable>(NEX_CSTR_ID("CameraTransform"));
-	Quaternion rotation = QuatFromAxisAng(Vector3::XAxis, Math::PI_BY_4);
+	Quat::type rotation = QuatFromAxisAng(Vec3::type::XAxis, Math::PI_BY_4);
 	mv->SetTransform(Vec3ASet(10, 50, -50), rotation, 1);
 	e->AttachComponent(mv);
 	e->AttachComponent(b);

@@ -29,7 +29,7 @@ bool CmdCreateBuffer::BeginExecute(CommandContext* pContext,
 	c->_numTargets = 0;
 	c->_bufferDim.combined = 0;
 	c->_bufferDepth = 1;
-	c->_bufferDimFactor = Vector2(1, 1);
+	c->_bufferDimFactor = Vec2::type(1, 1);
 	String temp;
 	if (it.HasNext(temp))
 		c->_bufferName = temp;

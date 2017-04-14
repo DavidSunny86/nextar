@@ -10,9 +10,9 @@ namespace nextar {
 
 
 typedef nextar::vector<uint32>::type IndexArray;
-typedef nextar::vector<Vector3>::type Vec3Array;
-typedef nextar::vector<Vector4>::type Vec4Array;
-typedef nextar::vector<Vector2>::type Vec2Array;
+typedef nextar::vector<Vec3::type>::type Vec3Array;
+typedef nextar::vector<Vec4::type>::type Vec4Array;
+typedef nextar::vector<Vec2::type>::type Vec2Array;
 typedef nextar::vector<Vec3Array>::type Vec3ArrayList;
 typedef nextar::vector<Vec2Array>::type Vec2ArrayList;
 

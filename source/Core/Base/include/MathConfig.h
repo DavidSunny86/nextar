@@ -16,6 +16,9 @@
 #define NEX_VECTOR_MATH_TYPE_IS_SSE 0
 #endif
 
+#ifdef NEX_PREFER_SPEED_OVER_ACCURACY 
+#	define NEX_USE_FAST_DIVISION
+#endif
 // Num matrix per block in matrix pool
 #define NEX_MATRIX_POOL_NUM_PER_BLOCK ((size_t)BaseConstants::NUM_MATRIX_PER_BLOCK)
 #define NEX_BV_POOL_NUM_PER_BLOCK ((size_t)BaseConstants::NUM_BV_PER_BLOCK)

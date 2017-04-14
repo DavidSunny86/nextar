@@ -40,7 +40,7 @@ void Light::SetLightRange(float range) {
 		moveable->SetScaling(range);
 	} else {
 		float ratio = range / lightRange;
-		Matrix4x4& m = GetWorldMatrix();
+		Mat4::type& m = GetWorldMatrix();
 		m = Mat4x4Scale(ratio, m);
 	}
 	lightRange = range;

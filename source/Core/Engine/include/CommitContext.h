@@ -49,8 +49,8 @@ public:
 	Size targetDimension;
 	Size viewDimensions;
 
-	//Vector4 sunLightIntensity;
-	//Vector4 sunLightPosition;
+	//Vec4::type sunLightIntensity;
+	//Vec4::type sunLightPosition;
 	//Color sunLightColor;
 
 	Color color;
@@ -85,11 +85,11 @@ public:
 	// camera and planes
 	Camera* camera;
 
-	const Matrix4x4* viewMatrix;
-	const Matrix4x4* viewProjectionMatrix;
-	const Matrix4x4* projectionMatrix;
-	const Matrix4x4* invProjectionMatrix;
-	const Matrix4x4* invViewProjectionMatrix;
+	const Mat4::type* viewMatrix;
+	const Mat4::type* viewProjectionMatrix;
+	const Mat4::type* projectionMatrix;
+	const Mat4::type* invProjectionMatrix;
+	const Mat4::type* invViewProjectionMatrix;
 
 	static RenderTargetName ParseTargetName(const String& target);
 	RenderTarget* GetTargetByName(RenderTargetName toLastSubTarget);

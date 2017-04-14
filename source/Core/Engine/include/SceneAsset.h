@@ -19,8 +19,8 @@ public:
 	SceneParameters();
 	~SceneParameters();
 
-	Vector3 maxPoint;
-	Vector3 minPoint;
+	Vec3::type maxPoint;
+	Vec3::type minPoint;
 };
 
 struct SceneEventListener {

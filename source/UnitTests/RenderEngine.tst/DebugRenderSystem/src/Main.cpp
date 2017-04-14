@@ -16,7 +16,7 @@ public:
 		UTApplication::_SetupScene(scene);
 		AxisAlignedBox box =  AxisAlignedBox(-10, -10, -10, 10,  10,  10);
 		DebugDisplay::Register(box, Color::Blue);
-		Matrix4x4 m = Matrix4x4::IdentityMatrix;
+		Mat4::type m = Mat4::type::IdentityMatrix;
 		m = Mat4x4Scale(4, m);
 		DebugDisplay::Register(m);
 	}

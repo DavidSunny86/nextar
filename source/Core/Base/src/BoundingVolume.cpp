@@ -15,13 +15,13 @@ BoundingBox::BoundingBox() {
 	extends = origExtends = Vec3AZero();
 }
 
-void BoundingBox::UpdateBounds(Mat4x4F m) {
+void BoundingBox::UpdateBounds(Mat4::pref m) {
 	//@todo test which is tighter avro's bound transform or this one
 	center = Mat4x4TransVec3A(origCenter, m);
 	extends = Mat4x4TransBoundRadius(origExtends, m);
 }
 
-void BoundingBox::UpdateBounds(float scale, QuatF rot, Vec3AF pos) {
+void BoundingBox::UpdateBounds(float scale, Quat::pref rot, Vec3A::pref pos) {
 	//@todo test which is tighter avro's bound transform or this one
 	center = Vec3AAdd(QuatTransVec3A(rot, origCenter), pos);
 	extends = QuatTransBoundRadius(Vec3AMulScalar(origExtends, scale), rot);
@@ -31,12 +31,12 @@ void BoundingBox::SetNull() {
 	center = origCenter = extends = origExtends = Vec3AZero();
 }
 
-void BoundingBox::SetVolume(Vec3AF center, Vec3AF extends) {
+void BoundingBox::SetVolume(Vec3A::pref center, Vec3A::pref extends) {
 	this->center = this->origCenter = center;
 	this->extends = this->origExtends = extends;
 }
 
-void BoundingBox::UpdateBounds(const Vector3A* pt, uint32 numPts) {
+void BoundingBox::UpdateBounds(const Vec3A::type* pt, uint32 numPts) {
 	if (numPts) {
 		/* Costly calculate to encompass all points */
 
@@ -88,15 +88,15 @@ BoundingVolume::~BoundingVolume() {
 }
 
 void BoundingVolume::MergeBounds(const BoundingVolume& vol) {
-	Vector3A a = Vec3AAbs(Vec3ASub(box->center, vol.box->center));
-	Vector3A b = Vec3AAdd(box->center, vol.box->center);
+	Vec3A::type a = Vec3AAbs(Vec3ASub(box->center, vol.box->center));
+	Vec3A::type b = Vec3AAdd(box->center, vol.box->center);
 	box->center = box->origCenter = Vec3AMulScalar(b, 0.5f);
 	box->extends = box->origExtends = Vec3AAdd(a,
 			Vec3AAdd(vol.box->extends, box->extends));
 	radius += (vol.radius + Vec3ADot(a, a));
 }
 
-void BoundingVolume::SetVolume(Vec3AF center, Vec3AF extends, float radius) {
+void BoundingVolume::SetVolume(Vec3A::pref center, Vec3A::pref extends, float radius) {
 	box->SetVolume(center, extends);
 	this->radius = radius;
 }

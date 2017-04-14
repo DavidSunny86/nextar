@@ -247,13 +247,13 @@ DstType Convert(const SrcType& t) {
 }
 
 template<>
-Vector3 Convert<FbxVector4, Vector3>(const FbxVector4& v) {
-	return Vector3((float) v[0], (float) v[1], (float) v[2]);
+Vec3::type Convert<FbxVector4, Vec3::type>(const FbxVector4& v) {
+	return Vec3::Set((float) v[0], (float) v[1], (float) v[2]);
 }
 
 template<>
-Vector2 Convert<FbxVector2, Vector2>(const FbxVector2& v) {
-	return Vector2((float) v[0], (float) v[1]);
+Vec2::type Convert<FbxVector2, Vec2::type>(const FbxVector2& v) {
+	return Vec2::type((float) v[0], (float) v[1]);
 }
 
 template<>
@@ -387,7 +387,7 @@ void FbxMeshLoaderImplv1_0::CreatePrimitiveGroupFrom(FbxSurfaceMaterial* pMtl,
 		FbxGeometryElementNormal* pFbxNormalLayer = pMesh->GetElementNormal(0);
 		VertexChannel* pNormalChannel = pBuffer->GetVertexChannel(COMP_NORMAL,
 				0);
-		CopyVertexChannel<FbxVector4, Vector3>(pMesh, pFbxNormalLayer,
+		CopyVertexChannel<FbxVector4, Vec3::type>(pMesh, pFbxNormalLayer,
 				pNormalChannel, polys);
 	}
 
@@ -396,7 +396,7 @@ void FbxMeshLoaderImplv1_0::CreatePrimitiveGroupFrom(FbxSurfaceMaterial* pMtl,
 				0);
 		VertexChannel* pTangentChannel = pBuffer->GetVertexChannel(COMP_TANGENT,
 				0);
-		CopyVertexChannel<FbxVector4, Vector3>(pMesh, pFbxTangentLayer,
+		CopyVertexChannel<FbxVector4, Vec3::type>(pMesh, pFbxTangentLayer,
 				pTangentChannel, polys);
 	}
 
@@ -405,7 +405,7 @@ void FbxMeshLoaderImplv1_0::CreatePrimitiveGroupFrom(FbxSurfaceMaterial* pMtl,
 				pMesh->GetElementBinormal(0);
 		VertexChannel* pBinormalChannel = pBuffer->GetVertexChannel(
 				COMP_TANGENT, 0);
-		CopyVertexChannel<FbxVector4, Vector3>(pMesh, pFbxBinormalLayer,
+		CopyVertexChannel<FbxVector4, Vec3::type>(pMesh, pFbxBinormalLayer,
 				pBinormalChannel, polys);
 	}
 
@@ -413,7 +413,7 @@ void FbxMeshLoaderImplv1_0::CreatePrimitiveGroupFrom(FbxSurfaceMaterial* pMtl,
 		FbxGeometryElementUV* pFbxUVChannel = pMesh->GetElementUV(uv);
 		VertexChannel* pUVChannel = pBuffer->GetVertexChannel(
 				COMP_TEXTURE_COORDINATE, (uint32) uv);
-		CopyVertexChannel<FbxVector2, Vector2>(pMesh, pFbxUVChannel, pUVChannel,
+		CopyVertexChannel<FbxVector2, Vec2::type>(pMesh, pFbxUVChannel, pUVChannel,
 				polys);
 	}
 

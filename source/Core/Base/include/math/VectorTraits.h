@@ -73,7 +73,6 @@ public:
 	typedef const type pref;
 	typedef float base_type;
 	typedef float row_type;
-	typedef VecOp<_Quad> vecop;
 
 	enum : uint32 {
 		_count = 4,
@@ -88,13 +87,8 @@ public:
 			Math::Traits<float>::Equals(vecop::GetW(r), 0));
 	}
 
-	inline static bool IsNan(pref v) {
-		return vecop::Hadd(vecop::IsNan(v)) != 0;
-	}
-
-	inline static bool IsInf(pref v) {
-		return vecop::Hadd(vecop::IsInf(v)) != 0;
-	}
+	inline static bool IsNan(pref v);
+	inline static bool IsInf(pref v);
 };
 
 template <>
@@ -180,8 +174,8 @@ public:
 	typedef const type& pref;
 	typedef RowType row_type_id;
 	typedef Traits<RowType> row_type_traits;
-	typedef row_type_traits::type row_type;
-	typedef row_type_traits::base_type base_type;
+	typedef typename row_type_traits::type row_type;
+	typedef typename row_type_traits::base_type base_type;
 	typedef float float_type;
 
 	enum : uint32 {

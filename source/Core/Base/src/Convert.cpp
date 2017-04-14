@@ -101,44 +101,44 @@ _NexBaseAPI VersionID ToVersion(const String& ver) {
 		return static_cast<uint32>(Constants::INVALID_VERSION_ID);
 }
 
-_NexBaseAPI String ToString(nextar::Vec4AF v) {
+_NexBaseAPI String ToString(nextar::Vec4::pref v) {
 	OutStringStream ret;
 	ret << Vec4AGetX(v) << ' ' << Vec4AGetY(v) << ' ' << Vec4AGetZ(v) << ' '
 			<< Vec4AGetW(v);
 	return ret.str();
 }
 
-_NexBaseAPI String ToString(const nextar::Vector3& v) {
+_NexBaseAPI String ToString(const nextar::Vec3::type& v) {
 	OutStringStream ret;
 	ret << v.x << ' ' << v.y << ' ' << v.z;
 	return ret.str();
 }
 
-_NexBaseAPI String ToString(const nextar::Vector2& v) {
+_NexBaseAPI String ToString(const nextar::Vec2::type& v) {
 	OutStringStream ret;
 	ret << v.x << ' ' << v.y;
 	return ret.str();
 }
 
-_NexBaseAPI String ToString(const nextar::IVector2& v) {
+_NexBaseAPI String ToString(const IVec2::type& v) {
 	OutStringStream ret;
 	ret << v[0] << ' ' << v[1];
 	return ret.str();
 }
 
-_NexBaseAPI String ToString(const nextar::IVector3& v) {
+_NexBaseAPI String ToString(const IVec3::type& v) {
 	OutStringStream ret;
 	ret << v[0] << ' ' << v[1] << ' ' << v[2];
 	return ret.str();
 }
 
-_NexBaseAPI String ToString(const nextar::IVector4& v) {
+_NexBaseAPI String ToString(const IVec4::type& v) {
 	OutStringStream ret;
 	ret << v[0] << ' ' << v[1] << ' ' << v[2] << ' ' << v[3];
 	return ret.str();
 }
 
-_NexBaseAPI String ToString(nextar::Mat4x4F mat) {
+_NexBaseAPI String ToString(nextar::Mat4::pref mat) {
 	OutStringStream ret;
 	ret << ' ';
 	for (int32 i = 0; i < 4; ++i)
@@ -146,7 +146,7 @@ _NexBaseAPI String ToString(nextar::Mat4x4F mat) {
 	return ret.str();
 }
 
-_NexBaseAPI String ToString(nextar::Mat3x4F mat) {
+_NexBaseAPI String ToString(nextar::Mat3::pref mat) {
 	OutStringStream ret;
 	ret << ' ';
 	for (int32 i = 0; i < 3; ++i)
@@ -167,51 +167,51 @@ _NexBaseAPI String ToString(const nextar::Color32& mat) {
 	return ret.str();
 }
 
-_NexBaseAPI nextar::Vector4 ToVector4(const String& inp) {
+_NexBaseAPI nextar::Vec4::type ToVector4(const String& inp) {
 	InStringStream ret(inp);
 
 	float x, y, z, w;
 	ret >> x >> y >> z >> w;
-	return Vector4(x, y, z, w);
+	return Vec4::type(x, y, z, w);
 }
 
-_NexBaseAPI nextar::Vector3 ToVector3(const String& inp) {
+_NexBaseAPI nextar::Vec3::type ToVector3(const String& inp) {
 	InStringStream ret(inp);
-	Vector3 v;
+	Vec3::type v;
 	ret >> v.x >> v.y >> v.z;
 	return v;
 }
 
-_NexBaseAPI nextar::Vector2 ToVector2(const String& inp) {
+_NexBaseAPI nextar::Vec2::type ToVector2(const String& inp) {
 	InStringStream ret(inp);
-	Vector2 v;
+	Vec2::type v;
 	ret >> v.x >> v.y;
 	return v;
 }
 
-_NexBaseAPI nextar::IVector2 ToIVector2(const String& inp) {
+_NexBaseAPI IVec2::type ToIVector2(const String& inp) {
 	InStringStream ret(inp);
-	IVector2 v;
+	IVec2::type v;
 	ret >> v[0] >> v[1];
 	return v;
 }
 
-_NexBaseAPI nextar::IVector3 ToIVector3(const String& inp) {
+_NexBaseAPI IVec3::type ToIVector3(const String& inp) {
 	InStringStream ret(inp);
-	IVector3 v;
+	IVec3::type v;
 	ret >> v[0] >> v[1] >> v[2];
 	return v;
 }
 
-_NexBaseAPI nextar::IVector4 ToIVector4(const String& inp) {
+_NexBaseAPI IVec4::type ToIVector4(const String& inp) {
 	InStringStream ret(inp);
-	IVector4 v;
+	IVec4::type v;
 	ret >> v[0] >> v[1] >> v[2] >> v[4];
 	return v;
 }
 
-_NexBaseAPI nextar::Matrix4x4 ToMat4x4(const String& inp) {
-	nextar::Matrix4x4 ret;
+_NexBaseAPI nextar::Mat4::type ToMat4x4(const String& inp) {
+	nextar::Mat4::type ret;
 	InStringStream stream(inp);
 	float x, y, z, w;
 	if (inp.length() >= 25) {
@@ -223,8 +223,8 @@ _NexBaseAPI nextar::Matrix4x4 ToMat4x4(const String& inp) {
 	return ret;
 }
 
-_NexBaseAPI nextar::Matrix3x4 ToMat3x4(const String& inp) {
-	nextar::Matrix3x4 ret;
+_NexBaseAPI nextar::Mat3::type ToMat3x4(const String& inp) {
+	nextar::Mat3::type ret;
 	InStringStream stream(inp);
 	float x, y, z, w;
 	if (inp.length() >= 25) {

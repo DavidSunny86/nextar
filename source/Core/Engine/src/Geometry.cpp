@@ -34,20 +34,19 @@ Geometry Geometry::CreateSphere(uint32 density, float radius,
 			float phi   = float(i)/(width-1 ) * Math::TWO_PI;
 			float sinPhi, cosPhi;
 			Math::SinCos(phi, sinPhi, cosPhi);
-			Vector3 pos(radius*sinTheta * cosPhi,
-					    		radius*cosTheta,
-								-radius*sinTheta * sinPhi);
+			Vec3::type pos{ radius*sinTheta * cosPhi,
+								radius*cosTheta,
+								-radius*sinTheta * sinPhi };
 			points.push_back(pos);
 		}
 	}
-	points.push_back(Vector3(0, radius, 0));
-	points.push_back(Vector3(0,-radius, 0));
+	points.push_back(Vec3::type{ 0, radius, 0 });
+	points.push_back(Vec3::type{ 0,-radius, 0 });
 
 	if (normalData) {
 		normals.reserve(points.size());
 		for(auto &p : points) {
-			normals.push_back(p);
-			normals.back().Normalize();
+			normals.push_back(Vec3::Normalize(p));
 		}
 	}
 
@@ -102,18 +101,18 @@ Geometry Geometry::CreateCone(uint32 density,
 	float angleStepper = Math::TWO_PI / (density);
 
 
-	points.push_back(Vector3(0, heightCap, 0));
-	points.push_back(Vector3(0, 0, 0));
+	points.push_back(Vec3::type{ 0, heightCap, 0 });
+	points.push_back(Vec3::type{ 0, 0, 0 });
 
 	float ratio = ((height - heightCap) / height) * baseRadius;
 	float theta = 0;
 	if (topCapped) {
 		for(uint32 i = 0; i < density; ++i, theta += angleStepper) {
 
-			Vector3 p(
+			Vec3::type p{
 					ratio * Math::Cos(theta),
 					heightCap,
-					ratio * Math::Sin(theta));
+					ratio * Math::Sin(theta) };
 			points.push_back(p);
 
 		}
@@ -122,10 +121,10 @@ Geometry Geometry::CreateCone(uint32 density,
 	theta = 0;
 	for(uint32 i = 0; i < density; ++i, theta += angleStepper) {
 
-		Vector3 p(
+		Vec3::type p{
 			ratio * Math::Cos(theta),
 			0,
-			ratio * Math::Sin(theta));
+			ratio * Math::Sin(theta) };
 		points.push_back(p);
 	}
 
@@ -143,21 +142,19 @@ Geometry Geometry::CreateCone(uint32 density,
 	}
 
 	if (normalData) {
-		normals.push_back(Vector3(0, 1, 0));
-		normals.push_back(Vector3(0,-1, 0));
+		normals.push_back(Vec3::Set(0, 1, 0));
+		normals.push_back(Vec3::Set(0,-1, 0));
 		if (topCapped) {
 			for(uint32 i = 0; i < density; ++i) {
-				Vector3& p = points[i+2];
-				Vector3 n(p.x, 0, p.z);
-				n.Normalize();
+				Vec3::type& p = points[i+2];
+				Vec3::type n = Vec3::Normalize({ p.x, 0, p.z });
 				normals.push_back(n);
 			}
 		}
 
 		for(uint32 i = 0; i < density; ++i) {
-			Vector3& p = points[i+2];
-			Vector3 n(p.x, 0, p.z);
-			n.Normalize();
+			Vec3::type& p = points[i+2];
+			Vec3::type n = Vec3::Normalize({ p.x, 0, p.z });
 			normals.push_back(n);
 		}
 	}
@@ -210,47 +207,47 @@ Geometry Geometry::CreateCylinder(
 Geometry Geometry::CreateCube(float dx, float dy, float dz,
 		bool normalData, bool colorData, const Color& color) {
 	Geometry::PointList positions = {
-		Vector3(-1.0f,-1.0f,-1.0f), // triangle 1 : begin
-		Vector3(-1.0f,-1.0f, 1.0f),
-		Vector3(-1.0f, 1.0f, 1.0f), // triangle 1 : end
-		Vector3(-1.0f,-1.0f,-1.0f),
-		Vector3(-1.0f, 1.0f, 1.0f),
-		Vector3(-1.0f, 1.0f,-1.0f),
+		Vec3::Set(-1.0f,-1.0f,-1.0f), // triangle 1 : begin
+		Vec3::Set(-1.0f,-1.0f, 1.0f),
+		Vec3::Set(-1.0f, 1.0f, 1.0f), // triangle 1 : end
+		Vec3::Set(-1.0f,-1.0f,-1.0f),
+		Vec3::Set(-1.0f, 1.0f, 1.0f),
+		Vec3::Set(-1.0f, 1.0f,-1.0f),
 
-		Vector3( 1.0f, 1.0f,-1.0f), // triangle 2 : begin
-		Vector3(-1.0f,-1.0f,-1.0f),
-		Vector3(-1.0f, 1.0f,-1.0f), // triangle 2 : end
-		Vector3(1.0f, 1.0f,-1.0f),
-		Vector3(1.0f,-1.0f,-1.0f),
-		Vector3(-1.0f,-1.0f,-1.0f),
+		Vec3::Set( 1.0f, 1.0f,-1.0f), // triangle 2 : begin
+		Vec3::Set(-1.0f,-1.0f,-1.0f),
+		Vec3::Set(-1.0f, 1.0f,-1.0f), // triangle 2 : end
+		Vec3::Set(1.0f, 1.0f,-1.0f),
+		Vec3::Set(1.0f,-1.0f,-1.0f),
+		Vec3::Set(-1.0f,-1.0f,-1.0f),
 
-		Vector3(1.0f,-1.0f, 1.0f),
-		Vector3(-1.0f,-1.0f,-1.0f),
-		Vector3(1.0f,-1.0f,-1.0f),
-		Vector3(1.0f,-1.0f, 1.0f ),
-		Vector3(-1.0f,-1.0f, 1.0f),
-		Vector3(-1.0f,-1.0f,-1.0f),
+		Vec3::Set(1.0f,-1.0f, 1.0f),
+		Vec3::Set(-1.0f,-1.0f,-1.0f),
+		Vec3::Set(1.0f,-1.0f,-1.0f),
+		Vec3::Set(1.0f,-1.0f, 1.0f ),
+		Vec3::Set(-1.0f,-1.0f, 1.0f),
+		Vec3::Set(-1.0f,-1.0f,-1.0f),
 
-		Vector3(-1.0f, 1.0f, 1.0f),
-		Vector3(-1.0f,-1.0f, 1.0f),
-		Vector3(1.0f,-1.0f, 1.0f),
-		Vector3( 1.0f, 1.0f, 1.0f ),
-		Vector3(-1.0f, 1.0f, 1.0f),
-		Vector3( 1.0f,-1.0f, 1.0f),
+		Vec3::Set(-1.0f, 1.0f, 1.0f),
+		Vec3::Set(-1.0f,-1.0f, 1.0f),
+		Vec3::Set(1.0f,-1.0f, 1.0f),
+		Vec3::Set( 1.0f, 1.0f, 1.0f ),
+		Vec3::Set(-1.0f, 1.0f, 1.0f),
+		Vec3::Set( 1.0f,-1.0f, 1.0f),
 
-		Vector3(1.0f, 1.0f, 1.0f),
-		Vector3(1.0f,-1.0f,-1.0f),
-		Vector3(1.0f, 1.0f,-1.0f),
-		Vector3(1.0f,-1.0f,-1.0f),
-		Vector3(1.0f, 1.0f, 1.0f),
-		Vector3(1.0f,-1.0f, 1.0f),
+		Vec3::Set(1.0f, 1.0f, 1.0f),
+		Vec3::Set(1.0f,-1.0f,-1.0f),
+		Vec3::Set(1.0f, 1.0f,-1.0f),
+		Vec3::Set(1.0f,-1.0f,-1.0f),
+		Vec3::Set(1.0f, 1.0f, 1.0f),
+		Vec3::Set(1.0f,-1.0f, 1.0f),
 
-		Vector3(1.0f, 1.0f, 1.0f),
-		Vector3(1.0f, 1.0f,-1.0f),
-		Vector3(-1.0f, 1.0f,-1.0f),
-		Vector3( 1.0f, 1.0f, 1.0f ),
-		Vector3(-1.0f, 1.0f,-1.0f),
-		Vector3(-1.0f, 1.0f, 1.0f)
+		Vec3::Set(1.0f, 1.0f, 1.0f),
+		Vec3::Set(1.0f, 1.0f,-1.0f),
+		Vec3::Set(-1.0f, 1.0f,-1.0f),
+		Vec3::Set( 1.0f, 1.0f, 1.0f ),
+		Vec3::Set(-1.0f, 1.0f,-1.0f),
+		Vec3::Set(-1.0f, 1.0f, 1.0f)
 	};
 
 	for(uint32 i = 0; i < 36; ++i) {
@@ -262,13 +259,13 @@ Geometry Geometry::CreateCube(float dx, float dy, float dz,
 	Geometry::PointList normals;
 	if (normalData) {
 
-		Vector3 normalV[] = {
-				Vector3(-1.0f, 0.0f, 0.0f), // triangle 1 : begin
-				Vector3( 0.0f, 0.0f,-1.0f), // triangle 2 : begin
-				Vector3( 0.0f,-1.0f, 0.0f),
-				Vector3( 0.0f, 0.0f, 1.0f),
-				Vector3( 1.0f, 0.0f, 0.0f),
-				Vector3( 0.0f, 0.0f, 0.0f)
+		Vec3::type normalV[] = {
+				Vec3::Set(-1.0f, 0.0f, 0.0f), // triangle 1 : begin
+				Vec3::Set( 0.0f, 0.0f,-1.0f), // triangle 2 : begin
+				Vec3::Set( 0.0f,-1.0f, 0.0f),
+				Vec3::Set( 0.0f, 0.0f, 1.0f),
+				Vec3::Set( 1.0f, 0.0f, 0.0f),
+				Vec3::Set( 0.0f, 0.0f, 0.0f)
 		};
 
 		normals.reserve(positions.size());
@@ -292,14 +289,14 @@ Geometry Geometry::CreateBox(float width, float height, float depth,
 		bool colorData, const Color& color) {
 
 	Geometry::PointList points = {
-		Vector3(-width, -height, -depth ), // 0
-		Vector3(width, -height, -depth  ), // 1
-		Vector3(width,  height, -depth  ), // 2
-		Vector3(-width,  height, -depth ), // 3
-		Vector3(-width, -height,  depth ), // 4
-		Vector3(width, -height,  depth  ), // 5
-		Vector3(width,  height,  depth  ), // 6
-		Vector3(-width,  height,  depth )// 7
+		Vec3::Set(-width, -height, -depth ), // 0
+		Vec3::Set(width, -height, -depth  ), // 1
+		Vec3::Set(width,  height, -depth  ), // 2
+		Vec3::Set(-width,  height, -depth ), // 3
+		Vec3::Set(-width, -height,  depth ), // 4
+		Vec3::Set(width, -height,  depth  ), // 5
+		Vec3::Set(width,  height,  depth  ), // 6
+		Vec3::Set(-width,  height,  depth )// 7
 	};
 
 	/***
@@ -346,12 +343,12 @@ Geometry Geometry::CreateQuad(float dx, float dy,
 	bool colorData, const Color& color, bool uvData) {
 	Geometry p;
 	Geometry::PointList points = {
-		Vector3(-dx,-dy, 0), // 0
-		Vector3(-dx, dy, 0), // 1
-		Vector3( dx, dy, 0), // 2
-		Vector3( dx, dy, 0), // 2
-		Vector3( dx,-dy, 0), // 3
-		Vector3(-dx,-dy, 0), // 0
+		Vec3::Set(-dx,-dy, 0), // 0
+		Vec3::Set(-dx, dy, 0), // 1
+		Vec3::Set( dx, dy, 0), // 2
+		Vec3::Set( dx, dy, 0), // 2
+		Vec3::Set( dx,-dy, 0), // 3
+		Vec3::Set(-dx,-dy, 0), // 0
 	};
 
 	p.points = std::move(points);
@@ -369,12 +366,12 @@ Geometry Geometry::CreateQuad(float dx, float dy,
 
 	if (uvData) {
 		Geometry::Point2DList uv = {
-			Vector2(0, 0),
-			Vector2(0, 1),
-			Vector2(1, 1),
-			Vector2(1, 1),
-			Vector2(1, 0),
-			Vector2(0, 0)
+			Vec2::Set(0, 0),
+			Vec2::Set(0, 1),
+			Vec2::Set(1, 1),
+			Vec2::Set(1, 1),
+			Vec2::Set(1, 0),
+			Vec2::Set(0, 0)
 		};
 		p.uv = std::move(uv);
 	}
@@ -382,11 +379,11 @@ Geometry Geometry::CreateQuad(float dx, float dy,
 	return p;
 }
 
-void Geometry::Transform(Mat4x4R m) {
+void Geometry::Transform(Mat4::pref m) {
 	if (points.size() > 0)
-		Mat4x4TransVec3(points.data(), sizeof(Vector3), (uint32)points.size(), m);
+		Mat4::TransformOrtho(m, points.data(), sizeof(Vec3::type), (uint32)points.size());
 	if (normals.size() > 0)
-		Mat4x4TransVec3Normals(normals.data(), sizeof(Vector3), (uint32)normals.size(), m);
+		Mat4::Rotate(m, normals.data(), sizeof(Vec3::type), (uint32)normals.size());
 }
 
 bool Geometry::Merge(const Geometry& second) {

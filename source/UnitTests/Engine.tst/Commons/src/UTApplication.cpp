@@ -35,7 +35,7 @@ void UTApplication::_SetupScene(SceneAssetPtr& scene) {
 	EntityPtr camera = entityManager->AsyncCreateCameraEntity(
 			NEX_CSTR_ID("MainCamera"));
 	// A camera at 50,0,50 looking at 0,0,0
-	Quaternion rotation = QuatFromAxisAng(Vector3::XAxis, Math::PI_BY_4);
+	Quat::type rotation = QuatFromAxisAng(Vec3::type::XAxis, Math::PI_BY_4);
 	camera->SetTransform(Vec3ASet(0, 50,-50), rotation, 1);
 	Camera::PerspectiveParams params;
 

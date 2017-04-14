@@ -7,7 +7,7 @@ namespace Intersect {
 _NexBaseAPI IntersectionResult BoundingVolumes(const BoundingVolume& vol1,
 		const BoundingVolume& vol2) {
 
-	Vector3A d = Vec3ASub(vol1.GetCenter(), vol2.GetCenter());
+	Vec3A::type d = Vec3ASub(vol1.GetCenter(), vol2.GetCenter());
 	float dist = Vec3ADot(d, d);
 	float rad = vol1.GetRadius() + vol2.GetRadius();
 	if (dist > rad * rad)
@@ -24,11 +24,11 @@ _NexBaseAPI IntersectionResult BoundingVolumeFrustumCoherent(
 
 	uint32 i, k = 1 << lastPlane;
 	IntersectionResult result = IR_INSIDE;
-	const Plane *planes = frustum.GetPlanes();
+	const Plane::type *planes = frustum.GetPlanes();
 	outMask = 0;
 	if (k & inMask) {
 		float m = PlaneDotVec3A(planes[lastPlane], vol.GetExtends());
-		Vector3A absNorm = PlaneAbsNormal(planes[lastPlane]);
+		Vec3A::type absNorm = PlaneAbsNormal(planes[lastPlane]);
 		float n = Vec3ADot(absNorm, vol.GetExtends());
 
 		if (m + n < 0)
@@ -44,7 +44,7 @@ _NexBaseAPI IntersectionResult BoundingVolumeFrustumCoherent(
 
 		if ((i != lastPlane) && (k & inMask)) {
 			float m = PlaneDotVec3A(planes[i], vol.GetExtends());
-			Vector3A absNorm = PlaneAbsNormal(planes[i]);
+			Vec3A::type absNorm = PlaneAbsNormal(planes[i]);
 			float n = Vec3ADot(absNorm, vol.GetExtends());
 
 			if (m + n < 0) {
@@ -64,10 +64,10 @@ _NexBaseAPI IntersectionResult BoundingVolumeFrustum(const BoundingVolume& vol,
 		const Frustum& frustum) {
 	IntersectionResult result = IR_INSIDE;
 	size_t numPlanes = frustum.GetNumPlanes();
-	const Plane* planes = frustum.GetPlanes();
+	const Plane::type* planes = frustum.GetPlanes();
 	for (size_t i = 0; i < numPlanes; ++i) {
 		float m = PlaneDotVec3A(planes[i], vol.GetExtends());
-		Vector3A absNorm = PlaneAbsNormal(planes[i]);
+		Vec3A::type absNorm = PlaneAbsNormal(planes[i]);
 		float n = Vec3ADot(absNorm, vol.GetExtends());
 
 		if (m + n < 0)
@@ -78,10 +78,10 @@ _NexBaseAPI IntersectionResult BoundingVolumeFrustum(const BoundingVolume& vol,
 	return result;
 }
 
-_NexBaseAPI IntersectionResult BoundingSphereFrustum(Vec3AF center,
+_NexBaseAPI IntersectionResult BoundingSphereFrustum(Vec3A::pref center,
 		float radius, const Frustum& frustum) {
 	size_t numPlanes = frustum.GetNumPlanes();
-	const Plane* planes = frustum.GetPlanes();
+	const Plane::type* planes = frustum.GetPlanes();
 	for (size_t i = 0; i < numPlanes; ++i) {
 		float c = PlaneDotVec3A(planes[i], center);
 		if (c > radius)

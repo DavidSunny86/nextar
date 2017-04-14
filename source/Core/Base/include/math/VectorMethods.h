@@ -33,6 +33,14 @@ public:
 	static inline type Set(base_type x, base_type y, base_type z);
 	static inline type Set(base_type x, base_type y, base_type z, base_type w);
 	static inline type Set(const base_type* v);
+	static inline type SetX(pref v, base_type x);
+	static inline type SetY(pref v, base_type y);
+	static inline type SetZ(pref v, base_type z);
+	static inline type SetW(pref v, base_type w);
+	static inline type SplatX(pref v);
+	static inline type SplatY(pref v);
+	static inline type SplatZ(pref v);
+	static inline type SplatW(pref v);
 	static inline type Zero();
 	static inline base_type Get(pref v, uint32 i);
 	static inline type Abs(pref v);
@@ -54,6 +62,7 @@ public:
 	static inline float_type Length(pref c1);
 	static inline float_type Distance(pref vec1, pref vec2);
 	static inline float_type SqDistance(pref vec1, pref vec2);
+	static inline type Normalize(pref v);
 };
 
 template <typename T, typename U=T>
@@ -201,15 +210,15 @@ template <typename T>
 class MatBaseOp {
 public:
 	typedef Traits<T> traits;
-	typedef traits::type type;
-	typedef traits::ref ref;
-	typedef traits::pref pref;
-	typedef traits::cref cref;
-	typedef traits::base_type base_type;
-	typedef traits::row_type row_type;
-	typedef traits::float_type float_type;
-	typedef traits::row_type_traits row_type_traits;
-	typedef traits::row_type_id row_type_id;
+	typedef typename traits::type type;
+	typedef typename traits::ref ref;
+	typedef typename traits::pref pref;
+	typedef typename traits::cref cref;
+	typedef typename traits::base_type base_type;
+	typedef typename traits::row_type row_type;
+	typedef typename traits::float_type float_type;
+	typedef typename traits::row_type_traits row_type_traits;
+	typedef typename traits::row_type_id row_type_id;
 	typedef VecOp<row_type_id> row_op;
 
 	enum {
@@ -285,7 +294,7 @@ public:
 	static inline type FromRot(TraitsQuat::pref rot);
 	// @brief Create a view matrix from camera world matrix
 	static inline type FromWorldToView(pref m);
-	// @brief Matrix4x4 Creates a camera look at matrix 
+	// @brief Mat4::type Creates a camera look at matrix 
 	static inline type FromLookAt(TraitsVec3A::pref eye, TraitsVec3A::pref lookAt, TraitsVec3A::pref up);
 	// @brief Orthogonal Projection matrix 
 	static inline type FromOrthoProjection(float_type width, float_type height, float_type nearPlane,
@@ -322,6 +331,15 @@ public:
 	static inline type Union(pref box, pref other);
 };
 
+
+template <>
+class MatOp<_Rect> : public MatBaseOp<_Rect> {
+public:
+	static inline TraitsVec2::type GetHalfSize(pref box);
+	static inline TraitsVec2::type GetSize(pref box);
+	static inline TraitsVec2::type GetCenter(pref box);
+};
+
 typedef VecOp<_Quad> QuadOp;
 typedef VecOp<_Vec2> Vec2Op;
 typedef VecOp<_Vec3> Vec3Op;
@@ -332,14 +350,33 @@ typedef VecOp<_Quat> QuatOp;
 typedef VecOp<_AxisAngle> AxisAngleOp;
 typedef VecOp<_EulerAngles> EulerAnglesOp;
 typedef VecOp<_PolarCoord> PolarCoordOp;
-
+typedef VecOp<_IVector2> IVec2Op;
+typedef VecOp<_IVector3> IVec3Op;
+typedef VecOp<_IVector4> IVec4Op;
 typedef MatOp<_AxisAlignedBox> AABoxOp;
 typedef MatOp<_Matrix3x4> Mat3x4Op;
 typedef MatOp<_Matrix4x4> Mat4Op;
-typedef Mat4Op Mat4x4Op;
 typedef MatOp<_Rect> RectOp;
-
+typedef Mat4Op Mat4x4Op;
 
 }
+
+typedef Math::Vec2Op Vec2;
+typedef Math::Vec3Op Vec3;
+typedef Math::Vec4Op Vec4;
+typedef Math::IVec2Op IVec2;
+typedef Math::IVec3Op IVec3;
+typedef Math::IVec4Op IVec4;
+typedef Math::PlaneOp Plane;
+typedef Math::Vec3AOp Vec3A;
+typedef Math::QuatOp Quat;
+
+typedef Math::AABoxOp AABox;
+typedef Math::Mat3x4Op Mat3x4;
+typedef Math::Mat4x4Op  Mat4x4;
+typedef Math::RectOp Rect;
+typedef Mat3x4 Mat3;
+typedef Mat4x4 Mat4;
+
 }
 

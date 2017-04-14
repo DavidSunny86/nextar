@@ -137,37 +137,37 @@ void ShaderParamVector::SetParamValueImpl(size_t offset,
 	switch(pe.type) {
 	case ParamDataType::PDT_VEC2:
 	{
-		Vector2 c_value = Convert::ToVector2(value);
+		Vec2::type c_value = Convert::ToVector2(value);
 		buffer->SetData(&c_value, (uint32)offset, 4 * 2);
 	}
 	break;
 	case ParamDataType::PDT_VEC3:
 	{
-		Vector3 c_value = Convert::ToVector3(value);
+		Vec3::type c_value = Convert::ToVector3(value);
 		buffer->SetData(&c_value, (uint32)offset, 4 * 3);
 	}
 	break;
 	case ParamDataType::PDT_VEC4:
 	{
-		Vector4 c_value = Convert::ToVector4(value);
+		Vec4::type c_value = Convert::ToVector4(value);
 		buffer->SetData(&c_value, (uint32)offset, 4 * 4);
 	}
 	break;
 	case ParamDataType::PDT_IVEC2:
 	{
-		IVector2 c_value = Convert::ToIVector2(value);
+		IVec2::type c_value = Convert::ToIVector2(value);
 		buffer->SetData(c_value.data(), (uint32)offset, 4 * 2);
 	}
 	break;
 	case ParamDataType::PDT_IVEC3:
 	{
-		IVector3 c_value = Convert::ToIVector3(value);
+		IVec3::type c_value = Convert::ToIVector3(value);
 		buffer->SetData(c_value.data(), (uint32)offset, 4 * 3);
 	}
 	break;
 	case ParamDataType::PDT_IVEC4:
 	{
-		IVector4 c_value = Convert::ToIVector4(value);
+		IVec4::type c_value = Convert::ToIVector4(value);
 		buffer->SetData(c_value.data(), (uint32)offset, 4 * 4);
 	}
 	break;
@@ -187,13 +187,13 @@ void ShaderParamMatrix::SetParamValueImpl(size_t offset,
 	switch(pe.type) {
 	case ParamDataType::PDT_MAT4x4:
 	{
-		Matrix4x4 c_value = Convert::ToMat4x4(value);
+		Mat4::type c_value = Convert::ToMat4x4(value);
 		buffer->SetData(&c_value, (uint32)offset, 4 * 16);
 	}
 	break;
 	case ParamDataType::PDT_MAT3x4:
 	{
-		Matrix3x4 c_value = Convert::ToMat3x4(value);
+		Mat3::type c_value = Convert::ToMat3x4(value);
 		buffer->SetData(&c_value, (uint32)offset, 4 * 12);
 	}
 	break;

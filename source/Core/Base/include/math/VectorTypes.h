@@ -39,7 +39,6 @@ struct alignas(16) _Quad {
 };
 #endif
 
-typedef _Quad Quad;
 
 struct _Vec2 {
 	typedef _Vec2 type; 
@@ -49,6 +48,7 @@ struct _Vec2 {
 		};
 		float v[2]; 
 	};
+	static _NexBaseAPI const _Vec2 Origin;
 };
 
 struct _Vec3 { 
@@ -59,6 +59,11 @@ struct _Vec3 {
 		};
 		float v[3];
 	};
+
+	static _NexBaseAPI const _Vec3 XAxis;
+	static _NexBaseAPI const _Vec3 YAxis;
+	static _NexBaseAPI const _Vec3 ZAxis;
+	static _NexBaseAPI const _Vec3 Origin;
 };
 
 struct _Vec3A { typedef _Quad type; };
@@ -83,7 +88,7 @@ typedef _Vec2::type Vector2;
 typedef _Vec3::type Vector3;
 typedef _Vec3A::type Vector3A;
 typedef _Vec4::type Vector4;
-typedef _Plane::type Plane;
+typedef _Plane::type Plane3D;
 typedef _Quat::type Quaternion;
 typedef _AxisAngle::type AxisAngle;
 typedef _EulerAngles::type EulerAngles;
@@ -102,14 +107,19 @@ struct _IVecN {
 	std::array<int32, n> v;
 };
 
-typedef _IVecN<2> IVector2;
-typedef _IVecN<3> IVector3;
-typedef _IVecN<4> IVector4;
+typedef _IVecN<2> _IVector2;
+typedef _IVecN<3> _IVector3;
+typedef _IVecN<4> _IVector4;
+typedef _IVector2 IVector2;
+typedef _IVector3 IVector3;
+typedef _IVector4 IVector4;
 
 struct alignas(16) _Matrix3x4 : public AllocMatrix3x4 {
 	typedef Matrix3x4 type;
 
 	union {
+		Vector3A r[3];
+		float m[12];
 		struct {
 			float m00, m01, m02, m03;
 			float m10, m11, m12, m13;
@@ -120,8 +130,6 @@ struct alignas(16) _Matrix3x4 : public AllocMatrix3x4 {
 			Vector3A y;
 			Vector3A z;
 		};
-		float m[12];
-		Vector3A r[3];
 	};
 };
 
@@ -131,28 +139,42 @@ struct alignas(16) _Matrix4x4 : public AllocMatrix4x4 {
 	static _NexBaseAPI const Matrix4x4 IdentityMatrix;
 
 	union {
+		Vector3A r[4];
+		float m[16];
 		struct {
 			float m00, m01, m02, m03;
 			float m10, m11, m12, m13;
 			float m20, m21, m22, m23;
 			float m30, m31, m32, m33;
 		};
-		float m[16];
-		Vector3A r[4];
 	};
 
+	inline _Matrix4x4();
+	inline _Matrix4x4(float m00, float m01, float m02, float m03, float m10,
+		float m11, float m12, float m13, float m20, float m21, float m22,
+		float m23, float m30, float m31, float m32, float m33);
+	inline _Matrix4x4(std::initializer_list<float> l);
+	inline _Matrix4x4(const Matrix3x4& m, const Vector3A& v);
+	inline _Matrix4x4& operator =(const Matrix4x4& m);
 };
 
 struct _Rect {
 	typedef _Rect type;
+
 	union {
+		Vector2 r[2];
 		struct {
 			Vector2 leftTop;
 			Vector2 rightBottom;
 		};
+		struct {
+			Vector2 min;
+			Vector2 max;
+		};
 		Vector2 extremes[2];
-		Vector2 r[2];
 	};
+	inline _Rect();
+	inline _Rect(float left, float top, float right, float bottom);
 };
 
 struct alignas(16) _AxisAlignedBox : public AllocAABox {
@@ -162,16 +184,21 @@ struct alignas(16) _AxisAlignedBox : public AllocAABox {
 	static _NexBaseAPI const AxisAlignedBox InvalidBox;
 
 	union {
+		Vector3A r[2];
+		float m[8];
 		struct {
 			Vector3A minPoint;
 			Vector3A maxPoint;
 		};
 		Vector3A extremes[2];
-		Vector3A r[2];
 	};
+
+	inline _AxisAlignedBox();
+	inline _AxisAlignedBox(float minX, float minY, float minZ, float maxX, float maxY, float maxZ);
+	inline _AxisAlignedBox(std::initializer_list<float> l);
 };
 
-typedef _Rect::type Rect;
+typedef _Rect::type Rect2D;
 
 typedef Traits<_Vec2> TraitsVec2;
 typedef Traits<_Vec3> TraitsVec3;
@@ -187,9 +214,9 @@ typedef Traits<_Rect> TraitsRect;
 typedef Traits<_AxisAngle> TraitsAxisAngle;
 typedef Traits<_EulerAngles> TraitsEulerAngles;
 typedef Traits<_PolarCoord> TraitsPolarCoord;
-typedef Traits<IVector2> TraitsIVector2;
-typedef Traits<IVector3> TraitsIVector3;
-typedef Traits<IVector4> TraitsIVector4;
+typedef Traits<IVector2> TraitsIVec2;
+typedef Traits<IVector3> TraitsIVec3;
+typedef Traits<IVector4> TraitsIVec4;
 
 _NexTemplateExtern template class _NexBaseAPI PooledAllocator< _Matrix3x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE >;
 _NexTemplateExtern template class _NexBaseAPI PooledAllocator< _Matrix4x4, NEX_MATRIX_POOL_NUM_PER_BLOCK, MEMCAT_MATH_CORE >;

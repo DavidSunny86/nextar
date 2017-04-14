@@ -95,9 +95,9 @@ void FPSControlBehaviour::XBox360Controller::Process(Moveable* m,
 	float timeDelta,
 	float movementSpeedFactor, float rotationSpeedFactor) {
 	// @todo We need the timer here
-	Vector2 movement(movementSpeedFactor * moveSpeedXZ.x * timeDelta,
+	Vec2::type movement(movementSpeedFactor * moveSpeedXZ.x * timeDelta,
 		-movementSpeedFactor * moveSpeedXZ.y * timeDelta);
-	Vector2 rotation(rotationSpeedFactor * rotateSpeedXY.x * timeDelta,
+	Vec2::type rotation(rotationSpeedFactor * rotateSpeedXY.x * timeDelta,
 		rotationSpeedFactor * rotateSpeedXY.y * timeDelta);
 	m->LocalApplyCameraMotion(movement, rotation);
 }
@@ -158,9 +158,9 @@ void FPSControlBehaviour::KeyboardMouseController::Process(Moveable* m,
 	float timeDelta,
 	float movementSpeedFactor, float rotationSpeedFactor) {
 	// @todo We need the timer here
-	Vector2 movement(movementSpeedFactor * moveSpeedXZ.x * timeDelta,
+	Vec2::type movement(movementSpeedFactor * moveSpeedXZ.x * timeDelta,
 		-movementSpeedFactor * moveSpeedXZ.y * timeDelta);
-	Vector2 rotation(rotationSpeedFactor * rotateSpeedXY.x * timeDelta,
+	Vec2::type rotation(rotationSpeedFactor * rotateSpeedXY.x * timeDelta,
 		rotationSpeedFactor * rotateSpeedXY.y * timeDelta);
 	m->LocalApplyCameraMotion(movement, rotation);
 	rotateSpeedXY.x = 0;

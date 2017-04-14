@@ -1,7 +1,7 @@
 #include "VectorMethods.h"
 #pragma once
-using namespace nextar;
-using namespace nextar::Math;
+namespace nextar {
+namespace Math {
 
 inline _VecOp<_EulerAngles, _EulerAngles>::type _VecOp<_EulerAngles, _EulerAngles>::Canonize(pref m) {
 	// First, wrap r.x in range -pi ... pi
@@ -120,3 +120,5 @@ inline _VecOp<_EulerAngles, _EulerAngles>::type _VecOp<_EulerAngles, _EulerAngle
 	return r;
 }
 
+}
+}

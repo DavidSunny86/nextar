@@ -64,10 +64,62 @@ inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Set(const base_type * val) {
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Zero() {
+inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SetX(pref v, base_type val) {
+	type r = v;
+	r.v[0] = val;
+	return r;
+}
+
+template<typename T, typename impl>
+inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SetY(pref v, base_type val) {
+	type r = v;
+	r.v[1] = val;
+	return r;
+}
+
+template<typename T, typename impl>
+inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SetZ(pref v, base_type val) {
+	type r = v;
+	r.v[2] = val;
+	return r;
+}
+
+template<typename T, typename impl>
+inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SetW(pref v, base_type val) {
+	type r = v;
+	r.v[3] = val;
+	return r;
+}
+
+template<typename T, typename impl>
+inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SplatX(pref val) {
 	type v;
 	for (uint32 i = 0; i < _count; ++i)
-		v.v[i] = static_cast<base_type>(0);
+		v.v[i] = val.v[0];
+	return v;
+}
+
+template<typename T, typename impl>
+inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SplatY(pref val) {
+	type v;
+	for (uint32 i = 0; i < _count; ++i)
+		v.v[i] = val.v[1];
+	return v;
+}
+
+template<typename T, typename impl>
+inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SplatZ(pref val) {
+	type v;
+	for (uint32 i = 0; i < _count; ++i)
+		v.v[i] = val.v[2];
+	return v;
+}
+
+template<typename T, typename impl>
+inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SplatW(pref val) {
+	type v;
+	for (uint32 i = 0; i < _count; ++i)
+		v.v[i] = val.v[3];
 	return v;
 }
 
@@ -196,28 +248,35 @@ inline bool VecBaseOp<T, impl>::LesserAny(pref q1, pref q2) {
 
 template<typename T, typename impl>
 inline VecBaseOp<T, impl>::base_type VecBaseOp<T, impl>::Dot(pref q1, pref q2) {
-	return Hadd(Mul(q1, q2));
+	return impl::Hadd(impl::Mul(q1, q2));
 }
 
 template<typename T, typename impl>
 inline VecBaseOp<T, impl>::float_type VecBaseOp<T, impl>::SqLength(pref c1) {
-	return Dot(c1, c1);
+	return impl::Dot(c1, c1);
 }
 
 template<typename T, typename impl>
 inline VecBaseOp<T, impl>::float_type VecBaseOp<T, impl>::Length(pref c1) {
-	return float_type(std::sqrt(SqLength(c1)));
+	return float_type(std::sqrt(impl::SqLength(c1)));
 }
 
 template<typename T, typename impl>
 inline VecBaseOp<T, impl>::float_type VecBaseOp<T, impl>::Distance(pref vec1, pref vec2) {
-	return Length(Sub(vec2, vec1));
+	return impl::Length(impl::Sub(vec2, vec1));
 }
 
 template<typename T, typename impl>
 inline VecBaseOp<T, impl>::float_type VecBaseOp<T, impl>::SqDistance(pref vec1, pref vec2) {
-	return SqLength(Sub(vec2, vec1));
+	return impl::SqLength(impl::Sub(vec2, vec1));
 }
+
+
+template<typename T, typename impl>
+inline type VecBaseOp<T, impl>::Normalize(pref v) {
+	return impl::Mul(v, 1 / impl::Length(v) );
+}
+
 
 }
 }

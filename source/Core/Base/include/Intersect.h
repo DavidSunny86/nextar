@@ -35,7 +35,7 @@ _NexBaseAPI IntersectionResult BoundingVolumes(const BoundingVolume& vol1,
 		const BoundingVolume& vol2);
 
 /** @remarks Intersect sphere with frustum */
-_NexBaseAPI IntersectionResult BoundingSphereFrustum(Vec3AF center,
+_NexBaseAPI IntersectionResult BoundingSphereFrustum(Vec3A::pref center,
 		float radius, const Frustum& frustum);
 }
 }

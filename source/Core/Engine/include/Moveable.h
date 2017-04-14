@@ -44,12 +44,12 @@ public:
 	}
 
 	/** @remarks Returns the local position for parent */
-	inline Vec3AF GetTranslation() const {
+	inline Vec3A::pref GetTranslation() const {
 		return transform->GetTranslation();
 	}
 
 	/** @remarks Returns the local rotation for parent */
-	inline Vec3AF GetRotation() const {
+	inline Vec3A::pref GetRotation() const {
 		return transform->GetRotation();
 	}
 
@@ -61,7 +61,7 @@ public:
 	/** @remarks Sets the rotation of object in world space
 	 * NotifyUpdated must be called after this call.
 	 */
-	inline void SetRotation(QuatF q) {
+	inline void SetRotation(Quat::pref q) {
 		transform->SetRotation(q);
 		transform->SetMatrixDirty(true);
 		SetUpdateRequired(true);
@@ -70,7 +70,7 @@ public:
 	/** @remarks Sets the position of object in world space
 	 * NotifyUpdated must be called after this call.
 	 */
-	inline void SetTranslation(Vec3AF v) {
+	inline void SetTranslation(Vec3A::pref v) {
 		transform->SetTranslation(v);
 		transform->SetMatrixDirty(true);
 		SetUpdateRequired(true);
@@ -86,7 +86,7 @@ public:
 	}
 
 	/** @remarks Returns the derived matrix  */
-	inline Matrix4x4& GetWorldMatrix() {
+	inline Mat4::type& GetWorldMatrix() {
 		if (transform->IsMatrixDirty()) {
 			transform->UpdateMatrix();
 		}
@@ -101,7 +101,7 @@ public:
 		return transform->GetMatrixState();
 	}
 
-	inline void SetTransform(Vec3AF t, QuatF q, float scale) {
+	inline void SetTransform(Vec3A::pref t, Quat::pref q, float scale) {
 		transform->SetTranslation(t);
 		transform->SetRotation(q);
 		transform->SetScaling(scale);
@@ -109,18 +109,18 @@ public:
 		SetUpdateRequired(true);
 	}
 
-	inline void TranslateBy(Vec3AF t) {
+	inline void TranslateBy(Vec3A::pref t) {
 		transform->SetTranslation(Vec3AAdd(t, transform->GetTranslation()));
 		transform->SetMatrixDirty(true);
 		SetUpdateRequired(true);
 	}
 
 	/** @todo Test this function */
-	void LocalApplyCameraMotion(const Vector2& moveXZ, const Vector2& rotateXY);
+	void LocalApplyCameraMotion(const Vec2::type& moveXZ, const Vec2::type& rotateXY);
 	/** @todo Test this function */
-	void LocalApplyCameraMotionOnLocal(const Vector2& moveXZ, const Vector2& rotateXY);
+	void LocalApplyCameraMotionOnLocal(const Vec2::type& moveXZ, const Vec2::type& rotateXY);
 	/** @todo Test this function */
-	void LocalApplyDeltaTransform(Vec3AF t, QuatF q);
+	void LocalApplyDeltaTransform(Vec3A::pref t, Quat::pref q);
 
 	virtual void Update(const FrameTimer& frameTimer);
 	/** @brief Initialize position, rotation and scaling values to identity */
