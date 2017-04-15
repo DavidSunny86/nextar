@@ -73,6 +73,7 @@ public:
 template <typename U>
 class _VecOp<_Quad, U> {
 public:
+	typedef _VecOp<_Quad, U> super;
 	typedef _VecOp<U, U> impl;
 	typedef Traits<U> traits;
 	typedef typename traits::type type;
@@ -89,6 +90,7 @@ public:
 	static inline type Set(base_type x, base_type y, base_type z);
 	static inline type Set(base_type x, base_type y, base_type z, base_type w);
 	static inline type Set(const base_type* v);
+	static inline type SetUnaligned(const base_type* v);
 	static inline type Zero();
 	static inline base_type Get(pref v, uint32 i);
 	static inline base_type GetX(pref v);
@@ -137,6 +139,7 @@ public:
 template <>
 class _VecOp<_Vec4, _Vec4> : public _VecOp<_Quad, _Vec4> {
 public:
+	using super::Mul;
 	static inline type Mul(pref v, TraitsMat4x4::pref m);
 };
 
@@ -151,6 +154,7 @@ public:
 	static inline bool GreaterAny(pref q1, pref q2);
 	static inline bool LesserAll(pref q1, pref q2);
 	static inline bool LesserAny(pref q1, pref q2);
+	using super::Mul;
 	static inline type Mul(pref v, TraitsMat4x4::pref m);
 };
 
@@ -302,8 +306,10 @@ public:
 	// @brief Perspective Projection matrix 
 	static inline type FromPerspectiveProjection(float_type fieldOfView, float_type aspectRatio,
 		float_type nearPlane, float_type farPlane);
-	// @brief Scale
-	static inline type Scale(pref m, float_type amount);
+
+	static inline type Mul(pref m, float_type amount);
+	static inline type Mul(float_type amount, pref m);
+
 	static inline type Transpose(pref m);
 	static inline type Inverse(pref m);
 	// @brief Inverse for orthogonal matrix

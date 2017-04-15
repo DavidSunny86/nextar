@@ -1,3 +1,4 @@
+#include "VectorMethods.h"
 #ifndef VECBASEOP_H_
 #define VECBASEOP_H_
 
@@ -21,7 +22,7 @@ inline bool VecBaseOp<T, impl>::IsInf(pref v) {
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Set(base_type val) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Set(base_type val) {
 	type v;
 	for (uint32 i = 0; i < _count; ++i)
 		v.v[i] = val;
@@ -29,7 +30,7 @@ inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Set(base_type val) {
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Set(base_type x, base_type y) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Set(base_type x, base_type y) {
 	type v;
 	v.v[0] = x;
 	v.v[1] = y;
@@ -37,7 +38,7 @@ inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Set(base_type x, base_type y
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Set(base_type x, base_type y, base_type z) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Set(base_type x, base_type y, base_type z) {
 	type v;
 	v.v[0] = x;
 	v.v[1] = y;
@@ -46,7 +47,7 @@ inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Set(base_type x, base_type y
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Set(base_type x, base_type y, base_type z, base_type w) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Set(base_type x, base_type y, base_type z, base_type w) {
 	type v;
 	v.v[0] = x;
 	v.v[1] = y;
@@ -56,7 +57,7 @@ inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Set(base_type x, base_type y
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Set(const base_type * val) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Set(const base_type * val) {
 	type v;
 	for (uint32 i = 0; i < _count; ++i)
 		v.v[i] = val[i];
@@ -64,35 +65,35 @@ inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Set(const base_type * val) {
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SetX(pref v, base_type val) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SetX(pref v, base_type val) {
 	type r = v;
 	r.v[0] = val;
 	return r;
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SetY(pref v, base_type val) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SetY(pref v, base_type val) {
 	type r = v;
 	r.v[1] = val;
 	return r;
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SetZ(pref v, base_type val) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SetZ(pref v, base_type val) {
 	type r = v;
 	r.v[2] = val;
 	return r;
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SetW(pref v, base_type val) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SetW(pref v, base_type val) {
 	type r = v;
 	r.v[3] = val;
 	return r;
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SplatX(pref val) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SplatX(pref val) {
 	type v;
 	for (uint32 i = 0; i < _count; ++i)
 		v.v[i] = val.v[0];
@@ -100,7 +101,7 @@ inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SplatX(pref val) {
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SplatY(pref val) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SplatY(pref val) {
 	type v;
 	for (uint32 i = 0; i < _count; ++i)
 		v.v[i] = val.v[1];
@@ -108,7 +109,7 @@ inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SplatY(pref val) {
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SplatZ(pref val) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SplatZ(pref val) {
 	type v;
 	for (uint32 i = 0; i < _count; ++i)
 		v.v[i] = val.v[2];
@@ -116,7 +117,7 @@ inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SplatZ(pref val) {
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SplatW(pref val) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SplatW(pref val) {
 	type v;
 	for (uint32 i = 0; i < _count; ++i)
 		v.v[i] = val.v[3];
@@ -124,12 +125,20 @@ inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::SplatW(pref val) {
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::base_type VecBaseOp<T, impl>::Get(pref v, uint32 i) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Zero() {
+	type v;
+	for (uint32 i = 0; i < _count; ++i)
+		v.v[i] = 0;
+	return v;
+}
+
+template<typename T, typename impl>
+inline typename VecBaseOp<T, impl>::base_type VecBaseOp<T, impl>::Get(pref v, uint32 i) {
 	return v.v[i];
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Abs(pref q) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Abs(pref q) {
 	type v;
 	for (uint32 i = 0; i < _count; ++i)
 		v.v[i] = std::abs(q.v[i]);
@@ -137,7 +146,7 @@ inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Abs(pref q) {
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Negate(pref q) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Negate(pref q) {
 	type v;
 	for (uint32 i = 0; i < _count; ++i)
 		v.v[i] = -q.v[i];
@@ -145,7 +154,7 @@ inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Negate(pref q) {
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Add(pref a, pref b) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Add(pref a, pref b) {
 	type v;
 	for (uint32 i = 0; i < _count; ++i)
 		v.v[i] = a.v[i] + b.v[i];
@@ -153,7 +162,7 @@ inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Add(pref a, pref b) {
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Sub(pref a, pref b) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Sub(pref a, pref b) {
 	type v;
 	for (uint32 i = 0; i < _count; ++i)
 		v.v[i] = a.v[i] - b.v[i];
@@ -161,7 +170,7 @@ inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Sub(pref a, pref b) {
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Mul(pref a, pref b) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Mul(pref a, pref b) {
 	type v;
 	for (uint32 i = 0; i < _count; ++i)
 		v.v[i] = a.v[i] * b.v[i];
@@ -169,7 +178,7 @@ inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Mul(pref a, pref b) {
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Mul(pref a, base_type b) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Mul(pref a, base_type b) {
 	type v;
 	for (uint32 i = 0; i < _count; ++i)
 		v.v[i] = a.v[i] + b;
@@ -177,12 +186,12 @@ inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Mul(pref a, base_type b) {
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Mul(base_type b, pref a) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Mul(base_type b, pref a) {
 	return Mul(a, b);
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Div(pref a, pref b) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Div(pref a, pref b) {
 	type v;
 	for (uint32 i = 0; i < _count; ++i)
 		v.v[i] = a.v[i] / b.v[i];
@@ -190,7 +199,7 @@ inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Div(pref a, pref b) {
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Madd(pref q, pref m, pref a) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Madd(pref q, pref m, pref a) {
 	type v;
 	for (uint32 i = 0; i < _count; ++i)
 		v.v[i] = q.v[i] * m.v[i] + a.v[i];
@@ -198,7 +207,7 @@ inline VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Madd(pref q, pref m, pref a)
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::base_type VecBaseOp<T, impl>::Hadd(pref q1) {
+inline typename VecBaseOp<T, impl>::base_type VecBaseOp<T, impl>::Hadd(pref q1) {
 	base_type r = 0;
 	for (uint32 i = 0; i < _count; ++i)
 		r += v.v[i];
@@ -247,33 +256,33 @@ inline bool VecBaseOp<T, impl>::LesserAny(pref q1, pref q2) {
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::base_type VecBaseOp<T, impl>::Dot(pref q1, pref q2) {
+inline typename VecBaseOp<T, impl>::base_type VecBaseOp<T, impl>::Dot(pref q1, pref q2) {
 	return impl::Hadd(impl::Mul(q1, q2));
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::float_type VecBaseOp<T, impl>::SqLength(pref c1) {
+inline typename VecBaseOp<T, impl>::float_type VecBaseOp<T, impl>::SqLength(pref c1) {
 	return impl::Dot(c1, c1);
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::float_type VecBaseOp<T, impl>::Length(pref c1) {
+inline typename VecBaseOp<T, impl>::float_type VecBaseOp<T, impl>::Length(pref c1) {
 	return float_type(std::sqrt(impl::SqLength(c1)));
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::float_type VecBaseOp<T, impl>::Distance(pref vec1, pref vec2) {
+inline typename VecBaseOp<T, impl>::float_type VecBaseOp<T, impl>::Distance(pref vec1, pref vec2) {
 	return impl::Length(impl::Sub(vec2, vec1));
 }
 
 template<typename T, typename impl>
-inline VecBaseOp<T, impl>::float_type VecBaseOp<T, impl>::SqDistance(pref vec1, pref vec2) {
+inline typename VecBaseOp<T, impl>::float_type VecBaseOp<T, impl>::SqDistance(pref vec1, pref vec2) {
 	return impl::SqLength(impl::Sub(vec2, vec1));
 }
 
 
 template<typename T, typename impl>
-inline type VecBaseOp<T, impl>::Normalize(pref v) {
+inline typename VecBaseOp<T, impl>::type VecBaseOp<T, impl>::Normalize(pref v) {
 	return impl::Mul(v, 1 / impl::Length(v) );
 }
 

@@ -11,16 +11,16 @@ inline nextar::Math::_Rect::_Rect(float left, float top, float right, float bott
 	rightBottom = Vec2Op::Set(right, bottom);
 }
 
-inline TraitsVec2::type MatOp<_Rect>::GetSize(pref box) {
-	return Vec2::Mul(Vec2::Sub(max, min), 0.5f);
+inline TraitsVec2::type MatOp<_Rect>::GetHalfSize(pref box) {
+	return Vec2::Mul(Vec2::Sub(box.max, box.min), 0.5f);
 }
 
 inline TraitsVec2::type MatOp<_Rect>::GetSize(pref box) {
-	return Vec2::Sub(max, min);
+	return Vec2::Sub(box.max, box.min);
 }
 
 inline TraitsVec2::type MatOp<_Rect>::GetCenter(pref box) {
-	return Vec2::Mul(Vec2::Add(max, min), 0.5f);
+	return Vec2::Mul(Vec2::Add(box.max, box.min), 0.5f);
 }
 
 }

@@ -24,10 +24,10 @@ inline _Matrix4x4::_Matrix4x4(const Matrix3x4& m, const Vector3A& v) {
 inline _Matrix4x4::_Matrix4x4(float m00, float m01, float m02, float m03, float m10,
 	float m11, float m12, float m13, float m20, float m21, float m22,
 	float m23, float m30, float m31, float m32, float m33) {
-	r[0] = Vec3AOp::Set(m00, m01, m02, m03);
-	r[1] = Vec3AOp::Set(m10, m11, m12, m13);
-	r[2] = Vec3AOp::Set(m20, m21, m22, m23);
-	r[3] = Vec3AOp::Set(m30, m31, m32, m33);
+	r[0] = Vec4::Set(m00, m01, m02, m03);
+	r[1] = Vec4::Set(m10, m11, m12, m13);
+	r[2] = Vec4::Set(m20, m21, m22, m23);
+	r[3] = Vec4::Set(m30, m31, m32, m33);
 }
 
 inline _Matrix4x4::_Matrix4x4(std::initializer_list<float> l) {
@@ -177,7 +177,7 @@ inline void MatOp<_Matrix4x4>::TransformOrtho(pref m,
 
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	NEX_ASSERT(ioStream);
-	uint8* inpVec = (const uint8*)ioStream;
+	uint8* inpVec = (uint8*)ioStream;
 	
 	for (uint32 i = 0; i < count; i++) {
 		_Quad x = _mm_load_ps1(&reinterpret_cast<const Vector3*>(inpVec)->x);
@@ -190,16 +190,16 @@ inline void MatOp<_Matrix4x4>::TransformOrtho(pref m,
 		x = _mm_mul_ps(x, m.r[0]);
 		res = _mm_add_ps(res, x);
 		_mm_store_ps(store.s, res);
-		((float*)inpVec)[0] = store[0];
-		((float*)inpVec)[1] = store[1];
-		((float*)inpVec)[2] = store[2];
+		((float*)inpVec)[0] = store.s[0];
+		((float*)inpVec)[1] = store.s[1];
+		((float*)inpVec)[2] = store.s[2];
 
 		inpVec += inStride;
 	}
 #else
 	NEX_ASSERT(outstream);
 	NEX_ASSERT(inpstream);
-	const uint8* inpVec = (const uint8*)inpstream;
+	uint8* inpVec = (uint8*)inpstream;
 
 	_Quad  x, y, z, r;
 
@@ -444,7 +444,7 @@ inline MatOp<_Matrix4x4>::type MatOp<_Matrix4x4>::FromScaleRotPos(float_type sca
 	q1 = _mm_shuffle_ps(r0, v0, _MM_SHUFFLE(1, 0, 3, 0));
 	q1 = _mm_shuffle_ps(q1, q1, _MM_SHUFFLE(1, 3, 2, 0));
 
-	_Quad scaleQ = QuadReplicate(scale);
+	_Quad scaleQ = QuadOp::Set(scale);
 	Matrix4x4 ret;
 	ret.r[0] = _mm_mul_ps(scaleQ, q1);
 	q1 = _mm_shuffle_ps(r0, v0, _MM_SHUFFLE(3, 2, 3, 1));
@@ -550,14 +550,14 @@ inline MatOp<_Matrix4x4>::type MatOp<_Matrix4x4>::FromWorldToView(pref m) {
 inline MatOp<_Matrix4x4>::type MatOp<_Matrix4x4>::FromLookAt(TraitsVec3A::pref eye, 
 	TraitsVec3A::pref lookAt, TraitsVec3A::pref vup) {
 	Matrix4x4 m;
-	zaxis = m.r[2] = Vec3AOp::Normalize(Vec3AOp::Sub(lookat, eye));
-	xaxis = m.r[0] = Vec3AOp::Normalize(Vec3AOp::Cross(vup, m.r[2]));
-	yaxis = m.r[1] = Vec3AOp::Cross(m.r[2], m.r[0]);
+	Vec3A::type zaxis = m.r[2] = Vec3AOp::Normalize(Vec3AOp::Sub(lookAt, eye));
+	Vec3A::type xaxis = m.r[0] = Vec3AOp::Normalize(Vec3AOp::Cross(vup, m.r[2]));
+	Vec3A::type yaxis = m.r[1] = Vec3AOp::Cross(m.r[2], m.r[0]);
 	m.r[3] = Matrix4x4::IdentityMatrix.r[3];
 	m = Transpose(m);
 
 	Vector3A negEye = Vec3AOp::Negate(eye);
-	m.r[3] = Vec4AOp::Set(
+	m.r[3] = Vec4::Set(
 		Vec3AOp::Dot(xaxis, negEye),
 		Vec3AOp::Dot(yaxis, negEye),
 		Vec3AOp::Dot(zaxis, negEye),
@@ -585,10 +585,10 @@ inline MatOp<_Matrix4x4>::type MatOp<_Matrix4x4>::FromPerspectiveProjection(floa
 		1, 0, 0, -q * zn, 0 };
 }
 
-inline MatOp<_Matrix4x4>::type MatOp<_Matrix4x4>::Scale(pref m, float_type scale) {
+inline MatOp<_Matrix4x4>::type MatOp<_Matrix4x4>::Mul(pref m, float_type scale) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	Matrix4x4 ret;
-	_Quad scaleQ = QuadOp::Scale(scale);
+	_Quad scaleQ = QuadOp::Set(scale);
 	ret.r[0] = _mm_mul_ps(scaleQ, m.r[0]);
 	ret.r[1] = _mm_mul_ps(scaleQ, m.r[1]);
 	ret.r[2] = _mm_mul_ps(scaleQ, m.r[2]);
@@ -609,6 +609,10 @@ inline MatOp<_Matrix4x4>::type MatOp<_Matrix4x4>::Scale(pref m, float_type scale
 	ret.m22 *= scale;
 	return ret;
 #endif
+}
+
+inline MatOp<_Matrix4x4>::type MatOp<_Matrix4x4>::Mul(float_type scale, pref m) {
+	return Mul(m, scale);
 }
 
 inline MatOp<_Matrix4x4>::type MatOp<_Matrix4x4>::Transpose(pref m) {

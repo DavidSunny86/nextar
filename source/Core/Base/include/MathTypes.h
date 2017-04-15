@@ -26,6 +26,7 @@ struct TraitsBase {
 	typedef const type& pref;
 	typedef float base_type;
 	typedef base_type row_type;
+	typedef float float_type;
 
 	enum : uint32 {
 		_count = sizeof(type) / sizeof(base_type),
@@ -52,7 +53,7 @@ public:
 
 	typedef typename TraitsBase<T>::type type;
 	typedef typename TraitsBase<T>::pref pref;
-	typedef typename TraitsBase<T>::base_type;
+	typedef typename TraitsBase<T>::base_type base_type;
 	typedef typename TraitsBase<T>::row_type row_type;
 	
 	typedef type& ref;

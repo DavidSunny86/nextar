@@ -20,7 +20,7 @@ inline bool TraitsBase<_Quad>::IsInf(pref v) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::IsNan(pref v) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::IsNan(pref v) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	return _mm_cmpneq_ps(v, v);
 #else
@@ -33,7 +33,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::IsNan(pref v) {
 }
 
 template <typename U>
-inline bool _VecOp<_Quad, U>::IsInf(pref v) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::IsInf(pref v) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	// Mask off the sign bit
 	_Quad vtemp = _mm_and_ps(v, N3D_ClearSign.v);
@@ -53,7 +53,7 @@ inline bool _VecOp<_Quad, U>::IsInf(pref v) {
 
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Set(base_type v) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Set(base_type v) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	return _mm_set_ps1(v);
 #else
@@ -65,7 +65,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Set(base_type v) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Set(const base_type *v) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Set(const base_type *v) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	return _mm_load_ps(v);
 #else
@@ -77,13 +77,13 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Set(const base_type *v) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Set(base_type x, base_type y, base_type z) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Set(base_type x, base_type y, base_type z) {
 	return Set(x, y, z, 0);
 }
 
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Set(base_type x, base_type y, base_type z, base_type w) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Set(base_type x, base_type y, base_type z, base_type w) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	return _mm_set_ps(w, z, y, x);
 #else
@@ -94,7 +94,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Set(base_type x, base_type y, ba
 
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SetUnaligned(const base_type *v) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SetUnaligned(const base_type *v) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	return _mm_loadu_ps(v);
 #else
@@ -107,7 +107,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SetUnaligned(const base_type *v)
 
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Zero() {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Zero() {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	return _mm_setzero_ps();
 #else
@@ -117,7 +117,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Zero() {
 
 
 template <typename U>
-inline _VecOp<_Quad, U>::base_type _VecOp<_Quad, U>::Get(pref q, uint32 idx) {
+inline typename _VecOp<_Quad, U>::base_type _VecOp<_Quad, U>::Get(pref q, uint32 idx) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 #if defined(NEX_MSVC)
 	return q.m128_f32[idx];
@@ -130,7 +130,7 @@ inline _VecOp<_Quad, U>::base_type _VecOp<_Quad, U>::Get(pref q, uint32 idx) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::base_type _VecOp<_Quad, U>::GetX(pref q) {
+inline typename _VecOp<_Quad, U>::base_type _VecOp<_Quad, U>::GetX(pref q) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	return _mm_cvtss_f32(q);
 #else
@@ -139,7 +139,7 @@ inline _VecOp<_Quad, U>::base_type _VecOp<_Quad, U>::GetX(pref q) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::base_type _VecOp<_Quad, U>::GetY(pref q) {
+inline typename _VecOp<_Quad, U>::base_type _VecOp<_Quad, U>::GetY(pref q) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	_Quad temp = _mm_shuffle_ps(q, q, _MM_SHUFFLE(1, 1, 1, 1));
 	return _mm_cvtss_f32(temp);
@@ -149,7 +149,7 @@ inline _VecOp<_Quad, U>::base_type _VecOp<_Quad, U>::GetY(pref q) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::base_type _VecOp<_Quad, U>::GetZ(pref q) {
+inline typename _VecOp<_Quad, U>::base_type _VecOp<_Quad, U>::GetZ(pref q) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	_Quad temp = _mm_shuffle_ps(q, q, _MM_SHUFFLE(2, 2, 2, 2));
 	return _mm_cvtss_f32(temp);
@@ -159,7 +159,7 @@ inline _VecOp<_Quad, U>::base_type _VecOp<_Quad, U>::GetZ(pref q) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::base_type _VecOp<_Quad, U>::GetW(pref q) {
+inline typename _VecOp<_Quad, U>::base_type _VecOp<_Quad, U>::GetW(pref q) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	_Quad temp = _mm_shuffle_ps(q, q, _MM_SHUFFLE(3, 3, 3, 3));
 	return _mm_cvtss_f32(temp);
@@ -169,7 +169,7 @@ inline _VecOp<_Quad, U>::base_type _VecOp<_Quad, U>::GetW(pref q) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SetX(pref q, base_type val) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SetX(pref q, base_type val) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	_Quad v = _mm_set_ss(val);
 	return _mm_move_ss(q, v);
@@ -181,7 +181,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SetX(pref q, base_type val) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SetY(pref q, base_type val) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SetY(pref q, base_type val) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 #ifdef NEX_MSVC
 	_Quad res;
@@ -206,7 +206,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SetY(pref q, base_type val) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SetZ(pref q, base_type z) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SetZ(pref q, base_type z) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 #ifdef NEX_MSVC
 	_Quad res;
@@ -231,7 +231,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SetZ(pref q, base_type z) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SetW(pref q, base_type val) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SetW(pref q, base_type val) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 #ifdef NEX_MSVC
 	_Quad res;
@@ -256,7 +256,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SetW(pref q, base_type val) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SplatX(pref q) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SplatX(pref q) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	return _mm_shuffle_ps(q, q, _MM_SHUFFLE(0, 0, 0, 0));
 #else
@@ -265,7 +265,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SplatX(pref q) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SplatY(pref q) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SplatY(pref q) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	return _mm_shuffle_ps(q, q, _MM_SHUFFLE(1, 1, 1, 1));
 #else
@@ -274,7 +274,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SplatY(pref q) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SplatZ(pref q) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SplatZ(pref q) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	return _mm_shuffle_ps(q, q, _MM_SHUFFLE(2, 2, 2, 2));
 #else
@@ -283,7 +283,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SplatZ(pref q) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SplatW(pref q) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::SplatW(pref q) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	return _mm_shuffle_ps(q, q, _MM_SHUFFLE(3, 3, 3, 3));
 #else
@@ -328,7 +328,7 @@ inline bool _VecOp<_Quad, U>::LesserAll(pref q1, pref q2) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Abs(pref q) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Abs(pref q) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	return _mm_and_ps(q, N3D_ClearSign.v);
 #else
@@ -337,7 +337,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Abs(pref q) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Negate(pref q) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Negate(pref q) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	return _mm_xor_ps(q, N3D_XXXX.v);
 #else
@@ -346,7 +346,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Negate(pref q) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Add(pref a, pref b) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Add(pref a, pref b) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	return _mm_add_ps(a, b);
 #else
@@ -355,7 +355,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Add(pref a, pref b) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Sub(pref a, pref b) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Sub(pref a, pref b) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	return _mm_sub_ps(a, b);
 #else
@@ -365,7 +365,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Sub(pref a, pref b) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Mul(pref a, pref b) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Mul(pref a, pref b) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	return _mm_mul_ps(a, b);
 #else
@@ -374,7 +374,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Mul(pref a, pref b) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Div(pref a, pref b) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Div(pref a, pref b) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	return _mm_div_ps(a, b);
 #else
@@ -383,7 +383,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Div(pref a, pref b) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Mul(pref q, base_type val) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Mul(pref q, base_type val) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	__m128 res = _mm_set_ps1(val);
 	return _mm_mul_ps(q, res);
@@ -393,7 +393,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Mul(pref q, base_type val) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Mul(base_type val, pref q) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Mul(base_type val, pref q) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	__m128 res = _mm_set_ps1(val);
 	return _mm_mul_ps(q, res);
@@ -403,7 +403,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Mul(base_type val, pref q) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Madd(pref a, pref v, pref c) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Madd(pref a, pref v, pref c) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	_Quad t = _mm_mul_ps(a, v);
 	return _mm_add_ps(t, c);
@@ -413,10 +413,9 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Madd(pref a, pref v, pref c) {
 }
 
 template<typename U>
-inline base_type nextar::Math::_VecOp<_Quad, U>::Hadd(pref v) {
+inline typename _VecOp<_Quad, U>::base_type nextar::Math::_VecOp<_Quad, U>::Hadd(pref v) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
-#if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE3 || 
-	NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE4
+#if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE3 || NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE4
 	_Quad q = _mm_hadd_ps(v, v); // latency 7
 	q = _mm_hadd_ps(q, q);// latency 7
 	return GetX(q);
@@ -438,7 +437,7 @@ inline base_type nextar::Math::_VecOp<_Quad, U>::Hadd(pref v) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::InvSqrt(pref qpf) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::InvSqrt(pref qpf) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 #ifdef NEX_PREFER_SPEED_OVER_ACCURACY
 	return __mm_rsqrt_ps(qpf);
@@ -454,7 +453,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::InvSqrt(pref qpf) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Select(pref v1, pref v2, pref control) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Select(pref v1, pref v2, pref control) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	_Quad vtemp1 = _mm_andnot_ps(control, v1);
 	_Quad vtemp2 = _mm_and_ps(v2, control);
@@ -472,7 +471,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Select(pref v1, pref v2, pref co
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::VDot(pref q1, pref q2) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::VDot(pref q1, pref q2) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 #if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE4
 	return _mm_dp_ps(vec1, vec2, 0xFF);
@@ -499,7 +498,7 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::VDot(pref q1, pref q2) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::base_type _VecOp<_Quad, U>::Dot(pref q1, pref q2) {
+inline typename _VecOp<_Quad, U>::base_type _VecOp<_Quad, U>::Dot(pref q1, pref q2) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	return impl::GetX(impl::VDot(q1, q2));
 #else
@@ -511,7 +510,7 @@ inline _VecOp<_Quad, U>::base_type _VecOp<_Quad, U>::Dot(pref q1, pref q2) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Normalize(pref vec) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Normalize(pref vec) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 #if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE4
 	_Quad q = _mm_dp_ps(vec, vec, 0xFF);
@@ -549,27 +548,27 @@ inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Normalize(pref vec) {
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Lerp(pref src, pref dst, float_type t) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Lerp(pref src, pref dst, float_type t) {
 	return impl::Madd(impl::Set(t), impl::Sub(dst, src), src);
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::float_type _VecOp<_Quad, U>::Length(pref vec) {
+inline typename _VecOp<_Quad, U>::float_type _VecOp<_Quad, U>::Length(pref vec) {
 	return Math::Sqrt(impl::Dot(vec, vec));
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::float_type _VecOp<_Quad, U>::SqLength(pref vec) {
+inline typename _VecOp<_Quad, U>::float_type _VecOp<_Quad, U>::SqLength(pref vec) {
 	return impl::Dot(vec, vec);
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::float_type _VecOp<_Quad, U>::Distance(pref vec1, pref vec2) {
+inline typename _VecOp<_Quad, U>::float_type _VecOp<_Quad, U>::Distance(pref vec1, pref vec2) {
 	return impl::Length(impl::Sub(vec1, vec2));
 }
 
 template <typename U>
-inline _VecOp<_Quad, U>::float_type _VecOp<_Quad, U>::SqDistance(pref vec1, pref vec2) {
+inline typename _VecOp<_Quad, U>::float_type _VecOp<_Quad, U>::SqDistance(pref vec1, pref vec2) {
 	return impl::SqLength(impl::Sub(vec1, vec2));
 }
 

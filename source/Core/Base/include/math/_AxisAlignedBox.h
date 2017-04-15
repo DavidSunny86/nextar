@@ -5,6 +5,11 @@ namespace Math {
 inline _AxisAlignedBox::_AxisAlignedBox() {
 }
 
+_AxisAlignedBox::_AxisAlignedBox(const Vector3A& minP, const Vector3A& maxP) {
+	minPoint = minP;
+	maxPoint = maxP;
+}
+
 _AxisAlignedBox::_AxisAlignedBox(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
 	minPoint = Vec3AOp::Set(minX, minY, minZ);
 	maxPoint = Vec3AOp::Set(maxX, maxY, maxZ);
@@ -26,11 +31,11 @@ inline bool MatOp<_AxisAlignedBox>::IsValid(pref box) {
 }
 
 inline TraitsVec3A::type MatOp<_AxisAlignedBox>::GetCenter(pref box) {
-	return Vec3AOp::Mul(Vec3AOp::Add(box.maxPoint, box.minPoint), 0.5f);
+	return Vec3A::Mul(Vec3A::Add(box.maxPoint, box.minPoint), 0.5f);
 }
 
 inline TraitsVec3A::type MatOp<_AxisAlignedBox>::GetSize(pref box) {
-	return Vec3AOp::Mul(Vec3AOp::Sub(box.maxPoint, box.minPoint), 0.5f);
+	return Vec3A::Mul(Vec3A::Sub(box.maxPoint, box.minPoint), 0.5f);
 }
 
 inline TraitsVec3A::type MatOp<_AxisAlignedBox>::GetPoint(pref box, unsigned int i) {
@@ -42,8 +47,8 @@ inline TraitsVec3A::type MatOp<_AxisAlignedBox>::GetPoint(pref box, unsigned int
 
 inline MatOp<_AxisAlignedBox>::type MatOp<_AxisAlignedBox>::Union(pref b, TraitsVec3A::pref point) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
-	return  { _mm_min_ps(b.minPoint, point),
-		_mm_max_ps(b.maxPoint, point) };
+	return  _AxisAlignedBox( _mm_min_ps(b.minPoint, point),
+		_mm_max_ps(b.maxPoint, point) );
 #else
 	AxisAlignedBox box = b;
 	for (int i = 0; i < 3; ++i) {
@@ -58,10 +63,10 @@ inline MatOp<_AxisAlignedBox>::type MatOp<_AxisAlignedBox>::Union(pref b, Traits
 
 inline MatOp<_AxisAlignedBox>::type MatOp<_AxisAlignedBox>::Union(pref box, pref other) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
-	return  { 
+	return  _AxisAlignedBox(
 		_mm_min_ps(box.minPoint, other.minPoint),
 		_mm_max_ps(box.maxPoint, other.maxPoint)
-	};
+	);
 #else
 	AxisAlignedBox ret;
 	for (int i = 0; i < 3; ++i) {

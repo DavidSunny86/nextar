@@ -194,12 +194,12 @@ public:
 };
 
 template <>
-class TraitsBase<_Matrix4x4> : public _TraitsBaseMat<_Matrix4x4, 4, 4, _Vec3A> {
+class TraitsBase<_Matrix4x4> : public _TraitsBaseMat<_Matrix4x4, 4, 4, _Vec4> {
 public:
 };
 
 template <>
-class TraitsBase<_Matrix4x4> : public _TraitsBaseMat<_Matrix4x4, 3, 4, _Vec3A> {
+class TraitsBase<_Matrix3x4> : public _TraitsBaseMat<_Matrix3x4, 3, 4, _Vec4> {
 public:
 };
 

@@ -67,10 +67,10 @@ inline _VecOp<_EulerAngles, _EulerAngles>::type _VecOp<_EulerAngles, _EulerAngle
 
 inline _VecOp<_EulerAngles, _EulerAngles>::type _VecOp<_EulerAngles, _EulerAngles>::FromInvQuat(TraitsQuat::pref src) {
 	type r;
-	float srcX = QuatGetX(src);
-	float srcY = QuatGetY(src);
-	float srcZ = QuatGetZ(src);
-	float srcW = QuatGetW(src);
+	float srcX = Quat::GetX(src);
+	float srcY = Quat::GetY(src);
+	float srcZ = Quat::GetZ(src);
+	float srcW = Quat::GetW(src);
 	// Extract sin(r.x)
 	float sp = -2.0f * (srcY * srcZ + srcW * srcX);
 	// Check for Gimbel Lock, giving slight tolerance for numerical imprecision
