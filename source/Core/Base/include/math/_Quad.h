@@ -2,6 +2,15 @@
 namespace nextar {
 namespace Math {
 
+inline bool TraitsBase<_Quad>::Equals(pref v1, pref v2) {
+	type r = QuadOp::Sub(v1, v2);
+	return (bool)(
+		Math::Traits<float>::Equals(QuadOp::GetX(r), 0) &&
+		Math::Traits<float>::Equals(QuadOp::GetY(r), 0) &&
+		Math::Traits<float>::Equals(QuadOp::GetZ(r), 0) &&
+		Math::Traits<float>::Equals(QuadOp::GetW(r), 0));
+}
+
 inline bool TraitsBase<_Quad>::IsNan(pref v) {
 	return QuadOp::Hadd(QuadOp::IsNan(v)) != 0;
 }

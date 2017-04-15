@@ -78,15 +78,7 @@ public:
 		_count = 4,
 	};
 
-	inline static bool Equals(pref v1, pref v2) {
-		type r = vecop::Sub(v1, v2);
-		return (bool)(
-			Math::Traits<float>::Equals(vecop::GetX(r), 0) &&
-			Math::Traits<float>::Equals(vecop::GetY(r), 0) &&
-			Math::Traits<float>::Equals(vecop::GetZ(r), 0) &&
-			Math::Traits<float>::Equals(vecop::GetW(r), 0));
-	}
-
+	inline static bool Equals(pref v1, pref v2);
 	inline static bool IsNan(pref v);
 	inline static bool IsInf(pref v);
 };
