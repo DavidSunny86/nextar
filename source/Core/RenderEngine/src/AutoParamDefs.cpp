@@ -139,7 +139,7 @@ void BaseRenderManager::RegisterAutoParams() {
 		ParameterContext::CTX_OBJECT, 32, "Omni light properties.");
 	MAKE_AUTO_PARAM(AlbedoMap, AutoParamName::AUTO_ALBEDO_MAP, PDT_TEXTURE,
 		ParameterContext::CTX_PASS, sizeof(TextureUnit), "GBuffer albedo map.");
-		MAKE_AUTO_PARAM(SpecularAndGlossMap, AutoParamName::AUTO_SPECULAR_AND_GLOSS_MAP, PDT_TEXTURE,
+	MAKE_AUTO_PARAM(SpecularAndGlossMap, AutoParamName::AUTO_SPECULAR_AND_GLOSS_MAP, PDT_TEXTURE,
 			ParameterContext::CTX_PASS, sizeof(TextureUnit), "GBuffer specular map.");
 	MAKE_AUTO_PARAM(NormalMap, AutoParamName::AUTO_NORMAL_MAP, PDT_TEXTURE,
 		ParameterContext::CTX_PASS, sizeof(TextureUnit), "GBuffer normal map.");

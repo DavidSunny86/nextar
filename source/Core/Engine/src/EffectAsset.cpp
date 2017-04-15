@@ -120,7 +120,25 @@ void EffectAsset::ResolveMaterial(
 }
 
 void EffectAsset::ResolveMaterialSingle(const StringUtils::WordList & options, 
-	const StringUtils::WordList & renderPassOptions, Material & m) {
+	const StringUtils::WordList & renderPassOptions, 
+	Material & m) {
+
+	const String& baseOptions = RenderManager::Instance().GetGlobalShaderOptions();
+
+	ShaderOptions shaderOptions;
+	String strOptions;
+	shaderOptions.Append(baseOptions);
+	shaderOptions.Append(options);
+	shaderOptions.Append(renderPassOptions);
+	shaderOptions.ToString(strOptions);
+	m._reserved_i = _Resolve(strOptions);
+	// combine options
+	// for each render pass
+	//   combine options
+	//   find hash, if not available
+	//     generate shader
+	//   use shader to fill render info
+
 }
 
 void EffectAsset::AsyncAcquireData() {

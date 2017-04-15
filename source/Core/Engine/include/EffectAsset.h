@@ -69,8 +69,7 @@ public:
 	};
 
 	class _NexEngineAPI FullLoadRequest: public SourceLoadRequest {
-		NEX_LOG_HELPER(ShaderAsset::FullLoadRequest)
-		;
+		NEX_LOG_HELPER(ShaderAsset::FullLoadRequest);
 	public:
 		FullLoadRequest(EffectAsset*);
 		~FullLoadRequest();
