@@ -1,21 +1,26 @@
 
-#pragoma once
+#pragma once
 
 namespace nextar {
 namespace Math {
 
 template <typename T>
-MatBaseOp<T>::row_type MatBaseOp::Row(pref m, uint32 i) {
+inline void MatBaseOp<T>::SetRow(ref m, uint32 i, row_type_pref r) {
+	m.r[i] = r;
+}
+
+template <typename T>
+inline typename MatBaseOp<T>::row_type MatBaseOp<T>::Row(pref m, uint32 i) {
 	return m.r[i];
 }
 
 template <typename T>
-MatBaseOp<T>::base_type MatBaseOp::Get(pref m, uint32 i, uint32 j) {
+inline typename MatBaseOp<T>::base_type MatBaseOp<T>::Get(pref m, uint32 i, uint32 j) {
 	return VecOp<row_type>::Get(m.r[i], j);
 }
 
 template <typename T>
-MatBaseOp<T>::type MatBaseOp::Add(pref m1, pref m2) {
+inline typename MatBaseOp<T>::type MatBaseOp<T>::Add(pref m1, pref m2) {
 	type r;
 	for (unsigned int i = 0; i < _rows; ++i)
 		r.r[i] = row_op::Add(m1.r[i], m2.r[i]);
@@ -23,7 +28,7 @@ MatBaseOp<T>::type MatBaseOp::Add(pref m1, pref m2) {
 }
 
 template <typename T>
-MatBaseOp<T>::type MatBaseOp::Sub(pref m1, pref m2) {
+inline typename MatBaseOp<T>::type MatBaseOp<T>::Sub(pref m1, pref m2) {
 	type r;
 	for (unsigned int i = 0; i < _rows; ++i)
 		r.r[i] = row_op::Sub(m1.r[i], m2.r[i]);
@@ -31,7 +36,7 @@ MatBaseOp<T>::type MatBaseOp::Sub(pref m1, pref m2) {
 }
 
 template<typename T>
-inline _Mat4Op<T>::type _Mat4Op<T>::FromVectorMapping(TraitsVec3::pref v1, TraitsVec3::pref v2) {
+inline typename _Mat4Op<T>::type _Mat4Op<T>::FromVectorMapping(TraitsVec3::pref v1, TraitsVec3::pref v2) {
 	/** \todo sse **/
 	type m;
 	float_type cs, xy1C, xz1C, yz1C;
@@ -204,21 +209,8 @@ inline void _Mat4Op<T>::SetRot(ref ret, TraitsQuat::pref rot) {
 #endif
 }
 
-
 template<typename T>
-inline _Mat4Op<T>::type _Mat4Op<T>::FromQuat(TraitsQuat::pref rot) {
-	type r;
-	SetRot(r, rot);
-	return r;
-}
-
-template<typename T>
-inline _Mat4Op<T>::type _Mat4Op<T>::FromRot(TraitsQuat::pref rot) {
-	return FromQuat(rot);
-}
-
-template<typename T>
-inline _Mat4Op<T>::type _Mat4Op<T>::SetViewAndUp(ref ret, TraitsVec3A::pref viewDir, TraitsVec3A::pref up) {
+inline void _Mat4Op<T>::SetViewAndUp(ref ret, TraitsVec3A::pref viewDir, TraitsVec3A::pref up) {
 	Vector3A up;
 	ret.r[2] = Vec3AOp::Normalize(viewDir);
 	up = Vec3AOp::Cross(upDir, viewDir);

@@ -194,7 +194,7 @@ struct alignas(16) _AxisAlignedBox : public AllocAABox {
 	};
 
 	inline _AxisAlignedBox();
-	inline _AxisAlignedBox(const Vector3A& v1, const Vector3A& v2);
+	inline _AxisAlignedBox(const Vector3A& min, const Vector3A& max);
 	inline _AxisAlignedBox(float minX, float minY, float minZ, float maxX, float maxY, float maxZ);
 	inline _AxisAlignedBox(std::initializer_list<float> l);
 };

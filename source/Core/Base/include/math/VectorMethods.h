@@ -146,6 +146,7 @@ public:
 template <>
 class _VecOp<_Vec3A, _Vec3A> : public _VecOp<_Quad, _Vec3A> {
 public:
+	static inline type From(TraitsVec4::pref q);
 	static inline type VDot(pref q1, pref q2);
 	static inline base_type Dot(pref q1, pref q2);
 	static inline type Normalize(pref q);
@@ -223,6 +224,7 @@ public:
 	typedef typename traits::float_type float_type;
 	typedef typename traits::row_type_traits row_type_traits;
 	typedef typename traits::row_type_id row_type_id;
+	typedef typename row_type_traits::pref row_type_pref;
 	typedef VecOp<row_type_id> row_op;
 
 	enum {
@@ -235,6 +237,7 @@ public:
 	static inline base_type Get(pref m, uint32 i, uint32 j);
 	static inline type Add(pref m1, pref m2);
 	static inline type Sub(pref m1, pref m2);
+	static inline void SetRow(ref m, uint32 i, row_type_pref p);
 };
 
 
@@ -309,6 +312,7 @@ public:
 
 	static inline type Mul(pref m, float_type amount);
 	static inline type Mul(float_type amount, pref m);
+	static inline TraitsVec4::type Mul(TraitsVec4::pref v, pref m);
 
 	static inline type Transpose(pref m);
 	static inline type Inverse(pref m);
@@ -332,9 +336,11 @@ public:
 	static inline bool IsValid(pref box);
 	static inline TraitsVec3A::type GetCenter(pref box);
 	static inline TraitsVec3A::type GetSize(pref box);
+	static inline TraitsVec3A::type GetHalfSize(pref box);
 	static inline TraitsVec3A::type GetPoint(pref box, unsigned int i);
 	static inline type Union(pref box, TraitsVec3A::pref point);
 	static inline type Union(pref box, pref other);
+	static inline type FromCenterExtends(TraitsVec3A::pref center, TraitsVec3A::pref extends);
 };
 
 

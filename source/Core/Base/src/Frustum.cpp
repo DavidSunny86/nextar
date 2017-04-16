@@ -34,22 +34,24 @@ void Frustum::SetupPlanes(size_t num) {
 
 void Frustum::ConstructFrom(Mat4::pref combo) {
 	// Left clipping planeT
-	planes[PLANE_LEFT] = PlaneNormalize(
-	Vec4ANegate(Vec4AAdd(Mat4x4Row(combo, 0), Mat4x4Row(combo, 3))));
+	planes[PLANE_LEFT] = Plane::Normalize(
+		Vec4::Negate(Vec4::Add(Mat4::Row(combo, 0), Mat4::Row(combo, 3))));
 	// Right clipping planeT
-	planes[PLANE_RIGHT] = PlaneNormalize(
-	Vec4ASub(Mat4x4Row(combo, 0), Mat4x4Row(combo, 3)));
+	planes[PLANE_RIGHT] = Plane::Normalize(
+		Vec4::Sub(Mat4::Row(combo, 0), Mat4::Row(combo, 3)));
 	// Top clipping planeT
-	planes[PLANE_TOP] = PlaneNormalize(
-	Vec4ASub(Mat4x4Row(combo, 1), Mat4x4Row(combo, 3)));
+	planes[PLANE_TOP] = Plane::Normalize(
+		Vec4::Sub(Mat4::Row(combo, 1), Mat4::Row(combo, 3)));
 	// Bottom clipping planeT
-	planes[PLANE_BOTTOM] = PlaneNormalize(
-	Vec4ANegate(Vec4AAdd(Mat4x4Row(combo, 1), Mat4x4Row(combo, 3))));
+	planes[PLANE_BOTTOM] = Plane::Normalize(
+		Vec4::Negate(Vec4::Add(Mat4::Row(combo, 1), Mat4::Row(combo, 3))));
 	// Near clipping planeT
-	planes[PLANE_NEAR] = PlaneNormalize(Vec4ANegate(Mat4x4Row(combo, 2)));
+	planes[PLANE_NEAR] = Plane::Normalize(Vec4::Negate(Mat4::Row(combo, 2)));
 	// Far clipping planeT
-	planes[PLANE_FAR] = PlaneNormalize(
-	Vec4ASub(Mat4x4Row(combo, 2), Mat4x4Row(combo, 3)));
+	planes[PLANE_FAR] = Plane::Normalize(
+		Vec4::Sub(Mat4::Row(combo, 2), Mat4::Row(combo, 3)));
 }
+
+
 }
 

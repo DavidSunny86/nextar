@@ -1,3 +1,4 @@
+#include "VectorMethods.h"
 #pragma once
 namespace nextar {
 namespace Math {
@@ -64,6 +65,10 @@ inline _VecOp<_Vec3A, _Vec3A>::type _VecOp<_Vec3A, _Vec3A>::Normalize(pref vec) 
 	NEX_ASSERT(val > Math::EPSILON);
 	return Mul(vec, 1 / val);
 #endif
+}
+
+inline _VecOp<_Vec3A, _Vec3A>::type _VecOp<_Vec3A, _Vec3A>::From(TraitsVec4::pref q) {
+	return q;
 }
 
 inline _VecOp<_Vec3A, _Vec3A>::type _VecOp<_Vec3A, _Vec3A>::VDot(pref vec1, pref vec2) {

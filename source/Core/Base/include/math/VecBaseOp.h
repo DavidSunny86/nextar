@@ -210,7 +210,7 @@ template<typename T, typename impl>
 inline typename VecBaseOp<T, impl>::base_type VecBaseOp<T, impl>::Hadd(pref q1) {
 	base_type r = 0;
 	for (uint32 i = 0; i < _count; ++i)
-		r += v.v[i];
+		r += q1.v[i];
 	return r;
 }
 

@@ -150,8 +150,8 @@ inline void MatOp<_Matrix4x4>::TransformOrtho(pref m, const TraitsVec3::type * i
 
 		
 		x = Vec3Op::SplatX(((float*)inpVec)[0]);
-		y = Vec3Op::SplatX(((float*)inpVec)[1]);
-		z = Vec3Op::SplatX(((float*)inpVec)[2]);
+		y = Vec3Op::SplatY(((float*)inpVec)[1]);
+		z = Vec3Op::SplatZ(((float*)inpVec)[2]);
 
 		r = Vec3AOp::Madd(z, Row(m, 2), Row(m, 3));
 		r = Vec3AOp::Madd(y, Row(m, 1), r);
@@ -206,8 +206,8 @@ inline void MatOp<_Matrix4x4>::TransformOrtho(pref m,
 	for (uint32 i = 0; i < count; i++) {
 
 		x = Vec3Op::SplatX(((float*)inpVec)[0]);
-		y = Vec3Op::SplatX(((float*)inpVec)[1]);
-		z = Vec3Op::SplatX(((float*)inpVec)[2]);
+		y = Vec3Op::SplatY(((float*)inpVec)[1]);
+		z = Vec3Op::SplatZ(((float*)inpVec)[2]);
 
 		r = Vec3AOp::Madd(z, Row(m, 2), Row(m, 3));
 		r = Vec3AOp::Madd(y, Row(m, 1), r);
@@ -264,8 +264,8 @@ inline void MatOp<_Matrix4x4>::Transform(pref m,
 	for (uint32 i = 0; i < count; i++) {
 
 		x = Vec3Op::SplatX(((float*)inpVec)[0]);
-		y = Vec3Op::SplatX(((float*)inpVec)[1]);
-		z = Vec3Op::SplatX(((float*)inpVec)[2]);
+		y = Vec3Op::SplatY(((float*)inpVec)[1]);
+		z = Vec3Op::SplatZ(((float*)inpVec)[2]);
 
 		r = Vec3AOp::Madd(z, Row(m, 2), Row(m, 3));
 		r = Vec3AOp::Madd(y, Row(m, 1), r);
@@ -300,8 +300,8 @@ inline TraitsVec3A::type MatOp<_Matrix4x4>::TransformOrtho(pref m, TraitsVec3A::
 	_Quad r, x, y, z;
 
 	x = Vec3Op::SplatX(v);
-	y = Vec3Op::SplatX(v);
-	z = Vec3Op::SplatX(v);
+	y = Vec3Op::SplatY(v);
+	z = Vec3Op::SplatZ(v);
 
 	r = Vec3AOp::Madd(z, Row(m, 2), Row(m, 3));
 	r = Vec3AOp::Madd(y, Row(m, 1), r);
@@ -329,8 +329,8 @@ inline TraitsVec3A::type MatOp<_Matrix4x4>::Transform(pref m, TraitsVec3A::pref 
 	_Quad r, x, y, z;
 
 	x = Vec3Op::SplatX(v);
-	y = Vec3Op::SplatX(v);
-	z = Vec3Op::SplatX(v);
+	y = Vec3Op::SplatY(v);
+	z = Vec3Op::SplatZ(v);
 
 	r = Vec3AOp::Madd(z, Row(m, 2), Row(m, 3));
 	r = Vec3AOp::Madd(y, Row(m, 1), r);
@@ -615,6 +615,38 @@ inline MatOp<_Matrix4x4>::type MatOp<_Matrix4x4>::Mul(float_type scale, pref m) 
 	return Mul(m, scale);
 }
 
+inline TraitsVec4::type MatOp<_Matrix4x4>::Mul(TraitsVec4::pref v, pref m) {
+#if NEX_VECTOR_MATH_TYPE_IS_SSE
+	_Quad ret, vTemp;
+	ret = _mm_shuffle_ps(v, v, _MM_SHUFFLE(0, 0, 0, 0));
+	ret = _mm_mul_ps(ret, m.r[0]);
+	vTemp = _mm_shuffle_ps(v, v, _MM_SHUFFLE(1, 1, 1, 1));
+	vTemp = _mm_mul_ps(vTemp, m.r[1]);
+	ret = _mm_add_ps(ret, vTemp);
+	vTemp = _mm_shuffle_ps(v, v, _MM_SHUFFLE(2, 2, 2, 2));
+	vTemp = _mm_mul_ps(vTemp, m.r[2]);
+	ret = _mm_add_ps(ret, vTemp);
+	vTemp = _mm_shuffle_ps(v, v, _MM_SHUFFLE(3, 3, 3, 3));
+	vTemp = _mm_mul_ps(vTemp, m.r[3]);
+	ret = _mm_add_ps(ret, vTemp);
+	return ret;
+#else
+	_Quad r, x, y, z, w;
+
+	x = Vec3Op::SplatX(v);
+	y = Vec3Op::SplatY(v);
+	z = Vec3Op::SplatZ(v);
+	w = Vec3Op::SplatW(v);
+
+	r = Vec3AOp::Mul(w, Row(m, 3));
+	r = Vec3AOp::Madd(z, Row(m, 2), r);
+	r = Vec3AOp::Madd(y, Row(m, 1), r);
+	r = Vec3AOp::Madd(x, Row(m, 0), r);
+
+	return r;
+#endif
+}
+
 inline MatOp<_Matrix4x4>::type MatOp<_Matrix4x4>::Transpose(pref m) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 	// x.x,x.y,y.x,y.y
@@ -753,8 +785,7 @@ inline MatOp<_Matrix4x4>::type MatOp<_Matrix4x4>::Inverse(pref m) {
 	C4 = _mm_shuffle_ps(C4, C4, _MM_SHUFFLE(3, 1, 2, 0));
 	C6 = _mm_shuffle_ps(C6, C6, _MM_SHUFFLE(3, 1, 2, 0));
 	// Get the determinate
-	QuadDot(C0, MT.r[0]);
-#if NEX_USE_FAST_DIVISION
+#ifdef NEX_USE_FAST_DIVISION
 	_Quad vTemp = QuadOp::SplatX(_mm_rcp_ss(QuadOp::VDot(C0, MT.r[0])));
 #else
 	_Quad vTemp = QuadOp::SplatX(_mm_div_ss(N3D_1000.v, QuadOp::VDot(C0, MT.r[0])));
@@ -930,9 +961,9 @@ inline MatOp<_Matrix4x4>::type MatOp<_Matrix4x4>::InverseOrtho(pref m) {
 		ret.m[i * 4 + 3] = 0;
 	}
 
-	ret.m30 = -Vec3ADot(m.Row(3), m.Row(0));
-	ret.m31 = -Vec3ADot(m.Row(3), m.Row(1));
-	ret.m32 = -Vec3ADot(m.Row(3), m.Row(2));
+	ret.m30 = -Vec3A::Dot(m.Row(3), m.Row(0));
+	ret.m31 = -Vec3A::Dot(m.Row(3), m.Row(1));
+	ret.m32 = -Vec3A::Dot(m.Row(3), m.Row(2));
 	ret.m33 = 1;
 	return ret;
 

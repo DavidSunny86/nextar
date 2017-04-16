@@ -57,12 +57,12 @@ _NexBaseAPI bool IsPow2(uint32 from) {
 		return 0;
 	return 1;
 }
-}
+
 
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 
-#define NEXCORE_DEFINE_MASK(maskname) const _ConstI32  maskname
-#define NEXCORE_DEFINE_F32C(_f32const_) const _ConstF32  _f32const_
+#define NEXCORE_DEFINE_MASK(maskname) NEX_EXTERN_SYM _NexBaseAPI const _ConstI32  maskname
+#define NEXCORE_DEFINE_F32C(_f32const_) NEX_EXTERN_SYM _NexBaseAPI const _ConstF32  _f32const_
 
 NEXCORE_DEFINE_MASK(N3D_ClearSign) = { 0x7fffffff, 0x7fffffff, 0x7fffffff,
 		0x7fffffff };
@@ -111,5 +111,6 @@ NEXCORE_DEFINE_F32C(N3D_Infinite) = { 0x7F800000, 0x7F800000, 0x7F800000,
 
 #endif
 
+}
 }
 

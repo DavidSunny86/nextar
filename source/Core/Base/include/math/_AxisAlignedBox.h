@@ -1,3 +1,4 @@
+#include "VectorMethods.h"
 #pragma once
 namespace nextar {
 namespace Math {
@@ -35,6 +36,10 @@ inline TraitsVec3A::type MatOp<_AxisAlignedBox>::GetCenter(pref box) {
 }
 
 inline TraitsVec3A::type MatOp<_AxisAlignedBox>::GetSize(pref box) {
+	return Vec3A::Sub(box.maxPoint, box.minPoint);
+}
+
+inline TraitsVec3A::type MatOp<_AxisAlignedBox>::GetHalfSize(pref box) {
 	return Vec3A::Mul(Vec3A::Sub(box.maxPoint, box.minPoint), 0.5f);
 }
 
@@ -77,6 +82,16 @@ inline MatOp<_AxisAlignedBox>::type MatOp<_AxisAlignedBox>::Union(pref box, pref
 	}
 	return box;
 #endif
+}
+
+inline MatOp<_AxisAlignedBox>::type MatOp<_AxisAlignedBox>::FromCenterExtends(
+	TraitsVec3A::pref center, 
+	TraitsVec3A::pref extends) {
+
+	return  _AxisAlignedBox(
+		Vec3A::Sub(center, extends),
+		Vec3A::Add(center, extends) );
+
 }
 
 }

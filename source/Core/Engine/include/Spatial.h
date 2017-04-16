@@ -84,16 +84,16 @@ public:
 	}
 
 	inline Vec3A::type GetTranslation() const {
-		return Mat4x4Row(*worldMatrix, 3);
+		return Mat4::Row(*worldMatrix, 3);
 	}
 
 	inline Vec3A::type GetDirectionVector() const {
-		return Mat4x4Row(*worldMatrix, 2);
+		return Mat4::Row(*worldMatrix, 2);
 	}
 
 	void SetTransform(Vec3A::pref pos, Quat::pref rot, float scaling) {
 		NEX_ASSERT(!moveable);
-		*worldMatrix = Mat4x4FromScaleRotPos(scaling, rot, pos);
+		*worldMatrix = Mat4::FromScaleRotPos(scaling, rot, pos);
 		SetUpdateRequired(true);
 	}
 

@@ -58,6 +58,7 @@ public:
 
 	void SetNull();
 	void SetVolume(Vec3A::pref center, Vec3A::pref extends);
+	void SetVolume(Vec3A::pref center, Vec3A::pref extends, float radius);
 	void UpdateBounds(Mat4::pref m);
 	void UpdateBounds(float scale, Quat::pref rot, Vec3A::pref pos);
 	void UpdateBounds(const Vec3A::type* points, uint32 maxPoints);
@@ -70,14 +71,19 @@ protected:
 	/* center wrt some coordinate system mostly 0,0,0 */
 	Vec3A::type origCenter;
 	/* half extends dx/2, dy/2, dz/2 and linear extends in w */
-	Vec3A::type origExtends;
+	union {
+		Vec4::type origExtendsAndRadius;
+		struct {
+			Vec3::type origExtends;
+			float radius;
+		};
+	};
 
 	friend class BoundingVolume;
 };
 
 class _NexBaseAPI BoundingVolume : public AllocGeneral {
 	BoundingBox* box;
-	float radius;
 public:
 	static BoundingVolume Null;
 
@@ -89,11 +95,11 @@ public:
 	}
 
 	inline float GetRadius() const {
-		return radius;
+		return box->radius;
 	}
 
 	inline void SetRadius(float radius) {
-		this->radius = radius;
+		box->radius = radius;
 	}
 
 	const Vec3A::type& GetCenter() const {
@@ -118,8 +124,8 @@ public:
 
 	void SetVolume(Vec3A::pref center, Vec3A::pref extends, float radius);
 	void MergeBounds(const BoundingVolume&);
-
 };
+
 }
 
 #endif	/* BOUNDING_VOLUME_H */

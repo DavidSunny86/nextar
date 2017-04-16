@@ -56,7 +56,7 @@ void Camera::UpdateFrustum() {
 	const Mat4::type& worldData = GetWorldMatrix();
 	//if (viewMatrixNumber != GetMatrixNumber()) {
 
-	m->view = Mat4x4ViewFromWorld(worldData);
+	m->view = Mat4::FromWorldToView(worldData);
 	//	viewMatrixNumber = GetMatrixNumber();
 	updateFrustum = true;
 	//}
@@ -67,8 +67,8 @@ void Camera::UpdateFrustum() {
 	}
 
 	if (updateFrustum) {
-		m->viewProjection = Mat4x4Mul(m->view, m->projection);
-		m->invViewProjection = Mat4x4Inverse(m->viewProjection);
+		m->viewProjection = Mat4::Mul(m->view, m->projection);
+		m->invViewProjection = Mat4::Inverse(m->viewProjection);
 		viewFrustum.ConstructFrom(m->viewProjection);
 	}
 
@@ -89,7 +89,7 @@ const Vec3A::type* Camera::GetCorners() {
 		Vec3A::type* corners = m->projCorners;
 
 		for (int i = 0; i < 8; ++i)
-			transCorners[i] = Mat4x4TransVec3A(corners[i], worldData);
+			transCorners[i] = Mat4::TransformOrtho(worldData, corners[i]);
 		UnsetFlag(BOUNDS_OUTDATED);
 	}
 	return transCorners;
@@ -138,14 +138,14 @@ void Camera::_CalculateViewDimensions() {
 		break;
 	}
 
-	corners[0] = Vec3ASet(leftNear, topNear, nearDistance);
-	corners[1] = Vec3ASet(rightNear, topNear, nearDistance);
-	corners[2] = Vec3ASet(leftNear, bottomNear, nearDistance);
-	corners[3] = Vec3ASet(rightNear, bottomNear, nearDistance);
-	corners[4] = Vec3ASet(leftFar, topFar, farDistance);
-	corners[5] = Vec3ASet(rightFar, topFar, farDistance);
-	corners[6] = Vec3ASet(leftFar, bottomFar, farDistance);
-	corners[7] = Vec3ASet(rightFar, bottomFar, farDistance);
+	corners[0] = Vec3A::Set(leftNear, topNear, nearDistance);
+	corners[1] = Vec3A::Set(rightNear, topNear, nearDistance);
+	corners[2] = Vec3A::Set(leftNear, bottomNear, nearDistance);
+	corners[3] = Vec3A::Set(rightNear, bottomNear, nearDistance);
+	corners[4] = Vec3A::Set(leftFar, topFar, farDistance);
+	corners[5] = Vec3A::Set(rightFar, topFar, farDistance);
+	corners[6] = Vec3A::Set(leftFar, bottomFar, farDistance);
+	corners[7] = Vec3A::Set(rightFar, bottomFar, farDistance);
 
 	UnsetFlag(VIEW_DIM_OUTDATED);
 }
@@ -155,17 +155,17 @@ void Camera::UpdateProjection() {
 	recipDistanceInView = 1 / distanceInView;
 	switch (projectionType) {
 	case ORTHOGRAPHIC:
-		matrixData->projection = Mat4x4FromOrtho(orthographic.viewWidth,
+		matrixData->projection = Mat4::FromOrthoProjection(orthographic.viewWidth,
 				orthographic.viewHeight, nearDistance, farDistance);
 		break;
 	case PERSPECTIVE:
-		matrixData->projection = Mat4x4FromPerspective(perspective.fieldOfView,
+		matrixData->projection = Mat4::FromPerspectiveProjection(perspective.fieldOfView,
 				perspective.aspectRatio, nearDistance, farDistance);
 		break;
 	case ASYMMETRIC:
 		break;
 	}
-	matrixData->invProjection = Mat4x4Inverse(matrixData->projection);
+	matrixData->invProjection = Mat4::Inverse(matrixData->projection);
 	UnsetFlag(PROJECTION_DIRTY);
 }
 

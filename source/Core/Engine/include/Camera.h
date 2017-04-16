@@ -131,13 +131,13 @@ public:
 
 	// The point must be a vector of type (x, y, z, 1)
 	// Returned coordinates are normalized to -1, 1 in all axes (ClipSpace).
-	inline Vec4::type GetWorldToClipCoord(Vec4::type point);
+	inline Vec4::type GetWorldToClipCoord(Vec4::pref point);
 	// Coordinates are expected to be normalized between -1, 1 in all axes (ClipSpace).
-	inline Vec4::type GetClipToWorldCoord(Vec4::type point);
+	inline Vec4::type GetClipToWorldCoord(Vec4::pref point);
 	// Returned coordinates in screen/clip space with w divided (NDC)
-	inline Vec3A::type GetWorldToScreenCoord(Vec3A::type point);
+	inline Vec3A::type GetWorldToScreenCoord(Vec3A::pref point);
 	// Get point in world coordinate from clip space (NDC)
-	inline Vec3A::type GetScreenToWorldCoord(Vec3A::type point);
+	inline Vec3A::type GetScreenToWorldCoord(Vec3A::pref point);
 
 	const Vec3A::type* GetCorners();
 	/** @remarks Called to update the render queue with renderable data. */
@@ -291,15 +291,15 @@ inline bool Camera::IsViewDimOutOfDate() const {
 }
 
 inline Vec3A::type Camera::GetRightDirection() const {
-	return Mat4x4Row(*worldMatrix, 0);
+	return Mat4::Row(*worldMatrix, 0);
 }
 
 inline Vec3A::type Camera::GetUpDirection() const {
-	return Mat4x4Row(*worldMatrix, 1);
+	return Mat4::Row(*worldMatrix, 1);
 }
 
 inline Vec3A::type Camera::GetViewDirection() const {
-	return Mat4x4Row(*worldMatrix, 2);
+	return Mat4::Row(*worldMatrix, 2);
 }
 
 inline Vec3A::type Camera::GetEyePosition() const {
@@ -307,28 +307,27 @@ inline Vec3A::type Camera::GetEyePosition() const {
 }
 
 inline float Camera::GetDepth(Vec3A::pref ofPoint) {
-	return Vec3ASqDistance(ofPoint, GetEyePosition());
+	return Vec3A::SqDistance(ofPoint, GetEyePosition());
 }
 
 inline float Camera::GetNormalizedDepth(Vec3A::pref ofPoint) {
 	return GetDepth(ofPoint) * recipDistanceInView;
 }
 
-inline Vec3A::type Camera::GetWorldToScreenCoord(Vec3A::type point) {
-	return Mat4x4TransAndProjVec3A(point, GetViewProjectionMatrix());
+inline Vec3A::type Camera::GetWorldToScreenCoord(Vec3A::pref point) {
+	return Mat4::Transform(GetViewProjectionMatrix(), point);
 }
 
-inline Vec3A::type Camera::GetScreenToWorldCoord(Vec3A::type point) {
-	return Mat4x4TransAndProjVec3A(point, GetInvViewProjectionMatrix());
+inline Vec3A::type Camera::GetScreenToWorldCoord(Vec3A::pref point) {
+	return Mat4::Transform(GetInvViewProjectionMatrix(), point);
 }
 
-inline Vec4::type Camera::GetWorldToClipCoord(Vec4::type point) {
-	return Vec4AMulMat4x4(point, GetViewProjectionMatrix());
+inline Vec4::type Camera::GetWorldToClipCoord(Vec4::pref point) {
+	return Mat4::Mul(point, GetViewProjectionMatrix());
 }
 
-inline Vec4::type Camera::GetClipToWorldCoord(Vec4::type point) {
-	return Vec4AMulMat4x4(point, GetInvViewProjectionMatrix());
-
+inline Vec4::type Camera::GetClipToWorldCoord(Vec4::pref point) {
+	return Mat4::Mul(point, GetInvViewProjectionMatrix());
 }
 
 /************************************************************/

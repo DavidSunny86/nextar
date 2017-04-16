@@ -471,7 +471,7 @@ inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::Select(pref v1, pref v2
 }
 
 template <typename U>
-inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::VDot(pref q1, pref q2) {
+inline typename _VecOp<_Quad, U>::type _VecOp<_Quad, U>::VDot(pref vec1, pref vec2) {
 #if NEX_VECTOR_MATH_TYPE_IS_SSE
 #if NEX_VECTOR_MATH_TYPE == NEX_VECTOR_MATH_TYPE_SSE4
 	return _mm_dp_ps(vec1, vec2, 0xFF);

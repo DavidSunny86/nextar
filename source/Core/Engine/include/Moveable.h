@@ -110,7 +110,7 @@ public:
 	}
 
 	inline void TranslateBy(Vec3A::pref t) {
-		transform->SetTranslation(Vec3AAdd(t, transform->GetTranslation()));
+		transform->SetTranslation(Vec3A::Add(t, transform->GetTranslation()));
 		transform->SetMatrixDirty(true);
 		SetUpdateRequired(true);
 	}

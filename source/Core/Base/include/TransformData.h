@@ -34,8 +34,8 @@ public:
 	}
 
 	inline void SetIdentity() {
-		rotation = QuatIdentity();
-		translation = Vec3AZero();
+		rotation = Quat::Identity();
+		translation = Vec3A::Zero();
 		scale = 1.0f;
 		matrix = Mat4::type::IdentityMatrix;
 		matrixState++;
@@ -51,7 +51,7 @@ public:
 	}
 
 	inline void UpdateMatrix() {
-		matrix = Mat4x4FromScaleRotPos(scale, rotation, translation);
+		matrix = Mat4::FromScaleRotPos(scale, rotation, translation);
 		matrixState++;
 		flags &= ~MATRIX_DIRTY;
 	}
@@ -92,6 +92,7 @@ public:
 		scale = value;
 	}
 };
+
 }
 
 #endif //TRANSFORMDATA_H_
