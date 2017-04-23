@@ -46,7 +46,7 @@ public:
 		const ShaderOptions* _options;
 		CompiledOutput _outData;
 	};
-		
+
 	class View : public ContextObject::View {
 	public:
 
@@ -73,6 +73,11 @@ public:
 
 	inline hash_t GetOptionHash() const {
 		return optionHash;
+	}
+
+	// retrieve parameter information for a context
+	const ParamEntryTableItem& GetParamTableItem(ParameterContext context) {
+		return paramsPerContext[(uint32)context];
 	}
 
 protected:

@@ -10,9 +10,10 @@
 namespace nextar {
 
 Material::~Material() {
-	if (_reserved)
-		RenderManager::Instance().FreeMaterialRenderInfo(_reserved);
-	_reserved = nullptr;
+	if (_reserved_p) {
+		RenderManager::Instance().FreeMaterialRenderInfo(_reserved_p);
+		_reserved_p = nullptr;
+	}
 }
 
 } /* namespace nextar */

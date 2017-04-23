@@ -206,6 +206,10 @@ struct ParamEntryTableItem {
 	uint32 totalParamBufferSize;
 };
 
+struct ShaderUnitRenderInfo {
+	int32  shaderUnit;
+	uint32 paramBufferOffset;
+};
 
 } // namespace nextar
 #endif // SHADERPARAM_H_

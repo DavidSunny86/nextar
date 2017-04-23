@@ -18,7 +18,7 @@ ShaderUnit::View::View() {
 /****************************************************/
 /* ShaderUnit::ShaderUnit
 /****************************************************/
-ShaderUnit::ShaderUnit(hash_t hash) {
+ShaderUnit::ShaderUnit(hash_t hash) : optionHash(hash){
 }
 
 } /* namespace nextar */

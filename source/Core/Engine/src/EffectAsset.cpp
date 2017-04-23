@@ -93,8 +93,9 @@ void EffectAsset::ResolveMaterial(
 	if (!data)
 		return;
 
-	RenderInfo_Material* rinfo = static_cast<RenderInfo_Material*>(m._reserved_p);
+	ShaderUnitRenderInfo* rinfo = m._reserved_p;
 	uint32 count = renderSys->GetPassCount();
+	uint32 offset = 0;
 	for (uint32 i = 0; i < count; ++i) {
 		RenderPass* pass = renderSys->GetPass(i);
 		RenderPass::Info info = pass->GetPassInfo();
@@ -102,12 +103,16 @@ void EffectAsset::ResolveMaterial(
 			// we can call @_Resolve with the effect from this pass
 			// but we do not do that for now.
 			rinfo[i].shaderUnit = -1;
+			rinfo[i].paramBufferOffset = -1;
 		} else {
 
 			ShaderOptions newOptions(info._options ? *info._options : StringUtils::Null);
+			int32 su = _Resolve(strOptions);
 			newOptions.Append(shaderOptions);
 			newOptions.ToString(strOptions);
-			rinfo[i].shaderUnit = _Resolve(strOptions);
+			rinfo[i].shaderUnit = su;
+			rinfo[i].paramBufferOffset = offset;
+			offset += shaderUnits[su].Get
 		}
 	}
 	// combine options
@@ -131,7 +136,7 @@ void EffectAsset::ResolveMaterialSingle(const StringUtils::WordList & options,
 	shaderOptions.Append(options);
 	shaderOptions.Append(renderPassOptions);
 	shaderOptions.ToString(strOptions);
-	m._reserved_i = _Resolve(strOptions);
+	m._reserved_i.shaderUnit = _Resolve(strOptions);
 	// combine options
 	// for each render pass
 	//   combine options

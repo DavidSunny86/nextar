@@ -15,7 +15,6 @@
 namespace nextar {
 
 class AssetStreamRequest;
-class ParamterItearator;
 /*
  *
  */

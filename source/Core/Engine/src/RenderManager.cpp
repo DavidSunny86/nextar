@@ -14,13 +14,12 @@
 #include <Geometry.h>
 #include <PluginRegistry.h>
 #include <EngineApplicationContext.h>
-#include <RenderInfo_Material.h>
 
 namespace nextar {
 
 NEX_DEFINE_SINGLETON_PTR(RenderManager);
 
-RenderManager::RenderManager() : _materialRenderInfoPool(nullptr) {
+RenderManager::RenderManager() {
 	VertexSemantic::BuildSemanticMap();
 	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_INIT_RESOURCES, CreateResources, this);
 	ApplicationContext::Instance().Subscribe(ApplicationContext::EVENT_DESTROY_RESOURCES, DestroyResources, this);
@@ -28,8 +27,7 @@ RenderManager::RenderManager() : _materialRenderInfoPool(nullptr) {
 
 RenderManager::~RenderManager() {
 	VertexSemantic::ClearSemanticMap();
-	if (_materialRenderInfoPool)
-		NEX_DELETE(_materialRenderInfoPool);
+	_materialRenderInfoPool.FreePool();
 }
 
 bool RenderManager::QueryService(const Config& config) {
@@ -155,7 +153,7 @@ RenderSystemPtr RenderManager::CreateRenderSystem(const String& configName, Size
 	}
 	activeRenderSystem = CreateRenderSystemImpl(configName, viewDimensions);
 	if (activeRenderSystem) {
-		uint32 objectSize = sizeof(RenderInfo_Material) * activeRenderSystem->GetPassCount();
+		uint32 objectSize = sizeof(ShaderUnitRenderInfo) * activeRenderSystem->GetPassCount();
 		_materialRenderInfoPool.InitPool(objectSize, 32);
 	}
 	return activeRenderSystem;

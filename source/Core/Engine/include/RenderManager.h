@@ -126,11 +126,11 @@ public:
 		return shaderOptions;
 	}
 
-	Material::RenderInfo* AllocMaterialRenderInfo() {
-		return reinterpret_cast<Material::RenderInfo*>(_materialRenderInfoPool.Alloc());
+	ShaderUnitRenderInfo* AllocMaterialRenderInfo() {
+		return reinterpret_cast<ShaderUnitRenderInfo*>(_materialRenderInfoPool.Alloc());
 	}
 
-	void FreeMaterialRenderInfo(Material::RenderInfo* info) {
+	void FreeMaterialRenderInfo(ShaderUnitRenderInfo* info) {
 		_materialRenderInfoPool.Free(info);
 	}
 
@@ -152,7 +152,7 @@ protected:
 
 	NEX_THREAD_MUTEX(accessLock);
 
-	typedef MemoryPool<MEMCAT_GENERAL, NullMutex> PoolType;
+	typedef MemoryPool<MEMCAT_MATH_CORE, NullMutex> PoolType;
 	/* bool loadDefaultTexture; */
 
 	PoolType _materialRenderInfoPool;
@@ -172,7 +172,6 @@ protected:
 	RenderSystemStreamerMap renderSystemStreamers;
 	// Global shader options
 	StringUtils::WordList shaderOptions;
-
 
 };
 

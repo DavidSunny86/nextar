@@ -19,23 +19,20 @@ public:
 	enum {
 		RENDER_INFO_PER_PASS = 1 << 0,
 	};
-
-	struct RenderInfo {
-	};
-
+		
 	Material() : _reserved_p(nullptr), flags(0) {}
 	~Material();
-
-	uint32 flags;
+		
 	union {
-		RenderInfo* _reserved_p;
-		uint32 _reserved_i;
+		ShaderUnitRenderInfo* _reserved_p;
+		ShaderUnitRenderInfo _reserved_i;
 	};
 
+
+	uint32 flags;
 	//ConstantBufferPtr materialParameters;
 	// todo
 	ParameterBuffer materialParamData;
-
 };
 
 } /* namespace nextar */
