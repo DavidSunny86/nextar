@@ -199,6 +199,10 @@ int32 EffectAsset::_FindUnit(const String & id, hash_t h) {
 #ifdef NEX_DEBUG
 			if (su.VerifyId(id))
 				return i;
+			else {
+				// hash probably has conflict
+				NEX_THROW_FatalError(EXCEPT_ASSERTION_FAILED);
+			}
 #endif
 		}
 	}
