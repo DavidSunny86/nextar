@@ -50,12 +50,14 @@ public:
 	class View : public ContextObject::View {
 	public:
 
+		View();
+		// Compile
 		virtual void Compile(RenderContext*,
 			const ShaderUnit::CompileParams&) = 0;
 		// Bind texture to a shader parameter. The number of units must match the desc->numUnits count.
 		virtual void SetTexture(RenderContext* rc, const SamplerParameter& desc,
 			TextureBase* t) = 0;
-
+		// Update
 		virtual void Update(nextar::RenderContext*, uint32 msg,
 			ContextParamPtr);
 
